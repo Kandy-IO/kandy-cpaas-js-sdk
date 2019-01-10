@@ -2,7 +2,7 @@
     "name": "@kandy-io/cpaas-sdk",
     "version": "4.0.0",
     "license": "SEE LICENSE IN LICENSE.md",
-    "main":"https://github.com/Kandy-IO/kandy-cpaas-js-sdk/tree/KAA-1346/dist",
+    "main":"./dist/kandy.cpaas2.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/Kandy-IO/kandy-cpaas-js-sdk"
