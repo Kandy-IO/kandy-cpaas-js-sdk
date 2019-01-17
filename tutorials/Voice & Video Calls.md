@@ -46,8 +46,18 @@ function subscribe() {
   const services = ['call']
   const subscriptionType = 'websocket'
   client.services.subscribe(services, subscriptionType)
-  log('Subscribed to call service (websocket channel)')
 }
+
+// Listen for subscription changes.
+client.on('subscription:change', function() {
+
+  if(
+    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().subscribed.length > 0
+  ) {
+    log('Successfully subscribed')
+    }
+})
 ```
 
 To learn more about authentication, services and channels, refer to the [Authentication Quickstart](index.html#Authentication)

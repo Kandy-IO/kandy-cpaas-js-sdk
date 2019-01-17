@@ -816,16 +816,16 @@ Sets the channel to be used while proxy mode is enabled.
 
 -   `channel` **Channel** 
 
-## MediaObject
+## DeviceInfo
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+Contains information about a device.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][11]>** A list of Track objects that are contained in this Media object.
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## CallObject
 
@@ -849,6 +849,17 @@ A Call can be manipulated by using the Call feature's APIs.
     -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][11]>** A list of Track objects that are contained in this Media object.
 
 ## TrackObject
 
@@ -875,17 +886,6 @@ A collection of devices and their information.
 -   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
 -   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
 -   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
 
 ## Subscription
 

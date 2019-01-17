@@ -80,8 +80,17 @@ function subscribe() {
   const services = ["chat"];
   const subscriptionType = "websocket";
   client.services.subscribe(services, subscriptionType);
-  log("Subscribed to chat service (websocket channel)");
 }
+
+client.on('subscription:change', function() {
+
+  if(
+    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().subscribed.length > 0
+  ) {
+    log('Successfully subscribed')
+    }
+})
 ```
 
 #### HTML

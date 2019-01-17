@@ -90,9 +90,19 @@ Once we have authenticated, we need to subscribe for presence on the services we
 function subscribeService() {
   const services = ['presence']
   const subscriptionType = 'websocket'
-  client.services.subscribe(services, subscriptionType)
-  log('Subscribed to presence service (websocket channel)')
+  client.services.subscribe(services, subscriptionType) 
 }
+
+// Listen for subscription changes.
+client.on('subscription:change', function() {
+
+  if(
+    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().subscribed.length > 0
+  ) {
+    log('Successfully subscribed')
+    }
+})
 ```
 
 To learn more about authentication, services and channels, refer to the [Authentication Quickstart](index.html#Authentication)

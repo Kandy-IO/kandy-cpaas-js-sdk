@@ -21,8 +21,18 @@ function subscribe() {
   const services = ['smsinbound', 'smsoutbound']
   const subscriptionType = 'websocket'
   client.services.subscribe(services, subscriptionType)
-  log('Subscribed to SMS service (websocket channel)')
 }
+
+// Listen for subscription changes.
+client.on('subscription:change', function() {
+
+  if(
+    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().subscribed.length > 0
+  ) {
+    log('Successfully subscribed')
+    }
+})
 ```
 
 ## Creating a SMS Conversation

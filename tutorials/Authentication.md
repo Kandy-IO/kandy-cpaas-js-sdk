@@ -175,15 +175,6 @@ function subscribe() {
 
 The `client.services.subscribe()` function does not return a value. Instead, the SDK uses events to tell you when something has changed.
 
-If something goes wrong when we try to subscribe (invalid services maybe), we want to know. The Javascript SDK has a `subscription:error` event to support this.
-
-```javascript
-// Listen for subscription errors.
-client.on('subscription:error', function(params) {
-  log('Subscription error: ' + params.error.message + ' (' + params.error.code + ')')
-})
-```
-
 In the above piece of code we subscribe an anonymous function to the `subscription:error` event. Now, whenever the SDK fires off a `subscription:error` event, that function will be called.
 
 ## Step 4: Unsubscribing
@@ -200,8 +191,14 @@ Calling this function will trigger a change in the connection state, which in tu
 
 ```javascript
 // Listen for subscription changes.
-client.on('subscription:change', function(params) {
-  log('Subscription changed.')
+client.on('subscription:change', function() {
+
+  if(
+    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().subscribed.length > 0
+  ) {
+    log('Successfully subscribed')
+    }
 })
 ```
 
