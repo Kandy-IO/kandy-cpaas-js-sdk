@@ -967,19 +967,9 @@
               
                 
                 <li><a
-                  href='#callobject'
+                  href='#devicesobject'
                   class="">
-                  CallObject
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#mediaobject'
-                  class="">
-                  MediaObject
+                  DevicesObject
                   
                 </a>
                 
@@ -997,9 +987,19 @@
               
                 
                 <li><a
-                  href='#devicesobject'
+                  href='#mediaobject'
                   class="">
-                  DevicesObject
+                  MediaObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#callobject'
+                  class="">
+                  CallObject
                   
                 </a>
                 
@@ -9707,20 +9707,18 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='callobject'>
-      CallObject
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
     </h3>
     
     
   </div>
   
 
-  <p>The state representation of a Call.
-Can be retrieved using the Call feature's <code>getAll</code> or <code>getById</code> APIs.
-A Call can be manipulated by using the Call feature's APIs.</p>
+  <p>A collection of devices and their information.</p>
 
 
-  <div class='pre p1 fill-light mt0'>CallObject</div>
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
   
   
 
@@ -9738,175 +9736,22 @@ A Call can be manipulated by using the Call feature's APIs.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>direction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The direction in which the call was created (outgoing/incoming).
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the call.
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>localHold</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicates whether this call is currently being held locally.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>localTracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : A list of Track IDs that the call is sending to the remote participant.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>mediaConstraints</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-          : This indicates the media types that the call was initialized with.
-
-          
-            <ul>
-              
-                <li><code>mediaConstraints.audio</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
-                  
-                  <p>Whether the call was initialized with audio.</p>
-</li>
-              
-                <li><code>mediaConstraints.video</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
-                  
-                  <p>Whether the call was initialized with video.</p>
-</li>
-              
-            </ul>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteHold</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicates whether this call is currently being held remotely.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteTracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : A list of Track IDs that the call is receiving from the remote participant.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteParticipant</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-          : Information about the other call participant.
-
-          
-            <ul>
-              
-                <li><code>remoteParticipant.displayNumber</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-                  
-                  <p>The username with domain of the callee in the form "username@domain"</p>
-</li>
-              
-                <li><code>remoteParticipant.displayName</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-                  
-                  <p>The display name of the callee</p>
-</li>
-              
-            </ul>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>startTime</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-          : The start time of the call in milliseconds since the epoch.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The current state of the call. See 
-<code>Call.states</code>
- for possible states.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
-
-
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
 
           
         </div>
@@ -10044,18 +9889,19 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
     </h3>
     
     
   </div>
   
 
-  <p>A collection of devices and their information.</p>
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
 
 
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
   
   
 
@@ -10073,22 +9919,176 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='callobject'>
+      CallObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The state representation of a Call.
+Can be retrieved using the Call feature's <code>getAll</code> or <code>getById</code> APIs.
+A Call can be manipulated by using the Call feature's APIs.</p>
+
+
+  <div class='pre p1 fill-light mt0'>CallObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>direction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The direction in which the call was created (outgoing/incoming).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the call.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>localHold</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicates whether this call is currently being held locally.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>localTracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : A list of Track IDs that the call is sending to the remote participant.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>mediaConstraints</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : This indicates the media types that the call was initialized with.
+
+          
+            <ul>
+              
+                <li><code>mediaConstraints.audio</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
+                  
+                  <p>Whether the call was initialized with audio.</p>
+</li>
+              
+                <li><code>mediaConstraints.video</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
+                  
+                  <p>Whether the call was initialized with video.</p>
+</li>
+              
+            </ul>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteHold</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicates whether this call is currently being held remotely.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteTracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : A list of Track IDs that the call is receiving from the remote participant.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteParticipant</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : Information about the other call participant.
+
+          
+            <ul>
+              
+                <li><code>remoteParticipant.displayNumber</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+                  
+                  <p>The username with domain of the callee in the form "username@domain"</p>
+</li>
+              
+                <li><code>remoteParticipant.displayName</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+                  
+                  <p>The display name of the callee</p>
+</li>
+              
+            </ul>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>startTime</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+          : The start time of the call in milliseconds since the epoch.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The current state of the call. See 
+<code>Call.states</code>
+ for possible states.
 
           
         </div>
