@@ -1,6 +1,10 @@
 # "Display" data about quickstarts.
 # Information to be displayed on the Quickstarts page.
 
+- name: Get Started
+  description: # Get Started
+  link: /quickstarts/javascript/cpaas2/Get%20Started
+
 - name: Configurations
   description: # Configurations
   link: /quickstarts/javascript/cpaas2/Configurations
