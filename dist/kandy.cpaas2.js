@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.1.0-beta.51352
+ * Version: 3.1.0-beta.51921
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20696,7 +20696,7 @@ class Track extends _eventemitter2.default {
     if (type === 'video') {
       renderer.muted = 'true';
       // Needed for Android.
-      renderer.play();
+      renderer.play().catch(err => _loglevel2.default.error(`video tag (#${renderer.id}) - play() - ${err}`));
     }
 
     // Set speaker if it was provided and it's supported.
@@ -29185,7 +29185,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.1.0-beta.51352';
+  let version = '3.1.0-beta.51921';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
