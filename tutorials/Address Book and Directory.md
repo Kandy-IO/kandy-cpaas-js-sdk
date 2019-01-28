@@ -316,8 +316,8 @@ client.on('directory:error', function (error) {
               <div class='form column'>
                   ID <input type="text" id="id" placeholder='ID' />
                   Primary Contact <input type="text" id="primary-contact" placeholder='Primary Contact' />
-                  First <input type="text" id="first" placeholder='First Name' />
-                  Last <input type="text" id="last" placeholder='Last Name' />
+                  First <input type="text" id="firstName" placeholder='First Name' />
+                  Last <input type="text" id="lastName" placeholder='Last Name' />
                   Home <input type="text" id="home-phone" placeholder='Home Phone' />
                   Business <input type="text" id="business-phone" placeholder='Business Phone' />
                   Email <input type="text" id="email" placeholder='Email' />
@@ -454,8 +454,8 @@ function refreshContacts() {
 function getContactFormData() {
   const contactId = document.getElementById('id').value
   const primaryContact = document.getElementById('primary-contact').value
-  const firstName = document.getElementById('first').value
-  const lastName = document.getElementById('last').value
+  const firstName = document.getElementById('firstName').value
+  const lastName = document.getElementById('lastName').value
   const emailAddress = document.getElementById('email').value
   const homePhoneNumber = document.getElementById('home-phone').value
   const businessPhoneNumber = document.getElementById('business-phone').value
@@ -513,15 +513,15 @@ function buildContactRow (contact) {
 
 // Fetch one user from the directory
 function fetchUser() {
-  const userId = document.getElementById('user-id')
+  const userId = document.getElementById('user-id').value
 
-  cpaas.user.fetch(userId)
+  client.user.fetch(userId)
 }
 
 // Search the directory for users
 function searchDirectory() {
   const filterValue = document.getElementById('filter-value').value
-  const filterType = document.querySelector('input[name=filter-type]:checked').value
+  const filterType = document.querySelector('input[name=filter-key]:checked').value
 
   client.user.search({ [filterType]: filterValue })
 }
@@ -546,8 +546,8 @@ client.on('directory:error', error => {
 function updateUserList() {
   const select = document.getElementById('userDropDown')
   select.innerHTML = ''
-  const users = cpaas.users.getAll()
-  for (let userId in user) {
+  const users = client.users.getAll()
+  for (let userId in users) {
     for (let opt of select.options) {
       if (opt.value === userId) {
         select.removeChild(opt)
@@ -567,7 +567,7 @@ function renderUser(id) {
   const userId = id || getSelectedUser()
 
   if (userId) {
-    const user = cpaas.user.get(userId)
+    const user = client.user.get(userId)
     updateUserForm(user)
     const userDisplay = document.getElementById('display')
     let text = '<h3>User Info</h3>'
