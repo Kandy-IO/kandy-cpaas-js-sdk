@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.1.0-beta.52019
+ * Version: 3.1.0-beta.52156
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -250,6 +250,28 @@ exports.default = _assign2.default || function (target) {
         target[key] = source[key];
       }
     }
+  }
+
+  return target;
+};
+
+/***/ }),
+
+/***/ "../../node_modules/babel-runtime/helpers/objectWithoutProperties.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+exports.default = function (obj, keys) {
+  var target = {};
+
+  for (var i in obj) {
+    if (keys.indexOf(i) >= 0) continue;
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+    target[i] = obj[i];
   }
 
   return target;
@@ -29185,7 +29207,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.1.0-beta.52019';
+  let version = '3.1.0-beta.52156';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -32905,7 +32927,7 @@ function* chatFetchMessages(requestInfo, destination) {
  * @return {Object}
  */
 function* fetchImageLinks(requestInfo, url) {
-  const response = yield (0, _effects2.default)({ url, method: 'GET' }, requestInfo.options);
+  const response = yield (0, _effects2.default)({ url, method: 'GET', responseType: 'blob' }, requestInfo.options);
 
   if (response.error) {
     return {
@@ -36087,7 +36109,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @param {string} options.url The url to perform the request on.
  * @param {string} options.method The HTTP method to use for the request.
  * @param {Object} options.headers Object literal of headers you want to add to the request.
- * @param {Blob|BufferSource|FormData|UrlSearchParams|string} options.body Any body that you want to add to your request.
+ * @param {Object} [options.queryParams] The parameters to be added to the query string
+ * @param {string} [options.responseType] The data type assumed to be received in the response body
+ * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] Any body that you want to add to your request.
  * @return A blocking redux-saga effect that will instruct the middleware to wait for the request to be fullfilled or until it fails.
  */
 function request(options, commonOptions) {
@@ -36123,10 +36147,19 @@ function* requestSaga(options, commonOptions) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.__testonly__ = undefined;
 
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+var _objectWithoutProperties2 = __webpack_require__("../../node_modules/babel-runtime/helpers/objectWithoutProperties.js");
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _freeze = __webpack_require__("../../node_modules/babel-runtime/core-js/object/freeze.js");
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
 
 exports.default = request;
 
@@ -36144,10 +36177,6 @@ var _fetchPonyfill = __webpack_require__("../../node_modules/fetch-ponyfill/buil
 
 var _fetchPonyfill2 = _interopRequireDefault(_fetchPonyfill);
 
-var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _utils = __webpack_require__("./src/common/utils.js");
 
 var _logs = __webpack_require__("./src/logs/index.js");
@@ -36158,6 +36187,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const { fetch } = (0, _fetchPonyfill2.default)({ Promise: _promise2.default });
 const log = (0, _logs.getLogManager)().getLogger('REQUEST');
+
+/**
+ * Enum declaring the valid request response data types that are available to be handled
+ */
+const responseTypes = (0, _freeze2.default)({
+  json: 'json',
+  blob: 'blob'
+});
+
 /*
  * HTTP request plugin.
  */
@@ -36187,7 +36225,7 @@ function* handleRequest(action) {
   yield (0, _effects.put)(actions.response(action.meta.requestId, result, !!result.error));
 }
 
-/*
+/**
  * Make a request with the specified options. The options is very similar to the options passed to the GlobalFetch
  * method except that is also accepts the url as part of the options.
  *
@@ -36201,80 +36239,90 @@ function* handleRequest(action) {
  *
  * @param {Object} options Options to make the request with.
  * @param {string} options.url The URL to make the request to.
+ * @param {Object} [options.queryParams] The parameters to be added to the query string
+ * @param {string} [options.responseType] The data type assumed to be received in the response body
+ * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
  * @return {Promise} A promise that resolves with a custom response object.
  */
-function makeRequest(options, requestId) {
+async function makeRequest(options, requestId) {
   // Extract and remove the url property.
-  let optionsCopy = (0, _extends3.default)({}, options);
-  const { url, queryParams } = optionsCopy;
-  delete optionsCopy.url;
-  delete optionsCopy.queryParams;
+  const { url, queryParams, responseType = 'json' } = options,
+        fetchOptions = (0, _objectWithoutProperties3.default)(options, ['url', 'queryParams', 'responseType']);
 
-  return fetch(url + (0, _utils.toQueryString)(queryParams), optionsCopy).then(response => {
-    // Information about the result of the actual fetch request.
-    let result = {
-      ok: response.ok,
-      code: response.status,
-      message: response.statusText
+  if (!responseTypes.hasOwnProperty(responseType)) {
+    // Invalid data type requested
+    log.debug('responseType value was invalid');
+    return {
+      body: undefined,
+      error: 'RESPONSE_TYPE',
+      message: 'Requested invalid data type for response'
     };
-
-    let error = response.ok ? false : 'REQUEST';
-
-    // Check whether there is a JSON body or not. If not, provide a dummy response.
-    const cType = response.headers.get('Content-Type');
-    let responseBodyPromise;
-    if (cType === 'application/json') {
-      responseBodyPromise = response.json();
-    } else if (cType === 'application/octet-stream' || cType === 'image/jpeg' || cType === 'image/png') {
-      responseBodyPromise = response.blob();
-    } else if (cType === 'text/plain') {
-      log.debug(`Received ${cType} response for request ${requestId}. Discarding body.`);
-      return {
-        body: false,
-        error,
-        result
-      };
-    } else {
-      log.debug(`Invalid contentType for RESPONSE ${cType}`);
-      return {
-        body: false,
-        error,
-        result
-      };
-    }
-    return responseBodyPromise.then(responseBody => {
-      return {
-        body: responseBody,
-        error,
-        result
-      };
-    }).catch(err => {
-      log.debug(`Error parsing response '${err}' response for request ${requestId}.`);
-      return {
-        body: false,
-        error,
-        result
-      };
-    });
-  }).catch(function (error) {
-    // Scenario: fetch failed, and so went straight to catch.
-    //      Only the fetch error is provided here; there is no response.
-    // Ref: https://github.com/github/fetch/issues/201#issuecomment-308213104
-    log.debug(`Fetch request ${requestId} failed: ${error.message}.`);
-
-    // TODO: Improve this error checking / Provide info on what the
-    //      error was?
+  }
+  let response;
+  try {
+    response = await fetch(url + (0, _utils.toQueryString)(queryParams), fetchOptions);
+  } catch (err) {
+    log.debug(`Fetch request ${requestId} failed: ${err.message}.`);
     return {
       body: false,
       error: 'FETCH',
       result: {
         ok: false,
-        code: error.name,
-        message: error.message
+        code: err.name,
+        message: err.message
       }
     };
-  });
+  }
+  try {
+    let result = {
+      ok: response.ok,
+      code: response.status,
+      message: response.statusText
+    };
+    let responseBody;
+    let error = !response.ok;
+
+    if (error) {
+      // If the response indicates an error, resolve the body as JSON and return a `REQUEST` error
+      log.debug(`Response indicates that request ${requestId} failed`);
+      responseBody = await response.json();
+      return {
+        body: responseBody,
+        error: 'REQUEST',
+        result
+      };
+    } else {
+      if (responseType === responseTypes.json) {
+        responseBody = await response.json();
+      } else {
+        // `blob` is the only other possible value for responseType
+        responseBody = await response.blob();
+      }
+      return {
+        body: responseBody,
+        error: false,
+        result
+      };
+    }
+  } catch (err) {
+    log.debug(`Error parsing response. Response for request ${requestId}: "${err.message}"`);
+    return {
+      body: false,
+      error: 'REQUEST',
+      result: {
+        ok: false,
+        code: err.name,
+        message: err.message
+      }
+    };
+  }
 }
+
+// begin-test-code
+const __testonly__ = exports.__testonly__ = { makeRequest, watchRequests, handleRequest
+  // end-test-code
+
+};
 
 /***/ }),
 
@@ -36319,6 +36367,11 @@ function generateRequestId() {
 
 /**
  * Creates a request action.
+ * @param {Object} options
+ * @param {string} options.url The url for the request
+ * @param {Object} [options.queryParams] Query parameters to be added to the url string
+ * @param {string} [options.responseType] The data type assumed to be received in the response body
+ * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
  */
 function request(options) {
   return {
