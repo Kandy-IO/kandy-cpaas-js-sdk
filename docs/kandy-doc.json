@@ -31670,7 +31670,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
+              "value": "A collection of devices and their information.",
               "position": {
                 "start": {
                   "line": 1,
@@ -31678,13 +31678,11 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 40,
-                  "offset": 83
+                  "line": 1,
+                  "column": 47,
+                  "offset": 46
                 },
-                "indent": [
-                  1
-                ]
+                "indent": []
               }
             }
           ],
@@ -31695,13 +31693,11 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 40,
-              "offset": 83
+              "line": 1,
+              "column": 47,
+              "offset": 46
             },
-            "indent": [
-              1
-            ]
+            "indent": []
           }
         }
       ],
@@ -31712,9 +31708,9 @@
           "offset": 0
         },
         "end": {
-          "line": 2,
-          "column": 40,
-          "offset": 83
+          "line": 1,
+          "column": 47,
+          "offset": 46
         }
       }
     },
@@ -31722,40 +31718,20 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 4,
+        "lineNumber": 3,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 5,
+        "lineNumber": 4,
         "type": null,
-        "name": "MediaObject"
+        "name": "DevicesObject"
       },
       {
         "title": "property",
-        "description": "The ID of the Media object.",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "id"
-      },
-      {
-        "title": "property",
-        "description": "Indicator on whether this media is local or remote.",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "local"
-      },
-      {
-        "title": "property",
-        "description": "A list of Track objects that are contained in this Media object.",
-        "lineNumber": 8,
+        "description": "A list of camera device information.",
+        "lineNumber": 5,
         "type": {
           "type": "TypeApplication",
           "expression": {
@@ -31765,20 +31741,58 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "TrackObject"
+              "name": "DeviceInfo"
             }
           ]
         },
-        "name": "tracks"
+        "name": "camera"
+      },
+      {
+        "title": "property",
+        "description": "A list of microphone device information.",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "microphone"
+      },
+      {
+        "title": "property",
+        "description": "A list of speaker device information.",
+        "lineNumber": 7,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "speaker"
       }
     ],
     "loc": {
       "start": {
-        "line": 47,
+        "line": 74,
         "column": 0
       },
       "end": {
-        "line": 56,
+        "line": 82,
         "column": 3
       }
     },
@@ -31801,8 +31815,8 @@
     "properties": [
       {
         "title": "property",
-        "name": "id",
-        "lineNumber": 6,
+        "name": "camera",
+        "lineNumber": 5,
         "description": {
           "type": "root",
           "children": [
@@ -31811,7 +31825,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The ID of the Media object.",
+                  "value": "A list of camera device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -31820,210 +31834,13 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 28,
-                      "offset": 27
+                      "column": 37,
+                      "offset": 36
                     },
                     "indent": []
                   }
                 }
               ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 28,
-                  "offset": 27
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 28,
-              "offset": 27
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "local",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Indicator on whether this media is local or remote.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 52,
-                      "offset": 51
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 52,
-                  "offset": 51
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 52,
-              "offset": 51
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
-      },
-      {
-        "title": "property",
-        "name": "tracks",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of Track objects that are contained in this Media object.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 65,
-                      "offset": 64
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 65,
-                  "offset": 64
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 65,
-              "offset": 64
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "TrackObject"
-            }
-          ]
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "MediaObject",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "MediaObject",
-        "kind": "module"
-      }
-    ],
-    "namespace": "MediaObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Contains information about a device.",
               "position": {
                 "start": {
                   "line": 1,
@@ -32049,170 +31866,26 @@
               "line": 1,
               "column": 37,
               "offset": 36
-            },
-            "indent": []
+            }
           }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
         },
-        "end": {
-          "line": 1,
-          "column": 37,
-          "offset": 36
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DeviceInfo"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the device.",
-        "lineNumber": 5,
         "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "deviceId"
-      },
-      {
-        "title": "property",
-        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "groupId"
-      },
-      {
-        "title": "property",
-        "description": "The type of the device (audioinput, audiooutput, videoinput).",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "kind"
-      },
-      {
-        "title": "property",
-        "description": "The name of the device.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "label"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 84,
-        "column": 0
-      },
-      "end": {
-        "line": 93,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 104,
-          "column": 0
-        },
-        "end": {
-          "line": 108,
-          "column": 1
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "deviceId",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
             {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 22,
-                      "offset": 21
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 22,
-                  "offset": 21
-                },
-                "indent": []
-              }
+              "type": "NameExpression",
+              "name": "DeviceInfo"
             }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 22,
-              "offset": 21
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
+          ]
         }
       },
       {
         "title": "property",
-        "name": "groupId",
+        "name": "microphone",
         "lineNumber": 6,
         "description": {
           "type": "root",
@@ -32222,7 +31895,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The group ID of the device. Devices that share a ",
+                  "value": "A list of microphone device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -32231,42 +31904,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "groupId",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " belong to the same physical device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 95,
-                      "offset": 94
+                      "column": 41,
+                      "offset": 40
                     },
                     "indent": []
                   }
@@ -32280,8 +31919,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 95,
-                  "offset": 94
+                  "column": 41,
+                  "offset": 40
                 },
                 "indent": []
               }
@@ -32295,19 +31934,28 @@
             },
             "end": {
               "line": 1,
-              "column": 95,
-              "offset": 94
+              "column": 41,
+              "offset": 40
             }
           }
         },
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
         }
       },
       {
         "title": "property",
-        "name": "kind",
+        "name": "speaker",
         "lineNumber": 7,
         "description": {
           "type": "root",
@@ -32317,7 +31965,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
+                  "value": "A list of speaker device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -32326,8 +31974,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 62,
-                      "offset": 61
+                      "column": 38,
+                      "offset": 37
                     },
                     "indent": []
                   }
@@ -32341,8 +31989,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 62,
-                  "offset": 61
+                  "column": 38,
+                  "offset": 37
                 },
                 "indent": []
               }
@@ -32356,75 +32004,23 @@
             },
             "end": {
               "line": 1,
-              "column": 62,
-              "offset": 61
+              "column": 38,
+              "offset": 37
             }
           }
         },
         "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "label",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
             {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The name of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 24,
-                      "offset": 23
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 24,
-                  "offset": 23
-                },
-                "indent": []
-              }
+              "type": "NameExpression",
+              "name": "DeviceInfo"
             }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 24,
-              "offset": 23
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
+          ]
         }
       }
     ],
@@ -32434,7 +32030,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "DeviceInfo",
+    "name": "DevicesObject",
     "members": {
       "global": [],
       "inner": [],
@@ -32444,11 +32040,11 @@
     },
     "path": [
       {
-        "name": "DeviceInfo",
+        "name": "DevicesObject",
         "kind": "module"
       }
     ],
-    "namespace": "DeviceInfo"
+    "namespace": "DevicesObject"
   },
   {
     "description": {
@@ -33720,7 +33316,7 @@
           "children": [
             {
               "type": "text",
-              "value": "A collection of devices and their information.",
+              "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
               "position": {
                 "start": {
                   "line": 1,
@@ -33728,11 +33324,13 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 47,
-                  "offset": 46
+                  "line": 2,
+                  "column": 40,
+                  "offset": 83
                 },
-                "indent": []
+                "indent": [
+                  1
+                ]
               }
             }
           ],
@@ -33743,11 +33341,13 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 47,
-              "offset": 46
+              "line": 2,
+              "column": 40,
+              "offset": 83
             },
-            "indent": []
+            "indent": [
+              1
+            ]
           }
         }
       ],
@@ -33758,9 +33358,9 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 47,
-          "offset": 46
+          "line": 2,
+          "column": 40,
+          "offset": 83
         }
       }
     },
@@ -33768,58 +33368,40 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 3,
+        "lineNumber": 4,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DevicesObject"
-      },
-      {
-        "title": "property",
-        "description": "A list of camera device information.",
         "lineNumber": 5,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "camera"
+        "type": null,
+        "name": "MediaObject"
       },
       {
         "title": "property",
-        "description": "A list of microphone device information.",
+        "description": "The ID of the Media object.",
         "lineNumber": 6,
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         },
-        "name": "microphone"
+        "name": "id"
       },
       {
         "title": "property",
-        "description": "A list of speaker device information.",
+        "description": "Indicator on whether this media is local or remote.",
         "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "local"
+      },
+      {
+        "title": "property",
+        "description": "A list of Track objects that are contained in this Media object.",
+        "lineNumber": 8,
         "type": {
           "type": "TypeApplication",
           "expression": {
@@ -33829,20 +33411,20 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "DeviceInfo"
+              "name": "TrackObject"
             }
           ]
         },
-        "name": "speaker"
+        "name": "tracks"
       }
     ],
     "loc": {
       "start": {
-        "line": 74,
+        "line": 47,
         "column": 0
       },
       "end": {
-        "line": 82,
+        "line": 56,
         "column": 3
       }
     },
@@ -33865,8 +33447,8 @@
     "properties": [
       {
         "title": "property",
-        "name": "camera",
-        "lineNumber": 5,
+        "name": "id",
+        "lineNumber": 6,
         "description": {
           "type": "root",
           "children": [
@@ -33875,7 +33457,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of camera device information.",
+                  "value": "The ID of the Media object.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -33884,13 +33466,210 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 37,
-                      "offset": 36
+                      "column": 28,
+                      "offset": 27
                     },
                     "indent": []
                   }
                 }
               ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 28,
+              "offset": 27
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "local",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Indicator on whether this media is local or remote.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 52,
+                      "offset": 51
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 52,
+                  "offset": 51
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "tracks",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of Track objects that are contained in this Media object.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 65,
+                      "offset": 64
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 65,
+                  "offset": 64
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 65,
+              "offset": 64
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "TrackObject"
+            }
+          ]
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "MediaObject",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "MediaObject",
+        "kind": "module"
+      }
+    ],
+    "namespace": "MediaObject"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Contains information about a device.",
               "position": {
                 "start": {
                   "line": 1,
@@ -33916,26 +33695,170 @@
               "line": 1,
               "column": 37,
               "offset": 36
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 37,
+          "offset": 36
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "DeviceInfo"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the device.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "deviceId"
+      },
+      {
+        "title": "property",
+        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "groupId"
+      },
+      {
+        "title": "property",
+        "description": "The type of the device (audioinput, audiooutput, videoinput).",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "kind"
+      },
+      {
+        "title": "property",
+        "description": "The name of the device.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "label"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 84,
+        "column": 0
+      },
+      "end": {
+        "line": 93,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 104,
+          "column": 0
+        },
+        "end": {
+          "line": 108,
+          "column": 1
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "deviceId",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 22,
+                      "offset": 21
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 22,
+              "offset": 21
             }
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         }
       },
       {
         "title": "property",
-        "name": "microphone",
+        "name": "groupId",
         "lineNumber": 6,
         "description": {
           "type": "root",
@@ -33945,7 +33868,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of microphone device information.",
+                  "value": "The group ID of the device. Devices that share a ",
                   "position": {
                     "start": {
                       "line": 1,
@@ -33954,8 +33877,42 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 41,
-                      "offset": 40
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "groupId",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " belong to the same physical device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 95,
+                      "offset": 94
                     },
                     "indent": []
                   }
@@ -33969,8 +33926,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 41,
-                  "offset": 40
+                  "column": 95,
+                  "offset": 94
                 },
                 "indent": []
               }
@@ -33984,28 +33941,19 @@
             },
             "end": {
               "line": 1,
-              "column": 41,
-              "offset": 40
+              "column": 95,
+              "offset": 94
             }
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         }
       },
       {
         "title": "property",
-        "name": "speaker",
+        "name": "kind",
         "lineNumber": 7,
         "description": {
           "type": "root",
@@ -34015,7 +33963,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of speaker device information.",
+                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34024,8 +33972,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 38,
-                      "offset": 37
+                      "column": 62,
+                      "offset": 61
                     },
                     "indent": []
                   }
@@ -34039,8 +33987,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 38,
-                  "offset": 37
+                  "column": 62,
+                  "offset": 61
                 },
                 "indent": []
               }
@@ -34054,23 +34002,75 @@
             },
             "end": {
               "line": 1,
-              "column": 38,
-              "offset": 37
+              "column": 62,
+              "offset": 61
             }
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "label",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
             {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The name of the device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
         }
       }
     ],
@@ -34080,7 +34080,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "DevicesObject",
+    "name": "DeviceInfo",
     "members": {
       "global": [],
       "inner": [],
@@ -34090,11 +34090,11 @@
     },
     "path": [
       {
-        "name": "DevicesObject",
+        "name": "DeviceInfo",
         "kind": "module"
       }
     ],
-    "namespace": "DevicesObject"
+    "namespace": "DeviceInfo"
   },
   {
     "description": {
