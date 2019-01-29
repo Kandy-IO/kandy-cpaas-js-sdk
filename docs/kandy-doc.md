@@ -816,15 +816,16 @@ Sets the channel to be used while proxy mode is enabled.
 
 -   `channel` **Channel** 
 
-## DevicesObject
+## MediaObject
 
-A collection of devices and their information.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][11]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][11]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][11]>** A list of speaker device information.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][11]>** A list of Track objects that are contained in this Media object.
 
 ## CallObject
 
@@ -849,16 +850,15 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## MediaObject
+## DevicesObject
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+A collection of devices and their information.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+-   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
 
 ## DeviceInfo
 
@@ -950,6 +950,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [10]: #mediaobject
 
-[11]: #deviceinfo
+[11]: #trackobject
 
-[12]: #trackobject
+[12]: #deviceinfo
