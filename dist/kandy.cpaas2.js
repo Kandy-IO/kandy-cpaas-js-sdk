@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.1.0-beta.52550
+ * Version: 3.1.0-beta.52737
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29207,7 +29207,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.1.0-beta.52550';
+  let version = '3.1.0-beta.52737';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -29433,6 +29433,10 @@ var _factory = __webpack_require__("./src/factory.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+// This is a hack to fix an issue where Lodash will add itself to
+// the window scope even if it's loaded via ES6. You can remove this when
+// we have an answer to https://github.com/lodash/lodash/issues/1798 .
+// eslint-disable-next-line
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
@@ -29494,6 +29498,8 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 /*
  * Index template file that is used to create pre-defined version of the SDK.
  */
+if (_fp._) _fp._.noConflict();
+
 function commonIndex(options = {}, plugins = []) {
   const pluginInstances = (0, _fp.map)(function (plugin) {
     return plugin.fn(options[plugin.name]);
