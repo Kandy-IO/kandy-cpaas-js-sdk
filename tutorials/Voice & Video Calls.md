@@ -52,7 +52,7 @@ function subscribe() {
 client.on('subscription:change', function() {
 
   if(
-    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().isPending === false &&
     client.services.getSubscriptions().subscribed.length > 0
   ) {
     log('Successfully subscribed')
@@ -318,13 +318,13 @@ client.on('call:error', function(params) {
 
 ### `call:stateChange`
 
-As the call is acted upon (such as answered or rejected), its state will change. We can react to changes in the call by listening for the `call:stateChange` event.
+As the call is acted upon (such as answered or rejected), its state will change. We can react to changes in the call by listening for the `call:stateChange` event. This event includes the state that the call transitioned out of, and we can get the current call information to know what state the call is now in.
 
 ```javascript
 // Set listener for changes in a call's state.
 client.on('call:stateChange', function(params) {
   const call = client.call.getById(params.callId)
-  log('Call state changed to: ' + call.state)
+  log('Call state changed from ' + params.previous.state + ' to ' + call.state)
 
   renderMedia(params.callId)
 
@@ -348,26 +348,6 @@ client.on('call:receive', function(params) {
   // Retrieve call information.
   call = client.call.getById(params.callId)
   log('Received incoming call')
-})
-```
-
-### `call:answered`
-
-The `call:answered` event informs the callee that the incoming call has been answered.
-
-```javascript
-client.on('call:answered', params => {
-  renderMedia(params.callId)
-})
-```
-
-### `call:accepted`
-
-The `call:accepted` event informs the caller that their outgoing call has been accepted by the callee.
-
-```javascript
-client.on('call:accepted', params => {
-  renderMedia(params.callId)
 })
 ```
 

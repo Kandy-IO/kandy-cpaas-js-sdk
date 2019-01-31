@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.1.0-beta.53534
+ * Version: 3.1.0-beta.53579
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -25582,10 +25582,15 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
  * @event call:stateChange
  * @param {Object} params
  * @param {string} params.callId The ID of the Media object that was operated on.
+ * @param {Object} params.previous The call's properties before the operation changed it.
+ * @param {string} params.previous.state The previous state of the call.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  * @example
  * client.on('call:stateChange', function (params) {
  *     const call = client.call.getById(params.callId)
+ *     const prevState = params.previous.state
+ *     log(`Call changed from ${prevState} to ${call.state} state.`)
+ *
  *     // Handle the event depending on the new call state.
  *     switch (call.state) {
  *         case client.call.states.CONNECTED:
@@ -25599,28 +25604,6 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
  * })
  */
 const CALL_STATE_CHANGE = exports.CALL_STATE_CHANGE = 'call:stateChange';
-
-/**
- * An incoming call has been answered and is now on call.
- * @public
- * @memberof Calls
- * @event call:answered
- * @param {Object} params
- * @param {string} params.callId The Id of the call.
- * @param {BasicError} [params.error] An error object, if the operation was not successful.
- */
-const CALL_ANSWERED = exports.CALL_ANSWERED = 'call:answered';
-
-/**
- * An outgoing call has been accepted and is now on call.
- * @public
- * @memberof Calls
- * @event call:accepted
- * @param {Object} params
- * @param {string} params.callId The Id of the call.
- * @param {BasicError} [params.error] An error object, if the operation was not successful.
- */
-const CALL_ACCEPTED = exports.CALL_ACCEPTED = 'call:accepted';
 
 /**
  * A call hold opeartion has completed.
@@ -25735,6 +25718,8 @@ var _actionTypes = __webpack_require__("./src/call/interfaceNew/actionTypes.js")
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
+var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
+
 var _actionTypes2 = __webpack_require__("./src/webrtc/interface/actionTypes.js");
 
 var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
@@ -25751,6 +25736,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param  {Object} [params={}] Any non-consistent information to be included in the event.
  * @return {Object} An event object.
  */
+// Call plugin.
 function callEventHandler(type, action, params = {}) {
   /**
    * Call event format.
@@ -25767,7 +25753,6 @@ function callEventHandler(type, action, params = {}) {
 }
 
 // Webrtc plugin.
-// Call plugin.
 const callEvents = exports.callEvents = {};
 
 callEvents[actionTypes.MAKE_CALL_FINISH] = action => {
@@ -25782,33 +25767,63 @@ callEvents[actionTypes.CALL_INCOMING] = action => {
   });
 };
 
-callEvents[actionTypes.CALL_RINGING] = action => {
+callEvents[actionTypes.CALL_RINGING] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
   return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state
+    }
   });
 };
 
-callEvents[actionTypes.CALL_CANCELLED] = action => {
+callEvents[actionTypes.CALL_CANCELLED] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
   return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state
+    }
   });
 };
 
-callEvents[actionTypes.ANSWER_CALL_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_ANSWERED, action, {
-    error: action.payload.error
-  });
-};
+callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
 
-callEvents[actionTypes.CALL_ACCEPTED] = action => {
-  return callEventHandler(eventTypes.CALL_ACCEPTED, action, {
-    error: action.payload.error
-  });
-};
-
-callEvents[actionTypes.END_CALL_FINISH] = action => {
   return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state
+    }
+  });
+};
+
+callEvents[actionTypes.CALL_ACCEPTED] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state
+    }
+  });
+};
+
+callEvents[actionTypes.END_CALL_FINISH] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state
+    }
   });
 };
 
@@ -28737,7 +28752,12 @@ function middleware(context) {
         break;
       default:
         if (eventMap.hasOwnProperty(action.type)) {
+          // Get state both before and after allowing the action to go through
+          //    the reducers. This lets events have compare state changes.
+          const prevState = context.getState();
           let result = next(action);
+          const state = context.getState();
+
           // make this compatible with promise middleware by ensuring we
           // wait for the promise to resolve. It's easier to just always
           // use a promise, as opposed to handling cases.
@@ -28746,7 +28766,9 @@ function middleware(context) {
           }
           result.then(function () {
             for (let mapper of eventMap[action.type]) {
-              let events = mapper(action, context);
+              // Use the mapper(s) for this specific event to create the event object(s).
+              // Event mappings have access to the action and states pre+post reducer.
+              let events = mapper(action, { prevState, state });
               if (!events) {
                 events = [];
               } else if (!Array.isArray(events)) {
@@ -29207,7 +29229,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.1.0-beta.53534';
+  let version = '3.1.0-beta.53579';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -31275,7 +31297,7 @@ eventsMap[actionTypes.FETCH_CONVERSATIONS_FINISHED] = function (action) {
   }
 };
 
-eventsMap[actionTypes.DELETE_CONVERSATION_FINISH] = function (action, context) {
+eventsMap[actionTypes.DELETE_CONVERSATION_FINISH] = function (action, { state }) {
   if (action.error) {
     return {
       type: eventTypes.MESSAGES_ERROR,
@@ -31284,7 +31306,7 @@ eventsMap[actionTypes.DELETE_CONVERSATION_FINISH] = function (action, context) {
   } else {
     return {
       type: eventTypes.CONVERSATIONS_CHANGE,
-      args: context.getState().messaging.conversations.map(conversation => {
+      args: state.messaging.conversations.map(conversation => {
         if (!((0, _fp.isEqual)(conversation.destination, action.payload.destination) && conversation.type === action.payload.type)) {
           return {
             destination: conversation.destination,

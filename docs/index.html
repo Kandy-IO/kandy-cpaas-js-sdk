@@ -231,18 +231,6 @@
                         </a></li>
                       
                         <li><a
-                          href='#callseventcallanswered'
-                          class='regular pre-open'>
-                          ⓔ call:answered
-                        </a></li>
-                      
-                        <li><a
-                          href='#callseventcallaccepted'
-                          class='regular pre-open'>
-                          ⓔ call:accepted
-                        </a></li>
-                      
-                        <li><a
                           href='#callseventcallheld'
                           class='regular pre-open'>
                           ⓔ call:held
@@ -957,16 +945,6 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
-                  class="">
-                  DeviceInfo
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#devicesobject'
                   class="">
                   DevicesObject
@@ -977,9 +955,9 @@
               
                 
                 <li><a
-                  href='#trackobject'
+                  href='#deviceinfo'
                   class="">
-                  TrackObject
+                  DeviceInfo
                   
                 </a>
                 
@@ -990,6 +968,16 @@
                   href='#callobject'
                   class="">
                   CallObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#trackobject'
+                  class="">
+                  TrackObject
                   
                 </a>
                 
@@ -3104,6 +3092,26 @@ See <code>Call.states</code> for possible call states.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>params.previous</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  </td>
+  <td class='break-word'><span>The call's properties before the operation changed it.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>params.previous.state</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The previous state of the call.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'><a href="#basicerror">BasicError</a>?</code>
   </td>
   <td class='break-word'><span>An error object, if the operation was not successful.
@@ -3132,6 +3140,9 @@ See <code>Call.states</code> for possible call states.</p>
       
       <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">'call:stateChange'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
     <span class="hljs-keyword">const</span> call = client.call.getById(params.callId)
+    <span class="hljs-keyword">const</span> prevState = params.previous.state
+    log(<span class="hljs-string">`Call changed from <span class="hljs-subst">${prevState}</span> to <span class="hljs-subst">${call.state}</span> state.`</span>)
+
     <span class="hljs-comment">// Handle the event depending on the new call state.</span>
     <span class="hljs-keyword">switch</span> (call.state) {
         <span class="hljs-keyword">case</span> client.call.states.CONNECTED:
@@ -3144,192 +3155,6 @@ See <code>Call.states</code> for possible call states.</p>
     }
 })</pre>
     
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='callseventcallanswered'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>call:answered</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>An incoming call has been answered and is now on call.</p>
-
-
-  <div class='pre p1 fill-light mt0'>call:answered</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The Id of the call.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'><a href="#basicerror">BasicError</a>?</code>
-  </td>
-  <td class='break-word'><span>An error object, if the operation was not successful.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='callseventcallaccepted'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>call:accepted</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>An outgoing call has been accepted and is now on call.</p>
-
-
-  <div class='pre p1 fill-light mt0'>call:accepted</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The Id of the call.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'><a href="#basicerror">BasicError</a>?</code>
-  </td>
-  <td class='break-word'><span>An error object, if the operation was not successful.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
   
 
   
@@ -9625,88 +9450,6 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Contains information about a device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='devicesobject'>
       DevicesObject
     </h3>
@@ -9780,19 +9523,18 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='trackobject'>
-      TrackObject
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
     </h3>
     
     
   </div>
   
 
-  <p>A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
+  <p>Contains information about a device.</p>
 
 
-  <div class='pre p1 fill-light mt0'>TrackObject</div>
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
   
   
 
@@ -9810,57 +9552,31 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : The list of CSS selectors that were used to render this Track.
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Track.
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The kind of Track this is (audio, video).
+          : The type of the device (audioinput, audiooutput, videoinput).
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The label of the device this Track uses.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this Track is muted or not.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The state of this Track. Can be 'live' or 'ended'.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media Stream that includes this Track.
+          : The name of the device.
 
           
         </div>
@@ -10015,6 +9731,115 @@ A Call can be manipulated by using the Call feature's APIs.</p>
           : The current state of the call. See 
 <code>Call.states</code>
  for possible states.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='trackobject'>
+      TrackObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
+
+
+  <div class='pre p1 fill-light mt0'>TrackObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : The list of CSS selectors that were used to render this Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The kind of Track this is (audio, video).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The label of the device this Track uses.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this Track is muted or not.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The state of this Track. Can be 'live' or 'ended'.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media Stream that includes this Track.
 
           
         </div>
