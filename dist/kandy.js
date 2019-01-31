@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.1.0-beta.53775
+ * Version: 3.1.0-beta.53813
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -25584,6 +25584,8 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
  * @param {string} params.callId The ID of the Media object that was operated on.
  * @param {Object} params.previous The call's properties before the operation changed it.
  * @param {string} params.previous.state The previous state of the call.
+ * @param {boolean} [params.previous.localHold] The previous local hold state. Present when the state change was a hold/unhold operation.
+ * @param {boolean} [params.previous.remoteHold] The previous remote hold state. Present when the state change was a hold/unhold operation.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  * @example
  * client.on('call:stateChange', function (params) {
@@ -25604,30 +25606,6 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
  * })
  */
 const CALL_STATE_CHANGE = exports.CALL_STATE_CHANGE = 'call:stateChange';
-
-/**
- * A call hold opeartion has completed.
- * @public
- * @memberof Calls
- * @event call:held
- * @param {Object} params
- * @param {string} params.callId The Id of the call.
- * @param {boolean} params.local Whether the operation was local or not.
- * @param {BasicError} [params.error] An error object, if the operation was not successful.
- */
-const CALL_HELD = exports.CALL_HELD = 'call:held';
-
-/**
- * A call unhold opeartion has completed.
- * @public
- * @memberof Calls
- * @event call:unheld
- * @param {Object} params
- * @param {string} params.callId The Id of the call.
- * @param {boolean} params.local Whether the operation was local or not.
- * @param {BasicError} [params.error] An error object, if the operation was not successful.
- */
-const CALL_UNHELD = exports.CALL_UNHELD = 'call:unheld';
 
 /**
  * New media has been added to the call.
@@ -25827,17 +25805,33 @@ callEvents[actionTypes.END_CALL_FINISH] = (action, params) => {
   });
 };
 
-callEvents[actionTypes.CALL_HOLD_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_HELD, action, {
+callEvents[actionTypes.CALL_HOLD_FINISH] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
     local: action.payload.local,
-    error: action.payload.error
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state,
+      localHold: prevCall.localHold,
+      remoteHold: prevCall.remoteHold
+    }
   });
 };
 
-callEvents[actionTypes.CALL_UNHOLD_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_UNHELD, action, {
+callEvents[actionTypes.CALL_UNHOLD_FINISH] = (action, params) => {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
     local: action.payload.local,
-    error: action.payload.error
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state,
+      localHold: prevCall.localHold,
+      remoteHold: prevCall.remoteHold
+    }
   });
 };
 
@@ -29229,7 +29223,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.1.0-beta.53775';
+  let version = '3.1.0-beta.53813';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
