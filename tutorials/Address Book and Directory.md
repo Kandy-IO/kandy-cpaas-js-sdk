@@ -6,7 +6,7 @@ permalink: /quickstarts/javascript/cpaas2/Address%20Book%20and%20Directory
 position: 6
 ---
 
-# Address Book & Directory
+# Address Book and Directory
 
 This document demonstrates the Address Book and Directory APIs using the JavaScript SDK.
 

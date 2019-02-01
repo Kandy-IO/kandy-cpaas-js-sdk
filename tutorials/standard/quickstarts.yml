@@ -13,9 +13,9 @@
   description: # Authentication
   link: /quickstarts/javascript/cpaas2/Authentication
 
-- name: Voice & Video Calls
-  description: # Voice & Video Calls
-  link: /quickstarts/javascript/cpaas2/Voice%20%26%20Video%20Calls
+- name: Voice and Video Calls
+  description: # Voice and Video Calls
+  link: /quickstarts/javascript/cpaas2/Voice%20and%20Video%20Calls
 
 - name: Chat
   description: # Chat
@@ -26,10 +26,10 @@
   link: /quickstarts/javascript/cpaas2/SMS%20Messaging
 
 - name: Address Book and Directory
-  description: # Address Book & Directory
+  description: # Address Book and Directory
   link: /quickstarts/javascript/cpaas2/Address%20Book%20and%20Directory
 
-- name: Troubleshooting & Logs
+- name: Troubleshooting and Logs
   description: # Capturing Logs and Troubleshooting Problems
-  link: /quickstarts/javascript/cpaas2/Troubleshooting%20%26%20Logs
+  link: /quickstarts/javascript/cpaas2/Troubleshooting%20and%20Logs
 
