@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kandy Tutorials</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tutorials for doing common things in Kandy." />
+
+    <!-- Nicer CSS -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/pure/0.6.0/pure-min.css" />
+    <link rel="stylesheet" href="//rawgit.com/sindresorhus/github-markdown-css/gh-pages/github-markdown.css" />
+
+    <!-- Markdown parsing library -->
+    <script src="//cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
+    <script src="//cdn.rawgit.com/knsv/mermaid/0.5.1/dist/mermaidAPI.js"></script>
+
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.6/styles/default.min.css" />
+    <script src="//cdn.jsdelivr.net/highlight.js/8.6/highlight.min.js"></script>
+
+    <style>
+      .back-menu {
+        margin-bottom: 30px;
+      }
+
+      nav {
+        background: #dddddd;
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        width: 200px;
+      }
+
+      article {
+        min-width: 200px;
+        max-width: 790px;
+        margin: 0 auto;
+        padding: 50px 0px 50px 200px;
+      }
+
+      .codepen-form {
+        margin: 0 auto;
+        width: 250px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="pure-menu">
+      <a href="../../../" class="pure-menu-link back-menu">Back</a>
+
+      <div class="pure-menu-heading">Kandy Tutorials</div>
+      <ul class="pure-menu-list">
+        
+        <li class="pure-menu-item"><a href="#Address Book and Directory" class="pure-menu-link"> Address Book and Directory</a></li>
+        
+        <li class="pure-menu-item"><a href="#Authentication" class="pure-menu-link"> Authentication</a></li>
+        
+        <li class="pure-menu-item"><a href="#Chat" class="pure-menu-link"> Chat</a></li>
+        
+        <li class="pure-menu-item"><a href="#Configurations" class="pure-menu-link"> Configurations</a></li>
+        
+        <li class="pure-menu-item"><a href="#Get Started" class="pure-menu-link"> Get Started</a></li>
+        
+        <li class="pure-menu-item"><a href="#Multimedia Chat" class="pure-menu-link"> Multimedia Chat</a></li>
+        
+        <li class="pure-menu-item"><a href="#Presence" class="pure-menu-link"> Presence</a></li>
+        
+        <li class="pure-menu-item"><a href="#SMS Messaging" class="pure-menu-link"> SMS Messaging</a></li>
+        
+        <li class="pure-menu-item"><a href="#Troubleshooting and Logs" class="pure-menu-link"> Troubleshooting and Logs</a></li>
+        
+        <li class="pure-menu-item"><a href="#Voice and Video Calls" class="pure-menu-link"> Voice and Video Calls</a></li>
+        
+      </ul>
+    </nav>
+
+    <article id="tutorial" class="markdown-body"></article>
+
+    <script type="text/javascript">
+      mermaidAPI.initialize({ startOnLoad: false });
+
+      var chartIdSuffix = 0;
+      function mermaidPlugin(md, options) {
+        md.renderer.rules.fence_custom["mermaid"] = function(tokens, idx) {
+          var token = tokens[idx];
+          var chart;
+
+          try {
+            // Not sure why mermaid uses a callback for the result. Thankfully it is synchronous.
+            mermaidAPI.render("mermaid_chart_" + chartIdSuffix++, token.content, function(result) {
+              chart = "<div>" + result + "</div>";
+            });
+          } catch (err) {
+            chart = '<pre><code class="language-mermaid">' + token.content + "</code></pre>";
+          }
+
+          return chart;
+        };
+      }
+
+      /**
+       * Remarkable plugin for Codepen 'POST to Prefill' support.
+       *
+       * Adds two custom renderer rules:
+       * 		- 'codepen': Grabs all html, css, and javascript code fences in the markdown file to create a POST request for
+       * 			the Codepen API. The 'codepen' custom fence contains an optional JSON object for configurations.
+       *    	- 'hidden': Hides code snippets that we want in the codepen but don't want the reader to see.
+       *
+       * 		See http://blog.codepen.io/documentation/api/prefill/ for configuration object details.
+       */
+      function codepenPlugin(md, options) {
+        /**
+         * codepen custom rule.
+         * Expects an optional JSON configuration object between fence posts.
+         * @param  {Object} tokens All markdown tokens parsed from the file.
+         * @param  {[type]} idx    Id of the token that triggered this rule.
+         * @return {String} form HTML form in string format.
+         */
+        md.renderer.rules.fence_custom["codepen"] = function(tokens, idx) {
+          var data = { html: "", css: "", js: "" };
+
+          // Iterate over all tokens on the page to find non-excluded fence posts.
+          for (var id in tokens) {
+            var token = tokens[id];
+            if (tokens.hasOwnProperty(id) && token.type === "fence" && token.params.indexOf("exclude") === -1) {
+              // For relevant fence posts, process the content as needed.
+              if (token.params.indexOf("html") > -1) {
+                data.html += token.content + "\n";
+              } else if (token.params.indexOf("css") > -1) {
+                data.css += token.content + "\n";
+              } else if (token.params.indexOf("javascript") > -1) {
+                data.js += token.content + "\n";
+              } else if (token.params === "codepen") {
+                if (token.content) {
+                  data = addOptions(data, token.content);
+                }
+              }
+            }
+          }
+
+          // Prepend a plug to Kandy's tutorials at the start of the js.
+          var plug =
+            "/**\n" +
+            (data.title ? " * " + data.title + "\n" : "") +
+            " * View this tutorial and others at https://developer.kandy.io/tutorials\n" +
+            " */\n\n";
+          data.js = plug + data.js;
+
+          return createForm(data);
+        };
+
+        /**
+         * hidden custom rule.
+         * Does nothing. Used for hiding code snippets that we want included in the final codepen.
+         * @return {String} Empty string.
+         */
+        md.renderer.rules.fence_custom["hidden"] = function(tokens, idx) {
+          return "";
+        };
+
+        /**
+         * Parse and add the configurations to the data object.
+         * @param {Object} data JSON data object.
+         * @param {String} options Options to be added.
+         * @return {Object} data JSON data object with added options.
+         */
+        function addOptions(data, options) {
+          var jsonOptions = JSON.parse(options);
+          for (var key in jsonOptions) {
+            if (jsonOptions.hasOwnProperty(key)) {
+              data[key] = jsonOptions[key];
+            }
+          }
+
+          return data;
+        }
+
+        /**
+         * Assemble all the pieces to make the html form.
+         * @param  {Object} data JSON data object.
+         * @return {String} form HTML form in string format.
+         */
+        function createForm(data) {
+          // Escape all quotes to make sure the JSON doesn't mess up when it is a form value.
+          data = JSON.stringify(data)
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&apos;");
+
+          var form =
+            '<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form">' +
+            '<input type="hidden" name="data" value=\' ' +
+            data +
+            " '>" +
+            '<input type="image" src="../resources/TryItOn-CodePen.png">' +
+            "</form>";
+
+          return form;
+        }
+      }
+
+      var md = new window.Remarkable("commonmark");
+      var hljs = window.hljs;
+      var articles = document.getElementsByTagName("article");
+
+      md.use(mermaidPlugin);
+      md.use(codepenPlugin);
+      md.block.ruler.enable(["table"]);
+
+      md.set({
+        highlight: function(str, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              return hljs.highlight(lang, str).value;
+            } catch (err) {
+              console.log(err);
+            }
+          }
+
+          try {
+            return hljs.highlightAuto(str).value;
+          } catch (err) {
+            console.log(err);
+          }
+
+          return ""; // use external default escaping
+        }
+      });
+
+      const pretests = [
+        [RegExp.prototype.test.bind(/CPaaS/gm), "You should use the $KANDY$ variable instead of CPaaS"],
+        [RegExp.prototype.test.bind(/iot/gim), "You should use the $KANDYFQDN$ variable instead of a hard coded fqdn"]
+      ];
+
+      const posttests = [
+        [
+          RegExp.prototype.test.bind(/(?<!path\/to\/|from ')kandy(?!\.create|url|\/kandy|\.cpaas)/gim),
+          "You shouldn't use the string Kandy"
+        ]
+      ];
+
+      function process(markdown) {
+        let errors = pretests.map(test => test[0](markdown) && test[1]).filter(errors => errors);
+
+        markdown = markdown.replace(/\$KANDYFQDN\$/gi, "nvs-cpaas-oauth.kandy.io");
+        markdown = markdown.replace(/\$KANDY\$/gi, "CPaaS");
+
+        errors = [...errors, ...posttests.map(test => test[0](markdown) && test[1]).filter(errors => errors)];
+
+        return { markdown, errors };
+      }
+
+      function render() {
+        var hash = window.location.hash.substr(1);
+        if (hash.length) {
+          var tutorialFileName = hash + ".md";
+          window
+            .fetch(tutorialFileName)
+            .then(function(response) {
+              return response.text();
+            })
+            .then(function(original) {
+              var article = articles[0];
+              if (article) {
+                const { markdown, errors } = process(original);
+                let header;
+                if (errors) {
+                  header = errors.map(error => '<h2 style="color:red">' + error + "</h2>").join("");
+                }
+
+                if (header) {
+                  article.innerHTML = header + md.render(markdown);
+                } else {
+                  article.innerHTML = md.render(markdown);
+                }
+              }
+            });
+        } else {
+          var article = articles[0];
+          if (article) {
+            article.innerHTML = "";
+          }
+        }
+
+        // Scroll to the top.
+        window.scroll(0, 0);
+      }
+
+      window.addEventListener("hashchange", render);
+      document.addEventListener("DOMContentLoaded", render);
+    </script>
+  </body>
+</html>

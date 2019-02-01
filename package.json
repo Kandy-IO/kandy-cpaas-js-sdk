@@ -1,0 +1,10 @@
+{
+    "name": "@kandy-io/cpaas-sdk",
+    "version": "4.0.0",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "main":"./dist/kandy.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Kandy-IO/kandy-cpaas-js-sdk"
+    }
+}
