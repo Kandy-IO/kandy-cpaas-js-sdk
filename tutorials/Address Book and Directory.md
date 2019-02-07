@@ -450,6 +450,12 @@ function refreshContacts() {
   client.contacts.refresh()
 }
 
+// Clear all input fields from Directory
+function clearContactForm() {
+  document.getElementById('user-id').value = "";
+  document.getElementById('filter-value').value = "";
+}
+
 // Get data from the contact form
 function getContactFormData() {
   const contactId = document.getElementById('id').value
