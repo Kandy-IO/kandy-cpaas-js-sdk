@@ -2,7 +2,7 @@
 layout: page
 categories: quickstarts-javascript
 title: Voice and Video Calls
-permalink: /quickstarts/javascript/cpaas2/Voice%20%26%20Video%20Calls
+permalink: /quickstarts/javascript/cpaas2/Voice%20and%20Video%20Calls
 position: 3
 categories:
   - voice
@@ -372,7 +372,7 @@ video {
 ```
 
 ### Instructions For Demo
-* Open two tabs for this demo by clicking the link twice. One will start the call (User A) and the other will answer it (User B).
+* Open two tabs [in a supported WebRTC-enabled browser](index.html#Get%20Started) for this demo by clicking the link twice. One will start the call (User A) and the other will answer it (User B).
 * Enter your Client ID for your account or project. Do this on both tabs.
 * Enter the email address of User A in the first tab. User A will be one of your account or project's users.
 * Enter the email address of User B in the second tab. User B will be one of your account or project's users.

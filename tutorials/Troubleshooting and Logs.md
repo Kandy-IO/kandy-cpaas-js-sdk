@@ -2,7 +2,7 @@
 layout: page
 categories: quickstarts-javascript
 title: Troubleshooting and Logs
-permalink: /quickstarts/javascript/cpaas2/Troubleshooting%20%26%20Logs
+permalink: /quickstarts/javascript/cpaas2/Troubleshooting%20and%20Logs
 position: 8
 ---
 
