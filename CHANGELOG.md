@@ -15,6 +15,9 @@ Kandy.js change log.
 - Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
 - Fixed a crash when using the Presence `fetch` API and receiving no data. `KAA-1169`.
 
+### Changed
+- Changed the default sdpSemantics to "unified-plan". `KAA-1427`
+
 ## 4.0.0 - 2019-02-01
 
 ### Compatibility Warning

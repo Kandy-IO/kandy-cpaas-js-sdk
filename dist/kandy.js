@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.56188
+ * Version: 3.2.0-beta.56292
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23022,7 +23022,7 @@ function cpaas2Calls(options = {}) {
       credential: ''
     }],
     // TODO: Remove this once all the browsers use unified-plan
-    sdpSemantics: 'plan-b',
+    sdpSemantics: 'unified-plan',
     // Whether the SDK should fetch turn credentials.
     serverTurnCredentials: true,
     // Trickle ICE method to use for calls.
@@ -29995,7 +29995,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.56188';
+  let version = '3.2.0-beta.56292';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
