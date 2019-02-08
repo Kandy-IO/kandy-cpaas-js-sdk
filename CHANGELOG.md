@@ -6,6 +6,11 @@ Kandy.js change log.
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
 ## 4.1.0-beta
+
+### Added
+- Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
+
+### Fixed
 - Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
 
 ## 4.0.0 - 2019-02-01
@@ -20,10 +25,13 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 - Refactored all of the WebRTC-related code.
 
 ## 3.2.0-beta
-- Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
+
+### Added
+- Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
 
 ### Fixed
 - Fixed an issue where refreshing an empty address book generated an error. `KAA-1380`
+- Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
 
 ## 3.1.0 - 2019-02-01
 
