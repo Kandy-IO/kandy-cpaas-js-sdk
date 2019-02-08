@@ -478,6 +478,18 @@ Retrieve the presence information for specified users.
 
 Returns **[Array][7]** List of user presence information.
 
+### getAll
+
+Retrieve the presence information for all users.
+
+Returns **[Array][7]** List of user presence information.
+
+### getSelf
+
+Retrieves the presence information for the current user.
+
+Returns **[Object][5]** 
+
 ### fetch
 
 Fetch (from the server) the presence for the given users.
@@ -824,17 +836,6 @@ Sets the channel to be used while proxy mode is enabled.
 
 -   `channel` **Channel** 
 
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][11]>** A list of Track objects that are contained in this Media object.
-
 ## CallObject
 
 The state representation of a Call.
@@ -875,9 +876,9 @@ A collection of devices and their information.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+-   `camera` **[Array][7]&lt;[DeviceInfo][11]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][11]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][11]>** A list of speaker device information.
 
 ## TrackObject
 
@@ -894,6 +895,17 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
 
 ## Subscription
 
@@ -958,6 +970,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [10]: #mediaobject
 
-[11]: #trackobject
+[11]: #deviceinfo
 
-[12]: #deviceinfo
+[12]: #trackobject

@@ -8,10 +8,12 @@ Kandy.js change log.
 ## 4.1.0-beta
 
 ### Added
+- Added Presence APIs for retrieving presence information. See `kandy.presence.getAll` and `kandy.presence.getSelf`. KAA-1152.
 - Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
 
 ### Fixed
 - Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
+- Fixed a crash when using the Presence `fetch` API and receiving no data. `KAA-1169`.
 
 ## 4.0.0 - 2019-02-01
 
@@ -27,11 +29,13 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 ## 3.2.0-beta
 
 ### Added
+- Added Presence APIs for retrieving presence information. See `kandy.presence.getAll` and `kandy.presence.getSelf`. KAA-1152.
 - Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
 
 ### Fixed
 - Fixed an issue where refreshing an empty address book generated an error. `KAA-1380`
 - Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
+- Fixed a crash when using the Presence `fetch` API and receiving no data. `KAA-1169`.
 
 ## 3.1.0 - 2019-02-01
 

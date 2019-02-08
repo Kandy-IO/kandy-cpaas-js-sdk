@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.56097
+ * Version: 3.2.0-beta.56188
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29995,7 +29995,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.56097';
+  let version = '3.2.0-beta.56188';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -36532,6 +36532,32 @@ exports.default = function (context) {
     },
 
     /**
+     * Retrieve the presence information for all users.
+     *
+     * @public
+     * @memberof Presence
+     * @requires presence
+     * @method getAll
+     * @return {Array} List of user presence information.
+     */
+    getAll() {
+      return selectors.getAllPresence(context.getState());
+    },
+
+    /**
+     * Retrieves the presence information for the current user.
+     *
+     * @public
+     * @memberof Presence
+     * @requires presence
+     * @method getSelf
+     * @return {Object}
+     */
+    getSelf() {
+      return selectors.getSelfPresence(context.getState());
+    },
+
+    /**
      * Fetch (from the server) the presence for the given users.
      * This will update the store with the retrieved values, which can then
      * be accessed using `get`.
@@ -36791,6 +36817,10 @@ reducers[actionTypes.GET] = {
 
 reducers[actionTypes.GET_FINISH] = {
   next(state, { payload }) {
+    if (!payload.presenceContact) {
+      return (0, _extends3.default)({}, state);
+    }
+
     let users = {};
     for (let contact of payload.presenceContact) {
       let presenceObject = {};
@@ -36854,6 +36884,8 @@ var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/obje
 var _values2 = _interopRequireDefault(_values);
 
 exports.getPresence = getPresence;
+exports.getAllPresence = getAllPresence;
+exports.getSelfPresence = getSelfPresence;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36865,6 +36897,26 @@ function getPresence(state, users) {
 
   // Grab all users that match the passed in IDs, return
   return (0, _values2.default)(state.presence.users).filter(user => users.indexOf(user.userId) !== -1);
+}
+
+/**
+ * Retrieves presence information for all users.
+ * @method getAllPresence
+ * @param  {Object} state Redux state.
+ * @return {Array}  List of presence information for users.
+ */
+function getAllPresence(state) {
+  return (0, _values2.default)(state.presence.users);
+}
+
+/**
+ * Retrieves the current user's self presence.
+ * @method getSelfPresence
+ * @param  {Object} state Redux state.
+ * @return {Object} Self-presence information.
+ */
+function getSelfPresence(state) {
+  return state.presence.self;
 }
 
 /***/ }),
