@@ -53,7 +53,7 @@ const client = create(configs)
 client.on( ... )
 ```
 
-After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The [API reference documentation](../docs#) will help to explain the details of the available features.
+After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The [API reference documentation](../../references/cpaas2#) will help to explain the details of the available features.
 
 ## Configurations
 
@@ -78,7 +78,7 @@ const client = create({
 })
 ```
 
-To learn more about configuring the SDK, please see the [Configuration Quickstart](index.html#Configurations).
+To learn more about configuring the SDK, please see the [Configuration Quickstart](Configurations).
 
 ## Further Reading
 
@@ -91,3 +91,6 @@ The best way to learn is usually by example. Our quickstarts will provided you w
 | Chrome  | Latest 3 Major Versions |
 | Firefox | Latest 3 Major Versions |
 | Safari  |  Latest Major Version   |
+
+
+

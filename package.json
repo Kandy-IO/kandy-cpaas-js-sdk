@@ -5,6 +5,6 @@
     "main":"./dist/kandy.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Kandy-IO/kandy-cpaas-js-sdk"
+        "url": "https://github.com/kandy-io/kandy-cpaas-js-sdk"
     }
 }

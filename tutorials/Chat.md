@@ -16,75 +16,13 @@ In this quickstart we will cover how to send and receive text-based chat message
 
 The chat feature doesn't have any required configuration. Simply creating an instance of the SDK and authenticating is sufficient to get started.
 
-```javascript exclude
+```javascript 
 const client = Kandy.create({
   // ... Only other configuration necessary
 })
 ```
 
-```hidden javascript
-const client = Kandy.create({
-  subscription: {
-    expires: 3600
-  },
-  // Required: Server connection configs.
-  authentication: {
-    server: {
-      base: '$KANDYFQDN$'
-    },
-    clientCorrelator: 'sampleCorrelator'
-  }
-})
-
-const cpaasAuthUrl = 'https://$KANDYFQDN$/cpaas/auth/v1/token'
-
-/**
- * Creates a form body from an dictionary
- */
-function createFormBody(paramsObject) {
-  const keyValuePairs = Object.entries(paramsObject).map(
-    ([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value)
-  )
-  return keyValuePairs.join('&')
-}
-/**
- * Gets the tokens necessary for authentication to $KANDY$
- */
-async function getTokens({ clientId, username, password }) {
-  const formBody = createFormBody({
-    client_id: clientId,
-    username,
-    password,
-    grant_type: 'password',
-    scope: 'openid'
-  })
-  // POST a request to create a new authentication access token.
-  const fetchResult = await fetch(cpaasAuthUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: formBody
-  })
-  // Parse the result of the fetch as a JSON format.
-  const data = await fetchResult.json()
-  return { accessToken: data.access_token, idToken: data.id_token }
-}
-async function login() {
-  const clientId = document.getElementById('clientId').value
-  const userEmail = document.getElementById('userEmail').value
-  const password = document.getElementById('password').value
-  try {
-    const tokens = await getTokens({ clientId, username: userEmail, password })
-    client.setTokens(tokens)
-    log('Successfully logged in as ' + userEmail)
-  } catch (error) {
-    log('Error: Failed to get authentication tokens. Error: ' + error)
-  }
-}
-```
-
-To learn more about configuration, refer to the [Configurations Quickstart](index.html#Configurations).
+To learn more about configuration, refer to the [Configurations Quickstart](Configurations).
 
 Once we have authenticated, we need to subscribe for notifications on the services we care about. In this case, we are subscribing to the `chat` Service on the `websocket` Channel.
 
@@ -107,7 +45,7 @@ client.on('subscription:change', function() {
 })
 ```
 
-To learn more about authentication, services and channels, refer to the [Authentication Quickstart](index.html#Authentication)
+To learn more about authentication, services and channels, refer to the [Authentication Quickstart](Authentication)
 
 #### HTML
 
@@ -153,18 +91,6 @@ Next, we have a fieldset that contains all the actions we will perform for messa
 </fieldset>
 ```
 
-```hidden javascript
-// Utility function for appending messages to the message div.
-function log(message) {
-  // Wrap message in textNode to guarantee that it is a string
-  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html
-  const textNode = document.createTextNode(message)
-  const divContainer = document.createElement('div')
-  divContainer.appendChild(textNode)
-  document.getElementById('messages').appendChild(divContainer)
-}
-```
-
 Below that is a fieldset to hold the incoming and outgoing conversation messages.
 
 ```html
@@ -203,7 +129,7 @@ function createConvo() {
 }
 ```
 
-A `Conversation` has a few functions on it, such as `getMessages()`. To learn more about these functions, go [here](../docs#conversation).
+A `Conversation` has a few functions on it, such as `getMessages()`. To learn more about these functions, go [here](../../references/cpaas2#conversation).
 
 ## Step 2: Creating and Sending a Message
 
@@ -232,7 +158,7 @@ There are a few messaging events we care about. We will go over two such events 
 
 ### `messages:change`
 
-The `messages:change` event is fired whenever a message is added to a conversation that is present in the Javascript SDK's state (including outgoing messages). Any subscribers to this event will receive the conversation for which there is a new message. You can read more about this event [here](../docs#messaging).
+The `messages:change` event is fired whenever a message is added to a conversation that is present in the Javascript SDK's state (including outgoing messages). Any subscribers to this event will receive the conversation for which there is a new message. You can read more about this event [here](../../references/cpaas2#messaging).
 
 ```javascript
 /*
@@ -256,7 +182,7 @@ client.on('messages:change', function(convo) {
 
 ### `conversations:change`
 
-The `conversations:change` event is fired whenever a new conversation is added to the conversation list in the Javascript SDK's store. One such example of this occurring is when the Javascript SDK receives a message from a conversation it does not yet have a record for. In this instance, the Javascript SDK will create a representation of the new conversation in the store and emit this event. You can read more about this event [here](../docs#messaging).
+The `conversations:change` event is fired whenever a new conversation is added to the conversation list in the Javascript SDK's store. One such example of this occurring is when the Javascript SDK receives a message from a conversation it does not yet have a record for. In this instance, the Javascript SDK will create a representation of the new conversation in the store and emit this event. You can read more about this event [here](../../references/cpaas2#messaging).
 
 ```javascript
 /*
@@ -299,10 +225,6 @@ This function receives the conversation object as input. It then grabs the messa
 
 Want to play around with this example for yourself? Feel free to edit this code on Codepen.
 
-```codepen
-{
-	"title": "Javascript SDK Basic Chat Demo",
-	"editors": "101",
-	"js_external": "https://localhost:3000/kandy/kandy.cpaas2.js"
-}
-```
+
+
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * Javascript SDK Basic Chat Demo\n */\n\nconst client = Kandy.create({\n  subscription: {\n    expires: 3600\n  },\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: &apos;$KANDYFQDN$&apos;\n    },\n    clientCorrelator: &apos;sampleCorrelator&apos;\n  }\n})\n\nconst cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody(paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n  // POST a request to create a new authentication access token.\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n  return { accessToken: data.access_token, idToken: data.id_token }\n}\nasync function login() {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;userEmail&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n  try {\n    const tokens = await getTokens({ clientId, username: userEmail, password })\n    client.setTokens(tokens)\n    log(&apos;Successfully logged in as &apos; + userEmail)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\nfunction subscribe() {\n  const services = [&apos;chat&apos;]\n  const subscriptionType = &apos;websocket&apos;\n  client.services.subscribe(services, subscriptionType)\n}\n\n// Listen for subscription changes.\nclient.on(&apos;subscription:change&apos;, function() {\n\n  if(\n    client.services.getSubscriptions().isPending === false && \n    client.services.getSubscriptions().subscribed.length > 0\n  ) {\n    log(&apos;Successfully subscribed&apos;)\n    }\n})\n\n// Utility function for appending messages to the message div.\nfunction log(message) {\n  // Wrap message in textNode to guarantee that it is a string\n  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html\n  const textNode = document.createTextNode(message)\n  const divContainer = document.createElement(&apos;div&apos;)\n  divContainer.appendChild(textNode)\n  document.getElementById(&apos;messages&apos;).appendChild(divContainer)\n}\n\n/*\n *  Basic Chat functionality.\n */\n\n// We will only track one conversation in this demo.\nvar currentConvo\n\n// Create a new conversation with another user.\nfunction createConvo() {\n  const participant = document.getElementById(&apos;convo-participant&apos;).value\n\n  // Pass in the SIP address of a user to create a conversation with them.\n  currentConvo = client.conversation.create([participant], { type: &apos;chat&apos; })\n\n  log(&apos;Conversation created with: &apos; + participant)\n}\n\n// Create and send a message to the current conversation.\nfunction sendMessage() {\n  if (currentConvo) {\n    var text = document.getElementById(&apos;message-text&apos;).value\n\n    // Create the message object, passing in the text for the message.\n    var message = currentConvo.createMessage(text)\n\n    // Send the message!\n    message.send()\n  } else {\n    log(&apos;No current conversation to send message to.&apos;)\n  }\n}\n\n/*\n * Listen for new messages sent or received.\n * This event occurs when a new message is added to a conversation.\n */\nclient.on(&apos;messages:change&apos;, function(convo) {\n  const destination = convo.destination[0]\n  log(&apos;New message in conversation with &apos; + destination)\n\n  if (!currentConvo && [&apos;im&apos;, &apos;chat&apos;, &apos;sms&apos;].includes(convo.type)) {\n    currentConvo = client.conversation.get(destination, { type: convo.type })\n  }\n\n  // If the message is in the current conversation, render it.\n  if (currentConvo.destination[0] === destination) {\n    renderLatestMessage(client.conversation.get(currentConvo.destination, { type: convo.type }))\n  }\n})\n\n/*\n * Listen for a change in the list of conversations.\n * In our case, it will occur when we receive a message from a user that\n * we do not have a conversation created with.\n */\nclient.on(&apos;conversations:change&apos;, function(convos) {\n  log(&apos;New conversation&apos;)\n\n  // If we don&apos;t have a current conversation, assign the new one and render it.\n  if (!currentConvo && convos.length !== 0) {\n    currentConvo = client.conversation.get(convos[0].destination, { type: convos[0].type })\n    renderLatestMessage(currentConvo)\n  }\n})\n\n// Display the latest message in the provided conversation.\nfunction renderLatestMessage(convo) {\n  // Retrieve the latest message from the conversation.\n  var messages = convo.getMessages()\n  var message = messages[messages.length - 1]\n\n  // Construct the text of the message.\n  var text = message.sender + &apos;: &apos; + message.parts[0].text\n\n  // Display the message.\n  var convoDiv = document.getElementById(&apos;convo-messages&apos;)\n  convoDiv.innerHTML += &apos;<div>&apos; + text + &apos;</div>&apos;\n}\n\n&quot;,&quot;html&quot;:&quot;<fieldset>\n  <legend>Authenticate using your account information</legend>\n  Client ID: <input type=&apos;text&apos; id=&apos;clientId&apos;/>\n  User Email: <input type=&apos;text&apos; id=&apos;userEmail&apos;/>\n  Password: <input type=&apos;password&apos; id=&apos;password&apos;/>\n  <input type=&apos;button&apos; value=&apos;Login&apos; onclick=&apos;login();&apos; />\n</fieldset>\n<fieldset>\n  <legend>Subscribe to Chat Service on Websocket Channel</legend>\n  <input type=&apos;button&apos; value=&apos;subscribe&apos; onclick=&apos;subscribe();&apos; />\n</fieldset>\n\n<fieldset>\n  <legend>Conversations</legend>\n\n  Step 1: Enter their User Id:\n  <input type=&apos;text&apos; id=&apos;convo-participant&apos; />\n  <br/>\n  <sub><i>example:</i></sub>\n  <br/>\n  <sub><i>User ID: janedoe@somedomain.com ([userId]@[domain])</i></sub>\n  <br/><br/>\n\n  Step 2: Create!\n  <input type=&apos;button&apos; value=&apos;Create&apos; onclick=&apos;createConvo();&apos; />\n  <br/><hr>\n\n  <input type=&apos;button&apos; value=&apos;Send&apos; onclick=&apos;sendMessage();&apos; />\n  <input type=&apos;text&apos; placeholder=&apos;Test message&apos; id=&apos;message-text&apos; />\n\n</fieldset>\n\n<fieldset>\n  <legend>Messages</legend>\n  <div id=&apos;convo-messages&apos;></div>\n</fieldset>\n\n<div id=\&quot;messages\&quot;> </div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;Javascript SDK Basic Chat Demo&quot;,&quot;editors&quot;:&quot;101&quot;,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@56362/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
