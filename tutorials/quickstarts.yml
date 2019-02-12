@@ -29,6 +29,10 @@
   description: # Address Book and Directory
   link: /quickstarts/javascript/cpaas2/Address%20Book%20and%20Directory
 
+- name: Presence
+  description: # Presence
+  link: /quickstarts/javascript/cpaas2/Presence
+
 - name: Troubleshooting and Logs
   description: # Capturing Logs and Troubleshooting Problems
   link: /quickstarts/javascript/cpaas2/Troubleshooting%20and%20Logs
