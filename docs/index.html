@@ -961,19 +961,9 @@
               
                 
                 <li><a
-                  href='#devicesobject'
+                  href='#trackobject'
                   class="">
-                  DevicesObject
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#callobject'
-                  class="">
-                  CallObject
+                  TrackObject
                   
                 </a>
                 
@@ -991,9 +981,19 @@
               
                 
                 <li><a
-                  href='#trackobject'
+                  href='#callobject'
                   class="">
-                  TrackObject
+                  CallObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#devicesobject'
+                  class="">
+                  DevicesObject
                   
                 </a>
                 
@@ -9524,18 +9524,19 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
+    <h3 class='fl m0' id='trackobject'>
+      TrackObject
     </h3>
     
     
   </div>
   
 
-  <p>A collection of devices and their information.</p>
+  <p>A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
 
 
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  <div class='pre p1 fill-light mt0'>TrackObject</div>
   
   
 
@@ -9553,22 +9554,131 @@ Indicates either a change in the mode or the channel.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
+          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : The list of CSS selectors that were used to render this Track.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
+          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The kind of Track this is (audio, video).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The label of the device this Track uses.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this Track is muted or not.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The state of this Track. Can be 'live' or 'ended'.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media Stream that includes this Track.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
+
+
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
 
           
         </div>
@@ -9751,19 +9861,18 @@ A Call can be manipulated by using the Call feature's APIs.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
     </h3>
     
     
   </div>
   
 
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
+  <p>A collection of devices and their information.</p>
 
 
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
   
   
 
@@ -9781,131 +9890,22 @@ Media is a collection of Track objects.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='trackobject'>
-      TrackObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
-
-
-  <div class='pre p1 fill-light mt0'>TrackObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : The list of CSS selectors that were used to render this Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The kind of Track this is (audio, video).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The label of the device this Track uses.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this Track is muted or not.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The state of this Track. Can be 'live' or 'ended'.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media Stream that includes this Track.
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
 
           
         </div>
