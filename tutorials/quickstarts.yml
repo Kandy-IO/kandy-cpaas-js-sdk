@@ -17,6 +17,10 @@
   description: # Voice and Video Calls
   link: /quickstarts/javascript/cpaas2/Voice%20and%20Video%20Calls
 
+- name: Anonymous Calls
+  description: # Anonymous Calls
+  link: /quickstarts/javascript/cpaas2/Anonymous%20Calls
+
 - name: Chat
   description: # Chat
   link: /quickstarts/javascript/cpaas2/Chat
