@@ -53,7 +53,7 @@ const client = create(configs)
 client.on( ... )
 ```
 
-After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The [API reference documentation](../../references/cpaas2#) will help to explain the details of the available features.
+After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The API reference documentation will help to explain the details of the available features.
 
 ## Configurations
 

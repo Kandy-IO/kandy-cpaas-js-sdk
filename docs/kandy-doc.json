@@ -31210,7 +31210,7 @@
           "children": [
             {
               "type": "text",
-              "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
+              "value": "A collection of devices and their information.",
               "position": {
                 "start": {
                   "line": 1,
@@ -31218,45 +31218,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 50,
-                  "offset": 115
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "getTrackById",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 50,
-                  "offset": 115
-                },
-                "end": {
-                  "line": 2,
-                  "column": 64,
-                  "offset": 129
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " API and manipulated with other functions of the Media module.",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 64,
-                  "offset": 129
-                },
-                "end": {
-                  "line": 2,
-                  "column": 126,
-                  "offset": 191
+                  "line": 1,
+                  "column": 47,
+                  "offset": 46
                 },
                 "indent": []
               }
@@ -31269,13 +31233,11 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 126,
-              "offset": 191
+              "line": 1,
+              "column": 47,
+              "offset": 46
             },
-            "indent": [
-              1
-            ]
+            "indent": []
           }
         }
       ],
@@ -31286,9 +31248,9 @@
           "offset": 0
         },
         "end": {
-          "line": 2,
-          "column": 126,
-          "offset": 191
+          "line": 1,
+          "column": 47,
+          "offset": 46
         }
       }
     },
@@ -31296,19 +31258,38 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 4,
+        "lineNumber": 3,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 5,
+        "lineNumber": 4,
         "type": null,
-        "name": "TrackObject"
+        "name": "DevicesObject"
       },
       {
         "title": "property",
-        "description": "The list of CSS selectors that were used to render this Track.",
+        "description": "A list of camera device information.",
+        "lineNumber": 5,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "camera"
+      },
+      {
+        "title": "property",
+        "description": "A list of microphone device information.",
         "lineNumber": 6,
         "type": {
           "type": "TypeApplication",
@@ -31319,90 +31300,39 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "string"
+              "name": "DeviceInfo"
             }
           ]
         },
-        "name": "containers"
+        "name": "microphone"
       },
       {
         "title": "property",
-        "description": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
+        "description": "A list of speaker device information.",
         "lineNumber": 7,
         "type": {
-          "type": "NameExpression",
-          "name": "boolean"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
         },
-        "name": "disabled"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the Track.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "id"
-      },
-      {
-        "title": "property",
-        "description": "The kind of Track this is (audio, video).",
-        "lineNumber": 9,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "kind"
-      },
-      {
-        "title": "property",
-        "description": "The label of the device this Track uses.",
-        "lineNumber": 10,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "label"
-      },
-      {
-        "title": "property",
-        "description": "Indicator on whether this Track is muted or not.",
-        "lineNumber": 11,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "muted"
-      },
-      {
-        "title": "property",
-        "description": "The state of this Track. Can be 'live' or 'ended'.",
-        "lineNumber": 12,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "state"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the Media Stream that includes this Track.",
-        "lineNumber": 13,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "streamId"
+        "name": "speaker"
       }
     ],
     "loc": {
       "start": {
-        "line": 58,
+        "line": 74,
         "column": 0
       },
       "end": {
-        "line": 72,
+        "line": 82,
         "column": 3
       }
     },
@@ -31425,8 +31355,8 @@
     "properties": [
       {
         "title": "property",
-        "name": "containers",
-        "lineNumber": 6,
+        "name": "camera",
+        "lineNumber": 5,
         "description": {
           "type": "root",
           "children": [
@@ -31435,7 +31365,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The list of CSS selectors that were used to render this Track.",
+                  "value": "A list of camera device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -31444,8 +31374,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 63,
-                      "offset": 62
+                      "column": 37,
+                      "offset": 36
                     },
                     "indent": []
                   }
@@ -31459,8 +31389,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 63,
-                  "offset": 62
+                  "column": 37,
+                  "offset": 36
                 },
                 "indent": []
               }
@@ -31474,8 +31404,8 @@
             },
             "end": {
               "line": 1,
-              "column": 63,
-              "offset": 62
+              "column": 37,
+              "offset": 36
             }
           }
         },
@@ -31488,15 +31418,15 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "string"
+              "name": "DeviceInfo"
             }
           ]
         }
       },
       {
         "title": "property",
-        "name": "disabled",
-        "lineNumber": 7,
+        "name": "microphone",
+        "lineNumber": 6,
         "description": {
           "type": "root",
           "children": [
@@ -31505,190 +31435,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 90,
-                      "offset": 89
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 90,
-                  "offset": 89
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 90,
-              "offset": 89
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
-      },
-      {
-        "title": "property",
-        "name": "id",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the Track.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 21,
-                      "offset": 20
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 21,
-                  "offset": 20
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 21,
-              "offset": 20
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "kind",
-        "lineNumber": 9,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The kind of Track this is (audio, video).",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 42,
-                  "offset": 41
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 42,
-              "offset": 41
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "label",
-        "lineNumber": 10,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The label of the device this Track uses.",
+                  "value": "A list of microphone device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -31733,14 +31480,23 @@
           }
         },
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
         }
       },
       {
         "title": "property",
-        "name": "muted",
-        "lineNumber": 11,
+        "name": "speaker",
+        "lineNumber": 7,
         "description": {
           "type": "root",
           "children": [
@@ -31749,7 +31505,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "Indicator on whether this Track is muted or not.",
+                  "value": "A list of speaker device information.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -31758,8 +31514,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 49,
-                      "offset": 48
+                      "column": 38,
+                      "offset": 37
                     },
                     "indent": []
                   }
@@ -31773,8 +31529,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 49,
-                  "offset": 48
+                  "column": 38,
+                  "offset": 37
                 },
                 "indent": []
               }
@@ -31788,136 +31544,23 @@
             },
             "end": {
               "line": 1,
-              "column": 49,
-              "offset": 48
+              "column": 38,
+              "offset": 37
             }
           }
         },
         "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
-      },
-      {
-        "title": "property",
-        "name": "state",
-        "lineNumber": 12,
-        "description": {
-          "type": "root",
-          "children": [
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
             {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The state of this Track. Can be 'live' or 'ended'.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 51,
-                      "offset": 50
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 51,
-                  "offset": 50
-                },
-                "indent": []
-              }
+              "type": "NameExpression",
+              "name": "DeviceInfo"
             }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 51,
-              "offset": 50
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "streamId",
-        "lineNumber": 13,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the Media Stream that includes this Track.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 53,
-                      "offset": 52
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 53,
-              "offset": 52
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
+          ]
         }
       }
     ],
@@ -31927,7 +31570,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "TrackObject",
+    "name": "DevicesObject",
     "members": {
       "global": [],
       "inner": [],
@@ -31937,11 +31580,11 @@
     },
     "path": [
       {
-        "name": "TrackObject",
+        "name": "DevicesObject",
         "kind": "module"
       }
     ],
-    "namespace": "TrackObject"
+    "namespace": "DevicesObject"
   },
   {
     "description": {
@@ -34002,7 +33645,7 @@
           "children": [
             {
               "type": "text",
-              "value": "A collection of devices and their information.",
+              "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
               "position": {
                 "start": {
                   "line": 1,
@@ -34010,9 +33653,45 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 47,
-                  "offset": 46
+                  "line": 2,
+                  "column": 50,
+                  "offset": 115
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "getTrackById",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 50,
+                  "offset": 115
+                },
+                "end": {
+                  "line": 2,
+                  "column": 64,
+                  "offset": 129
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " API and manipulated with other functions of the Media module.",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 64,
+                  "offset": 129
+                },
+                "end": {
+                  "line": 2,
+                  "column": 126,
+                  "offset": 191
                 },
                 "indent": []
               }
@@ -34025,11 +33704,13 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 47,
-              "offset": 46
+              "line": 2,
+              "column": 126,
+              "offset": 191
             },
-            "indent": []
+            "indent": [
+              1
+            ]
           }
         }
       ],
@@ -34040,9 +33721,9 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 47,
-          "offset": 46
+          "line": 2,
+          "column": 126,
+          "offset": 191
         }
       }
     },
@@ -34050,38 +33731,19 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 3,
+        "lineNumber": 4,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DevicesObject"
-      },
-      {
-        "title": "property",
-        "description": "A list of camera device information.",
         "lineNumber": 5,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "camera"
+        "type": null,
+        "name": "TrackObject"
       },
       {
         "title": "property",
-        "description": "A list of microphone device information.",
+        "description": "The list of CSS selectors that were used to render this Track.",
         "lineNumber": 6,
         "type": {
           "type": "TypeApplication",
@@ -34092,39 +33754,90 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "DeviceInfo"
+              "name": "string"
             }
           ]
         },
-        "name": "microphone"
+        "name": "containers"
       },
       {
         "title": "property",
-        "description": "A list of speaker device information.",
+        "description": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
         "lineNumber": 7,
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "boolean"
         },
-        "name": "speaker"
+        "name": "disabled"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the Track.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "id"
+      },
+      {
+        "title": "property",
+        "description": "The kind of Track this is (audio, video).",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "kind"
+      },
+      {
+        "title": "property",
+        "description": "The label of the device this Track uses.",
+        "lineNumber": 10,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "label"
+      },
+      {
+        "title": "property",
+        "description": "Indicator on whether this Track is muted or not.",
+        "lineNumber": 11,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "muted"
+      },
+      {
+        "title": "property",
+        "description": "The state of this Track. Can be 'live' or 'ended'.",
+        "lineNumber": 12,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "state"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the Media Stream that includes this Track.",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "streamId"
       }
     ],
     "loc": {
       "start": {
-        "line": 74,
+        "line": 58,
         "column": 0
       },
       "end": {
-        "line": 82,
+        "line": 72,
         "column": 3
       }
     },
@@ -34147,8 +33860,8 @@
     "properties": [
       {
         "title": "property",
-        "name": "camera",
-        "lineNumber": 5,
+        "name": "containers",
+        "lineNumber": 6,
         "description": {
           "type": "root",
           "children": [
@@ -34157,7 +33870,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of camera device information.",
+                  "value": "The list of CSS selectors that were used to render this Track.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34166,8 +33879,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 37,
-                      "offset": 36
+                      "column": 63,
+                      "offset": 62
                     },
                     "indent": []
                   }
@@ -34181,8 +33894,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 37,
-                  "offset": 36
+                  "column": 63,
+                  "offset": 62
                 },
                 "indent": []
               }
@@ -34196,8 +33909,8 @@
             },
             "end": {
               "line": 1,
-              "column": 37,
-              "offset": 36
+              "column": 63,
+              "offset": 62
             }
           }
         },
@@ -34210,15 +33923,15 @@
           "applications": [
             {
               "type": "NameExpression",
-              "name": "DeviceInfo"
+              "name": "string"
             }
           ]
         }
       },
       {
         "title": "property",
-        "name": "microphone",
-        "lineNumber": 6,
+        "name": "disabled",
+        "lineNumber": 7,
         "description": {
           "type": "root",
           "children": [
@@ -34227,7 +33940,190 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of microphone device information.",
+                  "value": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 90,
+                      "offset": 89
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 90,
+                  "offset": 89
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 90,
+              "offset": 89
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "id",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the Track.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 21,
+                      "offset": 20
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 21,
+                  "offset": 20
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 21,
+              "offset": 20
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "kind",
+        "lineNumber": 9,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The kind of Track this is (audio, video).",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 42,
+                  "offset": 41
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 42,
+              "offset": 41
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "label",
+        "lineNumber": 10,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The label of the device this Track uses.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34272,23 +34168,14 @@
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         }
       },
       {
         "title": "property",
-        "name": "speaker",
-        "lineNumber": 7,
+        "name": "muted",
+        "lineNumber": 11,
         "description": {
           "type": "root",
           "children": [
@@ -34297,7 +34184,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of speaker device information.",
+                  "value": "Indicator on whether this Track is muted or not.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34306,8 +34193,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 38,
-                      "offset": 37
+                      "column": 49,
+                      "offset": 48
                     },
                     "indent": []
                   }
@@ -34321,8 +34208,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 38,
-                  "offset": 37
+                  "column": 49,
+                  "offset": 48
                 },
                 "indent": []
               }
@@ -34336,23 +34223,136 @@
             },
             "end": {
               "line": 1,
-              "column": 38,
-              "offset": 37
+              "column": 49,
+              "offset": 48
             }
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "state",
+        "lineNumber": 12,
+        "description": {
+          "type": "root",
+          "children": [
             {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The state of this Track. Can be 'live' or 'ended'.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "streamId",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the Media Stream that includes this Track.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
         }
       }
     ],
@@ -34362,7 +34362,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "DevicesObject",
+    "name": "TrackObject",
     "members": {
       "global": [],
       "inner": [],
@@ -34372,11 +34372,11 @@
     },
     "path": [
       {
-        "name": "DevicesObject",
+        "name": "TrackObject",
         "kind": "module"
       }
     ],
-    "namespace": "DevicesObject"
+    "namespace": "TrackObject"
   },
   {
     "description": {
