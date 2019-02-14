@@ -3,7 +3,7 @@ layout: page
 categories: quickstarts-javascript
 title: Presence
 permalink: /quickstarts/javascript/cpaas2/Presence
-position: 7
+position: 8
 ---
 
 # Presence
@@ -14,75 +14,13 @@ In this quickstart, we will cover how to subscribe and retrieve users' Presence 
 
 The presence feature doesn't have any required configuration. Simply creating an instance of the SDK and authenticating is sufficient to get started.
 
-```javascript exclude
+```javascript 
 const client = Kandy.create({
   // ... Only other configuration necessary
 })
 ```
 
-```hidden javascript
-const client = Kandy.create({
-  subscription: {
-    expires: 3600
-  },
-  // Required: Server connection configs.
-  authentication: {
-    server: {
-      base: '$KANDYFQDN$'
-    },
-    clientCorrelator: 'sampleCorrelator'
-  }
-})
-
-const cpaasAuthUrl = 'https://$KANDYFQDN$/cpaas/auth/v1/token'
-
-/**
- * Creates a form body from an dictionary
- */
-function createFormBody(paramsObject) {
-  const keyValuePairs = Object.entries(paramsObject).map(
-    ([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value)
-  )
-  return keyValuePairs.join('&')
-}
-/**
- * Gets the tokens necessary for authentication to $KANDY$
- */
-async function getTokens({ clientId, username, password }) {
-  const formBody = createFormBody({
-    client_id: clientId,
-    username,
-    password,
-    grant_type: 'password',
-    scope: 'openid'
-  })
-  // POST a request to create a new authentication access token.
-  const fetchResult = await fetch(cpaasAuthUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: formBody
-  })
-  // Parse the result of the fetch as a JSON format.
-  const data = await fetchResult.json()
-  return { accessToken: data.access_token, idToken: data.id_token }
-}
-async function login() {
-  const clientId = document.getElementById('clientId').value
-  const userEmail = document.getElementById('email').value
-  const password = document.getElementById('password').value
-  try {
-    const tokens = await getTokens({ clientId, username: userEmail, password })
-    client.setTokens(tokens)
-    log('Successfully logged in as ' + userEmail)
-  } catch (error) {
-    log('Error: Failed to get authentication tokens. Error: ' + error)
-  }
-}
-```
-
-To learn more about configuration, refer to the [Configurations Quickstart](index.html#Configurations).
+To learn more about configuration, refer to the [Configurations Quickstart](Configurations).
 
 Once we have authenticated, we need to subscribe for presence on the services we care about. In this case, we are subscribing to the `presence` service on the `websocket` Channel.
 
@@ -90,14 +28,14 @@ Once we have authenticated, we need to subscribe for presence on the services we
 function subscribeService() {
   const services = ['presence']
   const subscriptionType = 'websocket'
-  client.services.subscribe(services, subscriptionType) 
+  client.services.subscribe(services, subscriptionType)
 }
 
 // Listen for subscription changes.
 client.on('subscription:change', function() {
 
   if(
-    client.services.getSubscriptions().isPending === false && 
+    client.services.getSubscriptions().isPending === false &&
     client.services.getSubscriptions().subscribed.length > 0
   ) {
     log('Successfully subscribed')
@@ -105,7 +43,7 @@ client.on('subscription:change', function() {
 })
 ```
 
-To learn more about authentication, services and channels, refer to the [Authentication Quickstart](index.html#Authentication)
+To learn more about authentication, services and channels, refer to the [Authentication Quickstart](Authentication)
 
 #### HTML
 
@@ -120,8 +58,8 @@ First we have some fields for the user to input their credentials to login and s
   Email: <input type='text' id='email'/>
   Password: <input type='password' id='password'/>
   <input type='button' value='Login' onclick='login();' />
-  <input type='button' value='Subscribe to service' onclick='subscribeService();' />
-  <input type='button' value='Populate dropdowns' onclick='populateDropdowns();' />
+  <input type='button' value='Subscribe to Service' onclick='subscribeService();' />
+  <input type='button' value='Populate Dropdowns' onclick='populateDropdowns();' />
 </fieldset>
 ```
 
@@ -133,40 +71,23 @@ Next, we have a number fieldsets that contains all the actions we will perform f
   Status: <select class='content' id='statusesDropdown'></select>
   Activity: <select class='content' id='activitiesDropdown'></select>
   Note: <input type='text' id='note'/>
-  <input type='button' value='update' onclick='updatePresence()' />
+  <input type='button' value='Update' onclick='updatePresence()' />
 </fieldset>
 
 <fieldset>
   <legend>Subscribe (watch) user</legend>
-  UserId(s): <input type='text' id='userIdSubscribe'/>
-  <input type='button' value='subscribe' onclick='subscribe()' />
-  <input type='button' value='unsubscribe' onclick='unsubscribe()' />
+  User Id: <input type='text' id='userIdSubscribe'/>
+  <input type='button' value='Subscribe' onclick='subscribe()' />
+  <input type='button' value='Unsubscribe' onclick='unsubscribe()' />
 </fieldset>
 
 <fieldset>
   <legend>Fetch and Get presence</legend>
-  UserId(s): <input type='text' id='userIdFetch'/>
-  <input type='button' value='fetch' onclick='fetchPresence()' />
-  <input type='button' value='get' onclick='getPresence()' />
-  <input type='button' value='clear activities' onclick='clearActivities()' />
+  User Id: <input type='text' id='userIdFetch'/>
+  <input type='button' value='Fetch' onclick='fetchPresence()' />
+  <input type='button' value='Get' onclick='getPresence()' />
+  <input type='button' value='Clear Activities' onclick='clearActivities()' />
 </fieldset>
-```
-
-```hidden javascript
-// Utility function for appending activity messages to the activity div.
-function log(message) {
-  // Wrap message in textNode to guarantee that it is a string
-  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html
-  const textNode = document.createTextNode(message)
-  const divContainer = document.createElement('div')
-  divContainer.appendChild(textNode)
-  document.getElementById('presence-activity').appendChild(divContainer)
-}
-
-// Utility function for clearing the activity messages
-function clearActivities() {
-  document.getElementById('presence-activity').innerHTML = ''
-}
 ```
 
 Below that is a fieldset to hold the presence activity messages.
@@ -223,6 +144,7 @@ function updatePresence() {
 }
 
 ```
+
 ## Step 2: Subscribing to other user's presence
 
 Once your presence has been updated and is available for other users to subscribe to, you will want to subscribe to other users in order to see their presence. The `subscribe()` function is used for this. You can pass in a single user, or an array of valid usersIds. In this example, the values from the UserIds text box is used. For this exercise, subscribe to yourself using your userId. Although, this is not practical in a real world situation, it is still perfectly valid and will allow you to test the remaining presence features. For a more realistic scenario, use two browser instances and login as different users.
@@ -257,7 +179,7 @@ Once subscribed to a user or a number of users, an event is fired when a users p
 
 ### `presence:change`
 
-The `presence:change` event is fired whenever a user's presence is updated providing you are subscribed to that user. All subscribers to this user's presence will receive the presence for that user. The javascript SDK's state is automatically updated with this information. You can read more about this event [here](../docs#presence).
+The `presence:change` event is fired whenever a user's presence is updated providing you are subscribed to that user. All subscribers to this user's presence will receive the presence for that user. The javascript SDK's state is automatically updated with this information. You can read more about this event [here](../../references/cpaas2#presence).
 
 ```javascript
 /*
@@ -315,10 +237,31 @@ function getPresence() {
 
 Want to play around with this example for yourself? Feel free to edit this code on Codepen.
 
-```codepen
-{
-	"title": "Javascript SDK Presence Demo",
-	"editors": "101",
-	"js_external": "https://localhost:3000/kandy/kandy.cpaas2.js"
-}
-```
+### Instructions For Demo
+* Open two tabs for this demo by clicking the link twice to check and update the Presence for User A and User B.
+* Enter your Client ID for your account or project. Do this on both tabs.
+* Enter the email address and password of User A in the first tab. User A will be one of your account or project's users.
+* Enter the email address and password of User B in the second tab. User B will be one of your account or project's users.
+* Click *Login* to get your time-limited access token in both tabs.
+* Click *Subscribe to service* in both tabs to receive notifications from the server.
+* Click *Populate dropdowns* to fetch the 'Status' and 'Activity' list.
+
+#### Update your Presence
+
+* Select a 'Status' and 'Activity' from the list.
+* Note that the information in the "Note" input box is only valid when the 'Activity' is set to 'ActivitiesOther'. Otherwise, it's ignored.
+* Update User A's presence by selecting the status and activity from the dropdown and submit to notify your user's subscribers about their presence update.
+
+#### Subscribe for updates of user's presence
+
+* Enter User B's User Id into User A's tab under "Subscribe (watch) user"; e.g., username@domain.com
+* Click the Subscribe button to receive the presence details about the provided user.
+
+#### Fetch and Get Presence of users manually
+
+* Enter User B's User Id into User A's tab under "Fetch and Get presence" field; e.g., username@domain.com
+* Click *Fetch* to fetch the presence of the User B.
+
+
+
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * Javascript SDK Presence Demo\n */\n\nconst client = Kandy.create({\n  subscription: {\n    expires: 3600\n  },\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: &apos;$KANDYFQDN$&apos;\n    },\n    clientCorrelator: &apos;sampleCorrelator&apos;\n  }\n})\n\nconst cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody(paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n  // POST a request to create a new authentication access token.\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n  return { accessToken: data.access_token, idToken: data.id_token }\n}\nasync function login() {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;email&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n  try {\n    const tokens = await getTokens({ clientId, username: userEmail, password })\n    client.setTokens(tokens)\n    log(&apos;Successfully logged in as &apos; + userEmail)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\nfunction subscribeService() {\n  const services = [&apos;presence&apos;]\n  const subscriptionType = &apos;websocket&apos;\n  client.services.subscribe(services, subscriptionType)\n}\n\n// Listen for subscription changes.\nclient.on(&apos;subscription:change&apos;, function() {\n\n  if(\n    client.services.getSubscriptions().isPending === false &&\n    client.services.getSubscriptions().subscribed.length > 0\n  ) {\n    log(&apos;Successfully subscribed&apos;)\n    }\n})\n\n// Utility function for appending activity messages to the activity div.\nfunction log(message) {\n  // Wrap message in textNode to guarantee that it is a string\n  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html\n  const textNode = document.createTextNode(message)\n  const divContainer = document.createElement(&apos;div&apos;)\n  divContainer.appendChild(textNode)\n  document.getElementById(&apos;presence-activity&apos;).appendChild(divContainer)\n}\n\n// Utility function for clearing the activity messages\nfunction clearActivities() {\n  document.getElementById(&apos;presence-activity&apos;).innerHTML = &apos;&apos;\n}\n\n// Helper functions to update the status and activities dropdown controls\nfunction populateDropdownControls(target, values) {\n  const selectCtrl = document.getElementById(target)\n  selectCtrl.innerHTML = &apos;&apos;\n  for (let value in values) {\n    for (let opt of selectCtrl.options) {\n      if (opt.value === values[value]) {\n        selectCtrl.removeChild(opt)\n      }\n    }\n    var opt = document.createElement(&apos;option&apos;)\n    opt.value = opt.text = values[value]\n    selectCtrl.appendChild(opt)\n  }\n}\n\nfunction populateDropdowns() {\n  populateDropdownControls(&apos;activitiesDropdown&apos;, client.presence.activities)\n  populateDropdownControls(&apos;statusesDropdown&apos;, client.presence.statuses)\n}\n\n/*\n *  Update user&apos;s Presence.\n */\nfunction updatePresence() {\n  const status = document.getElementById(&apos;statusesDropdown&apos;).value\n  const activity = document.getElementById(&apos;activitiesDropdown&apos;).value\n  const note = document.getElementById(&apos;note&apos;).value\n  // Pass in your current availability.\n  const myStatus = client.presence.update(status, activity, note)\n  log(&apos;Presence updated with: &apos; + status + &apos;, &apos; + activity + &apos;, &apos; + note)\n}\n\n\n/*\n *  Subscribe to the presence of the given user(s).\n */\nfunction subscribe() {\n  const userIds = document.getElementById(&apos;userIdSubscribe&apos;).value\n  client.presence.subscribe(userIds)\n  log(&apos;Subscribing to: &apos; + userIds)\n}\n\n/*\n *  Unsubscribe from the presence of the given user(s).\n */\nfunction unsubscribe() {\n  const userIds = document.getElementById(&apos;userIdSubscribe&apos;).value\n  client.presence.unsubscribe(userIds)\n  log(&apos;Unsubscribing from: &apos; + userIds)\n}\n\n/*\n* Listen for change of subscribed users&apos; presence\n*/\nclient.on(&apos;presence:change&apos;, function(presence) {\n  // When an event is received, output the users presence.\n  log(&apos;Presence received for &apos; +  presence.userId)\n  log(&apos;....Status: &apos; + presence.status)\n  log(&apos;....Activity: &apos; + presence.activity)\n  if (presence.note) {\n    log(&apos;....Note: &apos; + presence.note)\n  }\n})\n\n/*\n* Get (from state) the presence for the given user(s)\n*/\nfunction getPresence() {\n  const userIds = document.getElementById(&apos;userIdFetch&apos;).value\n  const presence = client.presence.get(userIds)\n\n  for (let i=0; i < presence.length; i++ ) {\n    log(&apos;Presence for &apos; +  presence[i].userId)\n    log(&apos;....Status: &apos; + presence[i].status)\n    log(&apos;....Activity: &apos; + presence[i].activity)\n    if (presence[i].note) {\n      log(&apos;....Note: &apos; + presence[i].note)\n    }\n  }\n}\n\n&quot;,&quot;html&quot;:&quot;<fieldset>\n  <legend>Authenticate using your account information</legend>\n  Client ID: <input type=&apos;text&apos; id=&apos;clientId&apos;/>\n  Email: <input type=&apos;text&apos; id=&apos;email&apos;/>\n  Password: <input type=&apos;password&apos; id=&apos;password&apos;/>\n  <input type=&apos;button&apos; value=&apos;Login&apos; onclick=&apos;login();&apos; />\n  <input type=&apos;button&apos; value=&apos;Subscribe to Service&apos; onclick=&apos;subscribeService();&apos; />\n  <input type=&apos;button&apos; value=&apos;Populate Dropdowns&apos; onclick=&apos;populateDropdowns();&apos; />\n</fieldset>\n\n<fieldset>\n  <legend>Update your presence on Websocket Channel</legend>\n  Status: <select class=&apos;content&apos; id=&apos;statusesDropdown&apos;></select>\n  Activity: <select class=&apos;content&apos; id=&apos;activitiesDropdown&apos;></select>\n  Note: <input type=&apos;text&apos; id=&apos;note&apos;/>\n  <input type=&apos;button&apos; value=&apos;Update&apos; onclick=&apos;updatePresence()&apos; />\n</fieldset>\n\n<fieldset>\n  <legend>Subscribe (watch) user</legend>\n  User Id: <input type=&apos;text&apos; id=&apos;userIdSubscribe&apos;/>\n  <input type=&apos;button&apos; value=&apos;Subscribe&apos; onclick=&apos;subscribe()&apos; />\n  <input type=&apos;button&apos; value=&apos;Unsubscribe&apos; onclick=&apos;unsubscribe()&apos; />\n</fieldset>\n\n<fieldset>\n  <legend>Fetch and Get presence</legend>\n  User Id: <input type=&apos;text&apos; id=&apos;userIdFetch&apos;/>\n  <input type=&apos;button&apos; value=&apos;Fetch&apos; onclick=&apos;fetchPresence()&apos; />\n  <input type=&apos;button&apos; value=&apos;Get&apos; onclick=&apos;getPresence()&apos; />\n  <input type=&apos;button&apos; value=&apos;Clear Activities&apos; onclick=&apos;clearActivities()&apos; />\n</fieldset>\n\n<fieldset>\n  <legend>Presence activity</legend>\n  <div id=&apos;presence-activity&apos;></div>\n</fieldset>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;Javascript SDK Presence Demo&quot;,&quot;editors&quot;:&quot;101&quot;,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@57418/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>

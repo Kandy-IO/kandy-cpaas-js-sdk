@@ -2,8 +2,8 @@
 layout: page
 categories: quickstarts-javascript
 title: Troubleshooting and Logs
-permalink: /quickstarts/javascript/cpaas2/Troubleshooting%20%26%20Logs
-position: 8
+permalink: /quickstarts/javascript/cpaas2/Troubleshooting%20and%20Logs
+position: 9
 ---
 
 # Capturing Logs and Troubleshooting Problems
@@ -12,9 +12,9 @@ This quickstart covers the basics of how to gather log information from the SDK 
 
 ## Configuring the Logger
 
-When you create an instance of the SDK, you can supply configurations for the logger as part of the configuration object. The [Configuration Documentation](../docs#configurations) includes the full list of log configurations available for the logger.
+When you create an instance of the SDK, you can supply configurations for the logger as part of the configuration object. The [Configuration Documentation](../../references/cpaas2#configurations) includes the full list of log configurations available for the logger.
 
-```javascript exclude
+```javascript 
 // Log settings can be configured on SDK initialization.
 var client = Kandy.create({
   logs: {
@@ -100,10 +100,6 @@ The following demo shows how various log levels affect the logging output. Note:
 
 Want to play around with this example for yourself? Feel free to edit this code on Codepen.
 
-```codepen
-{
-    "title": "$KANDY$ Logger Demo",
-    "editors": 101,
-    "js_external": "https://localhost:3000/kandy/kandy.cpaas2.js"
-}
-```
+
+
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Logger Demo\n */\n\nfunction initialize() {\n  var logLevel = document.querySelector(&apos;input[name=\&quot;log-level\&quot;]:checked&apos;).value\n  console.log(&apos;log level:&apos;, logLevel)\n  var client = Kandy.create({\n    logs: {\n      logLevel: logLevel,\n      enableFcsLogs: true\n    },\n    authentication: {\n      server: {\n        base: &apos;$KANDYFQDN$&apos;\n      },\n      clientCorrelator: &apos;sampleCorrelator&apos;\n    }\n  })\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Select a Log level</legend>\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;silent\&quot;>silent\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;error\&quot; >error\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;warn\&quot;>warn\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;info\&quot;>info\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;debug\&quot;>debug\n  </fieldset>\n  <input type=\&quot;button\&quot; value=\&quot;Initialize SDK\&quot; onclick=\&quot;initialize();\&quot; />\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Logger Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@57418/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>

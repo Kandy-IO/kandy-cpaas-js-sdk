@@ -30,7 +30,7 @@ In most cases, the default values will suffice for an application, but specifyin
 
 ## Example Configurations
 
-This quickstart will showcase a few samples of why you may want to use certain configurations. For a full list of the possible configurations, see the [Configuration Documentation](../docs#configurations).
+This quickstart will showcase a few samples of why you may want to use certain configurations. For a full list of the possible configurations, see the [Configuration Documentation](../../references/cpaas2#configurations).
 
 ### Authentication
 
@@ -102,3 +102,6 @@ connectivity: {
   reconnectLimit: 3
 }
 ```
+
+
+
