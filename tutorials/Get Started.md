@@ -20,7 +20,7 @@ To begin, you will need to include the javascript library in your application. T
 
 The library will expose the `Kandy` object to global scope. The `Kandy.create` function is used to create an instance of the SDK, as well as to configure that instance.
 
-```
+``` html
 <!-- HTML -->
 
 <!-- Load the library. -->
@@ -40,7 +40,7 @@ The library will expose the `Kandy` object to global scope. The `Kandy.create` f
 
 Different module bundlers can be used to bundle the library with your application. In your application, you simply need to import the library to be able to make use of it.
 
-```
+``` javascript
 // ES6 import or...
 import { create } from './path/to/Kandy'
 // CommonJS module.
