@@ -91,6 +91,3 @@ The best way to learn is usually by example. Our quickstarts will provided you w
 | Chrome  | Latest 3 Major Versions |
 | Firefox | Latest 3 Major Versions |
 | Safari  |  Latest Major Version   |
-
-
-
