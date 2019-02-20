@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.58010
+ * Version: 3.2.0-beta.58620
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29995,7 +29995,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.58010';
+  let version = '3.2.0-beta.58620';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -34660,7 +34660,7 @@ function notifications(options = {}) {
     yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
 
-  const capabilities = ['externalNotifications'];
+  const capabilities = [];
 
   return {
     name: _interface.name,
@@ -35005,7 +35005,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * @public
  * @module Notification
- * @requires justHideThisForNowTODO
+ * @requires externalNotifications
  */
 function api({ dispatch }) {
   const notificationApi = {
