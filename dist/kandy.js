@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.58871
+ * Version: 3.2.0-beta.58925
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29995,7 +29995,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.58871';
+  let version = '3.2.0-beta.58925';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -36639,6 +36639,16 @@ Object.defineProperty(exports, "__esModule", {
 const RECEIVED = exports.RECEIVED = 'presence:change';
 
 /**
+ * The user's self presence information has changed.
+ *
+ * @public
+ * @memberof Presence
+ * @requires presence
+ * @event presence:selfChange
+ */
+const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
+
+/**
  * An error occured with presence.
  *
  * @public
@@ -36694,8 +36704,17 @@ eventsMap[actionTypes.RECEIVED] = action => ({
   }
 });
 
+eventsMap[actionTypes.UPDATE_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.SELF_CHANGE
+    };
+  }
+};
+
 // TODO: Should have events to notifiy of successful operations for these actions.
-eventsMap[actionTypes.UPDATE_FINISH] = presenceError;
 eventsMap[actionTypes.GET_FINISH] = presenceError;
 eventsMap[actionTypes.SUBSCRIBE_FINISH] = presenceError;
 eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = presenceError;

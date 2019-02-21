@@ -8,6 +8,7 @@ Kandy.js change log.
 ## 4.1.0-beta
 
 ### Added
+- Added new Presence event, `presence:selfChange`, to notify when self-presence information has changed. `KAA-1153`
 - Added Presence APIs for retrieving presence information. See `kandy.presence.getAll` and `kandy.presence.getSelf`. KAA-1152.
 - Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
 
@@ -32,6 +33,7 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 ## 3.2.0-beta
 
 ### Added
+- Added new Presence event, `presence:selfChange`, to notify when self-presence information has changed. `KAA-1153`
 - Added Presence APIs for retrieving presence information. See `kandy.presence.getAll` and `kandy.presence.getSelf`. KAA-1152.
 - Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
 
