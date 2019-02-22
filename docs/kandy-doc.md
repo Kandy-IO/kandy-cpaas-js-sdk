@@ -126,33 +126,6 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### states
-
-Possible states for a call.
-
-**Properties**
-
--   `INITIATING` **[string][2]** The (outgoing) call is being started.
--   `INITIATED` **[string][2]** The (outgoing) call has been sent over the network, but has not been received.
--   `RINGING` **[string][2]** The call has been received by both parties, and is waiting to be answered.
--   `CANCELLED` **[string][2]** The call was disconnected before it could be answered.
--   `CONNECTED` **[string][2]** Both parties are connected and media is flowing.
--   `ON_HOLD` **[string][2]** Both parties are connected but no media is flowing.
--   `ENDED` **[string][2]** The call has ended.
-
-**Examples**
-
-```javascript
-// Use the call states to know how to handle a change in the call.
-client.on('call:stateChange', function (params) {
-   const call = client.call.getById(params.callId)
-   // Check if the call now has media flowing.
-   if (call.state === client.call.states.CONNECTED) {
-     // Render call media ...
-   }
-})
-```
-
 ### make
 
 Starts an outgoing call to a SIP user or a PSTN phone number.
@@ -291,6 +264,33 @@ A track ID can optionally be provided to get a report for the specific track of 
 
 -   `callId` **[string][2]** The ID of the call to retrieve stats report.
 -   `trackId` **[string][2]?** TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
+
+### states
+
+Possible states for a call.
+
+**Properties**
+
+-   `INITIATING` **[string][2]** The (outgoing) call is being started.
+-   `INITIATED` **[string][2]** The (outgoing) call has been sent over the network, but has not been received.
+-   `RINGING` **[string][2]** The call has been received by both parties, and is waiting to be answered.
+-   `CANCELLED` **[string][2]** The call was disconnected before it could be answered.
+-   `CONNECTED` **[string][2]** Both parties are connected and media is flowing.
+-   `ON_HOLD` **[string][2]** Both parties are connected but no media is flowing.
+-   `ENDED` **[string][2]** The call has ended.
+
+**Examples**
+
+```javascript
+// Use the call states to know how to handle a change in the call.
+client.on('call:stateChange', function (params) {
+   const call = client.call.getById(params.callId)
+   // Check if the call now has media flowing.
+   if (call.state === client.call.states.CONNECTED) {
+     // Render call media ...
+   }
+})
+```
 
 ## Media
 
@@ -836,6 +836,27 @@ Sets the channel to be used while proxy mode is enabled.
 
 -   `channel` **Channel** 
 
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][11]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][11]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][11]>** A list of speaker device information.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+
 ## CallObject
 
 The state representation of a Call.
@@ -859,27 +880,6 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][11]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][11]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][11]>** A list of speaker device information.
-
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -896,16 +896,16 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## MediaObject
+## DeviceInfo
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+Contains information about a device.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## Subscription
 

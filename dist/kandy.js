@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.58925
+ * Version: 3.2.0-beta.59135
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22985,8 +22985,6 @@ var _events = __webpack_require__("./src/call/interfaceNew/events.js");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _constants = __webpack_require__("./src/call/constants.js");
-
 var _actions = __webpack_require__("./src/events/interface/actions.js");
 
 var _actions2 = __webpack_require__("./src/config/interface/actions.js");
@@ -23007,7 +23005,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Other plugins.
-// Call plugin.
 function cpaas2Calls(options = {}) {
   const defaultOptions = {
     // The list of TURN/STUN servers to use.
@@ -23055,42 +23052,16 @@ function cpaas2Calls(options = {}) {
     }
   }
 
-  // Add the CPaaS2 call state constants to the API.
-  const api = _interfaceNew2.default.api;
-  /**
-   * Possible states for a call.
-   *
-   * @public
-   * @memberof Calls
-   * @type {Object}
-   * @property {string} INITIATING The (outgoing) call is being started.
-   * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received.
-   * @property {string} RINGING The call has been received by both parties, and is waiting to be answered.
-   * @property {string} CANCELLED The call was disconnected before it could be answered.
-   * @property {string} CONNECTED Both parties are connected and media is flowing.
-   * @property {string} ON_HOLD Both parties are connected but no media is flowing.
-   * @property {string} ENDED The call has ended.
-   * @example
-   * // Use the call states to know how to handle a change in the call.
-   * client.on('call:stateChange', function (params) {
-   *    const call = client.call.getById(params.callId)
-   *    // Check if the call now has media flowing.
-   *    if (call.state === client.call.states.CONNECTED) {
-   *      // Render call media ...
-   *    }
-   * })
-   */
-  api.call.states = _constants.CALL_STATES;
-
   return {
     name: _interfaceNew2.default.name,
-    api: api,
+    api: _interfaceNew2.default.api,
     reducer: _interfaceNew2.default.reducer,
     init
   };
 }
 
 // Helpers.
+// Call plugin.
 
 /***/ }),
 
@@ -25594,6 +25565,30 @@ function callAPI({ dispatch, getState }) {
     getStats(callId, trackId) {
       dispatch(_actions.callActions.getStats(callId, { trackId }));
     },
+
+    /**
+     * Possible states for a call.
+     *
+     * @public
+     * @memberof Calls
+     * @type {Object}
+     * @property {string} INITIATING The (outgoing) call is being started.
+     * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received.
+     * @property {string} RINGING The call has been received by both parties, and is waiting to be answered.
+     * @property {string} CANCELLED The call was disconnected before it could be answered.
+     * @property {string} CONNECTED Both parties are connected and media is flowing.
+     * @property {string} ON_HOLD Both parties are connected but no media is flowing.
+     * @property {string} ENDED The call has ended.
+     * @example
+     * // Use the call states to know how to handle a change in the call.
+     * client.on('call:stateChange', function (params) {
+     *    const call = client.call.getById(params.callId)
+     *    // Check if the call now has media flowing.
+     *    if (call.state === client.call.states.CONNECTED) {
+     *      // Render call media ...
+     *    }
+     * })
+     */
     states: _constants.CALL_STATES
   };
 }
@@ -29995,7 +29990,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.58925';
+  let version = '3.2.0-beta.59135';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
