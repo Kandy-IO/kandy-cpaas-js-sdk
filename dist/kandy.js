@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.59605
+ * Version: 3.2.0-beta.59675
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -25407,8 +25407,6 @@ var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
-var _normalization = __webpack_require__("./src/call/utils/normalization.js");
-
 var _v = __webpack_require__("../../node_modules/uuid/v4.js");
 
 var _v2 = _interopRequireDefault(_v);
@@ -25419,7 +25417,6 @@ var _constants = __webpack_require__("./src/call/constants.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Call plugin.
 function callAPI({ dispatch, getState }) {
   return {
     /**
@@ -25444,7 +25441,7 @@ function callAPI({ dispatch, getState }) {
       };
 
       dispatch(_actions.callActions.makeCall(callId, (0, _extends3.default)({
-        participantAddress: (0, _normalization.normalizeSipUri)(destination),
+        participantAddress: destination,
         mediaConstraints
       }, options)));
       return callId;
@@ -25646,6 +25643,7 @@ function callAPI({ dispatch, getState }) {
 }
 
 // Libraries.
+// Call plugin.
 
 /***/ }),
 
@@ -26015,7 +26013,7 @@ callEvents[actionTypes.CALL_CANCELLED] = (action, params) => {
 
 callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
   // Don't emit an event if it was a slow start answer.
-  if (action.meta.isSlowStart) {
+  if (action.meta && action.meta.isSlowStart) {
     return;
   }
 
@@ -26661,96 +26659,6 @@ function getOptions(state) {
  */
 function getTurnInfo(state) {
   return state.call.turn;
-}
-
-/***/ }),
-
-/***/ "./src/call/utils/normalization.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.normalizeSipUri = normalizeSipUri;
-/**
- *The function takes in the input dial string and domain address of the user, performs a normalization process based on the phone number handling normalization rules
- * @function normalizeSipUri
- * @param {string} address   It contains the input dial string the user dials in or the callee address
- * @param {string} domain    It contains the user's domain address
- * @returns {string} output  The output which is the normalized callee address/phone number
- */
-
-function normalizeSipUri(address, domain) {
-  var output;
-
-  // Remove all leading space and tailing space
-  address = address.trim();
-
-  // Remove all in-between spaces
-  address = address.replace(/[ ]/g, '');
-
-  // Check for: '@' if at the beginning or at the end
-  if (address.indexOf('@') === 0 || address.indexOf('@') === address.length - 1) {
-    output = 'sip:' + address + '@' + domain;
-  } else {
-    var dialAddress;
-    var domainAddress;
-
-    // Check for: '@' symbol in address
-    if (address.indexOf('@') !== -1) {
-      // Split address at the occurence of '@' into two e.g 12345 and @domain.com, so we can normalize better
-      dialAddress = address.substr(0, address.indexOf('@'));
-      domainAddress = address.substr(address.indexOf('@'));
-    } else {
-      dialAddress = address;
-      domainAddress = domain;
-    }
-
-    let leadingChar = dialAddress.substring(0, 1);
-
-    // Check for: no leading char
-    if (!(['*', '+', '#'].indexOf(leadingChar) !== -1)) {
-      // Check for: digits and visual seperators
-      if (dialAddress.match(/^[0-9-+().]*$/)) {
-        address = dialAddress.replace(/[-+().]/g, '');
-      } else if (dialAddress.match(/^[a-zA-Z0-9-]*$/)) {
-        // Check for: lower case and uppercase alpha chars, digits and visual seperators
-        address = dialAddress;
-      }
-    } else {
-      // Check for: leading char
-      if (dialAddress.indexOf(leadingChar) === 0) {
-        // Check for: leading char(*), digits and visual seperators
-        if (dialAddress.match(/^\*+[0-9-+.()]*$/)) {
-          address = dialAddress.replace(/[-+.()]/g, '');
-        } else if (dialAddress.match(/^\+[0-9-+.()]*$/)) {
-          // Check for: leading char(+), digits and visual seperators
-          address = leadingChar + dialAddress.replace(/[-+.()]/g, '');
-        } else if (dialAddress.match(/^\+[a-zA-Z0-9-]*$/)) {
-          // Check for: leading char(+), alpha chars, digits and visual seperators
-          address = dialAddress.replace(/[.()]/g, '');
-        } else if (dialAddress.match(/^\+[#0-9-+.()]*$/)) {
-          // Check for: leading char(+), digits and visual seperators
-          address = leadingChar + dialAddress.replace(/[-+.()]/g, '');
-        } else if (dialAddress.match(/^[#0-9.()]*$/)) {
-          // Check for: leading char(#), digits and visual seperators
-          address = dialAddress.replace(/[.()]/g, '');
-        }
-      } else {
-        address = dialAddress;
-      }
-    }
-
-    if (domainAddress.indexOf('@') === 0) {
-      output = 'sip:' + address + domainAddress;
-    } else {
-      output = 'sip:' + address + '@' + domainAddress;
-    }
-  }
-  return output;
 }
 
 /***/ }),
@@ -30042,7 +29950,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.59605';
+  let version = '3.2.0-beta.59675';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
