@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.59409
+ * Version: 3.2.0-beta.59605
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19655,8 +19655,20 @@ class Peer extends _eventemitter2.default {
       // event object contains transceiver which already has track attached to its receiver
       const { track: nativeTrack, streams } = event;
 
+      // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
+      //  a stream is not associated with it so we get no stream here.
+      // So we create our own stream here.
+      // In the future, support will be available for `sender.setStreams` on the remote side
+      //  so this is a temporary workaround.
+      let targetStream;
+      if (streams.length === 0) {
+        targetStream = new MediaStream([nativeTrack]);
+      } else {
+        targetStream = streams[0];
+      }
+
       // Convert the native MediaStreamTrack into a Track object.
-      const track = this.trackManager.add(nativeTrack, streams[0]);
+      const track = this.trackManager.add(nativeTrack, targetStream);
 
       _loglevel2.default.debug(`Peer (${this.id}) received track (${track.id}).`);
       this.emit('ontrack', track);
@@ -19889,28 +19901,27 @@ class Peer extends _eventemitter2.default {
   /**
    * Finds a specific transceiver depending on the options passed in
    * @method findTransceiver
-   * @param {Object} [options]
-   * @param {String} [options.trackId] The transceiver with the specific sender.track.id.
-   * @param {String} [options.mid] The transceiver with the specific media id.
+   * @param {Object} [options] Only one of these options will be taken with order of precedence being trackId, mid.
+   * @param {string} [options.trackId] The transceiver with the specific sender.track.id.
+   * @param {string} [options.mid] The transceiver with the specific media id.
    * @return {Object} The transceiver that was found (undefined if not found).
    */
   findTransceiver(options) {
     const transceivers = this.peerConnection.getTransceivers();
-    let foundTransceiver;
     if (options.trackId) {
-      foundTransceiver = transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
+      return transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
     } else if (options.mid) {
-      foundTransceiver = transceivers.find(transceiver => transceiver.mid === options.mid);
+      return transceivers.find(transceiver => transceiver.mid === options.mid);
     }
-    return foundTransceiver;
   }
 
   /**
    * Replaces a specified transceiver's sender.track.
    * @method replaceTrack
-   * @param {Object} [options]
-   * @param {String} [options.trackId] The transceiver with the specific sender.track.id.
-   * @param {String} [options.mid] The transceiver with the specific media id.
+   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced.
+   *  If both are provided, mid will be used.
+   * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
+   * @param {string} [options.mid] The optional media id of a specific transceiver.
    * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
@@ -19923,6 +19934,20 @@ class Peer extends _eventemitter2.default {
         reject(new Error(`Transceiver ${options} not found.`));
       }
     });
+  }
+
+  /**
+   * Finds a transceiver that does not have a track on its sender.
+   * @param {string} kind The kind of transceiver to find (audio or video)
+   * @returns {Object} Transceiver object that matches kind and has no sender track. Otherwise undefined.
+   */
+  findVacantTransceiver(kind) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
+      const transceivers = this.peerConnection.getTransceivers();
+      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind);
+    } else {
+      _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
+    }
   }
 
   /**
@@ -20112,7 +20137,7 @@ class Peer extends _eventemitter2.default {
   /**
    * Sets the direction of transceivers.
    * @method setTransceiversDirection
-   * @param {String} targetDirection The desired direction to set the transceivers to.
+   * @param {string} targetDirection The desired direction to set the transceivers to.
    * @param {Object} [options] Options for specifying which transceivers should be affected.
    *  Only one of these options can be provided at a time.
    *  If both are provided, trackIds will be used.
@@ -20303,27 +20328,54 @@ class Session extends _eventemitter2.default {
     const peer = this.peerManager.get(this.peerId);
     // TODO: Better error handling?
     if (peer) {
-      tracks.forEach(track => {
-        peer.addTrack(track);
-
-        // Indicate that the Session has a new Track.
-        this.emit('new:track', {
-          local: true,
-          trackId: track.id
-        });
-
-        track.once('ended', () => {
-          // If the PeerConnection is closed, we don't need to worry about
-          //    removing the track (and it would throw an error anyway).
-          if (peer.peerConnection.signalingState !== 'closed') {
-            peer.removeTrack(track.id);
-            this.emit('track:ended', {
-              local: true,
-              trackId: track.id
+      const addTrackOrReuseTransceiverPromises = tracks.map(track => {
+        return new _promise2.default((resolve, reject) => {
+          const vacantTransceiver = peer.findVacantTransceiver(track.track.kind);
+          // If we can find a vacant transceiver, reuse it.
+          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
+            peer.replaceTrack({ mid: vacantTransceiver.mid }, track.track).then(() => {
+              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              const result = peer.setTransceiversDirection(targetDirection, {
+                mid: vacantTransceiver.mid
+              });
+              if (!result.error) {
+                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
+              } else {
+                reject(new Error(`Failed to process the following transceivers: ${result.failures}`));
+              }
+            }).catch(err => {
+              _loglevel2.default.error(err);
+              reject(err);
             });
+          } else {
+            peer.addTrack(track);
+            resolve(`Added track (${track.track.kind} : ${track.id}).`);
           }
+        }).then(message => {
+          // Set event emitters and handlers
+          _loglevel2.default.info(message);
+
+          // Indicate that the Session has a new Track.
+          this.emit('new:track', {
+            local: true,
+            trackId: track.id
+          });
+
+          track.once('ended', () => {
+            // If the PeerConnection is closed, we don't need to worry about
+            //    removing the track (and it would throw an error anyway).
+            if (peer.peerConnection.signalingState !== 'closed') {
+              peer.removeTrack(track.id);
+              this.emit('track:ended', {
+                local: true,
+                trackId: track.id
+              });
+            }
+          });
         });
       });
+
+      return _promise2.default.all(addTrackOrReuseTransceiverPromises);
     }
   }
 
@@ -29990,7 +30042,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.59409';
+  let version = '3.2.0-beta.59605';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
