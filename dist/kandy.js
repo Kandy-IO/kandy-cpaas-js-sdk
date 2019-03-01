@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.60099
+ * Version: 3.3.0-beta.60265
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18377,8 +18377,27 @@ function createCodecRemover(config) {
         return typeof item === 'string' ? { name: item } : item;
     });
 
-    return function (params) {
-        var newSdp = (0, _fp.cloneDeep)(params.currentSdp);
+    return function () {
+        // Adding support for new callstack sdp handlers
+        // Old callstack sdp pipeline passes an object to each sdp
+        // handler that contains the currentSdp
+        // New callstack passes 3 arguments to each sdp handler
+        // newSdp, info, originalSdp
+        var oldCallstack = true;
+        var currentSdp = void 0;
+
+        for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+            params[_key] = arguments[_key];
+        }
+
+        if (params[0].currentSdp) {
+            currentSdp = params[0].currentSdp;
+        } else if (params.length === 3) {
+            oldCallstack = false;
+            currentSdp = params[0];
+        }
+
+        var newSdp = (0, _fp.cloneDeep)(currentSdp);
 
         // This is an array of strings representing codec names we want to remove.
         var codecStringsToRemove = config.map(function (codec) {
@@ -18477,7 +18496,9 @@ function createCodecRemover(config) {
             }
         });
 
-        return params.next(newSdp);
+        // If old callstack, then return the results of the next sdp handler
+        // If new callstack, then just return the modified sdp
+        return oldCallstack ? params[0].next(newSdp) : newSdp;
     };
 }
 
@@ -19878,6 +19899,9 @@ class Peer extends _eventemitter2.default {
               this.emit('onnegotiationready');
             } else {
               _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${this.config.trickleIceMode}).`);
+              // TODO: Handle this scenario properly.
+              // If ICE collection never finishes, we need to time it out at some point.
+              setTimeout(() => this.emit('onnegotiationready'), 3000);
             }
           }, 25);
         }
@@ -23018,11 +23042,13 @@ const CALL_STATES = exports.CALL_STATES = {
    * @property {string} CHANGE_MEDIA Media flow remains the same, includes non-flow related media changes.
    * @property {string} HOLD_MEDIA   Media flow stops. May include non-flow related media changes.
    * @property {string} UNHOLD_MEDIA Media flow restarts. May include non-flow related media changes.
+   * @property {string} MUSIC_ON_HOLD Media flow changes to sendonly.
    */
 };const OPERATIONS = exports.OPERATIONS = {
   CHANGE_MEDIA: 'Change Media',
   HOLD_MEDIA: 'Hold Media',
-  UNHOLD_MEDIA: 'Unhold Media'
+  UNHOLD_MEDIA: 'Unhold Media',
+  MUSIC_ON_HOLD: 'Music on hold'
 
   /**
    * Call direction
@@ -23106,6 +23132,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Configuration options for the call feature.
+ * @public
+ * @name config.call
+ * @memberof config
+ * @instance
+ * @param {Object} call The call configuration object.
+ * @param {Object} [call.iceServers] ICE servers to be used for calls.
+ * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
+ * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ */
+
 // Libraries.
 
 
@@ -23128,7 +23166,9 @@ function cpaas2Calls(options = {}) {
     // Whether the SDK should fetch turn credentials.
     serverTurnCredentials: true,
     // Trickle ICE method to use for calls.
-    trickleIceMode: 'NONE'
+    trickleIceMode: 'NONE',
+    // SDP handlers to be included in the pipeline for every operation.
+    sdpHandlers: []
   };
   options = (0, _utils2.mergeValues)(defaultOptions, options);
 
@@ -23139,12 +23179,14 @@ function cpaas2Calls(options = {}) {
     /*
      * Set SDP handlers to be used for every operation:
      *
-     * 1. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
+     * 1. Application provided SDP handlers.
+     *
+     * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
      *    crypto method enabled. WebRTC only allows one method to be enabled.
      * This is needed for interopability with non-browser endpoints that include
      *    SDES as a fallback method.
      */
-    webRTC.sdp.pipeline.setHandlers([_utils.sanitizeSdesFromSdp]);
+    webRTC.sdp.pipeline.setHandlers(options.sdpHandlers.concat([_utils.sanitizeSdesFromSdp]));
 
     // Wrap the call sagas in a function that provides them with the webRTC stack.
     const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
@@ -25134,6 +25176,8 @@ const ADD_MEDIA_FINISH = exports.ADD_MEDIA_FINISH = callPrefix + 'ADD_MEDIA_FINI
 const REMOVE_MEDIA = exports.REMOVE_MEDIA = callPrefix + 'REMOVE_MEDIA';
 const REMOVE_MEDIA_FINISH = exports.REMOVE_MEDIA_FINISH = callPrefix + 'REMOVE_MEDIA_FINISH';
 
+const MUSIC_ON_HOLD = exports.MUSIC_ON_HOLD = callPrefix + 'MUSIC_ON_HOLD';
+
 const SEND_DTMF = exports.SEND_DTMF = callPrefix + 'SEND_DTMF';
 const SEND_DTMF_FINISH = exports.SEND_DTMF_FINISH = callPrefix + 'SEND_DTMF_FINISH';
 
@@ -25197,6 +25241,7 @@ exports.addMedia = addMedia;
 exports.addMediaFinish = addMediaFinish;
 exports.removeMedia = removeMedia;
 exports.removeMediaFinish = removeMediaFinish;
+exports.musicOnHold = musicOnHold;
 exports.sendDTMF = sendDTMF;
 exports.sendDTMFFinish = sendDTMFFinish;
 exports.getStats = getStats;
@@ -25360,6 +25405,10 @@ function removeMediaFinish(id, params) {
   return callActionHelper(actionTypes.REMOVE_MEDIA_FINISH, id, params);
 }
 
+function musicOnHold(id, params) {
+  return callActionHelper(actionTypes.MUSIC_ON_HOLD, id, params);
+}
+
 function sendDTMF(id, params) {
   return callActionHelper(actionTypes.SEND_DTMF, id, params);
 }
@@ -25461,6 +25510,8 @@ var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
+var _normalization = __webpack_require__("./src/call/utils/normalization.js");
+
 var _v = __webpack_require__("../../node_modules/uuid/v4.js");
 
 var _v2 = _interopRequireDefault(_v);
@@ -25471,6 +25522,7 @@ var _constants = __webpack_require__("./src/call/constants.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Call plugin.
 function callAPI({ dispatch, getState }) {
   return {
     /**
@@ -25495,7 +25547,7 @@ function callAPI({ dispatch, getState }) {
       };
 
       dispatch(_actions.callActions.makeCall(callId, (0, _extends3.default)({
-        participantAddress: destination,
+        participantAddress: (0, _normalization.normalizeSipUri)(destination),
         mediaConstraints
       }, options)));
       return callId;
@@ -25697,7 +25749,6 @@ function callAPI({ dispatch, getState }) {
 }
 
 // Libraries.
-// Call plugin.
 
 /***/ }),
 
@@ -26026,7 +26077,33 @@ function callEventHandler(type, action, params = {}) {
   };
 }
 
+/**
+ * Helper function for converting an action to a "call state change" event.
+ * Ensures that all such events have consistent parameters.
+ * @method stateChangeHandler
+ * @param  {Object} action
+ * @param  {Object} params
+ * @param  {Object} params.prevState Redux state from before the action was processed by reducers.
+ * @param  {Object} params.state     Redux state from after the action was processed by reducers.
+ * @return {Object} An event object.
+ */
+
+
 // Helpers
+function stateChangeHandler(action, params) {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state,
+      localHold: prevCall.localHold,
+      remoteHold: prevCall.remoteHold
+    }
+  });
+}
+
 const callEvents = exports.callEvents = {};
 
 callEvents[actionTypes.MAKE_CALL_FINISH] = action => {
@@ -26041,107 +26118,26 @@ callEvents[actionTypes.CALL_INCOMING] = action => {
   });
 };
 
-callEvents[actionTypes.CALL_RINGING] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_CANCELLED] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
+callEvents[actionTypes.CALL_RINGING] = stateChangeHandler;
+callEvents[actionTypes.CALL_CANCELLED] = stateChangeHandler;
 
 callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
-  // Don't emit an event if it was a slow start answer.
-  if (action.meta && action.meta.isSlowStart) {
+  // Don't emit an event if it was a slow start answer. The call isn't actually
+  //    answered yet, so state hasn't changed.
+  if (action.meta.isSlowStart) {
     return;
   }
 
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
+  return stateChangeHandler(action, params);
 };
 
-callEvents[actionTypes.CALL_ACCEPTED] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.IGNORE_CALL_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error
-  });
-};
-
-callEvents[actionTypes.END_CALL_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    transition: action.payload.transition,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_HOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    local: action.payload.local,
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_UNHOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    local: action.payload.local,
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
+callEvents[actionTypes.CALL_ACCEPTED] = stateChangeHandler;
+callEvents[actionTypes.IGNORE_CALL_FINISH] = stateChangeHandler;
+callEvents[actionTypes.END_CALL_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_HOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_UNHOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = stateChangeHandler;
 
 callEvents[actionTypes.ADD_MEDIA_FINISH] = action => {
   return callEventHandler(eventTypes.CALL_ADDED_MEDIA, action, {
@@ -26165,34 +26161,6 @@ callEvents[actionTypes.GET_STATS_FINISH] = action => {
     result: action.payload.result,
     error: action.payload.error,
     trackId: action.payload.trackId
-  });
-};
-
-callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
   });
 };
 
@@ -26433,6 +26401,12 @@ callReducers[actionTypes.UPDATE_CALL] = {
   }
 };
 
+callReducers[actionTypes.MUSIC_ON_HOLD] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, action.payload);
+  }
+};
+
 callReducers[actionTypes.CALL_HOLD_FINISH] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -26480,7 +26454,7 @@ callReducers[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD);
 
 /*
  * Reducer to handle specific call actions.
@@ -26713,6 +26687,170 @@ function getOptions(state) {
  */
 function getTurnInfo(state) {
   return state.call.turn;
+}
+
+/***/ }),
+
+/***/ "./src/call/utils/normalization.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.normalizeSipUri = normalizeSipUri;
+/**
+ * Extracts the domain from an address if an @ symbol exists and isn't at the start or end of the address.
+ * @param {string} addressString The address string to extract the domain from (if it exists).
+ * @returns {string} The extracted domain. Empty string of none found.
+ */
+function extractDomainFromAddress(addressString) {
+  const indexOfAtSymbol = addressString.indexOf('@');
+  if (indexOfAtSymbol !== 0 && indexOfAtSymbol !== addressString.length - 1) {
+    // If '@' symbol found in middle of addressString, split it.
+    if (indexOfAtSymbol !== -1) {
+      return addressString.substr(indexOfAtSymbol + 1);
+    }
+  }
+  return '';
+}
+
+/**
+ * Determines which address and domain to use depending on whether the address string contains a domain or not.
+ * @param {string} addressString The address string to examine and extract a domain from (if any).
+ * @param {string} defaultDomainString The domain to use if the address string does not contain a domain in it.
+ * @returns {Object} An object containing the correct address and domain to use.
+ */
+function separateAddressAndDomain(addressString, defaultDomainString) {
+  const extractedDomain = extractDomainFromAddress(addressString);
+  // If a domain was extracted from the address, use that as the domain and strip it from the address.
+  if (extractedDomain) {
+    return {
+      address: addressString.substr(0, addressString.length - extractedDomain.length - 1),
+      domain: extractedDomain
+    };
+  } else {
+    return {
+      address: addressString,
+      domain: defaultDomainString
+    };
+  }
+}
+
+/**
+ * Extracts any pre-pended data before a ":" (if it exists) from the beginning of a string.
+ * @param {string} inputString The string to remove pre-pended data from.
+ * @returns {string} The pre-pended data string.
+ */
+function extractPrependedData(inputString) {
+  const prependedDataMatches = inputString.match(/^.*:/g);
+  if (prependedDataMatches && prependedDataMatches[0]) {
+    return prependedDataMatches[0];
+  } else {
+    return '';
+  }
+}
+
+/**
+ * Finds the leading special characters ("#", "+", "*") of an address if it is a phone number.
+ * If the address contains letters or any non-visual-separator characters,
+ *  it is not a phone number and no leading special characters will be found.
+ * @param {string} addressString The address string to find the leading characters of (if any).
+ *  The addressString must not contain any pre-pended data such as "sip:".
+ *  The addressString must not contain a domain.
+ * @returns {string} The leading special characters as one string. Empty string if none found.
+ */
+function extractLeadingSpecialCharacters(addressString) {
+  // A single or group of contiguous characters are considered leading character/s if it is  the following:
+  // - starts at the beginning of the string - ^
+  // - is any of the following characters - [#+*]+
+  // - is followed by a digit or "(" - [\d|(]
+  // - is followed by any number of only digits and visual separators - [\d \-.()+]*$
+  const potentialLeadingChars = addressString.match(/^[#+*]+[\d|(][\d \-.()+]*$/g);
+  if (potentialLeadingChars && potentialLeadingChars[0]) {
+    // Guaranteed to have a match for regex [#+*]+ since we have potentialLeadingChars
+    // which was a match for a similar regex and we are simply extracting the leading characters part.
+    const actualLeadingChars = potentialLeadingChars[0].match(/[#+*]+/g);
+    return actualLeadingChars[0];
+  }
+  return '';
+}
+
+/**
+ * Outputs a new string without its phone number visual separators ("-", ".", "(", ")", "+").
+ * @param {string} inputString The string to remove visual separators from.
+ * @returns {string} A new string without visual separators.
+ */
+function withoutVisualSeparators(inputString) {
+  return inputString.replace(/[ \-.()+]/g, '');
+}
+
+/**
+ * Determines whether a string should be considered a phone number or not.
+ * @param {string} addressString The address string to check.
+ *  The addressString must not contain any pre-pended data such as "sip:"
+ *  The addressString must not contain any leading special characters.
+ *  The addressString must not contain a domain.
+ * @returns {boolean} True if the input string is a phone number. False if it is not.
+ */
+function isPhoneNumber(addressString) {
+  const cleanNumber = withoutVisualSeparators(addressString);
+  const phoneNumberMatch = cleanNumber.match(/^\d+$/g);
+  return phoneNumberMatch && phoneNumberMatch.length === 1;
+}
+
+/**
+ * Processes the address string and returns the correct output.
+ * If the address is a phone number, visual separators are removed.
+ * Otherwise, it will just return the address as-is.
+ * @param {string} addressString The address string to process.
+ *  The addressString must not contain any pre-pended data such as "sip:".
+ *  The addressString must not contain any leading special characters (if it is a phone number).
+ *  The addressString must not contain a domain.
+ * @returns {string} A phone number without visual-separators or the addressString as-is.
+ */
+function processAddress(addressString) {
+  return isPhoneNumber(addressString) ? withoutVisualSeparators(addressString) : addressString;
+}
+
+/**
+ * Processes the domain string and returns the correct output.
+ * Adds an "@" symbol if it isn't present at the beginning of the domain.
+ * @param {string} domainString The domain string to process.
+ * @returns {string} The domain with "@" symbol at the beginning if it doesn't exist.
+ */
+function processDomain(domainString) {
+  return (domainString.indexOf('@') === 0 ? '' : '@') + domainString;
+}
+
+/**
+ *The function takes in the input dial string and domain address of the user, performs a normalization process based on the phone number handling normalization rules
+ * @function normalizeSipUri
+ * @param {string} address   It contains the input dial string the user dials in or the callee address
+ * @param {string} domain    It contains the user's domain address
+ * @returns {string} output  The output which is the normalized callee address/phone number
+ */
+function normalizeSipUri(address, domain) {
+  // Remove leading and trailing white spaces.
+  address = address.trim();
+
+  // Extract domain.
+  const resultingAddressAndDomain = separateAddressAndDomain(address, domain);
+  domain = resultingAddressAndDomain.domain;
+  address = resultingAddressAndDomain.address;
+
+  // Extract pre-pended "sip:".
+  const prepend = extractPrependedData(address);
+  address = address.substr(prepend.length);
+
+  // Extract leading characters.
+  const leadingChars = extractLeadingSpecialCharacters(address);
+  address = address.substr(leadingChars.length);
+
+  // Process and build parts into final output in the form of `<prepend>:<leadingChars><address>@<domain>`.
+  return 'sip:' + leadingChars + processAddress(address) + processDomain(domain);
 }
 
 /***/ }),
@@ -30004,7 +30142,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.60099';
+  let version = '3.3.0-beta.60265';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -30472,6 +30610,7 @@ const logMgr = getLogManager(defaultOptions);
  * @public
  * @name config.logs
  * @memberof config
+ * @requires logs
  * @instance
  * @param {Object} logs Logs configs.
  * @param  {string} [logs.logLevel=debug] Log level to be set. See `logger.levels`.
@@ -30511,6 +30650,7 @@ function logger(options = {}) {
 
   var components = {
     name,
+    capabilities: ['logs'],
     init,
     api: _api2.default
     // Consider actions to be at the INFO log level.
@@ -30537,6 +30677,11 @@ function logger(options = {}) {
         nextState: false
       };
     }
+
+    if (options.logActions.excludeActions) {
+      actionOptions.predicate = excludeActions(options.logActions.excludeActions);
+    }
+
     // ALWAYS use our own logger
     actionOptions.logger = logMgr.getLogger('ACTION');
     // ALWAYS remove theming/styling from the action log messages
@@ -30569,6 +30714,16 @@ function getLogManager(options) {
   return getLogManager.instance;
 }
 
+/**
+ * Logger predicate function that will take an array of action types
+ * and exclude them from logs
+ * @param {Array} actions An array of action types to exclude from logs
+ * @returns {function} A predicate function
+ */
+function excludeActions(actions) {
+  return (getState, action) => !actions.includes(action.type);
+}
+
 /***/ }),
 
 /***/ "./src/logs/interface/api.js":
@@ -30592,6 +30747,7 @@ exports.default = api;
  *
  * @public
  * @module Logger
+ * @requires logs
  */
 
 function api() {
@@ -41974,11 +42130,18 @@ function api(context) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.default = mediaAPI;
 
 var _actions = __webpack_require__("./src/webrtc/interface/actions/index.js");
 
 var _selectors = __webpack_require__("./src/webrtc/interface/selectors.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Media related APIs.
@@ -42015,6 +42178,8 @@ function mediaAPI({ dispatch, getState }) {
 
     /**
      * Retrieve a Track object from state with a specific ID.
+     * @public
+     * @memberof Media
      * @method getTrackById
      * @param  {string} trackId The ID of the track to retrieve.
      * @return {Object} A track object.
@@ -42031,6 +42196,8 @@ function mediaAPI({ dispatch, getState }) {
      * @method renderTracks
      * @param  {Array}  tracks List of Track IDs to be rendered.
      * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Object} [options] Additional options for rendering the tracks.
+     * @param  {string} [options.speakerId] The device ID of the speaker to use for audio tracks.
      * @example
      * // When an outgoing call is accepted, render the media used for the call.
      * client.on('call:accepted', function (params) {
@@ -42042,8 +42209,10 @@ function mediaAPI({ dispatch, getState }) {
      *     client.media.render(call.remoteMedia[0], remoteContainer)
      * })
      */
-    renderTracks(tracks, cssSelector) {
-      dispatch(_actions.trackActions.renderTracks(tracks, { selector: cssSelector }));
+    renderTracks(tracks, cssSelector, options = {}) {
+      dispatch(_actions.trackActions.renderTracks(tracks, (0, _extends3.default)({
+        selector: cssSelector
+      }, options)));
     },
 
     /**
@@ -42869,8 +43038,10 @@ function* renderTracks(webRTC, action) {
     return;
   }
 
+  const speakerId = action.payload.speakerId;
+
   // Render the tracks.
-  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], container)));
+  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], container, speakerId)));
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
@@ -42976,6 +43147,138 @@ function findContainer(selector) {
     log.error(`Unable to get container with selector: "${selector}". Error: ${e}`);
   }
   return container;
+}
+
+/***/ }),
+
+/***/ "./src/webrtcProxy/channel.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = wrapChannel;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Wraps a channel with only `send` and `receive` functionality into one that
+ *    also has `reply` functionality.
+ * This is required by the Proxy Plugin to convert asynchronous code into
+ *    synchronous code. The Proxy needs to return a value synchronously when
+ *    sending data over the channel.
+ * @method wrapChannel
+ * @param  {Object} channel
+ * @return {Object} The same channel, but with a `reply` method as well.
+ */
+function wrapChannel(channel) {
+  /**
+   * Track sent messages by their ID.
+   * @type {Object}
+   */
+  const sentMessages = {};
+
+  channel.receive = function receiveMessage(message) {
+    const { messageId, data } = message;
+
+    // Determine how the message needs to be handled.
+    if (messageId && sentMessages[messageId]) {
+      // If the message has an ID from a sent message, then it is a reply to
+      //    that message. Resolve the promise associated with it.
+      sentMessages[messageId].resolve(data);
+    } else if (messageId && !sentMessages[messageId]) {
+      // If the message has an ID that we don't know about, then the application
+      //    will need to handle it.
+      if (api.receive) {
+        api.receive(messageId, data);
+      } else {
+        console.log('No listener for receiving messages.', data);
+      }
+    } else {
+      // If the message didn't have an ID, then it wasn't from our test channel.
+      console.log('Unknown message.');
+    }
+  };
+
+  /*
+   * The interface that the Proxy Plugin will use.
+   */
+  const api = {};
+
+  /**
+   * Send a message over the channel.
+   * @method send
+   * @param {string} messageId A unique ID to track the sent message.
+   * @param {Object} data
+   * @param {Function} callback Function called when a reply is received.
+   */
+  api.send = (messageId, data, callback) => {
+    if (sentMessages[messageId]) {
+      // The ID has already been used for sending a message.
+      callback(null, new Error('Cannot send message; ID already used.'));
+      return;
+    }
+
+    // Attach a messageId to the message.
+    // This lets the remote side reply to this message by using the messageId.
+    const message = {
+      data,
+      messageId
+
+      // Wrap `send` is a promise so that we can correlate receiving a reply
+      //    to the callback.
+    };new _promise2.default(resolve => {
+      // Store `resolve` so we can call it call it when we receive a reply.
+      sentMessages[messageId] = {
+        resolve
+        // Send the message over the channel.
+      };channel.send(message);
+    }).then(data => {
+      // The message received a reply, so remove the reference.
+      delete sentMessages[messageId];
+      console.debug('Received response for message: ', messageId);
+      if (typeof callback === 'function') {
+        callback(data);
+      }
+    });
+  };
+
+  /**
+   * Listener for receiving a message from the channel.
+   * @method receive
+   * @param {string} messageId
+   * @param {Object} data
+   */
+  // eslint-disable-next-line
+  api.receive = undefined;
+
+  /**
+   * Send a reply to a specific received message over the channel.
+   * @method reply
+   * @param {string} messageId
+   * @param {Object} data
+   */
+  api.reply = (messageId, data) => {
+    console.debug(`Replying to message ${messageId}.`, data);
+
+    // Attach the messageId to the message.
+    const message = {
+      data,
+      messageId
+    };
+
+    channel.send(message);
+  };
+
+  return api;
 }
 
 /***/ }),
@@ -43106,6 +43409,9 @@ const SET_MODE_FINISH = exports.SET_MODE_FINISH = PREFIX + 'SET_MODE_FINISH';
 const SET_CHANNEL = exports.SET_CHANNEL = PREFIX + 'SET_CHANNEL';
 const SET_CHANNEL_FINISH = exports.SET_CHANNEL_FINISH = PREFIX + 'SET_CHANNEL_FINISH';
 
+const INITIALIZE = exports.INITIALIZE = PREFIX + 'INITIALIZE';
+const INITIALIZE_FINISH = exports.INITIALIZE_FINISH = PREFIX + 'INITIALIZE_FINISH';
+
 /***/ }),
 
 /***/ "./src/webrtcProxy/interface/actions.js":
@@ -43126,6 +43432,8 @@ exports.setProxyMode = setProxyMode;
 exports.setProxyModeFinish = setProxyModeFinish;
 exports.setChannel = setChannel;
 exports.setChannelFinish = setChannelFinish;
+exports.initializeRemote = initializeRemote;
+exports.initializeRemoteFinish = initializeRemoteFinish;
 
 var _actionTypes = __webpack_require__("./src/webrtcProxy/interface/actionTypes.js");
 
@@ -43162,6 +43470,14 @@ function setChannel(channel) {
 
 function setChannelFinish({ error }) {
   return actionHelper(actionTypes.SET_CHANNEL_FINISH, { error });
+}
+
+function initializeRemote(config) {
+  return actionHelper(actionTypes.INITIALIZE, { config });
+}
+
+function initializeRemoteFinish({ error }) {
+  return actionHelper(actionTypes.INITIALIZE_FINISH, { error });
 }
 
 /***/ }),
@@ -43202,12 +43518,60 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @module Proxy
  */
 
+/**
+ * The Channel object that the Proxy module needs to be provided.
+ *
+ * @public
+ * @module Channel
+ * @example
+ * // The channel the application uses for communicating with a remote endpoint.
+ * const appChannel = ...
+ *
+ * // The channel the application will provide to the Proxy module for use.
+ * const channel = {
+ *    send: function (data) {
+ *      // Any encoding / wrapping needed for a Proxy message being sent
+ *      //    over the channel.
+ *      appChannel.sendMessage(data)
+ *    },
+ *    // The Proxy module will set this function.
+ *    receive: undefined
+ * }
+ * appChannel.on('message', data => {
+ *    // Any decoding / unwrapping needed for the received message.
+ *    channel.receive(data)
+ * })
+ *
+ * client.proxy.setChannel(channel)
+ */
+
+/**
+ * Channel function that the Proxy module will use to send messages to the remote side.
+ * @public
+ * @memberof Channel
+ * @name send
+ * @function
+ * @param {Object} data Message to be sent over the channel.
+ */
+
+/**
+ * API that the Proxy module will assign a listener function for accepting received messages.
+ * This function should receive all messages sent from the remote side of the channel.
+ * @public
+ * @memberof Channel
+ * @name receive
+ * @function
+ * @param {Object} data The message received from the Channel.
+ */
+
 // Proxy plugin.
 function api({ dispatch, getState }) {
   const api = {
     /**
      * Sets the mode for the Proxy Plugin.
-     * When enabled, webRTC operations will be proxied over a channel.
+     * When enabled, webRTC operations will be proxied over a channel. Enabling
+     *    proxy mode requires a channel to have been set. See `setChannel` API.
+     * When disabled, webRTC operation will occur as normal on the local machine.
      * @public
      * @memberof Proxy
      * @method setProxyMode
@@ -43228,15 +43592,33 @@ function api({ dispatch, getState }) {
       return (0, _selectors.getProxyState)(getState()).proxyMode;
     },
 
+    /*
+     * Retrieve Proxy information.
+     */
+    getInfo() {
+      return (0, _selectors.getProxyState)(getState());
+    },
+
     /**
      * Sets the channel to be used while proxy mode is enabled.
      * @public
      * @memberof Proxy
      * @method setChannel
-     * @param {Channel} channel
+     * @param {Channel} channel See the `Channel` module for information.
      */
     setChannel(channel) {
       dispatch(actions.setChannel(channel));
+    },
+
+    /**
+     * Sends an initialization message over the channel with webRTC configurations.
+     * @public
+     * @memberof Proxy
+     * @method initializeRemote
+     * @param  {Object} config
+     */
+    initializeRemote(config) {
+      dispatch(actions.initializeRemote(config));
     }
   };
 
@@ -43323,6 +43705,7 @@ const proxyEvents = action => {
 
 eventsMap[actionTypes.SET_MODE_FINISH] = proxyEvents;
 eventsMap[actionTypes.SET_CHANNEL_FINISH] = proxyEvents;
+eventsMap[actionTypes.INITIALIZE_FINISH] = proxyEvents;
 
 exports.default = eventsMap;
 
@@ -43387,7 +43770,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Proxy plugin.
 const defaultState = {
   proxyMode: false,
-  hasChannel: false
+  hasChannel: false,
+  remoteInitialized: false
 };
 
 // Libraries.
@@ -43409,6 +43793,15 @@ reducers[actionTypes.SET_CHANNEL_FINISH] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
       hasChannel: true
+    });
+  }
+};
+
+// The remote side has been initialized.
+reducers[actionTypes.INITIALIZE_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      remoteInitialized: true
     });
   }
 };
@@ -43544,7 +43937,8 @@ exports.default = function (base, actualManager) {
                   }
                 }
 
-                thisArg.channel.send(operation, callback);
+                const messageId = (0, _v2.default)();
+                thisArg.channel.send(messageId, operation, callback);
               });
             }
           }
@@ -43562,9 +43956,14 @@ var _logs = __webpack_require__("./src/logs/index.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Other plugins.
+// Libraries.
+// Proxy plugin.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
 /**
@@ -43578,8 +43977,7 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  */
 
 
-// Libraries.
-// Proxy plugin.
+// Other plugins.
 
 /***/ }),
 
@@ -43601,8 +43999,13 @@ exports.default = modelProxy;
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Other plugins.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
 /**
@@ -43612,7 +44015,9 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  * @param  {Channel} channel The channel to use for proxying commands.
  * @return {Proxy}   A proxied webRTC object.
  */
-// Other plugins.
+
+
+// Libraries.
 function modelProxy(base, channel) {
   log.debug(`Creating proxy for ${base.type}.`, base);
 
@@ -43678,7 +44083,8 @@ function modelProxy(base, channel) {
                 resolve(data);
               }
 
-              channel.send(operation, callback);
+              const messageId = (0, _v2.default)();
+              channel.send(messageId, operation, callback);
             });
           }
         });
@@ -43698,16 +44104,30 @@ function modelProxy(base, channel) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
 exports.default = initializeProxy;
 
 var _manager = __webpack_require__("./src/webrtcProxy/proxies/manager.js");
 
 var _manager2 = _interopRequireDefault(_manager);
 
+var _channel = __webpack_require__("./src/webrtcProxy/channel.js");
+
+var _channel2 = _interopRequireDefault(_channel);
+
 var _logs = __webpack_require__("./src/logs/index.js");
+
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Other plugins.
 // Proxy plugin.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
@@ -43720,7 +44140,7 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  */
 
 
-// Other plugins.
+// Libraries.
 function initializeProxy(webRTC) {
   // The base of the proxy stack.
   const base = {
@@ -43793,15 +44213,16 @@ function initializeProxy(webRTC) {
       return false;
     }
 
+    const wrappedChannel = (0, _channel2.default)(channel);
     log.debug('Setting channel for proxy use.');
-    base.channel = channel;
+    base.channel = wrappedChannel;
 
     for (const manProxy in base.managers) {
-      base.managers[manProxy].channel = channel;
+      base.managers[manProxy].channel = wrappedChannel;
     }
 
     // TODO: Have an API for this.
-    setTimeout(initialize, 1000);
+    // setTimeout(initialize, 1000)
 
     return true;
   };
@@ -43830,20 +44251,27 @@ function initializeProxy(webRTC) {
    * @param {Object} config WebRTC stack configuration.
    */
   const initialize = config => {
-    if (!base.clientReady && base.channel) {
-      const callback = data => {
-        log.debug('Received initialize response.', data);
-        if (data.initialized) {
-          // The Client is now ready.
-          base.clientReady = true;
-        }
-      };
+    return new _promise2.default((resolve, reject) => {
+      if (!base.clientReady && base.channel) {
+        const callback = data => {
+          log.debug('Received initialize response.', data);
+          if (data.initialized) {
+            // The Client is now ready.
+            base.clientReady = true;
+            resolve();
+          } else {
+            reject(new Error('Remote end not initialized.'));
+          }
+        };
 
-      log.debug('Initializing remote webRTC stack.', config);
-      base.channel.send({ initialize: true, config: config }, callback);
-    } else {
-      log.info('Either Client is already ready or no channel to use.');
-    }
+        log.debug('Initializing remote webRTC stack.', config);
+        const messageId = (0, _v2.default)();
+        base.channel.send(messageId, { initialize: true, config: config }, callback);
+      } else {
+        log.info('Either Client is already ready or no channel to use.');
+        reject(new Error('Either Client is already ready or no channel to use.'));
+      }
+    });
   };
 
   /**
@@ -43886,6 +44314,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setMode = setMode;
 exports.setChannel = setChannel;
+exports.initializeRemote = initializeRemote;
 
 var _actionTypes = __webpack_require__("./src/webrtcProxy/interface/actionTypes.js");
 
@@ -43909,6 +44338,10 @@ function* setChannel(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.SET_CHANNEL, sagas.setChannel, webRTC);
 }
 
+function* initializeRemote(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.INITIALIZE, sagas.initializeRemote, webRTC);
+}
+
 /***/ }),
 
 /***/ "./src/webrtcProxy/sagas/proxyStack.js":
@@ -43923,6 +44356,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setProxyMode = setProxyMode;
 exports.setChannel = setChannel;
 exports.handleMessages = handleMessages;
+exports.initializeRemote = initializeRemote;
 
 var _actions = __webpack_require__("./src/webrtcProxy/interface/actions.js");
 
@@ -44064,6 +44498,16 @@ function* handleMessages(webRTC) {
     } else {
       log.debug('Received unknown message type; ignoring message.', data);
     }
+  }
+}
+
+function* initializeRemote(webRTC, action) {
+  const error = yield (0, _effects.call)([webRTC, 'initialize'], action.payload.config);
+
+  if (error) {
+    yield (0, _effects.put)(actions.initializeRemoteFinish({ error: error.message }));
+  } else {
+    yield (0, _effects.put)(actions.initializeRemoteFinish({}));
   }
 }
 

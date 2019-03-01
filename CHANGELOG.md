@@ -5,7 +5,9 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.1.0-beta
+## 4.2.0-beta
+
+## 4.1.0 - 2019-03-01
 
 ### Added
 - Added new Presence event, `presence:selfChange`, to notify when self-presence information has changed. `KAA-1153`
@@ -30,7 +32,12 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 ### Changed
 - Refactored all of the WebRTC-related code.
 
-## 3.2.0-beta
+## 3.3.0-beta
+
+### Changed
+- Changed the callOptions parameter for the makeAnonymous API function of the CallMe SDK. It must now include a `from` property (callOptions.from), indicating the URI of the caller, as it no longer receives a default value of `anonymousUser@kandy.callMe`. `KAA-1350`
+
+## 3.2.0 - 2019-03-01
 
 ### Added
 - Added new Presence event, `presence:selfChange`, to notify when self-presence information has changed. `KAA-1153`

@@ -315,6 +315,16 @@ Retrieve a media object from state with a specific media ID.
 
 Returns **[MediaObject][10]** A media object.
 
+### getTrackById
+
+Retrieve a Track object from state with a specific ID.
+
+**Parameters**
+
+-   `trackId` **[string][2]** The ID of the track to retrieve.
+
+Returns **[Object][5]** A track object.
+
 ### renderTracks
 
 Render media Tracks in a container.
@@ -324,6 +334,8 @@ The container is specified by providing a CSS selector string that corresponds t
 
 -   `tracks` **[Array][7]** List of Track IDs to be rendered.
 -   `cssSelector` **[string][2]** A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+-   `options` **[Object][5]?** Additional options for rendering the tracks.
+    -   `options.speakerId` **[string][2]?** The device ID of the speaker to use for audio tracks.
 
 **Examples**
 
@@ -702,6 +714,17 @@ Configuration options for the Authentication feature.
         -   `authentication.server.version` **[string][2]** Version of the REST API to be used. (optional, default `v1`)
     -   `authentication.clientCorrelator` **[string][2]** Unique ID for the client. This is required by the platform to identify an instance of the application used by the specific device.
 
+### config.call
+
+Configuration options for the call feature.
+
+**Parameters**
+
+-   `call` **[Object][5]** The call configuration object.
+    -   `call.iceServers` **[Object][5]?** ICE servers to be used for calls.
+    -   `call.serverTurnCredentials` **[boolean][6]** Whether server-provided TURN credentials should be used. (optional, default `true`)
+    -   `call.sdpHandlers` **[Array][7]?** List of SDP handler functions to modify SDP. Advanced usage.
+
 ### config.connectivity
 
 Configuration options for the Connectivity feature.
@@ -807,6 +830,51 @@ Update values in the global Config section of the store.
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
 
+## Channel
+
+The Channel object that the Proxy module needs to be provided.
+
+**Examples**
+
+```javascript
+// The channel the application uses for communicating with a remote endpoint.
+const appChannel = ...
+
+// The channel the application will provide to the Proxy module for use.
+const channel = {
+   send: function (data) {
+     // Any encoding / wrapping needed for a Proxy message being sent
+     //    over the channel.
+     appChannel.sendMessage(data)
+   },
+   // The Proxy module will set this function.
+   receive: undefined
+}
+appChannel.on('message', data => {
+   // Any decoding / unwrapping needed for the received message.
+   channel.receive(data)
+})
+
+client.proxy.setChannel(channel)
+```
+
+### receive
+
+API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.
+
+**Parameters**
+
+-   `data` **[Object][5]** The message received from the Channel.
+
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
+
 ## Proxy
 
 The Proxy module allows for a secondary mode for making calls: proxy mode.
@@ -816,7 +884,9 @@ This is an advanced feature that enables support for Calls in particular scenari
 ### setProxyMode
 
 Sets the mode for the Proxy Plugin.
-When enabled, webRTC operations will be proxied over a channel.
+When enabled, webRTC operations will be proxied over a channel. Enabling
+   proxy mode requires a channel to have been set. See `setChannel` API.
+When disabled, webRTC operation will occur as normal on the local machine.
 
 **Parameters**
 
@@ -834,7 +904,15 @@ Sets the channel to be used while proxy mode is enabled.
 
 **Parameters**
 
--   `channel` **Channel** 
+-   `channel` **[Channel][11]** See the `Channel` module for information.
+
+### initializeRemote
+
+Sends an initialization message over the channel with webRTC configurations.
+
+**Parameters**
+
+-   `config` **[Object][5]** 
 
 ## DeviceInfo
 
@@ -846,43 +924,6 @@ Contains information about a device.
 -   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][11]>** A list of Track objects that are contained in this Media object.
-
-## TrackObject
-
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
-
-**Properties**
-
--   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][2]** The ID of the Track.
--   `kind` **[string][2]** The kind of Track this is (audio, video).
--   `label` **[string][2]** The label of the device this Track uses.
--   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
--   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
 
 ## CallObject
 
@@ -906,6 +947,43 @@ A Call can be manipulated by using the Call feature's APIs.
     -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+
+## TrackObject
+
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+
+**Properties**
+
+-   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][2]** The ID of the Track.
+-   `kind` **[string][2]** The kind of Track this is (audio, video).
+-   `label` **[string][2]** The label of the device this Track uses.
+-   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
+-   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
 
 ## Subscription
 
@@ -970,6 +1048,8 @@ The Basic error object. Provides information about an error that occurred in the
 
 [10]: #mediaobject
 
-[11]: #trackobject
+[11]: #channel
 
-[12]: #deviceinfo
+[12]: #trackobject
+
+[13]: #deviceinfo
