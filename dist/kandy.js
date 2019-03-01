@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0-beta.60052
+ * Version: 3.2.0-beta.60099
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20199,6 +20199,8 @@ var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js");
 
+var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
+
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -20219,12 +20221,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-
-
-// SDP Helpers.
+// Helpers.
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
+
+    // Keeps track of who started the initial offer.
+    // We need this for calls with firefox so that DTLS roles aren't interpreted by other browsers (chrome)
+    //  as being switched when the one that didn't initiate a call tries to start renegotiation offer.
+    // See more details on the issue here https://groups.google.com/forum/#!topic/discuss-webrtc/gsw3OEAwNKo.
+    this.isInitialOfferrer = undefined;
+
+    _pipeline2.default.setHandlers([_handlers.setDtlsSetupToPassiveIfInitialOfferrer]);
+
     // The session's unique id
     this.id = id;
     this.config = config;
@@ -20422,11 +20431,17 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createOffer(options).then(offer => {
+        // If initialOfferrer flag not set and offering, that means we are the initial offerrer.
+        if (this.isInitialOfferrer === undefined) {
+          this.isInitialOfferrer = true;
+        }
+
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local offer with SDP pipeline.');
           offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
             type: offer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
+            endpoint: _constants.PEER.ENDPOINT.LOCAL,
+            isInitiator: this.isInitialOfferrer
           });
         }
         peer.setLocalDescription(offer).then(() => {
@@ -20492,7 +20507,8 @@ class Session extends _eventemitter2.default {
         _loglevel2.default.debug('Modifying remote offer with SDP pipeline.');
         offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
           type: offer.type,
-          endpoint: _constants.PEER.ENDPOINT.REMOTE
+          endpoint: _constants.PEER.ENDPOINT.REMOTE,
+          isInitiator: this.isInitialOfferrer
         });
       }
 
@@ -20543,11 +20559,17 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createAnswer(options).then(answer => {
+        // If initialOfferrer flag not set and answering, that means we aren't the initial offerrer.
+        if (this.isInitialOfferrer === undefined) {
+          this.isInitialOfferrer = false;
+        }
+
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local answer with SDP pipeline.');
           answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
             type: answer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
+            endpoint: _constants.PEER.ENDPOINT.LOCAL,
+            isInitiator: this.isInitialOfferrer
           });
         }
         peer.setLocalDescription(answer).then(() => {
@@ -20572,7 +20594,8 @@ class Session extends _eventemitter2.default {
       _loglevel2.default.debug('Modifying remote answer with SDP pipeline.');
       answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
         type: answer.type,
-        endpoint: _constants.PEER.ENDPOINT.REMOTE
+        endpoint: _constants.PEER.ENDPOINT.REMOTE,
+        isInitiator: this.isInitialOfferrer
       });
     }
 
@@ -20673,7 +20696,9 @@ class Session extends _eventemitter2.default {
     });
   }
 }
-exports.default = Session; // Helpers.
+exports.default = Session;
+
+// SDP Helpers.
 
 /***/ }),
 
@@ -20939,6 +20964,7 @@ var _values2 = _interopRequireDefault(_values);
 exports.removeTrickleIce = removeTrickleIce;
 exports.removeBundling = removeBundling;
 exports.changeMediaDirection = changeMediaDirection;
+exports.setDtlsSetupToPassiveIfInitialOfferrer = setDtlsSetupToPassiveIfInitialOfferrer;
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -21023,6 +21049,31 @@ function changeMediaDirection({ audio, video }) {
   };
 }
 
+/**
+ * Sets the DTLS setup to passive if it is active and if the following conditions hold:
+ *  - This session initiated the call with the first offer.
+ *  - We created the SDP.
+ *  - We are answering an offer.
+ * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
+ * @param {RTCSdpType} info Information about the session description.
+ * @param {RTCSdpType} info.type The session description's type.
+ * @param {string} info.endpoint Which end of the connection created the SDP.
+ * @param {boolean} info.isInitiator Whether this session initiated the call or not.
+ * @param {Object} originalSdp The sdp in its initial state.
+ */
+function setDtlsSetupToPassiveIfInitialOfferrer(newSdp, info, originalSdp) {
+  // Hack: If we are the initial offerrer, we created the sdp, and we're answering,
+  //  we need to set DTLS setup to passive if it's active.
+  if (info.isInitiator && info.endpoint === 'local' && info.type === 'answer') {
+    for (let mLine of newSdp.media) {
+      if (mLine.setup && mLine.setup === 'active') {
+        mLine.setup = 'passive';
+      }
+    }
+  }
+  return newSdp;
+}
+
 /***/ }),
 
 /***/ "../webrtc/src/sdpUtils/pipeline.js":
@@ -21057,12 +21108,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Basic SDP pipeline runner.
  * Does not include any default handlers.
  * @method sdpPipeline
- * @param  {Array}      handlers      List of functions that transform the SDP.
- * @param  {String}     sdp           The session description.
- * @param  {RTCSdpType} info          Information about the session description.
- * @param  {RTCSdpType} info.type     The session description's type.
- * @param  {String}     info.endpoint Which end of the connection created the SDP.
+ * @param  {Array}      handlers       List of functions that transform the SDP.
+ * @param  {String}     sdp            The session description.
+ * @param  {RTCSdpType} info           Information about the session description.
+ * @param  {RTCSdpType} info.type      The session description's type.
+ * @param  {String}     info.endpoint  Which end of the connection created the SDP.
+ * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
  * @return {String}     The modified session description.
+
  */
 function runPipeline(handlers, sdp, info) {
   let objectSdp = _sdpTransform2.default.parse(sdp);
@@ -21118,7 +21171,7 @@ function createPipeline() {
    */
   function setHandlers(handlers) {
     if ((0, _fp.isArray)(handlers)) {
-      defaultHandlers = handlers;
+      defaultHandlers = defaultHandlers.concat(handlers);
     }
   }
 
@@ -25006,6 +25059,7 @@ function* validateCallState(callId, expected) {
  * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
  * @param {string} info.endpoint Which end of the connection created the SDP.
+ * @param {boolean} info.isInitiator Whether this session initiated the call or not.
  * @param {Object} originalSdp The sdp in its initial state.
  * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
  */
@@ -29950,7 +30004,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0-beta.60052';
+  let version = '3.2.0-beta.60099';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
