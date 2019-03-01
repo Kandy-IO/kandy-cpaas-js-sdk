@@ -126,33 +126,6 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### states
-
-Possible states for a call.
-
-**Properties**
-
--   `INITIATING` **[string][2]** The (outgoing) call is being started.
--   `INITIATED` **[string][2]** The (outgoing) call has been sent over the network, but has not been received.
--   `RINGING` **[string][2]** The call has been received by both parties, and is waiting to be answered.
--   `CANCELLED` **[string][2]** The call was disconnected before it could be answered.
--   `CONNECTED` **[string][2]** Both parties are connected and media is flowing.
--   `ON_HOLD` **[string][2]** Both parties are connected but no media is flowing.
--   `ENDED` **[string][2]** The call has ended.
-
-**Examples**
-
-```javascript
-// Use the call states to know how to handle a change in the call.
-client.on('call:stateChange', function (params) {
-   const call = client.call.getById(params.callId)
-   // Check if the call now has media flowing.
-   if (call.state === client.call.states.CONNECTED) {
-     // Render call media ...
-   }
-})
-```
-
 ### make
 
 Starts an outgoing call to a SIP user or a PSTN phone number.
@@ -188,6 +161,14 @@ Will trigger a `call:answered` event.
 -   `media` **[Object][5]?** The media options the call should be initialized with.
     -   `media.audio` **[Boolean][6]** Whether the call should have audio on start. Currently, audio-less calls are not supported. (optional, default `true`)
     -   `media.video` **[Boolean][6]** Whether the call should have video on start. (optional, default `false`)
+
+### ignore
+
+Ignore an incoming call.
+
+**Parameters**
+
+-   `callId` **[string][2]** The ID of the call to ignore.
 
 ### hold
 
@@ -283,6 +264,33 @@ A track ID can optionally be provided to get a report for the specific track of 
 
 -   `callId` **[string][2]** The ID of the call to retrieve stats report.
 -   `trackId` **[string][2]?** TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
+
+### states
+
+Possible states for a call.
+
+**Properties**
+
+-   `INITIATING` **[string][2]** The (outgoing) call is being started.
+-   `INITIATED` **[string][2]** The (outgoing) call has been sent over the network, but has not been received.
+-   `RINGING` **[string][2]** The call has been received by both parties, and is waiting to be answered.
+-   `CANCELLED` **[string][2]** The call was disconnected before it could be answered.
+-   `CONNECTED` **[string][2]** Both parties are connected and media is flowing.
+-   `ON_HOLD` **[string][2]** Both parties are connected but no media is flowing.
+-   `ENDED` **[string][2]** The call has ended.
+
+**Examples**
+
+```javascript
+// Use the call states to know how to handle a change in the call.
+client.on('call:stateChange', function (params) {
+   const call = client.call.getById(params.callId)
+   // Check if the call now has media flowing.
+   if (call.state === client.call.states.CONNECTED) {
+     // Render call media ...
+   }
+})
+```
 
 ## Media
 
@@ -470,6 +478,18 @@ Retrieve the presence information for specified users.
 
 Returns **[Array][7]** List of user presence information.
 
+### getAll
+
+Retrieve the presence information for all users.
+
+Returns **[Array][7]** List of user presence information.
+
+### getSelf
+
+Retrieves the presence information for the current user.
+
+Returns **[Object][5]** 
+
 ### fetch
 
 Fetch (from the server) the presence for the given users.
@@ -646,6 +666,33 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
+
 ## config
 
 The configuration object. This object defines what different configuration
@@ -720,33 +767,6 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -816,21 +836,16 @@ Sets the channel to be used while proxy mode is enabled.
 
 -   `channel` **Channel** 
 
-## TrackObject
+## DeviceInfo
 
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+Contains information about a device.
 
 **Properties**
 
--   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][2]** The ID of the Track.
--   `kind` **[string][2]** The kind of Track this is (audio, video).
--   `label` **[string][2]** The label of the device this Track uses.
--   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
--   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## MediaObject
 
@@ -876,16 +891,21 @@ A collection of devices and their information.
 -   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
 -   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
 
-## DeviceInfo
+## TrackObject
 
-Contains information about a device.
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
 
 **Properties**
 
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+-   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][2]** The ID of the Track.
+-   `kind` **[string][2]** The kind of Track this is (audio, video).
+-   `label` **[string][2]** The label of the device this Track uses.
+-   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
+-   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
 ## Subscription
 

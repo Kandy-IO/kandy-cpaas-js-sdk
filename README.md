@@ -3,7 +3,7 @@
 
 ### Npm Install
 
-`$ npm install https://github.com/kandy-io/kandy-cpaas-js-sdk#v4.0.0`
+`$ npm install https://github.com/kandy-io/kandy-cpaas-js-sdk#master`
 
 ### Reference
 
