@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-beta.60265
+ * Version: 3.3.0-beta.61606
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19925,27 +19925,22 @@ class Peer extends _eventemitter2.default {
   /**
    * Finds a specific transceiver depending on the options passed in
    * @method findTransceiver
-   * @param {Object} [options] Only one of these options will be taken with order of precedence being trackId, mid.
+   * @param {Object} [options] Only one of these options will be taken. They are ordered by priority.
    * @param {string} [options.trackId] The transceiver with the specific sender.track.id.
-   * @param {string} [options.mid] The transceiver with the specific media id.
    * @return {Object} The transceiver that was found (undefined if not found).
    */
   findTransceiver(options) {
     const transceivers = this.peerConnection.getTransceivers();
     if (options.trackId) {
       return transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
-    } else if (options.mid) {
-      return transceivers.find(transceiver => transceiver.mid === options.mid);
     }
   }
 
   /**
    * Replaces a specified transceiver's sender.track.
    * @method replaceTrack
-   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced.
-   *  If both are provided, mid will be used.
+   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
    * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
-   * @param {string} [options.mid] The optional media id of a specific transceiver.
    * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
@@ -20162,12 +20157,9 @@ class Peer extends _eventemitter2.default {
    * Sets the direction of transceivers.
    * @method setTransceiversDirection
    * @param {string} targetDirection The desired direction to set the transceivers to.
-   * @param {Object} [options] Options for specifying which transceivers should be affected.
-   *  Only one of these options can be provided at a time.
-   *  If both are provided, trackIds will be used.
+   * @param {Object} [options] Options for specifying which transceivers should be affected. They are ordered by priority.
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
-   * @param {String} [options.mid] The optional media id of a specific transceiver.
-   * @return {Object} An object containing an `error` flag and  an array `failures` of transceiver "mid"s whose directions weren't changed.
+   * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
    */
   setTransceiversDirection(targetDirection, options = {}) {
     if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
@@ -20175,14 +20167,12 @@ class Peer extends _eventemitter2.default {
 
       if (options.trackIds) {
         transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
-      } else if (options.mid) {
-        transceivers = transceivers.filter(transceiver => transceiver.mid === options.mid);
       }
 
       const failures = [];
       transceivers.forEach(transceiver => {
         if (!(0, _transceiverUtils.setTransceiverDirection)(transceiver, targetDirection)) {
-          failures.push(transceiver.mid);
+          failures.push(transceiver);
         }
       });
       return {
@@ -20366,16 +20356,9 @@ class Session extends _eventemitter2.default {
           const vacantTransceiver = peer.findVacantTransceiver(track.track.kind);
           // If we can find a vacant transceiver, reuse it.
           if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
-            peer.replaceTrack({ mid: vacantTransceiver.mid }, track.track).then(() => {
-              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
-              const result = peer.setTransceiversDirection(targetDirection, {
-                mid: vacantTransceiver.mid
-              });
-              if (!result.error) {
-                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
-              } else {
-                reject(new Error(`Failed to process the following transceivers: ${result.failures}`));
-              }
+            vacantTransceiver.sender.replaceTrack(track.track).then(() => {
+              vacantTransceiver.direction = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
             }).catch(err => {
               _loglevel2.default.error(err);
               reject(err);
@@ -20496,10 +20479,8 @@ class Session extends _eventemitter2.default {
    * @method setTransceiversDirection
    * @param {String} targetDirection The desired direction to set the transceivers to.
    * @param {Object} [options] Options for specifying which transceivers should be affected.
-   *  Only one of these options can be provided at a time.
-   *  If both are provided, trackIds will be used.
+   *  trackIds option has priority
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
-   * @param {String} [options.mid] The optional media id of a specific transceiver.
    * @return {Object} An object containing an `error` flag and  an array `failures` of transceiver "mid"s whose directions weren't changed.
    */
   setTransceiversDirection(targetDirection, options = {}) {
@@ -30142,7 +30123,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-beta.60265';
+  let version = '3.3.0-beta.61606';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
