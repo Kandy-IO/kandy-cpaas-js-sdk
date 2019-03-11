@@ -678,33 +678,6 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## config
 
 The configuration object. This object defines what different configuration
@@ -790,6 +763,33 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
+
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -829,45 +829,6 @@ Update values in the global Config section of the store.
 **Parameters**
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
-
-## Proxy
-
-The Proxy module allows for a secondary mode for making calls: proxy mode.
-When proxy mode is enabled, the SDK will redirect webRTC / media operations from the current machine to a remote machine using a channel.
-This is an advanced feature that enables support for Calls in particular scenarios that would otherwise not support them.
-
-### setProxyMode
-
-Sets the mode for the Proxy Plugin.
-When enabled, webRTC operations will be proxied over a channel. Enabling
-   proxy mode requires a channel to have been set. See `setChannel` API.
-When disabled, webRTC operation will occur as normal on the local machine.
-
-**Parameters**
-
--   `value` **[boolean][6]** Whether proxy mode should be enabled.
-
-### getProxyMode
-
-Retrieves the current mode of the Proxy Plugin.
-
-Returns **[boolean][6]** Whether proxy mode is currently enabled.
-
-### setChannel
-
-Sets the channel to be used while proxy mode is enabled.
-
-**Parameters**
-
--   `channel` **[Channel][11]** See the `Channel` module for information.
-
-### initializeRemote
-
-Sends an initialization message over the channel with webRTC configurations.
-
-**Parameters**
-
--   `config` **[Object][5]** 
 
 ## Channel
 
@@ -913,6 +874,45 @@ This function should receive all messages sent from the remote side of the chann
 **Parameters**
 
 -   `data` **[Object][5]** The message received from the Channel.
+
+## Proxy
+
+The Proxy module allows for a secondary mode for making calls: proxy mode.
+When proxy mode is enabled, the SDK will redirect webRTC / media operations from the current machine to a remote machine using a channel.
+This is an advanced feature that enables support for Calls in particular scenarios that would otherwise not support them.
+
+### setProxyMode
+
+Sets the mode for the Proxy Plugin.
+When enabled, webRTC operations will be proxied over a channel. Enabling
+   proxy mode requires a channel to have been set. See `setChannel` API.
+When disabled, webRTC operation will occur as normal on the local machine.
+
+**Parameters**
+
+-   `value` **[boolean][6]** Whether proxy mode should be enabled.
+
+### getProxyMode
+
+Retrieves the current mode of the Proxy Plugin.
+
+Returns **[boolean][6]** Whether proxy mode is currently enabled.
+
+### setChannel
+
+Sets the channel to be used while proxy mode is enabled.
+
+**Parameters**
+
+-   `channel` **[Channel][11]** See the `Channel` module for information.
+
+### initializeRemote
+
+Sends an initialization message over the channel with webRTC configurations.
+
+**Parameters**
+
+-   `config` **[Object][5]** 
 
 ## MediaObject
 

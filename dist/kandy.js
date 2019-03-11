@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-beta.61606
+ * Version: 3.3.0-beta.61804
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20215,6 +20215,8 @@ var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js"
 
 var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
 
+var _transceiverUtils = __webpack_require__("../webrtc/src/sdpUtils/transceiverUtils.js");
+
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -20235,7 +20237,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-// Helpers.
+
+
+// SDP Helpers.
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
@@ -20357,8 +20361,12 @@ class Session extends _eventemitter2.default {
           // If we can find a vacant transceiver, reuse it.
           if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
             vacantTransceiver.sender.replaceTrack(track.track).then(() => {
-              vacantTransceiver.direction = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
-              resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
+              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              if ((0, _transceiverUtils.setTransceiverDirection)(vacantTransceiver, targetDirection)) {
+                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
+              } else {
+                reject(new Error(`Failed to set vacant transceiver direction to ${targetDirection}.`));
+              }
             }).catch(err => {
               _loglevel2.default.error(err);
               reject(err);
@@ -20701,9 +20709,7 @@ class Session extends _eventemitter2.default {
     });
   }
 }
-exports.default = Session;
-
-// SDP Helpers.
+exports.default = Session; // Helpers.
 
 /***/ }),
 
@@ -30123,7 +30129,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-beta.61606';
+  let version = '3.3.0-beta.61804';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
