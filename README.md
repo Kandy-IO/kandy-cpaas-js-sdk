@@ -1,4 +1,4 @@
-@kandy-io/cpaas-sdk
+# @kandy-io/cpaas-sdk
 
 ### Npm Install
 
