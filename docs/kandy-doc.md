@@ -830,51 +830,6 @@ Update values in the global Config section of the store.
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
 
-## Channel
-
-The Channel object that the Proxy module needs to be provided.
-
-**Examples**
-
-```javascript
-// The channel the application uses for communicating with a remote endpoint.
-const appChannel = ...
-
-// The channel the application will provide to the Proxy module for use.
-const channel = {
-   send: function (data) {
-     // Any encoding / wrapping needed for a Proxy message being sent
-     //    over the channel.
-     appChannel.sendMessage(data)
-   },
-   // The Proxy module will set this function.
-   receive: undefined
-}
-appChannel.on('message', data => {
-   // Any decoding / unwrapping needed for the received message.
-   channel.receive(data)
-})
-
-client.proxy.setChannel(channel)
-```
-
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
 ## Proxy
 
 The Proxy module allows for a secondary mode for making calls: proxy mode.
@@ -914,6 +869,51 @@ Sends an initialization message over the channel with webRTC configurations.
 
 -   `config` **[Object][5]** 
 
+## Channel
+
+The Channel object that the Proxy module needs to be provided.
+
+**Examples**
+
+```javascript
+// The channel the application uses for communicating with a remote endpoint.
+const appChannel = ...
+
+// The channel the application will provide to the Proxy module for use.
+const channel = {
+   send: function (data) {
+     // Any encoding / wrapping needed for a Proxy message being sent
+     //    over the channel.
+     appChannel.sendMessage(data)
+   },
+   // The Proxy module will set this function.
+   receive: undefined
+}
+appChannel.on('message', data => {
+   // Any decoding / unwrapping needed for the received message.
+   channel.receive(data)
+})
+
+client.proxy.setChannel(channel)
+```
+
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
+
+### receive
+
+API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.
+
+**Parameters**
+
+-   `data` **[Object][5]** The message received from the Channel.
+
 ## CallObject
 
 The state representation of a Call.
@@ -948,6 +948,16 @@ Contains information about a device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
 
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -973,17 +983,7 @@ Media is a collection of Track objects.
 
 -   `id` **[string][2]** The ID of the Media object.
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
+-   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
 
 ## Subscription
 
@@ -1050,6 +1050,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [11]: #channel
 
-[12]: #trackobject
+[12]: #deviceinfo
 
-[13]: #deviceinfo
+[13]: #trackobject
