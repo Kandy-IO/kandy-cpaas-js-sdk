@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-KAA-1440.66220
+ * Version: 3.3.0-beta.66318
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19956,14 +19956,20 @@ class Peer extends _eventemitter2.default {
   }
 
   /**
-   * Finds a transceiver that does not have a track on its sender.
+   * Finds a transceiver that can be reused.
+   * A transceiver can be reused if it satisfies the following conditions:
+   *   - it does not have a track on its sender
+   *   - it has the same kind (audio or video) as what we specified
+   *   - it has been used before (if it has not been used then we are not "reusing" it)
+   * @method findReusableTransceiver
    * @param {string} kind The kind of transceiver to find (audio or video)
-   * @returns {Object} Transceiver object that matches kind and has no sender track. Otherwise undefined.
+   * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
    */
-  findVacantTransceiver(kind) {
+  findReusableTransceiver(kind) {
     if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
       const transceivers = this.peerConnection.getTransceivers();
-      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind);
+      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
+      );
     } else {
       _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
     }
@@ -20215,8 +20221,6 @@ var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js"
 
 var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
 
-var _transceiverUtils = __webpack_require__("../webrtc/src/sdpUtils/transceiverUtils.js");
-
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -20237,9 +20241,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-
-
-// SDP Helpers.
+// Helpers.
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
@@ -20357,21 +20359,35 @@ class Session extends _eventemitter2.default {
     if (peer) {
       const addTrackOrReuseTransceiverPromises = tracks.map(track => {
         return new _promise2.default((resolve, reject) => {
-          const vacantTransceiver = peer.findVacantTransceiver(track.track.kind);
-          // If we can find a vacant transceiver, reuse it.
-          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
-            vacantTransceiver.sender.replaceTrack(track.track).then(() => {
-              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
-              if ((0, _transceiverUtils.setTransceiverDirection)(vacantTransceiver, targetDirection)) {
-                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
-              } else {
-                reject(new Error(`Failed to set vacant transceiver direction to ${targetDirection}.`));
-              }
+          // We try to find a reusable transceiver that we can attach the track to achieve the following:
+          // - Avoid transceiver pollution and needing to create a brand new transceiver to attach the track to.
+          // - Allow re-adding of the same track type that has been previously removed.
+          //   (This is so that we can still have re-adding of tracks when using the "basic" media API which imposes a 1-audio & 1-video limit)
+          const reusableTransceiver = peer.findReusableTransceiver(track.track.kind);
+
+          // If we can find a reusable transceiver, reuse it.
+          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
+            // Current limitations of transceiver reuse method:
+            // - We cannot attach the track's associated stream to the sender (lack of `sender.setStreams` support atm)
+            // So the local transceiver's sender track & remote transceiver's receiver track must have been used before so that it already has a stream attached to the sender.
+            // If the local transceiver's sender has not been used before, we should ideally be able to do the following:
+            // transceiver.sender.setStreams([<someStream>]) <- Not yet supported
+            // transceiver.sender.replaceTrack(<someTrack>)
+            // However, because of lack of support for `setStreams`, if we just tried to do `replaceTrack` on a transceiver that has not been used before,
+            //  the sender will not have a stream and the SDP generated will have no associated stream which can cuase issues such as not triggering events on the local stream during renegotiation.
+            // Once `setStreams` is supported, we can use the transceiver reuse method above even on transceivers that have not been used to send data before.
+            reusableTransceiver.sender.replaceTrack(track.track).then(() => {
+              reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${reusableTransceiver.mid}).`);
             }).catch(err => {
               _loglevel2.default.error(err);
               reject(err);
             });
           } else {
+            // To get around the current limitation described above, we use peerConnection's `addTrack` when we can't find a reusable transceiver.
+            // `addTrack` does one of the following when called:
+            // - Create a new transceiver and attaches the track and stream to the sender
+            // - Find and use an existing transceiver that has never been used to send data before and attach the track and stream to the sender.
             peer.addTrack(track);
             resolve(`Added track (${track.track.kind} : ${track.id}).`);
           }
@@ -20709,7 +20725,9 @@ class Session extends _eventemitter2.default {
     });
   }
 }
-exports.default = Session; // Helpers.
+exports.default = Session;
+
+// SDP Helpers.
 
 /***/ }),
 
@@ -30129,7 +30147,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-KAA-1440.66220';
+  let version = '3.3.0-beta.66318';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -30362,7 +30380,7 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
- * The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.
+ * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
  * @public
  * @method create
  * @param {config} config The configuration object.
