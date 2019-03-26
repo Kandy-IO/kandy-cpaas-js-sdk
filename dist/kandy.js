@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-beta.66318
+ * Version: 3.3.0-beta.66660
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18856,6 +18856,12 @@ class MediaManager extends _eventemitter2.default {
           this.remove(mediaId);
         });
 
+        media.on('track:removed', trackId => {
+          if (media.tracks.size === 0) {
+            this.remove(media.id);
+          }
+        });
+
         media.on('track:ended', ({ mediaId, trackId }) => {
           if (media.getTracks().length === 0) {
             this.remove(mediaId);
@@ -18888,6 +18894,12 @@ class MediaManager extends _eventemitter2.default {
 
     media.once('media:stopped', mediaId => {
       this.remove(mediaId);
+    });
+
+    media.on('track:removed', trackId => {
+      if (media.tracks.size === 0) {
+        this.remove(media.id);
+      }
     });
 
     media.on('track:ended', ({ mediaId, trackId }) => {
@@ -19232,9 +19244,19 @@ function TrackManager() {
    * @return {Track} The added/wrapped Track object.
    */
   function add(track, stream) {
-    if (tracks.has(track.id)) {
+    const targetTrack = tracks.get(track.id);
+
+    // Chrome issue: track.stream is outdated and needs to be updated to newStream.
+    // targetTrack.stream.active is false & targetTrack.stream.getTracks() gives us an empty array.
+    // stream.active is true & stream.getTracks() gives us the correct array of tracks.
+    // Set/update the new stream as the track's stream
+    if (targetTrack && !targetTrack.stream.active && stream.active) {
+      // The track was previously registered and is being re-added with new stream
+      targetTrack.stream = stream;
+      return targetTrack;
+    } else if (targetTrack) {
       // This track is already registered.
-      return get(track.id);
+      return targetTrack;
     } else {
       // Wrap the track as a Track object.
       const wrappedTrack = new _track2.default(track, stream);
@@ -19713,7 +19735,7 @@ class Peer extends _eventemitter2.default {
     .filter(sender => Boolean(sender.track)).map(sender => this.trackManager.get(sender.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the sender but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -19734,7 +19756,7 @@ class Peer extends _eventemitter2.default {
     .filter(receiver => Boolean(receiver.track)).map(receiver => this.trackManager.get(receiver.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the receiver but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -30147,7 +30169,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-beta.66318';
+  let version = '3.3.0-beta.66660';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
