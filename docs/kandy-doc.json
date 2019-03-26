@@ -31196,545 +31196,6 @@
           "children": [
             {
               "type": "text",
-              "value": "The Channel object that the Proxy module needs to be provided.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 63,
-                  "offset": 62
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 63,
-              "offset": 62
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 63,
-          "offset": 62
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "Channel"
-      },
-      {
-        "title": "example",
-        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)",
-        "lineNumber": 5
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 10,
-        "column": 0
-      },
-      "end": {
-        "line": 35,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 57,
-          "column": 0
-        },
-        "end": {
-          "line": 57,
-          "column": 36
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-    },
-    "augments": [],
-    "examples": [
-      {
-        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)"
-      }
-    ],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "Channel",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": [
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Channel function that the Proxy module will use to send messages to the remote side.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 85,
-                        "offset": 84
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 85,
-                    "offset": 84
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 85,
-                "offset": 84
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 2,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "Channel",
-              "lineNumber": 3
-            },
-            {
-              "title": "name",
-              "description": null,
-              "lineNumber": 4,
-              "name": "send"
-            },
-            {
-              "title": "function",
-              "description": null,
-              "lineNumber": 5,
-              "name": null
-            },
-            {
-              "title": "param",
-              "description": "Message to be sent over the channel.",
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "data"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 37,
-              "column": 0
-            },
-            "end": {
-              "line": 44,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 57,
-                "column": 0
-              },
-              "end": {
-                "line": 57,
-                "column": 36
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "data",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Message to be sent over the channel.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 37,
-                            "offset": 36
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 37,
-                        "offset": 36
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 37,
-                    "offset": 36
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "Channel",
-          "name": "send",
-          "kind": "function",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "Channel",
-              "kind": "module"
-            },
-            {
-              "name": "send",
-              "kind": "function"
-            }
-          ],
-          "namespace": "Channelsend"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "API that the Proxy module will assign a listener function for accepting received messages.\nThis function should receive all messages sent from the remote side of the channel.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 84,
-                        "offset": 174
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 84,
-                    "offset": 174
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 84,
-                "offset": 174
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 3,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "Channel",
-              "lineNumber": 4
-            },
-            {
-              "title": "name",
-              "description": null,
-              "lineNumber": 5,
-              "name": "receive"
-            },
-            {
-              "title": "function",
-              "description": null,
-              "lineNumber": 6,
-              "name": null
-            },
-            {
-              "title": "param",
-              "description": "The message received from the Channel.",
-              "lineNumber": 7,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "data"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 46,
-              "column": 0
-            },
-            "end": {
-              "line": 54,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 57,
-                "column": 0
-              },
-              "end": {
-                "line": 57,
-                "column": 36
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "data",
-              "lineNumber": 7,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The message received from the Channel.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 39,
-                            "offset": 38
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 39,
-                        "offset": 38
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 39,
-                    "offset": 38
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "Channel",
-          "name": "receive",
-          "kind": "function",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "Channel",
-              "kind": "module"
-            },
-            {
-              "name": "receive",
-              "kind": "function"
-            }
-          ],
-          "namespace": "Channelreceive"
-        }
-      ]
-    },
-    "path": [
-      {
-        "name": "Channel",
-        "kind": "module"
-      }
-    ],
-    "namespace": "Channel"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "The Proxy module allows for a secondary mode for making calls: proxy mode.\nWhen proxy mode is enabled, the SDK will redirect webRTC / media operations from the current machine to a remote machine using a channel.\nThis is an advanced feature that enables support for Calls in particular scenarios that would otherwise not support them.",
               "position": {
                 "start": {
@@ -33021,6 +32482,545 @@
           "children": [
             {
               "type": "text",
+              "value": "The Channel object that the Proxy module needs to be provided.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 63,
+              "offset": 62
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 63,
+          "offset": 62
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "Channel"
+      },
+      {
+        "title": "example",
+        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)",
+        "lineNumber": 5
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 10,
+        "column": 0
+      },
+      "end": {
+        "line": 35,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 57,
+          "column": 0
+        },
+        "end": {
+          "line": 57,
+          "column": 36
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+    },
+    "augments": [],
+    "examples": [
+      {
+        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)"
+      }
+    ],
+    "params": [],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "Channel",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Channel function that the Proxy module will use to send messages to the remote side.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 85,
+                        "offset": 84
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 85,
+                    "offset": 84
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 85,
+                "offset": 84
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 2,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "Channel",
+              "lineNumber": 3
+            },
+            {
+              "title": "name",
+              "description": null,
+              "lineNumber": 4,
+              "name": "send"
+            },
+            {
+              "title": "function",
+              "description": null,
+              "lineNumber": 5,
+              "name": null
+            },
+            {
+              "title": "param",
+              "description": "Message to be sent over the channel.",
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "data"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 37,
+              "column": 0
+            },
+            "end": {
+              "line": 44,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 57,
+                "column": 0
+              },
+              "end": {
+                "line": 57,
+                "column": 36
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "data",
+              "lineNumber": 6,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Message to be sent over the channel.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 37,
+                            "offset": 36
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 37,
+                    "offset": 36
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "Channel",
+          "name": "send",
+          "kind": "function",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Channel",
+              "kind": "module"
+            },
+            {
+              "name": "send",
+              "kind": "function"
+            }
+          ],
+          "namespace": "Channelsend"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "API that the Proxy module will assign a listener function for accepting received messages.\nThis function should receive all messages sent from the remote side of the channel.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 84,
+                        "offset": 174
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 84,
+                    "offset": 174
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 84,
+                "offset": 174
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 3,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "Channel",
+              "lineNumber": 4
+            },
+            {
+              "title": "name",
+              "description": null,
+              "lineNumber": 5,
+              "name": "receive"
+            },
+            {
+              "title": "function",
+              "description": null,
+              "lineNumber": 6,
+              "name": null
+            },
+            {
+              "title": "param",
+              "description": "The message received from the Channel.",
+              "lineNumber": 7,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "data"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 46,
+              "column": 0
+            },
+            "end": {
+              "line": 54,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 57,
+                "column": 0
+              },
+              "end": {
+                "line": 57,
+                "column": 36
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "data",
+              "lineNumber": 7,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The message received from the Channel.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 39,
+                            "offset": 38
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 39,
+                        "offset": 38
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 39,
+                    "offset": 38
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "Channel",
+          "name": "receive",
+          "kind": "function",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Channel",
+              "kind": "module"
+            },
+            {
+              "name": "receive",
+              "kind": "function"
+            }
+          ],
+          "namespace": "Channelreceive"
+        }
+      ]
+    },
+    "path": [
+      {
+        "name": "Channel",
+        "kind": "module"
+      }
+    ],
+    "namespace": "Channel"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "The state representation of a Call.\nCan be retrieved using the Call feature's ",
               "position": {
                 "start": {
@@ -34282,7 +34282,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Contains information about a device.",
+              "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
               "position": {
                 "start": {
                   "line": 1,
@@ -34290,11 +34290,13 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
+                  "line": 2,
+                  "column": 40,
+                  "offset": 83
                 },
-                "indent": []
+                "indent": [
+                  1
+                ]
               }
             }
           ],
@@ -34305,11 +34307,13 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
+              "line": 2,
+              "column": 40,
+              "offset": 83
             },
-            "indent": []
+            "indent": [
+              1
+            ]
           }
         }
       ],
@@ -34320,9 +34324,9 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 37,
-          "offset": 36
+          "line": 2,
+          "column": 40,
+          "offset": 83
         }
       }
     },
@@ -34330,64 +34334,63 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 3,
+        "lineNumber": 4,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DeviceInfo"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the device.",
         "lineNumber": 5,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "deviceId"
+        "type": null,
+        "name": "MediaObject"
       },
       {
         "title": "property",
-        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
+        "description": "The ID of the Media object.",
         "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "string"
         },
-        "name": "groupId"
+        "name": "id"
       },
       {
         "title": "property",
-        "description": "The type of the device (audioinput, audiooutput, videoinput).",
+        "description": "Indicator on whether this media is local or remote.",
         "lineNumber": 7,
         "type": {
           "type": "NameExpression",
-          "name": "string"
+          "name": "boolean"
         },
-        "name": "kind"
+        "name": "local"
       },
       {
         "title": "property",
-        "description": "The name of the device.",
+        "description": "A list of Track objects that are contained in this Media object.",
         "lineNumber": 8,
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "TrackObject"
+            }
+          ]
         },
-        "name": "label"
+        "name": "tracks"
       }
     ],
     "loc": {
       "start": {
-        "line": 84,
+        "line": 47,
         "column": 0
       },
       "end": {
-        "line": 93,
+        "line": 56,
         "column": 3
       }
     },
@@ -34410,68 +34413,7 @@
     "properties": [
       {
         "title": "property",
-        "name": "deviceId",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 22,
-                      "offset": 21
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 22,
-                  "offset": 21
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 22,
-              "offset": 21
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "groupId",
+        "name": "id",
         "lineNumber": 6,
         "description": {
           "type": "root",
@@ -34481,7 +34423,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The group ID of the device. Devices that share a ",
+                  "value": "The ID of the Media object.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34490,42 +34432,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "groupId",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " belong to the same physical device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 95,
-                      "offset": 94
+                      "column": 28,
+                      "offset": 27
                     },
                     "indent": []
                   }
@@ -34539,8 +34447,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 95,
-                  "offset": 94
+                  "column": 28,
+                  "offset": 27
                 },
                 "indent": []
               }
@@ -34554,8 +34462,8 @@
             },
             "end": {
               "line": 1,
-              "column": 95,
-              "offset": 94
+              "column": 28,
+              "offset": 27
             }
           }
         },
@@ -34566,7 +34474,7 @@
       },
       {
         "title": "property",
-        "name": "kind",
+        "name": "local",
         "lineNumber": 7,
         "description": {
           "type": "root",
@@ -34576,7 +34484,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
+                  "value": "Indicator on whether this media is local or remote.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34585,8 +34493,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 62,
-                      "offset": 61
+                      "column": 52,
+                      "offset": 51
                     },
                     "indent": []
                   }
@@ -34600,8 +34508,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 62,
-                  "offset": 61
+                  "column": 52,
+                  "offset": 51
                 },
                 "indent": []
               }
@@ -34615,19 +34523,19 @@
             },
             "end": {
               "line": 1,
-              "column": 62,
-              "offset": 61
+              "column": 52,
+              "offset": 51
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "string"
+          "name": "boolean"
         }
       },
       {
         "title": "property",
-        "name": "label",
+        "name": "tracks",
         "lineNumber": 8,
         "description": {
           "type": "root",
@@ -34637,7 +34545,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The name of the device.",
+                  "value": "A list of Track objects that are contained in this Media object.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -34646,8 +34554,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 24,
-                      "offset": 23
+                      "column": 65,
+                      "offset": 64
                     },
                     "indent": []
                   }
@@ -34661,8 +34569,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 24,
-                  "offset": 23
+                  "column": 65,
+                  "offset": 64
                 },
                 "indent": []
               }
@@ -34676,14 +34584,23 @@
             },
             "end": {
               "line": 1,
-              "column": 24,
-              "offset": 23
+              "column": 65,
+              "offset": 64
             }
           }
         },
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "TrackObject"
+            }
+          ]
         }
       }
     ],
@@ -34693,7 +34610,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "DeviceInfo",
+    "name": "MediaObject",
     "members": {
       "global": [],
       "inner": [],
@@ -34703,11 +34620,11 @@
     },
     "path": [
       {
-        "name": "DeviceInfo",
+        "name": "MediaObject",
         "kind": "module"
       }
     ],
-    "namespace": "DeviceInfo"
+    "namespace": "MediaObject"
   },
   {
     "description": {
@@ -35460,7 +35377,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
+              "value": "Contains information about a device.",
               "position": {
                 "start": {
                   "line": 1,
@@ -35468,13 +35385,11 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 40,
-                  "offset": 83
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
                 },
-                "indent": [
-                  1
-                ]
+                "indent": []
               }
             }
           ],
@@ -35485,13 +35400,11 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 40,
-              "offset": 83
+              "line": 1,
+              "column": 37,
+              "offset": 36
             },
-            "indent": [
-              1
-            ]
+            "indent": []
           }
         }
       ],
@@ -35502,9 +35415,9 @@
           "offset": 0
         },
         "end": {
-          "line": 2,
-          "column": 40,
-          "offset": 83
+          "line": 1,
+          "column": 37,
+          "offset": 36
         }
       }
     },
@@ -35512,63 +35425,64 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 4,
+        "lineNumber": 3,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 5,
+        "lineNumber": 4,
         "type": null,
-        "name": "MediaObject"
+        "name": "DeviceInfo"
       },
       {
         "title": "property",
-        "description": "The ID of the Media object.",
+        "description": "The ID of the device.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "deviceId"
+      },
+      {
+        "title": "property",
+        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
         "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "string"
         },
-        "name": "id"
+        "name": "groupId"
       },
       {
         "title": "property",
-        "description": "Indicator on whether this media is local or remote.",
+        "description": "The type of the device (audioinput, audiooutput, videoinput).",
         "lineNumber": 7,
         "type": {
           "type": "NameExpression",
-          "name": "boolean"
+          "name": "string"
         },
-        "name": "local"
+        "name": "kind"
       },
       {
         "title": "property",
-        "description": "A list of Track objects that are contained in this Media object.",
+        "description": "The name of the device.",
         "lineNumber": 8,
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "TrackObject"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         },
-        "name": "tracks"
+        "name": "label"
       }
     ],
     "loc": {
       "start": {
-        "line": 47,
+        "line": 84,
         "column": 0
       },
       "end": {
-        "line": 56,
+        "line": 93,
         "column": 3
       }
     },
@@ -35591,8 +35505,8 @@
     "properties": [
       {
         "title": "property",
-        "name": "id",
-        "lineNumber": 6,
+        "name": "deviceId",
+        "lineNumber": 5,
         "description": {
           "type": "root",
           "children": [
@@ -35601,7 +35515,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The ID of the Media object.",
+                  "value": "The ID of the device.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -35610,8 +35524,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 28,
-                      "offset": 27
+                      "column": 22,
+                      "offset": 21
                     },
                     "indent": []
                   }
@@ -35625,8 +35539,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 28,
-                  "offset": 27
+                  "column": 22,
+                  "offset": 21
                 },
                 "indent": []
               }
@@ -35640,8 +35554,8 @@
             },
             "end": {
               "line": 1,
-              "column": 28,
-              "offset": 27
+              "column": 22,
+              "offset": 21
             }
           }
         },
@@ -35652,7 +35566,102 @@
       },
       {
         "title": "property",
-        "name": "local",
+        "name": "groupId",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The group ID of the device. Devices that share a ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "groupId",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " belong to the same physical device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 95,
+                      "offset": 94
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 95,
+                  "offset": 94
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 95,
+              "offset": 94
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "kind",
         "lineNumber": 7,
         "description": {
           "type": "root",
@@ -35662,7 +35671,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "Indicator on whether this media is local or remote.",
+                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
                   "position": {
                     "start": {
                       "line": 1,
@@ -35671,8 +35680,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 52,
-                      "offset": 51
+                      "column": 62,
+                      "offset": 61
                     },
                     "indent": []
                   }
@@ -35686,8 +35695,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 52,
-                  "offset": 51
+                  "column": 62,
+                  "offset": 61
                 },
                 "indent": []
               }
@@ -35701,19 +35710,19 @@
             },
             "end": {
               "line": 1,
-              "column": 52,
-              "offset": 51
+              "column": 62,
+              "offset": 61
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "boolean"
+          "name": "string"
         }
       },
       {
         "title": "property",
-        "name": "tracks",
+        "name": "label",
         "lineNumber": 8,
         "description": {
           "type": "root",
@@ -35723,7 +35732,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of Track objects that are contained in this Media object.",
+                  "value": "The name of the device.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -35732,8 +35741,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 65,
-                      "offset": 64
+                      "column": 24,
+                      "offset": 23
                     },
                     "indent": []
                   }
@@ -35747,8 +35756,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 65,
-                  "offset": 64
+                  "column": 24,
+                  "offset": 23
                 },
                 "indent": []
               }
@@ -35762,23 +35771,14 @@
             },
             "end": {
               "line": 1,
-              "column": 65,
-              "offset": 64
+              "column": 24,
+              "offset": 23
             }
           }
         },
         "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "TrackObject"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "string"
         }
       }
     ],
@@ -35788,7 +35788,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "MediaObject",
+    "name": "DeviceInfo",
     "members": {
       "global": [],
       "inner": [],
@@ -35798,11 +35798,11 @@
     },
     "path": [
       {
-        "name": "MediaObject",
+        "name": "DeviceInfo",
         "kind": "module"
       }
     ],
-    "namespace": "MediaObject"
+    "namespace": "DeviceInfo"
   },
   {
     "description": {
