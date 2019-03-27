@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-KAA-1422.66931
+ * Version: 3.3.0-beta.67033
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18856,6 +18856,12 @@ class MediaManager extends _eventemitter2.default {
           this.remove(mediaId);
         });
 
+        media.on('track:removed', trackId => {
+          if (media.tracks.size === 0) {
+            this.remove(media.id);
+          }
+        });
+
         media.on('track:ended', ({ mediaId, trackId }) => {
           if (media.getTracks().length === 0) {
             this.remove(mediaId);
@@ -18888,6 +18894,12 @@ class MediaManager extends _eventemitter2.default {
 
     media.once('media:stopped', mediaId => {
       this.remove(mediaId);
+    });
+
+    media.on('track:removed', trackId => {
+      if (media.tracks.size === 0) {
+        this.remove(media.id);
+      }
     });
 
     media.on('track:ended', ({ mediaId, trackId }) => {
@@ -19232,9 +19244,19 @@ function TrackManager() {
    * @return {Track} The added/wrapped Track object.
    */
   function add(track, stream) {
-    if (tracks.has(track.id)) {
+    const targetTrack = tracks.get(track.id);
+
+    // Chrome issue: track.stream is outdated and needs to be updated to newStream.
+    // targetTrack.stream.active is false & targetTrack.stream.getTracks() gives us an empty array.
+    // stream.active is true & stream.getTracks() gives us the correct array of tracks.
+    // Set/update the new stream as the track's stream
+    if (targetTrack && !targetTrack.stream.active && stream.active) {
+      // The track was previously registered and is being re-added with new stream
+      targetTrack.stream = stream;
+      return targetTrack;
+    } else if (targetTrack) {
       // This track is already registered.
-      return get(track.id);
+      return targetTrack;
     } else {
       // Wrap the track as a Track object.
       const wrappedTrack = new _track2.default(track, stream);
@@ -19713,7 +19735,7 @@ class Peer extends _eventemitter2.default {
     .filter(sender => Boolean(sender.track)).map(sender => this.trackManager.get(sender.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the sender but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -19734,7 +19756,7 @@ class Peer extends _eventemitter2.default {
     .filter(receiver => Boolean(receiver.track)).map(receiver => this.trackManager.get(receiver.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the receiver but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -19956,14 +19978,20 @@ class Peer extends _eventemitter2.default {
   }
 
   /**
-   * Finds a transceiver that does not have a track on its sender.
+   * Finds a transceiver that can be reused.
+   * A transceiver can be reused if it satisfies the following conditions:
+   *   - it does not have a track on its sender
+   *   - it has the same kind (audio or video) as what we specified
+   *   - it has been used before (if it has not been used then we are not "reusing" it)
+   * @method findReusableTransceiver
    * @param {string} kind The kind of transceiver to find (audio or video)
-   * @returns {Object} Transceiver object that matches kind and has no sender track. Otherwise undefined.
+   * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
    */
-  findVacantTransceiver(kind) {
+  findReusableTransceiver(kind) {
     if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
       const transceivers = this.peerConnection.getTransceivers();
-      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind);
+      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
+      );
     } else {
       _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
     }
@@ -20215,8 +20243,6 @@ var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js"
 
 var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
 
-var _transceiverUtils = __webpack_require__("../webrtc/src/sdpUtils/transceiverUtils.js");
-
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -20237,9 +20263,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-
-
-// SDP Helpers.
+// Helpers.
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
@@ -20357,21 +20381,35 @@ class Session extends _eventemitter2.default {
     if (peer) {
       const addTrackOrReuseTransceiverPromises = tracks.map(track => {
         return new _promise2.default((resolve, reject) => {
-          const vacantTransceiver = peer.findVacantTransceiver(track.track.kind);
-          // If we can find a vacant transceiver, reuse it.
-          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
-            vacantTransceiver.sender.replaceTrack(track.track).then(() => {
-              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
-              if ((0, _transceiverUtils.setTransceiverDirection)(vacantTransceiver, targetDirection)) {
-                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
-              } else {
-                reject(new Error(`Failed to set vacant transceiver direction to ${targetDirection}.`));
-              }
+          // We try to find a reusable transceiver that we can attach the track to achieve the following:
+          // - Avoid transceiver pollution and needing to create a brand new transceiver to attach the track to.
+          // - Allow re-adding of the same track type that has been previously removed.
+          //   (This is so that we can still have re-adding of tracks when using the "basic" media API which imposes a 1-audio & 1-video limit)
+          const reusableTransceiver = peer.findReusableTransceiver(track.track.kind);
+
+          // If we can find a reusable transceiver, reuse it.
+          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
+            // Current limitations of transceiver reuse method:
+            // - We cannot attach the track's associated stream to the sender (lack of `sender.setStreams` support atm)
+            // So the local transceiver's sender track & remote transceiver's receiver track must have been used before so that it already has a stream attached to the sender.
+            // If the local transceiver's sender has not been used before, we should ideally be able to do the following:
+            // transceiver.sender.setStreams([<someStream>]) <- Not yet supported
+            // transceiver.sender.replaceTrack(<someTrack>)
+            // However, because of lack of support for `setStreams`, if we just tried to do `replaceTrack` on a transceiver that has not been used before,
+            //  the sender will not have a stream and the SDP generated will have no associated stream which can cuase issues such as not triggering events on the local stream during renegotiation.
+            // Once `setStreams` is supported, we can use the transceiver reuse method above even on transceivers that have not been used to send data before.
+            reusableTransceiver.sender.replaceTrack(track.track).then(() => {
+              reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${reusableTransceiver.mid}).`);
             }).catch(err => {
               _loglevel2.default.error(err);
               reject(err);
             });
           } else {
+            // To get around the current limitation described above, we use peerConnection's `addTrack` when we can't find a reusable transceiver.
+            // `addTrack` does one of the following when called:
+            // - Create a new transceiver and attaches the track and stream to the sender
+            // - Find and use an existing transceiver that has never been used to send data before and attach the track and stream to the sender.
             peer.addTrack(track);
             resolve(`Added track (${track.track.kind} : ${track.id}).`);
           }
@@ -20709,7 +20747,9 @@ class Session extends _eventemitter2.default {
     });
   }
 }
-exports.default = Session; // Helpers.
+exports.default = Session;
+
+// SDP Helpers.
 
 /***/ }),
 
@@ -25514,7 +25554,22 @@ function callAPI({ dispatch, getState }) {
   return {
     /**
      * Starts an outgoing call to a SIP user or a PSTN phone number.
-     * Will trigger a `call:started` event when the operation completes.
+     *
+     * The call will be tracked by a unique ID that is returned by the API. The
+     *    application will use this ID to identify and control the call after it
+     *    has been initiated.
+     *
+     * The `getCallById` API can be used to retrieve the current state of the
+     *    call.
+     *
+     * The SDK will emit a `call:start` event locally when the operation
+     *    completes. When the remote participant receives the call, a
+     *    `call:receive` event will be emitted remotely for them.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to make a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
      * @public
      * @memberof Calls
      * @method make
@@ -25524,6 +25579,18 @@ function callAPI({ dispatch, getState }) {
      * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Boolean} [media.video=false] Whether the call should have video on start.
      * @returns {string} The generated ID of the newly created call.
+     * @example
+     * // Listen for the event emitted after making a call.
+     * client.on('call:start', function (params) {
+     *   const { callId, error } = params
+     *   if (error) {
+     *     // Call failed to initialize.
+     *   } else {
+     *     // Call was initialized, and the recipient user will be notified.
+     *   }
+     * })
+     * // Make an audio-only call.
+     * const newCallId = client.call.make(callee, { audio: true })
      */
     make(destination, media = {}, options = {}) {
       const callId = (0, _v2.default)();
@@ -25542,7 +25609,13 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Rejects an incoming call.
-     * Will end the call and trigger a `call:stateChange` event.
+     *
+     * The specified call to reject must be in a ringing state with an incoming
+     *    direction. The call will be ended as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified, through their own
+     *    `call:stateChange` event, that the call was rejected.
      * @public
      * @memberof Calls
      * @method reject
@@ -25553,8 +25626,22 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Answer an incoming call.
-     * Will trigger a `call:answered` event.
+     * Answers an incoming call.
+     *
+     * The specified call to answer must be in a ringing state with an incoming
+     *    direction. The call will become connected as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. This indicates that the call has connected with the remote
+     *    participant. The `getCallById` API can be used to retrieve the latest
+     *    call state after the change. Further events will be emitted to
+     *    indicate that the call has received media from the remote participant.
+     *     See the `call:newTrack` event for more information about this.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to answer a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
      * @public
      * @memberof Calls
      * @method answer
@@ -25575,7 +25662,14 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Ignore an incoming call.
+     * Ignores an incoming call.
+     *
+     * The specified call to ignore must be in a ringing state with an incoming
+     *    direction. The call will be ended as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will not be notified that the call
+     *    was ignored.
      * @public
      * @memberof Calls
      * @method ignore
@@ -25586,8 +25680,19 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Put a call on hold.
-     * Will stop all media from flowing and trigger a `call:held` event.
+     * Puts a call on hold.
+     *
+     * The specified call to hold must not already be locally held. Any/all
+     *    media received from the remote participant will stop being received,
+     *    and any/all media being sent to the remote participant will stop
+     *    being sent.
+     *
+     * Some call operations cannot be performed while the call is on hold. The
+     *    call can be taken off hold with the `unhold` API.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified of the operation
+     *    through a `call:stateChange` as well.
      * @public
      * @memberof Calls
      * @method hold
@@ -25598,8 +25703,15 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Take a call off hold.
-     * Will resume any previously flowing media and trigger a `call:unheld` event.
+     * Takes a call off hold.
+     *
+     * The specified call to unhold must be locally held. If the call is not
+     *    also remotely held, call media will be reconnected as it was before
+     *    the call was held.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified of the operation
+     *    through a `call:stateChange` as well.
      * @public
      * @memberof Calls
      * @method unhold
@@ -25638,8 +25750,15 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * End an ongoing call.
-     * Will stop all media used for the call and trigger a `call:stateChange` event.
+     * Ends an ongoing call.
+     *
+     * The SDK will stop any/all local media associated with the call. Events
+     *    will be emitted to indicate which media tracks were stopped. See the
+     *    `call:trackEnded` event for more information.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified, through their own
+     *    `call:stateChange` event, that the call was ended.
      * @public
      * @memberof Calls
      * @method end
@@ -30129,7 +30248,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-KAA-1422.66931';
+  let version = '3.3.0-beta.67033';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -30362,7 +30481,7 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
- * The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.
+ * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
  * @public
  * @method create
  * @param {config} config The configuration object.

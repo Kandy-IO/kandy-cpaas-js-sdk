@@ -1009,9 +1009,9 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
+                  href='#callobject'
                   class="">
-                  DeviceInfo
+                  CallObject
                   
                 </a>
                 
@@ -1029,9 +1029,9 @@
               
                 
                 <li><a
-                  href='#trackobject'
+                  href='#deviceinfo'
                   class="">
-                  TrackObject
+                  DeviceInfo
                   
                 </a>
                 
@@ -1049,9 +1049,9 @@
               
                 
                 <li><a
-                  href='#callobject'
+                  href='#trackobject'
                   class="">
-                  CallObject
+                  TrackObject
                   
                 </a>
                 
@@ -1141,7 +1141,7 @@
   </div>
   
 
-  <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.</p>
+  <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.</p>
 
 
   <div class='pre p1 fill-light mt0'>create(config: <a href="#config">config</a>)</div>
@@ -1842,8 +1842,19 @@ SIP users and PSTN phones.</p>
 
   
 
-  <p>Starts an outgoing call to a SIP user or a PSTN phone number.
-Will trigger a <code>call:started</code> event when the operation completes.</p>
+  <p>Starts an outgoing call to a SIP user or a PSTN phone number.</p>
+<p>The call will be tracked by a unique ID that is returned by the API. The
+application will use this ID to identify and control the call after it
+has been initiated.</p>
+<p>The <code>getCallById</code> API can be used to retrieve the current state of the
+call.</p>
+<p>The SDK will emit a <code>call:start</code> event locally when the operation
+completes. When the remote participant receives the call, a
+<code>call:receive</code> event will be emitted remotely for them.</p>
+<p>The SDK requires access to the machine's media devices (eg. microphone)
+in order to make a call. If it does not already have permissions to
+use the devices, the user may be prompted by the browser to give
+permissions.</p>
 
 
   <div class='pre p1 fill-light mt0'>make(destination: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, media: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
@@ -1938,6 +1949,22 @@ Will trigger a <code>call:started</code> event when the operation completes.</p>
   
 
   
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Listen for the event emitted after making a call.</span>
+client.on(<span class="hljs-string">'call:start'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+  <span class="hljs-keyword">const</span> { callId, error } = params
+  <span class="hljs-keyword">if</span> (error) {
+    <span class="hljs-comment">// Call failed to initialize.</span>
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// Call was initialized, and the recipient user will be notified.</span>
+  }
+})
+<span class="hljs-comment">// Make an audio-only call.</span>
+<span class="hljs-keyword">const</span> newCallId = client.call.make(callee, { <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span> })</pre>
+    
+  
 
   
 
@@ -1961,8 +1988,12 @@ Will trigger a <code>call:started</code> event when the operation completes.</p>
 
   
 
-  <p>Rejects an incoming call.
-Will end the call and trigger a <code>call:stateChange</code> event.</p>
+  <p>Rejects an incoming call.</p>
+<p>The specified call to reject must be in a ringing state with an incoming
+direction. The call will be ended as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified, through their own
+<code>call:stateChange</code> event, that the call was rejected.</p>
 
 
   <div class='pre p1 fill-light mt0'>reject(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2022,8 +2053,19 @@ Will end the call and trigger a <code>call:stateChange</code> event.</p>
 
   
 
-  <p>Answer an incoming call.
-Will trigger a <code>call:answered</code> event.</p>
+  <p>Answers an incoming call.</p>
+<p>The specified call to answer must be in a ringing state with an incoming
+direction. The call will become connected as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. This indicates that the call has connected with the remote
+participant. The <code>getCallById</code> API can be used to retrieve the latest
+call state after the change. Further events will be emitted to
+indicate that the call has received media from the remote participant.
+See the <code>call:newTrack</code> event for more information about this.</p>
+<p>The SDK requires access to the machine's media devices (eg. microphone)
+in order to answer a call. If it does not already have permissions to
+use the devices, the user may be prompted by the browser to give
+permissions.</p>
 
 
   <div class='pre p1 fill-light mt0'>answer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, media: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</div>
@@ -2130,7 +2172,12 @@ Will trigger a <code>call:answered</code> event.</p>
 
   
 
-  <p>Ignore an incoming call.</p>
+  <p>Ignores an incoming call.</p>
+<p>The specified call to ignore must be in a ringing state with an incoming
+direction. The call will be ended as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will not be notified that the call
+was ignored.</p>
 
 
   <div class='pre p1 fill-light mt0'>ignore(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2190,8 +2237,16 @@ Will trigger a <code>call:answered</code> event.</p>
 
   
 
-  <p>Put a call on hold.
-Will stop all media from flowing and trigger a <code>call:held</code> event.</p>
+  <p>Puts a call on hold.</p>
+<p>The specified call to hold must not already be locally held. Any/all
+media received from the remote participant will stop being received,
+and any/all media being sent to the remote participant will stop
+being sent.</p>
+<p>Some call operations cannot be performed while the call is on hold. The
+call can be taken off hold with the <code>unhold</code> API.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified of the operation
+through a <code>call:stateChange</code> as well.</p>
 
 
   <div class='pre p1 fill-light mt0'>hold(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2251,8 +2306,13 @@ Will stop all media from flowing and trigger a <code>call:held</code> event.</p>
 
   
 
-  <p>Take a call off hold.
-Will resume any previously flowing media and trigger a <code>call:unheld</code> event.</p>
+  <p>Takes a call off hold.</p>
+<p>The specified call to unhold must be locally held. If the call is not
+also remotely held, call media will be reconnected as it was before
+the call was held.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified of the operation
+through a <code>call:stateChange</code> as well.</p>
 
 
   <div class='pre p1 fill-light mt0'>unhold(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2447,8 +2507,13 @@ Will resume any previously flowing media and trigger a <code>call:unheld</code> 
 
   
 
-  <p>End an ongoing call.
-Will stop all media used for the call and trigger a <code>call:stateChange</code> event.</p>
+  <p>Ends an ongoing call.</p>
+<p>The SDK will stop any/all local media associated with the call. Events
+will be emitted to indicate which media tracks were stopped. See the
+<code>call:trackEnded</code> event for more information.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified, through their own
+<code>call:stateChange</code> event, that the call was ended.</p>
 
 
   <div class='pre p1 fill-light mt0'>end(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -10017,344 +10082,6 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Contains information about a device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A collection of devices and their information.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='trackobject'>
-      TrackObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
-
-
-  <div class='pre p1 fill-light mt0'>TrackObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : The list of CSS selectors that were used to render this Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The kind of Track this is (audio, video).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The label of the device this Track uses.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this Track is muted or not.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The state of this Track. Can be 'live' or 'ended'.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media Stream that includes this Track.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
-
-
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='callobject'>
       CallObject
     </h3>
@@ -10481,6 +10208,344 @@ A Call can be manipulated by using the Call feature's APIs.</p>
           : The current state of the call. See 
 <code>Call.states</code>
  for possible states.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A collection of devices and their information.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Contains information about a device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
+
+
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='trackobject'>
+      TrackObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
+
+
+  <div class='pre p1 fill-light mt0'>TrackObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : The list of CSS selectors that were used to render this Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The kind of Track this is (audio, video).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The label of the device this Track uses.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this Track is muted or not.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The state of this Track. Can be 'live' or 'ended'.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media Stream that includes this Track.
 
           
         </div>
