@@ -2,7 +2,7 @@
 
 ## create
 
-The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
+The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.
 
 **Parameters**
 

@@ -8,7 +8,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.",
+              "value": "The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.",
               "position": {
                 "start": {
                   "line": 1,
@@ -17,8 +17,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 113,
-                  "offset": 112
+                  "column": 117,
+                  "offset": 116
                 },
                 "indent": []
               }
@@ -32,8 +32,8 @@
             },
             "end": {
               "line": 1,
-              "column": 113,
-              "offset": 112
+              "column": 117,
+              "offset": 116
             },
             "indent": []
           }
@@ -47,8 +47,8 @@
         },
         "end": {
           "line": 1,
-          "column": 113,
-          "offset": 112
+          "column": 117,
+          "offset": 116
         }
       }
     },
