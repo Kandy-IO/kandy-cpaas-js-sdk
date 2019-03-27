@@ -129,22 +129,7 @@ Call functions are all part of the 'call' namespace.
 ### make
 
 Starts an outgoing call to a SIP user or a PSTN phone number.
-
-The call will be tracked by a unique ID that is returned by the API. The
-   application will use this ID to identify and control the call after it
-   has been initiated.
-
-The `getCallById` API can be used to retrieve the current state of the
-   call.
-
-The SDK will emit a `call:start` event locally when the operation
-   completes. When the remote participant receives the call, a
-   `call:receive` event will be emitted remotely for them.
-
-The SDK requires access to the machine's media devices (eg. microphone)
-   in order to make a call. If it does not already have permissions to
-   use the devices, the user may be prompted by the browser to give
-   permissions.
+Will trigger a `call:started` event when the operation completes.
 
 **Parameters**
 
@@ -154,34 +139,12 @@ The SDK requires access to the machine's media devices (eg. microphone)
     -   `media.audio` **[Boolean][6]** Whether the call should have audio on start. Currently, audio-less calls are not supported. (optional, default `true`)
     -   `media.video` **[Boolean][6]** Whether the call should have video on start. (optional, default `false`)
 
-**Examples**
-
-```javascript
-// Listen for the event emitted after making a call.
-client.on('call:start', function (params) {
-  const { callId, error } = params
-  if (error) {
-    // Call failed to initialize.
-  } else {
-    // Call was initialized, and the recipient user will be notified.
-  }
-})
-// Make an audio-only call.
-const newCallId = client.call.make(callee, { audio: true })
-```
-
 Returns **[string][2]** The generated ID of the newly created call.
 
 ### reject
 
 Rejects an incoming call.
-
-The specified call to reject must be in a ringing state with an incoming
-   direction. The call will be ended as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified, through their own
-   `call:stateChange` event, that the call was rejected.
+Will end the call and trigger a `call:stateChange` event.
 
 **Parameters**
 
@@ -189,22 +152,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### answer
 
-Answers an incoming call.
-
-The specified call to answer must be in a ringing state with an incoming
-   direction. The call will become connected as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. This indicates that the call has connected with the remote
-   participant. The `getCallById` API can be used to retrieve the latest
-   call state after the change. Further events will be emitted to
-   indicate that the call has received media from the remote participant.
-    See the `call:newTrack` event for more information about this.
-
-The SDK requires access to the machine's media devices (eg. microphone)
-   in order to answer a call. If it does not already have permissions to
-   use the devices, the user may be prompted by the browser to give
-   permissions.
+Answer an incoming call.
+Will trigger a `call:answered` event.
 
 **Parameters**
 
@@ -215,14 +164,7 @@ The SDK requires access to the machine's media devices (eg. microphone)
 
 ### ignore
 
-Ignores an incoming call.
-
-The specified call to ignore must be in a ringing state with an incoming
-   direction. The call will be ended as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will not be notified that the call
-   was ignored.
+Ignore an incoming call.
 
 **Parameters**
 
@@ -230,19 +172,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### hold
 
-Puts a call on hold.
-
-The specified call to hold must not already be locally held. Any/all
-   media received from the remote participant will stop being received,
-   and any/all media being sent to the remote participant will stop
-   being sent.
-
-Some call operations cannot be performed while the call is on hold. The
-   call can be taken off hold with the `unhold` API.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified of the operation
-   through a `call:stateChange` as well.
+Put a call on hold.
+Will stop all media from flowing and trigger a `call:held` event.
 
 **Parameters**
 
@@ -250,15 +181,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### unhold
 
-Takes a call off hold.
-
-The specified call to unhold must be locally held. If the call is not
-   also remotely held, call media will be reconnected as it was before
-   the call was held.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified of the operation
-   through a `call:stateChange` as well.
+Take a call off hold.
+Will resume any previously flowing media and trigger a `call:unheld` event.
 
 **Parameters**
 
@@ -291,15 +215,8 @@ Returns **[CallObject][8]** A call object.
 
 ### end
 
-Ends an ongoing call.
-
-The SDK will stop any/all local media associated with the call. Events
-   will be emitted to indicate which media tracks were stopped. See the
-   `call:trackEnded` event for more information.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified, through their own
-   `call:stateChange` event, that the call was ended.
+End an ongoing call.
+Will stop all media used for the call and trigger a `call:stateChange` event.
 
 **Parameters**
 
@@ -647,7 +564,7 @@ Will trigger a `directory:change` event.
 
 **Parameters**
 
--   `userId` **[string][2]** The URI uniquely identifying the user.
+-   `primaryContact` **[string][2]** The URI uniquely identifying the user.
 
 ### fetchSelfInfo
 
@@ -660,7 +577,7 @@ Retrieves local information about a previously fetched user.
 
 **Parameters**
 
--   `userId` **[string][2]** The URI uniquely identifying the user.
+-   `primaryContact` **[string][2]** The URI uniquely identifying the user.
 
 ### getAll
 
@@ -941,14 +858,6 @@ appChannel.on('message', data => {
 client.proxy.setChannel(channel)
 ```
 
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
 ### receive
 
 API that the Proxy module will assign a listener function for accepting received messages.
@@ -957,6 +866,14 @@ This function should receive all messages sent from the remote side of the chann
 **Parameters**
 
 -   `data` **[Object][5]** The message received from the Channel.
+
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
 
 ## Proxy
 
@@ -997,16 +914,28 @@ Sends an initialization message over the channel with webRTC configurations.
 
 -   `config` **[Object][5]** 
 
-## DeviceInfo
+## CallObject
 
-Contains information about a device.
+The state representation of a Call.
+Can be retrieved using the Call feature's `getAll` or `getById` APIs.
+A Call can be manipulated by using the Call feature's APIs.
 
 **Properties**
 
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+-   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
+-   `id` **[string][2]** The ID of the call.
+-   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
+-   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
+    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
+    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
+-   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
+-   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
+    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
+-   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
+-   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## TrackObject
 
@@ -1035,6 +964,17 @@ Media is a collection of Track objects.
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
 -   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
 
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
+
 ## DevicesObject
 
 A collection of devices and their information.
@@ -1044,29 +984,6 @@ A collection of devices and their information.
 -   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
 -   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
 -   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
-
-## CallObject
-
-The state representation of a Call.
-Can be retrieved using the Call feature's `getAll` or `getById` APIs.
-A Call can be manipulated by using the Call feature's APIs.
-
-**Properties**
-
--   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
--   `id` **[string][2]** The ID of the call.
--   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
--   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
-    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
-    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
--   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
--   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
-    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
--   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
--   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## Subscription
 
