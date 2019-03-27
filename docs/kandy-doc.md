@@ -129,22 +129,7 @@ Call functions are all part of the 'call' namespace.
 ### make
 
 Starts an outgoing call to a SIP user or a PSTN phone number.
-
-The call will be tracked by a unique ID that is returned by the API. The
-   application will use this ID to identify and control the call after it
-   has been initiated.
-
-The `getCallById` API can be used to retrieve the current state of the
-   call.
-
-The SDK will emit a `call:start` event locally when the operation
-   completes. When the remote participant receives the call, a
-   `call:receive` event will be emitted remotely for them.
-
-The SDK requires access to the machine's media devices (eg. microphone)
-   in order to make a call. If it does not already have permissions to
-   use the devices, the user may be prompted by the browser to give
-   permissions.
+Will trigger a `call:started` event when the operation completes.
 
 **Parameters**
 
@@ -154,34 +139,12 @@ The SDK requires access to the machine's media devices (eg. microphone)
     -   `media.audio` **[Boolean][6]** Whether the call should have audio on start. Currently, audio-less calls are not supported. (optional, default `true`)
     -   `media.video` **[Boolean][6]** Whether the call should have video on start. (optional, default `false`)
 
-**Examples**
-
-```javascript
-// Listen for the event emitted after making a call.
-client.on('call:start', function (params) {
-  const { callId, error } = params
-  if (error) {
-    // Call failed to initialize.
-  } else {
-    // Call was initialized, and the recipient user will be notified.
-  }
-})
-// Make an audio-only call.
-const newCallId = client.call.make(callee, { audio: true })
-```
-
 Returns **[string][2]** The generated ID of the newly created call.
 
 ### reject
 
 Rejects an incoming call.
-
-The specified call to reject must be in a ringing state with an incoming
-   direction. The call will be ended as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified, through their own
-   `call:stateChange` event, that the call was rejected.
+Will end the call and trigger a `call:stateChange` event.
 
 **Parameters**
 
@@ -189,22 +152,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### answer
 
-Answers an incoming call.
-
-The specified call to answer must be in a ringing state with an incoming
-   direction. The call will become connected as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. This indicates that the call has connected with the remote
-   participant. The `getCallById` API can be used to retrieve the latest
-   call state after the change. Further events will be emitted to
-   indicate that the call has received media from the remote participant.
-    See the `call:newTrack` event for more information about this.
-
-The SDK requires access to the machine's media devices (eg. microphone)
-   in order to answer a call. If it does not already have permissions to
-   use the devices, the user may be prompted by the browser to give
-   permissions.
+Answer an incoming call.
+Will trigger a `call:answered` event.
 
 **Parameters**
 
@@ -215,14 +164,7 @@ The SDK requires access to the machine's media devices (eg. microphone)
 
 ### ignore
 
-Ignores an incoming call.
-
-The specified call to ignore must be in a ringing state with an incoming
-   direction. The call will be ended as a result of the operation.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will not be notified that the call
-   was ignored.
+Ignore an incoming call.
 
 **Parameters**
 
@@ -230,19 +172,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### hold
 
-Puts a call on hold.
-
-The specified call to hold must not already be locally held. Any/all
-   media received from the remote participant will stop being received,
-   and any/all media being sent to the remote participant will stop
-   being sent.
-
-Some call operations cannot be performed while the call is on hold. The
-   call can be taken off hold with the `unhold` API.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified of the operation
-   through a `call:stateChange` as well.
+Put a call on hold.
+Will stop all media from flowing and trigger a `call:held` event.
 
 **Parameters**
 
@@ -250,15 +181,8 @@ The SDK will emit a `call:stateChange` event locally when the operation
 
 ### unhold
 
-Takes a call off hold.
-
-The specified call to unhold must be locally held. If the call is not
-   also remotely held, call media will be reconnected as it was before
-   the call was held.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified of the operation
-   through a `call:stateChange` as well.
+Take a call off hold.
+Will resume any previously flowing media and trigger a `call:unheld` event.
 
 **Parameters**
 
@@ -291,15 +215,8 @@ Returns **[CallObject][8]** A call object.
 
 ### end
 
-Ends an ongoing call.
-
-The SDK will stop any/all local media associated with the call. Events
-   will be emitted to indicate which media tracks were stopped. See the
-   `call:trackEnded` event for more information.
-
-The SDK will emit a `call:stateChange` event locally when the operation
-   completes. The remote participant will be notified, through their own
-   `call:stateChange` event, that the call was ended.
+End an ongoing call.
+Will stop all media used for the call and trigger a `call:stateChange` event.
 
 **Parameters**
 
@@ -997,6 +914,16 @@ Sends an initialization message over the channel with webRTC configurations.
 
 -   `config` **[Object][5]** 
 
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+
 ## CallObject
 
 The state representation of a Call.
@@ -1020,38 +947,6 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
-
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1067,6 +962,28 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## Subscription
 
