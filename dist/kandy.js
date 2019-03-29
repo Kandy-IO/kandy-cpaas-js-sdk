@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.3.0-KAA-1422.68049
+ * Version: 3.4.0-beta.68272
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -28179,6 +28179,7 @@ const WS_ATTEMPT_CONNECT = exports.WS_ATTEMPT_CONNECT = prefix + 'WS_ATTEMPT_CON
 const WS_CONNECT_FINISHED = exports.WS_CONNECT_FINISHED = prefix + 'WS_CONNECT_FINISHED';
 const WS_DISCONNECT = exports.WS_DISCONNECT = prefix + 'WS_DISCONNECT';
 const WS_DISCONNECT_FINISHED = exports.WS_DISCONNECT_FINISHED = prefix + 'WS_DISCONNECT_FINISHED';
+const WS_RECONNECT_FAILED = exports.WS_RECONNECT_FAILED = prefix + 'WS_RECONNECT_FAILED';
 
 // actions for hooking into connectivity plugin behaviour
 const WS_CLOSED = exports.WS_CLOSED = prefix + 'WS_CLOSED';
@@ -28203,7 +28204,7 @@ const CHANGE_PING_INTERVAL = exports.CHANGE_PING_INTERVAL = prefix + 'CHANGE_PIN
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.changePingInterval = exports.changeConnectivityChecking = exports.receiveServerPong = exports.receiveServerPing = exports.lostConnection = exports.wsError = exports.wsClosed = exports.wsDisconnectFinished = exports.wsConnectFinished = exports.wsDisconnect = exports.wsAttemptConnect = undefined;
+exports.changePingInterval = exports.changeConnectivityChecking = exports.receiveServerPong = exports.receiveServerPing = exports.lostConnection = exports.wsError = exports.wsClosed = exports.wsReconnectFailed = exports.wsDisconnectFinished = exports.wsConnectFinished = exports.wsDisconnect = exports.wsAttemptConnect = undefined;
 
 var _actionTypes = __webpack_require__("./src/connectivity/interface/actionTypes.js");
 
@@ -28220,14 +28221,15 @@ function createWsAction(type) {
   /**
    * @param {any=} payload
    * @param {string=} platform
+   * @param {boolean=} [isReconnect] flag to signify if we are reconnecting or not.
    */
-  function action(payload, platform = _constants.platforms.LINK) {
+  function action(payload, platform = _constants.platforms.LINK, isReconnect = false) {
     return {
       type,
       // TODO: This must check for basic error eventually instead.
       error: payload instanceof Error,
       payload,
-      meta: { platform }
+      meta: { platform, isReconnect }
     };
   }
   return action;
@@ -28237,6 +28239,7 @@ const wsAttemptConnect = exports.wsAttemptConnect = createWsAction(actionTypes.W
 const wsDisconnect = exports.wsDisconnect = createWsAction(actionTypes.WS_DISCONNECT);
 const wsConnectFinished = exports.wsConnectFinished = createWsAction(actionTypes.WS_CONNECT_FINISHED);
 const wsDisconnectFinished = exports.wsDisconnectFinished = createWsAction(actionTypes.WS_DISCONNECT_FINISHED);
+const wsReconnectFailed = exports.wsReconnectFailed = createWsAction(actionTypes.WS_RECONNECT_FAILED);
 
 const wsClosed = exports.wsClosed = createWsAction(actionTypes.WS_CLOSED);
 const wsError = exports.wsError = createWsAction(actionTypes.WS_ERROR);
@@ -28535,6 +28538,17 @@ reducers[actionTypes.WS_ATTEMPT_CONNECT] = {
   }
 };
 
+reducers[actionTypes.WS_RECONNECT_FAILED] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      [action.meta.platform]: (0, _extends3.default)({}, state[action.meta.platform], {
+        connected: false,
+        pinging: false
+      })
+    });
+  }
+};
+
 reducers[actionTypes.WS_CONNECT_FINISHED] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -28766,7 +28780,8 @@ function* wsConnectFlow() {
  */
 function* websocketLifecycle(wsConnectAction) {
   const wsInfo = wsConnectAction.payload;
-  const platform = wsConnectAction.meta.platform;
+  const { platform, isReconnect } = wsConnectAction.meta;
+
   // Try to open the websocket.
   let websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
 
@@ -28779,10 +28794,13 @@ function* websocketLifecycle(wsConnectAction) {
 
   // If the websocket didn't open, dispatch the error and stop here.
   if (websocket.error) {
-    // TODO: Differentiate between failed initial connect and reconnect?
-    //      So that actions/events can too.
-    yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
-    return;
+    if (isReconnect) {
+      yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
+      return;
+    } else {
+      yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
+      return;
+    }
   }
 
   // set last contact in both cases to be now
@@ -28838,7 +28856,7 @@ function* websocketLifecycle(wsConnectAction) {
 
     // If we've lost connection, re-dispatch the initial action, so that we can
     //      start the lifecycle over.
-    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform));
+    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
   }
 }
 
@@ -30248,7 +30266,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.3.0-KAA-1422.68049';
+  let version = '3.4.0-beta.68272';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -37603,7 +37621,7 @@ function createSubcriptionPlugin(options = {}) {
   }
 
   return {
-    sagas: [_sagas.subscriptionFlow],
+    sagas: [_sagas.subscriptionFlow, _sagas.onConnectionLostEntry],
     init,
     api: _interface.api,
     reducer: _interface.reducer,
@@ -38035,11 +38053,14 @@ function* closeChannel(channel, platform) {
 
   // TODO: Don't hardcode a constant.
   if (channelType === 'websockets') {
-    // Ask the connectivity plugin to disconnect this platform's websocket.
-    const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
+    // Ask the connectivity plugin to disconnect this platform's websocket if it exists
+    const wsState = yield (0, _effects2.select)(_selectors3.getConnectionState, platform);
+    if (wsState.connected) {
+      const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
 
-    if (closeAction.error) {
-      log.debug('Failed to close websocket. Continuing anyway.');
+      if (closeAction.error) {
+        log.debug('Failed to close websocket. Continuing anyway.');
+      }
     }
 
     const requestInfo = yield (0, _effects2.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
@@ -38065,6 +38086,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.subscriptionFlow = subscriptionFlow;
 exports.refreshWebsocketSaga = refreshWebsocketSaga;
+exports.onConnectionLostEntry = onConnectionLostEntry;
+exports.onConnectionLost = onConnectionLost;
 
 var _actionTypes = __webpack_require__("./src/subscription/interface/actionTypes.js");
 
@@ -38074,13 +38097,17 @@ var _actions = __webpack_require__("./src/subscription/interface/actions.js");
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
-
 var _channels = __webpack_require__("./src/subscription/cpaas2/sagas/channels.js");
 
 var _requests = __webpack_require__("./src/subscription/cpaas2/requests.js");
 
-var _selectors2 = __webpack_require__("./src/subscription/interface/selectors.js");
+var _selectors = __webpack_require__("./src/subscription/interface/selectors.js");
+
+var _actionTypes2 = __webpack_require__("./src/connectivity/interface/actionTypes.js");
+
+var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _selectors2 = __webpack_require__("./src/auth/interface/selectors.js");
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
@@ -38101,13 +38128,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Helpers.
-// Subscription plugin.
+
+
+// Other plugins
 const platform = _constants.platforms.CPAAS2;
 
 // Constants
 
 
 // Libraries.
+// Subscription plugin.
 
 const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
@@ -38174,10 +38204,21 @@ function* subscriptionFlow() {
         continue;
       }
 
+      const connectionInfo = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
+      const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
+
+      // if we're not connected or connection info is not available, unsub from all services.
+      if ((0, _fp.isUndefined)(connectionInfo)) {
+        yield (0, _effects2.put)(actions.unsubscribeFinished({
+          unsubscriptions: subscribedServices,
+          type: action.payload.type
+        }));
+        continue;
+      }
+
       // Get the channel information of the channel to be closed.
-      const { notificationChannels } = yield (0, _effects2.select)(_selectors2.getNotificationChannels);
+      const { notificationChannels } = yield (0, _effects2.select)(_selectors.getNotificationChannels);
       const channel = notificationChannels[action.payload.type];
-      const subscribedServices = yield (0, _effects2.select)(_selectors2.getSubscribedServices, action.payload.type);
 
       // If there are no longer any subscribed services for this channel (and
       //    the channel is open), close it.
@@ -38211,7 +38252,7 @@ function* subscriptionFlow() {
  * @return {Object}
  */
 function* subscribeForServices(action) {
-  const registeredServices = yield (0, _effects2.select)(_selectors2.getRegisteredServices);
+  const registeredServices = yield (0, _effects2.select)(_selectors.getRegisteredServices);
 
   // Get the list of services that were requested, but plugins did not register.
   const notRegistered = (0, _fp.difference)(registeredServices, action.payload.services);
@@ -38235,7 +38276,7 @@ function* subscribeForServices(action) {
     };
   }
 
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors2.getSubscriptionConfig, platform);
+  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
 
   // Announce to all plugins that subscriptions should happen.
   yield (0, _effects2.put)(actions.doPluginSubscriptions(validServices, action.payload.type));
@@ -38261,7 +38302,7 @@ function* subscribeForServices(action) {
  * @return {Object}
  */
 function* unsubscribeServices(action) {
-  const subscribedServices = yield (0, _effects2.select)(_selectors2.getSubscribedServices, action.payload.type);
+  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
 
   // Get the list of services we want to unsubscribe, but aren't subscribed.
   const notSubscribed = action.payload.services.filter(service => {
@@ -38286,7 +38327,7 @@ function* unsubscribeServices(action) {
     };
   }
 
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors2.getSubscriptionConfig, platform);
+  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
 
   // Announce to all plugins that unsubscriptions should happen
   yield (0, _effects2.put)(actions.doPluginUnsubscriptions(validServices, action.payload.type));
@@ -38316,7 +38357,7 @@ function* refreshWebsocketSaga() {
       continue;
     }
 
-    const subscription = yield (0, _effects2.select)(_selectors.getSubscriptionInfo, platform);
+    const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
 
     const resubDelay = subscription.channelLifetime * 1000 / 2;
 
@@ -38329,9 +38370,9 @@ function* refreshWebsocketSaga() {
     // If the resubDelay has elapsed, resubscribe.
     if (expiry) {
       log.info('Extending user subscription.');
-      const connection = yield (0, _effects2.select)(_selectors.getConnectionInfo, platform);
-      const subscription = yield (0, _effects2.select)(_selectors.getSubscriptionInfo, platform);
-      const credentials = yield (0, _effects2.select)(_selectors.getUserInfo);
+      const connection = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
+      const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
+      const credentials = yield (0, _effects2.select)(_selectors2.getUserInfo);
 
       const response = yield (0, _effects2.call)(_requests.refreshWebsocket, connection, subscription, credentials);
 
@@ -38342,6 +38383,23 @@ function* refreshWebsocketSaga() {
       }
     }
   }
+}
+
+/**
+ * Triggers onConnectionLost saga when a WS_RECONNECT_FAILED actionType occurs
+ * @method onConnectionLostEntry
+ */
+function* onConnectionLostEntry() {
+  yield (0, _effects2.takeEvery)(connectivityActionTypes.WS_RECONNECT_FAILED, onConnectionLost);
+}
+
+/**
+ * Handles lost connections from the connectivity plugin
+ * @method onConnectionLost
+ */
+function* onConnectionLost() {
+  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices);
+  yield (0, _effects2.put)(actions.unsubscribe(subscribedServices));
 }
 
 /***/ }),
@@ -38921,7 +38979,19 @@ function pendingChange(value) {
 reducers[actionTypes.SUBSCRIBE] = pendingChange(true);
 reducers[actionTypes.SUBSCRIBE_FINISHED] = pendingChange(false);
 reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
-reducers[actionTypes.UNSUBSCRIBE_FINISHED] = pendingChange(false);
+
+/*
+ * Remove subscriptions that are in the unsubscriptions list
+ */
+reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
+  next(state, action) {
+    const subscribedServices = state.subscriptions.map(subscription => subscription.service);
+    return (0, _extends3.default)({}, state, {
+      isPending: false,
+      subscriptions: (0, _fp.difference)(subscribedServices, action.payload.unsubscriptions)
+    });
+  }
+};
 
 /*
  * When a plugin reports a succesful subscription, store it in state.
@@ -39055,6 +39125,7 @@ function getNotificationChannels(state) {
 /**
  * Retrieve the list of services with current subscriptions.
  * @method getSubscribedServices
+ * @param {string} type the type of subscription we want to get specifically
  * @return {Array}
  */
 function getSubscribedServices(state, type) {
@@ -39734,7 +39805,7 @@ function* searchDirectory(action) {
 }
 
 /**
- * fetch one user by their userId/primaryContact
+ * fetch one user by their userId
  * @method fetchUser
  * @param {Object} action an action of type FETCH_USER
  */
@@ -40403,10 +40474,10 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @memberof Users
      * @method fetch
      *
-     * @param {string} primaryContact The URI uniquely identifying the user.
+     * @param {string} userId The URI uniquely identifying the user.
      */
-    fetch(primaryContact) {
-      dispatch(actions.fetchUser(primaryContact));
+    fetch(userId) {
+      dispatch(actions.fetchUser(userId));
     },
 
     /**
@@ -40426,10 +40497,10 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @public
      * @memberof Users
      * @method get
-     * @param {string} primaryContact The URI uniquely identifying the user.
+     * @param {string} userId The URI uniquely identifying the user.
      */
-    get(primaryContact) {
-      return (0, _selectors.getUser)(getState(), primaryContact);
+    get(userId) {
+      return (0, _selectors.getUser)(getState(), userId);
     },
 
     /**

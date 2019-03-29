@@ -647,7 +647,7 @@ Will trigger a `directory:change` event.
 
 **Parameters**
 
--   `primaryContact` **[string][2]** The URI uniquely identifying the user.
+-   `userId` **[string][2]** The URI uniquely identifying the user.
 
 ### fetchSelfInfo
 
@@ -660,7 +660,7 @@ Retrieves local information about a previously fetched user.
 
 **Parameters**
 
--   `primaryContact` **[string][2]** The URI uniquely identifying the user.
+-   `userId` **[string][2]** The URI uniquely identifying the user.
 
 ### getAll
 
@@ -980,15 +980,6 @@ appChannel.on('message', data => {
 client.proxy.setChannel(channel)
 ```
 
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
 ### send
 
 Channel function that the Proxy module will use to send messages to the remote side.
@@ -997,28 +988,14 @@ Channel function that the Proxy module will use to send messages to the remote s
 
 -   `data` **[Object][5]** Message to be sent over the channel.
 
-## CallObject
+### receive
 
-The state representation of a Call.
-Can be retrieved using the Call feature's `getAll` or `getById` APIs.
-A Call can be manipulated by using the Call feature's APIs.
+API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.
 
-**Properties**
+**Parameters**
 
--   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
--   `id` **[string][2]** The ID of the call.
--   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
--   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
-    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
-    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
--   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
--   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
-    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
--   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
--   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+-   `data` **[Object][5]** The message received from the Channel.
 
 ## DeviceInfo
 
@@ -1067,6 +1044,29 @@ Media is a collection of Track objects.
 -   `id` **[string][2]** The ID of the Media object.
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
 -   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
+
+## CallObject
+
+The state representation of a Call.
+Can be retrieved using the Call feature's `getAll` or `getById` APIs.
+A Call can be manipulated by using the Call feature's APIs.
+
+**Properties**
+
+-   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
+-   `id` **[string][2]** The ID of the call.
+-   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
+-   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
+    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
+    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
+-   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
+-   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
+    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
+-   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
+-   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## Subscription
 
