@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.2.0
+ * Version: 3.3.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18377,8 +18377,27 @@ function createCodecRemover(config) {
         return typeof item === 'string' ? { name: item } : item;
     });
 
-    return function (params) {
-        var newSdp = (0, _fp.cloneDeep)(params.currentSdp);
+    return function () {
+        // Adding support for new callstack sdp handlers
+        // Old callstack sdp pipeline passes an object to each sdp
+        // handler that contains the currentSdp
+        // New callstack passes 3 arguments to each sdp handler
+        // newSdp, info, originalSdp
+        var oldCallstack = true;
+        var currentSdp = void 0;
+
+        for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+            params[_key] = arguments[_key];
+        }
+
+        if (params[0].currentSdp) {
+            currentSdp = params[0].currentSdp;
+        } else if (params.length === 3) {
+            oldCallstack = false;
+            currentSdp = params[0];
+        }
+
+        var newSdp = (0, _fp.cloneDeep)(currentSdp);
 
         // This is an array of strings representing codec names we want to remove.
         var codecStringsToRemove = config.map(function (codec) {
@@ -18477,7 +18496,9 @@ function createCodecRemover(config) {
             }
         });
 
-        return params.next(newSdp);
+        // If old callstack, then return the results of the next sdp handler
+        // If new callstack, then just return the modified sdp
+        return oldCallstack ? params[0].next(newSdp) : newSdp;
     };
 }
 
@@ -18835,6 +18856,12 @@ class MediaManager extends _eventemitter2.default {
           this.remove(mediaId);
         });
 
+        media.on('track:removed', trackId => {
+          if (media.tracks.size === 0) {
+            this.remove(media.id);
+          }
+        });
+
         media.on('track:ended', ({ mediaId, trackId }) => {
           if (media.getTracks().length === 0) {
             this.remove(mediaId);
@@ -18867,6 +18894,12 @@ class MediaManager extends _eventemitter2.default {
 
     media.once('media:stopped', mediaId => {
       this.remove(mediaId);
+    });
+
+    media.on('track:removed', trackId => {
+      if (media.tracks.size === 0) {
+        this.remove(media.id);
+      }
     });
 
     media.on('track:ended', ({ mediaId, trackId }) => {
@@ -19211,9 +19244,19 @@ function TrackManager() {
    * @return {Track} The added/wrapped Track object.
    */
   function add(track, stream) {
-    if (tracks.has(track.id)) {
+    const targetTrack = tracks.get(track.id);
+
+    // Chrome issue: track.stream is outdated and needs to be updated to newStream.
+    // targetTrack.stream.active is false & targetTrack.stream.getTracks() gives us an empty array.
+    // stream.active is true & stream.getTracks() gives us the correct array of tracks.
+    // Set/update the new stream as the track's stream
+    if (targetTrack && !targetTrack.stream.active && stream.active) {
+      // The track was previously registered and is being re-added with new stream
+      targetTrack.stream = stream;
+      return targetTrack;
+    } else if (targetTrack) {
       // This track is already registered.
-      return get(track.id);
+      return targetTrack;
     } else {
       // Wrap the track as a Track object.
       const wrappedTrack = new _track2.default(track, stream);
@@ -19692,7 +19735,7 @@ class Peer extends _eventemitter2.default {
     .filter(sender => Boolean(sender.track)).map(sender => this.trackManager.get(sender.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the sender but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -19713,7 +19756,7 @@ class Peer extends _eventemitter2.default {
     .filter(receiver => Boolean(receiver.track)).map(receiver => this.trackManager.get(receiver.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the receiver but not the actual track yet.
-      return track && track.getState().state === 'live';
+      return track && track.getState().state === 'live' && track.stream.active;
     });
   }
 
@@ -19878,6 +19921,9 @@ class Peer extends _eventemitter2.default {
               this.emit('onnegotiationready');
             } else {
               _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${this.config.trickleIceMode}).`);
+              // TODO: Handle this scenario properly.
+              // If ICE collection never finishes, we need to time it out at some point.
+              setTimeout(() => this.emit('onnegotiationready'), 3000);
             }
           }, 25);
         }
@@ -19901,27 +19947,22 @@ class Peer extends _eventemitter2.default {
   /**
    * Finds a specific transceiver depending on the options passed in
    * @method findTransceiver
-   * @param {Object} [options] Only one of these options will be taken with order of precedence being trackId, mid.
+   * @param {Object} [options] Only one of these options will be taken. They are ordered by priority.
    * @param {string} [options.trackId] The transceiver with the specific sender.track.id.
-   * @param {string} [options.mid] The transceiver with the specific media id.
    * @return {Object} The transceiver that was found (undefined if not found).
    */
   findTransceiver(options) {
     const transceivers = this.peerConnection.getTransceivers();
     if (options.trackId) {
       return transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
-    } else if (options.mid) {
-      return transceivers.find(transceiver => transceiver.mid === options.mid);
     }
   }
 
   /**
    * Replaces a specified transceiver's sender.track.
    * @method replaceTrack
-   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced.
-   *  If both are provided, mid will be used.
+   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
    * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
-   * @param {string} [options.mid] The optional media id of a specific transceiver.
    * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
@@ -19937,14 +19978,20 @@ class Peer extends _eventemitter2.default {
   }
 
   /**
-   * Finds a transceiver that does not have a track on its sender.
+   * Finds a transceiver that can be reused.
+   * A transceiver can be reused if it satisfies the following conditions:
+   *   - it does not have a track on its sender
+   *   - it has the same kind (audio or video) as what we specified
+   *   - it has been used before (if it has not been used then we are not "reusing" it)
+   * @method findReusableTransceiver
    * @param {string} kind The kind of transceiver to find (audio or video)
-   * @returns {Object} Transceiver object that matches kind and has no sender track. Otherwise undefined.
+   * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
    */
-  findVacantTransceiver(kind) {
+  findReusableTransceiver(kind) {
     if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
       const transceivers = this.peerConnection.getTransceivers();
-      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind);
+      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
+      );
     } else {
       _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
     }
@@ -20138,12 +20185,9 @@ class Peer extends _eventemitter2.default {
    * Sets the direction of transceivers.
    * @method setTransceiversDirection
    * @param {string} targetDirection The desired direction to set the transceivers to.
-   * @param {Object} [options] Options for specifying which transceivers should be affected.
-   *  Only one of these options can be provided at a time.
-   *  If both are provided, trackIds will be used.
+   * @param {Object} [options] Options for specifying which transceivers should be affected. They are ordered by priority.
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
-   * @param {String} [options.mid] The optional media id of a specific transceiver.
-   * @return {Object} An object containing an `error` flag and  an array `failures` of transceiver "mid"s whose directions weren't changed.
+   * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
    */
   setTransceiversDirection(targetDirection, options = {}) {
     if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
@@ -20151,14 +20195,12 @@ class Peer extends _eventemitter2.default {
 
       if (options.trackIds) {
         transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
-      } else if (options.mid) {
-        transceivers = transceivers.filter(transceiver => transceiver.mid === options.mid);
       }
 
       const failures = [];
       transceivers.forEach(transceiver => {
         if (!(0, _transceiverUtils.setTransceiverDirection)(transceiver, targetDirection)) {
-          failures.push(transceiver.mid);
+          failures.push(transceiver);
         }
       });
       return {
@@ -20199,6 +20241,8 @@ var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js");
 
+var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
+
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -20219,12 +20263,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-
-
-// SDP Helpers.
+// Helpers.
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
+
+    // Keeps track of who started the initial offer.
+    // We need this for calls with firefox so that DTLS roles aren't interpreted by other browsers (chrome)
+    //  as being switched when the one that didn't initiate a call tries to start renegotiation offer.
+    // See more details on the issue here https://groups.google.com/forum/#!topic/discuss-webrtc/gsw3OEAwNKo.
+    this.isInitialOfferrer = undefined;
+
+    _pipeline2.default.setHandlers([_handlers.setDtlsSetupToPassiveIfInitialOfferrer]);
+
     // The session's unique id
     this.id = id;
     this.config = config;
@@ -20330,24 +20381,35 @@ class Session extends _eventemitter2.default {
     if (peer) {
       const addTrackOrReuseTransceiverPromises = tracks.map(track => {
         return new _promise2.default((resolve, reject) => {
-          const vacantTransceiver = peer.findVacantTransceiver(track.track.kind);
-          // If we can find a vacant transceiver, reuse it.
-          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && vacantTransceiver) {
-            peer.replaceTrack({ mid: vacantTransceiver.mid }, track.track).then(() => {
-              const targetDirection = vacantTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
-              const result = peer.setTransceiversDirection(targetDirection, {
-                mid: vacantTransceiver.mid
-              });
-              if (!result.error) {
-                resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${vacantTransceiver.mid}).`);
-              } else {
-                reject(new Error(`Failed to process the following transceivers: ${result.failures}`));
-              }
+          // We try to find a reusable transceiver that we can attach the track to achieve the following:
+          // - Avoid transceiver pollution and needing to create a brand new transceiver to attach the track to.
+          // - Allow re-adding of the same track type that has been previously removed.
+          //   (This is so that we can still have re-adding of tracks when using the "basic" media API which imposes a 1-audio & 1-video limit)
+          const reusableTransceiver = peer.findReusableTransceiver(track.track.kind);
+
+          // If we can find a reusable transceiver, reuse it.
+          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
+            // Current limitations of transceiver reuse method:
+            // - We cannot attach the track's associated stream to the sender (lack of `sender.setStreams` support atm)
+            // So the local transceiver's sender track & remote transceiver's receiver track must have been used before so that it already has a stream attached to the sender.
+            // If the local transceiver's sender has not been used before, we should ideally be able to do the following:
+            // transceiver.sender.setStreams([<someStream>]) <- Not yet supported
+            // transceiver.sender.replaceTrack(<someTrack>)
+            // However, because of lack of support for `setStreams`, if we just tried to do `replaceTrack` on a transceiver that has not been used before,
+            //  the sender will not have a stream and the SDP generated will have no associated stream which can cuase issues such as not triggering events on the local stream during renegotiation.
+            // Once `setStreams` is supported, we can use the transceiver reuse method above even on transceivers that have not been used to send data before.
+            reusableTransceiver.sender.replaceTrack(track.track).then(() => {
+              reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${reusableTransceiver.mid}).`);
             }).catch(err => {
               _loglevel2.default.error(err);
               reject(err);
             });
           } else {
+            // To get around the current limitation described above, we use peerConnection's `addTrack` when we can't find a reusable transceiver.
+            // `addTrack` does one of the following when called:
+            // - Create a new transceiver and attaches the track and stream to the sender
+            // - Find and use an existing transceiver that has never been used to send data before and attach the track and stream to the sender.
             peer.addTrack(track);
             resolve(`Added track (${track.track.kind} : ${track.id}).`);
           }
@@ -20422,11 +20484,17 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createOffer(options).then(offer => {
+        // If initialOfferrer flag not set and offering, that means we are the initial offerrer.
+        if (this.isInitialOfferrer === undefined) {
+          this.isInitialOfferrer = true;
+        }
+
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local offer with SDP pipeline.');
           offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
             type: offer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
+            endpoint: _constants.PEER.ENDPOINT.LOCAL,
+            isInitiator: this.isInitialOfferrer
           });
         }
         peer.setLocalDescription(offer).then(() => {
@@ -20457,10 +20525,8 @@ class Session extends _eventemitter2.default {
    * @method setTransceiversDirection
    * @param {String} targetDirection The desired direction to set the transceivers to.
    * @param {Object} [options] Options for specifying which transceivers should be affected.
-   *  Only one of these options can be provided at a time.
-   *  If both are provided, trackIds will be used.
+   *  trackIds option has priority
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
-   * @param {String} [options.mid] The optional media id of a specific transceiver.
    * @return {Object} An object containing an `error` flag and  an array `failures` of transceiver "mid"s whose directions weren't changed.
    */
   setTransceiversDirection(targetDirection, options = {}) {
@@ -20492,7 +20558,8 @@ class Session extends _eventemitter2.default {
         _loglevel2.default.debug('Modifying remote offer with SDP pipeline.');
         offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
           type: offer.type,
-          endpoint: _constants.PEER.ENDPOINT.REMOTE
+          endpoint: _constants.PEER.ENDPOINT.REMOTE,
+          isInitiator: this.isInitialOfferrer
         });
       }
 
@@ -20543,11 +20610,17 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createAnswer(options).then(answer => {
+        // If initialOfferrer flag not set and answering, that means we aren't the initial offerrer.
+        if (this.isInitialOfferrer === undefined) {
+          this.isInitialOfferrer = false;
+        }
+
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local answer with SDP pipeline.');
           answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
             type: answer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
+            endpoint: _constants.PEER.ENDPOINT.LOCAL,
+            isInitiator: this.isInitialOfferrer
           });
         }
         peer.setLocalDescription(answer).then(() => {
@@ -20572,7 +20645,8 @@ class Session extends _eventemitter2.default {
       _loglevel2.default.debug('Modifying remote answer with SDP pipeline.');
       answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
         type: answer.type,
-        endpoint: _constants.PEER.ENDPOINT.REMOTE
+        endpoint: _constants.PEER.ENDPOINT.REMOTE,
+        isInitiator: this.isInitialOfferrer
       });
     }
 
@@ -20673,7 +20747,9 @@ class Session extends _eventemitter2.default {
     });
   }
 }
-exports.default = Session; // Helpers.
+exports.default = Session;
+
+// SDP Helpers.
 
 /***/ }),
 
@@ -20939,6 +21015,7 @@ var _values2 = _interopRequireDefault(_values);
 exports.removeTrickleIce = removeTrickleIce;
 exports.removeBundling = removeBundling;
 exports.changeMediaDirection = changeMediaDirection;
+exports.setDtlsSetupToPassiveIfInitialOfferrer = setDtlsSetupToPassiveIfInitialOfferrer;
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -21023,6 +21100,31 @@ function changeMediaDirection({ audio, video }) {
   };
 }
 
+/**
+ * Sets the DTLS setup to passive if it is active and if the following conditions hold:
+ *  - This session initiated the call with the first offer.
+ *  - We created the SDP.
+ *  - We are answering an offer.
+ * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
+ * @param {RTCSdpType} info Information about the session description.
+ * @param {RTCSdpType} info.type The session description's type.
+ * @param {string} info.endpoint Which end of the connection created the SDP.
+ * @param {boolean} info.isInitiator Whether this session initiated the call or not.
+ * @param {Object} originalSdp The sdp in its initial state.
+ */
+function setDtlsSetupToPassiveIfInitialOfferrer(newSdp, info, originalSdp) {
+  // Hack: If we are the initial offerrer, we created the sdp, and we're answering,
+  //  we need to set DTLS setup to passive if it's active.
+  if (info.isInitiator && info.endpoint === 'local' && info.type === 'answer') {
+    for (let mLine of newSdp.media) {
+      if (mLine.setup && mLine.setup === 'active') {
+        mLine.setup = 'passive';
+      }
+    }
+  }
+  return newSdp;
+}
+
 /***/ }),
 
 /***/ "../webrtc/src/sdpUtils/pipeline.js":
@@ -21057,12 +21159,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Basic SDP pipeline runner.
  * Does not include any default handlers.
  * @method sdpPipeline
- * @param  {Array}      handlers      List of functions that transform the SDP.
- * @param  {String}     sdp           The session description.
- * @param  {RTCSdpType} info          Information about the session description.
- * @param  {RTCSdpType} info.type     The session description's type.
- * @param  {String}     info.endpoint Which end of the connection created the SDP.
+ * @param  {Array}      handlers       List of functions that transform the SDP.
+ * @param  {String}     sdp            The session description.
+ * @param  {RTCSdpType} info           Information about the session description.
+ * @param  {RTCSdpType} info.type      The session description's type.
+ * @param  {String}     info.endpoint  Which end of the connection created the SDP.
+ * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
  * @return {String}     The modified session description.
+
  */
 function runPipeline(handlers, sdp, info) {
   let objectSdp = _sdpTransform2.default.parse(sdp);
@@ -21118,7 +21222,7 @@ function createPipeline() {
    */
   function setHandlers(handlers) {
     if ((0, _fp.isArray)(handlers)) {
-      defaultHandlers = handlers;
+      defaultHandlers = defaultHandlers.concat(handlers);
     }
   }
 
@@ -22965,11 +23069,13 @@ const CALL_STATES = exports.CALL_STATES = {
    * @property {string} CHANGE_MEDIA Media flow remains the same, includes non-flow related media changes.
    * @property {string} HOLD_MEDIA   Media flow stops. May include non-flow related media changes.
    * @property {string} UNHOLD_MEDIA Media flow restarts. May include non-flow related media changes.
+   * @property {string} MUSIC_ON_HOLD Media flow changes to sendonly.
    */
 };const OPERATIONS = exports.OPERATIONS = {
   CHANGE_MEDIA: 'Change Media',
   HOLD_MEDIA: 'Hold Media',
-  UNHOLD_MEDIA: 'Unhold Media'
+  UNHOLD_MEDIA: 'Unhold Media',
+  MUSIC_ON_HOLD: 'Music on hold'
 
   /**
    * Call direction
@@ -23053,6 +23159,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Configuration options for the call feature.
+ * @public
+ * @name config.call
+ * @memberof config
+ * @instance
+ * @param {Object} call The call configuration object.
+ * @param {Object} [call.iceServers] ICE servers to be used for calls.
+ * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
+ * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ */
+
 // Libraries.
 
 
@@ -23075,7 +23193,9 @@ function cpaas2Calls(options = {}) {
     // Whether the SDK should fetch turn credentials.
     serverTurnCredentials: true,
     // Trickle ICE method to use for calls.
-    trickleIceMode: 'NONE'
+    trickleIceMode: 'NONE',
+    // SDP handlers to be included in the pipeline for every operation.
+    sdpHandlers: []
   };
   options = (0, _utils2.mergeValues)(defaultOptions, options);
 
@@ -23086,12 +23206,14 @@ function cpaas2Calls(options = {}) {
     /*
      * Set SDP handlers to be used for every operation:
      *
-     * 1. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
+     * 1. Application provided SDP handlers.
+     *
+     * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
      *    crypto method enabled. WebRTC only allows one method to be enabled.
      * This is needed for interopability with non-browser endpoints that include
      *    SDES as a fallback method.
      */
-    webRTC.sdp.pipeline.setHandlers([_utils.sanitizeSdesFromSdp]);
+    webRTC.sdp.pipeline.setHandlers(options.sdpHandlers.concat([_utils.sanitizeSdesFromSdp]));
 
     // Wrap the call sagas in a function that provides them with the webRTC stack.
     const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
@@ -25006,6 +25128,7 @@ function* validateCallState(callId, expected) {
  * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
  * @param {string} info.endpoint Which end of the connection created the SDP.
+ * @param {boolean} info.isInitiator Whether this session initiated the call or not.
  * @param {Object} originalSdp The sdp in its initial state.
  * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
  */
@@ -25080,6 +25203,8 @@ const ADD_MEDIA_FINISH = exports.ADD_MEDIA_FINISH = callPrefix + 'ADD_MEDIA_FINI
 const REMOVE_MEDIA = exports.REMOVE_MEDIA = callPrefix + 'REMOVE_MEDIA';
 const REMOVE_MEDIA_FINISH = exports.REMOVE_MEDIA_FINISH = callPrefix + 'REMOVE_MEDIA_FINISH';
 
+const MUSIC_ON_HOLD = exports.MUSIC_ON_HOLD = callPrefix + 'MUSIC_ON_HOLD';
+
 const SEND_DTMF = exports.SEND_DTMF = callPrefix + 'SEND_DTMF';
 const SEND_DTMF_FINISH = exports.SEND_DTMF_FINISH = callPrefix + 'SEND_DTMF_FINISH';
 
@@ -25143,6 +25268,7 @@ exports.addMedia = addMedia;
 exports.addMediaFinish = addMediaFinish;
 exports.removeMedia = removeMedia;
 exports.removeMediaFinish = removeMediaFinish;
+exports.musicOnHold = musicOnHold;
 exports.sendDTMF = sendDTMF;
 exports.sendDTMFFinish = sendDTMFFinish;
 exports.getStats = getStats;
@@ -25306,6 +25432,10 @@ function removeMediaFinish(id, params) {
   return callActionHelper(actionTypes.REMOVE_MEDIA_FINISH, id, params);
 }
 
+function musicOnHold(id, params) {
+  return callActionHelper(actionTypes.MUSIC_ON_HOLD, id, params);
+}
+
 function sendDTMF(id, params) {
   return callActionHelper(actionTypes.SEND_DTMF, id, params);
 }
@@ -25407,6 +25537,8 @@ var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
+var _normalization = __webpack_require__("./src/call/utils/normalization.js");
+
 var _v = __webpack_require__("../../node_modules/uuid/v4.js");
 
 var _v2 = _interopRequireDefault(_v);
@@ -25417,11 +25549,27 @@ var _constants = __webpack_require__("./src/call/constants.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Call plugin.
 function callAPI({ dispatch, getState }) {
   return {
     /**
      * Starts an outgoing call to a SIP user or a PSTN phone number.
-     * Will trigger a `call:started` event when the operation completes.
+     *
+     * The call will be tracked by a unique ID that is returned by the API. The
+     *    application will use this ID to identify and control the call after it
+     *    has been initiated.
+     *
+     * The `getCallById` API can be used to retrieve the current state of the
+     *    call.
+     *
+     * The SDK will emit a `call:start` event locally when the operation
+     *    completes. When the remote participant receives the call, a
+     *    `call:receive` event will be emitted remotely for them.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to make a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
      * @public
      * @memberof Calls
      * @method make
@@ -25431,6 +25579,18 @@ function callAPI({ dispatch, getState }) {
      * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Boolean} [media.video=false] Whether the call should have video on start.
      * @returns {string} The generated ID of the newly created call.
+     * @example
+     * // Listen for the event emitted after making a call.
+     * client.on('call:start', function (params) {
+     *   const { callId, error } = params
+     *   if (error) {
+     *     // Call failed to initialize.
+     *   } else {
+     *     // Call was initialized, and the recipient user will be notified.
+     *   }
+     * })
+     * // Make an audio-only call.
+     * const newCallId = client.call.make(callee, { audio: true })
      */
     make(destination, media = {}, options = {}) {
       const callId = (0, _v2.default)();
@@ -25441,7 +25601,7 @@ function callAPI({ dispatch, getState }) {
       };
 
       dispatch(_actions.callActions.makeCall(callId, (0, _extends3.default)({
-        participantAddress: destination,
+        participantAddress: (0, _normalization.normalizeSipUri)(destination),
         mediaConstraints
       }, options)));
       return callId;
@@ -25449,7 +25609,13 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Rejects an incoming call.
-     * Will end the call and trigger a `call:stateChange` event.
+     *
+     * The specified call to reject must be in a ringing state with an incoming
+     *    direction. The call will be ended as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified, through their own
+     *    `call:stateChange` event, that the call was rejected.
      * @public
      * @memberof Calls
      * @method reject
@@ -25460,8 +25626,22 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Answer an incoming call.
-     * Will trigger a `call:answered` event.
+     * Answers an incoming call.
+     *
+     * The specified call to answer must be in a ringing state with an incoming
+     *    direction. The call will become connected as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. This indicates that the call has connected with the remote
+     *    participant. The `getCallById` API can be used to retrieve the latest
+     *    call state after the change. Further events will be emitted to
+     *    indicate that the call has received media from the remote participant.
+     *     See the `call:newTrack` event for more information about this.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to answer a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
      * @public
      * @memberof Calls
      * @method answer
@@ -25482,7 +25662,14 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Ignore an incoming call.
+     * Ignores an incoming call.
+     *
+     * The specified call to ignore must be in a ringing state with an incoming
+     *    direction. The call will be ended as a result of the operation.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will not be notified that the call
+     *    was ignored.
      * @public
      * @memberof Calls
      * @method ignore
@@ -25493,8 +25680,19 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Put a call on hold.
-     * Will stop all media from flowing and trigger a `call:held` event.
+     * Puts a call on hold.
+     *
+     * The specified call to hold must not already be locally held. Any/all
+     *    media received from the remote participant will stop being received,
+     *    and any/all media being sent to the remote participant will stop
+     *    being sent.
+     *
+     * Some call operations cannot be performed while the call is on hold. The
+     *    call can be taken off hold with the `unhold` API.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified of the operation
+     *    through a `call:stateChange` as well.
      * @public
      * @memberof Calls
      * @method hold
@@ -25505,8 +25703,15 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Take a call off hold.
-     * Will resume any previously flowing media and trigger a `call:unheld` event.
+     * Takes a call off hold.
+     *
+     * The specified call to unhold must be locally held. If the call is not
+     *    also remotely held, call media will be reconnected as it was before
+     *    the call was held.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified of the operation
+     *    through a `call:stateChange` as well.
      * @public
      * @memberof Calls
      * @method unhold
@@ -25545,8 +25750,15 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * End an ongoing call.
-     * Will stop all media used for the call and trigger a `call:stateChange` event.
+     * Ends an ongoing call.
+     *
+     * The SDK will stop any/all local media associated with the call. Events
+     *    will be emitted to indicate which media tracks were stopped. See the
+     *    `call:trackEnded` event for more information.
+     *
+     * The SDK will emit a `call:stateChange` event locally when the operation
+     *    completes. The remote participant will be notified, through their own
+     *    `call:stateChange` event, that the call was ended.
      * @public
      * @memberof Calls
      * @method end
@@ -25643,7 +25855,6 @@ function callAPI({ dispatch, getState }) {
 }
 
 // Libraries.
-// Call plugin.
 
 /***/ }),
 
@@ -25972,7 +26183,33 @@ function callEventHandler(type, action, params = {}) {
   };
 }
 
+/**
+ * Helper function for converting an action to a "call state change" event.
+ * Ensures that all such events have consistent parameters.
+ * @method stateChangeHandler
+ * @param  {Object} action
+ * @param  {Object} params
+ * @param  {Object} params.prevState Redux state from before the action was processed by reducers.
+ * @param  {Object} params.state     Redux state from after the action was processed by reducers.
+ * @return {Object} An event object.
+ */
+
+
 // Helpers
+function stateChangeHandler(action, params) {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+
+  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
+    error: action.payload.error,
+    previous: {
+      state: prevCall.state,
+      localHold: prevCall.localHold,
+      remoteHold: prevCall.remoteHold
+    }
+  });
+}
+
 const callEvents = exports.callEvents = {};
 
 callEvents[actionTypes.MAKE_CALL_FINISH] = action => {
@@ -25987,107 +26224,26 @@ callEvents[actionTypes.CALL_INCOMING] = action => {
   });
 };
 
-callEvents[actionTypes.CALL_RINGING] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_CANCELLED] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
+callEvents[actionTypes.CALL_RINGING] = stateChangeHandler;
+callEvents[actionTypes.CALL_CANCELLED] = stateChangeHandler;
 
 callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
-  // Don't emit an event if it was a slow start answer.
-  if (action.meta && action.meta.isSlowStart) {
+  // Don't emit an event if it was a slow start answer. The call isn't actually
+  //    answered yet, so state hasn't changed.
+  if (action.meta.isSlowStart) {
     return;
   }
 
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
+  return stateChangeHandler(action, params);
 };
 
-callEvents[actionTypes.CALL_ACCEPTED] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.IGNORE_CALL_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error
-  });
-};
-
-callEvents[actionTypes.END_CALL_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    transition: action.payload.transition,
-    previous: {
-      state: prevCall.state
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_HOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    local: action.payload.local,
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_UNHOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    local: action.payload.local,
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
+callEvents[actionTypes.CALL_ACCEPTED] = stateChangeHandler;
+callEvents[actionTypes.IGNORE_CALL_FINISH] = stateChangeHandler;
+callEvents[actionTypes.END_CALL_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_HOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_UNHOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = stateChangeHandler;
 
 callEvents[actionTypes.ADD_MEDIA_FINISH] = action => {
   return callEventHandler(eventTypes.CALL_ADDED_MEDIA, action, {
@@ -26111,34 +26267,6 @@ callEvents[actionTypes.GET_STATS_FINISH] = action => {
     result: action.payload.result,
     error: action.payload.error,
     trackId: action.payload.trackId
-  });
-};
-
-callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
-  });
-};
-
-callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = (action, params) => {
-  // Get the call state before this action updated state.
-  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
-
-  return callEventHandler(eventTypes.CALL_STATE_CHANGE, action, {
-    error: action.payload.error,
-    previous: {
-      state: prevCall.state,
-      localHold: prevCall.localHold,
-      remoteHold: prevCall.remoteHold
-    }
   });
 };
 
@@ -26379,6 +26507,12 @@ callReducers[actionTypes.UPDATE_CALL] = {
   }
 };
 
+callReducers[actionTypes.MUSIC_ON_HOLD] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, action.payload);
+  }
+};
+
 callReducers[actionTypes.CALL_HOLD_FINISH] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -26426,7 +26560,7 @@ callReducers[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD);
 
 /*
  * Reducer to handle specific call actions.
@@ -26659,6 +26793,170 @@ function getOptions(state) {
  */
 function getTurnInfo(state) {
   return state.call.turn;
+}
+
+/***/ }),
+
+/***/ "./src/call/utils/normalization.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.normalizeSipUri = normalizeSipUri;
+/**
+ * Extracts the domain from an address if an @ symbol exists and isn't at the start or end of the address.
+ * @param {string} addressString The address string to extract the domain from (if it exists).
+ * @returns {string} The extracted domain. Empty string of none found.
+ */
+function extractDomainFromAddress(addressString) {
+  const indexOfAtSymbol = addressString.indexOf('@');
+  if (indexOfAtSymbol !== 0 && indexOfAtSymbol !== addressString.length - 1) {
+    // If '@' symbol found in middle of addressString, split it.
+    if (indexOfAtSymbol !== -1) {
+      return addressString.substr(indexOfAtSymbol + 1);
+    }
+  }
+  return '';
+}
+
+/**
+ * Determines which address and domain to use depending on whether the address string contains a domain or not.
+ * @param {string} addressString The address string to examine and extract a domain from (if any).
+ * @param {string} defaultDomainString The domain to use if the address string does not contain a domain in it.
+ * @returns {Object} An object containing the correct address and domain to use.
+ */
+function separateAddressAndDomain(addressString, defaultDomainString) {
+  const extractedDomain = extractDomainFromAddress(addressString);
+  // If a domain was extracted from the address, use that as the domain and strip it from the address.
+  if (extractedDomain) {
+    return {
+      address: addressString.substr(0, addressString.length - extractedDomain.length - 1),
+      domain: extractedDomain
+    };
+  } else {
+    return {
+      address: addressString,
+      domain: defaultDomainString
+    };
+  }
+}
+
+/**
+ * Extracts any pre-pended data before a ":" (if it exists) from the beginning of a string.
+ * @param {string} inputString The string to remove pre-pended data from.
+ * @returns {string} The pre-pended data string.
+ */
+function extractPrependedData(inputString) {
+  const prependedDataMatches = inputString.match(/^.*:/g);
+  if (prependedDataMatches && prependedDataMatches[0]) {
+    return prependedDataMatches[0];
+  } else {
+    return '';
+  }
+}
+
+/**
+ * Finds the leading special characters ("#", "+", "*") of an address if it is a phone number.
+ * If the address contains letters or any non-visual-separator characters,
+ *  it is not a phone number and no leading special characters will be found.
+ * @param {string} addressString The address string to find the leading characters of (if any).
+ *  The addressString must not contain any pre-pended data such as "sip:".
+ *  The addressString must not contain a domain.
+ * @returns {string} The leading special characters as one string. Empty string if none found.
+ */
+function extractLeadingSpecialCharacters(addressString) {
+  // A single or group of contiguous characters are considered leading character/s if it is  the following:
+  // - starts at the beginning of the string - ^
+  // - is any of the following characters - [#+*]+
+  // - is followed by a digit or "(" - [\d|(]
+  // - is followed by any number of only digits and visual separators - [\d \-.()+]*$
+  const potentialLeadingChars = addressString.match(/^[#+*]+[\d|(][\d \-.()+]*$/g);
+  if (potentialLeadingChars && potentialLeadingChars[0]) {
+    // Guaranteed to have a match for regex [#+*]+ since we have potentialLeadingChars
+    // which was a match for a similar regex and we are simply extracting the leading characters part.
+    const actualLeadingChars = potentialLeadingChars[0].match(/[#+*]+/g);
+    return actualLeadingChars[0];
+  }
+  return '';
+}
+
+/**
+ * Outputs a new string without its phone number visual separators ("-", ".", "(", ")", "+").
+ * @param {string} inputString The string to remove visual separators from.
+ * @returns {string} A new string without visual separators.
+ */
+function withoutVisualSeparators(inputString) {
+  return inputString.replace(/[ \-.()+]/g, '');
+}
+
+/**
+ * Determines whether a string should be considered a phone number or not.
+ * @param {string} addressString The address string to check.
+ *  The addressString must not contain any pre-pended data such as "sip:"
+ *  The addressString must not contain any leading special characters.
+ *  The addressString must not contain a domain.
+ * @returns {boolean} True if the input string is a phone number. False if it is not.
+ */
+function isPhoneNumber(addressString) {
+  const cleanNumber = withoutVisualSeparators(addressString);
+  const phoneNumberMatch = cleanNumber.match(/^\d+$/g);
+  return phoneNumberMatch && phoneNumberMatch.length === 1;
+}
+
+/**
+ * Processes the address string and returns the correct output.
+ * If the address is a phone number, visual separators are removed.
+ * Otherwise, it will just return the address as-is.
+ * @param {string} addressString The address string to process.
+ *  The addressString must not contain any pre-pended data such as "sip:".
+ *  The addressString must not contain any leading special characters (if it is a phone number).
+ *  The addressString must not contain a domain.
+ * @returns {string} A phone number without visual-separators or the addressString as-is.
+ */
+function processAddress(addressString) {
+  return isPhoneNumber(addressString) ? withoutVisualSeparators(addressString) : addressString;
+}
+
+/**
+ * Processes the domain string and returns the correct output.
+ * Adds an "@" symbol if it isn't present at the beginning of the domain.
+ * @param {string} domainString The domain string to process.
+ * @returns {string} The domain with "@" symbol at the beginning if it doesn't exist.
+ */
+function processDomain(domainString) {
+  return (domainString.indexOf('@') === 0 ? '' : '@') + domainString;
+}
+
+/**
+ *The function takes in the input dial string and domain address of the user, performs a normalization process based on the phone number handling normalization rules
+ * @function normalizeSipUri
+ * @param {string} address   It contains the input dial string the user dials in or the callee address
+ * @param {string} domain    It contains the user's domain address
+ * @returns {string} output  The output which is the normalized callee address/phone number
+ */
+function normalizeSipUri(address, domain) {
+  // Remove leading and trailing white spaces.
+  address = address.trim();
+
+  // Extract domain.
+  const resultingAddressAndDomain = separateAddressAndDomain(address, domain);
+  domain = resultingAddressAndDomain.domain;
+  address = resultingAddressAndDomain.address;
+
+  // Extract pre-pended "sip:".
+  const prepend = extractPrependedData(address);
+  address = address.substr(prepend.length);
+
+  // Extract leading characters.
+  const leadingChars = extractLeadingSpecialCharacters(address);
+  address = address.substr(leadingChars.length);
+
+  // Process and build parts into final output in the form of `<prepend>:<leadingChars><address>@<domain>`.
+  return 'sip:' + leadingChars + processAddress(address) + processDomain(domain);
 }
 
 /***/ }),
@@ -27881,6 +28179,7 @@ const WS_ATTEMPT_CONNECT = exports.WS_ATTEMPT_CONNECT = prefix + 'WS_ATTEMPT_CON
 const WS_CONNECT_FINISHED = exports.WS_CONNECT_FINISHED = prefix + 'WS_CONNECT_FINISHED';
 const WS_DISCONNECT = exports.WS_DISCONNECT = prefix + 'WS_DISCONNECT';
 const WS_DISCONNECT_FINISHED = exports.WS_DISCONNECT_FINISHED = prefix + 'WS_DISCONNECT_FINISHED';
+const WS_RECONNECT_FAILED = exports.WS_RECONNECT_FAILED = prefix + 'WS_RECONNECT_FAILED';
 
 // actions for hooking into connectivity plugin behaviour
 const WS_CLOSED = exports.WS_CLOSED = prefix + 'WS_CLOSED';
@@ -27905,7 +28204,7 @@ const CHANGE_PING_INTERVAL = exports.CHANGE_PING_INTERVAL = prefix + 'CHANGE_PIN
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.changePingInterval = exports.changeConnectivityChecking = exports.receiveServerPong = exports.receiveServerPing = exports.lostConnection = exports.wsError = exports.wsClosed = exports.wsDisconnectFinished = exports.wsConnectFinished = exports.wsDisconnect = exports.wsAttemptConnect = undefined;
+exports.changePingInterval = exports.changeConnectivityChecking = exports.receiveServerPong = exports.receiveServerPing = exports.lostConnection = exports.wsError = exports.wsClosed = exports.wsReconnectFailed = exports.wsDisconnectFinished = exports.wsConnectFinished = exports.wsDisconnect = exports.wsAttemptConnect = undefined;
 
 var _actionTypes = __webpack_require__("./src/connectivity/interface/actionTypes.js");
 
@@ -27922,14 +28221,15 @@ function createWsAction(type) {
   /**
    * @param {any=} payload
    * @param {string=} platform
+   * @param {boolean=} [isReconnect] flag to signify if we are reconnecting or not.
    */
-  function action(payload, platform = _constants.platforms.LINK) {
+  function action(payload, platform = _constants.platforms.LINK, isReconnect = false) {
     return {
       type,
       // TODO: This must check for basic error eventually instead.
       error: payload instanceof Error,
       payload,
-      meta: { platform }
+      meta: { platform, isReconnect }
     };
   }
   return action;
@@ -27939,6 +28239,7 @@ const wsAttemptConnect = exports.wsAttemptConnect = createWsAction(actionTypes.W
 const wsDisconnect = exports.wsDisconnect = createWsAction(actionTypes.WS_DISCONNECT);
 const wsConnectFinished = exports.wsConnectFinished = createWsAction(actionTypes.WS_CONNECT_FINISHED);
 const wsDisconnectFinished = exports.wsDisconnectFinished = createWsAction(actionTypes.WS_DISCONNECT_FINISHED);
+const wsReconnectFailed = exports.wsReconnectFailed = createWsAction(actionTypes.WS_RECONNECT_FAILED);
 
 const wsClosed = exports.wsClosed = createWsAction(actionTypes.WS_CLOSED);
 const wsError = exports.wsError = createWsAction(actionTypes.WS_ERROR);
@@ -28237,6 +28538,17 @@ reducers[actionTypes.WS_ATTEMPT_CONNECT] = {
   }
 };
 
+reducers[actionTypes.WS_RECONNECT_FAILED] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      [action.meta.platform]: (0, _extends3.default)({}, state[action.meta.platform], {
+        connected: false,
+        pinging: false
+      })
+    });
+  }
+};
+
 reducers[actionTypes.WS_CONNECT_FINISHED] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -28468,7 +28780,8 @@ function* wsConnectFlow() {
  */
 function* websocketLifecycle(wsConnectAction) {
   const wsInfo = wsConnectAction.payload;
-  const platform = wsConnectAction.meta.platform;
+  const { platform, isReconnect } = wsConnectAction.meta;
+
   // Try to open the websocket.
   let websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
 
@@ -28481,10 +28794,13 @@ function* websocketLifecycle(wsConnectAction) {
 
   // If the websocket didn't open, dispatch the error and stop here.
   if (websocket.error) {
-    // TODO: Differentiate between failed initial connect and reconnect?
-    //      So that actions/events can too.
-    yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
-    return;
+    if (isReconnect) {
+      yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
+      return;
+    } else {
+      yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
+      return;
+    }
   }
 
   // set last contact in both cases to be now
@@ -28540,7 +28856,7 @@ function* websocketLifecycle(wsConnectAction) {
 
     // If we've lost connection, re-dispatch the initial action, so that we can
     //      start the lifecycle over.
-    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform));
+    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
   }
 }
 
@@ -29950,7 +30266,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.2.0';
+  let version = '3.3.0';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -30183,7 +30499,7 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
- * The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.
+ * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
  * @public
  * @method create
  * @param {config} config The configuration object.
@@ -30418,6 +30734,7 @@ const logMgr = getLogManager(defaultOptions);
  * @public
  * @name config.logs
  * @memberof config
+ * @requires logs
  * @instance
  * @param {Object} logs Logs configs.
  * @param  {string} [logs.logLevel=debug] Log level to be set. See `logger.levels`.
@@ -30457,6 +30774,7 @@ function logger(options = {}) {
 
   var components = {
     name,
+    capabilities: ['logs'],
     init,
     api: _api2.default
     // Consider actions to be at the INFO log level.
@@ -30483,6 +30801,11 @@ function logger(options = {}) {
         nextState: false
       };
     }
+
+    if (options.logActions.excludeActions) {
+      actionOptions.predicate = excludeActions(options.logActions.excludeActions);
+    }
+
     // ALWAYS use our own logger
     actionOptions.logger = logMgr.getLogger('ACTION');
     // ALWAYS remove theming/styling from the action log messages
@@ -30515,6 +30838,16 @@ function getLogManager(options) {
   return getLogManager.instance;
 }
 
+/**
+ * Logger predicate function that will take an array of action types
+ * and exclude them from logs
+ * @param {Array} actions An array of action types to exclude from logs
+ * @returns {function} A predicate function
+ */
+function excludeActions(actions) {
+  return (getState, action) => !actions.includes(action.type);
+}
+
 /***/ }),
 
 /***/ "./src/logs/interface/api.js":
@@ -30538,6 +30871,7 @@ exports.default = api;
  *
  * @public
  * @module Logger
+ * @requires logs
  */
 
 function api() {
@@ -37287,7 +37621,7 @@ function createSubcriptionPlugin(options = {}) {
   }
 
   return {
-    sagas: [_sagas.subscriptionFlow],
+    sagas: [_sagas.subscriptionFlow, _sagas.onConnectionLostEntry],
     init,
     api: _interface.api,
     reducer: _interface.reducer,
@@ -37719,11 +38053,14 @@ function* closeChannel(channel, platform) {
 
   // TODO: Don't hardcode a constant.
   if (channelType === 'websockets') {
-    // Ask the connectivity plugin to disconnect this platform's websocket.
-    const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
+    // Ask the connectivity plugin to disconnect this platform's websocket if it exists
+    const wsState = yield (0, _effects2.select)(_selectors3.getConnectionState, platform);
+    if (wsState.connected) {
+      const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
 
-    if (closeAction.error) {
-      log.debug('Failed to close websocket. Continuing anyway.');
+      if (closeAction.error) {
+        log.debug('Failed to close websocket. Continuing anyway.');
+      }
     }
 
     const requestInfo = yield (0, _effects2.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
@@ -37749,6 +38086,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.subscriptionFlow = subscriptionFlow;
 exports.refreshWebsocketSaga = refreshWebsocketSaga;
+exports.onConnectionLostEntry = onConnectionLostEntry;
+exports.onConnectionLost = onConnectionLost;
 
 var _actionTypes = __webpack_require__("./src/subscription/interface/actionTypes.js");
 
@@ -37758,13 +38097,17 @@ var _actions = __webpack_require__("./src/subscription/interface/actions.js");
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
-
 var _channels = __webpack_require__("./src/subscription/cpaas2/sagas/channels.js");
 
 var _requests = __webpack_require__("./src/subscription/cpaas2/requests.js");
 
-var _selectors2 = __webpack_require__("./src/subscription/interface/selectors.js");
+var _selectors = __webpack_require__("./src/subscription/interface/selectors.js");
+
+var _actionTypes2 = __webpack_require__("./src/connectivity/interface/actionTypes.js");
+
+var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _selectors2 = __webpack_require__("./src/auth/interface/selectors.js");
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
@@ -37785,13 +38128,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Helpers.
-// Subscription plugin.
+
+
+// Other plugins
 const platform = _constants.platforms.CPAAS2;
 
 // Constants
 
 
 // Libraries.
+// Subscription plugin.
 
 const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
@@ -37858,10 +38204,21 @@ function* subscriptionFlow() {
         continue;
       }
 
+      const connectionInfo = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
+      const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
+
+      // if we're not connected or connection info is not available, unsub from all services.
+      if ((0, _fp.isUndefined)(connectionInfo)) {
+        yield (0, _effects2.put)(actions.unsubscribeFinished({
+          unsubscriptions: subscribedServices,
+          type: action.payload.type
+        }));
+        continue;
+      }
+
       // Get the channel information of the channel to be closed.
-      const { notificationChannels } = yield (0, _effects2.select)(_selectors2.getNotificationChannels);
+      const { notificationChannels } = yield (0, _effects2.select)(_selectors.getNotificationChannels);
       const channel = notificationChannels[action.payload.type];
-      const subscribedServices = yield (0, _effects2.select)(_selectors2.getSubscribedServices, action.payload.type);
 
       // If there are no longer any subscribed services for this channel (and
       //    the channel is open), close it.
@@ -37895,7 +38252,7 @@ function* subscriptionFlow() {
  * @return {Object}
  */
 function* subscribeForServices(action) {
-  const registeredServices = yield (0, _effects2.select)(_selectors2.getRegisteredServices);
+  const registeredServices = yield (0, _effects2.select)(_selectors.getRegisteredServices);
 
   // Get the list of services that were requested, but plugins did not register.
   const notRegistered = (0, _fp.difference)(registeredServices, action.payload.services);
@@ -37919,7 +38276,7 @@ function* subscribeForServices(action) {
     };
   }
 
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors2.getSubscriptionConfig, platform);
+  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
 
   // Announce to all plugins that subscriptions should happen.
   yield (0, _effects2.put)(actions.doPluginSubscriptions(validServices, action.payload.type));
@@ -37945,7 +38302,7 @@ function* subscribeForServices(action) {
  * @return {Object}
  */
 function* unsubscribeServices(action) {
-  const subscribedServices = yield (0, _effects2.select)(_selectors2.getSubscribedServices, action.payload.type);
+  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
 
   // Get the list of services we want to unsubscribe, but aren't subscribed.
   const notSubscribed = action.payload.services.filter(service => {
@@ -37970,7 +38327,7 @@ function* unsubscribeServices(action) {
     };
   }
 
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors2.getSubscriptionConfig, platform);
+  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
 
   // Announce to all plugins that unsubscriptions should happen
   yield (0, _effects2.put)(actions.doPluginUnsubscriptions(validServices, action.payload.type));
@@ -38000,7 +38357,7 @@ function* refreshWebsocketSaga() {
       continue;
     }
 
-    const subscription = yield (0, _effects2.select)(_selectors.getSubscriptionInfo, platform);
+    const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
 
     const resubDelay = subscription.channelLifetime * 1000 / 2;
 
@@ -38013,9 +38370,9 @@ function* refreshWebsocketSaga() {
     // If the resubDelay has elapsed, resubscribe.
     if (expiry) {
       log.info('Extending user subscription.');
-      const connection = yield (0, _effects2.select)(_selectors.getConnectionInfo, platform);
-      const subscription = yield (0, _effects2.select)(_selectors.getSubscriptionInfo, platform);
-      const credentials = yield (0, _effects2.select)(_selectors.getUserInfo);
+      const connection = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
+      const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
+      const credentials = yield (0, _effects2.select)(_selectors2.getUserInfo);
 
       const response = yield (0, _effects2.call)(_requests.refreshWebsocket, connection, subscription, credentials);
 
@@ -38026,6 +38383,23 @@ function* refreshWebsocketSaga() {
       }
     }
   }
+}
+
+/**
+ * Triggers onConnectionLost saga when a WS_RECONNECT_FAILED actionType occurs
+ * @method onConnectionLostEntry
+ */
+function* onConnectionLostEntry() {
+  yield (0, _effects2.takeEvery)(connectivityActionTypes.WS_RECONNECT_FAILED, onConnectionLost);
+}
+
+/**
+ * Handles lost connections from the connectivity plugin
+ * @method onConnectionLost
+ */
+function* onConnectionLost() {
+  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices);
+  yield (0, _effects2.put)(actions.unsubscribe(subscribedServices));
 }
 
 /***/ }),
@@ -38605,7 +38979,19 @@ function pendingChange(value) {
 reducers[actionTypes.SUBSCRIBE] = pendingChange(true);
 reducers[actionTypes.SUBSCRIBE_FINISHED] = pendingChange(false);
 reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
-reducers[actionTypes.UNSUBSCRIBE_FINISHED] = pendingChange(false);
+
+/*
+ * Remove subscriptions that are in the unsubscriptions list
+ */
+reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
+  next(state, action) {
+    const subscribedServices = state.subscriptions.map(subscription => subscription.service);
+    return (0, _extends3.default)({}, state, {
+      isPending: false,
+      subscriptions: (0, _fp.difference)(subscribedServices, action.payload.unsubscriptions)
+    });
+  }
+};
 
 /*
  * When a plugin reports a succesful subscription, store it in state.
@@ -38739,6 +39125,7 @@ function getNotificationChannels(state) {
 /**
  * Retrieve the list of services with current subscriptions.
  * @method getSubscribedServices
+ * @param {string} type the type of subscription we want to get specifically
  * @return {Array}
  */
 function getSubscribedServices(state, type) {
@@ -39418,7 +39805,7 @@ function* searchDirectory(action) {
 }
 
 /**
- * fetch one user by their userId/primaryContact
+ * fetch one user by their userId
  * @method fetchUser
  * @param {Object} action an action of type FETCH_USER
  */
@@ -40087,10 +40474,10 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @memberof Users
      * @method fetch
      *
-     * @param {string} primaryContact The URI uniquely identifying the user.
+     * @param {string} userId The URI uniquely identifying the user.
      */
-    fetch(primaryContact) {
-      dispatch(actions.fetchUser(primaryContact));
+    fetch(userId) {
+      dispatch(actions.fetchUser(userId));
     },
 
     /**
@@ -40110,10 +40497,10 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @public
      * @memberof Users
      * @method get
-     * @param {string} primaryContact The URI uniquely identifying the user.
+     * @param {string} userId The URI uniquely identifying the user.
      */
-    get(primaryContact) {
-      return (0, _selectors.getUser)(getState(), primaryContact);
+    get(userId) {
+      return (0, _selectors.getUser)(getState(), userId);
     },
 
     /**
@@ -41920,11 +42307,18 @@ function api(context) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.default = mediaAPI;
 
 var _actions = __webpack_require__("./src/webrtc/interface/actions/index.js");
 
 var _selectors = __webpack_require__("./src/webrtc/interface/selectors.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Media related APIs.
@@ -41961,6 +42355,8 @@ function mediaAPI({ dispatch, getState }) {
 
     /**
      * Retrieve a Track object from state with a specific ID.
+     * @public
+     * @memberof Media
      * @method getTrackById
      * @param  {string} trackId The ID of the track to retrieve.
      * @return {Object} A track object.
@@ -41977,6 +42373,8 @@ function mediaAPI({ dispatch, getState }) {
      * @method renderTracks
      * @param  {Array}  tracks List of Track IDs to be rendered.
      * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Object} [options] Additional options for rendering the tracks.
+     * @param  {string} [options.speakerId] The device ID of the speaker to use for audio tracks.
      * @example
      * // When an outgoing call is accepted, render the media used for the call.
      * client.on('call:accepted', function (params) {
@@ -41988,8 +42386,10 @@ function mediaAPI({ dispatch, getState }) {
      *     client.media.render(call.remoteMedia[0], remoteContainer)
      * })
      */
-    renderTracks(tracks, cssSelector) {
-      dispatch(_actions.trackActions.renderTracks(tracks, { selector: cssSelector }));
+    renderTracks(tracks, cssSelector, options = {}) {
+      dispatch(_actions.trackActions.renderTracks(tracks, (0, _extends3.default)({
+        selector: cssSelector
+      }, options)));
     },
 
     /**
@@ -42815,8 +43215,10 @@ function* renderTracks(webRTC, action) {
     return;
   }
 
+  const speakerId = action.payload.speakerId;
+
   // Render the tracks.
-  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], container)));
+  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], container, speakerId)));
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
@@ -42922,6 +43324,138 @@ function findContainer(selector) {
     log.error(`Unable to get container with selector: "${selector}". Error: ${e}`);
   }
   return container;
+}
+
+/***/ }),
+
+/***/ "./src/webrtcProxy/channel.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = wrapChannel;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Wraps a channel with only `send` and `receive` functionality into one that
+ *    also has `reply` functionality.
+ * This is required by the Proxy Plugin to convert asynchronous code into
+ *    synchronous code. The Proxy needs to return a value synchronously when
+ *    sending data over the channel.
+ * @method wrapChannel
+ * @param  {Object} channel
+ * @return {Object} The same channel, but with a `reply` method as well.
+ */
+function wrapChannel(channel) {
+  /**
+   * Track sent messages by their ID.
+   * @type {Object}
+   */
+  const sentMessages = {};
+
+  channel.receive = function receiveMessage(message) {
+    const { messageId, data } = message;
+
+    // Determine how the message needs to be handled.
+    if (messageId && sentMessages[messageId]) {
+      // If the message has an ID from a sent message, then it is a reply to
+      //    that message. Resolve the promise associated with it.
+      sentMessages[messageId].resolve(data);
+    } else if (messageId && !sentMessages[messageId]) {
+      // If the message has an ID that we don't know about, then the application
+      //    will need to handle it.
+      if (api.receive) {
+        api.receive(messageId, data);
+      } else {
+        console.log('No listener for receiving messages.', data);
+      }
+    } else {
+      // If the message didn't have an ID, then it wasn't from our test channel.
+      console.log('Unknown message.');
+    }
+  };
+
+  /*
+   * The interface that the Proxy Plugin will use.
+   */
+  const api = {};
+
+  /**
+   * Send a message over the channel.
+   * @method send
+   * @param {string} messageId A unique ID to track the sent message.
+   * @param {Object} data
+   * @param {Function} callback Function called when a reply is received.
+   */
+  api.send = (messageId, data, callback) => {
+    if (sentMessages[messageId]) {
+      // The ID has already been used for sending a message.
+      callback(null, new Error('Cannot send message; ID already used.'));
+      return;
+    }
+
+    // Attach a messageId to the message.
+    // This lets the remote side reply to this message by using the messageId.
+    const message = {
+      data,
+      messageId
+
+      // Wrap `send` is a promise so that we can correlate receiving a reply
+      //    to the callback.
+    };new _promise2.default(resolve => {
+      // Store `resolve` so we can call it call it when we receive a reply.
+      sentMessages[messageId] = {
+        resolve
+        // Send the message over the channel.
+      };channel.send(message);
+    }).then(data => {
+      // The message received a reply, so remove the reference.
+      delete sentMessages[messageId];
+      console.debug('Received response for message: ', messageId);
+      if (typeof callback === 'function') {
+        callback(data);
+      }
+    });
+  };
+
+  /**
+   * Listener for receiving a message from the channel.
+   * @method receive
+   * @param {string} messageId
+   * @param {Object} data
+   */
+  // eslint-disable-next-line
+  api.receive = undefined;
+
+  /**
+   * Send a reply to a specific received message over the channel.
+   * @method reply
+   * @param {string} messageId
+   * @param {Object} data
+   */
+  api.reply = (messageId, data) => {
+    console.debug(`Replying to message ${messageId}.`, data);
+
+    // Attach the messageId to the message.
+    const message = {
+      data,
+      messageId
+    };
+
+    channel.send(message);
+  };
+
+  return api;
 }
 
 /***/ }),
@@ -43052,6 +43586,9 @@ const SET_MODE_FINISH = exports.SET_MODE_FINISH = PREFIX + 'SET_MODE_FINISH';
 const SET_CHANNEL = exports.SET_CHANNEL = PREFIX + 'SET_CHANNEL';
 const SET_CHANNEL_FINISH = exports.SET_CHANNEL_FINISH = PREFIX + 'SET_CHANNEL_FINISH';
 
+const INITIALIZE = exports.INITIALIZE = PREFIX + 'INITIALIZE';
+const INITIALIZE_FINISH = exports.INITIALIZE_FINISH = PREFIX + 'INITIALIZE_FINISH';
+
 /***/ }),
 
 /***/ "./src/webrtcProxy/interface/actions.js":
@@ -43072,6 +43609,8 @@ exports.setProxyMode = setProxyMode;
 exports.setProxyModeFinish = setProxyModeFinish;
 exports.setChannel = setChannel;
 exports.setChannelFinish = setChannelFinish;
+exports.initializeRemote = initializeRemote;
+exports.initializeRemoteFinish = initializeRemoteFinish;
 
 var _actionTypes = __webpack_require__("./src/webrtcProxy/interface/actionTypes.js");
 
@@ -43108,6 +43647,14 @@ function setChannel(channel) {
 
 function setChannelFinish({ error }) {
   return actionHelper(actionTypes.SET_CHANNEL_FINISH, { error });
+}
+
+function initializeRemote(config) {
+  return actionHelper(actionTypes.INITIALIZE, { config });
+}
+
+function initializeRemoteFinish({ error }) {
+  return actionHelper(actionTypes.INITIALIZE_FINISH, { error });
 }
 
 /***/ }),
@@ -43148,12 +43695,60 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @module Proxy
  */
 
+/**
+ * The Channel object that the Proxy module needs to be provided.
+ *
+ * @public
+ * @module Channel
+ * @example
+ * // The channel the application uses for communicating with a remote endpoint.
+ * const appChannel = ...
+ *
+ * // The channel the application will provide to the Proxy module for use.
+ * const channel = {
+ *    send: function (data) {
+ *      // Any encoding / wrapping needed for a Proxy message being sent
+ *      //    over the channel.
+ *      appChannel.sendMessage(data)
+ *    },
+ *    // The Proxy module will set this function.
+ *    receive: undefined
+ * }
+ * appChannel.on('message', data => {
+ *    // Any decoding / unwrapping needed for the received message.
+ *    channel.receive(data)
+ * })
+ *
+ * client.proxy.setChannel(channel)
+ */
+
+/**
+ * Channel function that the Proxy module will use to send messages to the remote side.
+ * @public
+ * @memberof Channel
+ * @name send
+ * @function
+ * @param {Object} data Message to be sent over the channel.
+ */
+
+/**
+ * API that the Proxy module will assign a listener function for accepting received messages.
+ * This function should receive all messages sent from the remote side of the channel.
+ * @public
+ * @memberof Channel
+ * @name receive
+ * @function
+ * @param {Object} data The message received from the Channel.
+ */
+
 // Proxy plugin.
 function api({ dispatch, getState }) {
   const api = {
     /**
      * Sets the mode for the Proxy Plugin.
-     * When enabled, webRTC operations will be proxied over a channel.
+     * When enabled, webRTC operations will be proxied over a channel. Enabling
+     *    proxy mode requires a channel to have been set. See `setChannel` API.
+     * When disabled, webRTC operation will occur as normal on the local machine.
      * @public
      * @memberof Proxy
      * @method setProxyMode
@@ -43174,15 +43769,33 @@ function api({ dispatch, getState }) {
       return (0, _selectors.getProxyState)(getState()).proxyMode;
     },
 
+    /*
+     * Retrieve Proxy information.
+     */
+    getInfo() {
+      return (0, _selectors.getProxyState)(getState());
+    },
+
     /**
      * Sets the channel to be used while proxy mode is enabled.
      * @public
      * @memberof Proxy
      * @method setChannel
-     * @param {Channel} channel
+     * @param {Channel} channel See the `Channel` module for information.
      */
     setChannel(channel) {
       dispatch(actions.setChannel(channel));
+    },
+
+    /**
+     * Sends an initialization message over the channel with webRTC configurations.
+     * @public
+     * @memberof Proxy
+     * @method initializeRemote
+     * @param  {Object} config
+     */
+    initializeRemote(config) {
+      dispatch(actions.initializeRemote(config));
     }
   };
 
@@ -43269,6 +43882,7 @@ const proxyEvents = action => {
 
 eventsMap[actionTypes.SET_MODE_FINISH] = proxyEvents;
 eventsMap[actionTypes.SET_CHANNEL_FINISH] = proxyEvents;
+eventsMap[actionTypes.INITIALIZE_FINISH] = proxyEvents;
 
 exports.default = eventsMap;
 
@@ -43333,7 +43947,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Proxy plugin.
 const defaultState = {
   proxyMode: false,
-  hasChannel: false
+  hasChannel: false,
+  remoteInitialized: false
 };
 
 // Libraries.
@@ -43355,6 +43970,15 @@ reducers[actionTypes.SET_CHANNEL_FINISH] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
       hasChannel: true
+    });
+  }
+};
+
+// The remote side has been initialized.
+reducers[actionTypes.INITIALIZE_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      remoteInitialized: true
     });
   }
 };
@@ -43490,7 +44114,8 @@ exports.default = function (base, actualManager) {
                   }
                 }
 
-                thisArg.channel.send(operation, callback);
+                const messageId = (0, _v2.default)();
+                thisArg.channel.send(messageId, operation, callback);
               });
             }
           }
@@ -43508,9 +44133,14 @@ var _logs = __webpack_require__("./src/logs/index.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Other plugins.
+// Libraries.
+// Proxy plugin.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
 /**
@@ -43524,8 +44154,7 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  */
 
 
-// Libraries.
-// Proxy plugin.
+// Other plugins.
 
 /***/ }),
 
@@ -43547,8 +44176,13 @@ exports.default = modelProxy;
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Other plugins.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
 /**
@@ -43558,7 +44192,9 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  * @param  {Channel} channel The channel to use for proxying commands.
  * @return {Proxy}   A proxied webRTC object.
  */
-// Other plugins.
+
+
+// Libraries.
 function modelProxy(base, channel) {
   log.debug(`Creating proxy for ${base.type}.`, base);
 
@@ -43624,7 +44260,8 @@ function modelProxy(base, channel) {
                 resolve(data);
               }
 
-              channel.send(operation, callback);
+              const messageId = (0, _v2.default)();
+              channel.send(messageId, operation, callback);
             });
           }
         });
@@ -43644,16 +44281,30 @@ function modelProxy(base, channel) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
 exports.default = initializeProxy;
 
 var _manager = __webpack_require__("./src/webrtcProxy/proxies/manager.js");
 
 var _manager2 = _interopRequireDefault(_manager);
 
+var _channel = __webpack_require__("./src/webrtcProxy/channel.js");
+
+var _channel2 = _interopRequireDefault(_channel);
+
 var _logs = __webpack_require__("./src/logs/index.js");
+
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Other plugins.
 // Proxy plugin.
 const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
@@ -43666,7 +44317,7 @@ const log = (0, _logs.getLogManager)().getLogger('PROXY');
  */
 
 
-// Other plugins.
+// Libraries.
 function initializeProxy(webRTC) {
   // The base of the proxy stack.
   const base = {
@@ -43739,15 +44390,16 @@ function initializeProxy(webRTC) {
       return false;
     }
 
+    const wrappedChannel = (0, _channel2.default)(channel);
     log.debug('Setting channel for proxy use.');
-    base.channel = channel;
+    base.channel = wrappedChannel;
 
     for (const manProxy in base.managers) {
-      base.managers[manProxy].channel = channel;
+      base.managers[manProxy].channel = wrappedChannel;
     }
 
     // TODO: Have an API for this.
-    setTimeout(initialize, 1000);
+    // setTimeout(initialize, 1000)
 
     return true;
   };
@@ -43776,20 +44428,27 @@ function initializeProxy(webRTC) {
    * @param {Object} config WebRTC stack configuration.
    */
   const initialize = config => {
-    if (!base.clientReady && base.channel) {
-      const callback = data => {
-        log.debug('Received initialize response.', data);
-        if (data.initialized) {
-          // The Client is now ready.
-          base.clientReady = true;
-        }
-      };
+    return new _promise2.default((resolve, reject) => {
+      if (!base.clientReady && base.channel) {
+        const callback = data => {
+          log.debug('Received initialize response.', data);
+          if (data.initialized) {
+            // The Client is now ready.
+            base.clientReady = true;
+            resolve();
+          } else {
+            reject(new Error('Remote end not initialized.'));
+          }
+        };
 
-      log.debug('Initializing remote webRTC stack.', config);
-      base.channel.send({ initialize: true, config: config }, callback);
-    } else {
-      log.info('Either Client is already ready or no channel to use.');
-    }
+        log.debug('Initializing remote webRTC stack.', config);
+        const messageId = (0, _v2.default)();
+        base.channel.send(messageId, { initialize: true, config: config }, callback);
+      } else {
+        log.info('Either Client is already ready or no channel to use.');
+        reject(new Error('Either Client is already ready or no channel to use.'));
+      }
+    });
   };
 
   /**
@@ -43832,6 +44491,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setMode = setMode;
 exports.setChannel = setChannel;
+exports.initializeRemote = initializeRemote;
 
 var _actionTypes = __webpack_require__("./src/webrtcProxy/interface/actionTypes.js");
 
@@ -43855,6 +44515,10 @@ function* setChannel(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.SET_CHANNEL, sagas.setChannel, webRTC);
 }
 
+function* initializeRemote(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.INITIALIZE, sagas.initializeRemote, webRTC);
+}
+
 /***/ }),
 
 /***/ "./src/webrtcProxy/sagas/proxyStack.js":
@@ -43869,6 +44533,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setProxyMode = setProxyMode;
 exports.setChannel = setChannel;
 exports.handleMessages = handleMessages;
+exports.initializeRemote = initializeRemote;
 
 var _actions = __webpack_require__("./src/webrtcProxy/interface/actions.js");
 
@@ -44010,6 +44675,16 @@ function* handleMessages(webRTC) {
     } else {
       log.debug('Received unknown message type; ignoring message.', data);
     }
+  }
+}
+
+function* initializeRemote(webRTC, action) {
+  const error = yield (0, _effects.call)([webRTC, 'initialize'], action.payload.config);
+
+  if (error) {
+    yield (0, _effects.put)(actions.initializeRemoteFinish({ error: error.message }));
+  } else {
+    yield (0, _effects.put)(actions.initializeRemoteFinish({}));
   }
 }
 

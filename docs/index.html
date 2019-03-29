@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy 3.2.0 | Documentation</title>
+  <title>kandy 3.3.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy</h3>
-          <div class='mb1'><code>3.2.0</code></div>
+          <div class='mb1'><code>3.3.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -295,6 +295,12 @@
                         href='#mediagetbyid'
                         class='regular pre-open'>
                         .getById
+                      </a></li>
+                    
+                      <li><a
+                        href='#mediagettrackbyid'
+                        class='regular pre-open'>
+                        .getTrackById
                       </a></li>
                     
                       <li><a
@@ -783,6 +789,12 @@
                       </a></li>
                       
                       <li><a
+                        href='#configconfigcall'
+                        class='regular pre-open'>
+                        #config.call
+                      </a></li>
+                      
+                      <li><a
                         href='#configconfigconnectivity'
                         class='regular pre-open'>
                         #config.connectivity
@@ -929,6 +941,12 @@
                         .setChannel
                       </a></li>
                     
+                      <li><a
+                        href='#proxyinitializeremote'
+                        class='regular pre-open'>
+                        .initializeRemote
+                      </a></li>
+                    
                     </ul>
                   
                   
@@ -957,19 +975,43 @@
               
                 
                 <li><a
-                  href='#mediaobject'
-                  class="">
-                  MediaObject
-                  
+                  href='#channel'
+                  class=" toggle-sibling">
+                  Channel
+                  <span class='icon'>▸</span>
                 </a>
+                
+                <div class='toggle-target display-none'>
+                  
+                  <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Static members</span></li>
+                    
+                      <li><a
+                        href='#channelsend'
+                        class='regular pre-open'>
+                        .send
+                      </a></li>
+                    
+                      <li><a
+                        href='#channelreceive'
+                        class='regular pre-open'>
+                        .receive
+                      </a></li>
+                    
+                    </ul>
+                  
+                  
+                  
+                  
+                </div>
                 
                 </li>
               
                 
                 <li><a
-                  href='#trackobject'
+                  href='#deviceinfo'
                   class="">
-                  TrackObject
+                  DeviceInfo
                   
                 </a>
                 
@@ -987,9 +1029,19 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
+                  href='#trackobject'
                   class="">
-                  DeviceInfo
+                  TrackObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#mediaobject'
+                  class="">
+                  MediaObject
                   
                 </a>
                 
@@ -1089,7 +1141,7 @@
   </div>
   
 
-  <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the the desired configurations.</p>
+  <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.</p>
 
 
   <div class='pre p1 fill-light mt0'>create(config: <a href="#config">config</a>)</div>
@@ -1790,8 +1842,19 @@ SIP users and PSTN phones.</p>
 
   
 
-  <p>Starts an outgoing call to a SIP user or a PSTN phone number.
-Will trigger a <code>call:started</code> event when the operation completes.</p>
+  <p>Starts an outgoing call to a SIP user or a PSTN phone number.</p>
+<p>The call will be tracked by a unique ID that is returned by the API. The
+application will use this ID to identify and control the call after it
+has been initiated.</p>
+<p>The <code>getCallById</code> API can be used to retrieve the current state of the
+call.</p>
+<p>The SDK will emit a <code>call:start</code> event locally when the operation
+completes. When the remote participant receives the call, a
+<code>call:receive</code> event will be emitted remotely for them.</p>
+<p>The SDK requires access to the machine's media devices (eg. microphone)
+in order to make a call. If it does not already have permissions to
+use the devices, the user may be prompted by the browser to give
+permissions.</p>
 
 
   <div class='pre p1 fill-light mt0'>make(destination: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, media: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
@@ -1886,6 +1949,22 @@ Will trigger a <code>call:started</code> event when the operation completes.</p>
   
 
   
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Listen for the event emitted after making a call.</span>
+client.on(<span class="hljs-string">'call:start'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+  <span class="hljs-keyword">const</span> { callId, error } = params
+  <span class="hljs-keyword">if</span> (error) {
+    <span class="hljs-comment">// Call failed to initialize.</span>
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// Call was initialized, and the recipient user will be notified.</span>
+  }
+})
+<span class="hljs-comment">// Make an audio-only call.</span>
+<span class="hljs-keyword">const</span> newCallId = client.call.make(callee, { <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span> })</pre>
+    
+  
 
   
 
@@ -1909,8 +1988,12 @@ Will trigger a <code>call:started</code> event when the operation completes.</p>
 
   
 
-  <p>Rejects an incoming call.
-Will end the call and trigger a <code>call:stateChange</code> event.</p>
+  <p>Rejects an incoming call.</p>
+<p>The specified call to reject must be in a ringing state with an incoming
+direction. The call will be ended as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified, through their own
+<code>call:stateChange</code> event, that the call was rejected.</p>
 
 
   <div class='pre p1 fill-light mt0'>reject(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -1970,8 +2053,19 @@ Will end the call and trigger a <code>call:stateChange</code> event.</p>
 
   
 
-  <p>Answer an incoming call.
-Will trigger a <code>call:answered</code> event.</p>
+  <p>Answers an incoming call.</p>
+<p>The specified call to answer must be in a ringing state with an incoming
+direction. The call will become connected as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. This indicates that the call has connected with the remote
+participant. The <code>getCallById</code> API can be used to retrieve the latest
+call state after the change. Further events will be emitted to
+indicate that the call has received media from the remote participant.
+See the <code>call:newTrack</code> event for more information about this.</p>
+<p>The SDK requires access to the machine's media devices (eg. microphone)
+in order to answer a call. If it does not already have permissions to
+use the devices, the user may be prompted by the browser to give
+permissions.</p>
 
 
   <div class='pre p1 fill-light mt0'>answer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, media: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</div>
@@ -2078,7 +2172,12 @@ Will trigger a <code>call:answered</code> event.</p>
 
   
 
-  <p>Ignore an incoming call.</p>
+  <p>Ignores an incoming call.</p>
+<p>The specified call to ignore must be in a ringing state with an incoming
+direction. The call will be ended as a result of the operation.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will not be notified that the call
+was ignored.</p>
 
 
   <div class='pre p1 fill-light mt0'>ignore(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2138,8 +2237,16 @@ Will trigger a <code>call:answered</code> event.</p>
 
   
 
-  <p>Put a call on hold.
-Will stop all media from flowing and trigger a <code>call:held</code> event.</p>
+  <p>Puts a call on hold.</p>
+<p>The specified call to hold must not already be locally held. Any/all
+media received from the remote participant will stop being received,
+and any/all media being sent to the remote participant will stop
+being sent.</p>
+<p>Some call operations cannot be performed while the call is on hold. The
+call can be taken off hold with the <code>unhold</code> API.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified of the operation
+through a <code>call:stateChange</code> as well.</p>
 
 
   <div class='pre p1 fill-light mt0'>hold(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2199,8 +2306,13 @@ Will stop all media from flowing and trigger a <code>call:held</code> event.</p>
 
   
 
-  <p>Take a call off hold.
-Will resume any previously flowing media and trigger a <code>call:unheld</code> event.</p>
+  <p>Takes a call off hold.</p>
+<p>The specified call to unhold must be locally held. If the call is not
+also remotely held, call media will be reconnected as it was before
+the call was held.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified of the operation
+through a <code>call:stateChange</code> as well.</p>
 
 
   <div class='pre p1 fill-light mt0'>unhold(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -2395,8 +2507,13 @@ Will resume any previously flowing media and trigger a <code>call:unheld</code> 
 
   
 
-  <p>End an ongoing call.
-Will stop all media used for the call and trigger a <code>call:stateChange</code> event.</p>
+  <p>Ends an ongoing call.</p>
+<p>The SDK will stop any/all local media associated with the call. Events
+will be emitted to indicate which media tracks were stopped. See the
+<code>call:trackEnded</code> event for more information.</p>
+<p>The SDK will emit a <code>call:stateChange</code> event locally when the operation
+completes. The remote participant will be notified, through their own
+<code>call:stateChange</code> event, that the call was ended.</p>
 
 
   <div class='pre p1 fill-light mt0'>end(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -3980,11 +4097,81 @@ currently using.</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='mediagettrackbyid'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getTrackById(trackId)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Retrieve a Track object from state with a specific ID.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getTrackById(trackId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>trackId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The ID of the track to retrieve.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+          A track object.
+
+        
+      </div>
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='mediarendertracks'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>renderTracks(tracks, cssSelector)</span>
+            <span class='code strong strong truncate'>renderTracks(tracks, cssSelector, options?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3996,7 +4183,7 @@ currently using.</p>
 The container is specified by providing a CSS selector string that corresponds to the HTMLElement to act as the container.</p>
 
 
-  <div class='pre p1 fill-light mt0'>renderTracks(tracks: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>, cssSelector: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  <div class='pre p1 fill-light mt0'>renderTracks(tracks: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>, cssSelector: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</div>
   
   
 
@@ -4026,6 +4213,40 @@ The container is specified by providing a CSS selector string that corresponds t
 	    A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
 
           </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
+	    Additional options for rendering the tracks.
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.speakerId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>The device ID of the speaker to use for audio tracks.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
           
         </div>
       
@@ -6541,7 +6762,7 @@ the SDK and one or more backend servers.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>fetch(primaryContact)</span>
+            <span class='code strong strong truncate'>fetch(userId)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -6553,7 +6774,7 @@ the SDK and one or more backend servers.</p>
 Will trigger a <code>directory:change</code> event.</p>
 
 
-  <div class='pre p1 fill-light mt0'>fetch(primaryContact: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  <div class='pre p1 fill-light mt0'>fetch(userId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
   
   
 
@@ -6570,7 +6791,7 @@ Will trigger a <code>directory:change</code> event.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>primaryContact</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>userId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The URI uniquely identifying the user.
 
           </div>
@@ -6649,7 +6870,7 @@ Will trigger a <code>directory:change</code> event.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>get(primaryContact)</span>
+            <span class='code strong strong truncate'>get(userId)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -6660,7 +6881,7 @@ Will trigger a <code>directory:change</code> event.</p>
   <p>Retrieves local information about a previously fetched user.</p>
 
 
-  <div class='pre p1 fill-light mt0'>get(primaryContact: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  <div class='pre p1 fill-light mt0'>get(userId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
   
   
 
@@ -6677,7 +6898,7 @@ Will trigger a <code>directory:change</code> event.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>primaryContact</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>userId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The URI uniquely identifying the user.
 
           </div>
@@ -8289,6 +8510,111 @@ values you can use when instantiating the SDK.</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='configconfigcall'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>config.call</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Configuration options for the call feature.</p>
+
+
+  <div class='pre p1 fill-light mt0'>config.call</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>call</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The call configuration object.
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>call.iceServers</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>ICE servers to be used for calls.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>call.serverTurnCredentials</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
+  
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>Whether server-provided TURN credentials should be used.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>call.sdpHandlers</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
+  </td>
+  <td class='break-word'><span>List of SDP handler functions to modify SDP. Advanced usage.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='configconfigconnectivity'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -9177,7 +9503,9 @@ This is an advanced feature that enables support for Calls in particular scenari
   
 
   <p>Sets the mode for the Proxy Plugin.
-When enabled, webRTC operations will be proxied over a channel.</p>
+When enabled, webRTC operations will be proxied over a channel. Enabling
+proxy mode requires a channel to have been set. See <code>setChannel</code> API.
+When disabled, webRTC operation will occur as normal on the local machine.</p>
 
 
   <div class='pre p1 fill-light mt0'>setProxyMode(value: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</div>
@@ -9296,7 +9624,7 @@ When enabled, webRTC operations will be proxied over a channel.</p>
   <p>Sets the channel to be used while proxy mode is enabled.</p>
 
 
-  <div class='pre p1 fill-light mt0'>setChannel(channel: Channel)</div>
+  <div class='pre p1 fill-light mt0'>setChannel(channel: <a href="#channel">Channel</a>)</div>
   
   
 
@@ -9313,7 +9641,69 @@ When enabled, webRTC operations will be proxied over a channel.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>channel</span> <code class='quiet'>(Channel)</code>
+            <span class='code bold'>channel</span> <code class='quiet'>(<a href="#channel">Channel</a>)</code>
+	    See the 
+<code>Channel</code>
+ module for information.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='proxyinitializeremote'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>initializeRemote(config)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Sends an initialization message over the channel with webRTC configurations.</p>
+
+
+  <div class='pre p1 fill-light mt0'>initializeRemote(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -9494,19 +9884,216 @@ Indicates either a change in the mode or the channel.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
+    <h3 class='fl m0' id='channel'>
+      Channel
     </h3>
     
     
   </div>
   
 
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
+  <p>The Channel object that the Proxy module needs to be provided.</p>
 
 
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  <div class='pre p1 fill-light mt0'>Channel</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// The channel the application uses for communicating with a remote endpoint.</span>
+<span class="hljs-keyword">const</span> appChannel = ...
+
+<span class="hljs-comment">// The channel the application will provide to the Proxy module for use.</span>
+<span class="hljs-keyword">const</span> channel = {
+   <span class="hljs-attr">send</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+     <span class="hljs-comment">// Any encoding / wrapping needed for a Proxy message being sent</span>
+     <span class="hljs-comment">//    over the channel.</span>
+     appChannel.sendMessage(data)
+   },
+   <span class="hljs-comment">// The Proxy module will set this function.</span>
+   receive: <span class="hljs-literal">undefined</span>
+}
+appChannel.on(<span class="hljs-string">'message'</span>, data =&gt; {
+   <span class="hljs-comment">// Any decoding / unwrapping needed for the received message.</span>
+   channel.receive(data)
+})
+
+client.proxy.setChannel(channel)</pre>
+    
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>API Functions</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='channelsend'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>send(data)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Channel function that the Proxy module will use to send messages to the remote side.</p>
+
+
+  <div class='pre p1 fill-light mt0'>send(data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    Message to be sent over the channel.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='channelreceive'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>receive(data)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.</p>
+
+
+  <div class='pre p1 fill-light mt0'>receive(data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The message received from the Channel.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Contains information about a device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
   
   
 
@@ -9524,22 +10111,104 @@ Media is a collection of Track objects.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A collection of devices and their information.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
 
           
         </div>
@@ -9677,18 +10346,19 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
     </h3>
     
     
   </div>
   
 
-  <p>A collection of devices and their information.</p>
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
 
 
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
   
   
 
@@ -9706,104 +10376,22 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Contains information about a device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
 
           
         </div>
