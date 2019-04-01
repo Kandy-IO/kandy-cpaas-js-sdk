@@ -44,13 +44,7 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 
 - Refactored all of the WebRTC-related code.
 
-## 3.4.0-beta
-
-## 3.3.0 - 2018-03-29
-
-### Fixed
-
-- Fixed an issue where JOIN_CALL was not emitting a call:error event when it failed. `KAA-922`
+## 3.3.0-beta
 
 ### Changed
 
