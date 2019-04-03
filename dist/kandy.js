@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.4.0-KAA-1440.68862
+ * Version: 3.4.0-beta.68884
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18646,6 +18646,9 @@ function initialize() {
     sdp: {
       pipeline: _pipeline2.default,
       handlers: sdpHandlers
+    },
+    getBrowserDetails: () => {
+      return browserDetails;
     }
   };
 }
@@ -19607,6 +19610,13 @@ class Peer extends _eventemitter2.default {
     this.peerConnection = new RTCPeerConnection(this.config.rtcConfig);
     this.iceTimer = _timerMachine2.default.get(`ice-${this.id}`);
 
+    /**
+     * The DTLS role selected for this PeerConnection. Set after the initial
+     *    negotiation is completed.
+     * @type {string}
+     */
+    this.dtlsRole = undefined;
+
     // Bubble up the RTCPeerConnection events.
     const events = ['oniceconnectionstatechange', 'onsignalingstatechange', 'onnegotiationneeded'];
 
@@ -19838,6 +19848,13 @@ class Peer extends _eventemitter2.default {
     return new _promise2.default((resolve, reject) => {
       this.peerConnection.createAnswer(options).then(answer => {
         const sdpHandlers = [];
+
+        /*
+         * Always include the `preventDtlsRoleChange` handler. This ensures
+         *    that the SDP's DTLS role does not change during a renegotiation.
+         */
+        sdpHandlers.push(_handlers.preventDtlsRoleChange);
+
         if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
           // Modify the answer to claim the Peer doesn't suport trickle ICE.
           sdpHandlers.push(_handlers.removeTrickleIce);
@@ -19854,7 +19871,8 @@ class Peer extends _eventemitter2.default {
           // Run the SDP pipeline with only these handlers.
           answer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, answer.sdp, {
             type: answer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
+            endpoint: _constants.PEER.ENDPOINT.LOCAL,
+            dtlsRole: this.dtlsRole
           });
         }
         resolve(answer);
@@ -19886,6 +19904,19 @@ class Peer extends _eventemitter2.default {
   setLocalDescription(sessionDesc) {
     // TODO: SDP pipeline here.
     _loglevel2.default.info(`Setting local description ${sessionDesc.type}:`, sessionDesc.sdp);
+
+    /**
+     * Scenario: A local answer SDP is being applied to the Peer, but it does
+     *    not have a selected DTLS role yet. This should occur during initial
+     *    negotiation, before responding with this Peer's answer.
+     * Set the local Peer's DTLS role depending on what role was generated. This
+     *    role will be kept throughout all renegotiations.
+     */
+    if (!this.dtlsRole && sessionDesc.type === 'answer') {
+      const localRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
+      _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer.`);
+      this.dtlsRole = localRole;
+    }
 
     return new _promise2.default((resolve, reject) => {
       // We always want to wait for the PeerConnection to be ready for
@@ -19937,6 +19968,20 @@ class Peer extends _eventemitter2.default {
    * @param  {RTCSessionDescription} sessionDesc
    */
   setRemoteDescription(sessionDesc) {
+    /**
+     * Scenario: A remote answer SDP is being applied to the Peer, but it does
+     *    not have a selected DTLS role yet. This should occur only when the
+     *    initial negotiation is being completed.
+     * Set the local Peer's DTLS role depending on what the remote Peer
+     *    selected. This role will be kept throughout all renegotiations.
+     */
+    if (!this.dtlsRole && sessionDesc.type === 'answer') {
+      const remoteRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
+      const localRole = remoteRole === 'active' ? 'passive' : 'active';
+      _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer. Remote Peer selected ${remoteRole} DTLS role.`);
+      this.dtlsRole = localRole;
+    }
+
     // TODO: SDP pipeline here.
     // TODO: Update `this.config.trickleIceMode` to either NONE or FULL (from HALF)
     //    depending on remote support, since HALF is only needed for initial.
@@ -20241,7 +20286,7 @@ var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js");
 
-var _handlers = __webpack_require__("../webrtc/src/sdpUtils/handlers.js");
+var _transceiverUtils = __webpack_require__("../webrtc/src/sdpUtils/transceiverUtils.js");
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -20267,14 +20312,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class Session extends _eventemitter2.default {
   constructor(id, managers, config = {}) {
     super();
-
-    // Keeps track of who started the initial offer.
-    // We need this for calls with firefox so that DTLS roles aren't interpreted by other browsers (chrome)
-    //  as being switched when the one that didn't initiate a call tries to start renegotiation offer.
-    // See more details on the issue here https://groups.google.com/forum/#!topic/discuss-webrtc/gsw3OEAwNKo.
-    this.isInitialOfferrer = undefined;
-
-    _pipeline2.default.setHandlers([_handlers.setDtlsSetupToPassiveIfInitialOfferrer]);
 
     // The session's unique id
     this.id = id;
@@ -20308,6 +20345,13 @@ class Session extends _eventemitter2.default {
           // Create a new Media object using the Track.
           media = this.mediaManager.createRemote(track.stream, [track]);
         }
+
+        media.on('track:removed', trackId => {
+          this.emit('track:removed', {
+            local: false,
+            trackId: trackId
+          });
+        });
 
         track.once('ended', () => {
           this.emit('track:ended', {
@@ -20423,6 +20467,16 @@ class Session extends _eventemitter2.default {
             trackId: track.id
           });
 
+          const media = this.mediaManager.get(track.stream.id);
+          if (media) {
+            media.on('track:removed', trackId => {
+              this.emit('track:removed', {
+                local: true,
+                trackId: trackId
+              });
+            });
+          }
+
           track.once('ended', () => {
             // If the PeerConnection is closed, we don't need to worry about
             //    removing the track (and it would throw an error anyway).
@@ -20484,17 +20538,11 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createOffer(options).then(offer => {
-        // If initialOfferrer flag not set and offering, that means we are the initial offerrer.
-        if (this.isInitialOfferrer === undefined) {
-          this.isInitialOfferrer = true;
-        }
-
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local offer with SDP pipeline.');
           offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
             type: offer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL,
-            isInitiator: this.isInitialOfferrer
+            endpoint: _constants.PEER.ENDPOINT.LOCAL
           });
         }
         peer.setLocalDescription(offer).then(() => {
@@ -20558,8 +20606,7 @@ class Session extends _eventemitter2.default {
         _loglevel2.default.debug('Modifying remote offer with SDP pipeline.');
         offer.sdp = _pipeline2.default.run(options.sdpHandlers, offer.sdp, {
           type: offer.type,
-          endpoint: _constants.PEER.ENDPOINT.REMOTE,
-          isInitiator: this.isInitialOfferrer
+          endpoint: _constants.PEER.ENDPOINT.REMOTE
         });
       }
 
@@ -20610,17 +20657,11 @@ class Session extends _eventemitter2.default {
       }
 
       peer.createAnswer(options).then(answer => {
-        // If initialOfferrer flag not set and answering, that means we aren't the initial offerrer.
-        if (this.isInitialOfferrer === undefined) {
-          this.isInitialOfferrer = false;
-        }
-
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local answer with SDP pipeline.');
           answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
             type: answer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL,
-            isInitiator: this.isInitialOfferrer
+            endpoint: _constants.PEER.ENDPOINT.LOCAL
           });
         }
         peer.setLocalDescription(answer).then(() => {
@@ -20645,8 +20686,7 @@ class Session extends _eventemitter2.default {
       _loglevel2.default.debug('Modifying remote answer with SDP pipeline.');
       answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
         type: answer.type,
-        endpoint: _constants.PEER.ENDPOINT.REMOTE,
-        isInitiator: this.isInitialOfferrer
+        endpoint: _constants.PEER.ENDPOINT.REMOTE
       });
     }
 
@@ -21015,7 +21055,7 @@ var _values2 = _interopRequireDefault(_values);
 exports.removeTrickleIce = removeTrickleIce;
 exports.removeBundling = removeBundling;
 exports.changeMediaDirection = changeMediaDirection;
-exports.setDtlsSetupToPassiveIfInitialOfferrer = setDtlsSetupToPassiveIfInitialOfferrer;
+exports.preventDtlsRoleChange = preventDtlsRoleChange;
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -21101,24 +21141,48 @@ function changeMediaDirection({ audio, video }) {
 }
 
 /**
- * Sets the DTLS setup to passive if it is active and if the following conditions hold:
- *  - This session initiated the call with the first offer.
- *  - We created the SDP.
- *  - We are answering an offer.
- * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
- * @param {RTCSdpType} info Information about the session description.
- * @param {RTCSdpType} info.type The session description's type.
- * @param {string} info.endpoint Which end of the connection created the SDP.
- * @param {boolean} info.isInitiator Whether this session initiated the call or not.
- * @param {Object} originalSdp The sdp in its initial state.
+ * SDP handler to modify the DTLS role of a locally generated answer SDP.
+ *
+ * The point of this SDP handler is to avoid a DTLS role conflict during a
+ *    renegotiation. A role conflict occurs when DTLS roles have been selected
+ *    during initial negotiation, but during renegotiation, the answerer selects
+ *    the opposite role than previously used.
+ *
+ * This handler only needs to be used when the Peer is generating an answer SDP.
+ *    That is the only point when a conflicting role can be chosen.
+ *
+ * This handler prevents the role changing by comparing the SDP's role with the
+ *    role that the Peer previously selected. If they conflict, the Peer's
+ *    previous role is used.
+ *
+ * Related stories: KAA-1426, KAA-1562.
+ * References: https://groups.google.com/forum/#!topic/discuss-webrtc/gsw3OEAwNKo
+ * @method preventDtlsRoleChange
+ * @param  {Object}     newSdp          The session description.
+ * @param  {Object}     info            Information about the session description.
+ * @param  {RTCSdpType} info.type       The session description's type.
+ * @param  {string}     info.endpoint   Which end of the connection created the SDP.
+ * @param  {string}     [info.dtlsRole] The previously select DTLS role of the Peer.
+ * @param  {Object}     originalSdp     The sdp in its initial state.
+ * @return {Object}                     The modified SDP.
  */
-function setDtlsSetupToPassiveIfInitialOfferrer(newSdp, info, originalSdp) {
-  // Hack: If we are the initial offerrer, we created the sdp, and we're answering,
-  //  we need to set DTLS setup to passive if it's active.
-  if (info.isInitiator && info.endpoint === 'local' && info.type === 'answer') {
+function preventDtlsRoleChange(newSdp, info, originalSdp) {
+  /**
+   * This SDP handler only affects local answer SDPs.
+   *  - Only local because we are trying to prevent role conflict issues caused
+   *        by the answerer choosing the "wrong" role during a renegotiation.
+   *  - Only answer because offers are always actpass.
+   */
+  if (info.endpoint === 'local' && info.type === 'answer') {
     for (let mLine of newSdp.media) {
-      if (mLine.setup && mLine.setup === 'active') {
-        mLine.setup = 'passive';
+      /**
+       * If the generated DTLS role is different than what the Peer expects,
+       *    replace it. The Peer expects the DTLS role to stay the same
+       *    throughout renegotiations.
+       */
+      if (mLine.setup && info.dtlsRole && mLine.setup !== info.dtlsRole) {
+        _loglevel2.default.debug(`Changing DTLS role from ${mLine.setup} to ${info.dtlsRole}.`);
+        mLine.setup = info.dtlsRole;
       }
     }
   }
@@ -23259,6 +23323,9 @@ exports.fetchCredentials = fetchCredentials;
 exports.updateSession = updateSession;
 exports.updateSessionStatus = updateSessionStatus;
 exports.endSession = endSession;
+exports.rejectSession = rejectSession;
+
+var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
 
 var _effects = __webpack_require__("./src/request/effects.js");
 
@@ -23266,17 +23333,38 @@ var _effects2 = _interopRequireDefault(_effects);
 
 var _helpers = __webpack_require__("./src/common/helpers/index.js");
 
+var _constants = __webpack_require__("./src/constants.js");
+
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * REST request to create a webRTC session.
+ * Creates a webRTC session on the server. CPaaS2-specific signalling function.
+ *
+ * This saga "starts a call" between the current user and another, specified
+ *    user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
  * @method createSession
- * @param  {Object} requestInfo
  * @param  {Object} callInfo
- * @return {Object}
+ * @param  {string} callInfo.participantAddress The user to receive the call.
+ * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
+ * @return {Object} response Signalling response.
+ * @return {string} [response.wrtcsSessionId] ID that the server uses to track this call.
+ * @return {Object} [response.error] An error object, if signalling failed.
  */
+
+
 // Helpers.
-function* createSession(requestInfo, callInfo) {
+function* createSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+
   const requestOptions = {
     method: 'POST',
     url: `${requestInfo.baseURL}/cpaas/webrtcsignaling/${requestInfo.version}/${requestInfo.username}/sessions`,
@@ -23300,21 +23388,43 @@ function* createSession(requestInfo, callInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Create session')
     };
   } else {
-    return response.payload.body.wrtcsSession;
+    const sessionInfo = response.payload.body.wrtcsSession;
+    return {
+      error: false,
+      wrtcsSessionId: sessionInfo.resourceURL.split('sessions/')[1]
+    };
   }
 }
 
 /**
- * REST request to answer a webRTC session.
+ * Updates a webRTC session on the server with an answer.
+ * CPaaS2-specific signaling function.
+ *
+ * This saga "answers a call" from another user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
  * @method answerSession
- * @param  {Object} requestInfo
  * @param  {Object} callInfo
- * @return {Object}
+ * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @param  {string} callInfo.answer The local SDP to complete negotiation. This may be an offer is performing slow start answer.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An error object, if signalling failed.
  */
-function* answerSession(requestInfo, callInfo) {
+
+
+// Libraries.
+// Other plugins.
+function* answerSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+
   const requestOptions = {
     method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.sessionId}/answer`,
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/answer`,
     body: (0, _stringify2.default)({
       wrtcsAnswer: {
         clientCorrelator: requestInfo.clientCorrelator,
@@ -23330,7 +23440,9 @@ function* answerSession(requestInfo, callInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Answer session')
     };
   } else {
-    return response.payload.body.wrtcsAnswer;
+    return {
+      error: false
+    };
   }
 }
 
@@ -23362,18 +23474,31 @@ function* fetchCredentials(requestInfo) {
 }
 
 /**
- * Update an existing webRTC session with a new offer.
+ * Updates an existing webRTC session on the server.
+ * CPaaS2-specific signalling function.
+ *
+ * This saga "updates a session" between the current user and another, specified
+ *    user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
  * @method updateSession
- * @param  {Object} requestInfo
  * @param  {Object} callInfo
- * @param  {string} callInfo.sessionId The ID the backend uses to track the session.
- * @param  {string} callInfo.offer The updated offer.
- * @return {Object}
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
+ * @return {Object} response Signalling response.
+ * @return {Object} response.error An error object, if signalling failed.
  */
-function* updateSession(requestInfo, callInfo) {
+function* updateSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+
   const requestOptions = {
     method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.sessionId}/update`,
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/update`,
     body: (0, _stringify2.default)({
       wrtcsOffer: {
         clientCorrelator: requestInfo.clientCorrelator,
@@ -23388,19 +23513,35 @@ function* updateSession(requestInfo, callInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Update session')
     };
   } else {
-    return response.payload.body.wrtcsOffer;
+    return {
+      error: false
+    };
   }
 }
 
 /**
- * REST PUT request to send webRTC session status.
+ * Updates a webRTC session on the server with a new state.
+ * CPaaS2-specific signaling function.
+ *
+ * The saga updates the server's session to be in a provided state. This can be
+ *    used for multiple purposes, such as to indicate ringing or as call audit.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
  * @method updateSessionStatus
- * @param  {Object} requestInfo
  * @param  {Object} callInfo
- * @param  {string} status The desired status to change the call state to
- * @return {Object}
+ * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @param  {string} status   The status to put the server session into.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An error object, if signalling failed.
  */
-function* updateSessionStatus(requestInfo, callInfo, status) {
+function* updateSessionStatus(callInfo, status) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+
   const requestOptions = {
     method: 'PUT',
     url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/status`,
@@ -23416,24 +23557,30 @@ function* updateSessionStatus(requestInfo, callInfo, status) {
 
   if (response.error) {
     return {
-      error: (0, _helpers.handleRequestError)(response, 'Session Status Update')
+      error: (0, _helpers.handleRequestError)(response, 'Session Status Update'),
+      status: 'Retry'
     };
   } else {
-    return response.payload.body.wrtcsSessionStatus;
+    return {
+      error: false,
+      status: response.payload.body.wrtcsSessionStatus.status
+    };
   }
 }
 
 /**
  * REST request to end a webRTC session.
  * @method endSession
- * @param  {Object} requestInfo
  * @param  {Object} callInfo
- * @return {Object}
+ * @param  {Object} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An BasicError object, if signalling failed.
  */
-function* endSession(requestInfo, callInfo) {
+function* endSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.sessionId}`
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}`
   };
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -23447,6 +23594,18 @@ function* endSession(requestInfo, callInfo) {
       error: false
     };
   }
+}
+
+/**
+ * REST request to reject a webRTC session. (Same as ending a webRTC session)
+ * @method rejectSession
+ * @param  {Object} callInfo
+ * @param  {Object} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An BasicError object, if signalling failed.
+ */
+function* rejectSession(callInfo) {
+  return yield (0, _effects3.call)(endSession, callInfo);
 }
 
 /***/ }),
@@ -23548,173 +23707,6 @@ function* callUnsubscribe(requestInfo, subInfo) {
 
 /***/ }),
 
-/***/ "./src/call/cpaas2/sagas/establish.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.makeCall = makeCall;
-exports.answerCall = answerCall;
-
-var _calls = __webpack_require__("./src/call/cpaas2/requests/calls.js");
-
-var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
-
-var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
-
-var _constants = __webpack_require__("./src/call/constants.js");
-
-var _selectors2 = __webpack_require__("./src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("./src/logs/index.js");
-
-var _establish = __webpack_require__("./src/callstack/sagas/establish.js");
-
-var _midcall = __webpack_require__("./src/callstack/sagas/midcall.js");
-
-var _constants2 = __webpack_require__("./src/constants.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-// Helpers.
-
-
-// Other plugins.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
-
-// Call plugin.
-const log = (0, _logs.getLogManager)().getLogger('CALL');
-
-/**
- * Start a call.
- * @method makeCall
- * @param {Object} webRTC an instance of WebRTC
- * @param {Object} action An action of type `MAKE_CALL`.
- */
-
-
-// Libraries.
-function* makeCall(webRTC, action) {
-  // Create a new local media object for this call.
-  const mediaConstraints = {
-    video: action.payload.mediaConstraints.video,
-    audio: action.payload.mediaConstraints.audio
-  };
-
-  if (!mediaConstraints.audio) {
-    log.warn('Making calls without audio is not currently supported; enabling audio for outgoing call.');
-    mediaConstraints.audio = true;
-  }
-
-  const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-  const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
-
-  const { offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
-    sdpSemantics,
-    turnInfo,
-    trickleIceMode
-  });
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
-  const callInfo = {
-    participantAddress: action.payload.participantAddress,
-    offer: offerSdp
-  };
-
-  const response = yield (0, _effects.call)(_calls.createSession, requestInfo, callInfo);
-  log.debug('Received session response:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
-      state: _constants.CALL_STATES.INITIATED,
-      // The ID that the backend uses to track this webRTC session.
-      wrtcsSessionId: response.resourceURL.split('sessions/')[1],
-      // The ID that the webRTC stack uses to track this webRTC session.
-      webrtcSessionId: sessionId,
-      // The local Media object associated with this call.
-      mediaId: mediaId
-    }));
-  } else {
-    // The call failed, so stop the Media object created for the call.
-    // TODO: Update redux state that the Media object is stopped.
-    //    Need an event from Media model to notify about the stop, and listener
-    //    set on Media when it is created (in `createLocalMedia` saga).
-    yield (0, _effects.call)(_midcall.closeCall, webRTC, sessionId);
-
-    yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
-      state: _constants.CALL_STATES.ENDED,
-      error: response.error
-    }));
-  }
-}
-
-/**
- * Answer a call.
- * @method answerCall
- * @param  {Object} action An action of type `ANSWER_CALL`.
- */
-function* answerCall(webRTC, action) {
-  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-
-  if (!incomingCall) {
-    log.error(`Error: Call ${action.payload.id} not found.`);
-    return;
-  }
-
-  const mediaConstraints = {
-    video: action.payload.mediaConstraints.video,
-    audio: action.payload.mediaConstraints.audio
-  };
-
-  if (!mediaConstraints.audio) {
-    // TODO: Does the backend require answering with audio?
-    log.warn('Answering calls without audio is not currently supported; enabling audio for incoming call.');
-    mediaConstraints.audio = true;
-  }
-
-  const sessionOptions = { sessionId: incomingCall.webrtcSessionId };
-  const { answerSDP, mediaId } = yield (0, _effects.call)(_establish.answerWebrtcSession, webRTC, mediaConstraints, sessionOptions);
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
-  const callInfo = {
-    answer: answerSDP,
-    sessionId: incomingCall.wrtcsSessionId
-  };
-
-  const response = yield (0, _effects.call)(_calls.answerSession, requestInfo, callInfo);
-
-  if (!response.error) {
-    yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
-      // TODO: Determine when we're actually "in call".
-      state: _constants.CALL_STATES.CONNECTED,
-      startTime: new Date().getTime(),
-      // The local Media object associated with this call.
-      mediaId: mediaId
-    }, {
-      // CPaaS2 does not check for / support slow start yet.
-      isSlowStart: false
-    }));
-  } else {
-    yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
-      error: response.error
-    }));
-  }
-}
-
-/***/ }),
-
 /***/ "./src/call/cpaas2/sagas/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23726,37 +23718,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.registerCall = registerCall;
 exports.createCall = createCall;
-exports.answerCall = answerCall;
+exports.answerCallEntry = answerCallEntry;
 exports.holdCall = holdCall;
 exports.unholdCall = unholdCall;
-exports.addMedia = addMedia;
-exports.removeMedia = removeMedia;
-exports.sendDTMF = sendDTMF;
+exports.addMediaEntry = addMediaEntry;
+exports.removeMediaEntry = removeMediaEntry;
+exports.sendDTMFEntry = sendDTMFEntry;
 exports.incomingCallNotification = incomingCallNotification;
 exports.callAcceptedNotification = callAcceptedNotification;
 exports.callStatusNotification = callStatusNotification;
 exports.callAudit = callAudit;
 exports.callOfferNotification = callOfferNotification;
 exports.callAnswerNotification = callAnswerNotification;
-exports.endCall = endCall;
-exports.getStats = getStats;
+exports.endCallEntry = endCallEntry;
+exports.rejectCallEntry = rejectCallEntry;
+exports.getStatsEntry = getStatsEntry;
 exports.setTurnCredentials = setTurnCredentials;
 
 var _subscriptions = __webpack_require__("./src/call/cpaas2/sagas/subscriptions.js");
 
 var subSagas = _interopRequireWildcard(_subscriptions);
 
-var _establish = __webpack_require__("./src/call/cpaas2/sagas/establish.js");
-
-var establishSagas = _interopRequireWildcard(_establish);
-
 var _notifications = __webpack_require__("./src/call/cpaas2/sagas/notifications.js");
 
 var notificationSagas = _interopRequireWildcard(_notifications);
-
-var _midcall = __webpack_require__("./src/call/cpaas2/sagas/midcall.js");
-
-var midcallSagas = _interopRequireWildcard(_midcall);
 
 var _support = __webpack_require__("./src/call/cpaas2/sagas/support.js");
 
@@ -23765,6 +23750,22 @@ var supportSagas = _interopRequireWildcard(_support);
 var _actionTypes = __webpack_require__("./src/call/interfaceNew/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _calls = __webpack_require__("./src/call/cpaas2/requests/calls.js");
+
+var requests = _interopRequireWildcard(_calls);
+
+var _establish = __webpack_require__("./src/callstack/call/establish.js");
+
+var establishSagas = _interopRequireWildcard(_establish);
+
+var _midcall = __webpack_require__("./src/callstack/call/midcall.js");
+
+var midcallSagas = _interopRequireWildcard(_midcall);
+
+var _notifications2 = __webpack_require__("./src/callstack/call/notifications.js");
+
+var _support2 = __webpack_require__("./src/callstack/call/support.js");
 
 var _effects = __webpack_require__("./src/subscription/interface/effects.js");
 
@@ -23783,12 +23784,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 
 // Other plugins.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
 
-// Call plugin.
+
+// Callstack plugin.
 function* registerCall() {
   yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
 }
@@ -23805,16 +23803,22 @@ function* registerCall() {
 
 
 // Libraries.
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// Call plugin.
 function* createCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, webRTC);
+  yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, { webRTC, requests });
 }
 
 /**
  * Answer a ringing call.
  * @method answerCall
  */
-function* answerCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, webRTC);
+function* answerCallEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, { webRTC, requests });
 }
 
 /**
@@ -23825,7 +23829,7 @@ function* answerCall(webRTC) {
  * @method holdCall
  */
 function* holdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, webRTC);
+  yield (0, _effects2.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, { webRTC, requests });
 }
 
 /**
@@ -23836,31 +23840,31 @@ function* holdCall(webRTC) {
  * @method unholdCall
  */
 function* unholdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, webRTC);
+  yield (0, _effects2.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, { webRTC, requests });
 }
 
 /**
  * Add media to a call.
  * @method addMedia
  */
-function* addMedia(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, webRTC);
+function* addMediaEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, { webRTC, requests });
 }
 
 /**
  * Remove media from a call.
  * @method removeMedia
  */
-function* removeMedia(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, webRTC);
+function* removeMediaEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, { webRTC, requests });
 }
 
 /**
  * Send DTMF tones for a call.
  * @method sendDTMF
  */
-function* sendDTMF(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, webRTC);
+function* sendDTMFEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, { webRTC });
 }
 
 /**
@@ -23873,11 +23877,44 @@ function* sendDTMF(webRTC) {
  * @param  {Object} webRTC The webRTC stack.
  */
 function* incomingCallNotification(webRTC) {
+  // Curry the signaling function to specify the status.
+  function* updateSessionRinging(...args) {
+    return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Ringing');
+  }
+
+  // Dependencies provided to the Callstack saga.
+  const deps = {
+    webRTC,
+    requests: {
+      // Add the wrapped request to CPaaS2's set of requests.
+      updateCallRinging: updateSessionRinging
+    }
+
+    /**
+     * Intercept the CPaaS2-specific notification, ensuring parameters are given
+     *    to the Callstack sagas into a generic format.
+     * @method cpaas2IncomingCall
+     * @param {Object} action An "incoming call notification" action.
+     */
+  };function* cpaas2IncomingCall(action) {
+    const notification = action.payload.wrtcsSessionInvitationNotification;
+
+    // Massage data into a generic format, instead of CPaaS2-specific.
+    const params = {
+      sdp: notification.offer.sdp,
+      wrtcsSessionId: notification.link[0].href.split('sessions/')[1],
+      callerName: notification.originatorName,
+      callerNumber: notification.originatorAddress
+
+      // Pass the incoming call parameters to the Callstack for handling.
+    };yield (0, _effects2.call)(_notifications2.incomingCall, deps, params);
+  }
+
   // Redux-saga take() pattern.
   function incomingCallPattern(action) {
     return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
   }
-  yield (0, _effects2.takeEvery)(incomingCallPattern, notificationSagas.incomingCall, webRTC);
+  yield (0, _effects2.takeEvery)(incomingCallPattern, cpaas2IncomingCall);
 }
 
 /**
@@ -23886,12 +23923,30 @@ function* incomingCallNotification(webRTC) {
  * @param  {Object} webRTC The webRTC stack.
  */
 function* callAcceptedNotification(webRTC) {
+  /**
+   * Intercept the CPaaS2-specific notification, ensuring parameters are given
+   *    to the Callstack sagas into a generic format.
+   * @method parseAcceptedNotification
+   * @param {Object} action
+   */
+  function* parseAcceptedNotification(action) {
+    const notification = action.payload.wrtcsAcceptanceNotification;
+
+    // Pull-out the parameters into a standard format for the Callstack.
+    const params = {
+      sdp: notification.answer.sdp,
+      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
+    };
+
+    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
+  }
+
   // Redux-saga take() pattern.
-  function callResponsePattern(action) {
+  function callAcceptedPattern(action) {
     return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
   }
 
-  yield (0, _effects2.takeEvery)(callResponsePattern, notificationSagas.callAccepted, webRTC);
+  yield (0, _effects2.takeEvery)(callAcceptedPattern, parseAcceptedNotification);
 }
 
 /**
@@ -23906,39 +23961,95 @@ function* callStatusNotification(webRTC) {
     };
   }
 
+  function* parseStatusNotification(action) {
+    const eventType = action.payload.wrtcsEventNotification.eventType;
+    const deps = { webRTC };
+    const params = {
+      wrtcsSessionId: action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1]
+    };
+    if (eventType === 'SessionEnded') {
+      yield (0, _effects2.call)(_notifications2.callStatusUpdateEnded, deps, params);
+    } else if (eventType === 'Ringing') {
+      yield (0, _effects2.call)(_notifications2.callStatusUpdateRinging, deps, params);
+    }
+  }
+
   // Handle specific call statuses
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('Ringing'), notificationSagas.callStatusUpdateRinging, webRTC);
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('SessionEnded'), notificationSagas.callStatusUpdateEnded, webRTC);
+  yield (0, _effects2.takeEvery)(statusUpdatePattern('Ringing'), parseStatusNotification);
+  yield (0, _effects2.takeEvery)(statusUpdatePattern('SessionEnded'), parseStatusNotification);
   yield (0, _effects2.takeEvery)(statusUpdatePattern('Cancelled'), notificationSagas.callStatusUpdateCancelled, webRTC);
 }
 
 /**
  * Handle sending a call audit request
+ * TODO: Move the common "setup" logic into the Callstack?
  * @method callAudit
  * @param  {Object} webRTC The webRTC stack.
  */
 function* callAudit(webRTC) {
   const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED];
 
+  // Curry the signaling function to specify the status.
+  function* auditCall(...args) {
+    // For CPaaS2, "call audit" is to update the call's status to 'Connected'.
+    return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Connected');
+  }
+
   function callStartAuditPattern(action) {
     return actionTypesToDoAuditOn.indexOf(action.type) !== -1 && !action.error;
   }
 
-  yield (0, _effects2.takeEvery)([callStartAuditPattern, actionTypes.CALL_AUDIT], supportSagas.sendCallAudit, webRTC);
+  yield (0, _effects2.takeEvery)([callStartAuditPattern, actionTypes.CALL_AUDIT], _support2.sendCallAudit, {
+    requests: {
+      auditCall
+    }
+  });
 }
 
 /**
- * Handle a "call offer" notification.
+ * Handle receiving remote offer notifications in a CPaaS2 format.
+ * Uses properties in the notification to create a standardized data object to
+ *    be used by the Callstack.
  * @method callOfferNotification
  * @param  {Object} webRTC The webRTC stack.
  */
 function* callOfferNotification(webRTC) {
+  // Dependencies provided to the Callstack saga.
+  const deps = {
+    webRTC,
+    requests: {
+      /*
+       * CPaaS2 uses the same REST endpoint for both answering a call and
+       *    answering a renegotiation. Rename the saga so that the Callstack
+       *    uses the correct REST saga.
+       */
+      updateSessionResponse: requests.answerSession
+    }
+
+    /**
+     * Intercept the CPaaS2-specific notification, ensuring parameters are given
+     *    to the Callstack sagas into a generic format.
+     * @method parseOfferNotification
+     * @param {Object} action
+     */
+  };function* parseOfferNotification(action) {
+    const notification = action.payload.wrtcsOfferNotification;
+
+    // Pull-out the parameters into a standard format for the Callstack.
+    const params = {
+      sdp: notification.offer.sdp,
+      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
+    };
+
+    yield (0, _effects2.call)(_notifications2.parseCallRequest, deps, params);
+  }
+
   // Redux-saga take() pattern.
   function callOfferPattern(action) {
     return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
   }
 
-  yield (0, _effects2.takeEvery)(callOfferPattern, notificationSagas.receivedOffer, webRTC);
+  yield (0, _effects2.takeEvery)(callOfferPattern, parseOfferNotification);
 }
 
 /**
@@ -23947,12 +24058,30 @@ function* callOfferNotification(webRTC) {
  * @param  {Object} webRTC The webRTC stack.
  */
 function* callAnswerNotification(webRTC) {
+  /**
+   * Intercept the CPaaS2-specific notification, ensuring parameters are given
+   *    to the Callstack sagas into a generic format.
+   * @method parseAnswerNotification
+   * @param {Object} action
+   */
+  function* parseAnswerNotification(action) {
+    const notification = action.payload.wrtcsAnswerNotification;
+
+    // Pull-out the parameters into a standard format for the Callstack.
+    const params = {
+      sdp: notification.answer.sdp,
+      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
+    };
+
+    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
+  }
+
   // Redux-saga take() pattern.
   function callAnswerPattern(action) {
     return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
   }
 
-  yield (0, _effects2.takeEvery)(callAnswerPattern, notificationSagas.handleAnswerNotification, webRTC);
+  yield (0, _effects2.takeEvery)(callAnswerPattern, parseAnswerNotification);
 }
 
 /**
@@ -23960,8 +24089,17 @@ function* callAnswerNotification(webRTC) {
  * @method endCall
  * @param  {Object} webRTC The webRTC stack.
  */
-function* endCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, webRTC);
+function* endCallEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, { webRTC, requests });
+}
+
+/**
+ * Reject an incoming call.
+ * @method rejectCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* rejectCallEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.REJECT_CALL, establishSagas.rejectCall, { webRTC, requests });
 }
 
 /**
@@ -23969,8 +24107,8 @@ function* endCall(webRTC) {
  * @method getStats
  * @param  {Object} webRTC The webRTC stack.
  */
-function* getStats(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, webRTC);
+function* getStatsEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, { webRTC });
 }
 
 /**
@@ -23991,437 +24129,6 @@ function* setTurnCredentials() {
 
 /***/ }),
 
-/***/ "./src/call/cpaas2/sagas/midcall.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.endCall = endCall;
-exports.offerInactiveMedia = offerInactiveMedia;
-exports.offerFullMedia = offerFullMedia;
-exports.addMedia = addMedia;
-exports.removeMedia = removeMedia;
-exports.sendDTMF = sendDTMF;
-exports.getStats = getStats;
-
-var _calls = __webpack_require__("./src/call/cpaas2/requests/calls.js");
-
-var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
-
-var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("./src/logs/index.js");
-
-var _errors = __webpack_require__("./src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _constants = __webpack_require__("./src/constants.js");
-
-var _utils = __webpack_require__("./src/call/cpaas2/utils/index.js");
-
-var _selectors2 = __webpack_require__("./src/call/interfaceNew/selectors.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-var _midcall = __webpack_require__("./src/callstack/sagas/midcall.js");
-
-var _constants2 = __webpack_require__("./src/call/constants.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Libraries.
-
-
-// Other plugins.
-/**
- * "Midcall sagas" handle performing local mid-call operations.
- *
- * These sagas assume that there is an established session (webRTC and server-
- *    side) to perform the operation on. Otherwise, it is considered an error.
- */
-
-// Call plugin.
-const log = (0, _logs.getLogManager)().getLogger('CALL');
-
-/**
- * End a call.
- * @method endCall
- * @param  {Object} action An action of type `END_CALL`.
- */
-
-
-// Helpers.
-function* endCall(webRTC, action) {
-  const { id } = action.payload;
-  const { error } = yield (0, _effects.call)(_utils.getSessionInfoByCallId, webRTC, id);
-
-  if (error) {
-    log.debug(`Failed to end call: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.endCallFinish(id, { error }));
-    return;
-  }
-
-  const { wrtcsSessionId, webrtcSessionId } = yield (0, _effects.select)(_selectors2.getCallById, id);
-
-  yield (0, _effects.call)(_midcall.closeCall, webRTC, webrtcSessionId);
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
-  const callInfo = {
-    sessionId: wrtcsSessionId
-  };
-
-  const response = yield (0, _effects.call)(_calls.endSession, requestInfo, callInfo);
-
-  if (!response.error) {
-    yield (0, _effects.put)(_actions.callActions.endCallFinish(id));
-  } else {
-    yield (0, _effects.put)(_actions.callActions.endCallFinish(id, {
-      error: response.error
-    }));
-  }
-}
-
-/**
- * Updates an existing session to have inactive media.
- * Can be used as a "hold" operation for plain webRTC scenarios.
- * @method offerInactiveMedia
- * @param  {Object} action An action of type `CALL_HOLD`.
- */
-function* offerInactiveMedia(webRTC, action) {
-  const { targetCall, error } = yield (0, _effects.call)(_utils.getSessionInfoByCallId, webRTC, action.payload.id);
-
-  if (error) {
-    log.debug(`Failed to re-offer: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
-      local: true,
-      error
-    }));
-    return;
-  } else if (targetCall.localHold) {
-    log.debug('Invalid state for hold operation: already held locally.');
-
-    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
-      local: true,
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_STATE,
-        message: 'Invalid state for hold operation: already held locally.'
-      })
-    }));
-    return;
-  }
-
-  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, targetCall.webrtcSessionId, {
-    audio: 'inactive',
-    video: 'inactive'
-  });
-
-  if (!offer) {
-    log.debug('Failed to generate SDP offer');
-    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
-      local: true,
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_OFFER,
-        message: 'Failed to generate SDP offer'
-      })
-    }));
-    return;
-  }
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
-  const callInfo = {
-    sessionId: targetCall.wrtcsSessionId,
-    offer: offer.sdp
-  };
-
-  const response = yield (0, _effects.call)(_calls.updateSession, requestInfo, callInfo);
-
-  if (response.error) {
-    log.debug('Failed to send hold offer.');
-    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
-      local: true,
-      error: response.error
-    }));
-  } else {
-    log.debug('Successfully sent hold offer.');
-    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
-      local: true
-    }));
-  }
-}
-
-/**
- * Updates an existing session to have "full" (sendrecv) media.
- * Can be used as an "unhold" operation in plain webRTC scenarios,
- * @method offerFullMedia
- * @param  {Object} action A "call unhold" action.
- */
-function* offerFullMedia(webRTC, action) {
-  const { targetCall, error } = yield (0, _effects.call)(_utils.getSessionInfoByCallId, webRTC, action.payload.id);
-
-  if (error) {
-    log.debug(`Failed to re-offer: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
-      local: true,
-      error
-    }));
-    return;
-  } else if (!targetCall.localHold) {
-    log.debug('Invalid state for unhold operation: not held locally.');
-    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
-      local: true,
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_STATE,
-        message: 'Invalid state for unhold operation: not held locally.'
-      })
-    }));
-    return;
-  }
-
-  // TODO: Make sure the session is in the correct signaling state to start a
-  //    renegotiation operation.
-  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, targetCall.webrtcSessionId, {
-    audio: 'sendrecv',
-    video: 'sendrecv'
-  });
-
-  if (!offer) {
-    log.debug('Invalid SDP offer or SDP offer not received.');
-    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
-      local: true,
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_OFFER,
-        message: 'Invalid SDP offer or SDP offer not received'
-      })
-    }));
-    return;
-  }
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
-  const callInfo = {
-    sessionId: targetCall.wrtcsSessionId,
-    offer: offer.sdp
-  };
-
-  const response = yield (0, _effects.call)(_calls.updateSession, requestInfo, callInfo);
-
-  if (response.error) {
-    log.debug('Failed to send unhold offer.');
-    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
-      local: true,
-      error: response.error
-    }));
-  } else {
-    log.debug('Successfully sent unhold offer.');
-    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
-      local: true
-    }));
-  }
-}
-
-/**
- * Updates an existing session with additional (sendrecv) media.
- * @method addMedia
- * @param  {Object} action An "add media" action.
- */
-function* addMedia(webRTC, action) {
-  // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants2.CALL_STATES.CONNECTED });
-  if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
-      local: true,
-      error: stateError
-    }));
-    return;
-  }
-
-  // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors2.getCallById, action.payload.id);
-
-  // Create media and add tracks using webRTC
-  const { sdp, media } = yield (0, _effects.call)(_midcall.webRtcAddMedia, webRTC, action.payload.mediaConstraints, {
-    sessionId: webrtcSessionId
-  });
-
-  // Get the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
-  const callInfo = {
-    sessionId: wrtcsSessionId,
-    offer: sdp
-  };
-
-  const response = yield (0, _effects.call)(_calls.updateSession, requestInfo, callInfo);
-
-  if (response.error) {
-    log.debug('Failed to send add media offer.');
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
-      local: true,
-      error: response.error
-    }));
-  } else {
-    log.debug('Successfully sent add media offer.');
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
-      local: true,
-      mediaId: media.id,
-      tracks: media.tracks.map(track => track.id)
-    }));
-  }
-}
-
-/**
- * Removes media from an existing session.
- * @method removeMedia
- * @param  {Object} action A "remove media" action.
- */
-function* removeMedia(webRTC, action) {
-  // Handle scenario where no track ids are provided or not in an array.
-  if (!(0, _fp.isArray)(action.payload.tracks) || (0, _fp.isEmpty)(action.payload.tracks)) {
-    log.debug(`No track ids specified to remove.`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
-      local: true,
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_PARAM,
-        message: 'No track ids specified to remove.'
-      })
-    }));
-    return;
-  }
-
-  // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants2.CALL_STATES.CONNECTED });
-  if (stateError) {
-    log.debug(`Invalid call state:  ${stateError.message}`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
-      local: true,
-      stateError
-    }));
-    return;
-  }
-  // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors2.getCallById, action.payload.id);
-
-  // Remove media and tracks using webRTC
-  const { sdp, error } = yield (0, _effects.call)(_midcall.webRtcRemoveMedia, webRTC, {
-    sessionId: webrtcSessionId,
-    tracks: action.payload.tracks
-  });
-  if (error) {
-    log.debug(`Failed to remove media: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
-      local: true,
-      error
-    }));
-    return;
-  }
-
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
-  const callInfo = {
-    sessionId: wrtcsSessionId,
-    offer: sdp
-  };
-
-  const response = yield (0, _effects.call)(_calls.updateSession, requestInfo, callInfo);
-
-  if (response.error) {
-    log.debug('Failed to send add media offer.');
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
-      local: true,
-      error: response.error
-    }));
-  } else {
-    log.debug('Successfully sent add media offer.');
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
-      local: true,
-      tracks: action.payload.tracks
-    }));
-  }
-}
-
-/**
- * Sends DTMF tones.
- * @method sendDTMF
- * @param  {Object} action A "send DTMF" action.
- */
-function* sendDTMF(webRTC, action) {
-  // Handle scenario where no tone is provided.
-  if ((0, _fp.isUndefined)(action.payload.tone)) {
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_PARAM,
-        message: 'No tone specifed.'
-      })
-    }));
-    return;
-  }
-
-  const { session, error } = yield (0, _effects.call)(_utils.getSessionInfoByCallId, webRTC, action.payload.id);
-  const { tone, duration, intertoneGap } = action.payload;
-
-  if (error) {
-    log.debug(`Failed to send DTMF: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, { error }));
-    return;
-  }
-  // Send DTMF tones.
-  const result = yield (0, _effects.call)([session, 'sendDTMF'], { tone, duration, intertoneGap });
-  if (result) {
-    log.debug('Successfully sent DTMF tones.');
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id));
-  } else {
-    log.debug('Failed to send DTMF tones.');
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.GENERIC_ERROR,
-        message: 'Unable to send DTMF tones.'
-      })
-    }));
-  }
-}
-/**
- * Gets RTCStatsReport.
- * @method getStats
- * @param  {Object} action A "get Stats" action.
- */
-function* getStats(webRTC, action) {
-  const trackId = action.payload.trackId;
-  const { session, error } = yield (0, _effects.call)(_utils.getSessionInfoByCallId, webRTC, action.payload.id);
-  if (error) {
-    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { error, trackId }));
-    return;
-  }
-
-  // Retrieve the RTCStatsReport from the session.
-  let result;
-  try {
-    result = yield (0, _effects.call)([session, 'getStats'], trackId);
-    log.debug('Successfully got RTCStatsReport.');
-  } catch (error) {
-    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.GENERIC_ERROR,
-        message: error.message
-      }),
-      trackId
-    }));
-  }
-  if (result) {
-    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { result, trackId }));
-  }
-}
-
-/***/ }),
-
 /***/ "./src/call/cpaas2/sagas/notifications.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24431,15 +24138,7 @@ function* getStats(webRTC, action) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.incomingCall = incomingCall;
-exports.callAccepted = callAccepted;
-exports.callStatusUpdateRinging = callStatusUpdateRinging;
 exports.callStatusUpdateCancelled = callStatusUpdateCancelled;
-exports.callStatusUpdateEnded = callStatusUpdateEnded;
-exports.receivedOffer = receivedOffer;
-exports.handleAnswerNotification = handleAnswerNotification;
-
-var _calls = __webpack_require__("./src/call/cpaas2/requests/calls.js");
 
 var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
 
@@ -24447,30 +24146,12 @@ var _constants = __webpack_require__("./src/call/constants.js");
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
-var _selectors2 = __webpack_require__("./src/auth/interface/selectors.js");
-
 var _logs = __webpack_require__("./src/logs/index.js");
 
-var _midcall = __webpack_require__("./src/callstack/sagas/midcall.js");
-
-var _negotiation = __webpack_require__("./src/callstack/sagas/negotiation.js");
-
-var _establish = __webpack_require__("./src/callstack/sagas/establish.js");
-
-var _constants2 = __webpack_require__("./src/constants.js");
+var _midcall = __webpack_require__("./src/callstack/webrtc/midcall.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
-var _v = __webpack_require__("../../node_modules/uuid/v4.js");
-
-var _v2 = _interopRequireDefault(_v);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Libraries.
-
-
-// Other plugins.
 /**
  * "Notification sagas" handle received notifications.
  * Each saga handles a single websocket notification that may be received from
@@ -24487,109 +24168,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
- * Handle an incoming call notification.
- * @method incomingCall
- * @param  {Object} action An action representing an incoming call notification.
- */
-
-
-// Helpers.
-function* incomingCall(webRTC, action) {
-  const { originatorAddress, originatorName, link, offer } = action.payload.wrtcsSessionInvitationNotification;
-  const wrtcsSessionId = link[0].href.split('sessions/')[1];
-
-  const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-  const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
-
-  const sessionId = yield (0, _effects.call)(_establish.setupIncomingCall, webRTC, {
-    offer,
-    trickleIceMode,
-    sdpSemantics,
-    turnInfo
-  });
-
-  // Send update that the wrtcsSessionStatus is 'Ringing'
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
-  const callInfo = { wrtcsSessionId };
-  const updateStatusResponse = yield (0, _effects.call)(_calls.updateSessionStatus, requestInfo, callInfo, 'Ringing');
-
-  if (updateStatusResponse.error) {
-    log.error(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
-  }
-
-  const callId = yield (0, _effects.call)(_v2.default);
-  yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
-    // TODO: Proper constants.
-    direction: 'incoming',
-    state: _constants.CALL_STATES.RINGING,
-    remoteParticipant: {
-      displayName: originatorAddress,
-      displayNumber: originatorName
-    },
-    // The ID that the backend uses to track this webRTC session.
-    wrtcsSessionId,
-    // The ID that the webRTC stack uses to track this webRTC session.
-    webrtcSessionId: sessionId
-  }));
-}
-
-/**
- * Handles a notification that the remote end accepted the call.
- * @method callAccepted
- * @param  {Object} action An action representing a call accepted notification.
- */
-function* callAccepted(webRTC, action) {
-  const wrtcsSession = action.payload.wrtcsAcceptanceNotification;
-  const wrtcsSessionId = wrtcsSession.link[0].href.split('sessions/')[1];
-
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
-
-  if (!currentCall) {
-    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  const sessionOptions = { sessionId: currentCall.webrtcSessionId, answerSdp: wrtcsSession.answer.sdp };
-  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionOptions, currentCall);
-
-  if (!error) {
-    yield (0, _effects.put)(_actions.callActions.callAccepted(currentCall.id, {
-      // TODO: Determine when we're actually "in call".
-      state: _constants.CALL_STATES.CONNECTED,
-      startTime: wrtcsSession.dateTime
-    }));
-  } else {
-    // TODO: Need to handle errors in webrtc before we know what to handle here.
-  }
-}
-
-/**
- * Handles a notification that the remote end call status is 'Ringing'.
- * @method callStatusUpdateRinging
- * @param  {Object} action An action representing a call notification.
- */
-function* callStatusUpdateRinging(webRTC, action) {
-  const wrtcsSessionId = action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1];
-
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
-
-  if (!currentCall) {
-    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  yield (0, _effects.put)(_actions.callActions.callRinging(currentCall.id));
-}
-
-/**
  * Handles a notification that the remote end call status is 'Cancelled'.
  * @method callStatusUpdateCancelled
  * @param  {Object} action An action representing a call notification.
  */
+
+
+// Libraries.
+
+
+// Other plugins.
 function* callStatusUpdateCancelled(webRTC, action) {
   const wrtcsSessionId = action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1];
 
@@ -24600,114 +24188,14 @@ function* callStatusUpdateCancelled(webRTC, action) {
     return;
   }
 
+  if (targetCall.state === _constants.CALL_STATES.ENDED) {
+    log.debug(`Call ${targetCall.id} is already in ENDED state`);
+    return;
+  }
+
   yield (0, _effects.call)(_midcall.closeCall, webRTC, targetCall.id);
 
   yield (0, _effects.put)(_actions.callActions.callCancelled(targetCall.id));
-}
-
-/**
- * Handles a notification that the remote end call status is 'SessionEnded'.
- * @method callStatusUpdateEnded
- * @param  {Object} action An action representing a call notification.
- */
-function* callStatusUpdateEnded(webRTC, action) {
-  const wrtcsSessionId = action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1];
-
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
-
-  if (!currentCall) {
-    log.debug(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  if (currentCall.state === _constants.CALL_STATES.ENDED) {
-    log.debug(`Error: wrtcs session call ${wrtcsSessionId} already in 'Ended' state.`);
-    return;
-  }
-
-  yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
-
-  yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id));
-}
-
-/**
- * Handle a remote SDP offer.
- * @method receivedOffer
- * @param  {Object} action A notification action for "offer received".
- */
-function* receivedOffer(webRTC, action) {
-  const { link, offer } = action.payload.wrtcsOfferNotification;
-  const wrtcsSessionId = link[0].href.split('sessions/')[1];
-
-  // TODO: Helper to go from wrtcsSessionId --> session.
-  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
-
-  if (!targetCall) {
-    // Scenario: Received a notification for a call that we don't
-    //  know about. Our state is not synced with backend state.
-    // TODO: Do we ignore the offer or try to recover the call?
-    log.debug(`Call for session ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  const { answerSDP, error } = yield (0, _effects.call)(_midcall.handleOffer, webRTC, offer.sdp, targetCall.webrtcSessionId);
-
-  if (error) {
-    log.debug('Failed to recieve offer SDP', error);
-    return;
-  }
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
-  const callInfo = {
-    answer: answerSDP,
-    sessionId: wrtcsSessionId
-  };
-
-  const response = yield (0, _effects.call)(_calls.answerSession, requestInfo, callInfo);
-
-  // TODO: Need to determine what was updated, then update state and emit an event.
-  if (response.error) {
-    log.debug('Failed to answer session update.', response.error);
-  } else {
-    log.debug('Successfully answered session update.');
-  }
-}
-
-/**
- * Handle a remote answer SDP.
- * @method handleAnswerNotification
- * @param  {Object} action A notification action for "answer received".
- */
-function* handleAnswerNotification(webRTC, action) {
-  const { link, answer } = action.payload.wrtcsAnswerNotification;
-  const wrtcsSessionId = link[0].href.split('sessions/')[1];
-
-  // TODO: Helper to go from wrtcsSessionId --> session.
-  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
-
-  if (!targetCall) {
-    // Scenario: Received a notification for a call that we don't
-    //  know about. Our state is not synced with backend state.
-    // TODO: Do we ignore the offer or try to recover the call?
-    log.debug(`Call for session ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  // Information about the Session / answer that the callstack will need.
-  const sessionInfo = {
-    sessionId: targetCall.webrtcSessionId,
-    answerSdp: answer.sdp
-  };
-
-  const { error } = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionInfo, targetCall);
-  // TODO: Need to determine what was updated, then update state and emit an event.
-  if (error) {
-    log.debug('Failed to process remote answer.', error);
-  } else {
-    log.debug('Successfully negotiated session update.');
-  }
 }
 
 /***/ }),
@@ -24822,7 +24310,6 @@ function* unsubscribe(action) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sendCallAudit = sendCallAudit;
 exports.setTurnCredentials = setTurnCredentials;
 
 var _calls = __webpack_require__("./src/call/cpaas2/requests/calls.js");
@@ -24831,13 +24318,11 @@ var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
-var _constants = __webpack_require__("./src/call/constants.js");
-
 var _selectors2 = __webpack_require__("./src/auth/interface/selectors.js");
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
-var _constants2 = __webpack_require__("./src/constants.js");
+var _constants = __webpack_require__("./src/constants.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
@@ -24845,6 +24330,16 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 
 // Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Handles setting/getting turn/stun information.
+ * Fetches TURN credentials from the backend if configured.
+ * @method setTurnCredentials
+ */
+
+
+// Libraries.
 /**
  * "Support sagas" handle call behaviours that are not directly related to calls
  *    themselves, but are required for establishing/maintaining a call.
@@ -24854,60 +24349,6 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
  */
 
 // Call plugin.
-const log = (0, _logs.getLogManager)().getLogger('CALL');
-
-/**
- * Send a call audit request repeatedly by redispatching sendCallAudit.
- * If no status is provided in the payload, then it is assumed that status === 'Connected'
- * @method sendCallAudit
- * @param  {Object} action An action of type `CALL_AUDIT`.
- */
-
-
-// Libraries.
-function* sendCallAudit(webRTC, action) {
-  const delayMs = action.payload.error ? 5000 : 25000;
-  yield (0, _effects.delay)(delayMs);
-
-  // If payload.status does not exist, then saga was triggered by actions ANSWER_CALL or CALL_ACCEPTED
-  // which do not provide a 'status' in the payload and should proceed as normal.
-  // Or there was an error in the request so status is unknown and we should try making a request again.
-  if (action.payload.status && action.payload.status !== 'Connected') {
-    log.debug(`Call status is "${action.payload.status}"; stopping call audits.`);
-    return;
-  }
-  const callId = action.payload.id;
-  const currentCall = yield (0, _effects.select)(_selectors.getCallById, callId);
-  if (!currentCall) {
-    log.error(`Error: Call ${callId} not found.`);
-    return;
-  }
-  if (currentCall.state === _constants.CALL_STATES.ENDED) {
-    log.debug(`Call ${callId} has ended; stopping call audits.`);
-    return;
-  }
-
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
-  const callInfo = { wrtcsSessionId: currentCall.wrtcsSessionId };
-  const updateStatusResponse = yield (0, _effects.call)(_calls.updateSessionStatus, requestInfo, callInfo, 'Connected');
-
-  if (updateStatusResponse.error) {
-    log.debug(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
-    yield (0, _effects.put)(_actions.callActions.sendCallAudit(callId, {
-      error: updateStatusResponse.error
-    }));
-  } else {
-    const status = updateStatusResponse.status === 'Closed' ? 'Closed' : 'Connected';
-    log.debug(`Call audit for ${callId}: Call is ${status}.`);
-    yield (0, _effects.put)(_actions.callActions.sendCallAudit(callId, { status }));
-  }
-}
-
-/**
- * Handles setting/getting turn/stun information.
- * Fetches TURN credentials from the backend if configured.
- * @method setTurnCredentials
- */
 function* setTurnCredentials() {
   const { iceServers, serverTurnCredentials } = yield (0, _effects.select)(_selectors.getOptions);
 
@@ -24925,7 +24366,7 @@ function* setTurnCredentials() {
     log.debug('Retrieving turn credentials from server.');
 
     // Collect the information needed to make the request.
-    const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants2.platforms.CPAAS2);
+    const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
 
     const response = yield (0, _effects.call)(_calls.fetchCredentials, requestInfo);
 
@@ -25128,7 +24569,6 @@ function* validateCallState(callId, expected) {
  * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
  * @param {string} info.endpoint Which end of the connection created the SDP.
- * @param {boolean} info.isInitiator Whether this session initiated the call or not.
  * @param {Object} originalSdp The sdp in its initial state.
  * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
  */
@@ -26240,6 +25680,7 @@ callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
 callEvents[actionTypes.CALL_ACCEPTED] = stateChangeHandler;
 callEvents[actionTypes.IGNORE_CALL_FINISH] = stateChangeHandler;
 callEvents[actionTypes.END_CALL_FINISH] = stateChangeHandler;
+callEvents[actionTypes.REJECT_CALL_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_HOLD_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_UNHOLD_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = stateChangeHandler;
@@ -26489,6 +25930,12 @@ callReducers[actionTypes.ANSWER_CALL_FINISH] = {
 callReducers[actionTypes.CALL_ACCEPTED] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, action.payload);
+  },
+  throw(state, action) {
+    const newState = action.payload.state || state.state;
+    return (0, _extends3.default)({}, state, {
+      state: newState
+    });
   }
 };
 
@@ -26497,7 +25944,8 @@ callReducers[actionTypes.CALL_ACCEPTED] = {
 // https://redux-actions.js.org/api/handleaction#handleactiontype-reducer-defaultstate
 callReducers[actionTypes.END_CALL_FINISH] = (state, action) => {
   return (0, _extends3.default)({}, state, {
-    state: _constants.CALL_STATES.ENDED
+    state: _constants.CALL_STATES.ENDED,
+    endTime: Date.now()
   });
 };
 
@@ -26961,7 +26409,1994 @@ function normalizeSipUri(address, domain) {
 
 /***/ }),
 
-/***/ "./src/callstack/sagas/establish.js":
+/***/ "./src/call/utils/operations.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getRemoteMediaOperation = getRemoteMediaOperation;
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _state = __webpack_require__("./src/call/utils/state.js");
+
+var _sdp = __webpack_require__("./src/call/utils/sdp.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+/**
+ * Determines the type of remote "media operation" based on the current call's
+ *    state and whether the new state has flowing media or not.
+ * @method getRemoteMediaOperation
+ * @param  {Object}  callState The current call's state.
+ * @param  {string} sdp An sdp offer used to determine which operation we should perform next
+ * @return {string}  An OPERATIONS enum value.
+ */
+// Helpers.
+function* getRemoteMediaOperation(callState, sdp) {
+  /*
+   * |               |    Remote Offer      |
+   * | Current State |    Media   | NoMedia |
+   * |---------------|------------|---------|
+   * |  Connected    | Change     | Hold    |
+   * |  Local Hold   | Change     | Hold    |
+   * |  Remote Hold  | Unhold/MoH | Change  |
+   * |  Dual Hold    | Unhold     | Change  |
+   *
+   * MoH Special case: If the remote offer fits specific criteria, the
+   *    remote operation is considered a "start music on hold" operation.
+   */
+  const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, sdp);
+  const musicOnHold = yield (0, _effects.call)(_sdp.hasMusicOnHold, sdp);
+
+  if ((0, _state.hasMedia)(callState) || (0, _state.isLocalHold)(callState)) {
+    return mediaFlowing ? _constants.OPERATIONS.CHANGE_MEDIA : _constants.OPERATIONS.HOLD_MEDIA;
+  } else if ((0, _state.isRemoteHold)(callState)) {
+    // Special case where we are on remote hold and recieve a
+    // request to play music on hold (sdp: a=sendonly)
+    if (musicOnHold) {
+      return _constants.OPERATIONS.MUSIC_ON_HOLD;
+    } else {
+      return mediaFlowing ? _constants.OPERATIONS.UNHOLD_MEDIA : _constants.OPERATIONS.CHANGE_MEDIA;
+    }
+  } else if ((0, _state.isDualHold)(callState)) {
+    return mediaFlowing ? _constants.OPERATIONS.UNHOLD_MEDIA : _constants.OPERATIONS.CHANGE_MEDIA;
+  }
+}
+// Libraries.
+
+/***/ }),
+
+/***/ "./src/call/utils/sdp.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setMediaInactive = setMediaInactive;
+exports.hasMediaFlowing = hasMediaFlowing;
+exports.hasMusicOnHold = hasMusicOnHold;
+
+var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Set all media to inactive in a given sdp string
+ * @method setMediaInactive
+ * @param  {string}  sdp An sdp string
+ * @return {string}  Modified sdp string with media direction set to inactive
+ */
+function setMediaInactive(sdp) {
+  const regex = /sendrecv|sendonly|recvonly/gi;
+  if (!sdp || typeof sdp !== 'string') {
+    return;
+  }
+
+  return sdp.replace(regex, 'inactive');
+}
+
+/**
+ * Helper function that returns a boolean if media is active or not.
+ * @method hasMediaFlowing
+ * @param  {string} sdp String representation of a calls sdp.
+ */
+// Libraries
+function* hasMediaFlowing(sdp) {
+  const objectSdp = _sdpTransform2.default.parse(sdp);
+
+  // Check that video directions (if there are any) indicate a "hold" scenario.
+  const isVideoInactive = objectSdp.media.filter(item => item.type === 'video').every(media => media && media.direction === 'inactive');
+
+  // Check that audio directions (if there are any) indicate a "hold" scenario.
+  const isAudioInactive = objectSdp.media.filter(item => item.type === 'audio')
+  // Special case: In music on hold scenarios, audio may be `sendonly`
+  //    so that the held user can still receive the "hold music".
+  .every(media => media && ['inactive', 'sendonly'].includes(media.direction));
+
+  return !isVideoInactive || !isAudioInactive;
+}
+
+/**
+ * Helper function that returns a boolean if media sendonly (music on hold).
+ * @method hasMusicOnHold
+ * @param  {string} sdp String representation of a calls sdp.
+ */
+function* hasMusicOnHold(sdp) {
+  const objectSdp = _sdpTransform2.default.parse(sdp);
+  const isMusicOnHold = objectSdp.media.filter(item => item.type === 'audio').some(media => media && media.direction === 'sendonly');
+
+  // Check that video directions (if there are any) indicate a "hold" scenario.
+  const isVideoInactive = objectSdp.media.filter(item => item.type === 'video').every(media => media && media.direction === 'inactive');
+
+  return isMusicOnHold && isVideoInactive;
+}
+
+/***/ }),
+
+/***/ "./src/call/utils/state.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getMediaState = getMediaState;
+exports.hasMedia = hasMedia;
+exports.isLocalHold = isLocalHold;
+exports.isRemoteHold = isRemoteHold;
+exports.isDualHold = isDualHold;
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+/**
+ * Retrieves the current state of media flow based on a call's state.
+ * @method getMediaState
+ * @param  {Object} callState A call's state.
+ * @return {string} A CALL_MEDIA_STATES enum value.
+ */
+function getMediaState(callState) {
+  if (hasMedia(callState)) {
+    return _constants.CALL_MEDIA_STATES.CONNECTED;
+  } else if (isLocalHold(callState)) {
+    return _constants.CALL_MEDIA_STATES.LOCAL_HOLD;
+  } else if (isRemoteHold(callState)) {
+    return _constants.CALL_MEDIA_STATES.REMOTE_HOLD;
+  } else if (isDualHold(callState)) {
+    return _constants.CALL_MEDIA_STATES.DUAL_HOLD;
+  }
+}
+
+/**
+ * Checks whether the call state indicates that the call has media.
+ * @method hasMedia
+ * @param  {Object}  callState Redux call state.
+ * @return {boolean}
+ */
+// Helpers.
+function hasMedia(callState) {
+  return callState.state === _constants.CALL_STATES.CONNECTED && !callState.localHold && !callState.remoteHold;
+}
+
+/**
+ * Checks whether the call state indicates that the call is locally held (only).
+ * @method isLocalHold
+ * @param  {Object}  callState Redux call state.
+ * @return {boolean}
+ */
+function isLocalHold(callState) {
+  return callState.state === _constants.CALL_STATES.ON_HOLD && callState.localHold && !callState.remoteHold;
+}
+
+/**
+ * Checks whether the call state indicates that the call is remotely held (only).
+ * @method isRemoteHold
+ * @param  {Object}  callState Redux call state.
+ * @return {boolean}
+ */
+function isRemoteHold(callState) {
+  return callState.state === _constants.CALL_STATES.ON_HOLD && !callState.localHold && callState.remoteHold;
+}
+
+/**
+ * Checks whether the call state indicates that the call is both locally and
+ *    remote held.
+ * @method isDualHold
+ * @param  {Object}  callState Redux call state.
+ * @return {boolean}
+ */
+function isDualHold(callState) {
+  return callState.state === _constants.CALL_STATES.ON_HOLD && callState.localHold && callState.remoteHold;
+}
+
+/***/ }),
+
+/***/ "./src/callstack/call/establish.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makeCall = makeCall;
+exports.answerCall = answerCall;
+exports.rejectCall = rejectCall;
+
+var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _utils = __webpack_require__("./src/call/cpaas2/utils/index.js");
+
+var _establish = __webpack_require__("./src/callstack/webrtc/establish.js");
+
+var _midcall = __webpack_require__("./src/callstack/webrtc/midcall.js");
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Other plugins.
+
+
+// Callstack plugin.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
+
+// Call plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Starts a new outgoing call.
+ *
+ * This saga defines how a call is started. It performs the webRTC and
+ *    signalling operations to create a "call" both locally and on the server.
+ * Assumptions:
+ *     1. None.
+ * Responsibilities:
+ *     1. Setup the call locally, using the webRTC helper saga.
+ *     2. Create the call on the server.
+ *     3. Update call state (via redux action).
+ * @method makeCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.createSession "Make call" signalling function.
+ * @param {Object}   action        An action of type `MAKE_CALL`.
+ */
+
+
+// Libraries.
+function* makeCall(deps, action) {
+  const { webRTC, requests } = deps;
+
+  // Create a new local media object for this call.
+  const mediaConstraints = {
+    video: action.payload.mediaConstraints.video,
+    audio: action.payload.mediaConstraints.audio
+  };
+
+  const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
+  const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+
+  const { offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
+    sdpSemantics,
+    turnInfo,
+    trickleIceMode
+  });
+
+  const callInfo = {
+    participantAddress: action.payload.participantAddress,
+    offer: offerSdp
+  };
+
+  const response = yield (0, _effects.call)(requests.createSession, callInfo);
+  log.debug('Received session response:', response);
+
+  if (!response.error) {
+    yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
+      state: _constants.CALL_STATES.INITIATED,
+      // The ID that the backend uses to track this webRTC session.
+      wrtcsSessionId: response.wrtcsSessionId,
+      // The ID that the webRTC stack uses to track this webRTC session.
+      webrtcSessionId: sessionId,
+      // The local Media object associated with this call.
+      mediaId: mediaId
+    }));
+  } else {
+    // The call failed, so stop the Media object created for the call.
+    // TODO: Update redux state that the Media object is stopped.
+    //    Need an event from Media model to notify about the stop, and listener
+    //    set on Media when it is created (in `createLocalMedia` saga).
+    yield (0, _effects.call)(_midcall.closeCall, webRTC, mediaId);
+
+    yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
+      state: _constants.CALL_STATES.ENDED,
+      error: response.error
+    }));
+  }
+}
+
+/**
+ * Answers an incoming call.
+ *
+ * This saga defines how a call is answered. It performs the webRTC and
+ *    signaling operations to respond to a call on the server. The local "call"
+ *    may or may not exist at this point in time, depending if the call is slow
+ *    start.
+ * If the call is using regular negotiation, the call will exist locally.
+ *    Signaling with an answer SDP will establish the call, so it can be
+ *    considered "Connected" afterwards.
+ * If the call is using slow start negotiation, the call needs to be created
+ *    locally. An offer SDP from the call will be used for signaling (as per
+ *    slow start), but the call cannot be considered "Connected" until we
+ *    receive a response to the offer SDP.
+ * Assumptions:
+ *    1. The call is in Ringing state.
+ *    2. The call's direction is incoming.
+ * Responsibilities:
+ *    1. Determine whether Regular or Slow Start negotiation is to be used.
+ *    2. Regular: Create an answer for the call, using the webRTC helpers.
+ *    3. Regular: Update the call on the server with the answer.
+ *    4. Regular: Update call state (via redux actions).
+ *    2. Slow Start: Setup the call locally, using the webRTC helper saga.
+ *    3. Slow Start: Update the call on the server with an offer.
+ *    4. Slow Start: Update state (via redux actions).
+ * @method answerCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.answerSession "Answer call" signalling function.
+ * @param {Object}   action        An "answer call" action.
+ */
+function* answerCall(deps, action) {
+  const { webRTC, requests } = deps;
+  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  if (!incomingCall) {
+    // TODO: Should report an error.
+    log.error(`Error: Call ${action.payload.id} not found.`);
+    return;
+  }
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
+    state: _constants.CALL_STATES.RINGING,
+    direction: 'incoming'
+  });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
+      error: stateError
+    }));
+    return;
+  }
+
+  const mediaConstraints = {
+    video: action.payload.mediaConstraints.video,
+    audio: action.payload.mediaConstraints.audio
+  };
+
+  let webrtcInfo, callInfo, nextState;
+  if (incomingCall.isSlowStart) {
+    /*
+     * If the call was a slow start call, then it doesn't have a webRTC session
+     *    yet. We need to setup the session and provide the signaling server
+     *    with an SDP offer.
+     */
+    log.debug('Answering slow start call.', action.payload.id);
+
+    const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
+    const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+
+    // Setup a webRTC session.
+    webrtcInfo = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
+      sdpSemantics,
+      turnInfo,
+      trickleIceMode
+    });
+
+    callInfo = {
+      answer: webrtcInfo.offerSdp,
+      wrtcsSessionId: incomingCall.wrtcsSessionId
+
+      // Even if the answer request is successful, we still need to wait for a
+      //    notification from the signaling server to know if the call is complete.
+    };nextState = _constants.CALL_STATES.RINGING;
+  } else {
+    /*
+     * For a regular call scenario, we perform normal webRTC negotiation.
+     */
+    log.debug('Answering call.', action.payload.id);
+
+    // Update the existing webRTC session with an answer.
+    const sessionOptions = { sessionId: incomingCall.webrtcSessionId };
+    webrtcInfo = yield (0, _effects.call)(_establish.answerWebrtcSession, webRTC, mediaConstraints, sessionOptions);
+
+    callInfo = {
+      answer: webrtcInfo.answerSDP,
+      wrtcsSessionId: incomingCall.wrtcsSessionId
+
+      // If the answer request is successful, then the call can be considered complete.
+    };nextState = _constants.CALL_STATES.CONNECTED;
+  }
+
+  // Perform the signaling to answer the call.
+  const response = yield (0, _effects.call)(requests.answerSession, callInfo);
+
+  if (!response.error) {
+    yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
+      state: nextState,
+      // TODO: Proper start time for slow-start calls.
+      startTime: Date.now(),
+      // The local Media object associated with this call.
+      mediaId: webrtcInfo.mediaId,
+      // For slow start calls, there isn't a webRTC session yet.
+      webrtcSessionId: webrtcInfo.sessionId
+    }, {
+      isSlowStart: incomingCall.isSlowStart
+    }));
+  } else {
+    yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
+      error: response.error
+    }, {
+      isSlowStart: incomingCall.isSlowStart
+    }));
+  }
+}
+
+/**
+ * Rejects an incoming call.
+ *
+ * This saga defines how a call is rejected. It performs the webRTC and
+ *    signalling operations to reject a "call" both locally and on the server.
+ * Assumptions:
+ *    1. None
+ * Responsibilities:
+ *    1. Cleanup the call locally, using the webRTC helper saga.
+ *    2. Reject the call on the server.
+ *    3. Update call state (via redux action).
+ * @method rejectCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.rejectSession "Reject call" signalling function.
+ * @param {Object}   action        An action of type `REJECT_CALL`.
+ */
+function* rejectCall(deps, action) {
+  const { webRTC, requests } = deps;
+  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  if (!incomingCall) {
+    log.debug(`Error: incoming call ${action.payload.id} not found.`);
+    return;
+  }
+
+  // Ensure the call is in a valid state for this operation.
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
+    state: _constants.CALL_STATES.RINGING,
+    direction: _constants.CALL_DIRECTION.INCOMING
+  });
+
+  if (stateError) {
+    log.debug(`Cannot reject call: ${stateError.message}`);
+    // Report the operation failure.
+    yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, { error: stateError }));
+    return;
+  }
+
+  yield (0, _effects.call)(_midcall.closeCall, webRTC, incomingCall.webrtcSessionId);
+
+  // Collect the information needed to make the request.
+  const callInfo = {
+    wrtcsSessionId: incomingCall.wrtcsSessionId
+  };
+  const response = yield (0, _effects.call)(requests.rejectSession, callInfo);
+
+  if (!response.error) {
+    yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id));
+  } else {
+    yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, {
+      error: response.error
+    }));
+  }
+}
+
+/***/ }),
+
+/***/ "./src/callstack/call/midcall.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.endCall = endCall;
+exports.offerInactiveMedia = offerInactiveMedia;
+exports.offerFullMedia = offerFullMedia;
+exports.sendDTMF = sendDTMF;
+exports.getStats = getStats;
+exports.addMedia = addMedia;
+exports.removeMedia = removeMedia;
+
+var _midcall = __webpack_require__("./src/callstack/webrtc/midcall.js");
+
+var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _errors = __webpack_require__("./src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _utils = __webpack_require__("./src/call/cpaas2/utils/index.js");
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+
+
+// Call plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * This saga ends a call, it performs the webRTC and signaling operations to
+ *    update the local and server sessions of a call.
+ * Assumptions:
+ *    1. None.
+ * Responsibilities:
+ *    1. Perform the signaling to tell the server that we want to end the session
+ *    2. Update call state (via redux actions).
+ * @method endCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.endSession "End session" signalling function.
+ * @param {Object}   action An action of type `END_CALL`.
+ */
+/**
+ * "Midcall sagas" handle performing local mid-call operations.
+ *
+ * These sagas assume that there is an established session (webRTC and server-
+ *    side) to perform the operation on. Otherwise, it is considered an error.
+ */
+
+// Callstack plugin.
+function* endCall(deps, action) {
+  const { webRTC, requests } = deps;
+  const { id } = action.payload;
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {});
+  if (stateError) {
+    log.debug(`Call not found: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(id, {
+      error: stateError
+    }));
+    return;
+  }
+
+  const { wrtcsSessionId, webrtcSessionId } = yield (0, _effects.select)(_selectors.getCallById, id);
+
+  // Perform webRTC functions
+  yield (0, _effects.call)(_midcall.closeCall, webRTC, webrtcSessionId);
+
+  // Perform signalling to end the session
+  const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId });
+
+  if (!response.error) {
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(id));
+  } else {
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(id, {
+      error: response.error
+    }));
+  }
+}
+
+/**
+ * Updates an existing call to have inactive media.
+ * Can be used as a "hold" operation for plain webRTC scenarios.
+ *
+ * This saga defines how a call is put "on hold". It performs the webRTC and
+ *    signaling operations to update the local and server sessions of a call.
+ *    This represents the start of the webRTC renegotiation process for the
+ *    local side.
+ * Assumptions:
+ *    1. The call is in the correct state for the operation.
+ *        - The call exists, and is not already locally held.
+ * Responsibilities:
+ *    1. Generate an offer with the media directions as "locally held".
+ *    2. Perform signaling to update the server session with the offer.
+ *    3. Update call state (via redux actions).
+ * @method offerInactiveMedia
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Object}   action An action of type `CALL_HOLD`.
+ */
+function* offerInactiveMedia(deps, action) {
+  const { webRTC, requests } = deps;
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: false });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
+      local: true,
+      error: stateError
+    }));
+    return;
+  }
+
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const { wrtcsSessionId, webrtcSessionId } = targetCall;
+
+  // TODO: Make sure the session is in the correct signaling state to start a
+  //    renegotiation operation.
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, webrtcSessionId, {
+    audio: 'inactive',
+    video: 'inactive'
+  });
+
+  if (!offer) {
+    log.debug('Failed to generate SDP offer');
+    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_OFFER,
+        message: 'Failed to generate SDP offer'
+      })
+    }));
+    return;
+  }
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: offer.sdp
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send hold offer.');
+    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent hold offer.');
+    yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
+      local: true
+    }));
+  }
+}
+
+/**
+ * Updates an existing call to have "full" media.
+ * Can be used as an "unhold" operation for plain webRTC scenarios.
+ *
+ * This saga defines how a call is taken off "hold". It performs the webRTC and
+ *    signaling operations to update the local and server sessions of a call.
+ *    This represents the start of the webRTC renegotiation process for the
+ *    local side.
+ * Assumptions:
+ *    1. The call is in the correct state for the operation.
+ *        - The call exists, and is locally held.
+ * Responsibilities:
+ *    1. Generate an offer with the media directions as "connected".
+ *    2. Perform signaling to update the server session with the offer.
+ *    3. Update call state (via redux actions).
+ * @method offerFullMedia
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Object}   action        A "unhold call" action.
+ */
+function* offerFullMedia(deps, action) {
+  const { webRTC, requests } = deps;
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: true });
+  if (stateError) {
+    log.debug(`Invalid call state, not on hold: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
+      local: true,
+      error: stateError
+    }));
+    return;
+  }
+
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const { wrtcsSessionId, webrtcSessionId } = targetCall;
+
+  // TODO: Make sure the session is in the correct signaling state to start a
+  //    renegotiation operation.
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, webrtcSessionId, {
+    audio: 'sendrecv',
+    video: 'sendrecv'
+  });
+
+  if (!offer) {
+    log.debug('Invalid SDP offer or SDP offer not received.');
+    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_OFFER,
+        message: 'Invalid SDP offer or SDP offer not received'
+      })
+    }));
+    return;
+  }
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: offer.sdp
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send unhold offer.');
+    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent unhold offer.');
+    yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
+      local: true
+    }));
+  }
+}
+
+/**
+ * Sends DTMF tones out-of-band.
+ *
+ * This saga defines how DTMF tones are sent over a call. It performs
+ *    the webRTC operations on the local session of a call. There is no
+ *    signaling involved.
+ * Assumptions:
+ *    1. The call is in the correct state.
+ *        - The call is connected.
+ * Responsibilities:
+ *    1. Validate that tones can be sent on the call's session.
+ *    2. Send the tones.
+ * @method sendDTMF
+ * @param {Object} deps        Dependencies that the saga uses.
+ * @param {Object} deps.webRTC The WebRTC stack.
+ * @param {Object} action      A "send dtmf" action.
+ */
+function* sendDTMF(deps, action) {
+  const { webRTC } = deps;
+
+  // Handle scenario where no tone is provided.
+  if ((0, _fp.isUndefined)(action.payload.tone)) {
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'No tone specifed.'
+      })
+    }));
+    return;
+  }
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
+      local: true,
+      error: stateError
+    }));
+    return;
+  }
+
+  // Get the call.
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Get the local Session for the call.
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], targetCall.webrtcSessionId);
+
+  const { tone, duration, intertoneGap } = action.payload;
+
+  // Send DTMF tones.
+  const result = yield (0, _effects.call)([session, 'sendDTMF'], { tone, duration, intertoneGap });
+  if (result) {
+    log.debug('Successfully sent DTMF tones.');
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id));
+  } else {
+    log.debug('Failed to send DTMF tones.');
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: 'Unable to send DTMF tones.'
+      })
+    }));
+  }
+}
+
+/**
+ * Gets low-level statistics about a call (or track).
+ *
+ * This saga defines how/what statistics are retrieved about a call. It performs
+ *    the webRTC operations on the local session. No signaling is involved.
+ * The retrieved call statistics are a RTCStatsReport as provided by the WebRTC
+ *    specification. Stats can be retrieved for either an entire call or
+ *    individual tracks.
+ * Assumptions:
+ *    1. The call is on-going.
+ * Responsibilities:
+ *    1. Ensure the call exists.
+ *    2. Use the webRTC layer to retrieve the stats.
+ *    3. Dispatch an action with the results (which triggers an event).
+ * @method getStats
+ * @param {Object} deps        Dependencies that the saga uses.
+ * @param {Object} deps.webRTC The WebRTC stack.
+ * @param {Object} action      A "get Stats" action.
+ */
+function* getStats(deps, action) {
+  const { webRTC } = deps;
+
+  // TODO: Actually check something other than "call exists"?
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {});
+
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
+      error: stateError,
+      trackId: action.payload.trackId
+    }));
+    return;
+  }
+
+  // Get the call.
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Get the local Session for the call.
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], targetCall.webrtcSessionId);
+
+  const trackId = action.payload.trackId;
+  // Retrieve the RTCStatsReport from the session.
+  let result;
+  try {
+    result = yield (0, _effects.call)([session, 'getStats'], trackId);
+    log.debug('Successfully got RTCStatsReport.');
+  } catch (error) {
+    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: error.message
+      }),
+      trackId
+    }));
+  }
+  if (result) {
+    yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { result, trackId }));
+  }
+}
+
+/**
+ * Adds media to the call
+ *
+ * This saga performs the webRTC and signaling operations to
+ *    update local and server sessions of a call.
+ * Assumptions:
+ *    1. Validate that the call state is "Connected".
+ *        - The call is connected.
+ * Responsibilities:
+ *    1. Perform webRTC operations to add media.
+ *    2. Update the backend with the new state.
+ *    3. Update local state, using Redux
+ * @method addMedia
+ * @param {Object}  deps          Injected dependencies that addMedia relies on
+ * @param {Object}  deps.webRTC   The WebRTC stack.
+ * @param {Object}  deps.requests requests that addMedia relies on
+ * @param {Function}  deps.requests.updateSession request to update the session on the backend
+ * @param  {Object} action        An "add media" action.
+ */
+function* addMedia(deps, action) {
+  const { webRTC, requests } = deps;
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+      local: true,
+      error: stateError
+    }));
+    return;
+  }
+
+  // Get some call data.
+  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Create media and add tracks using webRTC
+  const { sdp, media } = yield (0, _effects.call)(_midcall.webRtcAddMedia, webRTC, action.payload.mediaConstraints, {
+    sessionId: webrtcSessionId
+  });
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: sdp
+
+    // Perform signalling to add media
+  };const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send add media offer.');
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent add media offer.');
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+      local: true,
+      mediaId: media.id,
+      tracks: media.tracks.map(track => track.id)
+    }));
+  }
+}
+
+/**
+ *
+ * Removes media from an existing session.
+ *
+ * This saga handles the WebRTC and signalling portions of removing media from an existing call
+ * Assumptions:
+ *    1. The action contains a tracks object that is neither an array or an empty object
+ *    2. The call is in the 'Connected' state
+ * Responsibilities:
+ *    1. Perform the signaling to tell the server that we want to to remove the specified track
+ *    2. Update call state (via redux actions).
+ * @method removeMedia
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Object}   action An action of type `REMOVE_MEDIA`.
+ */
+function* removeMedia(deps, action) {
+  const { webRTC, requests } = deps;
+
+  // Handle scenario where no track ids are provided or not in an array.
+  if (!(0, _fp.isArray)(action.payload.tracks) || (0, _fp.isEmpty)(action.payload.tracks)) {
+    log.debug(`No track ids specified to remove.`);
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'No track ids specified to remove.'
+      })
+    }));
+    return;
+  }
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state:  ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+      local: true,
+      stateError
+    }));
+    return;
+  }
+  // Get some call data.
+  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Remove media and tracks using webRTC
+  const { sdp, error } = yield (0, _effects.call)(_midcall.webRtcRemoveMedia, webRTC, {
+    sessionId: webrtcSessionId,
+    tracks: action.payload.tracks
+  });
+  if (error) {
+    log.debug(`Failed to remove media: ${error.message}`);
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+      local: true,
+      error
+    }));
+    return;
+  }
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: sdp
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send remove media offer.');
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent remove media offer.');
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+      local: true,
+      tracks: action.payload.tracks
+    }));
+  }
+}
+
+/***/ }),
+
+/***/ "./src/callstack/call/negotiation.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.handleUpdateRequest = handleUpdateRequest;
+exports.handleSlowUpdateRequest = handleSlowUpdateRequest;
+exports.handleUpdateResponse = handleUpdateResponse;
+exports.handleSlowUpdateResponse = handleSlowUpdateResponse;
+exports.getCallAction = getCallAction;
+
+var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _sdp = __webpack_require__("./src/call/utils/sdp.js");
+
+var _state = __webpack_require__("./src/call/utils/state.js");
+
+var _operations = __webpack_require__("./src/call/utils/operations.js");
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _midcall = __webpack_require__("./src/callstack/webrtc/midcall.js");
+
+var _negotiation = __webpack_require__("./src/callstack/webrtc/negotiation.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Other plugins.
+
+
+// Call plugin helpers.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * A "call update request" has been received and needs to be handled.
+ * The request includes an offer SDP, so this is a regular webRTC scenario.
+ *
+ * This saga is intended to process all "call update requests", that have an
+ *    SDP, received from the call's remote side. It is assumed the call has
+ *    already been established, so this represents the start of the webRTC
+ *    renegotiation process for the local side.
+ * Handling the request is expected (but may not necessarily) affect the call's
+ *    media. The call state will be updated depending on the requested changes
+ *    and the current call state.
+ * Assumptions:
+ *    1. The request notification is valid.
+ *        - Call exists, Call is not Ended, Call is able to receive a request.
+ *    2. The SDP is a remote offer SDP.
+ *        - Indicates regular webRTC negotiation should occur.
+ * Responsibilities:
+ *    1. Determine what the remote operation was (ie. what is being offered).
+ *    2. Process the offer based on remote oepration and current local state.
+ *    3. Respond to the request.
+ *    4. Update call state (via redux action).
+ * @method handleUpdateRequest
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSessionResponse "Respond to offer" signalling function.
+ * @param {Object}   targetCall    The call being acted on.
+ * @param {string}   sdp           A remote offer SDP.
+ */
+
+
+// Libraries.
+// Call plugin.
+function* handleUpdateRequest(deps, targetCall, sdp) {
+  const { webRTC, requests } = deps;
+  log.info(`Handling regular update request for call ${targetCall.id}.`);
+
+  const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
+  log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
+
+  /*
+   * Determine what the remote operation was. The remote operation and our
+   *    current local state will affect how we process the received offer. Our
+   *    response needs to reflect our desired local state, so that the remote
+   *    side does not change the call in an undesired way (eg. offering media
+   *    in a dual hold scenario should not reconnect media).
+   */
+  const remoteOp = yield (0, _effects.call)(_operations.getRemoteMediaOperation, targetCall, sdp);
+  log.info(`Processing update request as remote ${remoteOp} operation in ${mediaState} scenario.`);
+
+  let callAction = yield (0, _effects.call)(getCallAction, remoteOp);
+
+  /*
+   * If the remote operation is offering media but the call is locally held,
+   *    then we need to modify the offer to ensure that media does not restart.
+   */
+  if (remoteOp === _constants.OPERATIONS.UNHOLD_MEDIA && mediaState === _constants.CALL_MEDIA_STATES.DUAL_HOLD || remoteOp === _constants.OPERATIONS.CHANGE_MEDIA && mediaState === _constants.CALL_MEDIA_STATES.LOCAL_HOLD) {
+    log.debug('Modifying remote offer to prevent resetting media while in local hold.');
+    sdp = yield (0, _effects.call)(_sdp.setMediaInactive, sdp);
+    if (!sdp) {
+      log.debug('SDP is either undefined or not a string.');
+      return;
+    }
+  }
+
+  // Handle the offer SDP to receive an answer SDP.
+  // TODO: Handle the offer differently depending on remote operation.
+  const { error, answerSDP } = yield (0, _effects.call)(_midcall.handleOffer, webRTC, sdp, targetCall.webrtcSessionId);
+
+  if (error) {
+    log.debug('Failed to receive offer SDP.', error);
+    // TODO: Dispatch an error action to notify of the error scenario.
+    // The call may now be in a bad state and needs to be fixed.
+    return;
+  }
+
+  // Send answer sdp back to remote side
+  const callInfo = {
+    wrtcsSessionId: targetCall.wrtcsSessionId,
+    answer: answerSDP
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
+
+  if (response.error) {
+    // Scenario: The offer was processed, but failed to respond with the answer.
+    // The remote side needs the answer SDP before the call is "connected".
+    // TODO: Handle this scenario (retry request or fail/revert operation?)
+    log.debug('Failed to respond to remote offer with an answer.');
+    yield (0, _effects.put)(callAction(targetCall.id, {
+      remote: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully responded to remote offer.');
+    yield (0, _effects.put)(callAction(targetCall.id, {
+      remote: true
+    }));
+  }
+}
+
+/**
+ * A "call update request" has been received and needs to be handled.
+ * The request does not include an SDP, so this is a slow start webRTC scenario.
+ *
+ * This saga is intended to process all "call update requests", that have no
+ *    SDP, received from the call's remote side. It is assumed the call has
+ *    already been established, so this represents the start of the slow start
+ *    webRTC renegotiation process for the local side.
+ * Handling the request will not affect the call's media at this point. As
+ *    opposed to regular negotiation, we require an additional "call response"
+ *    notification before negotiation is complete. Media and call state will
+ *    only be affected by that response notification.
+ * Assumptions:
+ *    1. The request notification is valid.
+ *        - Call exists, Call is not Ended, Call is able to receive a request.
+ *    2. There is no SDP.
+ *        - Indicates slow start webRTC negotiation should occur.
+ * Responsibilities:
+ *    1. Generate an offer SDP based on our current local state.
+ *    2. Respond to the request with our offer.
+ * @method handleSlowUpdateRequest
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSessionResponse "Respond to offer" signalling function.
+ * @param  {Object} targetCall The call being acted on.
+ */
+function* handleSlowUpdateRequest(deps, targetCall) {
+  const { webRTC, requests } = deps;
+
+  log.info(`Handling slow start update request for call ${targetCall.id}.`);
+
+  const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
+  log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
+
+  /*
+   * Decision: Whenever we receive an offer without an SDP (slow start), and
+   *    we're not locally held, respond with all media directions as sendrecv.
+   *    This is to signal what we are capable of, rather than what we want.
+   *    When we are locally held, we don't want to allow the remote side to
+   *    restart media, hence respond with media directions as inactive.
+   * This handles two (non-local hold) scenarios specifically:
+   *  1. Re-invite: We have already negotiated to perform the remote operation,
+   *      but we received a second offer (without an SDP) as a side-effect to
+   *      further update media.
+   *    Eg. Music on Hold: The remote operation is to set media to inactive,
+   *      and the re-invite updates media so we can receive the hold audio.
+   *  2. Slow start unhold: We receive an offer without an SDP, but we have no
+   *      idea what the remote operation was. If we are on remote hold, we
+   *      assume that it's a remote unhold operation.
+   */
+  const mediaDirections = {
+    audio: targetCall.localHold ? 'inactive' : 'sendrecv',
+    video: targetCall.localHold ? 'inactive' : 'sendrecv'
+
+    // Create an offer to use for responding to the slow start notification.
+  };const slowOffer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, targetCall.webrtcSessionId, mediaDirections);
+
+  const callInfo = {
+    wrtcsSessionId: targetCall.wrtcsSessionId,
+    answer: slowOffer.sdp
+
+    // Respond with our "offer".
+  };const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
+
+  if (response.error) {
+    // TODO: Handle this scenario (retry request or fail/revert operation?)
+    log.debug('Failed to respond to update.', response.error);
+    return;
+  }
+
+  log.debug('Responded to remote slow start offer. Awaiting response.');
+  /*
+   * Only update state to indicate that the call is waiting for a remote
+   *    operation to complete. The operation is not complete until we
+   *    receive a response to our offer. The response will be handled by the
+   *    `handleSlowUpdateResponse` saga.
+   */
+  yield (0, _effects.put)(_actions.callActions.updateCall(targetCall.id, {
+    pendingRemoteOp: true
+  }));
+}
+
+/**
+ * A "call update response" has been received and needs to be handled.
+ * The response is for a local operation, so this a regular webRTC scenario.
+ *
+ * This saga is intended to process all "call update responses", that are from
+ *    local operations, received from the call's remote side. The call may or
+ *    may not be established at this point. This represents the end of the
+ *    regular webRTC negotiation process for the local side.
+ * Handling the response will affect the call's media, and the call state will
+ *    be updated depending on the new media and the current call state.
+ * Assumptions:
+ *    1. Ensure this is a valid notification.
+ *        - Call exists, Call is not ended, Call expects the response.
+ *    2. The original operation was started locally.
+ *        - Indicates that it was a regular negotiation process.
+ * Responsibilities:
+ *    1. Have the callstack process the answer SDP.
+ *    2. TODO: Determine what the original operation was.
+ *    3. Update call state (via redux action).
+ * @method handleUpdateResponse
+ * @param  {Object} webRTC     The webRTC stack.
+ * @param  {Object} targetCall The call being acted on.
+ * @param  {string} sdp        A remote answer SDP.
+ */
+function* handleUpdateResponse(deps, targetCall, sdp) {
+  const { webRTC } = deps;
+  log.info(`Handling regular update response for call ${targetCall.id}.`);
+
+  const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
+  log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
+
+  // Handle the remote answer SDP.
+  const sessionInfo = { sessionId: targetCall.webrtcSessionId, answerSdp: sdp };
+  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionInfo, targetCall);
+
+  if (error) {
+    log.debug('Failed to receive answer SDP', error);
+    // TODO: Better error handling.
+    yield (0, _effects.put)(_actions.callActions.callAccepted(targetCall.id, {
+      state: _constants.CALL_STATES.ENDED,
+      error
+    }));
+    return;
+  }
+
+  // Update call state depending on what the current call state is.
+  if (targetCall.state === _constants.CALL_STATES.RINGING || targetCall.state === _constants.CALL_STATES.INITIATED) {
+    log.info(`Handling state change as remote answer operation.`);
+    // Scenario: The call was previously ringing, so this response is a "call
+    //    accepted" notification. The call should now be established.
+    // It's possible that the call never entered Ringing state (from Initiated).
+    //    Handle Initiated the same as Ringing.
+    // Transition to Connected state.
+    yield (0, _effects.put)(_actions.callActions.callAccepted(targetCall.id, {
+      // TODO: Determine when we're actually "in call".
+      state: _constants.CALL_STATES.CONNECTED,
+      // TODO: Make sure this is the correct units
+      startTime: Date.now()
+    }));
+  } else if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
+    // Scenario: The call was previously established, so this response is "call
+    //    update" notification. The call is still established.
+    // Transition to next state depending on what the operation was and the
+    //    updated media.
+
+    // Determine whether the SDP has active media.
+    const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, sdp);
+
+    log.info(`Handling state change as local midcall operation ${mediaFlowing ? 'with' : 'without'} media flowing.`);
+    yield (0, _effects.put)(_actions.callActions.updateCall(targetCall.id, {
+      state: mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD
+    }));
+  } else {
+    // Scenario: The call is in an unexpected state for receiving a remote
+    //    answer SDP. This should never happen.
+    log.error(`The call is in a bad state for receiving response. Cannot update.`);
+  }
+}
+
+/**
+ * A "call update response" has been received and needs to be handled.
+ * The response is for a remote operation, so this a slow start webRTC scenario.
+ *
+ * This saga is intended to process all "call update responses", that are from
+ *    remote operations, received from the call's remote side. This represents
+ *    the end of slow start webRTC negotiation process for the local side.
+ * Handling the response will affect the call's media, and the call state will
+ *    be updated depending on the new media and the current call state.
+ * Assumptions:
+ *    1. Ensure this is a valid notification.
+ *        - Call exists, Call is not ended, Call expects the response.
+ *    2. The original operation was started remotely.
+ *        - Indicates that it a was slow start negotiation process.
+ *        - The call has a pending remote operation.
+ * Responsibilities:
+ *    1. Determine what the original operation was.
+ *    2. Have the callstack process the answer SDP.
+ *    3. Update call state (via redux action) based on original operation.
+ * @method handleSlowUpdateResponse
+ * @param  {Object} webRTC     The webRTC stack.
+ * @param  {Object} targetCall The call being acted on.
+ * @param  {string} sdp        A remote answer SDP.
+ */
+function* handleSlowUpdateResponse(deps, targetCall, sdp) {
+  const { webRTC } = deps;
+  log.info(`Handling slow start update response for call ${targetCall.id}.`);
+
+  const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
+  log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
+
+  /*
+   * Determine what the remote operation was. The remote operation and our
+   *    current local state will affect how we update the call's state.
+   */
+  const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, sdp);
+  const remoteOp = yield (0, _effects.call)(_operations.getRemoteMediaOperation, targetCall, sdp);
+  log.info(`Handling state change as remote ${remoteOp} in ${mediaState} scenario.`);
+
+  /*
+   * If the remote operation was an unhold and we're in a dual hold scenario,
+   *    then make sure the remote SDP can't restart media. Do this by ensuring
+   *    that all media directions in the remote SDP are inactive.
+   *
+   * This won't affect the remote end, but it prevents the local side from
+   *    thinking it is receiving a track when it shouldn't be.
+   *
+   * This can occur during slow start renegotiation, if the server doesn't
+   *    respect the media directions we set (assuming we set them correctly).
+   */
+  if (remoteOp === _constants.OPERATIONS.UNHOLD_MEDIA && targetCall.localHold === true) {
+    const undesired = ['sendrecv', 'sendonly', 'recvonly'];
+    // If any undesirable direction is found in the SDP, replace it with inactive.
+    if (undesired.some(dir => sdp.includes(dir))) {
+      log.debug(`Modifying remote SDP to prevent media in local hold scenario.`);
+      sdp = sdp.replace(/sendrecv|sendonly|recvonly/gi, 'inactive');
+    }
+  }
+
+  // Handle the remote answer SDP.
+  const sessionInfo = { sessionId: targetCall.webrtcSessionId, answerSdp: sdp };
+  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionInfo, targetCall);
+
+  if (error) {
+    log.debug('Failed to receive answer SDP', error);
+    // TODO: Dispatch an error action to notify of the error scenario.
+    // The call may now be in a bad state and needs to be fixed.
+    return;
+  }
+
+  if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
+    let callAction = yield (0, _effects.call)(getCallAction, remoteOp);
+
+    yield (0, _effects.put)(callAction(targetCall.id, {
+      state: mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD,
+      pendingRemoteOp: false
+    }));
+  } else {
+    // Scenario: The call is in an unexpected state for receiving a remote
+    //    answer SDP. This should never happen.
+    log.error(`The call is in a bad state for receiving response. Cannot update.`);
+  }
+}
+
+/**
+ * Helper function that returns a call action function based on the
+ * remote operation being requested
+ * TODO: Move this somewhere better.
+ * TODO: Do this differently / better.
+ * @method getCallAction
+ * @param (string) remoteOp Remote operation being requested
+ * @returns {function} A redux action creator
+ */
+function* getCallAction(remoteOp) {
+  // Determine what redux action the operation represents.
+  switch (remoteOp) {
+    case _constants.OPERATIONS.HOLD_MEDIA:
+      return _actions.callActions.holdRemoteCallFinish;
+    case _constants.OPERATIONS.UNHOLD_MEDIA:
+      return _actions.callActions.unholdRemoteCallFinish;
+    case _constants.OPERATIONS.MUSIC_ON_HOLD:
+      return _actions.callActions.musicOnHold;
+    case _constants.OPERATIONS.CHANGE_MEDIA:
+      return _actions.callActions.updateCall;
+  }
+  return null;
+}
+
+/***/ }),
+
+/***/ "./src/callstack/call/notifications.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.incomingCall = incomingCall;
+exports.parseCallRequest = parseCallRequest;
+exports.parseCallResponse = parseCallResponse;
+exports.callStatusUpdateEnded = callStatusUpdateEnded;
+exports.callStatusUpdateRinging = callStatusUpdateRinging;
+
+var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _negotiation = __webpack_require__("./src/callstack/call/negotiation.js");
+
+var negotiation = _interopRequireWildcard(_negotiation);
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _establish = __webpack_require__("./src/callstack/webrtc/establish.js");
+
+var _midcall = __webpack_require__("./src/callstack/webrtc/midcall.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
+var _utils = __webpack_require__("./src/call/cpaas2/utils/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Other plugins
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * A "call incoming" notification has been received and needs to be handled.
+ *
+ * This saga is intended to be the entry point for all "call incoming"
+ *    notifications. A "call incoming" notification is the initial offer to
+ *    establish a call with a remote endpoint. It represents the start of both
+ *    the call flow and webRTC negotiation process for the local side.
+ * Handling the notification will create a new call in state.
+ * Responsibilities:
+ *    1. Have the callstack perform the required webRTC negotiation process.
+ *        - Regular or Slow Start negotiation.
+ *    2. Respond that the call has been received (ie. ringing).
+ *    3. Create call state (via redux action).
+ * @method incomingCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateCallRinging "Update call" signalling function.
+ * @param {Object}   params        Parameters describing the incoming call.
+ * @param {string}   [params.sdp]  The remote SDP offer included with the notification (if any).
+ * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
+ * @param {string}   params.callerNumber   Number of the remote participant.
+ * @param {string}   params.callerName     Display name of the remote participant.
+ */
+
+
+// Helpers
+// TODO: Move this to a shared location.
+
+
+// Libraries.
+
+
+// Callstack plugin.
+function* incomingCall(deps, params) {
+  const { webRTC, requests } = deps;
+  const { sdp, wrtcsSessionId, callerNumber, callerName } = params;
+
+  let sessionId, isSlowStart;
+  /**
+   * An incoming call may or may not have an SDP offer associated with it.
+   * If it has an SDP, then it is a "regular" call scenario and can be handled
+   *    as a normal webRTC negotiation.
+   * If it has no SDP, then it is a "slow start" call scenario. In a slow start
+   *    scenario, the signaling server acts as a webRTC-middleman, requiring
+   *    both sides to provide it with offers and generating the answers itself.
+   */
+  if (sdp) {
+    // Regular call.
+    isSlowStart = false;
+    const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
+    const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+
+    // Since we have the remote offer SDP, we can setup a webRTC session.
+    sessionId = yield (0, _effects.call)(_establish.setupIncomingCall, webRTC, {
+      offer: {
+        sdp
+      },
+      trickleIceMode,
+      sdpSemantics,
+      turnInfo
+    });
+  } else {
+    // Slow start call.
+    isSlowStart = true;
+    /*
+     * We can't setup a webRTC session yet because generating an offer requires
+     *   media constraints. We need to wait until the application provides
+     *   media information before we can setup the call.
+     */
+    sessionId = undefined;
+  }
+
+  // Send update that the wrtcsSessionStatus is 'Ringing'
+  const callInfo = { wrtcsSessionId };
+  const updateStatusResponse = yield (0, _effects.call)(requests.updateCallRinging, callInfo);
+
+  if (updateStatusResponse.error) {
+    log.error(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
+  }
+
+  const callId = yield (0, _effects.call)(_v2.default);
+  yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
+    // TODO: Proper constants.
+    direction: 'incoming',
+    state: _constants.CALL_STATES.RINGING,
+    remoteParticipant: {
+      displayName: callerName,
+      displayNumber: callerNumber
+    },
+    // The ID that the backend uses to track this webRTC session.
+    wrtcsSessionId,
+    // The ID that the webRTC stack uses to track this webRTC session.
+    webrtcSessionId: sessionId,
+    // Whether the call was received as a slow start call or not.
+    isSlowStart
+  }));
+}
+
+/**
+ * A "call request" notification has been received for an established call
+ *    and needs to be handled.
+ *
+ * This saga is intended to be the entry point for all "call request"
+ *    notifications received from the call's remote side. This does not include
+ *    "call incoming" notifications, and so it is assumed the call has already
+ *    been established. A "call request" notification is the offer from a remote
+ *    operation, and so represents the start of the webRTC renegotiation process
+ *    for the local side.
+ * This saga does not handle the request itself. It determines if it should be
+ *    handled and what process is needed to handle it.
+ * Responsibilities:
+ *    1. Ensure this is a valid request notification.
+ *        - Call exists, Call is not ended, TODO: Call is able to receive a request.
+ *    2. Determine how the request should be handled.
+ *        - Regular or slow start negotiation process.
+ *    3. Pass the request off to the appropriate handler.
+ * @method parseCallRequest
+ * @param {Object} deps         Dependencies that the saga uses.
+ * @param {Object} params       Parameters describing the incoming call.
+ * @param {string} [params.sdp] The remote SDP offer included with the notification (if any).
+ * @param {string} params.wrtcsSessionId ID that the server uses to identify the session.
+ */
+function* parseCallRequest(deps, params) {
+  const { wrtcsSessionId, sdp } = params;
+  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  if (!targetCall) {
+    // Scenario: No call is associated with the wrtcsSessionId.
+    log.debug(`Received request for unknown wrtcsSession: ${wrtcsSessionId}. Ignoring.`);
+    return;
+  } else if (targetCall.state === _constants.CALL_STATES.ENDED) {
+    // Scenario: The associated call is ended, and should not have an active
+    //    webRTC session.
+    log.debug(`Received request for ended call: ${targetCall.id}. Ignoring.`);
+    return;
+  }
+  // TODO: Make sure the call is able to receive a `respondCallRequest`
+  //    notification (ie. has no pending operation).
+  log.info(`Received update request ${sdp ? 'with' : 'without'} SDP for call: ${targetCall.id}. Processing.`);
+
+  /**
+   * How the request should be handled depends on whether it includes an SDP.
+   *    - SDP: Regular webRTC negotiation.
+   *    - No SDP: Slow start webRTC negotiation.
+   */
+  if (sdp) {
+    yield (0, _effects.call)(negotiation.handleUpdateRequest, deps, targetCall, sdp);
+  } else {
+    yield (0, _effects.call)(negotiation.handleSlowUpdateRequest, deps, targetCall);
+  }
+}
+
+/**
+ * A "call response" notification has been received and needs to be handled.
+ *
+ * This saga is intended to be the entry point for all "call response"
+ *    notifications received from the call's remote side. A "call response"
+ *    notification is the answer to an operation that was previously
+ *    performed (a "call request"), and so represents the last step in the
+ *    webRTC negotiation process.
+ * This saga does not handle the response itself. It determines if it should be
+ *    handled and what process is needed to handle it.
+ * Responsibilities:
+ *    1. Ensure this is a valid notification.
+ *        - Call exists, Call is not ended, TODO: Call expects the response.
+ *    2. Determine what negotiation process the response is from.
+ *        - Regular or slow start negotiation process.
+ *    3. Pass the request off to the appropriate handler.
+ * @method parseCallResponse
+ * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps         Dependencies that the saga uses.
+ * @param {Object} params       Parameters describing the incoming call.
+ * @param {string} [params.sdp] The remote SDP offer included with the notification (if any).
+ * @param {string} params.wrtcsSessionId ID that the server uses to identify the session.
+ */
+function* parseCallResponse(deps, params) {
+  const { wrtcsSessionId, sdp } = params;
+  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  if (!targetCall) {
+    // Scenario: The notification is about a call that state does not know about.
+    //    Ignore the notification.
+    log.debug(`Received response for unknown wrtcsSession: ${wrtcsSessionId}. Ignoring.`);
+    return;
+  } else if (targetCall.state === _constants.CALL_STATES.ENDED) {
+    // Scenario: The notification is about a call that state says is ended.
+    //    Ignore the notification, since ended calls should not have an active
+    //    webRTC Session.
+    log.debug(`Received response for ended call: ${targetCall.id}. Ignoring.`);
+    return;
+  }
+  // TODO: Make sure the call is expecting a `respondCallUpdate` notification.
+  //    ie. has a pending operation.
+  log.info(`Received response for call: ${targetCall.id}. Processing.`);
+
+  /**
+   * Determine if the original operation was done locally or remotely. This
+   *    indicates whether it was regular or slow start negotiation.
+   * If it was from a remote operation, the call was updated as having a pending
+   *    remote operation when we received the initial slow start update request.
+   */
+  if (targetCall.pendingRemoteOp) {
+    yield (0, _effects.call)(negotiation.handleSlowUpdateResponse, deps, targetCall, sdp);
+  } else {
+    yield (0, _effects.call)(negotiation.handleUpdateResponse, deps, targetCall, sdp);
+  }
+}
+
+/**
+ * A call status notification indicating other session has ended has been received and needs to be handled.
+ *
+ * This saga is intended to handle the call status notifications that indicates a call has ended.
+ * This notification means that the session has ended on the other side and we need to end our session as well.
+ * Handling the notification will cleanup the session's media and puts the call in ENDED state.
+ * Responsibilities:
+ *    1. Have the callstack perform the required webRTC cleanup process.
+ *    2. Update call state to ENDED (via redux action).
+ * @method callStatusUpdateEnded
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   params        Parameters describing the incoming call.
+ * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
+ * @param {string}   [params.reasonText]   Human-readable explanation for the call change.
+ * @param {string}   [params.statusCode]     Code representing the reason for the call change.
+ */
+function* callStatusUpdateEnded(deps, params) {
+  const { wrtcsSessionId, reasonText, statusCode } = params;
+  const endParams = {};
+  if (reasonText && statusCode) {
+    endParams.transition = { reasonText, statusCode };
+  }
+
+  const calls = yield (0, _effects.select)(_selectors.getCalls);
+  // TODO: `find` --> IE11 support.
+  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
+
+  if (!currentCall) {
+    log.debug(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    return;
+  }
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, currentCall.id, {});
+  if (stateError) {
+    log.debug(`Error: call session not found: ${stateError.message}`);
+    return;
+  }
+
+  if (currentCall.state === _constants.CALL_STATES.ENDED) {
+    log.debug(`Error: wrtcs session call ${wrtcsSessionId} already in 'Ended' state.`);
+    return;
+  }
+
+  yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
+
+  // TODO: Don't expose these directly. Create our own convention so that transition data
+  //       can be consistent across different operations.
+  yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, endParams));
+}
+
+/**
+ * A "call status update" has been received and needs to be handled.
+ * The update specifies the server session is in "ringing" state.
+ *
+ * This saga handles the "call ringing" notification by updating the local
+ *    session state to match the server session state. This only affects the
+ *    local call state.
+ * Responsibilities:
+ *    1. Update call state to RINGING (via redux action).
+ * @method callStatusUpdateRinging
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   params        Parameters describing the incoming call.
+ * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
+ */
+function* callStatusUpdateRinging(deps, params) {
+  const { wrtcsSessionId } = params;
+
+  const calls = yield (0, _effects.select)(_selectors.getCalls);
+  // TODO: `find` --> IE11 support.
+  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
+
+  if (!currentCall) {
+    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    return;
+  }
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, currentCall.id, { state: _constants.CALL_STATES.INITIATED });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    return;
+  }
+
+  yield (0, _effects.put)(_actions.callActions.callRinging(currentCall.id));
+}
+
+/***/ }),
+
+/***/ "./src/callstack/call/support.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sendCallAudit = sendCallAudit;
+
+var _actions = __webpack_require__("./src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
+
+var _constants = __webpack_require__("./src/call/constants.js");
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Sends a call audit.
+ *
+ * This saga defines how/when a call audit is sent. It performs the signaling
+ *    operations to audit the session on the server. There are no local webRTC
+ *    operations involved.
+ * Audits are sent in a loop. The saga receives the context of the call from
+ *    the previous audit loop. It uses that to know if the loop should continue
+ *    or not.
+ * Assumptions:
+ *    1. None.
+ * Responsibilities:
+ *    1. Determine if an audit should be sent.
+ *        - Both the server or local sessions are on-going.
+ *    2. Perform signaling (if needed).
+ *    3. Dispatch "call audit" action.
+ *        - Triggers the next loop. Includes info about the call context.
+ * @method sendCallAudit
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.auditCall "Call audit" signalling function.
+ * @param {Object}   action        The action that triggered the audit.
+ */
+
+
+// Libraries.
+// Call plugin.
+function* sendCallAudit(deps, action) {
+  const { requests } = deps;
+
+  const { error, id, status } = action.payload;
+  const delayMs = error ? 5000 : 25000;
+  yield (0, _effects.delay)(delayMs);
+
+  if (!status) {
+    // If the action has no status, then the call starting triggered this audit.
+    log.debug(`Starting audits for call ${id}.`);
+  } else if (status === 'Closed') {
+    // If the previous audit returned 'Closed', then the audit loop should stop.
+    log.debug(`Call status is "Closed"; stopping call audits for call ${id}.`);
+    return;
+  } else if (status === 'Retry') {
+    // If the previous audit failed for an unknown reason, retry it.
+    log.debug(`Call status is "Unknown"; retrying failed audit for call ${id}.`);
+  }
+
+  const currentCall = yield (0, _effects.select)(_selectors.getCallById, id);
+  if (!currentCall) {
+    log.error(`Error: call id ${id} not found.`);
+    return;
+  }
+  if (currentCall.state === _constants.CALL_STATES.ENDED) {
+    log.debug(`Call id ${id} has ended; stopping call audits`);
+    return;
+  }
+
+  const updateStatusResponse = yield (0, _effects.call)(requests.auditCall, {
+    wrtcsSessionId: currentCall.wrtcsSessionId
+  });
+
+  if (updateStatusResponse.error) {
+    log.debug(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
+    yield (0, _effects.put)(_actions.callActions.sendCallAudit(id, {
+      error: updateStatusResponse.error,
+      status: updateStatusResponse.status
+    }));
+  } else {
+    log.debug(`Call audit for ${id}: Call is ${updateStatusResponse.status}.`);
+    yield (0, _effects.put)(_actions.callActions.sendCallAudit(id, { status: updateStatusResponse.status }));
+  }
+}
+
+/***/ }),
+
+/***/ "./src/callstack/utils/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sanitizeSdesFromSdp = sanitizeSdesFromSdp;
+exports.changeDtlsRoleTo = changeDtlsRoleTo;
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+const log = (0, _logs.getLogManager)().getLogger('SDPHANDLER');
+
+/**
+ * SDP handler function that should be passed into session object's `processOffer` and `processAnswer` function.
+ * This function disables old media encryption method SDES (Modifies sdp by removing crypto).
+ * However, if only SDES is available, don't disable it.
+ *
+ * @method sanitizeSdesFromSdp
+ * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
+ * @param {RTCSdpType} info Information about the session description.
+ * @param {RTCSdpType} info.type The session description's type.
+ * @param {string} info.endpoint Which end of the connection created the SDP.
+ * @param {Object} originalSdp The sdp in its initial state.
+ * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
+ */
+// Other plugins.
+function sanitizeSdesFromSdp(newSdp, info, originalSdp) {
+  for (let mLine of newSdp.media) {
+    if (mLine.crypto && mLine.fingerprint) {
+      log.debug('Removing SDES line from SDP media section.');
+      delete mLine.crypto;
+    }
+  }
+  return newSdp;
+}
+
+/**
+ * Function generator for an SDP handler function that changes the DTLS role of the SDP.
+ * @method changeDtlsRoleTo
+ * @param  {string} role
+ * @return {Function} SDP handler.
+ */
+function changeDtlsRoleTo(role) {
+  return function changeDtlsRole(newSdp, info, originalSdp) {
+    // Grab the original DTLS role for logging purposes.
+    //    Assumed that the DTLS role is the same in every media section.
+    const original = newSdp.media[0].setup;
+    log.debug(`Changing SDP DTLS role from ${original} to ${role}.`);
+
+    // Change the DTLS role in every media section.
+    newSdp.media.map(media => {
+      media.setup = role;
+      return media;
+    });
+
+    return newSdp;
+  };
+}
+
+/***/ }),
+
+/***/ "./src/callstack/webrtc/establish.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27102,7 +28537,7 @@ function* answerWebrtcSession(webRTC, mediaConstraints, sessionOptions) {
 
 /***/ }),
 
-/***/ "./src/callstack/sagas/midcall.js":
+/***/ "./src/callstack/webrtc/midcall.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27288,10 +28723,12 @@ function* webRtcRemoveMedia(webRTC, sessionOptions) {
   if (!(0, _fp.isEmpty)(invalidTrackIds)) {
     const message = 'Invalid track id(s) provided';
     log.debug(message);
-    return new _errors2.default({
-      code: _errors.callCodes.INVALID_PARAM,
-      message
-    });
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message
+      })
+    };
   }
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionOptions.sessionId);
@@ -27315,7 +28752,7 @@ function* webRtcRemoveMedia(webRTC, sessionOptions) {
 
 /***/ }),
 
-/***/ "./src/callstack/sagas/negotiation.js":
+/***/ "./src/callstack/webrtc/negotiation.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27328,11 +28765,18 @@ exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__("./src/logs/index.js");
 
+var _errors = __webpack_require__("./src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
 var _utils = __webpack_require__("./src/callstack/utils/index.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // Helpers.
+// Other Plugins
 const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 /**
@@ -27357,11 +28801,11 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
  * @param {string} sessionInfo.sessionId ID for the local webRTC Session.
  * @param {string} sessionInfo.answerSdp The received answer SDP.
  * @param {Object} targetCall Information about the call that this Session is associated with.
+ * @returns {Object} Error object if any have occured. Undefined otherwise.
  */
 
 
 // Libraries.
-// Other Plugins
 function* receivedAnswer(webRTC, sessionInfo, targetCall) {
   log.debug(`Processing SDP answer for session ${sessionInfo.sessionId}.`);
 
@@ -27398,79 +28842,33 @@ function* receivedAnswer(webRTC, sessionInfo, targetCall) {
    * Provide the answer SDP to the Session for "processing".
    * If successful, the webRTC negotiation process is considered complete.
    */
-  const error = yield (0, _effects.call)([session, 'processAnswer'], {
-    type: 'answer',
-    sdp: answerSdp
-  }, { sdpHandlers });
+  let error;
+  try {
+    yield (0, _effects.call)([session, 'processAnswer'], {
+      type: 'answer',
+      sdp: answerSdp
+    }, { sdpHandlers });
+  } catch (err) {
+    // TODO: Better error handling.
+    log.debug(`Failed to process answer: ${err.message}`);
+    let errorInfo;
+    if (err.message.includes('The order of m-lines')) {
+      errorInfo = {
+        code: 'call:10',
+        message: 'Failed to receive answer due to media negotiation mismatch.'
+      };
+    } else {
+      errorInfo = {
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: `Failed to receive answer: ${err.message}`
+      };
+    }
+    error = new _errors2.default(errorInfo);
+  }
 
   // TODO: Handle webRTC errors here.
 
   return error;
-}
-
-/***/ }),
-
-/***/ "./src/callstack/utils/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.sanitizeSdesFromSdp = sanitizeSdesFromSdp;
-exports.changeDtlsRoleTo = changeDtlsRoleTo;
-
-var _logs = __webpack_require__("./src/logs/index.js");
-
-const log = (0, _logs.getLogManager)().getLogger('SDPHANDLER');
-
-/**
- * SDP handler function that should be passed into session object's `processOffer` and `processAnswer` function.
- * This function disables old media encryption method SDES (Modifies sdp by removing crypto).
- * However, if only SDES is available, don't disable it.
- *
- * @method sanitizeSdesFromSdp
- * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
- * @param {RTCSdpType} info Information about the session description.
- * @param {RTCSdpType} info.type The session description's type.
- * @param {string} info.endpoint Which end of the connection created the SDP.
- * @param {Object} originalSdp The sdp in its initial state.
- * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
- */
-// Other plugins.
-function sanitizeSdesFromSdp(newSdp, info, originalSdp) {
-  for (let mLine of newSdp.media) {
-    if (mLine.crypto && mLine.fingerprint) {
-      log.debug('Removing SDES line from SDP media section.');
-      delete mLine.crypto;
-    }
-  }
-  return newSdp;
-}
-
-/**
- * Function generator for an SDP handler function that changes the DTLS role of the SDP.
- * @method changeDtlsRoleTo
- * @param  {string} role
- * @return {Function} SDP handler.
- */
-function changeDtlsRoleTo(role) {
-  return function changeDtlsRole(newSdp, info, originalSdp) {
-    // Grab the original DTLS role for logging purposes.
-    //    Assumed that the DTLS role is the same in every media section.
-    const original = newSdp.media[0].setup;
-    log.debug(`Changing SDP DTLS role from ${original} to ${role}.`);
-
-    // Change the DTLS role in every media section.
-    newSdp.media.map(media => {
-      media.setup = role;
-      return media;
-    });
-
-    return newSdp;
-  };
 }
 
 /***/ }),
@@ -29348,6 +30746,14 @@ const authCodes = exports.authCodes = {
 };const clickToCallCodes = exports.clickToCallCodes = {
   MISSING_ARGS: 'clickToCall:1',
   RESPONSE_ERROR: 'clickToCall:2'
+  /**
+   * Error codes for the Groups plugin.
+   * @name groupsCodes
+   */
+};const groupsCodes = exports.groupsCodes = {
+  UNKNOWN_ERROR: 'groups:1',
+  GENERIC_ERROR: 'groups:2',
+  MISSING_PARAMETERS: 'groups:3'
 
   /**
    * Error codes for the Message plugin.
@@ -29458,6 +30864,12 @@ Object.defineProperty(exports, 'callHistoryCodes', {
   enumerable: true,
   get: function () {
     return _codes.callHistoryCodes;
+  }
+});
+Object.defineProperty(exports, 'groupsCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.groupsCodes;
   }
 });
 Object.defineProperty(exports, 'messagingCodes', {
@@ -30266,7 +31678,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.4.0-KAA-1440.68862';
+  let version = '3.4.0-beta.68884';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -30477,6 +31889,1161 @@ const factoryDefaults = {
 
 /***/ }),
 
+/***/ "./src/groups/cpaas2/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _interface = __webpack_require__("./src/groups/interface/index.js");
+
+var _sagas = __webpack_require__("./src/groups/cpaas2/sagas/index.js");
+
+var sagas = _interopRequireWildcard(_sagas);
+
+var _events = __webpack_require__("./src/groups/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("./src/events/interface/actions.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Libraries.
+// Groups plugin.
+const name = 'groups';
+
+// Other plugins.
+
+
+const capabilities = ['groups'];
+
+exports.default = () => {
+  return {
+    name,
+    capabilities,
+    api: _interface.api,
+    reducer: _interface.reducer,
+    init: () => [(0, _effects.put)((0, _actions.mapEvents)(_events2.default))],
+    sagas: (0, _fp.values)(sagas)
+  };
+};
+
+/***/ }),
+
+/***/ "./src/groups/cpaas2/requests/groups.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.createRequest = createRequest;
+exports.deleteRequest = deleteRequest;
+exports.fetchRequest = fetchRequest;
+
+var _effects = __webpack_require__("./src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _helpers = __webpack_require__("./src/common/helpers/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * REST request to create a new group.
+ * @method create
+ * @param {Object} params
+ * @param {string[]} [params.participants] - List of participants to add to group when created.
+ * @param {string} [params.subject] - Subject of the group chat session.
+ * @param {string} params.name - Name of the grour chat session.
+ * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
+ * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
+ * @return {group}
+ */
+// Groups plugin.
+
+// Helpers.
+function* createRequest(params, requestInfo) {
+  // Add the group owner (current user) to list of group participants
+  const groupOwner = {
+    address: requestInfo.username,
+    'x-isAdmin': true
+  };
+  const participants = [groupOwner, ...params.participants];
+
+  const requestBody = {
+    groupChatSessionInformation: {
+      participant: participants,
+      subject: params.subject,
+      'x-image': params['image'],
+      'x-name': params['name'],
+      'x-type': params['type']
+    }
+  };
+
+  const requestOptions = {
+    method: 'POST',
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`,
+    body: (0, _stringify2.default)(requestBody)
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Create group')
+    };
+  } else {
+    return response.payload;
+  }
+}
+
+/**
+ * Request to delete a specified group.
+ * @method deleteRequest
+ * @param  {Object} payload
+ * @param  {string} payload.groupId - The ID of the group to delete.
+ * @return {Object}
+ */
+function* deleteRequest(payload, requestInfo) {
+  const groupId = payload.groupId;
+  const requestOptions = {
+    method: 'DELETE',
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${payload.groupId}`,
+    responseType: 'text'
+  };
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response)
+    };
+  } else {
+    // response does not contain the groupId of the group deleted so it is
+    // appended to the response for the reducer to access.
+    response.payload.groupId = groupId;
+    return response.payload;
+  }
+}
+
+/**
+ * REST request to fetch groups from server.
+ * @method fetchRequest
+ * @return {Group[]} - An array of Groups.
+ */
+function* fetchRequest(requestInfo) {
+  const requestOptions = {
+    method: 'GET',
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Fetch groups')
+    };
+  } else {
+    return response.payload.body.groupChatSessionInformationList.groupChatSessionInformation;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/groups/cpaas2/sagas/groups.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.createGroup = createGroup;
+exports.deleteGroup = deleteGroup;
+exports.fetch = fetch;
+
+var _groups = __webpack_require__("./src/groups/cpaas2/requests/groups.js");
+
+var _actions = __webpack_require__("./src/groups/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
+
+var _errors = __webpack_require__("./src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _logs = __webpack_require__("./src/logs/index.js");
+
+var _constants = __webpack_require__("./src/constants.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Constants
+const log = (0, _logs.getLogManager)().getLogger('GROUPS');
+
+/**
+ * Create a group.
+ * @method create
+ * @param  {Object} action An action of type `CREATE`.
+ */
+
+
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+// groups plugin.
+function* createGroup({ payload }) {
+  log.info('createGroup saga called: ', payload);
+  const params = payload.params;
+
+  // Verify that name has been supplied
+  if (!params['name']) {
+    log.info('name value is mandatory.');
+    yield (0, _effects.put)(actions.createFinish({}, new _errors2.default({
+      code: _errors.groupsCodes.MISSING_PARAMETERS,
+      message: 'Failed to create group. No name value was provided.'
+    })));
+    return;
+  }
+
+  // add the provided participants to the createListFinish
+  let participantInvites = [];
+  if (params.participants) {
+    participantInvites = params.participants.map(participant => {
+      return { address: participant.address, 'x-isAdmin': false };
+    });
+  }
+
+  const requestParams = (0, _extends3.default)({}, params, { participants: participantInvites });
+
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+  const response = yield (0, _effects.call)(_groups.createRequest, requestParams, requestInfo);
+  log.debug('Received response from create group request:', response);
+
+  if (!response.error) {
+    // parse the resourceURL to get the groupID to save in state.
+    const resourceURL = response.body.groupChatSessionInformation.resourceURL;
+    const groupId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
+    response.body.groupChatSessionInformation.groupId = groupId;
+
+    yield (0, _effects.put)(actions.createFinish(response.body));
+  } else {
+    yield (0, _effects.put)(actions.createFinish({}, {
+      error: response.error
+    }));
+  }
+  return true;
+}
+
+/**
+ * Delete a group.
+ * @method deleteGroup
+ * @param  {Object} payload Information about the group to be deleted.
+ * @return {Object}
+ */
+function* deleteGroup({ payload }) {
+  log.info('deleteGroup saga called: ', payload.groupId);
+  const groupId = payload.groupId;
+
+  // verify that a groupId was supplied
+  if (!groupId || groupId === '') {
+    log.info('groupId parameter is required for delete group operation.');
+    yield (0, _effects.put)(actions.deleteGroupFinish({}, new _errors2.default({
+      code: _errors.groupsCodes.MISSING_PARAMETERS,
+      message: 'Failed to delete group. groupId parameter is required.'
+    })));
+    return;
+  }
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+  const response = yield (0, _effects.call)(_groups.deleteRequest, payload, requestInfo);
+  log.debug('Received response from deleteGroup request:', response);
+
+  if (!response.error) {
+    yield (0, _effects.put)(actions.deleteGroupFinish({ groupId: response.groupId }));
+  } else {
+    yield (0, _effects.put)(actions.deleteGroupFinish({ error: response.error }));
+  }
+}
+
+/**
+ * Fetches all existing groups from the server.
+ * @method fetch
+ * @return {Group[]} - An array of Groups.
+ */
+function* fetch({ payload }) {
+  log.info('fetch saga called: ', payload);
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+  const response = yield (0, _effects.call)(_groups.fetchRequest, requestInfo);
+  if (!response.error) {
+    yield (0, _effects.put)(actions.fetchGroupsFinish({ groups: response }));
+  } else {
+    yield (0, _effects.put)(actions.fetchGroupsFinish({ error: response.error }));
+  }
+
+  log.debug('Received response from fetch request:', response);
+}
+
+/***/ }),
+
+/***/ "./src/groups/cpaas2/sagas/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.processCreateGroup = processCreateGroup;
+exports.processDeleteGroup = processDeleteGroup;
+exports.fetch = fetch;
+
+var _groups = __webpack_require__("./src/groups/cpaas2/sagas/groups.js");
+
+var groupSagas = _interopRequireWildcard(_groups);
+
+var _actionTypes = __webpack_require__("./src/groups/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Create group.
+ * @method processCreateGroup
+ */
+function* processCreateGroup() {
+  yield (0, _effects.takeEvery)(actionTypes.CREATE_GROUP, groupSagas.createGroup);
+}
+
+/**
+ * Delete group.
+ * @method create
+ */
+
+
+// Libraries.
+/**
+ * Groups saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// groups plugin.
+function* processDeleteGroup() {
+  yield (0, _effects.takeEvery)(actionTypes.DELETE_GROUP, groupSagas.deleteGroup);
+}
+
+/**
+ * Fetch groups.
+ * @method fetch
+ */
+function* fetch() {
+  yield (0, _effects.takeEvery)(actionTypes.FETCH_GROUPS, groupSagas.fetch);
+}
+
+/***/ }),
+
+/***/ "./src/groups/interface/actionTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const prefix = '@@KANDY/GROUPS/';
+
+// Admin actions
+const ADD_PARTICIPANT = exports.ADD_PARTICIPANT = prefix + 'ADD_PARTICIPANT';
+const REMOVE_PARTICIPANT = exports.REMOVE_PARTICIPANT = prefix + 'REMOVE_PARTICIPANT';
+const GET_PARTICIPANTS = exports.GET_PARTICIPANTS = prefix + 'GET_PARTICIPANTS';
+const DELETE_GROUP = exports.DELETE_GROUP = prefix + 'DELETE_GROUP';
+const DELETE_GROUP_FINISH = exports.DELETE_GROUP_FINISH = prefix + 'DELETE_GROUP_FINISH';
+
+// User actions
+const GET_ALL_GROUPS = exports.GET_ALL_GROUPS = prefix + 'GET_ALL_GROUPS';
+const GET_GROUP = exports.GET_GROUP = prefix + 'GET_GROUP';
+const FETCH_GROUPS = exports.FETCH_GROUPS = prefix + 'FETCH_GROUPS';
+const FETCH_GROUPS_FINISH = exports.FETCH_GROUPS_FINISH = prefix + 'FETCH_GROUPS_FINISH';
+const CREATE_GROUP = exports.CREATE_GROUP = prefix + 'CREATE_GROUP';
+const CREATE_GROUP_FINISH = exports.CREATE_GROUP_FINISH = prefix + 'CREATE_GROUP_FINISH';
+const LEAVE_GROUP = exports.LEAVE_GROUP = prefix + 'LEAVE_GROUP';
+const ACCEPT_INVITATION = exports.ACCEPT_INVITATION = prefix + 'ACCEPT_INVITATION';
+const REJECT_INVITATION = exports.REJECT_INVITATION = prefix + 'REJECT_INVITATION';
+
+/***/ }),
+
+/***/ "./src/groups/interface/actions.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.getAll = getAll;
+exports.get = get;
+exports.fetchGroups = fetchGroups;
+exports.fetchGroupsFinish = fetchGroupsFinish;
+exports.create = create;
+exports.createFinish = createFinish;
+exports.leave = leave;
+exports.acceptInvitation = acceptInvitation;
+exports.rejectInvitation = rejectInvitation;
+exports.addParticipant = addParticipant;
+exports.removeParticipant = removeParticipant;
+exports.getParticipants = getParticipants;
+exports.deleteGroup = deleteGroup;
+exports.deleteGroupFinish = deleteGroupFinish;
+
+var _actionTypes = __webpack_require__("./src/groups/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Helper function for formatting actions.
+ * Ensures that actions follow an expectable format.
+ * @method actionFormatter
+ * @param  {string}  actionType   [description]
+ * @param  {Object} [payload={}] The action payload.
+ * @param  {BasicError} [payload.error] For an error action, the error should be provided.
+ * @param  {Object} [meta={}] The action meta data.
+ * @return {Object}
+ */
+function actionFormatter(actionType, payload = {}, meta = {}) {
+  return {
+    type: actionType,
+    payload: (0, _extends3.default)({}, payload),
+    error: !!payload.error,
+    meta: (0, _extends3.default)({}, meta)
+  };
+}
+
+/**
+ * Retrieves existing groups from state
+ * @return {Object}          A Flux Standard Action for GET_ALL
+ */
+// Groups plugin.
+function getAll() {
+  return {
+    type: actionTypes.GET_ALL
+  };
+}
+
+/**
+ * Retrieve a group from state
+ * @param {string} groupId - GroupId to retrieve.
+ * @return {Object}          A Flux Standard Action for GET_GROUP
+ */
+function get(groupId) {
+  return {
+    type: actionTypes.GET_GROUP,
+    payload: {
+      groupId
+    }
+  };
+}
+
+/**
+ * Fetches existing groups from the server
+ * @method fetchGroups
+ * @return {Object} A Flux Standard Action for FETCH_GROUPS
+ */
+function fetchGroups() {
+  return {
+    type: actionTypes.FETCH_GROUPS
+  };
+}
+
+/**
+ * A notice that fetchGroups has finished.
+ * @method fetchGroupsFinish
+ * @return {Object} A flux standard action.
+ */
+function fetchGroupsFinish({ groups, error }) {
+  return actionFormatter(actionTypes.FETCH_GROUPS_FINISH, { groups, error });
+}
+
+/**
+ * Create a new group
+ * @param {Object} params
+ * @param {string} params.userId - The Id of the current user.
+ * @param {string[]} params.users - Array of users to add to group upon creation.
+ * @param {string} params.image - The image for the group.
+ * @param {string} params.type - Type of group: ie 'Open', 'Closed'. //ToDo Verify this
+ * @return {Object}          A Flux Standard Action for CREATE_GROUP
+ */
+function create(params = {}) {
+  return actionFormatter(actionTypes.CREATE_GROUP, { params });
+}
+
+function createFinish(group, error) {
+  return actionFormatter(actionTypes.CREATE_GROUP_FINISH, { group, error });
+}
+
+/**
+ * Leave a group
+ * @param {string} groupId - GroupId of group to leave.
+ * @return {Object}          A Flux Standard Action for LEAVE_GROUP
+ */
+function leave(groupId) {
+  return {
+    type: actionTypes.LEAVE_GROUP,
+    payload: {
+      groupId
+    }
+  };
+}
+
+/**
+ * Accept a group invitation
+ * @param {string} groupId - GroupId to retrieve.
+ * @return {Object}          A Flux Standard Action for ACCEPT_INVITATION
+ */
+function acceptInvitation(groupId) {
+  return {
+    type: actionTypes.ACCEPT_INVITATION,
+    payload: {
+      groupId
+    }
+  };
+}
+
+/**
+ * Reject a group invitation
+ * @param {string} groupId - GroupId to reject.
+ * @return {Object}          A Flux Standard Action for REJECT_INVITATION
+ */
+function rejectInvitation(groupId) {
+  return {
+    type: actionTypes.REJECT_INVITATION,
+    payload: {
+      groupId
+    }
+  };
+}
+
+/**
+ * Add a participant to a group
+ * @param {string} groupId - GroupId to add participant to.
+ * @param {Object} participant - Participant to add to the group.
+ * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
+ */
+function addParticipant(groupId, participant) {
+  return {
+    type: actionTypes.ADD_PARTICIPANT,
+    payload: {
+      groupId,
+      participant
+    }
+  };
+}
+
+/**
+ * Remove a participant from a group
+ * @param {string} groupId - GroupId to remove participant from.
+ * @param {Object} participant - Participant to remove from the group.
+ * @return {Object}          A Flux Standard Action for REMOVE_PARTICIPANT
+ */
+function removeParticipant(groupId, participant) {
+  return {
+    type: actionTypes.REMOVE_PARTICIPANT,
+    payload: {
+      groupId,
+      participant
+    }
+  };
+}
+
+/**
+ * Get particpants
+ * @param {string} groupId - GroupId to request participants from.
+ * @return {Object}          A Flux Standard Action for GET_PARTICIPANTS
+ */
+function getParticipants(groupId) {
+  return {
+    type: actionTypes.GET_PARTICIPANTS,
+    payload: {
+      groupId
+    }
+  };
+}
+
+/**
+ * A request to delete a group.
+ * @param {string} groupId - GroupId of group to delete.
+ * @return {Object}          A Flux Standard Action for DELETE_GROUP
+ */
+function deleteGroup(groupId) {
+  return actionFormatter(actionTypes.DELETE_GROUP, { groupId });
+}
+
+/**
+ * A notice that deletGroup has finished.
+ * @method deleteGroupFinish
+ * @param  {Object} groupId Id of the group that was deleted.
+ * @param  {Object} [error] An error object.
+ * @return {Object} A flux standard action.
+ */
+function deleteGroupFinish({ groupId, error }) {
+  return actionFormatter(actionTypes.DELETE_GROUP_FINISH, { groupId, error });
+}
+
+/***/ }),
+
+/***/ "./src/groups/interface/api.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (context) {
+  const groupsApi = {
+    /**
+     * Create a group.
+     * User creating group will become the admin of that group.
+     *
+     * @public
+     * @memberof Groups
+     * @method create
+     * @param {Object} params
+     * @param {string[]} [params.participants] - List of participants to add to group when created.
+     * @param {string} [params.subject] - Subject of the grour chat session.
+     * @param {string} params.name - Name of the grour chat session.
+     * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
+     * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
+     */
+    create(params) {
+      context.dispatch(actions.create(params));
+    },
+
+    /**
+     * Fetches existing groups from the server.
+     * This will update the store with the retrieved groups, making them
+     * known locally. They can then be accessed using `get` or 'getAll'.
+     *
+     * @public
+     * @memberof Groups
+     * @method fetch
+     *
+     */
+    fetch() {
+      context.dispatch(actions.fetchGroups());
+    },
+
+    /**
+     * Get information for all groups known locally.
+     *
+     * @public
+     * @memberof Groups
+     * @method getAll
+     * @return {Group[]} - An array of Groups.
+     */
+    getAll() {
+      return selectors.getAllGroups(context.getState());
+    },
+
+    /**
+     * Retrieve information about a paticular group known locally.
+     *
+     * @public
+     * @memberof Groups
+     * @method get
+     * @param {string} groupId - The Id of the group to retrieve information for.
+     * @return {Group} - Group information.
+     */
+    get(groupId) {
+      return selectors.getGroup(context.getState(), groupId);
+    },
+
+    /**
+     * Retrieve list of particpants from a group know locally.
+     *
+     * @public
+     * @memberof Groups
+     * @method getParticipants
+     * @param {string} groupId - The Id of the group to get participants list.
+     * @return {Participant[]} - A list of participants.
+     */
+    getParticipants(groupId) {
+      return selectors.getParticipants(context.getState(), groupId);
+    },
+
+    /**
+     * Leave a group.
+     *
+     * @public
+     * @memberof Groups
+     * @method leave
+     * @param {string} groupId - The Id of the group to leave.
+     */
+    leave(groupId) {
+      context.dispatch(actions.leave(groupId));
+    },
+
+    /**
+     * Accept invitation to a group.
+     *
+     * @public
+     * @memberof Groups
+     * @method acceptInvitation
+     * @param {string} groupId - The Id of the group to accept an invitation to.
+     */
+    acceptInvitation(groupId) {
+      context.dispatch(actions.acceptInvitation(groupId));
+    },
+
+    /**
+     * Reject invitation to a group.
+     *
+     * @public
+     * @memberof Groups
+     * @method rejectInvitation
+     * @param {string} groupId - The Id of the group to reject an invitation to.
+     */
+    rejectInvitation(groupId) {
+      context.dispatch(actions.rejectInvitation(groupId));
+    },
+
+    /**
+     * Add participant to a group.
+     *
+     * @public
+     * @memberof Groups
+     * @method addParticipant
+     * @param {string} groupId - The Id of the group to add participant to.
+     * @param {string} participant - The userId of participant to add.
+     */
+    addParticipant(groupId, participant) {
+      context.dispatch(actions.addParticipant(groupId, participant));
+    },
+
+    /**
+     * Remove participant from a group.
+     *
+     * @public
+     * @memberof Groups
+     * @method removeParticipant
+     * @param {string} groupId - The Id of the group to remove participant from.
+     * @param {string} participant - The userId of participant to remove.
+     */
+    removeParticipant(groupId, participant) {
+      context.dispatch(actions.removeParticipant(groupId, participant));
+    },
+
+    /**
+     * Delete a group.
+     * The group is deleted and all participants will receive a 'group:delete' notification.
+     *
+     * @public
+     * @memberof Groups
+     * @method delete
+     * @param {string} groupId - The Id of the group to delete.
+     */
+    delete(groupId) {
+      context.dispatch(actions.deleteGroup(groupId));
+    }
+  };
+  return { groups: groupsApi };
+};
+
+var _actions = __webpack_require__("./src/groups/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("./src/groups/interface/selectors.js");
+
+var selectors = _interopRequireWildcard(_selectors);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/***/ }),
+
+/***/ "./src/groups/interface/eventTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * An new group has been created.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:new
+ * @param {Object} params
+ * @param {string} params.groupId The group that was created.
+ * @param {Array}  params.participants List of participants added to the new group.
+ */
+const GROUP_NEW = exports.GROUP_NEW = 'group:new';
+
+/**
+ * A group has been modified.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:change
+ * @param {Object} params
+ * @param {string} params.groupId The group that changed.
+ * @param {Array}  params.participants List of participants in the group.
+ */
+const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
+
+/**
+ * A group has been deleted.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:delete
+ * @param {Object} params
+ * @param {string} params.groupId The group that was deleted.
+ */
+const DELETE_GROUP = exports.DELETE_GROUP = 'group:delete';
+
+/**
+ * An invitation to a group has been accepted or declined.
+ * A status of 'connected' means the participant has accpeted the invitaion.
+ * A status of 'disconnected' means the participant has declined the invitaion.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:invitation
+ * @param {Object} params
+ * @param {string} params.groupId The group that invitation is for.
+ * @param {string} params.participant The name of the participant.
+ * @param {string} params.status The status of the participant.
+ */
+const GROUP_INVITATION = exports.GROUP_INVITATION = 'group:invitation';
+
+/**
+ * An error occured with groups.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:error
+ * @param {Object} params
+ * @param {BasicError} params.error The Basic error object.
+ */
+const GROUP_ERROR = exports.GROUP_ERROR = 'group:error';
+
+/***/ }),
+
+/***/ "./src/groups/interface/events.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _actionTypes = __webpack_require__("./src/groups/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _eventTypes = __webpack_require__("./src/groups/interface/eventTypes.js");
+
+var eventTypes = _interopRequireWildcard(_eventTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Helper function for error events.
+function groupsError(action) {
+  if (action.error) {
+    return {
+      type: eventTypes.ERROR,
+      args: { error: action.payload }
+    };
+  }
+}
+
+let events = {};
+
+events[actionTypes.CREATE_GROUP] = function (action) {
+  return {
+    type: eventTypes.GROUP_NEW,
+    args: {
+      groupId: action.payload.groupId,
+      participants: action.payload.participants
+    }
+  };
+};
+
+events[actionTypes.DELETE_GROUP] = function (action) {
+  return {
+    type: eventTypes.DELETE_GROUP,
+    args: {
+      groupId: action.payload.groupId
+    }
+  };
+};
+
+events[actionTypes.ADD_PARTICIPANT] = function (action) {
+  return {
+    type: eventTypes.GROUP_CHANGE,
+    args: {
+      groupId: action.payload.groupId,
+      participant: action.payload.participant
+    }
+  };
+};
+
+events[actionTypes.REMOVE_PARTICIPANT] = function (action) {
+  return {
+    type: eventTypes.GROUP_CHANGE,
+    args: {
+      groupId: action.payload.groupId,
+      participant: action.payload.participant
+    }
+  };
+};
+
+events[actionTypes.LEAVE_GROUP] = function (action) {
+  return {
+    type: eventTypes.GROUP_CHANGE,
+    args: {
+      groupId: action.payload.groupId
+    }
+  };
+};
+
+events[actionTypes.ACCEPT_INVITATION] = function (action) {
+  return {
+    type: eventTypes.GROUP_INVITATION,
+    args: {
+      groupId: action.payload.groupId
+    }
+  };
+};
+
+events[actionTypes.REJECT_INVITATION] = function (action) {
+  return {
+    type: eventTypes.GROUP_INVITATION,
+    args: {
+      groupId: action.payload.groupId
+    }
+  };
+};
+
+// TODO: Should have events to notifiy of successful operations for these actions.
+events[actionTypes.GET_ALL_GROUPS] = groupsError;
+events[actionTypes.GET_GROUP] = groupsError;
+events[actionTypes.FETCH_GROUPS] = groupsError;
+events[actionTypes.GET_PARTICIPANTS] = groupsError;
+
+exports.default = events;
+
+/***/ }),
+
+/***/ "./src/groups/interface/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _api = __webpack_require__("./src/groups/interface/api.js");
+
+Object.defineProperty(exports, 'api', {
+  enumerable: true,
+  get: function () {
+    return _interopRequireDefault(_api).default;
+  }
+});
+
+var _reducers = __webpack_require__("./src/groups/interface/reducers.js");
+
+Object.defineProperty(exports, 'reducer', {
+  enumerable: true,
+  get: function () {
+    return _interopRequireDefault(_reducers).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ "./src/groups/interface/reducers.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _actionTypes = __webpack_require__("./src/groups/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries
+const reducers = {};
+
+reducers[actionTypes.CREATE_GROUP_FINISH] = {
+  next(state, action) {
+    const newGroup = action.payload.group.groupChatSessionInformation;
+    return (0, _extends3.default)({}, state, { groups: [...state.groups, newGroup] });
+  }
+};
+
+/*
+ * Removes the specified group from state.
+ */
+reducers[actionTypes.DELETE_GROUP_FINISH] = {
+  next(state, action) {
+    const groupId = action.payload.groupId;
+    return (0, _extends3.default)({}, state, {
+      groups: state.groups.filter(group => group.groupId !== groupId.toString())
+    });
+  }
+};
+
+/*
+ * Fetch list of groups from server and merges with state.
+ */
+reducers[actionTypes.FETCH_GROUPS_FINISH] = {
+  next(state, action) {
+    const fetchedGroups = action.payload.groups;
+
+    // add groupId as a new property to each group. The groupId is
+    // parsed from the group's resourceURL
+    fetchedGroups.map(function (group) {
+      group.groupId = group.resourceURL.substring(group.resourceURL.lastIndexOf('/') + 1);
+      return group;
+    });
+
+    // merge the current state with the fetched results
+    const mergedGroups = (0, _fp.unionBy)('groupId', state.groups, fetchedGroups);
+
+    return (0, _extends3.default)({}, state, {
+      groups: mergedGroups
+    });
+  }
+};
+
+const reducer = (0, _reduxActions.handleActions)(reducers, { groups: [] });
+exports.default = reducer;
+
+/***/ }),
+
+/***/ "./src/groups/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getAllGroups = getAllGroups;
+exports.getGroup = getGroup;
+exports.getParticipants = getParticipants;
+/**
+ * Retrieves all the groups in state.
+ * @method getAllGroups
+ * @param  {Object} state Redux state.
+ * @return {[Object]}  List of group informations for users.
+ */
+function getAllGroups(state) {
+  console.log('getAllGroups selector called');
+  return null;
+}
+
+/**
+ * Retrieves group information from state.
+ * @method get
+ * @param  {Object} state Redux state.
+ * @return {Object}  Group information.
+ */
+function getGroup(state, groupId) {
+  console.log('getGroup selector called');
+  return null;
+}
+
+/**
+ * Retrieves list of participants from a group in state.
+ * @method getParticipants
+ * @param  {Object} state Redux state.
+ * @return {Object}  Group information.
+ */
+function getParticipants(state, groupId) {
+  return null;
+}
+
+/***/ }),
+
 /***/ "./src/index.common.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -30615,23 +33182,27 @@ var _cpaas9 = __webpack_require__("./src/presence/cpaas2/index.js");
 
 var _cpaas10 = _interopRequireDefault(_cpaas9);
 
-var _cpaas11 = __webpack_require__("./src/subscription/cpaas2/index.js");
+var _cpaas11 = __webpack_require__("./src/groups/cpaas2/index.js");
 
 var _cpaas12 = _interopRequireDefault(_cpaas11);
+
+var _cpaas13 = __webpack_require__("./src/subscription/cpaas2/index.js");
+
+var _cpaas14 = _interopRequireDefault(_cpaas13);
 
 var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
 
 var _codecRemover2 = _interopRequireDefault(_codecRemover);
 
-var _cpaas13 = __webpack_require__("./src/users/cpaas2/index.js");
+var _cpaas15 = __webpack_require__("./src/users/cpaas2/index.js");
 
-var _cpaas14 = _interopRequireDefault(_cpaas13);
+var _cpaas16 = _interopRequireDefault(_cpaas15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default },
 // TODO: Don't _always_ include the Proxy Plugin.
-{ name: 'proxy', fn: _webrtcProxy2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'subscription', fn: _cpaas12.default }, { name: 'users', fn: _cpaas14.default }];
+{ name: 'proxy', fn: _webrtcProxy2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'groups', fn: _cpaas12.default }, { name: 'subscription', fn: _cpaas14.default }, { name: 'users', fn: _cpaas16.default }];
 
 function root(options = {}, plugins = []) {
   return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
@@ -37347,7 +39918,8 @@ const log = (0, _logs.getLogManager)().getLogger('REQUEST');
  */
 const responseTypes = (0, _freeze2.default)({
   json: 'json',
-  blob: 'blob'
+  blob: 'blob',
+  text: 'text'
 });
 
 /*
@@ -37445,12 +40017,24 @@ async function makeRequest(options, requestId) {
         error: 'REQUEST',
         result
       };
+    } else if (response.status === 204) {
+      /*
+       * A `204 (No Content)` response indicates a success, but with no content to return.
+       * Avoid parsing the response because there isn't one.
+       */
+      responseBody = {};
+      return {
+        body: responseBody,
+        error: false,
+        result
+      };
     } else {
       if (responseType === responseTypes.json) {
         responseBody = await response.json();
-      } else {
-        // `blob` is the only other possible value for responseType
+      } else if (responseType === responseTypes.blob) {
         responseBody = await response.blob();
+      } else if (responseType === responseTypes.text) {
+        responseBody = await response.text();
       }
       return {
         body: responseBody,
@@ -38828,6 +41412,15 @@ Object.defineProperty(exports, "__esModule", {
  */
 const SUB_CHANGE = exports.SUB_CHANGE = 'subscription:change';
 
+/**
+ * Subscription state has changed.
+ * The new state can be retrieved by calling the `getSubscribedServices` API.
+ * @public
+ * @memberof Subscription
+ * @event subscription:error
+ */
+const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
+
 /***/ }),
 
 /***/ "./src/subscription/interface/events.js":
@@ -38852,7 +41445,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function subChangeEvent(action) {
   return {
-    type: eventTypes.SUB_CHANGE,
+    type: action.error ? eventTypes.SUB_ERROR : eventTypes.SUB_CHANGE,
     args: action.error ? { error: action.payload } : {}
   };
 }
@@ -41481,6 +44074,13 @@ function setListeners(session, emit, END = 'END') {
     }));
   };
 
+  const trackRemoved = ({ local, trackId }) => {
+    emit(_actions.sessionActions.sessionTrackRemoved(session.id, {
+      local,
+      trackId
+    }));
+  };
+
   const trackEnded = ({ local, trackId }) => {
     /**
      * When a track has ended,
@@ -41508,10 +44108,12 @@ function setListeners(session, emit, END = 'END') {
   };
 
   session.on('new:track', newTrack);
+  session.on('track:removed', trackRemoved);
   session.on('track:ended', trackEnded);
 
   const unsubscribe = () => {
     session.off('new:track', newTrack);
+    session.off('track:removed', trackRemoved);
     session.off('track:ended', trackEnded);
   };
   return unsubscribe;
@@ -41838,7 +44440,11 @@ var _sagas = __webpack_require__("./src/webrtc/sagas/index.js");
 
 var sagas = _interopRequireWildcard(_sagas);
 
-var _actions = __webpack_require__("./src/events/interface/actions.js");
+var _actions = __webpack_require__("./src/webrtc/interface/actions/index.js");
+
+var _actions2 = __webpack_require__("./src/events/interface/actions.js");
+
+var _logs = __webpack_require__("./src/logs/index.js");
 
 var _utils = __webpack_require__("./src/common/utils.js");
 
@@ -41855,21 +44461,23 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Helpers.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('WEBRTC');
+
+// Libraries.
+// Webrtc plugin.
 function initializeStack() {
   return (0, _kandyWebrtc2.default)();
 }
 
-// Libraries.
-
-
-// Other plugins.
-// Webrtc plugin.
 function webRtcPlugin() {
   // Initialize the webRTC.
   const webRTC = (0, _kandyWebrtc2.default)();
 
   function* init({ webRTC }) {
-    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+    yield (0, _effects.put)((0, _actions2.mapEvents)(_events2.default));
 
     // Wrap the webrtc sagas in a function that provides them with the webRTC stack.
     const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
@@ -41884,6 +44492,11 @@ function webRtcPlugin() {
     // Watch for events from the webRTC stack.
     // TODO: Don't also pass in the entire stack.
     yield (0, _effects.fork)(_channels2.default, webRTC.managers, webRTC);
+
+    // Use the webRTC stack to check the browser details.
+    const details = yield (0, _effects.call)([webRTC, 'getBrowserDetails']);
+    log.info(`Browser details: ${details.browser}, version ${details.version}.`);
+    yield (0, _effects.put)(_actions.miscActions.setBrowserDetails(details));
   }
 
   return {
@@ -41943,6 +44556,7 @@ const SESSION_ADDED = exports.SESSION_ADDED = sessionPrefix + 'ADDED';
 const SESSION_REMOVED = exports.SESSION_REMOVED = sessionPrefix + 'REMOVED';
 
 const SESSION_NEW_TRACK = exports.SESSION_NEW_TRACK = sessionPrefix + 'NEW_TRACK';
+const SESSION_TRACK_REMOVED = exports.SESSION_TRACK_REMOVED = sessionPrefix + 'TRACK_REMOVED';
 const SESSION_TRACK_ENDED = exports.SESSION_TRACK_ENDED = sessionPrefix + 'TRACK_ENDED';
 const SESSION_CHANGE = exports.SESSION_CHANGE = sessionPrefix + 'CHANGE';
 
@@ -41958,6 +44572,11 @@ const MEDIA_CHANGE = exports.MEDIA_CHANGE = mediaPrefix + 'CHANGE';
 const MEDIA_NEW_TRACK = exports.MEDIA_NEW_TRACK = mediaPrefix + 'NEW_TRACK';
 const MEDIA_TRACK_REMOVED = exports.MEDIA_TRACK_REMOVED = mediaPrefix + 'TRACK_REMOVED';
 const MEDIA_TRACK_ENDED = exports.MEDIA_TRACK_ENDED = mediaPrefix + 'TRACK_ENDED';
+
+/**
+ * Misc. action types.
+ */
+const SET_BROWSER_DETAILS = exports.SET_BROWSER_DETAILS = prefix + 'SET_BROWSER_DETAILS';
 
 /***/ }),
 
@@ -41996,7 +44615,7 @@ function devicesChanged(devices) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mediaActions = exports.sessionActions = exports.trackActions = exports.deviceActions = undefined;
+exports.miscActions = exports.mediaActions = exports.sessionActions = exports.trackActions = exports.deviceActions = undefined;
 
 var _devices = __webpack_require__("./src/webrtc/interface/actions/devices.js");
 
@@ -42014,6 +44633,10 @@ var _media = __webpack_require__("./src/webrtc/interface/actions/media.js");
 
 var mediaActionsImport = _interopRequireWildcard(_media);
 
+var _misc = __webpack_require__("./src/webrtc/interface/actions/misc.js");
+
+var miscActionsImport = _interopRequireWildcard(_misc);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Apparently the following doesn't work:
@@ -42023,6 +44646,7 @@ const deviceActions = exports.deviceActions = deviceActionsImport;
 const trackActions = exports.trackActions = trackActionsImport;
 const sessionActions = exports.sessionActions = sessionActionsImport;
 const mediaActions = exports.mediaActions = mediaActionsImport;
+const miscActions = exports.miscActions = miscActionsImport;
 
 /***/ }),
 
@@ -42097,6 +44721,40 @@ function mediaTrackEnded(id, params) {
 
 /***/ }),
 
+/***/ "./src/webrtc/interface/actions/misc.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setBrowserDetails = setBrowserDetails;
+
+var _actionTypes = __webpack_require__("./src/webrtc/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Action creator
+ * @method setBrowserDetails
+ * @param  {Object} details
+ * @param  {string} details.browser
+ * @param  {number} details.version
+ * @return {Object} A Flux-Standard-action.
+ */
+function setBrowserDetails(details) {
+  return {
+    type: actionTypes.SET_BROWSER_DETAILS,
+    payload: details
+  };
+} // Webrtc plugin.
+
+/***/ }),
+
 /***/ "./src/webrtc/interface/actions/sessions.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -42114,6 +44772,7 @@ var _extends3 = _interopRequireDefault(_extends2);
 exports.sessionAdded = sessionAdded;
 exports.sessionRemoved = sessionRemoved;
 exports.sessionNewTrack = sessionNewTrack;
+exports.sessionTrackRemoved = sessionTrackRemoved;
 exports.sessionTrackEnded = sessionTrackEnded;
 exports.sessionChange = sessionChange;
 
@@ -42156,6 +44815,10 @@ function sessionRemoved(id, params) {
 
 function sessionNewTrack(id, params) {
   return sessionActionHelper(actionTypes.SESSION_NEW_TRACK, id, params);
+}
+
+function sessionTrackRemoved(id, params) {
+  return sessionActionHelper(actionTypes.SESSION_TRACK_REMOVED, id, params);
 }
 
 function sessionTrackEnded(id, params) {
@@ -42279,6 +44942,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
+var _selectors = __webpack_require__("./src/webrtc/interface/selectors.js");
+
 var _media = __webpack_require__("./src/webrtc/interface/api/media.js");
 
 var _media2 = _interopRequireDefault(_media);
@@ -42290,11 +44955,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @method api
  * @return {Object}
  */
+// Webrtc plugin.
 function api(context) {
   return {
-    media: (0, _media2.default)(context)
+    media: (0, _media2.default)(context),
+
+    /**
+     * Retrieve information about the browser being used.
+     * Browser information being defined indicates that the browser supports
+     *    basic webRTC scenarios.
+     * @public
+     * @method getBrowserDetails
+     * @return {Object} Object containing `browser` and `version` information.
+     * @example
+     * const details = client.getBrowserDetails()
+     *
+     * log(`Browser in use: ${details.browser}, version ${details.version}.`)
+     */
+    getBrowserDetails() {
+      return (0, _selectors.getBrowserDetails)(context.getState());
+    }
   };
 }
+
+// Namespaced APIs.
 
 /***/ }),
 
@@ -42608,6 +45292,45 @@ exports.default = {
 
 /***/ }),
 
+/***/ "./src/webrtc/interface/reducers/browser.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _actionTypes = __webpack_require__("./src/webrtc/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * The devices substate keeps tracks the of the media devices available for use.
+ */
+// Call plugin.
+const reducers = {};
+
+// Replace old devices with newly checked devices.
+
+
+// Libraries.
+reducers[actionTypes.SET_BROWSER_DETAILS] = {
+  next(state, action) {
+    return action.payload;
+  }
+};
+
+const reducer = (0, _reduxActions.handleActions)(reducers, {});
+exports.default = reducer;
+
+/***/ }),
+
 /***/ "./src/webrtc/interface/reducers/devices.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -42669,7 +45392,8 @@ exports.default = function (state = {}, action) {
     devices: (0, _devices2.default)(state.devices, action),
     tracks: (0, _tracks2.default)(state.tracks, action),
     sessions: (0, _sessions2.default)(state.sessions, action),
-    media: (0, _media2.default)(state.media, action)
+    media: (0, _media2.default)(state.media, action),
+    browser: (0, _browser2.default)(state.browser, action)
   };
 };
 
@@ -42688,6 +45412,10 @@ var _tracks2 = _interopRequireDefault(_tracks);
 var _sessions = __webpack_require__("./src/webrtc/interface/reducers/sessions.js");
 
 var _sessions2 = _interopRequireDefault(_sessions);
+
+var _browser = __webpack_require__("./src/webrtc/interface/reducers/browser.js");
+
+var _browser2 = _interopRequireDefault(_browser);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42853,6 +45581,21 @@ sessionReducers[actionTypes.SESSION_NEW_TRACK] = {
   }
 };
 
+sessionReducers[actionTypes.SESSION_TRACK_REMOVED] = {
+  next(state, action) {
+    const removeTrack = trackId => trackId === action.payload.trackId;
+    if (action.payload.local) {
+      return (0, _extends3.default)({}, state, {
+        localTracks: (0, _fp.remove)(removeTrack, state.localTracks)
+      });
+    } else {
+      return (0, _extends3.default)({}, state, {
+        remoteTracks: (0, _fp.remove)(removeTrack, state.remoteTracks)
+      });
+    }
+  }
+};
+
 sessionReducers[actionTypes.SESSION_TRACK_ENDED] = {
   next(state, action) {
     const removeTrack = trackId => trackId === action.payload.trackId;
@@ -42870,7 +45613,7 @@ sessionReducers[actionTypes.SESSION_TRACK_ENDED] = {
 
 const sessionReducer = (0, _reduxActions.handleActions)(sessionReducers, {});
 
-const specificSessionActions = (0, _reduxActions.combineActions)(actionTypes.SESSION_NEW_TRACK, actionTypes.SESSION_TRACK_ENDED);
+const specificSessionActions = (0, _reduxActions.combineActions)(actionTypes.SESSION_NEW_TRACK, actionTypes.SESSION_TRACK_REMOVED, actionTypes.SESSION_TRACK_ENDED);
 
 reducers[specificSessionActions] = (state, action) => {
   return state.map(session => {
@@ -43023,6 +45766,7 @@ exports.getTrackById = getTrackById;
 exports.getMedia = getMedia;
 exports.getMediaById = getMediaById;
 exports.getMediaByCallId = getMediaByCallId;
+exports.getBrowserDetails = getBrowserDetails;
 
 var _selectors = __webpack_require__("./src/call/interfaceNew/selectors.js");
 
@@ -43100,6 +45844,16 @@ function getMediaByCallId(state, callId) {
   } else {
     return [];
   }
+}
+
+/**
+ * Retrieves information about the browser.
+ * @method getBrowserDetails
+ * @param  {Object} state Redux state.
+ * @return {Object}
+ */
+function getBrowserDetails(state) {
+  return state.webrtc.browser;
 }
 
 /***/ }),
@@ -43653,8 +46407,8 @@ function initializeRemote(config) {
   return actionHelper(actionTypes.INITIALIZE, { config });
 }
 
-function initializeRemoteFinish({ error }) {
-  return actionHelper(actionTypes.INITIALIZE_FINISH, { error });
+function initializeRemoteFinish({ error, browser }) {
+  return actionHelper(actionTypes.INITIALIZE_FINISH, { error, browser });
 }
 
 /***/ }),
@@ -43774,6 +46528,23 @@ function api({ dispatch, getState }) {
      */
     getInfo() {
       return (0, _selectors.getProxyState)(getState());
+    },
+
+    /**
+     * Retrieve information about the proxy's browser being used.
+     * Browser information being defined indicates that the browser supports
+     *    basic webRTC scenarios.
+     * @public
+     * @memberof Proxy
+     * @method getProxyDetails
+     * @return {Object} Object containing `browser` and `version` information.
+     * @example
+     * const details = client.proxy.getProxyDetails()
+     *
+     * log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
+     */
+    getProxyDetails() {
+      return (0, _selectors.getProxyState)(getState()).browser;
     },
 
     /**
@@ -43948,7 +46719,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const defaultState = {
   proxyMode: false,
   hasChannel: false,
-  remoteInitialized: false
+  remoteInitialized: false,
+  browser: {}
 };
 
 // Libraries.
@@ -43978,6 +46750,7 @@ reducers[actionTypes.SET_CHANNEL_FINISH] = {
 reducers[actionTypes.INITIALIZE_FINISH] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
+      browser: action.payload.browser,
       remoteInitialized: true
     });
   }
@@ -44050,7 +46823,6 @@ exports.default = function (base, actualManager) {
       // If the Proxy Stack is not in proxy mode, return the property from the
       //    actual webRTC manager object.
       if (!objTarget.proxyMode || !objTarget.channel) {
-        log.debug('Using local webRTC stack.');
         return actualManager[prop];
       }
       // Otherwise, the webRTC operation needs to be proxied over the channel.
@@ -44428,16 +47200,16 @@ function initializeProxy(webRTC) {
    * @param {Object} config WebRTC stack configuration.
    */
   const initialize = config => {
-    return new _promise2.default((resolve, reject) => {
+    return new _promise2.default(resolve => {
       if (!base.clientReady && base.channel) {
         const callback = data => {
           log.debug('Received initialize response.', data);
           if (data.initialized) {
             // The Client is now ready.
             base.clientReady = true;
-            resolve();
+            resolve({ browser: data.browser });
           } else {
-            reject(new Error('Remote end not initialized.'));
+            resolve({ error: new Error('Remote end not initialized.') });
           }
         };
 
@@ -44446,7 +47218,7 @@ function initializeProxy(webRTC) {
         base.channel.send(messageId, { initialize: true, config: config }, callback);
       } else {
         log.info('Either Client is already ready or no channel to use.');
-        reject(new Error('Either Client is already ready or no channel to use.'));
+        resolve({ error: new Error('Either Client is already ready or no channel to use.') });
       }
     });
   };
@@ -44458,6 +47230,20 @@ function initializeProxy(webRTC) {
    */
   function setHandlers(handlers) {
     webRTC.sdp.pipeline.setHandlers(handlers);
+  }
+
+  /**
+   * Retrieve details about the browser.
+   * Intended to only be used for retreiving the local browser details. The
+   *    Proxy details are retrieved when initializing the remote SDK.
+   * @method getBrowserDetails
+   * @return {Object}
+   */
+  function getBrowserDetails() {
+    // Query the local webRTC stack if we're not in proxy mode.
+    if (!base.proxyMode) {
+      return webRTC.getBrowserDetails();
+    }
   }
 
   return {
@@ -44474,7 +47260,8 @@ function initializeProxy(webRTC) {
         setHandlers
       }
     },
-    managers: base.managers
+    managers: base.managers,
+    getBrowserDetails
   };
 }
 
@@ -44679,12 +47466,12 @@ function* handleMessages(webRTC) {
 }
 
 function* initializeRemote(webRTC, action) {
-  const error = yield (0, _effects.call)([webRTC, 'initialize'], action.payload.config);
+  const result = yield (0, _effects.call)([webRTC, 'initialize'], action.payload.config);
 
-  if (error) {
-    yield (0, _effects.put)(actions.initializeRemoteFinish({ error: error.message }));
+  if (result.error) {
+    yield (0, _effects.put)(actions.initializeRemoteFinish({ error: result.error.message }));
   } else {
-    yield (0, _effects.put)(actions.initializeRemoteFinish({}));
+    yield (0, _effects.put)(actions.initializeRemoteFinish({ browser: result.browser }));
   }
 }
 
