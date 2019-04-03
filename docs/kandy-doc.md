@@ -913,51 +913,6 @@ Update values in the global Config section of the store.
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
 
-## Channel
-
-The Channel object that the Proxy module needs to be provided.
-
-**Examples**
-
-```javascript
-// The channel the application uses for communicating with a remote endpoint.
-const appChannel = ...
-
-// The channel the application will provide to the Proxy module for use.
-const channel = {
-   send: function (data) {
-     // Any encoding / wrapping needed for a Proxy message being sent
-     //    over the channel.
-     appChannel.sendMessage(data)
-   },
-   // The Proxy module will set this function.
-   receive: undefined
-}
-appChannel.on('message', data => {
-   // Any decoding / unwrapping needed for the received message.
-   channel.receive(data)
-})
-
-client.proxy.setChannel(channel)
-```
-
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
 ## Proxy
 
 The Proxy module allows for a secondary mode for making calls: proxy mode.
@@ -996,6 +951,74 @@ Sends an initialization message over the channel with webRTC configurations.
 **Parameters**
 
 -   `config` **[Object][5]** 
+
+## Channel
+
+The Channel object that the Proxy module needs to be provided.
+
+**Examples**
+
+```javascript
+// The channel the application uses for communicating with a remote endpoint.
+const appChannel = ...
+
+// The channel the application will provide to the Proxy module for use.
+const channel = {
+   send: function (data) {
+     // Any encoding / wrapping needed for a Proxy message being sent
+     //    over the channel.
+     appChannel.sendMessage(data)
+   },
+   // The Proxy module will set this function.
+   receive: undefined
+}
+appChannel.on('message', data => {
+   // Any decoding / unwrapping needed for the received message.
+   channel.receive(data)
+})
+
+client.proxy.setChannel(channel)
+```
+
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
+
+### receive
+
+API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.
+
+**Parameters**
+
+-   `data` **[Object][5]** The message received from the Channel.
+
+## CallObject
+
+The state representation of a Call.
+Can be retrieved using the Call feature's `getAll` or `getById` APIs.
+A Call can be manipulated by using the Call feature's APIs.
+
+**Properties**
+
+-   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
+-   `id` **[string][2]** The ID of the call.
+-   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
+-   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
+    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
+    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
+-   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
+-   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
+    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
+-   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
+-   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## DeviceInfo
 
@@ -1044,29 +1067,6 @@ Media is a collection of Track objects.
 -   `id` **[string][2]** The ID of the Media object.
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
 -   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
-
-## CallObject
-
-The state representation of a Call.
-Can be retrieved using the Call feature's `getAll` or `getById` APIs.
-A Call can be manipulated by using the Call feature's APIs.
-
-**Properties**
-
--   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
--   `id` **[string][2]** The ID of the call.
--   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
--   `localTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
-    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
-    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
--   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
--   `remoteTracks` **[Array][7]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
-    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
--   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
--   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## Subscription
 
