@@ -514,6 +514,109 @@ function.
 
 Sends the message.
 
+## Groups
+
+The Groups feature is used to manage groups.
+
+Group functions are all part of the 'groups' namespace.
+
+### create
+
+Create a group.
+User creating group will become the admin of that group.
+
+**Parameters**
+
+-   `params` **[Object][5]** 
+    -   `params.participants` **[Array][7]&lt;[string][2]>?** List of participants to add to group when created.
+    -   `params.subject` **[string][2]?** Subject of the grour chat session.
+    -   `params.name` **[string][2]** Name of the grour chat session.
+    -   `params.image` **[string][2]?** HTTP URL of the image that is assigned to the grpup chat session avatar
+    -   `params.type` **[string][2]** Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
+
+### fetch
+
+Fetches existing groups from the server.
+This will update the store with the retrieved groups, making them
+known locally. They can then be accessed using `get` or 'getAll'.
+
+### getAll
+
+Get information for all groups known locally.
+
+Returns **[Array][7]&lt;Group>** An array of Groups.
+
+### get
+
+Retrieve information about a paticular group known locally.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to retrieve information for.
+
+Returns **Group** Group information.
+
+### getParticipants
+
+Retrieve list of particpants from a group know locally.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to get participants list.
+
+Returns **[Array][7]&lt;Participant>** A list of participants.
+
+### leave
+
+Leave a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to leave.
+
+### acceptInvitation
+
+Accept invitation to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to accept an invitation to.
+
+### rejectInvitation
+
+Reject invitation to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to reject an invitation to.
+
+### addParticipant
+
+Add participant to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to add participant to.
+-   `participant` **[string][2]** The userId of participant to add.
+
+### removeParticipant
+
+Remove participant from a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to remove participant from.
+-   `participant` **[string][2]** The userId of participant to remove.
+
+### delete
+
+Delete a group.
+The group is deleted and all participants will receive a 'group:delete' notification.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to delete.
+
 ## Presence
 
 The presence features are used to update the authenticated users presence
@@ -913,6 +1016,22 @@ Update values in the global Config section of the store.
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
 
+## getBrowserDetails
+
+Retrieve information about the browser being used.
+Browser information being defined indicates that the browser supports
+   basic webRTC scenarios.
+
+**Examples**
+
+```javascript
+const details = client.getBrowserDetails()
+
+log(`Browser in use: ${details.browser}, version ${details.version}.`)
+```
+
+Returns **[Object][5]** Object containing `browser` and `version` information.
+
 ## Proxy
 
 The Proxy module allows for a secondary mode for making calls: proxy mode.
@@ -935,6 +1054,22 @@ When disabled, webRTC operation will occur as normal on the local machine.
 Retrieves the current mode of the Proxy Plugin.
 
 Returns **[boolean][6]** Whether proxy mode is currently enabled.
+
+### getProxyDetails
+
+Retrieve information about the proxy's browser being used.
+Browser information being defined indicates that the browser supports
+   basic webRTC scenarios.
+
+**Examples**
+
+```javascript
+const details = client.proxy.getProxyDetails()
+
+log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
+```
+
+Returns **[Object][5]** Object containing `browser` and `version` information.
 
 ### setChannel
 
@@ -997,17 +1132,6 @@ Channel function that the Proxy module will use to send messages to the remote s
 
 -   `data` **[Object][5]** Message to be sent over the channel.
 
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
-
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1024,26 +1148,26 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
-
 ## DevicesObject
 
 A collection of devices and their information.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
+-   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## CallObject
 
@@ -1067,6 +1191,17 @@ A Call can be manipulated by using the Call feature's APIs.
     -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
 
 ## Subscription
 
@@ -1133,6 +1268,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [11]: #channel
 
-[12]: #trackobject
+[12]: #deviceinfo
 
-[13]: #deviceinfo
+[13]: #trackobject
