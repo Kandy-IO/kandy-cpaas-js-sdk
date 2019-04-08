@@ -7,23 +7,6 @@ Kandy.js change log.
 
 ## 4.3.0-beta
 
-### Added
-- Added the error event to the `subscription`, to prevent subscription change to emmited when there is a subscription failure. `KAA-1351`
-- [CPaaS 2.0] Added reject call functionality. `KAA-1511`
-- Added an API to retrieve basic browser information. See `getBrowserDetails`. `KAA-1470`
-
-### Fixed
-- Fixed an issue where local call logs would not be generated after a call ended. `KAA-1535`
-- Fixed a "remove media" call issue where the error event provided an incorrect message if the track ID was invalid. `KAA-1436`
-- Fixed a call issue where, when put on hold by a Cisco Phone, the call would end after a short period. `KAA-1562`
-- Fixed reject call behaviour to make call state `Ended` on callee side instead of `Cancelled`. `KAA-1584`
-- Fixed a call issue where a media mismatch error on answer would leave the call in `Ringing` state instead of ending the call. `KAA-1432`
-- Fixed an issue where errors prevented renegotiation from completing. `KAA-1497`
-- Fixed call issue where, when on dual hold with a Cisco phone, a remote unhold operation may incorrectly show a video track being added to the call. `KAA-1593`
-
-### Changed
-- The `subscription:change` event is no longer emmitted when there is an error. User will have to subscribe to `subscription:error` as well. `KAA-1351`
-
 ## 4.2.0 - 2019-03-29
 
 ### Fixed
@@ -61,15 +44,7 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 
 - Refactored all of the WebRTC-related code.
 
-## 3.4.0-beta
-
-### Added
-- Added the error event to the `subscription`, to prevent subscription change to emmited when there is a subscription failure `KAA-1351`
-
-### Changed
-- The `subscription:change` event is no longer emmitted when there is an error. User will have to subscribe to `subscription:error` as well. `KAA-1351`
-
-## 3.3.0 - 2018-03-29
+## 3.3.0-beta
 
 ### Changed
 
