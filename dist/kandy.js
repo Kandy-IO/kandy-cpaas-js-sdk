@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.4.0-beta.69811
+ * Version: 3.4.0-beta.69849
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31678,7 +31678,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.4.0-beta.69811';
+  let version = '3.4.0-beta.69849';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -41782,6 +41782,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Other plugins.
 // Users plugin.
+const capabilities = ['addContactAsBuddy'];
+
+// Libraries.
 function cpaas2Users() {
   function* init() {
     yield (0, _effects.put)((0, _actions.mapEvents)((0, _extends3.default)({}, _contacts2.default, _users2.default)));
@@ -41792,11 +41795,10 @@ function cpaas2Users() {
     sagas: (0, _values2.default)(sagas),
     api: _index2.default.api,
     reducer: _index2.default.reducer,
+    capabilities,
     init
   };
 }
-
-// Libraries.
 
 /***/ }),
 
@@ -42891,12 +42893,36 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @public
      * @memberof Contacts
      * @method add
+     * @requires addContactAsFriend
      * @param {Object} contact The contact object.
      * @param {string} contact.primaryContact The primary userId for the contact
-     * @param {string} [contact.name] The name for the contact entry
+     * @param {string} contact.contactId The contact's unique contact ID
      * @param {string} [contact.firstName] The contact's first name
      * @param {string} [contact.lastName] The contact's last name
-     * @param {string} [contact.contactId] The contact's unique contact ID
+     * @param {string} [contact.photoUrl] The URL address identifying location of user's picture
+     * @param {string} [contact.emailAddress] The contact's email address
+     * @param {string} [contact.homePhone] The contact's home phone number
+     * @param {string} [contact.workPhone] The contact's business phone number
+     * @param {string} [contact.mobilePhone] The contact's mobile phone number
+     * @param {string} [contact.conferenceURL] Conference URL and access code for this user's address book entry
+     * @param {string} [contact.fax] The user's fax number
+     * @param {string} [contact.pager] The user's pager number
+     * @param {string} [contact.groupList] The name of the contact list for which to add this contact to ("friends" by default)
+     * @param {boolean} [contact.friendStatus] Indicates whether or not the contact is a friend of the user
+     */
+    /**
+     * Add a contact to a user's personal address book.
+     * Will trigger the `contacts:new` event.
+     *
+     * @public
+     * @memberof Contacts
+     * @method add
+     * @requires addContactAsBuddy
+     * @param {Object} contact The contact object.
+     * @param {string} contact.primaryContact The primary userId for the contact
+     * @param {string} contact.contactId The contact's unique contact ID
+     * @param {string} [contact.firstName] The contact's first name
+     * @param {string} [contact.lastName] The contact's last name
      * @param {string} [contact.email] The contact's email address
      * @param {string} [contact.homePhoneNumber] The contact's home phone number
      * @param {string} [contact.businessPhoneNumber] The contact's business phone number
@@ -42965,8 +42991,44 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @public
      * @memberof Contacts
      * @method update
-     * @param  {string} contactId The unique contact ID.
-     * @param  {Object} contact The contact object.
+     * @requires addContactAsFriend
+     * @param {string} contactId The unique contact ID.
+     * @param {Object} contact The contact object.
+     * @param {string} contact.primaryContact The primary userId for the contact
+     * @param {string} contact.contactId The contact's unique contact ID
+     * @param {string} [contact.firstName] The contact's first name
+     * @param {string} [contact.lastName] The contact's last name
+     * @param {string} [contact.photoUrl] The URL address identifying location of user's picture
+     * @param {string} [contact.emailAddress] The contact's email address
+     * @param {string} [contact.homePhone] The contact's home phone number
+     * @param {string} [contact.workPhone] The contact's business phone number
+     * @param {string} [contact.mobilePhone] The contact's mobile phone number
+     * @param {string} [contact.conferenceURL] Conference URL and access code for this user's address book entry
+     * @param {string} [contact.fax] The user's fax number
+     * @param {string} [contact.pager] The user's pager number
+     * @param {string} [contact.groupList] The name of the contact list for which to add this contact to ("friends" by default)
+     * @param {boolean} [contact.friendStatus] Indicates whether or not the contact is a friend of the user
+     */
+    /**
+     * Update a contact from the user's personal address book.
+     * Will trigger the `contacts:change` event.
+     *
+     * @public
+     * @memberof Contacts
+     * @method update
+     * @requires addContactAsBuddy
+     * @param {string} contactId The unique contact ID.
+     * @param {Object} contact The contact object.
+     * @param {string} contact.primaryContact The primary userId for the contact
+     * @param {string} contact.contactId The contact's unique contact ID
+     * @param {string} [contact.firstName] The contact's first name
+     * @param {string} [contact.lastName] The contact's last name
+     * @param {string} [contact.email] The contact's email address
+     * @param {string} [contact.homePhoneNumber] The contact's home phone number
+     * @param {string} [contact.businessPhoneNumber] The contact's business phone number
+     * @param {string} [contact.mobilePhoneNumber] The contact's mobile phone number
+     * @param {string} [contact.list] The name of the contact list for which to add this contact to ("friends" by default)
+     * @param {boolean} [contact.buddy] Indicates whether or not the contact is a friend of the user
      */
     update(contactId, contact) {
       dispatch(actions.updateContact(contactId, contact));

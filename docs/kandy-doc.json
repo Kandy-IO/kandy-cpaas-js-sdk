@@ -28079,7 +28079,7 @@
           "column": 2
         },
         "end": {
-          "line": 115,
+          "line": 175,
           "column": 3
         }
       },
@@ -28762,9 +28762,15 @@
               "name": "add"
             },
             {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 7,
+              "name": "addContactAsBuddy"
+            },
+            {
               "title": "param",
               "description": "The contact object.",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -28774,7 +28780,7 @@
             {
               "title": "param",
               "description": "The primary userId for the contact",
-              "lineNumber": 8,
+              "lineNumber": 9,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -28783,21 +28789,18 @@
             },
             {
               "title": "param",
-              "description": "The name for the contact entry",
-              "lineNumber": 9,
+              "description": "The contact's unique contact ID",
+              "lineNumber": 10,
               "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
+                "type": "NameExpression",
+                "name": "string"
               },
-              "name": "contact.name"
+              "name": "contact.contactId"
             },
             {
               "title": "param",
               "description": "The contact's first name",
-              "lineNumber": 10,
+              "lineNumber": 11,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -28810,19 +28813,6 @@
             {
               "title": "param",
               "description": "The contact's last name",
-              "lineNumber": 11,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
-              },
-              "name": "contact.lastName"
-            },
-            {
-              "title": "param",
-              "description": "The contact's unique contact ID",
               "lineNumber": 12,
               "type": {
                 "type": "OptionalType",
@@ -28831,7 +28821,7 @@
                   "name": "string"
                 }
               },
-              "name": "contact.contactId"
+              "name": "contact.lastName"
             },
             {
               "title": "param",
@@ -28914,22 +28904,22 @@
           ],
           "loc": {
             "start": {
-              "line": 15,
+              "line": 39,
               "column": 4
             },
             "end": {
-              "line": 34,
+              "line": 58,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 35,
+                "line": 59,
                 "column": 4
               },
               "end": {
-                "line": 37,
+                "line": 61,
                 "column": 5
               }
             },
@@ -28941,7 +28931,7 @@
             {
               "title": "param",
               "name": "contact",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "description": {
                 "type": "root",
                 "children": [
@@ -29002,7 +28992,7 @@
                 {
                   "title": "param",
                   "name": "contact.primaryContact",
-                  "lineNumber": 8,
+                  "lineNumber": 9,
                   "description": {
                     "type": "root",
                     "children": [
@@ -29062,8 +29052,8 @@
                 },
                 {
                   "title": "param",
-                  "name": "contact.name",
-                  "lineNumber": 9,
+                  "name": "contact.contactId",
+                  "lineNumber": 10,
                   "description": {
                     "type": "root",
                     "children": [
@@ -29072,7 +29062,7 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "The name for the contact entry",
+                            "value": "The contact's unique contact ID",
                             "position": {
                               "start": {
                                 "line": 1,
@@ -29081,8 +29071,8 @@
                               },
                               "end": {
                                 "line": 1,
-                                "column": 31,
-                                "offset": 30
+                                "column": 32,
+                                "offset": 31
                               },
                               "indent": []
                             }
@@ -29096,8 +29086,8 @@
                           },
                           "end": {
                             "line": 1,
-                            "column": 31,
-                            "offset": 30
+                            "column": 32,
+                            "offset": 31
                           },
                           "indent": []
                         }
@@ -29111,23 +29101,20 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 31,
-                        "offset": 30
+                        "column": 32,
+                        "offset": 31
                       }
                     }
                   },
                   "type": {
-                    "type": "OptionalType",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
+                    "type": "NameExpression",
+                    "name": "string"
                   }
                 },
                 {
                   "title": "param",
                   "name": "contact.firstName",
-                  "lineNumber": 10,
+                  "lineNumber": 11,
                   "description": {
                     "type": "root",
                     "children": [
@@ -29191,7 +29178,7 @@
                 {
                   "title": "param",
                   "name": "contact.lastName",
-                  "lineNumber": 11,
+                  "lineNumber": 12,
                   "description": {
                     "type": "root",
                     "children": [
@@ -29241,70 +29228,6 @@
                         "line": 1,
                         "column": 24,
                         "offset": 23
-                      }
-                    }
-                  },
-                  "type": {
-                    "type": "OptionalType",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                },
-                {
-                  "title": "param",
-                  "name": "contact.contactId",
-                  "lineNumber": 12,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The contact's unique contact ID",
-                            "position": {
-                              "start": {
-                                "line": 1,
-                                "column": 1,
-                                "offset": 0
-                              },
-                              "end": {
-                                "line": 1,
-                                "column": 32,
-                                "offset": 31
-                              },
-                              "indent": []
-                            }
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 32,
-                        "offset": 31
                       }
                     }
                   },
@@ -29824,22 +29747,22 @@
           ],
           "loc": {
             "start": {
-              "line": 39,
+              "line": 63,
               "column": 4
             },
             "end": {
-              "line": 47,
+              "line": 71,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 48,
+                "line": 72,
                 "column": 4
               },
               "end": {
-                "line": 50,
+                "line": 74,
                 "column": 5
               }
             },
@@ -30081,22 +30004,22 @@
           ],
           "loc": {
             "start": {
-              "line": 52,
+              "line": 76,
               "column": 4
             },
             "end": {
-              "line": 59,
+              "line": 83,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 60,
+                "line": 84,
                 "column": 4
               },
               "end": {
-                "line": 62,
+                "line": 86,
                 "column": 5
               }
             },
@@ -30305,22 +30228,22 @@
           ],
           "loc": {
             "start": {
-              "line": 64,
+              "line": 88,
               "column": 4
             },
             "end": {
-              "line": 71,
+              "line": 95,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 72,
+                "line": 96,
                 "column": 4
               },
               "end": {
-                "line": 74,
+                "line": 98,
                 "column": 5
               }
             },
@@ -30479,22 +30402,22 @@
           ],
           "loc": {
             "start": {
-              "line": 76,
+              "line": 100,
               "column": 4
             },
             "end": {
-              "line": 84,
+              "line": 108,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 85,
+                "line": 109,
                 "column": 4
               },
               "end": {
-                "line": 87,
+                "line": 111,
                 "column": 5
               }
             },
@@ -30703,9 +30626,15 @@
               "name": "update"
             },
             {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 7,
+              "name": "addContactAsBuddy"
+            },
+            {
               "title": "param",
               "description": "The unique contact ID.",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -30715,32 +30644,156 @@
             {
               "title": "param",
               "description": "The contact object.",
-              "lineNumber": 8,
+              "lineNumber": 9,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
               },
               "name": "contact"
+            },
+            {
+              "title": "param",
+              "description": "The primary userId for the contact",
+              "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "contact.primaryContact"
+            },
+            {
+              "title": "param",
+              "description": "The contact's unique contact ID",
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "contact.contactId"
+            },
+            {
+              "title": "param",
+              "description": "The contact's first name",
+              "lineNumber": 12,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.firstName"
+            },
+            {
+              "title": "param",
+              "description": "The contact's last name",
+              "lineNumber": 13,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.lastName"
+            },
+            {
+              "title": "param",
+              "description": "The contact's email address",
+              "lineNumber": 14,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.email"
+            },
+            {
+              "title": "param",
+              "description": "The contact's home phone number",
+              "lineNumber": 15,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.homePhoneNumber"
+            },
+            {
+              "title": "param",
+              "description": "The contact's business phone number",
+              "lineNumber": 16,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.businessPhoneNumber"
+            },
+            {
+              "title": "param",
+              "description": "The contact's mobile phone number",
+              "lineNumber": 17,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.mobilePhoneNumber"
+            },
+            {
+              "title": "param",
+              "description": "The name of the contact list for which to add this contact to (\"friends\" by default)",
+              "lineNumber": 18,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "contact.list"
+            },
+            {
+              "title": "param",
+              "description": "Indicates whether or not the contact is a friend of the user",
+              "lineNumber": 19,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "boolean"
+                }
+              },
+              "name": "contact.buddy"
             }
           ],
           "loc": {
             "start": {
-              "line": 89,
+              "line": 138,
               "column": 4
             },
             "end": {
-              "line": 98,
+              "line": 158,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 99,
+                "line": 159,
                 "column": 4
               },
               "end": {
-                "line": 101,
+                "line": 161,
                 "column": 5
               }
             },
@@ -30752,7 +30805,7 @@
             {
               "title": "param",
               "name": "contactId",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "description": {
                 "type": "root",
                 "children": [
@@ -30813,7 +30866,7 @@
             {
               "title": "param",
               "name": "contact",
-              "lineNumber": 8,
+              "lineNumber": 9,
               "description": {
                 "type": "root",
                 "children": [
@@ -30869,7 +30922,643 @@
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
-              }
+              },
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "contact.primaryContact",
+                  "lineNumber": 10,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The primary userId for the contact",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 35,
+                                "offset": 34
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 35,
+                            "offset": 34
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 35,
+                        "offset": 34
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.contactId",
+                  "lineNumber": 11,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's unique contact ID",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 32,
+                                "offset": 31
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 32,
+                        "offset": 31
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.firstName",
+                  "lineNumber": 12,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's first name",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 25,
+                                "offset": 24
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 25,
+                            "offset": 24
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 25,
+                        "offset": 24
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.lastName",
+                  "lineNumber": 13,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's last name",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 24,
+                                "offset": 23
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 24,
+                            "offset": 23
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 24,
+                        "offset": 23
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.email",
+                  "lineNumber": 14,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's email address",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 28,
+                                "offset": 27
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 28,
+                            "offset": 27
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 28,
+                        "offset": 27
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.homePhoneNumber",
+                  "lineNumber": 15,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's home phone number",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 32,
+                                "offset": 31
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 32,
+                        "offset": 31
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.businessPhoneNumber",
+                  "lineNumber": 16,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's business phone number",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 36,
+                                "offset": 35
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 36,
+                        "offset": 35
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.mobilePhoneNumber",
+                  "lineNumber": 17,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The contact's mobile phone number",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 34,
+                                "offset": 33
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 34,
+                        "offset": 33
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.list",
+                  "lineNumber": 18,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The name of the contact list for which to add this contact to (\"friends\" by default)",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 85,
+                                "offset": 84
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 85,
+                            "offset": 84
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 85,
+                        "offset": 84
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "contact.buddy",
+                  "lineNumber": 19,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Indicates whether or not the contact is a friend of the user",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 61,
+                                "offset": 60
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 61,
+                            "offset": 60
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 61,
+                        "offset": 60
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "boolean"
+                    }
+                  }
+                }
+              ]
             }
           ],
           "properties": [],
@@ -31022,22 +31711,22 @@
           ],
           "loc": {
             "start": {
-              "line": 103,
+              "line": 163,
               "column": 4
             },
             "end": {
-              "line": 111,
+              "line": 171,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 112,
+                "line": 172,
                 "column": 4
               },
               "end": {
-                "line": 114,
+                "line": 174,
                 "column": 5
               }
             },
@@ -39015,6 +39704,442 @@
           "children": [
             {
               "type": "text",
+              "value": "Contains information about a device.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 37,
+          "offset": 36
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "DeviceInfo"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the device.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "deviceId"
+      },
+      {
+        "title": "property",
+        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "groupId"
+      },
+      {
+        "title": "property",
+        "description": "The type of the device (audioinput, audiooutput, videoinput).",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "kind"
+      },
+      {
+        "title": "property",
+        "description": "The name of the device.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "label"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 84,
+        "column": 0
+      },
+      "end": {
+        "line": 93,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 104,
+          "column": 0
+        },
+        "end": {
+          "line": 108,
+          "column": 1
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "deviceId",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 22,
+                      "offset": 21
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 22,
+              "offset": 21
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "groupId",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The group ID of the device. Devices that share a ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "groupId",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " belong to the same physical device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 95,
+                      "offset": 94
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 95,
+                  "offset": 94
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 95,
+              "offset": 94
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "kind",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 62,
+                      "offset": 61
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 62,
+                  "offset": 61
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 62,
+              "offset": 61
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "label",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The name of the device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "DeviceInfo",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "DeviceInfo",
+        "kind": "module"
+      }
+    ],
+    "namespace": "DeviceInfo"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
               "position": {
                 "start": {
@@ -39358,6 +40483,1133 @@
       }
     ],
     "namespace": "MediaObject"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 50,
+                  "offset": 115
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "getTrackById",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 50,
+                  "offset": 115
+                },
+                "end": {
+                  "line": 2,
+                  "column": 64,
+                  "offset": 129
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " API and manipulated with other functions of the Media module.",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 64,
+                  "offset": 129
+                },
+                "end": {
+                  "line": 2,
+                  "column": 126,
+                  "offset": 191
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 126,
+              "offset": 191
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 126,
+          "offset": 191
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 4,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 5,
+        "type": null,
+        "name": "TrackObject"
+      },
+      {
+        "title": "property",
+        "description": "The list of CSS selectors that were used to render this Track.",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        },
+        "name": "containers"
+      },
+      {
+        "title": "property",
+        "description": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "disabled"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the Track.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "id"
+      },
+      {
+        "title": "property",
+        "description": "The kind of Track this is (audio, video).",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "kind"
+      },
+      {
+        "title": "property",
+        "description": "The label of the device this Track uses.",
+        "lineNumber": 10,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "label"
+      },
+      {
+        "title": "property",
+        "description": "Indicator on whether this Track is muted or not.",
+        "lineNumber": 11,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "muted"
+      },
+      {
+        "title": "property",
+        "description": "The state of this Track. Can be 'live' or 'ended'.",
+        "lineNumber": 12,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "state"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the Media Stream that includes this Track.",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "streamId"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 58,
+        "column": 0
+      },
+      "end": {
+        "line": 72,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 104,
+          "column": 0
+        },
+        "end": {
+          "line": 108,
+          "column": 1
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "containers",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The list of CSS selectors that were used to render this Track.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 63,
+                      "offset": 62
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 63,
+              "offset": 62
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "disabled",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 90,
+                      "offset": 89
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 90,
+                  "offset": 89
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 90,
+              "offset": 89
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "id",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the Track.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 21,
+                      "offset": 20
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 21,
+                  "offset": 20
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 21,
+              "offset": 20
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "kind",
+        "lineNumber": 9,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The kind of Track this is (audio, video).",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 42,
+                  "offset": 41
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 42,
+              "offset": 41
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "label",
+        "lineNumber": 10,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The label of the device this Track uses.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "muted",
+        "lineNumber": 11,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Indicator on whether this Track is muted or not.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 49,
+                  "offset": 48
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 49,
+              "offset": 48
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "state",
+        "lineNumber": 12,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The state of this Track. Can be 'live' or 'ended'.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "streamId",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the Media Stream that includes this Track.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "TrackObject",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "TrackObject",
+        "kind": "module"
+      }
+    ],
+    "namespace": "TrackObject"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A collection of devices and their information.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 47,
+                  "offset": 46
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 47,
+              "offset": 46
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 47,
+          "offset": 46
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "DevicesObject"
+      },
+      {
+        "title": "property",
+        "description": "A list of camera device information.",
+        "lineNumber": 5,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "camera"
+      },
+      {
+        "title": "property",
+        "description": "A list of microphone device information.",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "microphone"
+      },
+      {
+        "title": "property",
+        "description": "A list of speaker device information.",
+        "lineNumber": 7,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "speaker"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 74,
+        "column": 0
+      },
+      "end": {
+        "line": 82,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 104,
+          "column": 0
+        },
+        "end": {
+          "line": 108,
+          "column": 1
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "camera",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of camera device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "microphone",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of microphone device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "speaker",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of speaker device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 38,
+                      "offset": 37
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 38,
+              "offset": 37
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "DevicesObject",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "DevicesObject",
+        "kind": "module"
+      }
+    ],
+    "namespace": "DevicesObject"
   },
   {
     "description": {
@@ -40619,1569 +42871,6 @@
       }
     ],
     "namespace": "CallObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "A collection of devices and their information.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 47,
-                  "offset": 46
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 47,
-              "offset": 46
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 47,
-          "offset": 46
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DevicesObject"
-      },
-      {
-        "title": "property",
-        "description": "A list of camera device information.",
-        "lineNumber": 5,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "camera"
-      },
-      {
-        "title": "property",
-        "description": "A list of microphone device information.",
-        "lineNumber": 6,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "microphone"
-      },
-      {
-        "title": "property",
-        "description": "A list of speaker device information.",
-        "lineNumber": 7,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "speaker"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 74,
-        "column": 0
-      },
-      "end": {
-        "line": 82,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 104,
-          "column": 0
-        },
-        "end": {
-          "line": 108,
-          "column": 1
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "camera",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of camera device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 37,
-                      "offset": 36
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "microphone",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of microphone device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "speaker",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of speaker device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 38,
-                      "offset": 37
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 38,
-                  "offset": 37
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 38,
-              "offset": 37
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "DevicesObject",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "DevicesObject",
-        "kind": "module"
-      }
-    ],
-    "namespace": "DevicesObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Contains information about a device.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 37,
-          "offset": 36
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DeviceInfo"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the device.",
-        "lineNumber": 5,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "deviceId"
-      },
-      {
-        "title": "property",
-        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "groupId"
-      },
-      {
-        "title": "property",
-        "description": "The type of the device (audioinput, audiooutput, videoinput).",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "kind"
-      },
-      {
-        "title": "property",
-        "description": "The name of the device.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "label"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 84,
-        "column": 0
-      },
-      "end": {
-        "line": 93,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 104,
-          "column": 0
-        },
-        "end": {
-          "line": 108,
-          "column": 1
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "deviceId",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 22,
-                      "offset": 21
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 22,
-                  "offset": 21
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 22,
-              "offset": 21
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "groupId",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The group ID of the device. Devices that share a ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "groupId",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " belong to the same physical device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 95,
-                      "offset": 94
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 95,
-                  "offset": 94
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 95,
-              "offset": 94
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "kind",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 62,
-                      "offset": 61
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 62,
-                  "offset": 61
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 62,
-              "offset": 61
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "label",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The name of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 24,
-                      "offset": 23
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 24,
-                  "offset": 23
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 24,
-              "offset": 23
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "DeviceInfo",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "DeviceInfo",
-        "kind": "module"
-      }
-    ],
-    "namespace": "DeviceInfo"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 50,
-                  "offset": 115
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "getTrackById",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 50,
-                  "offset": 115
-                },
-                "end": {
-                  "line": 2,
-                  "column": 64,
-                  "offset": 129
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " API and manipulated with other functions of the Media module.",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 64,
-                  "offset": 129
-                },
-                "end": {
-                  "line": 2,
-                  "column": 126,
-                  "offset": 191
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 126,
-              "offset": 191
-            },
-            "indent": [
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 2,
-          "column": 126,
-          "offset": 191
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 4,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 5,
-        "type": null,
-        "name": "TrackObject"
-      },
-      {
-        "title": "property",
-        "description": "The list of CSS selectors that were used to render this Track.",
-        "lineNumber": 6,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        },
-        "name": "containers"
-      },
-      {
-        "title": "property",
-        "description": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "disabled"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the Track.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "id"
-      },
-      {
-        "title": "property",
-        "description": "The kind of Track this is (audio, video).",
-        "lineNumber": 9,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "kind"
-      },
-      {
-        "title": "property",
-        "description": "The label of the device this Track uses.",
-        "lineNumber": 10,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "label"
-      },
-      {
-        "title": "property",
-        "description": "Indicator on whether this Track is muted or not.",
-        "lineNumber": 11,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "muted"
-      },
-      {
-        "title": "property",
-        "description": "The state of this Track. Can be 'live' or 'ended'.",
-        "lineNumber": 12,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "state"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the Media Stream that includes this Track.",
-        "lineNumber": 13,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "streamId"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 58,
-        "column": 0
-      },
-      "end": {
-        "line": 72,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 104,
-          "column": 0
-        },
-        "end": {
-          "line": 108,
-          "column": 1
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "containers",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The list of CSS selectors that were used to render this Track.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 63,
-                      "offset": 62
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 63,
-                  "offset": 62
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 63,
-              "offset": 62
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "disabled",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 90,
-                      "offset": 89
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 90,
-                  "offset": 89
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 90,
-              "offset": 89
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
-      },
-      {
-        "title": "property",
-        "name": "id",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the Track.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 21,
-                      "offset": 20
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 21,
-                  "offset": 20
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 21,
-              "offset": 20
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "kind",
-        "lineNumber": 9,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The kind of Track this is (audio, video).",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 42,
-                  "offset": 41
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 42,
-              "offset": 41
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "label",
-        "lineNumber": 10,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The label of the device this Track uses.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "muted",
-        "lineNumber": 11,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Indicator on whether this Track is muted or not.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 49,
-                      "offset": 48
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 49,
-                  "offset": 48
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 49,
-              "offset": 48
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
-      },
-      {
-        "title": "property",
-        "name": "state",
-        "lineNumber": 12,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The state of this Track. Can be 'live' or 'ended'.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 51,
-                      "offset": 50
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 51,
-                  "offset": 50
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 51,
-              "offset": 50
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "streamId",
-        "lineNumber": 13,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the Media Stream that includes this Track.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 53,
-                      "offset": 52
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 53,
-              "offset": 52
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "TrackObject",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "TrackObject",
-        "kind": "module"
-      }
-    ],
-    "namespace": "TrackObject"
   },
   {
     "description": {
