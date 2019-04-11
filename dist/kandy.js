@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.4.0-beta.69849
+ * Version: 3.4.0-beta.70391
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31678,7 +31678,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.4.0-beta.69849';
+  let version = '3.4.0-beta.70391';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -31957,6 +31957,8 @@ var _stringify2 = _interopRequireDefault(_stringify);
 
 exports.createRequest = createRequest;
 exports.deleteRequest = deleteRequest;
+exports.addParticipantRequest = addParticipantRequest;
+exports.removeParticipantRequest = removeParticipantRequest;
 exports.fetchRequest = fetchRequest;
 
 var _effects = __webpack_require__("./src/request/effects.js");
@@ -31976,6 +31978,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {string} params.name - Name of the grour chat session.
  * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
  * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
+ * @param  {Object} requestInfo - Info needed to perform the request.
  * @return {group}
  */
 // Groups plugin.
@@ -32021,13 +32024,13 @@ function* createRequest(params, requestInfo) {
  * @method deleteRequest
  * @param  {Object} payload
  * @param  {string} payload.groupId - The ID of the group to delete.
+ * @param  {Object} requestInfo - Info needed to perform the request.
  * @return {Object}
  */
-function* deleteRequest(payload, requestInfo) {
-  const groupId = payload.groupId;
+function* deleteRequest({ groupId }, requestInfo) {
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${payload.groupId}`,
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}`,
     responseType: 'text'
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -32045,8 +32048,73 @@ function* deleteRequest(payload, requestInfo) {
 }
 
 /**
+ * REST request to add a participant to a specified group.
+ * @method addParticipantRequest
+ * @param  {Object} payload
+ * @param  {string} payload.groupId - The ID of the group to remove the participant from.
+ * @param  {string} payload.participant - The participant address.
+ * @param  {Object} requestInfo - Info needed to perform the request.
+ * @return {Object} participantInformation - Information about the participant.
+ * @return {string} participantInformation.address - Unique participant identifier
+ * @return {string} participantInformation.resourceURL - Participant locator
+ * @return {string} participantInformation.status - Participant status of 'Connected' or 'Invited'
+ * @return {boolean} participantInformation.x-isAdmin - Whether the participant is the group's admin
+ */
+function* addParticipantRequest({ groupId, participant }, requestInfo) {
+  const requestBody = {
+    participantInformation: {
+      address: participant,
+      'x-isAdmin': false
+    }
+  };
+
+  const requestOptions = {
+    method: 'POST',
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants`,
+    body: (0, _stringify2.default)(requestBody)
+  };
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Add Participant')
+    };
+  } else {
+    return response.payload.body.participantInformation;
+  }
+}
+
+/**
+ * REST request to remove a participant from a specified group.
+ * @method removeParticipantRequest
+ * @param  {Object} payload
+ * @param  {string} payload.groupId - The ID of the group.
+ * @param  {string} payload.participant - The ID of the group to delete.
+ * @param  {Object} requestInfo - Info needed to perform the request.
+ * @return {Object}
+ */
+function* removeParticipantRequest({ groupId, participant }, requestInfo) {
+  const requestOptions = {
+    method: 'DELETE',
+    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${participant}`
+  };
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Remove participant')
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
  * REST request to fetch groups from server.
  * @method fetchRequest
+ * @param  {Object} requestInfo - Info needed to perform the request.
  * @return {Group[]} - An array of Groups.
  */
 function* fetchRequest(requestInfo) {
@@ -32084,6 +32152,8 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.createGroup = createGroup;
 exports.deleteGroup = deleteGroup;
+exports.addParticipant = addParticipant;
+exports.removeParticipant = removeParticipant;
 exports.fetch = fetch;
 
 var _groups = __webpack_require__("./src/groups/cpaas2/requests/groups.js");
@@ -32127,8 +32197,8 @@ const log = (0, _logs.getLogManager)().getLogger('GROUPS');
 // Other plugins.
 // groups plugin.
 function* createGroup({ payload }) {
-  log.info('createGroup saga called: ', payload);
   const params = payload.params;
+  log.info(`Creating group ${params.name}.`);
 
   // Verify that name has been supplied
   if (!params['name']) {
@@ -32176,11 +32246,11 @@ function* createGroup({ payload }) {
  * @return {Object}
  */
 function* deleteGroup({ payload }) {
-  log.info('deleteGroup saga called: ', payload.groupId);
   const groupId = payload.groupId;
+  log.info(`Deleting group ${groupId}.`);
 
   // verify that a groupId was supplied
-  if (!groupId || groupId === '') {
+  if (!groupId) {
     log.info('groupId parameter is required for delete group operation.');
     yield (0, _effects.put)(actions.deleteGroupFinish({}, new _errors2.default({
       code: _errors.groupsCodes.MISSING_PARAMETERS,
@@ -32200,12 +32270,106 @@ function* deleteGroup({ payload }) {
 }
 
 /**
+ * Add a participant to a specified group.
+ * @method addParticipant
+ * @param  {Object} payload Information about the group and participant.
+ * @return {Object}
+ */
+function* addParticipant({ payload }) {
+  const groupId = payload.groupId;
+  const participant = payload.participant;
+  log.info(`Adding participant ${participant} to group ${groupId}.`);
+
+  // verify that a groupId was supplied
+  if (!groupId) {
+    log.info('groupId parameter is required for add participant operation.');
+    yield (0, _effects.put)(actions.addParticipantFinish({
+      error: new _errors2.default({
+        code: _errors.groupsCodes.MISSING_PARAMETERS,
+        message: 'Failed to add participant. groupId parameter is required.'
+      })
+    }));
+    return;
+  }
+
+  // verify that a participant was supplied
+  if (!participant) {
+    log.info('participant parameter is required for add participant operation.');
+    yield (0, _effects.put)(actions.addParticipantFinish({
+      error: new _errors2.default({
+        code: _errors.groupsCodes.MISSING_PARAMETERS,
+        message: 'Failed to add participant. Participant parameter is required.'
+      })
+    }));
+    return;
+  }
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+  const response = yield (0, _effects.call)(_groups.addParticipantRequest, payload, requestInfo);
+  log.debug('Received response from addParticipant request:', response);
+
+  if (!response.error) {
+    yield (0, _effects.put)(actions.addParticipantFinish({
+      groupId,
+      participant: response
+    }));
+  } else {
+    yield (0, _effects.put)(actions.addParticipantFinish({ error: response.error }));
+  }
+}
+
+/**
+ * Remove a participant to a group.
+ * @method removeParticipant
+ * @param  {Object} payload Information about the group modified.
+ * @return {Object}
+ */
+function* removeParticipant({ payload }) {
+  const groupId = payload.groupId;
+  const participant = payload.participant;
+  log.info(`Removing participant ${participant} from group ${groupId}.`);
+  // verify that a groupId was supplied
+  if (!groupId) {
+    log.info('groupId parameter is required for remove participant operation.');
+    yield (0, _effects.put)(actions.removeParticipantFinish({
+      error: new _errors2.default({
+        code: _errors.groupsCodes.MISSING_PARAMETERS,
+        message: 'Failed to remove participant. groupId parameter is required.'
+      })
+    }));
+    return;
+  }
+  // verify that a participant was supplied
+  if (!participant) {
+    log.info('participant parameter is required for remove participant operation.');
+    yield (0, _effects.put)(actions.removeParticipantFinish({
+      error: new _errors2.default({
+        code: _errors.groupsCodes.MISSING_PARAMETERS,
+        message: 'Failed to remove participant. Participant parameter is required.'
+      })
+    }));
+    return;
+  }
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
+  const response = yield (0, _effects.call)(_groups.removeParticipantRequest, payload, requestInfo);
+  log.debug('Received response from removeParticipant request:', response);
+
+  if (!response.error) {
+    yield (0, _effects.put)(actions.removeParticipantFinish({
+      groupId,
+      participant
+    }));
+  } else {
+    yield (0, _effects.put)(actions.removeParticipantFinish({ error: response.error }));
+  }
+}
+
+/**
  * Fetches all existing groups from the server.
  * @method fetch
  * @return {Group[]} - An array of Groups.
  */
-function* fetch({ payload }) {
-  log.info('fetch saga called: ', payload);
+function* fetch() {
+  log.info(`Fetching groups.`);
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS2);
   const response = yield (0, _effects.call)(_groups.fetchRequest, requestInfo);
   if (!response.error) {
@@ -32230,6 +32394,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.processCreateGroup = processCreateGroup;
 exports.processDeleteGroup = processDeleteGroup;
+exports.processAddParticipant = processAddParticipant;
+exports.processRemoveParticipant = processRemoveParticipant;
 exports.fetch = fetch;
 
 var _groups = __webpack_require__("./src/groups/cpaas2/sagas/groups.js");
@@ -32254,7 +32420,7 @@ function* processCreateGroup() {
 
 /**
  * Delete group.
- * @method create
+ * @method processDeleteGroup
  */
 
 
@@ -32267,6 +32433,22 @@ function* processCreateGroup() {
 // groups plugin.
 function* processDeleteGroup() {
   yield (0, _effects.takeEvery)(actionTypes.DELETE_GROUP, groupSagas.deleteGroup);
+}
+
+/**
+ * Add a participant to a group.
+ * @method processAddParticipant
+ */
+function* processAddParticipant() {
+  yield (0, _effects.takeEvery)(actionTypes.ADD_PARTICIPANT, groupSagas.addParticipant);
+}
+
+/**
+ * Remove a participant from a group.
+ * @method processRemoveParticipant
+ */
+function* processRemoveParticipant() {
+  yield (0, _effects.takeEvery)(actionTypes.REMOVE_PARTICIPANT, groupSagas.removeParticipant);
 }
 
 /**
@@ -32292,7 +32474,9 @@ const prefix = '@@KANDY/GROUPS/';
 
 // Admin actions
 const ADD_PARTICIPANT = exports.ADD_PARTICIPANT = prefix + 'ADD_PARTICIPANT';
+const ADD_PARTICIPANT_FINISH = exports.ADD_PARTICIPANT_FINISH = prefix + 'ADD_PARTICIPANT_FINISH';
 const REMOVE_PARTICIPANT = exports.REMOVE_PARTICIPANT = prefix + 'REMOVE_PARTICIPANT';
+const REMOVE_PARTICIPANT_FINISH = exports.REMOVE_PARTICIPANT_FINISH = prefix + 'REMOVE_PARTICIPANT_FINISH';
 const GET_PARTICIPANTS = exports.GET_PARTICIPANTS = prefix + 'GET_PARTICIPANTS';
 const DELETE_GROUP = exports.DELETE_GROUP = prefix + 'DELETE_GROUP';
 const DELETE_GROUP_FINISH = exports.DELETE_GROUP_FINISH = prefix + 'DELETE_GROUP_FINISH';
@@ -32334,7 +32518,9 @@ exports.leave = leave;
 exports.acceptInvitation = acceptInvitation;
 exports.rejectInvitation = rejectInvitation;
 exports.addParticipant = addParticipant;
+exports.addParticipantFinish = addParticipantFinish;
 exports.removeParticipant = removeParticipant;
+exports.removeParticipantFinish = removeParticipantFinish;
 exports.getParticipants = getParticipants;
 exports.deleteGroup = deleteGroup;
 exports.deleteGroupFinish = deleteGroupFinish;
@@ -32368,6 +32554,7 @@ function actionFormatter(actionType, payload = {}, meta = {}) {
 
 /**
  * Retrieves existing groups from state
+ * @method getAll
  * @return {Object}          A Flux Standard Action for GET_ALL
  */
 // Groups plugin.
@@ -32379,7 +32566,8 @@ function getAll() {
 
 /**
  * Retrieve a group from state
- * @param {string} groupId - GroupId to retrieve.
+ * @method get
+ * @param {string} groupId - The ID of the group to retrieve.
  * @return {Object}          A Flux Standard Action for GET_GROUP
  */
 function get(groupId) {
@@ -32405,6 +32593,9 @@ function fetchGroups() {
 /**
  * A notice that fetchGroups has finished.
  * @method fetchGroupsFinish
+ * @param {Object} params
+ * @param {[Object]} params.groups - Array of groups.
+ * @param {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function fetchGroupsFinish({ groups, error }) {
@@ -32413,6 +32604,7 @@ function fetchGroupsFinish({ groups, error }) {
 
 /**
  * Create a new group
+ * @method create
  * @param {Object} params
  * @param {string} params.userId - The Id of the current user.
  * @param {string[]} params.users - Array of users to add to group upon creation.
@@ -32424,13 +32616,20 @@ function create(params = {}) {
   return actionFormatter(actionTypes.CREATE_GROUP, { params });
 }
 
+/**
+ * @method createFinish
+ * @param {Object} group - The group that was created.
+ * @param {Object} [error] An error object.
+ * @return {Object} A flux standard action.
+ */
 function createFinish(group, error) {
   return actionFormatter(actionTypes.CREATE_GROUP_FINISH, { group, error });
 }
 
 /**
  * Leave a group
- * @param {string} groupId - GroupId of group to leave.
+ * @method leave
+ * @param {string} groupId - The ID of the group to leave.
  * @return {Object}          A Flux Standard Action for LEAVE_GROUP
  */
 function leave(groupId) {
@@ -32444,7 +32643,8 @@ function leave(groupId) {
 
 /**
  * Accept a group invitation
- * @param {string} groupId - GroupId to retrieve.
+ * @method acceptInvitation
+ * @param {string} groupId - The ID of the group to retrieve.
  * @return {Object}          A Flux Standard Action for ACCEPT_INVITATION
  */
 function acceptInvitation(groupId) {
@@ -32458,7 +32658,8 @@ function acceptInvitation(groupId) {
 
 /**
  * Reject a group invitation
- * @param {string} groupId - GroupId to reject.
+ * @method rejectInvitation
+ * @param {string} groupId - The ID of the group to reject.
  * @return {Object}          A Flux Standard Action for REJECT_INVITATION
  */
 function rejectInvitation(groupId) {
@@ -32472,39 +32673,56 @@ function rejectInvitation(groupId) {
 
 /**
  * Add a participant to a group
- * @param {string} groupId - GroupId to add participant to.
+ * @method addParticipant
+ * @param {string} groupId - The ID of the group to add a participant to.
  * @param {Object} participant - Participant to add to the group.
  * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
  */
 function addParticipant(groupId, participant) {
-  return {
-    type: actionTypes.ADD_PARTICIPANT,
-    payload: {
-      groupId,
-      participant
-    }
-  };
+  return actionFormatter(actionTypes.ADD_PARTICIPANT, { groupId, participant });
+}
+
+/**
+ * A notice that addParticipant has finished.
+ * @method addParticipantFinish
+ * @param {Object} params
+ * @param  {string} params.groupId The ID of the group to be modified.
+ * @param  {Object} params.participant Participant to add to the group.
+ * @param  {Object} [params.error] An error object.
+ * @return {Object} A flux standard action.
+ */
+function addParticipantFinish({ groupId, participant, error }) {
+  return actionFormatter(actionTypes.ADD_PARTICIPANT_FINISH, { groupId, participant, error });
 }
 
 /**
  * Remove a participant from a group
- * @param {string} groupId - GroupId to remove participant from.
- * @param {Object} participant - Participant to remove from the group.
- * @return {Object}          A Flux Standard Action for REMOVE_PARTICIPANT
+ * @method removeParticipant
+ * @param {string} groupId - The ID of the group to remove a participant from.
+ * @param {string} participant - Participant to remove from the group.
+ * @return {Object} A Flux Standard Action for REMOVE_PARTICIPANT
  */
 function removeParticipant(groupId, participant) {
-  return {
-    type: actionTypes.REMOVE_PARTICIPANT,
-    payload: {
-      groupId,
-      participant
-    }
-  };
+  return actionFormatter(actionTypes.REMOVE_PARTICIPANT, { groupId, participant });
 }
 
 /**
- * Get particpants
- * @param {string} groupId - GroupId to request participants from.
+ * A notice that removeParticipant has finished.
+ * @method removeParticipantFinish
+ * @param {Object} params
+ * @param  {string} params.groupId The ID of the group to be modified.
+ * @param  {Object} params.participant Participant to remove from the group.
+ * @param  {Object} [params.error] An error object.
+ * @return {Object} A flux standard action.
+ */
+function removeParticipantFinish({ groupId, participant, error }) {
+  return actionFormatter(actionTypes.REMOVE_PARTICIPANT_FINISH, { groupId, participant, error });
+}
+
+/**
+ * Get participants
+ * @method getParticipants
+ * @param {string} groupId - The ID of the group to request participants from.
  * @return {Object}          A Flux Standard Action for GET_PARTICIPANTS
  */
 function getParticipants(groupId) {
@@ -32518,7 +32736,8 @@ function getParticipants(groupId) {
 
 /**
  * A request to delete a group.
- * @param {string} groupId - GroupId of group to delete.
+ * @method deleteGroup
+ * @param {string} groupId - The ID of the the group to delete.
  * @return {Object}          A Flux Standard Action for DELETE_GROUP
  */
 function deleteGroup(groupId) {
@@ -32526,10 +32745,11 @@ function deleteGroup(groupId) {
 }
 
 /**
- * A notice that deletGroup has finished.
+ * A notice that deleteGroup has finished.
  * @method deleteGroupFinish
- * @param  {Object} groupId Id of the group that was deleted.
- * @param  {Object} [error] An error object.
+ * @param {Object} params
+ * @param {string} params.groupId The ID of the group that was deleted.
+ * @param {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function deleteGroupFinish({ groupId, error }) {
@@ -32965,7 +33185,48 @@ reducers[actionTypes.DELETE_GROUP_FINISH] = {
   next(state, action) {
     const groupId = action.payload.groupId;
     return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId.toString())
+      groups: state.groups.filter(group => group.groupId !== groupId)
+    });
+  }
+};
+
+/*
+ * Adds a participant to the specified group.
+ */
+reducers[actionTypes.ADD_PARTICIPANT_FINISH] = {
+  next(state, action) {
+    const groupId = action.payload.groupId;
+    const participant = action.payload.participant;
+
+    return (0, _extends3.default)({}, state, {
+      groups: state.groups.map(group => {
+        if (group.groupId === groupId) {
+          return (0, _extends3.default)({}, group, {
+            participant: [...group.participant, participant]
+          });
+        }
+        return group;
+      })
+    });
+  }
+};
+
+/*
+ * Removes a participant from the specified group.
+ */
+reducers[actionTypes.REMOVE_PARTICIPANT_FINISH] = {
+  next(state, action) {
+    const groupId = action.payload.groupId;
+    const participantAddress = action.payload.participant;
+    return (0, _extends3.default)({}, state, {
+      groups: state.groups.map(group => {
+        if (group.groupId === groupId) {
+          return (0, _extends3.default)({}, group, {
+            participant: group.participant.filter(member => member.address !== participantAddress)
+          });
+        }
+        return group;
+      })
     });
   }
 };
