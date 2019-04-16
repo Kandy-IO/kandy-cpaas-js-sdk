@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.4.0-beta.70854
+ * Version: 3.4.0-beta.70888
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23215,6 +23215,10 @@ var _utils = __webpack_require__("./src/callstack/utils/index.js");
 
 var _utils2 = __webpack_require__("./src/common/utils.js");
 
+var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
+
+var _codecRemover2 = _interopRequireDefault(_codecRemover);
+
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
@@ -23233,12 +23237,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Object} [call.iceServers] ICE servers to be used for calls.
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
  * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  */
 
 // Libraries.
 
 
-// Other plugins.
+// Helpers.
+// Call plugin.
 function cpaas2Calls(options = {}) {
   const defaultOptions = {
     // The list of TURN/STUN servers to use.
@@ -23259,7 +23265,9 @@ function cpaas2Calls(options = {}) {
     // Trickle ICE method to use for calls.
     trickleIceMode: 'NONE',
     // SDP handlers to be included in the pipeline for every operation.
-    sdpHandlers: []
+    sdpHandlers: [],
+    // filter out H264 Codec
+    removeH264Codecs: true
   };
   options = (0, _utils2.mergeValues)(defaultOptions, options);
 
@@ -23274,10 +23282,18 @@ function cpaas2Calls(options = {}) {
      *
      * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
      *    crypto method enabled. WebRTC only allows one method to be enabled.
-     * This is needed for interopability with non-browser endpoints that include
+     *    This is needed for interopability with non-browser endpoints that include
      *    SDES as a fallback method.
-     */
-    webRTC.sdp.pipeline.setHandlers(options.sdpHandlers.concat([_utils.sanitizeSdesFromSdp]));
+     *
+     * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
+     *
+    */
+    let sdpHandlers = options.sdpHandlers;
+    if (options.removeH264Codecs) {
+      sdpHandlers.push((0, _codecRemover2.default)(['H264']));
+    }
+    sdpHandlers.push(_utils.sanitizeSdesFromSdp);
+    webRTC.sdp.pipeline.setHandlers(sdpHandlers);
 
     // Wrap the call sagas in a function that provides them with the webRTC stack.
     const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
@@ -23298,8 +23314,7 @@ function cpaas2Calls(options = {}) {
   };
 }
 
-// Helpers.
-// Call plugin.
+// Other plugins.
 
 /***/ }),
 
@@ -31678,7 +31693,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.4.0-beta.70854';
+  let version = '3.4.0-beta.70888';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
