@@ -5,6 +5,16 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.2.1 - 2019-04-16
+
+### Added
+
+- Added a new call configuration property "removeH264Codecs" to disable removing "H264" Codecs from the SDP by default `KAA-1585`
+
+### Changed
+
+- Changed the default SDP handling to remove "H264" Codecs. `KAA-1585`
+
 ## 4.2.0 - 2019-03-29
 
 ### Fixed
