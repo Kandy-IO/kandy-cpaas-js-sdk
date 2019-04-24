@@ -558,13 +558,19 @@ Returns **Group** Group information.
 
 ### getParticipants
 
-Retrieve list of particpants from a group know locally.
+Retrieve list of particpants from a group known locally.
 
 **Parameters**
 
 -   `groupId` **[string][2]** The Id of the group to get participants list.
 
 Returns **[Array][7]&lt;Participant>** A list of participants.
+
+### getInvitations
+
+Retrieve list of invitations known locally.
+
+Returns **[Array][7]&lt;Invitaions>** A list of invitations.
 
 ### leave
 
@@ -1070,6 +1076,14 @@ appChannel.on('message', data => {
 client.proxy.setChannel(channel)
 ```
 
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
+
 ### receive
 
 API that the Proxy module will assign a listener function for accepting received messages.
@@ -1078,14 +1092,6 @@ This function should receive all messages sent from the remote side of the chann
 **Parameters**
 
 -   `data` **[Object][5]** The message received from the Channel.
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
 
 ## Proxy
 
@@ -1142,6 +1148,17 @@ Sends an initialization message over the channel with webRTC configurations.
 
 -   `config` **[Object][5]** 
 
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+
 ## CallObject
 
 The state representation of a Call.
@@ -1165,16 +1182,6 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
-
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1191,17 +1198,6 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
-
 ## DeviceInfo
 
 Contains information about a device.
@@ -1212,6 +1208,16 @@ Contains information about a device.
 -   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
 
 ## Subscription
 
@@ -1278,6 +1284,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [11]: #channel
 
-[12]: #deviceinfo
+[12]: #trackobject
 
-[13]: #trackobject
+[13]: #deviceinfo
