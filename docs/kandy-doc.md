@@ -879,6 +879,33 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
+
 ## config
 
 The configuration object. This object defines what different configuration
@@ -965,33 +992,6 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -1048,6 +1048,51 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
+## Channel
+
+The Channel object that the Proxy module needs to be provided.
+
+**Examples**
+
+```javascript
+// The channel the application uses for communicating with a remote endpoint.
+const appChannel = ...
+
+// The channel the application will provide to the Proxy module for use.
+const channel = {
+   send: function (data) {
+     // Any encoding / wrapping needed for a Proxy message being sent
+     //    over the channel.
+     appChannel.sendMessage(data)
+   },
+   // The Proxy module will set this function.
+   receive: undefined
+}
+appChannel.on('message', data => {
+   // Any decoding / unwrapping needed for the received message.
+   channel.receive(data)
+})
+
+client.proxy.setChannel(channel)
+```
+
+### receive
+
+API that the Proxy module will assign a listener function for accepting received messages.
+This function should receive all messages sent from the remote side of the channel.
+
+**Parameters**
+
+-   `data` **[Object][5]** The message received from the Channel.
+
+### send
+
+Channel function that the Proxy module will use to send messages to the remote side.
+
+**Parameters**
+
+-   `data` **[Object][5]** Message to be sent over the channel.
+
 ## Proxy
 
 The Proxy module allows for a secondary mode for making calls: proxy mode.
@@ -1103,61 +1148,6 @@ Sends an initialization message over the channel with webRTC configurations.
 
 -   `config` **[Object][5]** 
 
-## Channel
-
-The Channel object that the Proxy module needs to be provided.
-
-**Examples**
-
-```javascript
-// The channel the application uses for communicating with a remote endpoint.
-const appChannel = ...
-
-// The channel the application will provide to the Proxy module for use.
-const channel = {
-   send: function (data) {
-     // Any encoding / wrapping needed for a Proxy message being sent
-     //    over the channel.
-     appChannel.sendMessage(data)
-   },
-   // The Proxy module will set this function.
-   receive: undefined
-}
-appChannel.on('message', data => {
-   // Any decoding / unwrapping needed for the received message.
-   channel.receive(data)
-})
-
-client.proxy.setChannel(channel)
-```
-
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
-
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1173,6 +1163,27 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## MediaObject
 
@@ -1207,17 +1218,6 @@ A Call can be manipulated by using the Call feature's APIs.
     -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
 
 ## Subscription
 
