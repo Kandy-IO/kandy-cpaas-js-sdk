@@ -418,22 +418,22 @@
           ],
           "loc": {
             "start": {
-              "line": 20,
+              "line": 24,
               "column": 2
             },
             "end": {
-              "line": 34,
+              "line": 38,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 35,
+                "line": 39,
                 "column": 2
               },
               "end": {
-                "line": 37,
+                "line": 42,
                 "column": 3
               }
             },
@@ -759,22 +759,22 @@
           ],
           "loc": {
             "start": {
-              "line": 39,
+              "line": 44,
               "column": 2
             },
             "end": {
-              "line": 48,
+              "line": 53,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 49,
+                "line": 54,
                 "column": 2
               },
               "end": {
-                "line": 51,
+                "line": 57,
                 "column": 3
               }
             },
@@ -1086,22 +1086,22 @@
           ],
           "loc": {
             "start": {
-              "line": 53,
+              "line": 59,
               "column": 2
             },
             "end": {
-              "line": 61,
+              "line": 67,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 62,
+                "line": 68,
                 "column": 2
               },
               "end": {
-                "line": 64,
+                "line": 71,
                 "column": 3
               }
             },
@@ -1352,22 +1352,22 @@
           ],
           "loc": {
             "start": {
-              "line": 66,
+              "line": 73,
               "column": 2
             },
             "end": {
-              "line": 74,
+              "line": 81,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 75,
+                "line": 82,
                 "column": 2
               },
               "end": {
-                "line": 77,
+                "line": 85,
                 "column": 3
               }
             },
@@ -1756,22 +1756,22 @@
           ],
           "loc": {
             "start": {
-              "line": 194,
+              "line": 205,
               "column": 4
             },
             "end": {
-              "line": 204,
+              "line": 215,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 205,
+                "line": 216,
                 "column": 4
               },
               "end": {
-                "line": 207,
+                "line": 219,
                 "column": 5
               }
             },
@@ -2109,22 +2109,22 @@
           ],
           "loc": {
             "start": {
-              "line": 258,
+              "line": 272,
               "column": 4
             },
             "end": {
-              "line": 274,
+              "line": 288,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 275,
+                "line": 289,
                 "column": 4
               },
               "end": {
-                "line": 277,
+                "line": 293,
                 "column": 5
               }
             },
@@ -6325,22 +6325,22 @@
           ],
           "loc": {
             "start": {
-              "line": 14,
+              "line": 18,
               "column": 4
             },
             "end": {
-              "line": 53,
+              "line": 57,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 54,
+                "line": 58,
                 "column": 4
               },
               "end": {
-                "line": 70,
+                "line": 75,
                 "column": 5
               }
             },
@@ -6929,22 +6929,22 @@
           ],
           "loc": {
             "start": {
-              "line": 72,
+              "line": 77,
               "column": 4
             },
             "end": {
-              "line": 85,
+              "line": 90,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 86,
+                "line": 91,
                 "column": 4
               },
               "end": {
-                "line": 88,
+                "line": 94,
                 "column": 5
               }
             },
@@ -7400,22 +7400,22 @@
           ],
           "loc": {
             "start": {
-              "line": 90,
+              "line": 96,
               "column": 4
             },
             "end": {
-              "line": 114,
+              "line": 120,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 115,
+                "line": 121,
                 "column": 4
               },
               "end": {
-                "line": 127,
+                "line": 134,
                 "column": 5
               }
             },
@@ -7902,22 +7902,22 @@
           ],
           "loc": {
             "start": {
-              "line": 129,
+              "line": 136,
               "column": 4
             },
             "end": {
-              "line": 142,
+              "line": 149,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 143,
+                "line": 150,
                 "column": 4
               },
               "end": {
-                "line": 145,
+                "line": 153,
                 "column": 5
               }
             },
@@ -8325,22 +8325,22 @@
           ],
           "loc": {
             "start": {
-              "line": 147,
+              "line": 155,
               "column": 4
             },
             "end": {
-              "line": 165,
+              "line": 173,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 166,
+                "line": 174,
                 "column": 4
               },
               "end": {
-                "line": 168,
+                "line": 177,
                 "column": 5
               }
             },
@@ -8673,22 +8673,22 @@
           ],
           "loc": {
             "start": {
-              "line": 170,
+              "line": 179,
               "column": 4
             },
             "end": {
-              "line": 184,
+              "line": 193,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 185,
+                "line": 194,
                 "column": 4
               },
               "end": {
-                "line": 187,
+                "line": 197,
                 "column": 5
               }
             },
@@ -8884,22 +8884,22 @@
           ],
           "loc": {
             "start": {
-              "line": 189,
+              "line": 199,
               "column": 4
             },
             "end": {
-              "line": 200,
+              "line": 210,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 201,
+                "line": 211,
                 "column": 4
               },
               "end": {
-                "line": 203,
+                "line": 214,
                 "column": 5
               }
             },
@@ -9102,22 +9102,22 @@
           ],
           "loc": {
             "start": {
-              "line": 205,
+              "line": 216,
               "column": 4
             },
             "end": {
-              "line": 212,
+              "line": 223,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 213,
+                "line": 224,
                 "column": 4
               },
               "end": {
-                "line": 215,
+                "line": 227,
                 "column": 5
               }
             },
@@ -9544,22 +9544,22 @@
           ],
           "loc": {
             "start": {
-              "line": 217,
+              "line": 229,
               "column": 4
             },
             "end": {
-              "line": 231,
+              "line": 243,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 232,
+                "line": 244,
                 "column": 4
               },
               "end": {
-                "line": 234,
+                "line": 247,
                 "column": 5
               }
             },
@@ -9818,22 +9818,22 @@
           ],
           "loc": {
             "start": {
-              "line": 236,
+              "line": 249,
               "column": 4
             },
             "end": {
-              "line": 246,
+              "line": 259,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 247,
+                "line": 260,
                 "column": 4
               },
               "end": {
-                "line": 254,
+                "line": 268,
                 "column": 5
               }
             },
@@ -10208,22 +10208,22 @@
           ],
           "loc": {
             "start": {
-              "line": 256,
+              "line": 270,
               "column": 4
             },
             "end": {
-              "line": 262,
+              "line": 276,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 263,
+                "line": 277,
                 "column": 4
               },
               "end": {
-                "line": 265,
+                "line": 280,
                 "column": 5
               }
             },
@@ -10505,22 +10505,22 @@
           ],
           "loc": {
             "start": {
-              "line": 267,
+              "line": 282,
               "column": 4
             },
             "end": {
-              "line": 278,
+              "line": 293,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 279,
+                "line": 294,
                 "column": 4
               },
               "end": {
-                "line": 281,
+                "line": 297,
                 "column": 5
               }
             },
@@ -10953,22 +10953,22 @@
           ],
           "loc": {
             "start": {
-              "line": 283,
+              "line": 299,
               "column": 4
             },
             "end": {
-              "line": 290,
+              "line": 306,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 291,
+                "line": 307,
                 "column": 4
               },
               "end": {
-                "line": 293,
+                "line": 310,
                 "column": 5
               }
             },
@@ -11283,22 +11283,22 @@
           ],
           "loc": {
             "start": {
-              "line": 295,
+              "line": 312,
               "column": 4
             },
             "end": {
-              "line": 317,
+              "line": 334,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 318,
+                "line": 335,
                 "column": 4
               },
               "end": {
-                "line": 318,
+                "line": 335,
                 "column": 23
               }
             },
@@ -12650,22 +12650,22 @@
           ],
           "loc": {
             "start": {
-              "line": 14,
+              "line": 17,
               "column": 4
             },
             "end": {
-              "line": 20,
+              "line": 23,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 21,
+                "line": 24,
                 "column": 4
               },
               "end": {
-                "line": 23,
+                "line": 27,
                 "column": 5
               }
             },
@@ -12855,22 +12855,22 @@
           ],
           "loc": {
             "start": {
-              "line": 25,
+              "line": 29,
               "column": 4
             },
             "end": {
-              "line": 32,
+              "line": 36,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 33,
+                "line": 37,
                 "column": 4
               },
               "end": {
-                "line": 35,
+                "line": 40,
                 "column": 5
               }
             },
@@ -13122,22 +13122,22 @@
           ],
           "loc": {
             "start": {
-              "line": 37,
+              "line": 42,
               "column": 4
             },
             "end": {
-              "line": 44,
+              "line": 49,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 45,
+                "line": 50,
                 "column": 4
               },
               "end": {
-                "line": 47,
+                "line": 53,
                 "column": 5
               }
             },
@@ -13425,22 +13425,22 @@
           ],
           "loc": {
             "start": {
-              "line": 49,
+              "line": 55,
               "column": 4
             },
             "end": {
-              "line": 69,
+              "line": 75,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 70,
+                "line": 76,
                 "column": 4
               },
               "end": {
-                "line": 77,
+                "line": 84,
                 "column": 5
               }
             },
@@ -13832,22 +13832,22 @@
           ],
           "loc": {
             "start": {
-              "line": 79,
+              "line": 86,
               "column": 4
             },
             "end": {
-              "line": 87,
+              "line": 94,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 88,
+                "line": 95,
                 "column": 4
               },
               "end": {
-                "line": 90,
+                "line": 98,
                 "column": 5
               }
             },
@@ -14095,22 +14095,22 @@
           ],
           "loc": {
             "start": {
-              "line": 92,
+              "line": 100,
               "column": 4
             },
             "end": {
-              "line": 99,
+              "line": 107,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 100,
+                "line": 108,
                 "column": 4
               },
               "end": {
-                "line": 102,
+                "line": 111,
                 "column": 5
               }
             },
@@ -14297,22 +14297,22 @@
           ],
           "loc": {
             "start": {
-              "line": 104,
+              "line": 113,
               "column": 4
             },
             "end": {
-              "line": 111,
+              "line": 120,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 112,
+                "line": 121,
                 "column": 4
               },
               "end": {
-                "line": 114,
+                "line": 124,
                 "column": 5
               }
             },
@@ -19316,22 +19316,22 @@
           ],
           "loc": {
             "start": {
-              "line": 16,
+              "line": 20,
               "column": 4
             },
             "end": {
-              "line": 29,
+              "line": 33,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 30,
+                "line": 34,
                 "column": 4
               },
               "end": {
-                "line": 32,
+                "line": 37,
                 "column": 5
               }
             },
@@ -19817,22 +19817,22 @@
           ],
           "loc": {
             "start": {
-              "line": 34,
+              "line": 39,
               "column": 4
             },
             "end": {
-              "line": 43,
+              "line": 48,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 44,
+                "line": 49,
                 "column": 4
               },
               "end": {
-                "line": 46,
+                "line": 52,
                 "column": 5
               }
             },
@@ -19961,22 +19961,22 @@
           ],
           "loc": {
             "start": {
-              "line": 48,
+              "line": 54,
               "column": 4
             },
             "end": {
-              "line": 55,
+              "line": 61,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 56,
+                "line": 62,
                 "column": 4
               },
               "end": {
-                "line": 58,
+                "line": 65,
                 "column": 5
               }
             },
@@ -20175,22 +20175,22 @@
           ],
           "loc": {
             "start": {
-              "line": 60,
+              "line": 67,
               "column": 4
             },
             "end": {
-              "line": 68,
+              "line": 75,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 69,
+                "line": 76,
                 "column": 4
               },
               "end": {
-                "line": 71,
+                "line": 79,
                 "column": 5
               }
             },
@@ -20451,22 +20451,22 @@
           ],
           "loc": {
             "start": {
-              "line": 73,
+              "line": 81,
               "column": 4
             },
             "end": {
-              "line": 81,
+              "line": 89,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 82,
+                "line": 90,
                 "column": 4
               },
               "end": {
-                "line": 84,
+                "line": 93,
                 "column": 5
               }
             },
@@ -20726,22 +20726,22 @@
           ],
           "loc": {
             "start": {
-              "line": 86,
+              "line": 95,
               "column": 4
             },
             "end": {
-              "line": 93,
+              "line": 102,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 94,
+                "line": 103,
                 "column": 4
               },
               "end": {
-                "line": 96,
+                "line": 105,
                 "column": 5
               }
             },
@@ -20931,22 +20931,22 @@
           ],
           "loc": {
             "start": {
-              "line": 98,
+              "line": 107,
               "column": 4
             },
             "end": {
-              "line": 105,
+              "line": 114,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 106,
+                "line": 115,
                 "column": 4
               },
               "end": {
-                "line": 108,
+                "line": 118,
                 "column": 5
               }
             },
@@ -21129,22 +21129,22 @@
           ],
           "loc": {
             "start": {
-              "line": 110,
+              "line": 120,
               "column": 4
             },
             "end": {
-              "line": 117,
+              "line": 127,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 118,
+                "line": 128,
                 "column": 4
               },
               "end": {
-                "line": 120,
+                "line": 131,
                 "column": 5
               }
             },
@@ -21327,22 +21327,22 @@
           ],
           "loc": {
             "start": {
-              "line": 122,
+              "line": 133,
               "column": 4
             },
             "end": {
-              "line": 129,
+              "line": 140,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 130,
+                "line": 141,
                 "column": 4
               },
               "end": {
-                "line": 132,
+                "line": 144,
                 "column": 5
               }
             },
@@ -21535,22 +21535,22 @@
           ],
           "loc": {
             "start": {
-              "line": 134,
+              "line": 146,
               "column": 4
             },
             "end": {
-              "line": 142,
+              "line": 154,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 143,
+                "line": 155,
                 "column": 4
               },
               "end": {
-                "line": 145,
+                "line": 158,
                 "column": 5
               }
             },
@@ -21804,22 +21804,22 @@
           ],
           "loc": {
             "start": {
-              "line": 147,
+              "line": 160,
               "column": 4
             },
             "end": {
-              "line": 155,
+              "line": 168,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 156,
+                "line": 169,
                 "column": 4
               },
               "end": {
-                "line": 158,
+                "line": 172,
                 "column": 5
               }
             },
@@ -22067,22 +22067,22 @@
           ],
           "loc": {
             "start": {
-              "line": 160,
+              "line": 174,
               "column": 4
             },
             "end": {
-              "line": 168,
+              "line": 182,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 169,
+                "line": 183,
                 "column": 4
               },
               "end": {
-                "line": 171,
+                "line": 186,
                 "column": 5
               }
             },
@@ -23742,22 +23742,22 @@
           ],
           "loc": {
             "start": {
-              "line": 17,
+              "line": 21,
               "column": 4
             },
             "end": {
-              "line": 28,
+              "line": 32,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 29,
+                "line": 33,
                 "column": 4
               },
               "end": {
-                "line": 31,
+                "line": 36,
                 "column": 5
               }
             },
@@ -24098,22 +24098,22 @@
           ],
           "loc": {
             "start": {
-              "line": 33,
+              "line": 38,
               "column": 4
             },
             "end": {
-              "line": 42,
+              "line": 47,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 43,
+                "line": 48,
                 "column": 4
               },
               "end": {
-                "line": 54,
+                "line": 60,
                 "column": 5
               }
             },
@@ -24379,22 +24379,22 @@
           ],
           "loc": {
             "start": {
-              "line": 56,
+              "line": 62,
               "column": 4
             },
             "end": {
-              "line": 64,
+              "line": 70,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 71,
                 "column": 4
               },
               "end": {
-                "line": 67,
+                "line": 74,
                 "column": 5
               }
             },
@@ -24580,22 +24580,22 @@
           ],
           "loc": {
             "start": {
-              "line": 69,
+              "line": 76,
               "column": 4
             },
             "end": {
-              "line": 77,
+              "line": 84,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 78,
+                "line": 85,
                 "column": 4
               },
               "end": {
-                "line": 80,
+                "line": 88,
                 "column": 5
               }
             },
@@ -24804,22 +24804,22 @@
           ],
           "loc": {
             "start": {
-              "line": 82,
+              "line": 90,
               "column": 4
             },
             "end": {
-              "line": 92,
+              "line": 100,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 93,
+                "line": 101,
                 "column": 4
               },
               "end": {
-                "line": 96,
+                "line": 105,
                 "column": 5
               }
             },
@@ -25026,22 +25026,22 @@
           ],
           "loc": {
             "start": {
-              "line": 98,
+              "line": 107,
               "column": 4
             },
             "end": {
-              "line": 106,
+              "line": 115,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 107,
+                "line": 116,
                 "column": 4
               },
               "end": {
-                "line": 109,
+                "line": 119,
                 "column": 5
               }
             },
@@ -25230,22 +25230,22 @@
           ],
           "loc": {
             "start": {
-              "line": 111,
+              "line": 121,
               "column": 4
             },
             "end": {
-              "line": 119,
+              "line": 129,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 120,
+                "line": 130,
                 "column": 4
               },
               "end": {
-                "line": 122,
+                "line": 133,
                 "column": 5
               }
             },
@@ -25808,22 +25808,22 @@
           ],
           "loc": {
             "start": {
-              "line": 19,
+              "line": 23,
               "column": 4
             },
             "end": {
-              "line": 25,
+              "line": 29,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 26,
+                "line": 30,
                 "column": 4
               },
               "end": {
-                "line": 28,
+                "line": 33,
                 "column": 5
               }
             },
@@ -26007,22 +26007,22 @@
           ],
           "loc": {
             "start": {
-              "line": 30,
+              "line": 35,
               "column": 4
             },
             "end": {
-              "line": 36,
+              "line": 41,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 37,
+                "line": 42,
                 "column": 4
               },
               "end": {
-                "line": 39,
+                "line": 45,
                 "column": 5
               }
             },
@@ -26236,22 +26236,22 @@
     ],
     "loc": {
       "start": {
-        "line": 6,
+        "line": 9,
         "column": 2
       },
       "end": {
-        "line": 12,
+        "line": 15,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 14,
+          "line": 17,
           "column": 2
         },
         "end": {
-          "line": 85,
+          "line": 93,
           "column": 3
         }
       },
@@ -26833,22 +26833,22 @@
           ],
           "loc": {
             "start": {
-              "line": 15,
+              "line": 18,
               "column": 4
             },
             "end": {
-              "line": 24,
+              "line": 27,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 25,
+                "line": 28,
                 "column": 4
               },
               "end": {
-                "line": 27,
+                "line": 31,
                 "column": 5
               }
             },
@@ -27059,22 +27059,22 @@
           ],
           "loc": {
             "start": {
-              "line": 29,
+              "line": 33,
               "column": 4
             },
             "end": {
-              "line": 36,
+              "line": 40,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 37,
+                "line": 41,
                 "column": 4
               },
               "end": {
-                "line": 39,
+                "line": 44,
                 "column": 5
               }
             },
@@ -27195,22 +27195,22 @@
           ],
           "loc": {
             "start": {
-              "line": 41,
+              "line": 46,
               "column": 4
             },
             "end": {
-              "line": 47,
+              "line": 52,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 48,
+                "line": 53,
                 "column": 4
               },
               "end": {
-                "line": 50,
+                "line": 56,
                 "column": 5
               }
             },
@@ -27383,22 +27383,22 @@
           ],
           "loc": {
             "start": {
-              "line": 52,
+              "line": 58,
               "column": 4
             },
             "end": {
-              "line": 57,
+              "line": 63,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 58,
+                "line": 64,
                 "column": 4
               },
               "end": {
-                "line": 60,
+                "line": 67,
                 "column": 5
               }
             },
@@ -27700,22 +27700,22 @@
           ],
           "loc": {
             "start": {
-              "line": 62,
+              "line": 69,
               "column": 4
             },
             "end": {
-              "line": 81,
+              "line": 88,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 82,
+                "line": 89,
                 "column": 4
               },
               "end": {
-                "line": 84,
+                "line": 92,
                 "column": 5
               }
             },
@@ -28637,22 +28637,22 @@
     ],
     "loc": {
       "start": {
-        "line": 6,
+        "line": 10,
         "column": 2
       },
       "end": {
-        "line": 12,
+        "line": 16,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 14,
+          "line": 18,
           "column": 2
         },
         "end": {
-          "line": 175,
+          "line": 186,
           "column": 3
         }
       },
@@ -29477,22 +29477,22 @@
           ],
           "loc": {
             "start": {
-              "line": 39,
+              "line": 43,
               "column": 4
             },
             "end": {
-              "line": 58,
+              "line": 62,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 59,
+                "line": 63,
                 "column": 4
               },
               "end": {
-                "line": 61,
+                "line": 66,
                 "column": 5
               }
             },
@@ -30320,22 +30320,22 @@
           ],
           "loc": {
             "start": {
-              "line": 63,
+              "line": 68,
               "column": 4
             },
             "end": {
-              "line": 71,
+              "line": 76,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 72,
+                "line": 77,
                 "column": 4
               },
               "end": {
-                "line": 74,
+                "line": 80,
                 "column": 5
               }
             },
@@ -30577,22 +30577,22 @@
           ],
           "loc": {
             "start": {
-              "line": 76,
+              "line": 82,
               "column": 4
             },
             "end": {
-              "line": 83,
+              "line": 89,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 84,
+                "line": 90,
                 "column": 4
               },
               "end": {
-                "line": 86,
+                "line": 93,
                 "column": 5
               }
             },
@@ -30801,22 +30801,22 @@
           ],
           "loc": {
             "start": {
-              "line": 88,
+              "line": 95,
               "column": 4
             },
             "end": {
-              "line": 95,
+              "line": 102,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 96,
+                "line": 103,
                 "column": 4
               },
               "end": {
-                "line": 98,
+                "line": 106,
                 "column": 5
               }
             },
@@ -30975,22 +30975,22 @@
           ],
           "loc": {
             "start": {
-              "line": 100,
+              "line": 108,
               "column": 4
             },
             "end": {
-              "line": 108,
+              "line": 116,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 109,
+                "line": 117,
                 "column": 4
               },
               "end": {
-                "line": 111,
+                "line": 120,
                 "column": 5
               }
             },
@@ -31351,22 +31351,22 @@
           ],
           "loc": {
             "start": {
-              "line": 138,
+              "line": 147,
               "column": 4
             },
             "end": {
-              "line": 158,
+              "line": 167,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 159,
+                "line": 168,
                 "column": 4
               },
               "end": {
-                "line": 161,
+                "line": 171,
                 "column": 5
               }
             },
@@ -32284,22 +32284,22 @@
           ],
           "loc": {
             "start": {
-              "line": 163,
+              "line": 173,
               "column": 4
             },
             "end": {
-              "line": 171,
+              "line": 181,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 172,
+                "line": 182,
                 "column": 4
               },
               "end": {
-                "line": 174,
+                "line": 185,
                 "column": 5
               }
             },
@@ -32407,337 +32407,6 @@
       }
     ],
     "namespace": "Contacts"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "A set of handlers for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 4,
-                  "column": 26,
-                  "offset": 234
-                },
-                "indent": [
-                  1,
-                  1,
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 4,
-              "column": 26,
-              "offset": 234
-            },
-            "indent": [
-              1,
-              1,
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 4,
-          "column": 26,
-          "offset": 234
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 5,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 6,
-        "type": null,
-        "name": "sdpHandlers"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 27,
-        "column": 0
-      },
-      "end": {
-        "line": 34,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 62,
-          "column": 0
-        },
-        "end": {
-          "line": 62,
-          "column": 35
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "sdpHandlers",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": [
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 264,
-                        "offset": 263
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 264,
-                    "offset": 263
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 265
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 108,
-                        "offset": 372
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 265
-                  },
-                  "end": {
-                    "line": 3,
-                    "column": 108,
-                    "offset": 372
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 1,
-                        "offset": 374
-                      },
-                      "end": {
-                        "line": 5,
-                        "column": 167,
-                        "offset": 540
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 5,
-                    "column": 1,
-                    "offset": 374
-                  },
-                  "end": {
-                    "line": 5,
-                    "column": 167,
-                    "offset": 540
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 5,
-                "column": 167,
-                "offset": 540
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 7,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "sdpHandlers",
-              "lineNumber": 8
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 9,
-              "name": "createCodecRemover"
-            },
-            {
-              "title": "example",
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
-              "lineNumber": 10
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 38,
-              "column": 0
-            },
-            "end": {
-              "line": 57,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 62,
-                "column": 0
-              },
-              "end": {
-                "line": 62,
-                "column": 35
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
-            }
-          ],
-          "params": [],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "sdpHandlers",
-          "kind": "function",
-          "name": "createCodecRemover",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "sdpHandlers",
-              "kind": "module"
-            },
-            {
-              "name": "createCodecRemover",
-              "kind": "function"
-            }
-          ],
-          "namespace": "sdpHandlerscreateCodecRemover"
-        }
-      ]
-    },
-    "path": [
-      {
-        "name": "sdpHandlers",
-        "kind": "module"
-      }
-    ],
-    "namespace": "sdpHandlers"
   },
   {
     "description": {
@@ -33069,22 +32738,22 @@
           ],
           "loc": {
             "start": {
-              "line": 46,
+              "line": 49,
               "column": 0
             },
             "end": {
-              "line": 63,
+              "line": 66,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 71,
+                "line": 74,
                 "column": 0
               },
               "end": {
-                "line": 145,
+                "line": 148,
                 "column": 1
               }
             },
@@ -36807,6 +36476,337 @@
           "children": [
             {
               "type": "text",
+              "value": "A set of handlers for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 26,
+                  "offset": 234
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 26,
+              "offset": 234
+            },
+            "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 26,
+          "offset": 234
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 5,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 6,
+        "type": null,
+        "name": "sdpHandlers"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 27,
+        "column": 0
+      },
+      "end": {
+        "line": 34,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 62,
+          "column": 0
+        },
+        "end": {
+          "line": 62,
+          "column": 35
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "sdpHandlers",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 264,
+                        "offset": 263
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 264,
+                    "offset": 263
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 265
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 108,
+                        "offset": 372
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 265
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 108,
+                    "offset": 372
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 374
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 167,
+                        "offset": 540
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 374
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 167,
+                    "offset": 540
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 167,
+                "offset": 540
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 7,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "sdpHandlers",
+              "lineNumber": 8
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 9,
+              "name": "createCodecRemover"
+            },
+            {
+              "title": "example",
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
+              "lineNumber": 10
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 38,
+              "column": 0
+            },
+            "end": {
+              "line": 57,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 62,
+                "column": 0
+              },
+              "end": {
+                "line": 62,
+                "column": 35
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
+            }
+          ],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "sdpHandlers",
+          "kind": "function",
+          "name": "createCodecRemover",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "sdpHandlers",
+              "kind": "module"
+            },
+            {
+              "name": "createCodecRemover",
+              "kind": "function"
+            }
+          ],
+          "namespace": "sdpHandlerscreateCodecRemover"
+        }
+      ]
+    },
+    "path": [
+      {
+        "name": "sdpHandlers",
+        "kind": "module"
+      }
+    ],
+    "namespace": "sdpHandlers"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "The internal logger used to provide information about the SDK's behaviour.\nThe logger can provide two types of logs: basic logs and action logs. Basic\nlogs are simple lines of information about what the SDK is doing during operations.\nAction logs are complete information about a specific action that occurred\nwithin the SDK, prodiving debug information describing it.\nThe amount of information logged can be configured as part of the SDK\n(see ",
               "position": {
                 "start": {
@@ -37647,22 +37647,22 @@
           ],
           "loc": {
             "start": {
-              "line": 13,
+              "line": 17,
               "column": 4
             },
             "end": {
-              "line": 21,
+              "line": 25,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 22,
+                "line": 26,
                 "column": 4
               },
               "end": {
-                "line": 24,
+                "line": 29,
                 "column": 5
               }
             },
@@ -37849,22 +37849,22 @@
           ],
           "loc": {
             "start": {
-              "line": 26,
+              "line": 31,
               "column": 4
             },
             "end": {
-              "line": 34,
+              "line": 39,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 35,
+                "line": 40,
                 "column": 4
               },
               "end": {
-                "line": 37,
+                "line": 43,
                 "column": 5
               }
             },
@@ -38062,22 +38062,22 @@
     ],
     "loc": {
       "start": {
-        "line": 16,
+        "line": 20,
         "column": 4
       },
       "end": {
-        "line": 27,
+        "line": 31,
         "column": 7
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 28,
+          "line": 32,
           "column": 4
         },
         "end": {
-          "line": 30,
+          "line": 35,
           "column": 5
         }
       },
@@ -38240,545 +38240,6 @@
       }
     ],
     "namespace": "getBrowserDetails"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "The Channel object that the Proxy module needs to be provided.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 63,
-                  "offset": 62
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 63,
-              "offset": 62
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 63,
-          "offset": 62
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "Channel"
-      },
-      {
-        "title": "example",
-        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)",
-        "lineNumber": 5
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 10,
-        "column": 0
-      },
-      "end": {
-        "line": 35,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 57,
-          "column": 0
-        },
-        "end": {
-          "line": 57,
-          "column": 36
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-    },
-    "augments": [],
-    "examples": [
-      {
-        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)"
-      }
-    ],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "Channel",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": [
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Channel function that the Proxy module will use to send messages to the remote side.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 85,
-                        "offset": 84
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 85,
-                    "offset": 84
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 85,
-                "offset": 84
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 2,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "Channel",
-              "lineNumber": 3
-            },
-            {
-              "title": "name",
-              "description": null,
-              "lineNumber": 4,
-              "name": "send"
-            },
-            {
-              "title": "function",
-              "description": null,
-              "lineNumber": 5,
-              "name": null
-            },
-            {
-              "title": "param",
-              "description": "Message to be sent over the channel.",
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "data"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 37,
-              "column": 0
-            },
-            "end": {
-              "line": 44,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 57,
-                "column": 0
-              },
-              "end": {
-                "line": 57,
-                "column": 36
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "data",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Message to be sent over the channel.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 37,
-                            "offset": 36
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 37,
-                        "offset": 36
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 37,
-                    "offset": 36
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "Channel",
-          "name": "send",
-          "kind": "function",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "Channel",
-              "kind": "module"
-            },
-            {
-              "name": "send",
-              "kind": "function"
-            }
-          ],
-          "namespace": "Channelsend"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "API that the Proxy module will assign a listener function for accepting received messages.\nThis function should receive all messages sent from the remote side of the channel.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 84,
-                        "offset": 174
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 84,
-                    "offset": 174
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 84,
-                "offset": 174
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 3,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "Channel",
-              "lineNumber": 4
-            },
-            {
-              "title": "name",
-              "description": null,
-              "lineNumber": 5,
-              "name": "receive"
-            },
-            {
-              "title": "function",
-              "description": null,
-              "lineNumber": 6,
-              "name": null
-            },
-            {
-              "title": "param",
-              "description": "The message received from the Channel.",
-              "lineNumber": 7,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "data"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 46,
-              "column": 0
-            },
-            "end": {
-              "line": 54,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 57,
-                "column": 0
-              },
-              "end": {
-                "line": 57,
-                "column": 36
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "data",
-              "lineNumber": 7,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The message received from the Channel.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 39,
-                            "offset": 38
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 39,
-                        "offset": 38
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 39,
-                    "offset": 38
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "Channel",
-          "name": "receive",
-          "kind": "function",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "Channel",
-              "kind": "module"
-            },
-            {
-              "name": "receive",
-              "kind": "function"
-            }
-          ],
-          "namespace": "Channelreceive"
-        }
-      ]
-    },
-    "path": [
-      {
-        "name": "Channel",
-        "kind": "module"
-      }
-    ],
-    "namespace": "Channel"
   },
   {
     "description": {
@@ -39369,22 +38830,22 @@
           ],
           "loc": {
             "start": {
-              "line": 70,
+              "line": 73,
               "column": 4
             },
             "end": {
-              "line": 79,
+              "line": 82,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 80,
+                "line": 83,
                 "column": 4
               },
               "end": {
-                "line": 82,
+                "line": 86,
                 "column": 5
               }
             },
@@ -39566,22 +39027,22 @@
           ],
           "loc": {
             "start": {
-              "line": 84,
+              "line": 88,
               "column": 4
             },
             "end": {
-              "line": 90,
+              "line": 94,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 91,
+                "line": 95,
                 "column": 4
               },
               "end": {
-                "line": 93,
+                "line": 98,
                 "column": 5
               }
             },
@@ -39772,22 +39233,22 @@
           ],
           "loc": {
             "start": {
-              "line": 102,
+              "line": 108,
               "column": 4
             },
             "end": {
-              "line": 114,
+              "line": 120,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 115,
+                "line": 121,
                 "column": 4
               },
               "end": {
-                "line": 117,
+                "line": 124,
                 "column": 5
               }
             },
@@ -40040,22 +39501,22 @@
           ],
           "loc": {
             "start": {
-              "line": 119,
+              "line": 126,
               "column": 4
             },
             "end": {
-              "line": 125,
+              "line": 132,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 126,
+                "line": 133,
                 "column": 4
               },
               "end": {
-                "line": 128,
+                "line": 136,
                 "column": 5
               }
             },
@@ -40272,22 +39733,22 @@
           ],
           "loc": {
             "start": {
-              "line": 130,
+              "line": 138,
               "column": 4
             },
             "end": {
-              "line": 136,
+              "line": 144,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 137,
+                "line": 145,
                 "column": 4
               },
               "end": {
-                "line": 139,
+                "line": 148,
                 "column": 5
               }
             },
@@ -40343,6 +39804,930 @@
       }
     ],
     "namespace": "Proxy"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "The Channel object that the Proxy module needs to be provided.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 63,
+              "offset": 62
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 63,
+          "offset": 62
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "Channel"
+      },
+      {
+        "title": "example",
+        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)",
+        "lineNumber": 5
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 10,
+        "column": 0
+      },
+      "end": {
+        "line": 35,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 57,
+          "column": 0
+        },
+        "end": {
+          "line": 57,
+          "column": 36
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+    },
+    "augments": [],
+    "examples": [
+      {
+        "description": "// The channel the application uses for communicating with a remote endpoint.\nconst appChannel = ...\n\n// The channel the application will provide to the Proxy module for use.\nconst channel = {\n   send: function (data) {\n     // Any encoding / wrapping needed for a Proxy message being sent\n     //    over the channel.\n     appChannel.sendMessage(data)\n   },\n   // The Proxy module will set this function.\n   receive: undefined\n}\nappChannel.on('message', data => {\n   // Any decoding / unwrapping needed for the received message.\n   channel.receive(data)\n})\n\nclient.proxy.setChannel(channel)"
+      }
+    ],
+    "params": [],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "Channel",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "API that the Proxy module will assign a listener function for accepting received messages.\nThis function should receive all messages sent from the remote side of the channel.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 84,
+                        "offset": 174
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 84,
+                    "offset": 174
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 84,
+                "offset": 174
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 3,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "Channel",
+              "lineNumber": 4
+            },
+            {
+              "title": "name",
+              "description": null,
+              "lineNumber": 5,
+              "name": "receive"
+            },
+            {
+              "title": "function",
+              "description": null,
+              "lineNumber": 6,
+              "name": null
+            },
+            {
+              "title": "param",
+              "description": "The message received from the Channel.",
+              "lineNumber": 7,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "data"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 46,
+              "column": 0
+            },
+            "end": {
+              "line": 54,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 57,
+                "column": 0
+              },
+              "end": {
+                "line": 57,
+                "column": 36
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "data",
+              "lineNumber": 7,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The message received from the Channel.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 39,
+                            "offset": 38
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 39,
+                        "offset": 38
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 39,
+                    "offset": 38
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "Channel",
+          "name": "receive",
+          "kind": "function",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Channel",
+              "kind": "module"
+            },
+            {
+              "name": "receive",
+              "kind": "function"
+            }
+          ],
+          "namespace": "Channelreceive"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Channel function that the Proxy module will use to send messages to the remote side.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 85,
+                        "offset": 84
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 85,
+                    "offset": 84
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 85,
+                "offset": 84
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 2,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "Channel",
+              "lineNumber": 3
+            },
+            {
+              "title": "name",
+              "description": null,
+              "lineNumber": 4,
+              "name": "send"
+            },
+            {
+              "title": "function",
+              "description": null,
+              "lineNumber": 5,
+              "name": null
+            },
+            {
+              "title": "param",
+              "description": "Message to be sent over the channel.",
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "data"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 37,
+              "column": 0
+            },
+            "end": {
+              "line": 44,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 57,
+                "column": 0
+              },
+              "end": {
+                "line": 57,
+                "column": 36
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/webrtcProxy/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "data",
+              "lineNumber": 6,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Message to be sent over the channel.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 37,
+                            "offset": 36
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 37,
+                    "offset": 36
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "Channel",
+          "name": "send",
+          "kind": "function",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Channel",
+              "kind": "module"
+            },
+            {
+              "name": "send",
+              "kind": "function"
+            }
+          ],
+          "namespace": "Channelsend"
+        }
+      ]
+    },
+    "path": [
+      {
+        "name": "Channel",
+        "kind": "module"
+      }
+    ],
+    "namespace": "Channel"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A collection of devices and their information.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 47,
+                  "offset": 46
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 47,
+              "offset": 46
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 47,
+          "offset": 46
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "DevicesObject"
+      },
+      {
+        "title": "property",
+        "description": "A list of camera device information.",
+        "lineNumber": 5,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "camera"
+      },
+      {
+        "title": "property",
+        "description": "A list of microphone device information.",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "microphone"
+      },
+      {
+        "title": "property",
+        "description": "A list of speaker device information.",
+        "lineNumber": 7,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "speaker"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 74,
+        "column": 0
+      },
+      "end": {
+        "line": 82,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 104,
+          "column": 0
+        },
+        "end": {
+          "line": 108,
+          "column": 1
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "camera",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of camera device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "microphone",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of microphone device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "speaker",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of speaker device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 38,
+                      "offset": 37
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 38,
+              "offset": 37
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "DevicesObject",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "DevicesObject",
+        "kind": "module"
+      }
+    ],
+    "namespace": "DevicesObject"
   },
   {
     "description": {
@@ -43145,391 +43530,6 @@
           "children": [
             {
               "type": "text",
-              "value": "A collection of devices and their information.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 47,
-                  "offset": 46
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 47,
-              "offset": 46
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 47,
-          "offset": 46
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DevicesObject"
-      },
-      {
-        "title": "property",
-        "description": "A list of camera device information.",
-        "lineNumber": 5,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "camera"
-      },
-      {
-        "title": "property",
-        "description": "A list of microphone device information.",
-        "lineNumber": 6,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "microphone"
-      },
-      {
-        "title": "property",
-        "description": "A list of speaker device information.",
-        "lineNumber": 7,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "speaker"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 74,
-        "column": 0
-      },
-      "end": {
-        "line": 82,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 104,
-          "column": 0
-        },
-        "end": {
-          "line": 108,
-          "column": 1
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "camera",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of camera device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 37,
-                      "offset": 36
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "microphone",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of microphone device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "speaker",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of speaker device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 38,
-                      "offset": 37
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 38,
-                  "offset": 37
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 38,
-              "offset": 37
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "DevicesObject",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "DevicesObject",
-        "kind": "module"
-      }
-    ],
-    "namespace": "DevicesObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "The Service feature allows applications to subscribe for receiving\ncommunications from the platform's services. It allows an application to manage the\nfeatures that they will receive notifications for, and on which type of\nchannel they wish to receive them on.",
               "position": {
                 "start": {
@@ -44116,7 +44116,7 @@
                 "column": 4
               },
               "end": {
-                "line": 53,
+                "line": 54,
                 "column": 5
               }
             },
@@ -44375,22 +44375,22 @@
           ],
           "loc": {
             "start": {
-              "line": 55,
+              "line": 56,
               "column": 4
             },
             "end": {
-              "line": 62,
+              "line": 63,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 63,
+                "line": 64,
                 "column": 4
               },
               "end": {
-                "line": 71,
+                "line": 73,
                 "column": 5
               }
             },
@@ -44634,22 +44634,22 @@
           ],
           "loc": {
             "start": {
-              "line": 77,
+              "line": 80,
               "column": 4
             },
             "end": {
-              "line": 83,
+              "line": 86,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 84,
+                "line": 87,
                 "column": 4
               },
               "end": {
-                "line": 90,
+                "line": 94,
                 "column": 5
               }
             },

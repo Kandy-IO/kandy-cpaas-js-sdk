@@ -1,7 +1,7 @@
 /**
  * Kandy.js (Next)
  * kandy.cpaas2.js
- * Version: 3.4.0-beta.72055
+ * Version: 3.4.0-beta.72110
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22170,7 +22170,31 @@ var _selectors = __webpack_require__("./src/auth/interface/selectors.js");
 
 var _constants = __webpack_require__("./src/auth/constants.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * The authentication feature allows for setting authentication token which will be used for all communications
+ * with the platform. Authentication is used by all other features for
+ * fulfilling requests made to the backend server.
+ * @public
+ * @requires cpaas2auth
+ * @module Authentication
+ */
+
+/**
+ * The authentication feature handles connecting and disconnecting from any
+ * backend services that the SDK deals with. As well, it handles and stores
+ * authentication information on the behalf of the user. This allows the user to
+ * interact with the server without worrying about authenticating.
+ *
+ * @public
+ * @requires connect
+ * @module Authentication
+ */
+
+const log = (0, _logs.getLogManager)().getLogger('AUTH');
 
 /**
  * Authentication API.
@@ -22273,6 +22297,9 @@ function api({ dispatch, getState }) {
      * });
      */
     connect(credentials) {
+      // We won't expose oauthToken because it essentially acts as a password being used in conjunction with username
+      // ..and passwords should NOT be logged.
+      log.debug(_logs.API_LOG_TAG + 'connect: ', credentials.username);
       dispatch(actions.connect(credentials));
     },
 
@@ -22287,6 +22314,7 @@ function api({ dispatch, getState }) {
      * @method disconnect
      */
     disconnect() {
+      log.debug(_logs.API_LOG_TAG + 'disconnect');
       dispatch(actions.disconnect());
     },
 
@@ -22320,6 +22348,9 @@ function api({ dispatch, getState }) {
      * });
      */
     updateToken(credentials) {
+      // We won't expose oauthToken because it essentially acts as a password being used in conjunction with username
+      // ..and passwords should NOT be logged.
+      log.debug(_logs.API_LOG_TAG + 'updateToken: ', credentials.username);
       dispatch(actions.refreshTokens(credentials));
     },
 
@@ -22338,6 +22369,7 @@ function api({ dispatch, getState }) {
      * })
      */
     updateConnection(connection) {
+      log.debug(_logs.API_LOG_TAG + 'updateConnection: ', connection);
       dispatch(actions.updateSubscription(connection));
     },
 
@@ -22353,6 +22385,7 @@ function api({ dispatch, getState }) {
      * @returns {string} user.token The current access token.
      */
     getUserInfo() {
+      log.debug(_logs.API_LOG_TAG + 'getUserInfo');
       return (0, _selectors.getUserInfo)(getState());
     },
 
@@ -22371,6 +22404,7 @@ function api({ dispatch, getState }) {
      * @returns {string} connection.error.stack The stack trace of the error.
      */
     getConnection() {
+      log.debug(_logs.API_LOG_TAG + 'getConnection');
       const { isConnected, isPending, error } = getState().authentication;
       return {
         isConnected,
@@ -22390,6 +22424,7 @@ function api({ dispatch, getState }) {
      * @return {Array} A list of subscribed-to services.
      */
     getServices() {
+      log.debug(_logs.API_LOG_TAG + 'getServices');
       return (0, _selectors.getServices)(getState());
     },
 
@@ -22423,28 +22458,12 @@ function api({ dispatch, getState }) {
      * })
      */
     setTokens({ accessToken, idToken }) {
+      // We won't log both tokens, just the id one, so that we can still be able to debug.
+      log.debug(_logs.API_LOG_TAG + 'setTokens: ', idToken);
       dispatch(actions.setTokens({ accessToken, idToken }));
     }
   };
-} /**
-   * The authentication feature allows for setting authentication token which will be used for all communications
-   * with the platform. Authentication is used by all other features for
-   * fulfilling requests made to the backend server.
-   * @public
-   * @requires cpaas2auth
-   * @module Authentication
-   */
-
-/**
- * The authentication feature handles connecting and disconnecting from any
- * backend services that the SDK deals with. As well, it handles and stores
- * authentication information on the behalf of the user. This allows the user to
- * interact with the server without worrying about authenticating.
- *
- * @public
- * @requires connect
- * @module Authentication
- */
+}
 
 /***/ }),
 
@@ -25003,9 +25022,12 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 var _constants = __webpack_require__("./src/call/constants.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Call plugin.
+// Libraries.
+const log = (0, _logs.getLogManager)().getLogger('CALL'); // Call plugin.
 function callAPI({ dispatch, getState }) {
   return {
     /**
@@ -25049,6 +25071,7 @@ function callAPI({ dispatch, getState }) {
      * const newCallId = client.call.make(callee, { audio: true })
      */
     make(destination, media = {}, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'call.make: ', destination, media, options);
       const callId = (0, _v2.default)();
 
       const mediaConstraints = {
@@ -25078,6 +25101,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the call to reject.
      */
     reject(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.reject: ', callId);
       dispatch(_actions.callActions.rejectCall(callId));
     },
 
@@ -25107,6 +25131,7 @@ function callAPI({ dispatch, getState }) {
      * @param {Boolean} [media.video=false] Whether the call should have video on start.
      */
     answer(callId, media = {}, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
         video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
@@ -25132,6 +25157,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the call to ignore.
      */
     ignore(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.ignore: ', callId);
       dispatch(_actions.callActions.ignoreCall(callId));
     },
 
@@ -25155,6 +25181,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the call to hold.
      */
     hold(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.hold: ', callId);
       dispatch(_actions.callActions.holdCall(callId));
     },
 
@@ -25174,6 +25201,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the call to unhold.
      */
     unhold(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.unhold: ', callId);
       dispatch(_actions.callActions.unholdCall(callId));
     },
 
@@ -25190,6 +25218,7 @@ function callAPI({ dispatch, getState }) {
      * });
      */
     getAll() {
+      log.debug(_logs.API_LOG_TAG + 'call.getAll');
       return (0, _selectors.getCalls)(getState());
     },
 
@@ -25202,6 +25231,7 @@ function callAPI({ dispatch, getState }) {
      * @return {CallObject} A call object.
      */
     getById(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.getById: ', callId);
       return (0, _selectors.getCallById)(getState(), callId);
     },
 
@@ -25221,6 +25251,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the call to end.
      */
     end(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.end: ', callId);
       dispatch(_actions.callActions.endCall(callId));
     },
 
@@ -25236,6 +25267,7 @@ function callAPI({ dispatch, getState }) {
      * @param {Boolean} [media.video=false] Whether to add video to the call.
      */
     addMedia(callId, media = {}) {
+      log.debug(_logs.API_LOG_TAG + 'call.addMedia: ', callId, media);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
         video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
@@ -25252,6 +25284,7 @@ function callAPI({ dispatch, getState }) {
      * @param {Array} tracks A list of track IDs to remove.
      */
     removeMedia(callId, tracks) {
+      log.debug(_logs.API_LOG_TAG + 'call.removeMedia: ', callId, tracks);
       dispatch(_actions.callActions.removeMedia(callId, { tracks }));
     },
 
@@ -25268,6 +25301,7 @@ function callAPI({ dispatch, getState }) {
      *
      */
     sendDTMF(callId, tone, duration = 100, intertoneGap = 70) {
+      log.debug(_logs.API_LOG_TAG + 'call.sendDTMF: ', callId, tone, duration, intertoneGap);
       dispatch(_actions.callActions.sendDTMF(callId, { tone, duration, intertoneGap }));
     },
 
@@ -25280,6 +25314,7 @@ function callAPI({ dispatch, getState }) {
      * @param {string} [trackId] TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
      */
     getStats(callId, trackId) {
+      log.debug(_logs.API_LOG_TAG + 'call.getStats: ', callId, trackId);
       dispatch(_actions.callActions.getStats(callId, { trackId }));
     },
 
@@ -25309,8 +25344,6 @@ function callAPI({ dispatch, getState }) {
     states: _constants.CALL_STATES
   };
 }
-
-// Libraries.
 
 /***/ }),
 
@@ -29305,15 +29338,17 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__("./src/config/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * An interface for getting and updating the configuration Object.
- *
- * @public
- * @module Config
- * @requires config
- */
+const log = (0, _logs.getLogManager)().getLogger('CONFIG'); /**
+                                                             * An interface for getting and updating the configuration Object.
+                                                             *
+                                                             * @public
+                                                             * @module Config
+                                                             * @requires config
+                                                             */
 function api(context) {
   const configApi = {
     /**
@@ -29326,6 +29361,7 @@ function api(context) {
      * @returns {Object} A configuration Object
      */
     getConfig: function () {
+      log.debug(_logs.API_LOG_TAG + 'getConfig');
       return (0, _selectors.getConfiguration)(context.getState());
     },
 
@@ -29339,6 +29375,7 @@ function api(context) {
      * @param {Object} newConfigValues Key Value pairs that will be placed into the store.
      */
     updateConfig: function (newConfigValues) {
+      log.debug(_logs.API_LOG_TAG + 'updateConfig: ', newConfigValues);
       context.dispatch(actions.update(newConfigValues));
     }
   };
@@ -29685,6 +29722,11 @@ var _actions = __webpack_require__("./src/connectivity/interface/actions.js");
 
 var _selectors = __webpack_require__("./src/connectivity/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
+// Constants
+const log = (0, _logs.getLogManager)().getLogger('CONNECTIVITY');
+
 /**
  * The connection feature is used to connect and maintain connections between
  * the SDK and one or more backend servers.
@@ -29705,6 +29747,7 @@ function api({ dispatch, getState }) {
      * @param  {string} [platform='link'] Backend platform for which websocket's state to request.
      */
     getSocketState(platform = _constants.platforms.LINK) {
+      log.debug(_logs.API_LOG_TAG + 'connection.getSocketState: ', platform);
       return (0, _selectors.getConnectionState)(getState(), platform);
     },
 
@@ -29716,12 +29759,13 @@ function api({ dispatch, getState }) {
      * @param {boolean} enable Whether to enable or disable connectivity checking.
      */
     enableConnectivityChecking(enable) {
+      log.debug(_logs.API_LOG_TAG + 'connection.enableConnectivityChecking: ', enable);
       dispatch((0, _actions.changeConnectivityChecking)(enable));
     }
   };
 
   return { connection: connectivityApi };
-} // Constants
+}
 
 /***/ }),
 
@@ -31430,6 +31474,18 @@ exports.default = api;
 
 var _actions = __webpack_require__("./src/events/interface/actions.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
+/**
+ * The Events feature allows an application to listen for events that the SDK emits.
+ * Each other feature has a set of event types that can be subscribed to using
+ * the Event APIs.
+ * @public
+ * @module Events
+ */
+// Actions the interface uses.
+const log = (0, _logs.getLogManager)().getLogger('EVENTS');
+
 /**
  * API for Event Emitter plugin.
  * Defines the public end-points exposed by event plugins.
@@ -31455,6 +31511,7 @@ function api({ dispatch }) {
    * })
    */
   api.on = function (type, listener) {
+    log.debug(_logs.API_LOG_TAG + 'on: ', type);
     dispatch((0, _actions.on)(type, listener));
   };
 
@@ -31469,6 +31526,7 @@ function api({ dispatch }) {
    * @throws {Error} Invalid event type
    */
   api.off = function (type, listener) {
+    log.debug(_logs.API_LOG_TAG + 'off: ', type);
     dispatch((0, _actions.off)(type, listener));
   };
 
@@ -31482,6 +31540,7 @@ function api({ dispatch }) {
    * @throws {Error} Listener not a function
    */
   api.subscribe = function (listener) {
+    log.debug(_logs.API_LOG_TAG + 'subscribe');
     dispatch((0, _actions.subscribe)(listener));
   };
 
@@ -31495,18 +31554,12 @@ function api({ dispatch }) {
    * @throws {Error} Listener not a function
    */
   api.unsubscribe = function (listener) {
+    log.debug(_logs.API_LOG_TAG + 'unsubscribe');
     dispatch((0, _actions.unsubscribe)(listener));
   };
 
   return api;
-} /**
-   * The Events feature allows an application to listen for events that the SDK emits.
-   * Each other feature has a set of event types that can be subscribed to using
-   * the Event APIs.
-   * @public
-   * @module Events
-   */
-// Actions the interface uses.
+}
 
 /***/ }),
 
@@ -31694,7 +31747,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '3.4.0-beta.72055';
+  let version = '3.4.0-beta.72110';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -33209,6 +33262,7 @@ exports.default = function (context) {
      * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
      */
     create(params) {
+      log.debug(_logs.API_LOG_TAG + 'groups.create: ', params);
       context.dispatch(actions.create(params));
     },
 
@@ -33223,6 +33277,7 @@ exports.default = function (context) {
      *
      */
     fetch() {
+      log.debug(_logs.API_LOG_TAG + 'groups.fetch');
       context.dispatch(actions.fetchGroups());
     },
 
@@ -33235,6 +33290,7 @@ exports.default = function (context) {
      * @return {Group[]} - An array of Groups.
      */
     getAll() {
+      log.debug(_logs.API_LOG_TAG + 'groups.getAll');
       return selectors.getAllGroups(context.getState());
     },
 
@@ -33248,6 +33304,7 @@ exports.default = function (context) {
      * @return {Group} - Group information.
      */
     get(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.get: ', groupId);
       return selectors.getGroup(context.getState(), groupId);
     },
 
@@ -33261,6 +33318,7 @@ exports.default = function (context) {
      * @return {Participant[]} - A list of participants.
      */
     getParticipants(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.getParticipants: ', groupId);
       return selectors.getParticipants(context.getState(), groupId);
     },
 
@@ -33285,6 +33343,7 @@ exports.default = function (context) {
      * @param {string} groupId - The Id of the group to leave.
      */
     leave(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.leave: ', groupId);
       context.dispatch(actions.leave(groupId));
     },
 
@@ -33297,6 +33356,7 @@ exports.default = function (context) {
      * @param {string} groupId - The Id of the group to accept an invitation to.
      */
     acceptInvitation(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.acceptInvitation: ', groupId);
       context.dispatch(actions.acceptInvitation(groupId));
     },
 
@@ -33309,6 +33369,7 @@ exports.default = function (context) {
      * @param {string} groupId - The Id of the group to reject an invitation to.
      */
     rejectInvitation(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.rejectInvitation: ', groupId);
       context.dispatch(actions.rejectInvitation(groupId));
     },
 
@@ -33322,6 +33383,7 @@ exports.default = function (context) {
      * @param {string} participant - The userId of participant to add.
      */
     addParticipant(groupId, participant) {
+      log.debug(_logs.API_LOG_TAG + 'groups.addParticipant: ', groupId, participant);
       context.dispatch(actions.addParticipant(groupId, participant));
     },
 
@@ -33335,6 +33397,7 @@ exports.default = function (context) {
      * @param {string} participant - The userId of participant to remove.
      */
     removeParticipant(groupId, participant) {
+      log.debug(_logs.API_LOG_TAG + 'groups.removeParticipant: ', groupId, participant);
       context.dispatch(actions.removeParticipant(groupId, participant));
     },
 
@@ -33348,6 +33411,7 @@ exports.default = function (context) {
      * @param {string} groupId - The Id of the group to delete.
      */
     delete(groupId) {
+      log.debug(_logs.API_LOG_TAG + 'groups.delete: ', groupId);
       context.dispatch(actions.deleteGroup(groupId));
     }
   };
@@ -33362,7 +33426,19 @@ var _selectors = __webpack_require__("./src/groups/interface/selectors.js");
 
 var selectors = _interopRequireWildcard(_selectors);
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
+                                                             * The Groups feature is used to manage groups.
+                                                             *
+                                                             * Group functions are all part of the 'groups' namespace.
+                                                             *
+                                                             * @public
+                                                             * @requires groups
+                                                             * @module Groups
+                                                             */
 
 /***/ }),
 
@@ -34149,6 +34225,7 @@ root.sdpHandlers = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.API_LOG_TAG = undefined;
 
 var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
 
@@ -34208,7 +34285,7 @@ const defaultOptions = {
   },
   enableFcsLogs: true
 
-  // Instantiate the log manager
+  // Logs generated as a result of invoking the public API will contain this tag
 };
 
 // Redux Logger middleware
@@ -34218,6 +34295,9 @@ const defaultOptions = {
 
 
 // Libraries.
+const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
+
+// Instantiate the log manager
 const logMgr = getLogManager(defaultOptions);
 
 /**
@@ -38772,9 +38852,13 @@ var actions = _interopRequireWildcard(_actions);
 
 var _constants = __webpack_require__("./src/constants.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = (0, _logs.getLogManager)().getLogger('NOTIFICATION');
 
 /**
  * Notifications API.
@@ -38800,6 +38884,7 @@ function api({ dispatch }) {
      * @param {string} [channel] - The channel that the notification came from.
      */
     process(notification, channel, platform = _constants.platforms.LINK) {
+      log.debug(_logs.API_LOG_TAG + 'notification.process: ', notification, channel, platform);
       dispatch(actions.externalNotification(notification, channel, platform));
     },
 
@@ -38817,6 +38902,7 @@ function api({ dispatch }) {
      * @param {string} params.clientCorrelator - Unique identifier for a client device.
      */
     registerPush(params) {
+      log.debug(_logs.API_LOG_TAG + 'notification.registerPush', params);
       dispatch(actions.enableNotificationChannel('PUSH', (0, _extends3.default)({}, params, {
         channelEnabled: true
       })));
@@ -38831,6 +38917,7 @@ function api({ dispatch }) {
      * @method deregisterPush
      */
     deregisterPush() {
+      log.debug(_logs.API_LOG_TAG + 'notification.deregisterPush');
       dispatch(actions.enableNotificationChannel('PUSH', {
         channelEnabled: false
       }));
@@ -38846,6 +38933,7 @@ function api({ dispatch }) {
      * @param {boolean} enable - Whether the websocket channel should be enabled.
      */
     enableWebsocket(enable) {
+      log.debug(_logs.API_LOG_TAG + 'notification.enableWebsocket: ', enable);
       dispatch(actions.enableNotificationChannel('WEBSOCKET', {
         channelEnabled: enable
       }));
@@ -40285,6 +40373,7 @@ exports.default = function (context) {
      * @param  {string} [note] An additional note to be provided when the activity is "other".
      */
     update(status, activity, note) {
+      log.debug(_logs.API_LOG_TAG + 'presence.update: ', status, activity, note);
       context.dispatch(actions.updatePresence(status, activity, note));
     },
 
@@ -40299,6 +40388,7 @@ exports.default = function (context) {
      * @return {Array} List of user presence information.
      */
     get(user) {
+      log.debug(_logs.API_LOG_TAG + 'presence.get: ', user);
       const users = Array.isArray(user) ? user : [user];
       const storedUsers = selectors.getPresence(context.getState(), users);
       // return something sensible based on the input
@@ -40321,6 +40411,7 @@ exports.default = function (context) {
      * @return {Array} List of user presence information.
      */
     getAll() {
+      log.debug(_logs.API_LOG_TAG + 'presence.getAll');
       return selectors.getAllPresence(context.getState());
     },
 
@@ -40334,6 +40425,7 @@ exports.default = function (context) {
      * @return {Object}
      */
     getSelf() {
+      log.debug(_logs.API_LOG_TAG + 'presence.getSelf');
       return selectors.getSelfPresence(context.getState());
     },
 
@@ -40349,6 +40441,7 @@ exports.default = function (context) {
      * @param  {Array<string>|string} users  A user id or an array of user ids.
      */
     fetch(user) {
+      log.debug(_logs.API_LOG_TAG + 'presence.fetch: ', user);
       const users = Array.isArray(user) ? user : [user];
       context.dispatch(actions.getPresence(users));
     },
@@ -40363,6 +40456,7 @@ exports.default = function (context) {
      * @param  {string} user  The ID of the user to subscribe to.
      */
     subscribe(users) {
+      log.debug(_logs.API_LOG_TAG + 'presence.subscribe: ', users);
       context.dispatch(actions.subscribePresence(users));
     },
 
@@ -40376,6 +40470,7 @@ exports.default = function (context) {
      * @param  {string} user  The ID of the user to unsubscribe from.
      */
     unsubscribe(users) {
+      log.debug(_logs.API_LOG_TAG + 'presence.unsubscribe: ', users);
       context.dispatch(actions.unsubscribePresence(users));
     }
   };
@@ -40390,7 +40485,20 @@ var _selectors = __webpack_require__("./src/presence/interface/selectors.js");
 
 var selectors = _interopRequireWildcard(_selectors);
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const log = (0, _logs.getLogManager)().getLogger('PRESENCE'); /**
+                                                               * The presence features are used to update the authenticated users presence
+                                                               * on the server, as well as retrieve other users presence information.
+                                                               *
+                                                               * Presence functions are all part of the 'presence' namespace.
+                                                               *
+                                                               * @public
+                                                               * @requires presence
+                                                               * @module Presence
+                                                               */
 
 /***/ }),
 
@@ -42194,6 +42302,7 @@ function api({ dispatch, getState }) {
      * @param {String} [type='websocket'] The type of subscription you would like to subscribe for.
      */
     subscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
+      log.debug(_logs.API_LOG_TAG + 'services.subscribe: ', services, type);
       const userInfo = (0, _selectors2.getUserInfo)(getState());
       if (userInfo && userInfo.accessToken) {
         services = services.map(service => service.toLowerCase());
@@ -42212,6 +42321,7 @@ function api({ dispatch, getState }) {
      * @param {String} [type='websocket'] The type of channelto be used for the notifications.
      */
     unsubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
+      log.debug(_logs.API_LOG_TAG + 'services.unsubscribe: ', services, type);
       const userInfo = (0, _selectors2.getUserInfo)(getState());
       if (userInfo && userInfo.accessToken) {
         services = services.map(service => service.toLowerCase());
@@ -42222,6 +42332,7 @@ function api({ dispatch, getState }) {
     },
 
     resubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
+      log.debug(_logs.API_LOG_TAG + 'services.resubscribe: ', services, type);
       log.info(`THIS FUNCTIONALITY IS NOT YET SUPPORTED. Services: ${services}. Type: ${type}`);
     },
 
@@ -42233,6 +42344,7 @@ function api({ dispatch, getState }) {
      * @return {Object} Lists of subscribed and available services.
      */
     getSubscriptions() {
+      log.debug(_logs.API_LOG_TAG + 'services.getSubscriptions');
       return {
         subscribed: (0, _selectors.getSubscribedServices)(getState()),
         available: (0, _selectors.getRegisteredServices)(getState()),
@@ -43793,9 +43905,11 @@ var actions = _interopRequireWildcard(_contacts);
 
 var _selectors = __webpack_require__("./src/users/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// Users plugin.
+const log = (0, _logs.getLogManager)().getLogger('USERS'); // Users plugin.
 function contactsAPI({ dispatch, getState, primitives }) {
   /**
    * The Contacts feature allows users to store personal contacts to their account.
@@ -43851,6 +43965,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @param {boolean} [contact.buddy] Indicates whether or not the contact is a friend of the user
      */
     add(contact) {
+      log.debug(_logs.API_LOG_TAG + 'contacts.add: ', contact);
       dispatch(actions.addContact(contact));
     },
 
@@ -43864,6 +43979,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @return {Object} Contact information.
      */
     get(contactId) {
+      log.debug(_logs.API_LOG_TAG + 'contacts.get: ', contactId);
       return (0, _selectors.getContact)(getState(), contactId);
     },
 
@@ -43876,6 +43992,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @return {Array} List of contact information.
      */
     getAll() {
+      log.debug(_logs.API_LOG_TAG + 'contacts.getAll');
       return (0, _selectors.getContacts)(getState());
     },
 
@@ -43888,6 +44005,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @method refresh
      */
     refresh() {
+      log.debug(_logs.API_LOG_TAG + 'contacts.refresh');
       dispatch(actions.refreshContacts());
     },
 
@@ -43901,6 +44019,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @param  {string} id The Id of the contact that will be removed.
      */
     remove(id) {
+      log.debug(_logs.API_LOG_TAG + 'contacts.remove: ', id);
       dispatch(actions.removeContact(id));
     },
 
@@ -43951,6 +44070,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @param {boolean} [contact.buddy] Indicates whether or not the contact is a friend of the user
      */
     update(contactId, contact) {
+      log.debug(_logs.API_LOG_TAG + 'contacts.update: ', contactId, contact);
       dispatch(actions.updateContact(contactId, contact));
     },
 
@@ -43964,6 +44084,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @param  {string} contactId The unique contact ID of the contact.
      */
     fetch(contactId) {
+      log.debug(_logs.API_LOG_TAG + 'contacts.fetch: ', contactId);
       dispatch(actions.fetchContact(contactId));
     }
   };
@@ -44028,9 +44149,11 @@ var actions = _interopRequireWildcard(_users);
 
 var _selectors = __webpack_require__("./src/users/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// Users plugin.
+const log = (0, _logs.getLogManager)().getLogger('USERS'); // Users plugin.
 function usersAPI({ dispatch, getState, primitives }) {
   /**
    * The Users feature allows access to user information for users within the same domain.
@@ -44052,6 +44175,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @param {string} userId The URI uniquely identifying the user.
      */
     fetch(userId) {
+      log.debug(_logs.API_LOG_TAG + 'user.fetch: ', userId);
       dispatch(actions.fetchUser(userId));
     },
 
@@ -44064,6 +44188,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @method fetchSelfInfo
      */
     fetchSelfInfo() {
+      log.debug(_logs.API_LOG_TAG + 'user.fetchSelfInfo');
       dispatch(actions.fetchSelfInfo());
     },
 
@@ -44075,6 +44200,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @param {string} userId The URI uniquely identifying the user.
      */
     get(userId) {
+      log.debug(_logs.API_LOG_TAG + 'user.get: ', userId);
       return (0, _selectors.getUser)(getState(), userId);
     },
 
@@ -44085,6 +44211,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @method getAll
      */
     getAll() {
+      log.debug(_logs.API_LOG_TAG + 'user.getAll');
       return (0, _selectors.getUsers)(getState());
     },
 
@@ -44109,6 +44236,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @param {string} [options.next] The pointer for a chunk of results, which may be returned from other a previous query.
      */
     search(filters = {}, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'user.search: ', filters, options);
       dispatch(actions.searchDirectory(filters, options));
     }
   };
@@ -45930,7 +46058,12 @@ var _media = __webpack_require__("./src/webrtc/interface/api/media.js");
 
 var _media2 = _interopRequireDefault(_media);
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Namespaced APIs.
+const log = (0, _logs.getLogManager)().getLogger('WEBRTC');
 
 /**
  * Public API for the webRTC plugin.
@@ -45955,12 +46088,11 @@ function api(context) {
      * log(`Browser in use: ${details.browser}, version ${details.version}.`)
      */
     getBrowserDetails() {
+      log.debug(_logs.API_LOG_TAG + 'getBrowserDetails');
       return (0, _selectors.getBrowserDetails)(context.getState());
     }
   };
 }
-
-// Namespaced APIs.
 
 /***/ }),
 
@@ -45984,7 +46116,11 @@ var _actions = __webpack_require__("./src/webrtc/interface/actions/index.js");
 
 var _selectors = __webpack_require__("./src/webrtc/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = (0, _logs.getLogManager)().getLogger('MEDIA');
 
 /**
  * Media related APIs.
@@ -46004,6 +46140,7 @@ function mediaAPI({ dispatch, getState }) {
      * @return {Object} The lists of camera, microphone, and speaker devices.
      */
     getDevices() {
+      log.debug(_logs.API_LOG_TAG + 'media.getDevices');
       return (0, _selectors.getDevices)(getState());
     },
 
@@ -46016,6 +46153,7 @@ function mediaAPI({ dispatch, getState }) {
      * @return {MediaObject} A media object.
      */
     getById(mediaId) {
+      log.debug(_logs.API_LOG_TAG + 'media.getById: ', mediaId);
       return (0, _selectors.getMediaById)(getState(), mediaId);
     },
 
@@ -46028,6 +46166,7 @@ function mediaAPI({ dispatch, getState }) {
      * @return {Object} A track object.
      */
     getTrackById(trackId) {
+      log.debug(_logs.API_LOG_TAG + 'media.getByTrackId: ', trackId);
       return (0, _selectors.getTrackById)(getState(), trackId);
     },
 
@@ -46053,6 +46192,7 @@ function mediaAPI({ dispatch, getState }) {
      * })
      */
     renderTracks(tracks, cssSelector, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'media.renderTracks: ', tracks, cssSelector, options);
       dispatch(_actions.trackActions.renderTracks(tracks, (0, _extends3.default)({
         selector: cssSelector
       }, options)));
@@ -46068,6 +46208,7 @@ function mediaAPI({ dispatch, getState }) {
      * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
      */
     removeTracks(tracks, cssSelector) {
+      log.debug(_logs.API_LOG_TAG + 'media.removeTracks: ', tracks, cssSelector);
       dispatch(_actions.trackActions.removeTracks(tracks, { selector: cssSelector }));
     },
 
@@ -46080,6 +46221,7 @@ function mediaAPI({ dispatch, getState }) {
      * @param  {Array} tracks List of Track IDs.
      */
     muteTracks(tracks) {
+      log.debug(_logs.API_LOG_TAG + 'media.muteTracks: ', tracks);
       dispatch(_actions.trackActions.muteTracks(tracks));
     },
 
@@ -46092,6 +46234,7 @@ function mediaAPI({ dispatch, getState }) {
      * @param  {Array} tracks List of Track IDs.
      */
     unmuteTracks(tracks) {
+      log.debug(_logs.API_LOG_TAG + 'media.unmuteTracks: ', tracks);
       dispatch(_actions.trackActions.unmuteTracks(tracks));
     }
   };
@@ -47412,7 +47555,11 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__("./src/webrtcProxy/interface/selectors.js");
 
+var _logs = __webpack_require__("./src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const log = (0, _logs.getLogManager)().getLogger('PROXY');
 
 /**
  * Proxy Plugin API.
@@ -47491,6 +47638,7 @@ function api({ dispatch, getState }) {
      * @param {boolean} value Whether proxy mode should be enabled.
      */
     setProxyMode(value) {
+      log.debug(_logs.API_LOG_TAG + 'proxy.setProxyMode: ', value);
       dispatch(actions.setProxyMode(value));
     },
 
@@ -47502,6 +47650,7 @@ function api({ dispatch, getState }) {
      * @return {boolean} Whether proxy mode is currently enabled.
      */
     getProxyMode() {
+      log.debug(_logs.API_LOG_TAG + 'proxy.getProxyMode');
       return (0, _selectors.getProxyState)(getState()).proxyMode;
     },
 
@@ -47509,6 +47658,7 @@ function api({ dispatch, getState }) {
      * Retrieve Proxy information.
      */
     getInfo() {
+      log.debug(_logs.API_LOG_TAG + 'proxy.getInfo');
       return (0, _selectors.getProxyState)(getState());
     },
 
@@ -47526,6 +47676,7 @@ function api({ dispatch, getState }) {
      * log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
      */
     getProxyDetails() {
+      log.debug(_logs.API_LOG_TAG + 'proxy.getProxyDetails');
       return (0, _selectors.getProxyState)(getState()).browser;
     },
 
@@ -47537,6 +47688,7 @@ function api({ dispatch, getState }) {
      * @param {Channel} channel See the `Channel` module for information.
      */
     setChannel(channel) {
+      log.debug(_logs.API_LOG_TAG + 'proxy.setChannel: ', channel);
       dispatch(actions.setChannel(channel));
     },
 
@@ -47548,6 +47700,7 @@ function api({ dispatch, getState }) {
      * @param  {Object} config
      */
     initializeRemote(config) {
+      log.debug(_logs.API_LOG_TAG + 'proxy.initializeRemote: ', config);
       dispatch(actions.initializeRemote(config));
     }
   };
