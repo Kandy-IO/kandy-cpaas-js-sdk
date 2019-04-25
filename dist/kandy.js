@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.3.0-beta.72250
+ * Version: 4.3.0-beta.72321
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -28810,7 +28810,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.3.0-beta.72250';
+  let version = '4.3.0-beta.72321';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -34146,6 +34146,7 @@ var _stringify2 = _interopRequireDefault(_stringify);
 exports.setIsTypingRequest = setIsTypingRequest;
 exports.uploadFile = uploadFile;
 exports.sendChatMessageRequest = sendChatMessageRequest;
+exports.sendGroupChatMessageRequest = sendGroupChatMessageRequest;
 exports.chatSubscribe = chatSubscribe;
 exports.chatUnsubscribe = chatUnsubscribe;
 exports.sendSMSRequest = sendSMSRequest;
@@ -34286,9 +34287,11 @@ function* uploadFile(requestInfo, file) {
  * @returns {Object}
  */
 function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts) {
+  const URL = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+
   const requestOptions = {
     method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`,
+    url: URL,
     body: (0, _stringify2.default)({
       chatMessage: {
         text: textParts,
@@ -34315,6 +34318,59 @@ function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts)
       error: new _errors2.default({
         code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
         message: 'Failed to send Chat Message.'
+      })
+    };
+  } else {
+    // Success scenario.
+    return (0, _extends3.default)({}, response.payload.body.chatMessage, {
+      error: false
+    });
+  }
+}
+
+/**
+ * Used to send Group Chat messages
+ * Sends a chat message to a group (can include attachments)
+ * @method sendGroupChatMessageRequest
+ * @param {Object} requestInfo
+ * @param {Object} payload
+ * @param {Object} payload.destination a target destination for the message
+ * @param {Object} payload.textParts text parts of the message
+ * @param {Object} payload.fileParts parts of the message required for sending files
+ * @returns {Object}
+ */
+function* sendGroupChatMessageRequest(requestInfo, destination, textParts, fileParts) {
+  const URL = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${destination}/messages`;
+
+  const requestOptions = {
+    method: 'POST',
+    url: URL,
+    body: (0, _stringify2.default)({
+      chatMessage: {
+        text: textParts,
+        attachment: fileParts
+      }
+    })
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    // Request error.
+    _loglevel2.default.error('Failed to send Group Chat Message.', response.error);
+    return {
+      error: new _errors2.default({
+        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
+        message: 'Failed to send Group Chat Message.'
+      })
+    };
+  } else if (response.payload.requestError) {
+    // Server error.
+    _loglevel2.default.error('Failed to send Group Chat Message.', response.payload.requestError);
+    return {
+      error: new _errors2.default({
+        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
+        message: 'Failed to send Group Chat Message.'
       })
     };
   } else {
@@ -34754,7 +34810,7 @@ function* registerOutboundSMS() {
  */
 function* sendChatMessage() {
   function sendChatPattern(action) {
-    return action.type === actionTypes.SEND_MESSAGE && action.payload.message.type === 'chat';
+    return action.type === actionTypes.SEND_MESSAGE && (action.payload.message.type === 'chat' || action.payload.message.type === 'group');
   }
 
   yield (0, _effects2.takeEvery)(sendChatPattern, messagingSagas.sendChatMessage);
@@ -34976,6 +35032,7 @@ function* sendChatMessage(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
 
   let chatResponse;
+  const chatType = action.payload.message.type;
 
   let textParts = [];
   let fileParts = [];
@@ -35012,10 +35069,18 @@ function* sendChatMessage(action) {
       return { name: part.name, 'x-id': part['x-id'] };
     });
 
-    chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text, chatMediaParts);
+    if (chatType === 'chat') {
+      chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text, chatMediaParts);
+    } else if (chatType === 'group') {
+      chatResponse = yield (0, _effects.call)(_requests.sendGroupChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text, chatMediaParts);
+    }
   } else {
     // hardcoding textParts because API only allows sending one text part
-    chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text);
+    if (chatType === 'chat') {
+      chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text);
+    } else if (chatType === 'group') {
+      chatResponse = yield (0, _effects.call)(_requests.sendGroupChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text);
+    }
   }
   const allParts = textParts.concat(attachmentParts);
   let finishInfo = {
@@ -35162,7 +35227,6 @@ function* handleIncomingSMS(action) {
     type: 'sms'
   }));
 }
-
 /**
  * Saga that fetches a list of Chat Conversations
  * @method fetchChatConversations
