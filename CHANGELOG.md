@@ -8,6 +8,8 @@ Kandy.js change log.
 ## 4.3.0-beta
 
 ### Added
+- Added group chat functionality with support for sending and receiving messages `KAA-1594`
+- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality.  See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
 - Added the error event to the `subscription`, to prevent subscription change to emmited when there is a subscription failure. `KAA-1351`
 - [CPaaS 2.0] Added reject call functionality. `KAA-1511`
 - Added an API to retrieve basic browser information. See `getBrowserDetails`. `KAA-1470`
