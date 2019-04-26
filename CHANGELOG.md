@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.3.0-beta
+## 4.3.0 - 2019-04-26
 
 ### Added
 - Added group chat functionality with support for sending and receiving messages `KAA-1594`
@@ -63,13 +63,15 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 
 - Refactored all of the WebRTC-related code.
 
-## 3.4.0-beta
+## 3.4.0 - 2019-04-26
 
 ### Added
 - Added the error event to the `subscription`, to prevent subscription change to emmited when there is a subscription failure `KAA-1351`
+- Added a DEBUG log at the start of every public API invocation, which will better help with future investigations `KAA-1353`
 
 ### Changed
 - The `subscription:change` event is no longer emmitted when there is an error. User will have to subscribe to `subscription:error` as well. `KAA-1351`
+- No longer stores call stats in localstorage by default. Use the `recordCallStats` configuration to turn this back on. `KAA-1552`
 
 ## 3.3.0 - 2018-03-29
 
