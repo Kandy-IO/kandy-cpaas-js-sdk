@@ -514,6 +514,115 @@ function.
 
 Sends the message.
 
+## Groups
+
+The Groups feature is used to manage groups.
+
+Group functions are all part of the 'groups' namespace.
+
+### create
+
+Create a group.
+User creating group will become the admin of that group.
+
+**Parameters**
+
+-   `params` **[Object][5]** 
+    -   `params.participants` **[Array][7]&lt;[string][2]>?** List of participants to add to group when created.
+    -   `params.subject` **[string][2]?** Subject of the grour chat session.
+    -   `params.name` **[string][2]** Name of the grour chat session.
+    -   `params.image` **[string][2]?** HTTP URL of the image that is assigned to the grpup chat session avatar
+    -   `params.type` **[string][2]** Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
+
+### fetch
+
+Fetches existing groups from the server.
+This will update the store with the retrieved groups, making them
+known locally. They can then be accessed using `get` or 'getAll'.
+
+### getAll
+
+Get information for all groups known locally.
+
+Returns **[Array][7]&lt;Group>** An array of Groups.
+
+### get
+
+Retrieve information about a paticular group known locally.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to retrieve information for.
+
+Returns **Group** Group information.
+
+### getParticipants
+
+Retrieve list of particpants from a group known locally.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to get participants list.
+
+Returns **[Array][7]&lt;Participant>** A list of participants.
+
+### getInvitations
+
+Retrieve list of invitations known locally.
+
+Returns **[Array][7]&lt;Invitaions>** A list of invitations.
+
+### leave
+
+Leave a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to leave.
+
+### acceptInvitation
+
+Accept invitation to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to accept an invitation to.
+
+### rejectInvitation
+
+Reject invitation to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to reject an invitation to.
+
+### addParticipant
+
+Add participant to a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to add participant to.
+-   `participant` **[string][2]** The userId of participant to add.
+
+### removeParticipant
+
+Remove participant from a group.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to remove participant from.
+-   `participant` **[string][2]** The userId of participant to remove.
+
+### delete
+
+Delete a group.
+The group is deleted and all participants will receive a 'group:delete' notification.
+
+**Parameters**
+
+-   `groupId` **[string][2]** The Id of the group to delete.
+
 ## Presence
 
 The presence features are used to update the authenticated users presence
@@ -701,10 +810,9 @@ Will trigger the `contacts:new` event.
 
 -   `contact` **[Object][5]** The contact object.
     -   `contact.primaryContact` **[string][2]** The primary userId for the contact
-    -   `contact.name` **[string][2]?** The name for the contact entry
+    -   `contact.contactId` **[string][2]** The contact's unique contact ID
     -   `contact.firstName` **[string][2]?** The contact's first name
     -   `contact.lastName` **[string][2]?** The contact's last name
-    -   `contact.contactId` **[string][2]?** The contact's unique contact ID
     -   `contact.email` **[string][2]?** The contact's email address
     -   `contact.homePhoneNumber` **[string][2]?** The contact's home phone number
     -   `contact.businessPhoneNumber` **[string][2]?** The contact's business phone number
@@ -751,6 +859,16 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID.
 -   `contact` **[Object][5]** The contact object.
+    -   `contact.primaryContact` **[string][2]** The primary userId for the contact
+    -   `contact.contactId` **[string][2]** The contact's unique contact ID
+    -   `contact.firstName` **[string][2]?** The contact's first name
+    -   `contact.lastName` **[string][2]?** The contact's last name
+    -   `contact.email` **[string][2]?** The contact's email address
+    -   `contact.homePhoneNumber` **[string][2]?** The contact's home phone number
+    -   `contact.businessPhoneNumber` **[string][2]?** The contact's business phone number
+    -   `contact.mobilePhoneNumber` **[string][2]?** The contact's mobile phone number
+    -   `contact.list` **[string][2]?** The name of the contact list for which to add this contact to ("friends" by default)
+    -   `contact.buddy` **[boolean][6]?** Indicates whether or not the contact is a friend of the user
 
 ### fetch
 
@@ -760,6 +878,33 @@ Will trigger the `contacts:change` event.
 **Parameters**
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
+
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
 
 ## config
 
@@ -847,33 +992,6 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -913,6 +1031,22 @@ Update values in the global Config section of the store.
 **Parameters**
 
 -   `newConfigValues` **[Object][5]** Key Value pairs that will be placed into the store.
+
+## getBrowserDetails
+
+Retrieve information about the browser being used.
+Browser information being defined indicates that the browser supports
+   basic webRTC scenarios.
+
+**Examples**
+
+```javascript
+const details = client.getBrowserDetails()
+
+log(`Browser in use: ${details.browser}, version ${details.version}.`)
+```
+
+Returns **[Object][5]** Object containing `browser` and `version` information.
 
 ## Channel
 
@@ -982,6 +1116,22 @@ Retrieves the current mode of the Proxy Plugin.
 
 Returns **[boolean][6]** Whether proxy mode is currently enabled.
 
+### getProxyDetails
+
+Retrieve information about the proxy's browser being used.
+Browser information being defined indicates that the browser supports
+   basic webRTC scenarios.
+
+**Examples**
+
+```javascript
+const details = client.proxy.getProxyDetails()
+
+log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
+```
+
+Returns **[Object][5]** Object containing `browser` and `version` information.
+
 ### setChannel
 
 Sets the channel to be used while proxy mode is enabled.
@@ -1014,15 +1164,16 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## DevicesObject
+## MediaObject
 
-A collection of devices and their information.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][12]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][12]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][12]>** A list of speaker device information.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
 
 ## CallObject
 
@@ -1058,16 +1209,15 @@ Contains information about a device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
 
-## MediaObject
+## DevicesObject
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+A collection of devices and their information.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][13]>** A list of Track objects that are contained in this Media object.
+-   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
 
 ## Subscription
 
@@ -1134,6 +1284,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [11]: #channel
 
-[12]: #deviceinfo
+[12]: #trackobject
 
-[13]: #trackobject
+[13]: #deviceinfo
