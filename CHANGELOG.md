@@ -5,6 +5,11 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.3.1 - 2019-04-26
+
+### Fixed
+- Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
+
 ## 4.3.0 - 2019-04-26
 
 ### Added
@@ -62,6 +67,11 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 ### Changed
 
 - Refactored all of the WebRTC-related code.
+
+## 3.4.1 - 2019-04-26
+
+### Fixed
+- Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
 
 ## 3.4.0 - 2019-04-26
 
