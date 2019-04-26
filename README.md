@@ -14,7 +14,7 @@ To install a particular build branch or beta branch with the Github URL, run:
 
 ### In the browser :
 
-`$ <script src="https://cdn.jsdelivr.net/npm/@kandy-io/cpaas-sdk@v4.3.1"></script>`
+`$ <script src="https://cdn.jsdelivr.net/npm/@kandy-io/cpaas-sdk@v4.4.0"></script>`
 
 ## Reference
 

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.3.1-beta.72626
+ * Version: 4.4.0-beta.72746
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20829,6 +20829,7 @@ exports.callAudit = callAudit;
 exports.callOfferNotification = callOfferNotification;
 exports.callAnswerNotification = callAnswerNotification;
 exports.endCallEntry = endCallEntry;
+exports.ignoreCallEntry = ignoreCallEntry;
 exports.rejectCallEntry = rejectCallEntry;
 exports.getStatsEntry = getStatsEntry;
 exports.setTurnCredentials = setTurnCredentials;
@@ -21189,6 +21190,15 @@ function* callAnswerNotification(webRTC) {
  */
 function* endCallEntry(webRTC) {
   yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, { webRTC, requests });
+}
+
+/**
+ * Ignore an incoming call.
+ * @method ignoreCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* ignoreCallEntry(webRTC) {
+  yield (0, _effects2.takeEvery)(actionTypes.IGNORE_CALL, establishSagas.ignoreCall, { webRTC });
 }
 
 /**
@@ -21719,6 +21729,9 @@ const CALL_ACCEPTED = exports.CALL_ACCEPTED = callPrefix + 'ACCEPTED';
 const END_CALL = exports.END_CALL = callPrefix + 'END';
 const END_CALL_FINISH = exports.END_CALL_FINISH = callPrefix + 'END_FINISH';
 
+const FORWARD_CALL = exports.FORWARD_CALL = callPrefix + 'FORWARD_CALL';
+const FORWARD_CALL_FINISH = exports.FORWARD_CALL_FINISH = callPrefix + 'FORWARD_CALL_FINISH';
+
 /**
  * Mid-call operation actions.
  */
@@ -21811,6 +21824,8 @@ exports.sendDTMF = sendDTMF;
 exports.sendDTMFFinish = sendDTMFFinish;
 exports.getStats = getStats;
 exports.getStatsFinish = getStatsFinish;
+exports.forwardCall = forwardCall;
+exports.forwardCallFinish = forwardCallFinish;
 
 var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
 
@@ -21988,6 +22003,14 @@ function getStats(id, params) {
 
 function getStatsFinish(id, params) {
   return callActionHelper(actionTypes.GET_STATS_FINISH, id, params);
+}
+
+function forwardCall(id, params) {
+  return callActionHelper(actionTypes.FORWARD_CALL, id, params);
+}
+
+function forwardCallFinish(id, params) {
+  return callActionHelper(actionTypes.FORWARD_CALL_FINISH, id, params);
 }
 
 /***/ }),
@@ -22382,6 +22405,18 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
+     * Forward an incoming call to another user.
+     * @public
+     * @memberof Calls
+     * @method forward
+     * @param {string} callId      ID of the call being acted on.
+     * @param {string} destination The user to forward the call to.
+     */
+    forward(callId, destination) {
+      dispatch(_actions.callActions.forwardCall(callId, { destination }));
+    },
+
+    /**
      * Possible states for a call.
      *
      * @public
@@ -22576,6 +22611,7 @@ const CALL_STARTED = exports.CALL_STARTED = 'call:start';
  */
 const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
 
+// TODO: Add a property in event params that indicates the operation that caused the state change.
 /**
  * A call's state has changed.
  * See `Call.states` for possible call states.
@@ -22797,6 +22833,7 @@ callEvents[actionTypes.CALL_HOLD_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_UNHOLD_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = stateChangeHandler;
 callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = stateChangeHandler;
+callEvents[actionTypes.FORWARD_CALL_FINISH] = stateChangeHandler;
 
 callEvents[actionTypes.ADD_MEDIA_FINISH] = action => {
   return callEventHandler(eventTypes.CALL_ADDED_MEDIA, action, {
@@ -23113,6 +23150,14 @@ callReducers[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = {
   }
 };
 
+callReducers[actionTypes.FORWARD_CALL_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      state: _constants.CALL_STATES.ENDED
+    });
+  }
+};
+
 /*
  * Combine all of the call-tier reducers into a single reducer,
  *      each with a default state of empty object.
@@ -23120,7 +23165,7 @@ callReducers[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD, actionTypes.FORWARD_CALL_FINISH);
 
 /*
  * Reducer to handle specific call actions.
@@ -23746,6 +23791,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.makeCall = makeCall;
 exports.answerCall = answerCall;
 exports.rejectCall = rejectCall;
+exports.ignoreCall = ignoreCall;
+exports.forwardCall = forwardCall;
 
 var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
 
@@ -23999,11 +24046,6 @@ function* rejectCall(deps, action) {
   const { webRTC, requests } = deps;
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
-  if (!incomingCall) {
-    log.debug(`Error: incoming call ${action.payload.id} not found.`);
-    return;
-  }
-
   // Ensure the call is in a valid state for this operation.
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
     state: _constants.CALL_STATES.RINGING,
@@ -24032,6 +24074,101 @@ function* rejectCall(deps, action) {
       error: response.error
     }));
   }
+}
+
+/**
+ * Ignores an incoming call.
+ *
+ * This saga defines how a call is ignored. It performs the webRTC
+ *    operations to ignore a "call".
+ * Assumptions:
+ *    1. None
+ * Responsibilities:
+ *    1. Cleanup the call locally, using the webRTC helper saga.
+ *    2. Update call state (via redux action).
+ * @method ignoreCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   action        An action of type `IGNORE_CALL`.
+ */
+function* ignoreCall(deps, action) {
+  const { webRTC } = deps;
+
+  // Ensure the call is in a valid state for this operation.
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
+    state: _constants.CALL_STATES.RINGING,
+    direction: _constants.CALL_DIRECTION.INCOMING
+  });
+
+  if (stateError) {
+    log.debug(`Cannot ignore call: ${stateError.message}`);
+    // Report the operation failure.
+    yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(action.payload.id, { error: stateError }));
+    return;
+  }
+
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Clean-up webRTC objects. Ignore any errors returned, since we want the
+  //    call / session to be ended either way.
+  yield (0, _effects.call)(_midcall.closeCall, webRTC, targetCall.webrtcSessionId);
+
+  // Report the operation complete.
+  yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(targetCall.id));
+}
+
+/**
+ *
+ * Forwards an incoming call.
+ *
+ * This saga handles the WebRTC and signalling portions of forwarding an incoming call
+ * Assumptions:
+ *    1. The action contains a destination address
+ * Responsibilities:
+ *    1. Perform the signaling to tell the server that we want to forward the call to a specified destination address.
+ *    2. Update call state (via redux actions).
+ * @method forwardCall
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.forwardSession "Forward call" signalling function.
+ * @param {Object}   action An action of type `FORWARD_CALL`.
+ */
+function* forwardCall(deps, action) {
+  const { webRTC, requests } = deps;
+
+  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Ensure the call is in a valid state for this operation.
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
+    state: _constants.CALL_STATES.RINGING,
+    direction: _constants.CALL_DIRECTION.INCOMING
+  });
+
+  if (stateError) {
+    log.debug(`Cannot forward call: ${stateError.message}`);
+    // Report the operation failure.
+    yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, { error: stateError }));
+    return;
+  }
+
+  // Collect the information needed to make the request.
+  const callInfo = {
+    wrtcsSessionId: incomingCall.wrtcsSessionId,
+    address: action.payload.destination
+  };
+  const response = yield (0, _effects.call)(requests.forwardSession, callInfo);
+
+  if (response.error) {
+    yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, {
+      error: response.error
+    }));
+    return;
+  }
+
+  yield (0, _effects.call)(_midcall.closeCall, webRTC, incomingCall.webrtcSessionId);
+
+  yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id));
 }
 
 /***/ }),
@@ -25240,6 +25377,25 @@ function* parseCallResponse(deps, params) {
   // TODO: Make sure the call is expecting a `respondCallUpdate` notification.
   //    ie. has a pending operation.
   log.info(`Received response for call: ${targetCall.id}. Processing.`);
+
+  /**
+   * Check that the notification was not an "error" notification.
+   * Status code 49 with a `retryAfter` value indicates the original operation
+   *    failed (likely glare condition) and the SDK should retry the operation.
+   * TODO: This check is currently Link-specific. Depending on how CPaaS2
+   *    indicates a failed/glare operation, either standardize this check or
+   *    move this into Link-specific saga.
+   */
+  if (!sdp && params.code === 49 && params.retryAfter) {
+    // TODO: Properly handle this scenario. The call may be in a bad state
+    //    because we set an offer but not an answer. May need to revert
+    //    signaling state and/or re-perform operation internally.
+    // For now, fail loudly and abort the operation to prevent crashes. The
+    //    negotiation sagas expect there to be an SDP.
+    // The call state will be left in a broken state because of KAA-1607.
+    log.error(`Response indicates an error scenario (${params.message}). Aborting operation.`);
+    return;
+  }
 
   /**
    * Determine if the original operation was done locally or remotely. This
@@ -28810,7 +28966,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.3.1-beta.72626';
+  let version = '4.4.0-beta.72746';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -45907,6 +46063,8 @@ var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/pro
 
 var _promise2 = _interopRequireDefault(_promise);
 
+exports.default = DeviceManager;
+
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
 var _loglevel2 = _interopRequireDefault(_loglevel);
@@ -45933,56 +46091,65 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
    * Keeps an up-to-date list of all devices.
    * @class DeviceManager
    */
-};class DeviceManager extends _eventemitter2.default {
-  constructor() {
-    super();
-    // Store each device type separately, so that `deviceId` is unique
-    //    per kind (there is a `default` deviceId per kind).
-    this.microphone = [];
-    this.camera = [];
-    this.speaker = [];
+};function DeviceManager() {
+  // Internal variables.
+  const emitter = new _eventemitter2.default();
+  // Store each device type separately, so that `deviceId` is unique
+  //    per kind (there is a `default` deviceId per kind).
+  let microphone = [];
+  let camera = [];
+  let speaker = [];
 
-    // Check devices on initialization.
-    this.checkDevices().then(() => {
-      // Emit an initial event with the device lists.
-      this.emit('change', this.get());
-    });
+  // Check devices on initialization.
+  checkDevices().then(() => {
+    // Emit an initial event with the device lists.
+    emitter.emit('change', get());
+  });
 
-    // Check devices whenever they change.
-    let recentDeviceChange = false;
-    navigator.mediaDevices.ondevicechange = () => {
-      _loglevel2.default.info('Media device change detected.');
-      // A physical device change results in one event per
-      // device "kind". Group the events together.
-      if (!recentDeviceChange) {
-        recentDeviceChange = true;
-        setTimeout(() => {
-          recentDeviceChange = false;
-          this.checkDevices().then(() => {
-            // Emit an event with the updated device lists.
-            this.emit('change', this.get());
-          });
-        }, 50);
-      }
-    };
-  }
+  // Check devices whenever they change.
+  let recentDeviceChange = false;
+  navigator.mediaDevices.ondevicechange = () => {
+    _loglevel2.default.info('Media device change detected.');
+    // A physical device change results in one event per
+    // device "kind". Group the events together.
+    if (!recentDeviceChange) {
+      recentDeviceChange = true;
+      setTimeout(() => {
+        recentDeviceChange = false;
+        checkDevices().then(() => {
+          // Emit an event with the updated device lists.
+          emitter.emit('change', get());
+        });
+      }, 50);
+    }
+  };
 
   /**
    * Updates the stored device lists with the latest devices.
    * @method checkDevices
    * @return {Promise}
    */
-  checkDevices() {
+  function checkDevices() {
     _loglevel2.default.info('Checking media devices.');
     return new _promise2.default((resolve, reject) => {
       navigator.mediaDevices.enumerateDevices().then(devices => {
         // Clear the stored devices, to prevent duplicates.
-        this.microphone = [];
-        this.camera = [];
-        this.speaker = [];
+        microphone = [];
+        camera = [];
+        speaker = [];
         devices.forEach(device => {
           const kind = WEBRTC_DEVICE_KINDS[device.kind];
-          this[kind].push(device);
+          switch (kind) {
+            case 'microphone':
+              microphone.push(device);
+              break;
+            case 'camera':
+              camera.push(device);
+              break;
+            case 'speaker':
+              speaker.push(device);
+              break;
+          }
         });
         resolve();
       }).catch(reject);
@@ -45994,15 +46161,37 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
    * @method get
    * @return {Object}
    */
-  get() {
+  function get() {
     return {
-      microphone: this.microphone,
-      camera: this.camera,
-      speaker: this.speaker
+      microphone,
+      camera,
+      speaker
     };
   }
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    checkDevices,
+    get,
+    on,
+    once,
+    off
+  };
 }
-exports.default = DeviceManager;
 
 /***/ }),
 
@@ -46028,6 +46217,8 @@ var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js"
 
 var _map2 = _interopRequireDefault(_map);
 
+exports.default = MediaManager;
+
 var _media = __webpack_require__("../webrtc/src/models/media.js");
 
 var _media2 = _interopRequireDefault(_media);
@@ -46050,21 +46241,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-class MediaManager extends _eventemitter2.default {
-  constructor(managers) {
-    super();
-    this.trackManager = managers.trackManager;
-    // TODO: Have this private?
-    this.medias = new _map2.default();
-  }
+function MediaManager(managers) {
+  // Internal variables.
+  const trackManager = managers.trackManager;
+  const medias = new _map2.default();
+  const emitter = new _eventemitter2.default();
 
   /**
    * Retrieve a snapshot of all Media objects' current state.
    * @method getState
    * @return {Array}
    */
-  getState() {
-    return this.getAll().map(id => this.get(id).getState());
+  function getState() {
+    return getAll().map(id => get(id).getState());
   }
 
   /**
@@ -46074,7 +46263,7 @@ class MediaManager extends _eventemitter2.default {
    * @param  {MediaStreamConstraints}  constraints
    * @return {Promise}
    */
-  createLocal(constraints) {
+  function createLocal(constraints) {
     // Get user media, ...
     return new _promise2.default((resolve, reject) => {
       // TODO: Proper error checking.
@@ -46086,29 +46275,29 @@ class MediaManager extends _eventemitter2.default {
 
         // Only add tracks to a Media objects using the `addTrack` method.
         mediaStream.getTracks().forEach(nativeTrack => {
-          const wrappedTrack = this.trackManager.add(nativeTrack, mediaStream);
+          const wrappedTrack = trackManager.add(nativeTrack, mediaStream);
           media.addTrack(wrappedTrack);
         });
 
         media.once('media:stopped', mediaId => {
-          this.remove(mediaId);
+          remove(mediaId);
         });
 
         media.on('track:removed', trackId => {
           if (media.tracks.size === 0) {
-            this.remove(media.id);
+            remove(media.id);
           }
         });
 
         media.on('track:ended', ({ mediaId, trackId }) => {
           if (media.getTracks().length === 0) {
-            this.remove(mediaId);
+            remove(mediaId);
           }
         });
 
-        this.medias.set(media.id, media);
+        medias.set(media.id, media);
         // TODO: Better event. Include metadata?
-        this.emit('media:new', media.id);
+        emitter.emit('media:new', media.id);
 
         resolve(media);
       }).catch(reject);
@@ -46123,7 +46312,7 @@ class MediaManager extends _eventemitter2.default {
    * @param  {Tracks[]} tracks Array of Track objects.
    * @return {Media}
    */
-  createRemote(stream, tracks = []) {
+  function createRemote(stream, tracks = []) {
     const media = new _media2.default(stream, false);
 
     tracks.forEach(track => {
@@ -46131,38 +46320,38 @@ class MediaManager extends _eventemitter2.default {
     });
 
     media.once('media:stopped', mediaId => {
-      this.remove(mediaId);
+      remove(mediaId);
     });
 
     media.on('track:removed', trackId => {
       if (media.tracks.size === 0) {
-        this.remove(media.id);
+        remove(media.id);
       }
     });
 
     media.on('track:ended', ({ mediaId, trackId }) => {
       if (media.getTracks().length === 0) {
-        this.remove(mediaId);
+        remove(mediaId);
       }
     });
 
-    this.medias.set(media.id, media);
+    medias.set(media.id, media);
     // TODO: Better event. Include metadata?
-    this.emit('media:new', media.id);
+    emitter.emit('media:new', media.id);
     return media;
   }
 
-  // TODO: This should be a private function.
   /**
    * Removes a Media object from the medias array.
+   * @private
    * @method remove
    * @param {String} mediaId
    */
-  remove(mediaId) {
-    const media = this.get(mediaId);
+  function remove(mediaId) {
+    const media = get(mediaId);
     if (media) {
-      this.medias.delete(mediaId);
-      this.emit('media:removed', mediaId);
+      medias.delete(mediaId);
+      emitter.emit('media:removed', mediaId);
     }
   }
 
@@ -46172,8 +46361,8 @@ class MediaManager extends _eventemitter2.default {
    * @param  {String} mediaId ID of the desired Media object.
    * @return {Media}
    */
-  get(mediaId) {
-    const media = this.medias.get(mediaId);
+  function get(mediaId) {
+    const media = medias.get(mediaId);
     if (!media) {
       _loglevel2.default.debug(`No media found with ID: ${mediaId}.`);
     }
@@ -46185,8 +46374,8 @@ class MediaManager extends _eventemitter2.default {
    * @method getAll
    * @return {Array} List of Media IDs.
    */
-  getAll() {
-    return (0, _from2.default)(this.medias.keys());
+  function getAll() {
+    return (0, _from2.default)(medias.keys());
   }
 
   /**
@@ -46195,10 +46384,10 @@ class MediaManager extends _eventemitter2.default {
    * @param  {string}  trackId The ID of the Track to find.
    * @return {string} The ID of the Media object that contains the Track.
    */
-  findTrack(trackId) {
+  function findTrack(trackId) {
     // Search through all Media objects for the one that has the desired track.
-    const medias = (0, _from2.default)(this.medias.values());
-    const media = medias.find(media => media.getTrack(trackId));
+    const allMedia = (0, _from2.default)(medias.values());
+    const media = allMedia.find(media => media.getTrack(trackId));
     if (media) {
       _loglevel2.default.debug(`Found Media (${media.id}) with Track ${trackId}.`);
       return media.id;
@@ -46206,8 +46395,37 @@ class MediaManager extends _eventemitter2.default {
       _loglevel2.default.debug(`Found no Media with Track ${trackId}.`);
     }
   }
-}
-exports.default = MediaManager; // Models that this manager directly manages.
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    // Getter APIs.
+    get,
+    getAll,
+    getState,
+    findTrack,
+    // Create APIs.
+    createLocal,
+    createRemote,
+    // Event APIs.
+    on,
+    once,
+    off
+  };
+} // Models that this manager directly manages.
 
 /***/ }),
 
@@ -46228,6 +46446,8 @@ var _from2 = _interopRequireDefault(_from);
 var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js");
 
 var _map2 = _interopRequireDefault(_map);
+
+exports.default = PeerManager;
 
 var _peer = __webpack_require__("../webrtc/src/models/peer.js");
 
@@ -46250,22 +46470,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Manager for Peer objects.
  * Allows the creation and retrieval of peer objects.
- * @class PeerManager
+ * @method PeerManager
  */
-class PeerManager extends _eventemitter2.default {
-  constructor(managers) {
-    super();
-    this.trackManager = managers.trackManager;
-    this.peers = new _map2.default();
-  }
+function PeerManager(managers) {
+  // Internal variables.
+  const trackManager = managers.trackManager;
+  const peers = new _map2.default();
+  const emitter = new _eventemitter2.default();
 
   /**
    * Retrieve a snapshot of all Peer objects' current state.
    * @method getState
    * @return {Array}
    */
-  getState() {
-    return this.getAll().map(id => this.get(id).getState());
+  function getState() {
+    return getAll().map(id => get(id).getState());
   }
 
   /**
@@ -46274,11 +46493,11 @@ class PeerManager extends _eventemitter2.default {
    * @param  {Object} [config={}]
    * @return {Peer}
    */
-  create(config = {}) {
-    const peer = new _peer2.default((0, _v2.default)(), config, this.trackManager);
-    peer.once('peer:closed', id => this.peers.delete(id));
-    this.peers.set(peer.id, peer);
-    this.emit('peer:new', peer.id);
+  function create(config = {}) {
+    const peer = new _peer2.default((0, _v2.default)(), config, trackManager);
+    peer.once('peer:closed', id => peers.delete(id));
+    peers.set(peer.id, peer);
+    emitter.emit('peer:new', peer.id);
     return peer;
   }
 
@@ -46288,8 +46507,8 @@ class PeerManager extends _eventemitter2.default {
    * @param  {String} id ID of the desired Peer object.
    * @return {Peer}
    */
-  get(id) {
-    const peer = this.peers.get(id);
+  function get(id) {
+    const peer = peers.get(id);
     if (!peer) {
       _loglevel2.default.debug(`No Peer found with ID: ${id}.`);
     }
@@ -46301,11 +46520,36 @@ class PeerManager extends _eventemitter2.default {
    * @method getAll
    * @return {Array} List of Peer IDs.
    */
-  getAll() {
-    return (0, _from2.default)(this.peers.keys());
+  function getAll() {
+    return (0, _from2.default)(peers.keys());
   }
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    getState,
+    get,
+    getAll,
+    create,
+    // Event APIs.
+    on,
+    once,
+    off
+  };
 }
-exports.default = PeerManager;
 
 // Libraries.
 
@@ -46329,6 +46573,8 @@ var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js"
 
 var _map2 = _interopRequireDefault(_map);
 
+exports.default = SessionManager;
+
 var _session = __webpack_require__("../webrtc/src/models/session.js");
 
 var _session2 = _interopRequireDefault(_session);
@@ -46350,14 +46596,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Manager for Session objects.
  * Allows for creation and retrieval of session objects.
- * @class SessionManager
+ * @method SessionManager
  */
-class SessionManager extends _eventemitter2.default {
-  constructor(managers) {
-    super();
-    this.managers = managers;
-    this.sessions = new _map2.default();
-  }
+function SessionManager(managers) {
+  // Internal variables.
+  const sessions = new _map2.default();
+  const emitter = new _eventemitter2.default();
 
   /**
    * Create a new Session object.
@@ -46366,14 +46610,14 @@ class SessionManager extends _eventemitter2.default {
    * @param {Object} [config.peer] Configs for the Session's Peer object.
    * @return {Session}
    */
-  create(config = {}) {
-    const session = new _session2.default((0, _v2.default)(), this.managers, config);
+  function create(config = {}) {
+    const session = new _session2.default((0, _v2.default)(), managers, config);
     session.once('session:ended', id => {
-      this.sessions.delete(id);
-      this.emit('session:removed', id);
+      sessions.delete(id);
+      emitter.emit('session:removed', id);
     });
-    this.sessions.set(session.id, session);
-    this.emit('session:new', session.id);
+    sessions.set(session.id, session);
+    emitter.emit('session:new', session.id);
     return session;
   }
 
@@ -46383,8 +46627,8 @@ class SessionManager extends _eventemitter2.default {
    * @param  {String} sessionId ID of the desired Session object.
    * @return {Session}
    */
-  get(sessionId) {
-    const session = this.sessions.get(sessionId);
+  function get(sessionId) {
+    const session = sessions.get(sessionId);
     if (!session) {
       _loglevel2.default.debug(`No session found with ID: ${sessionId}.`);
     }
@@ -46396,11 +46640,34 @@ class SessionManager extends _eventemitter2.default {
    * @method getAll
    * @return {Array} List of Media IDs.
    */
-  getAll() {
-    return (0, _from2.default)(this.sessions.values());
+  function getAll() {
+    return (0, _from2.default)(sessions.values());
   }
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    create,
+    get,
+    getAll,
+    on,
+    once,
+    off
+  };
 }
-exports.default = SessionManager;
 
 // Libraries.
 
@@ -46574,6 +46841,8 @@ var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js"
 
 var _map2 = _interopRequireDefault(_map);
 
+exports.default = Media;
+
 var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
@@ -46585,40 +46854,40 @@ var _loglevel2 = _interopRequireDefault(_loglevel);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Class to represent a "media" object.
+ * Object to represent a "media" object.
  * Wraps a MediaStream object.
  * @class Media
  * TODO: Rename to Stream? Would be more straight-forward since Tracks can be
  *    managed directly (with trackManager), instead of through a "Media" object.
  */
 // Libraries.
-class Media extends _eventemitter2.default {
-  constructor(nativeStream, isLocal) {
-    super();
-    this.id = nativeStream.id;
-    this.isLocal = isLocal;
-    this.stream = nativeStream;
-    /**
-     * Mapping of the IDs of this Media object's tracks to the Track object.
-     * @type {Map}
-     */
-    this.tracks = new _map2.default();
-    this.stream.onremovetrack = event => {
-      this.tracks.delete(event.track.id);
-      this.emit('track:removed', event.track.id);
-    };
-  }
+function Media(nativeStream, isLocal) {
+  // Internal variables.
+  const id = nativeStream.id;
+  const stream = nativeStream;
+  const emitter = new _eventemitter2.default();
+
+  /**
+   * Mapping of the IDs of this Media object's tracks to the Track object.
+   * @type {Map}
+   */
+  const tracks = new _map2.default();
+
+  stream.onremovetrack = event => {
+    tracks.delete(event.track.id);
+    emitter.emit('track:removed', event.track.id);
+  };
 
   /**
    * Retrieve a snapshot of the Media object's current state.
    * @method getState
    * @return {Object}
    */
-  getState() {
+  function getState() {
     return {
-      id: this.id,
-      tracks: (0, _from2.default)(this.tracks.values()).map(track => track.getState()),
-      isLocal: this.isLocal
+      id: id,
+      tracks: (0, _from2.default)(tracks.values()).map(track => track.getState()),
+      isLocal: isLocal
     };
   }
 
@@ -46627,44 +46896,45 @@ class Media extends _eventemitter2.default {
    * @method addTrack
    * @param {Track} track The Track object to add to the Media object.
    */
-  addTrack(track) {
-    if (this.tracks.has(track.id)) {
-      _loglevel2.default.debug(`Track (${track.id}) is already in Media (${this.id}).`);
+  function addTrack(track) {
+    if (tracks.has(track.id)) {
+      _loglevel2.default.debug(`Track (${track.id}) is already in Media (${id}).`);
       return;
     }
 
     // Add the native MediaStreamTrack to the MediaStream.
-    this.stream.addTrack(track.track);
+    stream.addTrack(track.track);
     // Add the Track to the Media object.
-    this.tracks.set(track.id, track);
+    tracks.set(track.id, track);
 
     /**
      * When a track ends, remove it from the Media object then clean it up.
      */
     track.on('ended', () => {
-      const removedTrack = this.removeTrack(track.id);
+      const removedTrack = removeTrack(track.id);
       removedTrack.cleanup();
-      this.emit('track:ended', {
-        mediaId: this.id,
+      emitter.emit('track:ended', {
+        mediaId: id,
         trackId: removedTrack.id
       });
     });
     // TODO: Emit event or return result?
-    this.emit('track:new', {
-      mediaId: this.id,
+    emitter.emit('track:new', {
+      mediaId: id,
       trackId: track.id
     });
   }
 
   /**
    * Remove a track from the Media object.
+   * @private
    * @method removeTrack
    * @param  {string} trackId The Track to remove.
    */
-  removeTrack(trackId) {
-    const track = this.getTrack(trackId);
+  function removeTrack(trackId) {
+    const track = getTrack(trackId);
     if (track) {
-      this.tracks.delete(trackId);
+      tracks.delete(trackId);
       return track;
     }
   }
@@ -46675,8 +46945,8 @@ class Media extends _eventemitter2.default {
    * @param  {HTMLElement} element The DOM element to be rendered in.
    * @param  {String} [speakerId] The device ID to be used for audio output.
    */
-  renderIn(element, speakerId) {
-    this.getTracks().forEach(track => {
+  function renderIn(element, speakerId) {
+    getTracks().forEach(track => {
       track.renderIn(element, speakerId);
     });
   }
@@ -46686,8 +46956,8 @@ class Media extends _eventemitter2.default {
    * @method removeFrom
    * @param  {HTMLElement} element The DOM element to be removed from.
    */
-  removeFrom(element) {
-    this.getTracks().forEach(track => {
+  function removeFrom(element) {
+    getTracks().forEach(track => {
       track.removeFrom(element);
     });
   }
@@ -46697,8 +46967,8 @@ class Media extends _eventemitter2.default {
    * @method moveTo
    * @param  {HTMLElement} element The DOM element to be move to.
    */
-  moveTo(element) {
-    this.getTracks().forEach(track => {
+  function moveTo(element) {
+    getTracks().forEach(track => {
       track.moveTo(element);
     });
   }
@@ -46707,22 +46977,22 @@ class Media extends _eventemitter2.default {
    * Stop all Tracks within this Media object.
    * @method stop
    */
-  stop() {
-    this.getTracks().forEach(track => {
+  function stop() {
+    getTracks().forEach(track => {
       track.stop();
     });
-    this.emit('media:stopped', this.id);
+    emitter.emit('media:stopped', this.id);
   }
 
   /**
    * Clean-up the Media object by stopping all Tracks and removing any rendered media.
    * @method cleanup
    */
-  cleanup() {
-    this.getTracks().forEach(track => {
+  function cleanup() {
+    getTracks().forEach(track => {
       track.cleanup();
     });
-    this.emit('media:stopped', this.id);
+    emitter.emit('media:stopped', this.id);
   }
 
   /**
@@ -46730,8 +47000,8 @@ class Media extends _eventemitter2.default {
    * @method getTracks
    * @return {Array} The list of Track objects.
    */
-  getTracks() {
-    return (0, _from2.default)(this.tracks.values());
+  function getTracks() {
+    return (0, _from2.default)(tracks.values());
   }
 
   /**
@@ -46740,11 +47010,48 @@ class Media extends _eventemitter2.default {
    * @param  {String} trackId ID of the Track to retrieve.
    * @return {Track}
    */
-  getTrack(trackId) {
-    return this.tracks.get(trackId);
+  function getTrack(trackId) {
+    return tracks.get(trackId);
   }
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    id,
+    tracks,
+    isLocal,
+    // Getter APIs.
+    getState,
+    getTracks,
+    getTrack,
+    // Create APIs.
+    addTrack,
+    // Render APIs.
+    renderIn,
+    removeFrom,
+    moveTo,
+    // Cleanup APIs.
+    stop,
+    cleanup,
+    // Event APIs.
+    on,
+    once,
+    off
+  };
 }
-exports.default = Media;
 
 /***/ }),
 
@@ -46761,6 +47068,8 @@ Object.defineProperty(exports, "__esModule", {
 var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
 
 var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = Peer;
 
 var _constants = __webpack_require__("../webrtc/src/constants.js");
 
@@ -46829,146 +47138,145 @@ function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
 }
 
 /**
- * Wrapper class for a native RTCPeerConnection object.
+ * Wrapper object for a native RTCPeerConnection object.
  * Ref: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
- * @class Peer
+ * @method Peer
  * TODO: Should this be renamed to PeerConnection or Connection? Just so its clearer?
  */
-class Peer extends _eventemitter2.default {
-  constructor(id, config = {}, trackManager) {
-    super();
-    this.config = (0, _utils.mergeValues)(defaultConfig, config);
-    this.trackManager = trackManager;
+function Peer(id, config = {}, trackManager) {
+  // Internal variables.
+  config = (0, _utils.mergeValues)(defaultConfig, config);
 
-    _loglevel2.default.info(`Creating peer connection with ID: ${id}.`, this.config);
-    this.id = id;
-    this.peerConnection = new RTCPeerConnection(this.config.rtcConfig);
-    this.iceTimer = _timerMachine2.default.get(`ice-${this.id}`);
-
-    /**
-     * The DTLS role selected for this PeerConnection. Set after the initial
-     *    negotiation is completed.
-     * @type {string}
-     */
-    this.dtlsRole = undefined;
-
-    // Bubble up the RTCPeerConnection events.
-    const events = ['oniceconnectionstatechange', 'onsignalingstatechange', 'onnegotiationneeded'];
-
-    /**
-     * Intercept the PeerConnection onicecandidate event.
-     * Handle the candidate as defined by the current trickle ICE mode config.
-     * Trickle ICE scenarios:
-     *   - FULL: Trickle.
-     *   - HALF, pre-half: Wait for "half" or null candidate.
-     *   - HALF, post-half: Trickle.
-     *   - NONE: Wait for null candidate.
-     */
-    this.peerConnection.onicecandidate = event => {
-      _loglevel2.default.debug(`ICE candidate received (trickling?: ${this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL}): `, event.candidate);
-
-      if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
-        // If trickling is enabled, emit an event for every ICE candidate. The
-        //    Peer is already ready for negotiation at this point.
-        if (event.candidate) {
-          // Only trickle non-null (ie. actual) candidates.
-          this.emit('onicecandidate', event);
-        }
-      } else if (event.candidate === null) {
-        // If we received the last candidate (null), then gathering is done and
-        //    Peer is ready for negotiation (no matter the scenario).
-        _loglevel2.default.debug('ICE collection process complete; ready for negotiation.');
-        this.emit('onnegotiationready');
-      } else if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.HALF) {
-        // For half trickle, only start trickling after a certain threshold.
-        //    Peer will be considered ready for negotiation after that point.
-        const haveHalf = this.config.halfTrickleThreshold({
-          sdp: this.peerConnection.localDescription.sdp,
-          iceCandidate: event.candidate,
-          time: this.iceTimer.timeFromStart()
-        });
-
-        if (haveHalf) {
-          _loglevel2.default.debug('Half ICE collection process complete; ready for negotiation.');
-          this.config.trickleIceMode = _constants.PEER.TRICKLE_ICE.FULL;
-          this.emit('onnegotiationready');
-        }
-      }
-    };
-
-    /**
-     * Intercept the PeerConnection onicegatheringstatechange event.
-     * Time how long ICE collection takes and handles scenarios when it takes
-     *    too long.
-     * TODO: Figure out how we should do events. Makes events simpler/better,
-     *    with proper formats.
-     */
-    this.peerConnection.onicegatheringstatechange = event => {
-      const gatheringState = event.target.iceGatheringState;
-      _loglevel2.default.debug(`Peer's iceGatheringState changed to ${gatheringState}.`);
-
-      if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
-        this.iceTimer.start();
-        // TODO: Handle "ICE collection taking too long" scenario.
-      } else if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.COMPLETE) {
-        _loglevel2.default.debug(`Peer took ${this.iceTimer.timeFromStart()}ms to collect ICE candidates.`);
-        this.iceTimer.stop();
-      }
-      // Bubble the event up.
-      this.emit('onicegatheringstatechange', event);
-    };
-
-    // TODO: Is this how we want business logic to listen for PeerConnection events?
-    events.forEach(eventType => {
-      this.peerConnection[eventType] = event => {
-        _loglevel2.default.debug(`Peer ${eventType} event.`, event);
-        // TODO: Should this be eventType or event.type?
-        this.emit(eventType, event);
-      };
-    });
-
-    /**
-     * Intercept the PeerConnection ontrack event.
-     * Check whether the track is from a new MediaStream or not.
-     * TODO: Figure out how we should do events. Makes events simpler/better,
-     *    with proper formats.
-     */
-    this.peerConnection.ontrack = event => {
-      /**
-       * transceiver: The RTCRtpTransceiver for this remote track. (Available in unified-plan)
-       * receiver: The RTCRtpReceiver for this remote track.
-       * track: The remote MediaStreamTrack.
-       * streams: Array of MediaStreams the track is in.
-       */
-      // event object contains transceiver which already has track attached to its receiver
-      const { track: nativeTrack, streams } = event;
-
-      // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
-      //  a stream is not associated with it so we get no stream here.
-      // So we create our own stream here.
-      // In the future, support will be available for `sender.setStreams` on the remote side
-      //  so this is a temporary workaround.
-      let targetStream;
-      if (streams.length === 0) {
-        targetStream = new MediaStream([nativeTrack]);
-      } else {
-        targetStream = streams[0];
-      }
-
-      // Convert the native MediaStreamTrack into a Track object.
-      const track = this.trackManager.add(nativeTrack, targetStream);
-
-      _loglevel2.default.debug(`Peer (${this.id}) received track (${track.id}).`);
-      this.emit('ontrack', track);
-    };
-  }
+  const peerId = id;
+  _loglevel2.default.info(`Creating peer connection with ID: ${peerId}.`, config);
+  const peerConnection = new RTCPeerConnection(config.rtcConfig);
+  const iceTimer = _timerMachine2.default.get(`ice-${peerId}`);
+  const emitter = new _eventemitter2.default();
 
   /**
-   * @property {Array} localTracks List of active Track objects added to the Peer locally.
+   * The DTLS role selected for this PeerConnection. Set after the initial
+   *    negotiation is completed.
+   * @type {string}
    */
-  get localTracks() {
+  let dtlsRole;
+
+  // Bubble up the RTCPeerConnection events.
+  const events = ['oniceconnectionstatechange', 'onsignalingstatechange', 'onnegotiationneeded'];
+
+  /**
+   * Intercept the PeerConnection onicecandidate event.
+   * Handle the candidate as defined by the current trickle ICE mode config.
+   * Trickle ICE scenarios:
+   *   - FULL: Trickle.
+   *   - HALF, pre-half: Wait for "half" or null candidate.
+   *   - HALF, post-half: Trickle.
+   *   - NONE: Wait for null candidate.
+   */
+  peerConnection.onicecandidate = event => {
+    _loglevel2.default.debug(`ICE candidate received (trickling?: ${config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL}): `, event.candidate);
+
+    if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
+      // If trickling is enabled, emit an event for every ICE candidate. The
+      //    Peer is already ready for negotiation at this point.
+      if (event.candidate) {
+        // Only trickle non-null (ie. actual) candidates.
+        emitter.emit('onicecandidate', event);
+      }
+    } else if (event.candidate === null) {
+      // If we received the last candidate (null), then gathering is done and
+      //    Peer is ready for negotiation (no matter the scenario).
+      _loglevel2.default.debug('ICE collection process complete; ready for negotiation.');
+      emitter.emit('onnegotiationready');
+    } else if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.HALF) {
+      // For half trickle, only start trickling after a certain threshold.
+      //    Peer will be considered ready for negotiation after that point.
+      const haveHalf = config.halfTrickleThreshold({
+        sdp: peerConnection.localDescription.sdp,
+        iceCandidate: event.candidate,
+        time: iceTimer.timeFromStart()
+      });
+
+      if (haveHalf) {
+        _loglevel2.default.debug('Half ICE collection process complete; ready for negotiation.');
+        config.trickleIceMode = _constants.PEER.TRICKLE_ICE.FULL;
+        emitter.emit('onnegotiationready');
+      }
+    }
+  };
+
+  /**
+   * Intercept the PeerConnection onicegatheringstatechange event.
+   * Time how long ICE collection takes and handles scenarios when it takes
+   *    too long.
+   * TODO: Figure out how we should do events. Makes events simpler/better,
+   *    with proper formats.
+   */
+  peerConnection.onicegatheringstatechange = event => {
+    const gatheringState = event.target.iceGatheringState;
+    _loglevel2.default.debug(`Peer's iceGatheringState changed to ${gatheringState}.`);
+
+    if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
+      iceTimer.start();
+      // TODO: Handle "ICE collection taking too long" scenario.
+    } else if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.COMPLETE) {
+      _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates.`);
+      iceTimer.stop();
+    }
+    // Bubble the event up.
+    emitter.emit('onicegatheringstatechange', event);
+  };
+
+  // TODO: Is this how we want business logic to listen for PeerConnection events?
+  events.forEach(eventType => {
+    peerConnection[eventType] = event => {
+      _loglevel2.default.debug(`Peer ${eventType} event.`, event);
+      // TODO: Should this be eventType or event.type?
+      emitter.emit(eventType, event);
+    };
+  });
+
+  /**
+   * Intercept the PeerConnection ontrack event.
+   * Check whether the track is from a new MediaStream or not.
+   * TODO: Figure out how we should do events. Makes events simpler/better,
+   *    with proper formats.
+   */
+  peerConnection.ontrack = event => {
+    /**
+     * transceiver: The RTCRtpTransceiver for this remote track. (Available in unified-plan)
+     * receiver: The RTCRtpReceiver for this remote track.
+     * track: The remote MediaStreamTrack.
+     * streams: Array of MediaStreams the track is in.
+     */
+    // event object contains transceiver which already has track attached to its receiver
+    const { track: nativeTrack, streams } = event;
+
+    // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
+    //  a stream is not associated with it so we get no stream here.
+    // So we create our own stream here.
+    // In the future, support will be available for `sender.setStreams` on the remote side
+    //  so this is a temporary workaround.
+    let targetStream;
+    if (streams.length === 0) {
+      targetStream = new MediaStream([nativeTrack]);
+    } else {
+      targetStream = streams[0];
+    }
+
+    // Convert the native MediaStreamTrack into a Track object.
+    const track = trackManager.add(nativeTrack, targetStream);
+
+    _loglevel2.default.debug(`Peer (${peerId}) received track (${track.id}).`);
+    emitter.emit('ontrack', track);
+  };
+
+  /**
+   * @method getLocalTracks
+   * @return {Array} List of active Track objects added to the Peer locally.
+   */
+  function getLocalTracks() {
     // Return the list of Tracks from active senders.
-    return this.peerConnection.getSenders()
+    return peerConnection.getSenders()
     /**
      * Remove any Senders that do not have an associated track.
      * We only want to retrieve Senders that do have tracks, because those are
@@ -46977,7 +47285,7 @@ class Peer extends _eventemitter2.default {
      *    a remote track, but no local track has been added to it. We don't
      *    care about this for the "get local tracks" operation.
      */
-    .filter(sender => Boolean(sender.track)).map(sender => this.trackManager.get(sender.track.id)).filter(track => {
+    .filter(sender => Boolean(sender.track)).map(sender => trackManager.get(sender.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the sender but not the actual track yet.
       return track && track.getState().state === 'live' && track.stream.active;
@@ -46985,11 +47293,12 @@ class Peer extends _eventemitter2.default {
   }
 
   /**
-   * @property {Array} remoteTracks List of active Track objects the Peer has received remotely.
+   * @method getRemoteTracks
+   * @return {Array} List of active Track objects the Peer has received remotely.
    */
-  get remoteTracks() {
+  function getRemoteTracks() {
     // Return the list of Tracks from active receivers.
-    return this.peerConnection.getReceivers()
+    return peerConnection.getReceivers()
     /**
      * Remove any Receivers that do not have an associated track.
      * We only want to retrieve Receivers that do have tracks, because those are
@@ -46998,7 +47307,7 @@ class Peer extends _eventemitter2.default {
      *    a local track, but no remote track has been added to it. We don't
      *    care about this for the "get remote tracks" operation.
      */
-    .filter(receiver => Boolean(receiver.track)).map(receiver => this.trackManager.get(receiver.track.id)).filter(track => {
+    .filter(receiver => Boolean(receiver.track)).map(receiver => trackManager.get(receiver.track.id)).filter(track => {
       // Make sure the trackManager has the track and that its active.
       // It's possble that Peer has the receiver but not the actual track yet.
       return track && track.getState().state === 'live' && track.stream.active;
@@ -47010,14 +47319,14 @@ class Peer extends _eventemitter2.default {
    * @method getState
    * @return {Object}
    */
-  getState() {
+  function getState() {
     return {
-      id: this.id,
-      config: this.config,
-      localDesc: this.localDescription,
-      signalingState: this.peerConnection.signalingState,
-      localTracks: this.localTracks,
-      remoteTracks: this.remoteTracks
+      id: peerId,
+      config: config,
+      localDesc: getLocalDescription(),
+      signalingState: peerConnection.signalingState,
+      localTracks: getLocalTracks(),
+      remoteTracks: getRemoteTracks()
     };
   }
 
@@ -47030,21 +47339,21 @@ class Peer extends _eventemitter2.default {
    * @param  {string} [options.mediaDirections.video]
    * @return {Promise} Resolves with the offer.
    */
-  createOffer(options = {}) {
+  function createOffer(options = {}) {
     // If using unified-plan, remove options.mediaDirections.
     // This is because directions are now set in transceivers.
-    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
       delete options.mediaDirections;
     }
 
     return new _promise2.default((resolve, reject) => {
-      this.peerConnection.createOffer(options).then(offer => {
+      peerConnection.createOffer(options).then(offer => {
         const sdpHandlers = [];
-        if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
+        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
           // Modify the offer to claim the Peer doesn't suport trickle ICE.
           sdpHandlers.push(_handlers.removeTrickleIce);
         }
-        if (this.config.removeBundling) {
+        if (config.removeBundling) {
           // Modify the offer to remove media bundling
           sdpHandlers.push(_handlers.removeBundling);
         }
@@ -47073,15 +47382,15 @@ class Peer extends _eventemitter2.default {
    * @param  {string} [options.mediaDirections.video]
    * @return {Promise} Resolves with the answer.
    */
-  createAnswer(options = {}) {
+  function createAnswer(options = {}) {
     // If using unified-plan, remove options.mediaDirections.
     // This is because directions are now set in transceivers.
-    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
       delete options.mediaDirections;
     }
 
     return new _promise2.default((resolve, reject) => {
-      this.peerConnection.createAnswer(options).then(answer => {
+      peerConnection.createAnswer(options).then(answer => {
         const sdpHandlers = [];
 
         /*
@@ -47090,11 +47399,11 @@ class Peer extends _eventemitter2.default {
          */
         sdpHandlers.push(_handlers.preventDtlsRoleChange);
 
-        if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
+        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
           // Modify the answer to claim the Peer doesn't suport trickle ICE.
           sdpHandlers.push(_handlers.removeTrickleIce);
         }
-        if (this.config.removeBundling) {
+        if (config.removeBundling) {
           // Modify the offer to remove media bundling
           sdpHandlers.push(_handlers.removeBundling);
         }
@@ -47107,7 +47416,7 @@ class Peer extends _eventemitter2.default {
           answer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, answer.sdp, {
             type: answer.type,
             endpoint: _constants.PEER.ENDPOINT.LOCAL,
-            dtlsRole: this.dtlsRole
+            dtlsRole: dtlsRole
           });
         }
         resolve(answer);
@@ -47117,10 +47426,10 @@ class Peer extends _eventemitter2.default {
 
   /**
    * The SDP for the local end of the connection.
-   * @property localDescription
+   * @method getLocalDescription
    */
-  get localDescription() {
-    const localDesc = this.peerConnection.localDescription;
+  function getLocalDescription() {
+    const localDesc = peerConnection.localDescription;
     if (localDesc && localDesc.sdp && localDesc.type) {
       return localDesc;
     } else {
@@ -47136,7 +47445,7 @@ class Peer extends _eventemitter2.default {
    * @param  {RTCSessionDescription} sessionDesc
    * @return {Promise}
    */
-  setLocalDescription(sessionDesc) {
+  function setLocalDescription(sessionDesc) {
     // TODO: SDP pipeline here.
     _loglevel2.default.info(`Setting local description ${sessionDesc.type}:`, sessionDesc.sdp);
 
@@ -47147,30 +47456,30 @@ class Peer extends _eventemitter2.default {
      * Set the local Peer's DTLS role depending on what role was generated. This
      *    role will be kept throughout all renegotiations.
      */
-    if (!this.dtlsRole && sessionDesc.type === 'answer') {
+    if (!dtlsRole && sessionDesc.type === 'answer') {
       const localRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
       _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer.`);
-      this.dtlsRole = localRole;
+      dtlsRole = localRole;
     }
 
     return new _promise2.default((resolve, reject) => {
       // We always want to wait for the PeerConnection to be ready for
       //    negotiation before resolving setLocalDescription.
       // Each trickle ICE option (FULL/HALF/NONE) emits "negotiation ready" event once.
-      this.once('onnegotiationready', () => {
-        if (this.iceTimer.isStarted()) {
+      emitter.once('onnegotiationready', () => {
+        if (iceTimer.isStarted()) {
           // In a HALF trickle scenario, the Peer will be ready for negotiation
           //    before ICE collection has completed. Log that timing.
-          _loglevel2.default.debug(`Peer took ${this.iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
+          _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
         }
         resolve();
       });
 
-      this.peerConnection.setLocalDescription(sessionDesc).then(() => {
-        if (this.config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
+      peerConnection.setLocalDescription(sessionDesc).then(() => {
+        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
           // Trickling ICE candidates means that we can begin negotiation immediately.
           _loglevel2.default.debug('Local description set; ready for negotiation (full trickleICE).');
-          this.emit('onnegotiationready');
+          emitter.emit('onnegotiationready');
         } else {
           // ICE candidates aren't always gathered (only initially and when something
           //  changes), but we rely on "gathering complete" to know when the Peer is
@@ -47181,15 +47490,15 @@ class Peer extends _eventemitter2.default {
           // Known issue: If candidate collection takes less time than this timeout,
           //  the logged message will be incorrect, but will functionality still work.
           setTimeout(() => {
-            if (this.peerConnection.iceGatheringState === 'complete') {
+            if (peerConnection.iceGatheringState === 'complete') {
               // Gathering is "complete", so we are ready for negotiation.
               _loglevel2.default.debug(`Local description set, ICE candidate collection not needed; ready for negotiation.`);
-              this.emit('onnegotiationready');
+              emitter.emit('onnegotiationready');
             } else {
-              _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${this.config.trickleIceMode}).`);
+              _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${config.trickleIceMode}).`);
               // TODO: Handle this scenario properly.
               // If ICE collection never finishes, we need to time it out at some point.
-              setTimeout(() => this.emit('onnegotiationready'), 3000);
+              setTimeout(() => emitter.emit('onnegotiationready'), 3000);
             }
           }, 25);
         }
@@ -47202,7 +47511,7 @@ class Peer extends _eventemitter2.default {
    * @method setRemoteDescription
    * @param  {RTCSessionDescription} sessionDesc
    */
-  setRemoteDescription(sessionDesc) {
+  function setRemoteDescription(sessionDesc) {
     /**
      * Scenario: A remote answer SDP is being applied to the Peer, but it does
      *    not have a selected DTLS role yet. This should occur only when the
@@ -47210,18 +47519,18 @@ class Peer extends _eventemitter2.default {
      * Set the local Peer's DTLS role depending on what the remote Peer
      *    selected. This role will be kept throughout all renegotiations.
      */
-    if (!this.dtlsRole && sessionDesc.type === 'answer') {
+    if (!dtlsRole && sessionDesc.type === 'answer') {
       const remoteRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
       const localRole = remoteRole === 'active' ? 'passive' : 'active';
       _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer. Remote Peer selected ${remoteRole} DTLS role.`);
-      this.dtlsRole = localRole;
+      dtlsRole = localRole;
     }
 
     // TODO: SDP pipeline here.
-    // TODO: Update `this.config.trickleIceMode` to either NONE or FULL (from HALF)
+    // TODO: Update `config.trickleIceMode` to either NONE or FULL (from HALF)
     //    depending on remote support, since HALF is only needed for initial.
     _loglevel2.default.info(`Setting remote description ${sessionDesc.type}:`, sessionDesc.sdp);
-    return this.peerConnection.setRemoteDescription(sessionDesc);
+    return peerConnection.setRemoteDescription(sessionDesc);
   }
 
   /**
@@ -47231,8 +47540,8 @@ class Peer extends _eventemitter2.default {
    * @param {string} [options.trackId] The transceiver with the specific sender.track.id.
    * @return {Object} The transceiver that was found (undefined if not found).
    */
-  findTransceiver(options) {
-    const transceivers = this.peerConnection.getTransceivers();
+  function findTransceiver(options) {
+    const transceivers = peerConnection.getTransceivers();
     if (options.trackId) {
       return transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
     }
@@ -47246,8 +47555,8 @@ class Peer extends _eventemitter2.default {
    * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
-  replaceTrack(options, track) {
-    const targetTransceiver = this.findTransceiver(options);
+  function replaceTrack(options, track) {
+    const targetTransceiver = findTransceiver(options);
     return new _promise2.default((resolve, reject) => {
       if (targetTransceiver) {
         targetTransceiver.sender.replaceTrack(track).then(resolve).catch(reject);
@@ -47267,9 +47576,9 @@ class Peer extends _eventemitter2.default {
    * @param {string} kind The kind of transceiver to find (audio or video)
    * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
    */
-  findReusableTransceiver(kind) {
-    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
-      const transceivers = this.peerConnection.getTransceivers();
+  function findReusableTransceiver(kind) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+      const transceivers = peerConnection.getTransceivers();
       return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
       );
     } else {
@@ -47283,16 +47592,16 @@ class Peer extends _eventemitter2.default {
    * @param  {Track} track A Track object.
    * @return {RTCRtpSender}
    */
-  addTrack(track) {
+  function addTrack(track) {
     // Ensure the track wasn't already added to the Peer.
-    if (this.localTracks.findIndex(localTrack => localTrack.id === track.id) > -1) {
-      _loglevel2.default.debug(`Track (${track.id}) already added to Peer (${this.id}).`);
+    if (getLocalTracks().findIndex(localTrack => localTrack.id === track.id) > -1) {
+      _loglevel2.default.debug(`Track (${track.id}) already added to Peer (${peerId}).`);
       return;
     }
 
     let sender;
     try {
-      sender = this.peerConnection.addTrack(track.track, track.stream);
+      sender = peerConnection.addTrack(track.track, track.stream);
     } catch (err) {
       // TODO: Better error handling.
       _loglevel2.default.debug(err.message);
@@ -47307,14 +47616,14 @@ class Peer extends _eventemitter2.default {
    * @param  {RTCIceCandidate} candidate A native candidate object.
    * @return {Promise} Resolves when the candidate is successfully added.
    */
-  addIceCandidate(candidate) {
+  function addIceCandidate(candidate) {
     return new _promise2.default((resolve, reject) => {
-      if (this.peerConnection.remoteDescription.type && this.peerConnection.remoteDescription.sdp) {
-        this.peerConnection.addIceCandidate(candidate).then(resolve).catch(reject);
+      if (peerConnection.remoteDescription.type && peerConnection.remoteDescription.sdp) {
+        peerConnection.addIceCandidate(candidate).then(resolve).catch(reject);
       } else {
-        _loglevel2.default.debug(`Peer ${this.id} cannot set remote ICE candidate without a remote description.`);
+        _loglevel2.default.debug(`Peer ${peerId} cannot set remote ICE candidate without a remote description.`);
         // TODO: Better error.
-        reject(new Error(`Peer ${this.id} cannot set remote ICE candidate without a remote description.`));
+        reject(new Error(`Peer ${peerId} cannot set remote ICE candidate without a remote description.`));
       }
     });
   }
@@ -47323,9 +47632,9 @@ class Peer extends _eventemitter2.default {
    * Clean the Peer by closing the RTCPeerConnection.
    * @method close
    */
-  close() {
-    this.peerConnection.close();
-    this.emit('peer:closed', this.id);
+  function close() {
+    peerConnection.close();
+    emitter.emit('peer:closed', peerId);
   }
 
   /**
@@ -47333,27 +47642,28 @@ class Peer extends _eventemitter2.default {
    * @method removeTrack
    * @param  {string} trackId An id for a Track object.
    */
-  removeTrack(trackId) {
-    const track = this.localTracks.find(track => track.id === trackId);
+  function removeTrack(trackId) {
+    const track = getLocalTracks().find(track => track.id === trackId);
     if (!track) {
       _loglevel2.default.debug(`Invalid track ID ${trackId}; cannot remove track.`);
       return;
-    } else if (this.peerConnection.signalingState === ' closed') {
-      _loglevel2.default.debug(`Peer ${this.id} is closed; cannot remove track.`);
+    } else if (peerConnection.signalingState === ' closed') {
+      _loglevel2.default.debug(`Peer ${peerId} is closed; cannot remove track.`);
       return;
     }
 
     // Get the RtpSender for the Track we want to remove.
-    const sender = this.peerConnection.getSenders().filter(sender => sender.track !== null).find(sender => sender.track.id === trackId);
-    this.peerConnection.removeTrack(sender);
+    const sender = peerConnection.getSenders().filter(sender => sender.track !== null).find(sender => sender.track.id === trackId);
+    peerConnection.removeTrack(sender);
   }
 
   /**
    * Event handler when tone is played.
+   * @private
    * @method handleToneChangeEvent
    * @param  {event} event
    */
-  handleToneChangeEvent(event) {
+  function handleToneChangeEvent(event) {
     if (event.tone !== '') {
       _loglevel2.default.debug('Tone played: ' + event.tone);
     } else {
@@ -47363,6 +47673,7 @@ class Peer extends _eventemitter2.default {
 
   /**
    * Helper function to sendDTMF tones .
+   * @private
    * @method insertDTMF
    * @param {sender} object
    * @param {string} tone
@@ -47370,13 +47681,13 @@ class Peer extends _eventemitter2.default {
    * @param {number} intertoneGap
    * @param {Function} callback
    */
-  insertDTMF(sender, tone, duration, intertoneGap, callback) {
+  function insertDTMF(sender, tone, duration, intertoneGap, callback) {
     if (sender.dtmf) {
       const dtmfSender = sender.dtmf;
       if (callback) {
         dtmfSender.ontonechange = callback;
       } else {
-        dtmfSender.ontonechange = this.handleToneChangeEvent;
+        dtmfSender.ontonechange = handleToneChangeEvent;
       }
       try {
         dtmfSender.insertDTMF(tone, duration, intertoneGap);
@@ -47403,12 +47714,12 @@ class Peer extends _eventemitter2.default {
    * @param {string} [sendOptions.trackId] The trackId of the sender to use.
    * @return {Boolean} Whether the DTMF tones were inserted
    */
-  sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, trackId }) {
-    if (!this.peerConnection.getSenders) {
+  function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, trackId }) {
+    if (!peerConnection.getSenders) {
       _loglevel2.default.debug('RTCPeerConnection method getSenders() is required which is not support by this browser.');
       return false;
     }
-    const senders = this.peerConnection.getSenders();
+    const senders = peerConnection.getSenders();
     // Use the trackId if it was provided
     if (trackId) {
       let sender = senders.find(sender => sender.track.id === trackId);
@@ -47416,12 +47727,12 @@ class Peer extends _eventemitter2.default {
         _loglevel2.default.debug('No sender with that trackId');
         return false;
       }
-      this.insertDTMF(sender, tone, duration, intertoneGap, callback);
+      insertDTMF(sender, tone, duration, intertoneGap, callback);
       return true;
     } else {
       let result;
       for (let i = 0; i < senders.length; i++) {
-        result = this.insertDTMF(senders[i], tone, duration, intertoneGap, callback);
+        result = insertDTMF(senders[i], tone, duration, intertoneGap, callback);
         if (result) {
           return true;
         }
@@ -47437,14 +47748,14 @@ class Peer extends _eventemitter2.default {
    * @param {string} [TrackId] Return stats for peerConnection if trackId is not provided
    * @return {Promise} Resolves with the RTCStatsReport
    */
-  getStats(trackId) {
+  function getStats(trackId) {
     // If no trackId is supplied, get the stats from the RTCPeerConnection. Otherwise, find an RTCSender
     // associated with the trackId and get the stats from it.
 
     // Use the trackId if it was provided
     if (trackId) {
       return new _promise2.default((resolve, reject) => {
-        const senders = this.peerConnection.getSenders();
+        const senders = peerConnection.getSenders();
         // search for a sender associated with the trackId
         const sender = senders.find(sender => sender.track.id === trackId);
         if (sender) {
@@ -47457,7 +47768,7 @@ class Peer extends _eventemitter2.default {
       });
     } else {
       // get the stats associated with the peerConnection if no trackId is supplied
-      return this.peerConnection.getStats();
+      return peerConnection.getStats();
     }
   }
 
@@ -47469,9 +47780,9 @@ class Peer extends _eventemitter2.default {
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
    * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
    */
-  setTransceiversDirection(targetDirection, options = {}) {
-    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.rtcConfig.sdpSemantics)) {
-      let transceivers = this.peerConnection.getTransceivers();
+  function setTransceiversDirection(targetDirection, options = {}) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+      let transceivers = peerConnection.getTransceivers();
 
       if (options.trackIds) {
         transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
@@ -47494,8 +47805,62 @@ class Peer extends _eventemitter2.default {
       };
     }
   }
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    id: peerId,
+    // Getter APIs.
+    get localTracks() {
+      return getLocalTracks();
+    },
+    get remoteTracks() {
+      return getRemoteTracks();
+    },
+    get localDescription() {
+      return getLocalDescription();
+    },
+    getState,
+    findTransceiver,
+    findReusableTransceiver,
+    // Negotiation APIs.
+    createOffer,
+    createAnswer,
+    setLocalDescription,
+    setRemoteDescription,
+    setTransceiversDirection,
+    // Media APIs.
+    addTrack,
+    removeTrack,
+    replaceTrack,
+    // Other APIs.
+    addIceCandidate,
+    close,
+    sendDTMF,
+    getStats,
+    // Event APIs.
+    on,
+    once,
+    off,
+    // The native PeerConnection was accessible before, so it was used when it
+    //    probably shouldn't have been.
+    // TODO: Find a better solution.
+    peerConnection
+  };
 }
-exports.default = Peer;
 
 /***/ }),
 
@@ -47513,6 +47878,8 @@ var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/pro
 
 var _promise2 = _interopRequireDefault(_promise);
 
+exports.default = Session;
+
 var _constants = __webpack_require__("../webrtc/src/constants.js");
 
 var _pipeline = __webpack_require__("../webrtc/src/sdpUtils/pipeline.js");
@@ -47520,8 +47887,6 @@ var _pipeline = __webpack_require__("../webrtc/src/sdpUtils/pipeline.js");
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js");
-
-var _transceiverUtils = __webpack_require__("../webrtc/src/sdpUtils/transceiverUtils.js");
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -47534,83 +47899,81 @@ var _eventemitter2 = _interopRequireDefault(_eventemitter);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Class to represent a webRTC Session for a single peer.
+ * Object to represent a webRTC Session for a single peer.
  * "Session" being an abstraction of a webRTC connection between another peer.
  * Performs logic for initializing and connecting a peer connection.
  * Manages media added to / received from the peer connection.
- * @class Session
+ * @method Session
  */
 
 
 // Libraries.
-// Helpers.
-class Session extends _eventemitter2.default {
-  constructor(id, managers, config = {}) {
-    super();
 
-    // The session's unique id
-    this.id = id;
-    this.config = config;
-    this.peerManager = managers.peerManager;
-    this.mediaManager = managers.mediaManager;
-    this.trackManager = managers.trackManager;
 
-    // Create and initialize the peer
-    const peer = this.peerManager.create(this.config.peer);
-    if (peer) {
-      // The id of the created peer
-      this.peerId = peer.id;
+// SDP Helpers.
+function Session(id, managers, config = {}) {
+  // Internal variables.
+  const sessionId = id;
+  let peerId;
+  const peerManager = managers.peerManager;
+  const mediaManager = managers.mediaManager;
+  const emitter = new _eventemitter2.default();
 
-      // TODO: Use `uniqueLabel` when setting event listeners (and bubbling events).
-      // When the peer gets an ICE candidate, emit it as
-      //  a message to be sent to the other end.
-      peer.on('onicecandidate', event => {
-        this.emit('onicecandidate', {
-          candidate: event.candidate
+  // Create and initialize the peer
+  const peer = peerManager.create(config.peer);
+  if (peer) {
+    // The id of the created peer
+    peerId = peer.id;
+
+    // TODO: Use `uniqueLabel` when setting event listeners (and bubbling events).
+    // When the peer gets an ICE candidate, emit it as
+    //  a message to be sent to the other end.
+    peer.on('onicecandidate', event => {
+      emitter.emit('onicecandidate', {
+        candidate: event.candidate
+      });
+    });
+
+    // Handle when the Peer receives a new remote track.
+    peer.on('ontrack', track => {
+      let media = mediaManager.get(track.stream.id);
+      if (media) {
+        // Add the new Track to its Media object.
+        media.addTrack(track);
+      } else {
+        // Create a new Media object using the Track.
+        media = mediaManager.createRemote(track.stream, [track]);
+      }
+
+      media.on('track:removed', trackId => {
+        emitter.emit('track:removed', {
+          local: false,
+          trackId: trackId
         });
       });
 
-      // Handle when the Peer receives a new remote track.
-      peer.on('ontrack', track => {
-        let media = this.mediaManager.get(track.stream.id);
-        if (media) {
-          // Add the new Track to its Media object.
-          media.addTrack(track);
-        } else {
-          // Create a new Media object using the Track.
-          media = this.mediaManager.createRemote(track.stream, [track]);
-        }
-
-        media.on('track:removed', trackId => {
-          this.emit('track:removed', {
-            local: false,
-            trackId: trackId
-          });
-        });
-
-        track.once('ended', () => {
-          this.emit('track:ended', {
-            local: false,
-            trackId: track.id
-          });
-        });
-
-        // Indicate that the Session has a new Track.
-        this.emit('new:track', {
+      track.once('ended', () => {
+        emitter.emit('track:ended', {
           local: false,
           trackId: track.id
         });
       });
-    } else {
-      throw new Error(`Peer creation error in Session ${this.id}.`);
-    }
+
+      // Indicate that the Session has a new Track.
+      emitter.emit('new:track', {
+        local: false,
+        trackId: track.id
+      });
+    });
+  } else {
+    throw new Error(`Peer creation error in Session ${sessionId}.`);
   }
 
   /**
-   * @property {Array} localTracks List of active Track objects the Session has added locally.
+   * @property {Array} getLocalTracks List of active Track objects the Session has added locally.
    */
-  get localTracks() {
-    const peer = this.peerManager.get(this.peerId);
+  function getLocalTracks() {
+    const peer = peerManager.get(peerId);
     if (peer) {
       return peer.localTracks;
     } else {
@@ -47619,10 +47982,10 @@ class Session extends _eventemitter2.default {
   }
 
   /**
-   * @property {Array} remoteTracks List of active Track objects the Session has received remotely.
+   * @property {Array} getRemoteTracks List of active Track objects the Session has received remotely.
    */
-  get remoteTracks() {
-    const peer = this.peerManager.get(this.peerId);
+  function getRemoteTracks() {
+    const peer = peerManager.get(peerId);
     if (peer) {
       return peer.remoteTracks;
     } else {
@@ -47635,11 +47998,11 @@ class Session extends _eventemitter2.default {
    * @method getState
    * @return {Object}
    */
-  getState() {
+  function getState() {
     return {
-      id: this.id,
-      localTracks: this.localTracks,
-      remoteTracks: this.remoteTracks
+      id: sessionId,
+      localTracks: getLocalTracks(),
+      remoteTracks: getRemoteTracks()
     };
   }
 
@@ -47647,15 +48010,15 @@ class Session extends _eventemitter2.default {
    * Setup a warm PeerConnection.
    * @method warmup
    */
-  warmup() {}
+  function warmup() {}
 
   /**
    * Add Track objects to the Session.
    * @method addTracks
    * @param  {Array} tracks List of Track objects.
    */
-  addTracks(tracks) {
-    const peer = this.peerManager.get(this.peerId);
+  function addTracks(tracks) {
+    const peer = peerManager.get(peerId);
     // TODO: Better error handling?
     if (peer) {
       const addTrackOrReuseTransceiverPromises = tracks.map(track => {
@@ -47667,7 +48030,7 @@ class Session extends _eventemitter2.default {
           const reusableTransceiver = peer.findReusableTransceiver(track.track.kind);
 
           // If we can find a reusable transceiver, reuse it.
-          if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
+          if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
             // Current limitations of transceiver reuse method:
             // - We cannot attach the track's associated stream to the sender (lack of `sender.setStreams` support atm)
             // So the local transceiver's sender track & remote transceiver's receiver track must have been used before so that it already has a stream attached to the sender.
@@ -47697,15 +48060,15 @@ class Session extends _eventemitter2.default {
           _loglevel2.default.info(message);
 
           // Indicate that the Session has a new Track.
-          this.emit('new:track', {
+          emitter.emit('new:track', {
             local: true,
             trackId: track.id
           });
 
-          const media = this.mediaManager.get(track.stream.id);
+          const media = mediaManager.get(track.stream.id);
           if (media) {
             media.on('track:removed', trackId => {
-              this.emit('track:removed', {
+              emitter.emit('track:removed', {
                 local: true,
                 trackId: trackId
               });
@@ -47717,7 +48080,7 @@ class Session extends _eventemitter2.default {
             //    removing the track (and it would throw an error anyway).
             if (peer.peerConnection.signalingState !== 'closed') {
               peer.removeTrack(track.id);
-              this.emit('track:ended', {
+              emitter.emit('track:ended', {
                 local: true,
                 trackId: track.id
               });
@@ -47738,16 +48101,16 @@ class Session extends _eventemitter2.default {
    * @param  {Array}  [options.sdpHandlers] SDP handlers for modifying the local offer.
    * @return {Promise} Resolves with the offer.
    */
-  generateOffer(options = {}) {
+  function generateOffer(options = {}) {
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
       // If using unified-plan, remove options.mediaDirections.
       // This is because directions are now set in transceivers.
-      if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics)) {
+      if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
         if (options.mediaDirections) {
           const audioTransceiverTargetDir = options.mediaDirections.audio;
           const videoTransceiverTargetDir = options.mediaDirections.video;
@@ -47798,8 +48161,8 @@ class Session extends _eventemitter2.default {
    * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
-  replaceTrack(options, track) {
-    const peer = this.peerManager.get(this.peerId);
+  function replaceTrack(options, track) {
+    const peer = peerManager.get(peerId);
     return peer.replaceTrack(options, track);
   }
 
@@ -47812,9 +48175,9 @@ class Session extends _eventemitter2.default {
    * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
    * @return {Object} An object containing an `error` flag and  an array `failures` of transceiver "mid"s whose directions weren't changed.
    */
-  setTransceiversDirection(targetDirection, options = {}) {
-    if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics)) {
-      const peer = this.peerManager.get(this.peerId);
+  function setTransceiversDirection(targetDirection, options = {}) {
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
+      const peer = peerManager.get(peerId);
       return peer.setTransceiversDirection(targetDirection, options);
     } else {
       _loglevel2.default.info(`Transceiver direction modification is only available in unified-plan.`);
@@ -47830,11 +48193,11 @@ class Session extends _eventemitter2.default {
    * @param  {Array}  [options.sdpHandlers] SDP handlers for modifying the remote offer.
    * @return {Promise}
    */
-  processOffer(offer, options = {}) {
+  function processOffer(offer, options = {}) {
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
       if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
@@ -47857,16 +48220,16 @@ class Session extends _eventemitter2.default {
    * @param  {Array}  [options.sdpHandlers] SDP handlers for modifying the local answer.
    * @return {Promise} Resolves with the answer.
    */
-  generateAnswer(options = {}) {
+  function generateAnswer(options = {}) {
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
       // If using unified-plan, remove options.mediaDirections.
       // This is because directions are now set in transceivers.
-      if ((0, _sdpSemantics.isUnifiedPlan)(this.config.peer.rtcConfig.sdpSemantics)) {
+      if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
         if (options.mediaDirections) {
           const audioTransceiverTargetDir = options.mediaDirections.audio;
           const videoTransceiverTargetDir = options.mediaDirections.video;
@@ -47916,7 +48279,7 @@ class Session extends _eventemitter2.default {
    * @param  {Array}  [options.sdpHandlers] SDP handlers for modifying the remote answer.
    * @return {Promise}
    */
-  processAnswer(answer, options = {}) {
+  function processAnswer(answer, options = {}) {
     if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
       _loglevel2.default.debug('Modifying remote answer with SDP pipeline.');
       answer.sdp = _pipeline2.default.run(options.sdpHandlers, answer.sdp, {
@@ -47926,9 +48289,9 @@ class Session extends _eventemitter2.default {
     }
 
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
       peer.setRemoteDescription(answer).then(() => {
@@ -47945,11 +48308,11 @@ class Session extends _eventemitter2.default {
    * @param  {string} [options.label] The Peer to perform the operation on.
    * @return {Promise}
    */
-  addIceCandidate(candidate, options = {}) {
+  function addIceCandidate(candidate, options = {}) {
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
       peer.addIceCandidate(candidate).then(resolve).catch(reject);
@@ -47960,12 +48323,12 @@ class Session extends _eventemitter2.default {
    * End the Session.
    * @method end
    */
-  end() {
-    const peer = this.peerManager.get(this.peerId);
+  function end() {
+    const peer = peerManager.get(peerId);
     if (peer) {
       peer.close();
     }
-    this.emit('session:ended', this.id);
+    emitter.emit('session:ended', sessionId);
   }
 
   /**
@@ -47973,11 +48336,11 @@ class Session extends _eventemitter2.default {
    * @method removeTrack
    * @param  {Array} trackIds List of IDs of Track objects to remove.
    */
-  removeTracks(trackIds) {
-    const peer = this.peerManager.get(this.peerId);
+  function removeTracks(trackIds) {
+    const peer = peerManager.get(peerId);
     if (peer) {
       trackIds.forEach(trackId => {
-        if (this.localTracks.findIndex(track => track.id === trackId) > -1) {
+        if (getLocalTracks().findIndex(track => track.id === trackId) > -1) {
           peer.removeTrack(trackId);
         }
       });
@@ -47996,8 +48359,8 @@ class Session extends _eventemitter2.default {
    * @param {string} [sendOptions.trackId] The trackId of the sender to use.
    * @return {boolean} The success or fail indicator
    */
-  sendDTMF(DTMFOptions, sendOptions = {}) {
-    const peer = this.peerManager.get(this.peerId);
+  function sendDTMF(DTMFOptions, sendOptions = {}) {
+    const peer = peerManager.get(peerId);
     if (peer) {
       return peer.sendDTMF(DTMFOptions, sendOptions);
     } else {
@@ -48011,20 +48374,64 @@ class Session extends _eventemitter2.default {
    * @param  {string} trackId The track id associated with a sender.
    * @return {Promise}
    */
-  getStats(trackId) {
+  function getStats(trackId) {
     return new _promise2.default((resolve, reject) => {
-      const peer = this.peerManager.get(this.peerId);
+      const peer = peerManager.get(peerId);
       if (!peer) {
-        reject(new Error(`Peer not found in Session ${this.id}.`));
+        reject(new Error(`Peer not found in Session ${sessionId}.`));
         return;
       }
       peer.getStats(trackId).then(resolve).catch(reject);
     });
   }
-}
-exports.default = Session;
 
-// SDP Helpers.
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    id: sessionId,
+    config,
+    // Getter APIs.
+    getState,
+    get localTracks() {
+      return getLocalTracks();
+    },
+    get remoteTracks() {
+      return getRemoteTracks();
+    },
+    warmup,
+    addTracks,
+    removeTracks,
+    replaceTrack,
+    setTransceiversDirection,
+    // Negotiation APIs.
+    generateOffer,
+    processOffer,
+    generateAnswer,
+    processAnswer,
+    // Other APIs.
+    addIceCandidate,
+    end,
+    sendDTMF,
+    getStats,
+    // Event APIs.
+    on,
+    once,
+    off
+  };
+} // Helpers.
 
 /***/ }),
 
@@ -48037,6 +48444,7 @@ exports.default = Session;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = Track;
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -48051,44 +48459,43 @@ var _utils = __webpack_require__("../webrtc/src/utils.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Wrapper class for a native MediaStreamTrack object.
+ * Wrapper object for a native MediaStreamTrack object.
  * Ref: https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack
- * @class Track
+ * @method Track
  */
-class Track extends _eventemitter2.default {
-  constructor(mediaTrack, mediaStream) {
-    super();
-    this.id = mediaTrack.id;
-    this.track = mediaTrack;
-    this.stream = mediaStream;
-    this.containers = [];
-    this.constraints = {};
+function Track(mediaTrack, mediaStream) {
+  // Internal variables.
+  const id = mediaTrack.id;
+  const track = mediaTrack;
+  const stream = mediaStream;
+  const containers = [];
+  let constraints = {};
+  const emitter = new _eventemitter2.default();
 
-    /**
-     * When a track ends, the Track itself doesn't do anything about it.
-     * It "bubbles" the event up to be handled at a higher level.
-     */
-    this.track.onended = event => {
-      _loglevel2.default.debug('Event emitted: ', event);
-      this.emit('ended', this.track.id);
-    };
-  }
+  /**
+   * When a track ends, the Track itself doesn't do anything about it.
+   * It "bubbles" the event up to be handled at a higher level.
+   */
+  track.onended = event => {
+    _loglevel2.default.debug('Event emitted: ', event);
+    emitter.emit('ended', track.id);
+  };
 
   /**
    * Retrieve a snapshot of the Track object's current state.
    * @method getState
    * @return {Object}
    */
-  getState() {
+  function getState() {
     return {
-      id: this.id,
-      streamId: this.stream.id,
-      kind: this.track.kind,
-      label: this.track.label,
-      muted: !this.track.enabled,
-      disabled: this.track.muted,
-      state: this.track.readyState,
-      containers: this.containers.map(element => element.id)
+      id,
+      streamId: stream.id,
+      kind: track.kind,
+      label: track.label,
+      muted: !track.enabled,
+      disabled: track.muted,
+      state: track.readyState,
+      containers: containers.map(element => element.id)
     };
   }
 
@@ -48098,31 +48505,31 @@ class Track extends _eventemitter2.default {
    * @param  {HTMLElement} element The DOM element to be rendered in.
    * @param  {String} [speakerId] The device ID to be used for audio output.
    */
-  renderIn(element, speakerId) {
-    if (this.containers.indexOf(element) > -1) {
+  function renderIn(element, speakerId) {
+    if (containers.indexOf(element) > -1) {
       // Already rendered in element.
-      _loglevel2.default.debug(`Track ${this.id} already rendered in element.`, element);
+      _loglevel2.default.debug(`Track ${id} already rendered in element.`, element);
       return;
     }
 
-    this.containers.push(element);
+    containers.push(element);
 
-    let type = this.track.kind;
+    let type = track.kind;
     let renderer = document.createElement(type);
 
     // Make id safe for css (Firefox ids come wrapped in curly braces)
     // This makes it easier to do other manipulation on the rendering side
     // as we don't need to escape curly braces when doing element.querySelector (See removeFrom).
-    renderer.id = `${type}-${(0, _utils.makeSafeForCSS)(this.id)}`;
+    renderer.id = `${type}-${(0, _utils.makeSafeForCSS)(id)}`;
     renderer.style.height = '100%';
     renderer.style.width = '100%';
 
     try {
-      renderer.srcObject = this.stream;
+      renderer.srcObject = stream;
     } catch (error) {
       _loglevel2.default.debug('srcObject property not supported; reverting to createObjectURL.');
       // TODO: AdapterJS handles this, we should remove this.
-      renderer.src = window.URL.createObjectURL(this.stream);
+      renderer.src = window.URL.createObjectURL(stream);
     }
 
     renderer.autoplay = 'true';
@@ -48154,20 +48561,20 @@ class Track extends _eventemitter2.default {
    * @method removeFrom
    * @param  {HTMLElement} element The DOM element to be removed from.
    */
-  removeFrom(element) {
-    let index = this.containers.indexOf(element);
+  function removeFrom(element) {
+    let index = containers.indexOf(element);
     if (index === -1) {
       // Not rendered in element.
-      _loglevel2.default.debug(`Track ${this.id} not rendered in element.`, element);
+      _loglevel2.default.debug(`Track ${id} not rendered in element.`, element);
       return;
     }
-    this.containers.splice(index, 1);
+    containers.splice(index, 1);
 
     // TODO: This id may not be unique.
     // Make id safe for css (Firefox ids come wrapped in curly braces)
     // This makes it easier to do other manipulation on the rendering side
     // as we don't need to escape curly braces when doing element.querySelector.
-    let rendererId = `${this.track.kind}-${(0, _utils.makeSafeForCSS)(this.id)}`;
+    let rendererId = `${track.kind}-${(0, _utils.makeSafeForCSS)(id)}`;
     const renderer = element.querySelector(`#${rendererId}`);
 
     if (renderer.srcObject) {
@@ -48186,13 +48593,13 @@ class Track extends _eventemitter2.default {
    * @method moveTo
    * @param  {HTMLElement} element The DOM element to be moved to.
    */
-  moveTo(element) {
+  function moveTo(element) {
     // Iterate over the array backwards since `removeFrom` changes the length
     //    of the array. This ensures that indexes aren't skipped.
-    for (let i = this.containers.length; i > 0; i--) {
-      this.removeFrom(this.containers[i - 1]);
+    for (let i = containers.length; i > 0; i--) {
+      removeFrom(containers[i - 1]);
     }
-    this.renderIn(element);
+    renderIn(element);
   }
 
   /**
@@ -48200,15 +48607,15 @@ class Track extends _eventemitter2.default {
    *    track itself.
    * @method cleanup
    */
-  cleanup() {
+  function cleanup() {
     // Iterate over the array backwards since `removeFrom` changes the length
     //    of the array. This ensures that indexes aren't skipped.
-    for (let i = this.containers.length; i > 0; i--) {
-      this.removeFrom(this.containers[i - 1]);
+    for (let i = containers.length; i > 0; i--) {
+      removeFrom(containers[i - 1]);
     }
     // Stop the track if it isn't already stopped.
-    if (this.track.readyState === 'live') {
-      this.stop();
+    if (track.readyState === 'live') {
+      stop();
     }
   }
 
@@ -48216,30 +48623,30 @@ class Track extends _eventemitter2.default {
    * Set this Track to be disabled and disallow the Track to render the source stream.
    * @method mute
    */
-  mute() {
-    this.track.enabled = false;
+  function mute() {
+    track.enabled = false;
   }
 
   /**
    * Set this Track to be enabled and allow the Track to render the source stream.
    * @method unmute
    */
-  unmute() {
-    this.track.enabled = true;
+  function unmute() {
+    track.enabled = true;
   }
 
   /**
    * Calls native stop() function to deassociate the source and the track.
    * @method stop
    */
-  stop() {
-    this.track.stop();
+  function stop() {
+    track.stop();
     /**
      * Treat stopping the track the same as it being ended.
      * Noramlly, onended is not triggered when `stop` is called, only when it is
      *    "remotely ended".
      */
-    this.track.onended();
+    track.onended();
   }
 
   /**
@@ -48247,8 +48654,8 @@ class Track extends _eventemitter2.default {
    * @method getConstraints
    * @return {Object}
    */
-  getConstraints() {
-    return this.constraints;
+  function getConstraints() {
+    return constraints;
   }
 
   /**
@@ -48256,8 +48663,8 @@ class Track extends _eventemitter2.default {
    * @method applyConstraints
    * @param  {Object} constraints The list of constrainable properties.
    */
-  setConstraints(constraints) {
-    this.constraints = constraints;
+  function setConstraints(constr) {
+    constraints = constr;
   }
 
   /**
@@ -48265,11 +48672,50 @@ class Track extends _eventemitter2.default {
    * @method getContainers
    * @return {Array} List of HTMLElements.
    */
-  getContainers() {
-    return this.containers;
+  function getContainers() {
+    return containers;
   }
-}
-exports.default = Track; // Libraries.
+
+  function on(...args) {
+    return emitter.on(...args);
+  }
+
+  function once(...args) {
+    return emitter.once(...args);
+  }
+
+  function off(...args) {
+    return emitter.off(...args);
+  }
+
+  /**
+   * The exposed API.
+   */
+  return {
+    id,
+    // Track APIs.
+    getState,
+    renderIn,
+    removeFrom,
+    moveTo,
+    cleanup,
+    mute,
+    unmute,
+    stop,
+    getConstraints,
+    setConstraints,
+    getContainers,
+    // Event APIs.
+    on,
+    off,
+    once,
+    // The native track and stream was accessible before, so it was
+    //    used when it probably shouldn't have been.
+    // TODO: Find a better solution.
+    track,
+    stream
+  };
+} // Libraries.
 
 /***/ }),
 
