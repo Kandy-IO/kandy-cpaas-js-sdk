@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.73666
+ * Version: 4.4.0-beta.73700
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -15736,7 +15736,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.73666';
+  let version = '4.4.0-beta.73700';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -35111,7 +35111,14 @@ callReducers[actionTypes.CALL_CANCELLED] = {
 
 callReducers[actionTypes.IGNORE_CALL_FINISH] = {
   next(state, action) {
+    // The call being ignored means it was not completed. Ensure there are times
+    //    in state, and they reflect that the call was not completed.
+    // TODO: Better call times.
+    const now = Date.now();
+
     return (0, _extends3.default)({}, state, {
+      startTime: now,
+      endTime: now,
       state: _constants.CALL_STATES.ENDED
     });
   }
@@ -35119,7 +35126,14 @@ callReducers[actionTypes.IGNORE_CALL_FINISH] = {
 
 callReducers[actionTypes.REJECT_CALL_FINISH] = {
   next(state, action) {
+    // The call being rejected means it was not completed. Ensure there are
+    //    times in state, and they reflect that the call was not completed.
+    // TODO: Better call times.
+    const now = Date.now();
+
     return (0, _extends3.default)({}, state, {
+      startTime: now,
+      endTime: now,
       state: _constants.CALL_STATES.ENDED
     });
   }
@@ -35175,9 +35189,14 @@ callReducers[actionTypes.CALL_ACCEPTED] = {
 // Instead of an object with `next` & `throw` properties, pass in a function.
 // https://redux-actions.js.org/api/handleaction#handleactiontype-reducer-defaultstate
 callReducers[actionTypes.END_CALL_FINISH] = (state, action) => {
+  const now = Date.now();
+
   return (0, _extends3.default)({}, state, {
     state: _constants.CALL_STATES.ENDED,
-    endTime: Date.now(),
+    // If there isn't a start time, then the call was never completed.
+    //    Meaning it's duration was 0, so set the start time appropriately.
+    startTime: state.startTime || now,
+    endTime: now,
     remoteParticipant: (0, _extends3.default)({}, state.remoteParticipant, action.payload.remoteParticipant)
   });
 };
