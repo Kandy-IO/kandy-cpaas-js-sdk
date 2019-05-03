@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.73607
+ * Version: 4.4.0-beta.73666
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -15736,7 +15736,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.73607';
+  let version = '4.4.0-beta.73666';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -35090,7 +35090,8 @@ reducers[actionTypes.CALL_INCOMING] = {
 callReducers[actionTypes.CALL_RINGING] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
-      state: _constants.CALL_STATES.RINGING
+      state: _constants.CALL_STATES.RINGING,
+      remoteParticipant: action.payload.remoteParticipant
     });
   }
 };
@@ -35176,7 +35177,8 @@ callReducers[actionTypes.CALL_ACCEPTED] = {
 callReducers[actionTypes.END_CALL_FINISH] = (state, action) => {
   return (0, _extends3.default)({}, state, {
     state: _constants.CALL_STATES.ENDED,
-    endTime: Date.now()
+    endTime: Date.now(),
+    remoteParticipant: (0, _extends3.default)({}, state.remoteParticipant, action.payload.remoteParticipant)
   });
 };
 
@@ -35516,8 +35518,9 @@ function* incomingCallNotification(webRTC) {
     const params = {
       sdp: notification.offer.sdp,
       wrtcsSessionId: notification.link[0].href.split('sessions/')[1],
-      callerName: notification.originatorName,
-      callerNumber: notification.originatorAddress
+      // Remote participant information.
+      remoteName: notification.originatorName,
+      remoteNumber: notification.originatorAddress
 
       // Pass the incoming call parameters to the Callstack for handling.
     };yield (0, _effects2.call)(_notifications2.incomingCall, deps, params);
@@ -37119,8 +37122,8 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * @param {Object}   params        Parameters describing the incoming call.
  * @param {string}   [params.sdp]  The remote SDP offer included with the notification (if any).
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
- * @param {string}   params.callerNumber   Number of the remote participant.
- * @param {string}   params.callerName     Display name of the remote participant.
+ * @param {string}   params.remoteNumber   Number of the remote participant.
+ * @param {string}   params.remoteName     Display name of the remote participant.
  */
 
 
@@ -37134,7 +37137,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 // Callstack plugin.
 function* incomingCall(deps, params) {
   const { webRTC, requests } = deps;
-  const { sdp, wrtcsSessionId, callerNumber, callerName } = params;
+  const { sdp, wrtcsSessionId, remoteNumber, remoteName } = params;
 
   let sessionId, isSlowStart;
   /**
@@ -37185,8 +37188,8 @@ function* incomingCall(deps, params) {
     direction: 'incoming',
     state: _constants.CALL_STATES.RINGING,
     remoteParticipant: {
-      displayName: callerName,
-      displayNumber: callerNumber
+      displayName: remoteName,
+      displayNumber: remoteNumber
     },
     // The ID that the backend uses to track this webRTC session.
     wrtcsSessionId,
@@ -37273,6 +37276,8 @@ function* parseCallRequest(deps, params) {
  * @param {Object} params       Parameters describing the incoming call.
  * @param {string} [params.sdp] The remote SDP offer included with the notification (if any).
  * @param {string} params.wrtcsSessionId ID that the server uses to identify the session.
+ * @param {string} params.remoteName   Name of the remote participant.
+ * @param {string} params.remoteNumber Number of the remote participant.
  */
 function* parseCallResponse(deps, params) {
   const { wrtcsSessionId, sdp } = params;
@@ -37320,9 +37325,9 @@ function* parseCallResponse(deps, params) {
    *    remote operation when we received the initial slow start update request.
    */
   if (targetCall.pendingRemoteOp) {
-    yield (0, _effects.call)(negotiation.handleSlowUpdateResponse, deps, targetCall, sdp);
+    yield (0, _effects.call)(negotiation.handleSlowUpdateResponse, deps, targetCall, params);
   } else {
-    yield (0, _effects.call)(negotiation.handleUpdateResponse, deps, targetCall, sdp);
+    yield (0, _effects.call)(negotiation.handleUpdateResponse, deps, targetCall, params);
   }
 }
 
@@ -37342,10 +37347,18 @@ function* parseCallResponse(deps, params) {
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
  * @param {string}   [params.reasonText]   Human-readable explanation for the call change.
  * @param {string}   [params.statusCode]     Code representing the reason for the call change.
+ * @param {string}   params.remoteName   Name of the remote participant.
+ * @param {string}   params.remoteNumber Number of the remote participant.
  */
 function* callStatusUpdateEnded(deps, params) {
   const { wrtcsSessionId, reasonText, statusCode } = params;
-  const endParams = {};
+  const endParams = {
+    // Remote participant's information.
+    remoteParticipant: {
+      displayNumber: params.remoteNumber,
+      displayName: params.remoteName
+    }
+  };
   if (reasonText && statusCode) {
     endParams.transition = { reasonText, statusCode };
   }
@@ -37392,6 +37405,8 @@ function* callStatusUpdateEnded(deps, params) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   params        Parameters describing the incoming call.
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
+ * @param {string}   params.remoteName   Name of the remote participant.
+ * @param {string}   params.remoteNumber Number of the remote participant.
  */
 function* callStatusUpdateRinging(deps, params) {
   const { wrtcsSessionId } = params;
@@ -37412,7 +37427,13 @@ function* callStatusUpdateRinging(deps, params) {
     return;
   }
 
-  yield (0, _effects.put)(_actions.callActions.callRinging(currentCall.id));
+  yield (0, _effects.put)(_actions.callActions.callRinging(currentCall.id, {
+    // Remote participant's information.
+    remoteParticipant: {
+      displayNumber: params.remoteNumber,
+      displayName: params.remoteName
+    }
+  }));
 }
 
 /***/ }),
@@ -37661,10 +37682,14 @@ function* handleSlowUpdateRequest(deps, targetCall) {
  * @method handleUpdateResponse
  * @param  {Object} webRTC     The webRTC stack.
  * @param  {Object} targetCall The call being acted on.
- * @param  {string} sdp        A remote answer SDP.
+ * @param  {Object} params
+ * @param  {string} params.sdp A remote answer SDP.
+ * @param  {string} params.remoteName   Name of the remote participant.
+ * @param  {string} params.remoteNumber Number of the remote participant.
  */
-function* handleUpdateResponse(deps, targetCall, sdp) {
+function* handleUpdateResponse(deps, targetCall, params) {
   const { webRTC } = deps;
+  const { sdp } = params;
   log.info(`Handling regular update response for call ${targetCall.id}.`);
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
@@ -37696,7 +37721,12 @@ function* handleUpdateResponse(deps, targetCall, sdp) {
       // TODO: Determine when we're actually "in call".
       state: _constants.CALL_STATES.CONNECTED,
       // TODO: Make sure this is the correct units
-      startTime: Date.now()
+      startTime: Date.now(),
+      // Remote participant's information.
+      remoteParticipant: {
+        displayNumber: params.remoteNumber,
+        displayName: params.remoteName
+      }
     }));
   } else if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
     // Scenario: The call was previously established, so this response is "call
@@ -37740,10 +37770,14 @@ function* handleUpdateResponse(deps, targetCall, sdp) {
  * @method handleSlowUpdateResponse
  * @param  {Object} webRTC     The webRTC stack.
  * @param  {Object} targetCall The call being acted on.
- * @param  {string} sdp        A remote answer SDP.
+ * @param  {Object} params
+ * @param  {string} params.sdp A remote answer SDP.
+ * @param  {string} params.remoteName   Name of the remote participant.
+ * @param  {string} params.remoteNumber Number of the remote participant.
  */
-function* handleSlowUpdateResponse(deps, targetCall, sdp) {
+function* handleSlowUpdateResponse(deps, targetCall, params) {
   const { webRTC } = deps;
+  let { sdp } = params;
   log.info(`Handling slow start update response for call ${targetCall.id}.`);
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
@@ -37793,7 +37827,12 @@ function* handleSlowUpdateResponse(deps, targetCall, sdp) {
 
     yield (0, _effects.put)(callAction(targetCall.id, {
       state: mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD,
-      pendingRemoteOp: false
+      pendingRemoteOp: false,
+      // Remote participant's information.
+      remoteParticipant: {
+        displayNumber: params.remoteNumber,
+        displayName: params.remoteName
+      }
     }));
   } else {
     // Scenario: The call is in an unexpected state for receiving a remote
