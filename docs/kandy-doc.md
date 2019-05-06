@@ -1057,117 +1057,6 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## Proxy
-
-The Proxy module allows for a secondary mode for making calls: proxy mode.
-When proxy mode is enabled, the SDK will redirect webRTC / media operations from the current machine to a remote machine using a channel.
-This is an advanced feature that enables support for Calls in particular scenarios that would otherwise not support them.
-
-### setProxyMode
-
-Sets the mode for the Proxy Plugin.
-When enabled, webRTC operations will be proxied over a channel. Enabling
-   proxy mode requires a channel to have been set. See `setChannel` API.
-When disabled, webRTC operation will occur as normal on the local machine.
-
-**Parameters**
-
--   `value` **[boolean][6]** Whether proxy mode should be enabled.
-
-### getProxyMode
-
-Retrieves the current mode of the Proxy Plugin.
-
-Returns **[boolean][6]** Whether proxy mode is currently enabled.
-
-### getProxyDetails
-
-Retrieve information about the proxy's browser being used.
-Browser information being defined indicates that the browser supports
-   basic webRTC scenarios.
-
-**Examples**
-
-```javascript
-const details = client.proxy.getProxyDetails()
-
-log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
-```
-
-Returns **[Object][5]** Object containing `browser` and `version` information.
-
-### setChannel
-
-Sets the channel to be used while proxy mode is enabled.
-
-**Parameters**
-
--   `channel` **[Channel][11]** See the `Channel` module for information.
-
-### initializeRemote
-
-Sends an initialization message over the channel with webRTC configurations.
-
-**Parameters**
-
--   `config` **[Object][5]** 
-
-## Channel
-
-The Channel object that the Proxy module needs to be provided.
-
-**Examples**
-
-```javascript
-// The channel the application uses for communicating with a remote endpoint.
-const appChannel = ...
-
-// The channel the application will provide to the Proxy module for use.
-const channel = {
-   send: function (data) {
-     // Any encoding / wrapping needed for a Proxy message being sent
-     //    over the channel.
-     appChannel.sendMessage(data)
-   },
-   // The Proxy module will set this function.
-   receive: undefined
-}
-appChannel.on('message', data => {
-   // Any decoding / unwrapping needed for the received message.
-   channel.receive(data)
-})
-
-client.proxy.setChannel(channel)
-```
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
-
 ## CallObject
 
 The state representation of a Call.
@@ -1191,16 +1080,15 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## MediaObject
+## DevicesObject
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+A collection of devices and their information.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+-   `camera` **[Array][7]&lt;[DeviceInfo][11]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][11]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][11]>** A list of speaker device information.
 
 ## TrackObject
 
@@ -1218,15 +1106,27 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## DevicesObject
+## MediaObject
 
-A collection of devices and their information.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## Subscription
 
@@ -1291,8 +1191,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [10]: #mediaobject
 
-[11]: #channel
+[11]: #deviceinfo
 
 [12]: #trackobject
-
-[13]: #deviceinfo
