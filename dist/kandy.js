@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.74669
+ * Version: 4.4.0-beta.74741
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -12337,7 +12337,7 @@ exports.smsInboundSubscribe = smsInboundSubscribe;
 exports.smsInboundUnsubscribe = smsInboundUnsubscribe;
 exports.smsOutboundSubscribe = smsOutboundSubscribe;
 exports.smsOutboundUnsubscribe = smsOutboundUnsubscribe;
-exports.chatFetchConversations = chatFetchConversations;
+exports.fetchConversationsRequest = fetchConversationsRequest;
 exports.chatFetchMessages = chatFetchMessages;
 exports.fetchImageLinks = fetchImageLinks;
 
@@ -12381,12 +12381,19 @@ function _marshalData(attributes) {
  * @param {Object} requestInfo
  * @param {string} destination to send the notification to
  * @param {string} state (idle/active) the state of the user typing
+ * @param {string} type The type of conversation. Can be one of "chat", "sms" or "group"
  * @param {string} [refresh='60'] a string integer representing in seconds how long before the server refreshes the state
  * @returns {Object}
  */
-function* setIsTypingRequest(requestInfo, destination, state, refresh = '60') {
+function* setIsTypingRequest(requestInfo, destination, state, type, refresh = '60') {
+  let url;
+  if (type === 'chat') {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+  } else if (type === 'group') {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination[0]}/messages`;
+  }
   const requestOptions = {
-    url: `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`,
+    url: url,
     method: 'POST',
     body: (0, _stringify2.default)({
       isComposing: {
@@ -12470,11 +12477,11 @@ function* uploadFile(requestInfo, file) {
  * @returns {Object}
  */
 function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts) {
-  const URL = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
 
   const requestOptions = {
     method: 'POST',
-    url: URL,
+    url: url,
     body: (0, _stringify2.default)({
       chatMessage: {
         text: textParts,
@@ -12513,7 +12520,7 @@ function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts)
 
 /**
  * Used to send Group Chat messages
- * Sends a chat message to a group (can include attachments)
+ * sends a chat message to another user (can include attachments)
  * @method sendGroupChatMessageRequest
  * @param {Object} requestInfo
  * @param {Object} payload
@@ -12523,11 +12530,11 @@ function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts)
  * @returns {Object}
  */
 function* sendGroupChatMessageRequest(requestInfo, destination, textParts, fileParts) {
-  const URL = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${destination}/messages`;
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${destination}/messages`;
 
   const requestOptions = {
     method: 'POST',
-    url: URL,
+    url: url,
     body: (0, _stringify2.default)({
       chatMessage: {
         text: textParts,
@@ -12821,14 +12828,23 @@ function* smsOutboundUnsubscribe(requestInfo, subInfo) {
 
 /**
  * Performs a REST request to fetch a list of chat sessions
- * @method chatFetchConversations
+ * @method fetchConversationsRequest
  * @param {Object} requestInfo
  * @return {Object} a list of chat sessions
  */
-function* chatFetchConversations(requestInfo) {
+
+function* fetchConversationsRequest(requestInfo, type) {
+  let url;
+  if (type === 'group') {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/sessions`;
+  } else if (type === 'im') {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/sessions`;
+  } else {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/sessions`;
+  }
   const requestOptions = {
     method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne`
+    url: url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
   if (response.error) {
@@ -12839,9 +12855,11 @@ function* chatFetchConversations(requestInfo) {
       })
     };
   } else {
-    return (0, _extends3.default)({}, response.payload.body.chatSessionList, {
+    // return a list of conversations
+    return {
+      chatSession: response.payload.body.chatSessionList.chatSession,
       error: false
-    });
+    };
   }
 }
 
@@ -15555,7 +15573,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.74669';
+  let version = '4.4.0-beta.74741';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -38249,7 +38267,7 @@ function api(context) {
      * @param {string} [options.touched] The unix timestamp in seconds representing the date from which
      *  to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
      *  the back-end making use of the most recent date value provided in a previous request
-     * @param {string} [options.type] Limit results to one of: "internal", "sms", "group" or "unknown".
+     * @param {string} [options.type] Limit results to one of: "internal", "sms", "im" or "group".
      * @param {string|number} [options.thread] Limit results to one thread specified by its thread handle.
      * @memberof Messaging
      * @requires fetchConversations
@@ -38295,7 +38313,7 @@ function api(context) {
      * @method get
      * @param {string} recipient The destination for messages created in this conversation. This
      * will be a user's sip address.
-     * @param {string} type The type of conversation to create. Can be one of "im", "sms" or "other"
+     * @param {string} type The type of conversation to create. Can be one of "im", "sms" or "group"
      * @returns {Object} A Conversation object.
      */
     get: function (recipient, options = { type: 'im' }) {
@@ -38350,7 +38368,7 @@ function api(context) {
      * @requires multiUserConversation
      * @method create
      * @param {Array} recipient An array of destinations for messages created in this conversation. These will be a user's sip address.
-     * @param {string} type The type of conversation to create. Can be one of "im", "sms", "group" or "other"
+     * @param {string} type The type of conversation to create. Can be one of "im", "sms" or "group"
      * @param options
      * @returns {Object} a Conversation object
      */
@@ -38817,7 +38835,7 @@ function deleteConversation(destination, type) {
 }
 
 /**
- * Creates a fetch messages finished action.
+ * Creates a delete conversations finished action.
  * @method deleteConversationFinish
  * @param {Object} $0
  * @param {Array} $0.destination An array of destinations for messages created in this conversation.
@@ -38840,10 +38858,10 @@ function deleteConversationFinish({ destination, type, error }) {
  * @param {string} $0.destination the target user to send the notification to
  * @returns {Object}
  */
-function setIsTyping({ state, destination }) {
+function setIsTyping({ state, destination, type }) {
   return {
     type: actionTypes.SET_IS_TYPING,
-    payload: { state, destination }
+    payload: { state, destination, type }
   };
 }
 
@@ -39021,7 +39039,8 @@ reducers[actionTypes.MESSAGE_RECEIVED] = {
           destination: action.payload.destination,
           messages: [action.payload.message],
           type: action.meta.type,
-          lastReceived: action.payload.message.timestamp
+          lastReceived: action.payload.message.timestamp,
+          isTypingList: []
         }]
       });
     } else {
@@ -39623,7 +39642,7 @@ const conversationBase = {
      */
     setIsTyping: function (isTyping) {
       const typingState = isTyping ? 'active' : 'idle';
-      this.context.dispatch(_actions.convoActions.setIsTyping({ state: typingState, destination: this.destination }));
+      this.context.dispatch(_actions.convoActions.setIsTyping({ state: typingState, destination: this.destination, type: this.type }));
     }
   }
 
@@ -39799,7 +39818,7 @@ exports.receiveChatMessageNotification = receiveChatMessageNotification;
 exports.sendSMS = sendSMS;
 exports.receiveSMS = receiveSMS;
 exports.receiveDeliveryReceipt = receiveDeliveryReceipt;
-exports.fetchChatConversations = fetchChatConversations;
+exports.fetchConversations = fetchConversations;
 exports.fetchChatMessages = fetchChatMessages;
 exports.setIsTyping = setIsTyping;
 exports.receiveIsTypingNotification = receiveIsTypingNotification;
@@ -39936,11 +39955,11 @@ function* receiveDeliveryReceipt() {
  * Waits for fetch conversation actions and triggers fetchChatConversations saga
  * @method fetchChatConversations
  */
-function* fetchChatConversations() {
+function* fetchConversations() {
   function fetchConversationPattern(action) {
     return action.type === actionTypes.FETCH_CONVERSATIONS;
   }
-  yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchChatConversations);
+  yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchConversations);
 }
 
 /**
@@ -40009,7 +40028,7 @@ exports.handleChatMessageNotification = handleChatMessageNotification;
 exports.handleDeliveryReceipts = handleDeliveryReceipts;
 exports.sendSMS = sendSMS;
 exports.handleIncomingSMS = handleIncomingSMS;
-exports.fetchChatConversations = fetchChatConversations;
+exports.fetchConversations = fetchConversations;
 exports.fetchChatMessages = fetchChatMessages;
 exports.getImageLinks = getImageLinks;
 
@@ -40051,13 +40070,30 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 // Libraries.
 // Messaging plugin.
 function* receiveIsTypingNotification(action) {
-  const { state, senderAddress } = action.payload.chatMessageNotification.isComposing;
+  const {
+    state,
+    senderAddress,
+    'x-destinationAddress': destinationAddress
+  } = action.payload.chatMessageNotification.isComposing;
+
+  // use helper function to get sessionType from notifications
+  const sessionType = getResourceType(action.payload.chatMessageNotification, 'chatSession');
+  if (sessionType !== 'group' && sessionType !== 'chat') {
+    yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
+      error: new _errors2.default({
+        message: `Invalid chat type. Type must be 'group' or 'im'.`,
+        code: _errors.messagingCodes.SET_IS_TYPING_FAIL
+      })
+    }));
+  }
+  // For group chat, we need to use the destinationAddress (groupId)
+  const destination = sessionType === 'chat' ? senderAddress : destinationAddress;
 
   yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
     state,
     senderAddress: senderAddress,
-    destination: [senderAddress],
-    type: 'chat'
+    destination: [destination],
+    type: sessionType
   }));
 }
 
@@ -40068,7 +40104,8 @@ function* receiveIsTypingNotification(action) {
  */
 function* setIsTyping(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
-  const response = yield (0, _effects.call)(_requests.setIsTypingRequest, requestInfo, action.payload.destination, action.payload.state);
+  const type = action.payload.type;
+  const response = yield (0, _effects.call)(_requests.setIsTypingRequest, requestInfo, action.payload.destination, action.payload.state, type);
   const { state, senderAddress, 'x-destinationAddress': destination, error } = response;
 
   if (error) {
@@ -40080,7 +40117,7 @@ function* setIsTyping(action) {
       state,
       senderAddress: senderAddress,
       destination: [destination],
-      type: 'chat'
+      type: type
     }));
   }
 }
@@ -40146,7 +40183,7 @@ function* sendChatMessage(action) {
   }
   const allParts = textParts.concat(attachmentParts);
   let finishInfo = {
-    type: 'chat',
+    type: chatType,
     destination: action.payload.destination,
     sender: chatResponse.senderAddress,
     deliveryStatus: chatResponse.status,
@@ -40169,14 +40206,31 @@ function* sendChatMessage(action) {
 /**
  * Handles incoming chat message notifications
  * @method handleChatMessageNotification
- * @param  {Object} action A `NOTIFICATION_RECEIVED` action representing a deliveryReceipt.
+ * @param  {Object} action A `NOTIFICATION_RECEIVED` action.
  */
 function* handleChatMessageNotification(action) {
-  const { dateTime, senderAddress, text, attachment } = action.payload.chatMessageNotification.chatMessage;
+  const {
+    dateTime,
+    senderAddress,
+    text,
+    attachment,
+    'x-destinationAddress': destinationAddress
+  } = action.payload.chatMessageNotification.chatMessage;
+
+  // use helper function to get message type from notification
+  const messageType = getResourceType(action.payload.chatMessageNotification, 'chatMessage');
+
   // Grab the messageId from the end of link.href
   const messageId = action.payload.chatMessageNotification.link[0].href.split('/messages/')[1];
 
-  const existingConversation = yield (0, _effects.select)(_selectors.findConversation, [senderAddress], 'chat');
+  let destination;
+  if (messageType === 'group') {
+    destination = [destinationAddress];
+  } else {
+    destination = [senderAddress];
+  }
+
+  const existingConversation = yield (0, _effects.select)(_selectors.findConversation, destination, messageType);
   const newConversation = !existingConversation;
 
   let parts = [];
@@ -40198,8 +40252,8 @@ function* handleChatMessageNotification(action) {
     parts = parts.concat(fileParts);
   }
 
-  yield (0, _effects.put)(_actions.messageActions.messageReceived([senderAddress], parts, messageId, senderAddress, dateTime, {
-    type: 'chat',
+  yield (0, _effects.put)(_actions.messageActions.messageReceived(destination, parts, messageId, senderAddress, dateTime, {
+    type: messageType,
     newConversation: newConversation
   }));
 }
@@ -40289,41 +40343,44 @@ function* handleIncomingSMS(action) {
     type: 'sms'
   }));
 }
+
 /**
  * Saga that fetches a list of Chat Conversations
- * @method fetchChatConversations
+ * @method fetchConversations
  * @param {Object} action
  */
-function* fetchChatConversations(action) {
+function* fetchConversations(action) {
+  const type = action.payload.type;
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS2);
-  const response = yield (0, _effects.call)(_requests.chatFetchConversations, requestInfo);
+  const response = yield (0, _effects.call)(_requests.fetchConversationsRequest, requestInfo, type);
 
   if (response.error) {
     yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
       error: response.error
     }));
+  } else {
+    const chatSessions = response.chatSession.map(chatSession => {
+      const { sessionId, remoteAddress, localAddress, sessionDetails } = chatSession;
+      const { lastText, lastPullTime, lastMessageTime } = sessionDetails;
+
+      return {
+        id: sessionId,
+        destination: [remoteAddress],
+        address: localAddress,
+        type: 'type',
+        lastMessage: lastText,
+        lastReceived: lastMessageTime,
+        lastPull: lastPullTime,
+        isTypingList: [],
+        messages: []
+      };
+    });
+
+    yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
+      conversations: chatSessions,
+      error: false
+    }));
   }
-
-  const chatSessions = response.chatSession.map(chatSession => {
-    const { sessionId, remoteAddress, sessionDetails } = chatSession;
-    const { lastText, lastPullTime, lastMessageTime } = sessionDetails;
-
-    return {
-      id: sessionId,
-      destination: [remoteAddress],
-      type: 'chat',
-      lastMessage: lastText,
-      lastReceived: lastMessageTime,
-      lastPull: lastPullTime,
-      isTypingList: [],
-      messages: []
-    };
-  });
-
-  yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
-    conversations: chatSessions,
-    error: false
-  }));
 }
 
 /**
@@ -40395,6 +40452,32 @@ function* getImageLinks(action) {
       }));
     }
   }));
+}
+
+/**
+ * Helper function to determine the session or message type from the notification.
+ * @param {Object} notification
+ * @param {string} notificationType
+ * @return {string} resourceType
+ */
+function getResourceType(notification, notificationType) {
+  // determine type of resource by looking for '/group/' or '/oneToOne' in the link/href
+  const link = notification.link.find(link => link.rel === notificationType);
+  let resourceType;
+  if (link) {
+    // determine if the href is for a group type resource by searching for
+    // '/path-string/path-string/path-string/group/' in the link's href
+    if (link.href.search(/\/\S*\/\S*\/\S*\/group\//) !== -1) {
+      resourceType = 'group';
+      // determine if the href is for a chat type resource by searching for
+      // '/path-string/path-string/path-string/oneToOne/' in the link's href
+    } else if (link.href.search(/\/\S*\/\S*\/\S*\/oneToOne\//) !== -1) {
+      resourceType = 'chat';
+    } else {
+      log.info('Unknown chat type.');
+    }
+  }
+  return resourceType;
 }
 
 /***/ }),
