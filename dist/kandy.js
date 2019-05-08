@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.74470
+ * Version: 4.4.0-beta.74669
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -15555,7 +15555,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.74470';
+  let version = '4.4.0-beta.74669';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -36893,7 +36893,8 @@ callEvents[actionTypes.CALL_CANCELLED] = stateChangeHandler;
 callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
   // Don't emit an event if it was a slow start answer. The call isn't actually
   //    answered yet, so state hasn't changed.
-  if (action.meta.isSlowStart) {
+  // TODO: Don't have this in meta?
+  if (action.meta && action.meta.isSlowStart) {
     return;
   }
 
