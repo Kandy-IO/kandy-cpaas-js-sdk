@@ -32686,337 +32686,6 @@
           "children": [
             {
               "type": "text",
-              "value": "A set of handlers for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 4,
-                  "column": 26,
-                  "offset": 234
-                },
-                "indent": [
-                  1,
-                  1,
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 4,
-              "column": 26,
-              "offset": 234
-            },
-            "indent": [
-              1,
-              1,
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 4,
-          "column": 26,
-          "offset": 234
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 5,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 6,
-        "type": null,
-        "name": "sdpHandlers"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 27,
-        "column": 0
-      },
-      "end": {
-        "line": 34,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 62,
-          "column": 0
-        },
-        "end": {
-          "line": 62,
-          "column": 35
-        }
-      },
-      "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "sdpHandlers",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": [
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 264,
-                        "offset": 263
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 264,
-                    "offset": 263
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 265
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 108,
-                        "offset": 372
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 265
-                  },
-                  "end": {
-                    "line": 3,
-                    "column": 108,
-                    "offset": 372
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 1,
-                        "offset": 374
-                      },
-                      "end": {
-                        "line": 5,
-                        "column": 167,
-                        "offset": 540
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 5,
-                    "column": 1,
-                    "offset": 374
-                  },
-                  "end": {
-                    "line": 5,
-                    "column": 167,
-                    "offset": 540
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 5,
-                "column": 167,
-                "offset": 540
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 7,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "sdpHandlers",
-              "lineNumber": 8
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 9,
-              "name": "createCodecRemover"
-            },
-            {
-              "title": "example",
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
-              "lineNumber": 10
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 38,
-              "column": 0
-            },
-            "end": {
-              "line": 57,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 62,
-                "column": 0
-              },
-              "end": {
-                "line": 62,
-                "column": 35
-              }
-            },
-            "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
-            }
-          ],
-          "params": [],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "sdpHandlers",
-          "kind": "function",
-          "name": "createCodecRemover",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "sdpHandlers",
-              "kind": "module"
-            },
-            {
-              "name": "createCodecRemover",
-              "kind": "function"
-            }
-          ],
-          "namespace": "sdpHandlerscreateCodecRemover"
-        }
-      ]
-    },
-    "path": [
-      {
-        "name": "sdpHandlers",
-        "kind": "module"
-      }
-    ],
-    "namespace": "sdpHandlers"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "The configuration object. This object defines what different configuration\nvalues you can use when instantiating the SDK.",
               "position": {
                 "start": {
@@ -37066,6 +36735,337 @@
       }
     ],
     "namespace": "config"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A set of handlers for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 26,
+                  "offset": 234
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 26,
+              "offset": 234
+            },
+            "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 26,
+          "offset": 234
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 5,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 6,
+        "type": null,
+        "name": "sdpHandlers"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 27,
+        "column": 0
+      },
+      "end": {
+        "line": 34,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 62,
+          "column": 0
+        },
+        "end": {
+          "line": 62,
+          "column": 35
+        }
+      },
+      "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "sdpHandlers",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 264,
+                        "offset": 263
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 264,
+                    "offset": 263
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 265
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 108,
+                        "offset": 372
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 265
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 108,
+                    "offset": 372
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 374
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 167,
+                        "offset": 540
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 374
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 167,
+                    "offset": 540
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 167,
+                "offset": 540
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 7,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "sdpHandlers",
+              "lineNumber": 8
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 9,
+              "name": "createCodecRemover"
+            },
+            {
+              "title": "example",
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
+              "lineNumber": 10
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 38,
+              "column": 0
+            },
+            "end": {
+              "line": 57,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 62,
+                "column": 0
+              },
+              "end": {
+                "line": 62,
+                "column": 35
+              }
+            },
+            "file": "/home/circleci/kandy/packages/kandy/src/index.common.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
+            }
+          ],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "sdpHandlers",
+          "kind": "function",
+          "name": "createCodecRemover",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "sdpHandlers",
+              "kind": "module"
+            },
+            {
+              "name": "createCodecRemover",
+              "kind": "function"
+            }
+          ],
+          "namespace": "sdpHandlerscreateCodecRemover"
+        }
+      ]
+    },
+    "path": [
+      {
+        "name": "sdpHandlers",
+        "kind": "module"
+      }
+    ],
+    "namespace": "sdpHandlers"
   },
   {
     "description": {

@@ -888,33 +888,6 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## config
 
 The configuration object. This object defines what different configuration
@@ -1000,6 +973,33 @@ Configuration options for the Subscription feature.
 -   `subscription` **[Object][5]** Subscription configs.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
+
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
 
 ## Logger
 
