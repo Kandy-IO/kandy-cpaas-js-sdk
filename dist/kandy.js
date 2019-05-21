@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.76831
+ * Version: 4.4.0-beta.77378
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -15573,7 +15573,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.76831';
+  let version = '4.4.0-beta.77378';
   log.info(`CPaaS SDK version: ${version}`);
 
   var sagas = [];
@@ -38172,7 +38172,7 @@ function cpaas2Messaging(options = {}) {
     yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
 
-  const capabilities = ['sms', 'chat', 'parts', 'history', 'internalAndSmsMessaging', 'isTyping'];
+  const capabilities = ['sms', 'chat', 'parts', 'history', 'internalAndSmsMessaging', 'isTyping', 'richMessagingWithoutLocation', 'fetchConversations'];
 
   return {
     capabilities,
@@ -38277,32 +38277,6 @@ function api(context) {
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
-     * Get a conversation object matching the user ID provided
-     * If successful, the event 'conversations:change' will be emitted.
-     * If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created.
-     *
-     * @public
-     * @memberof Messaging
-     * @requires onlyInternalMessaging
-     * @method get
-     * @param {string} destination The destination for messages created in this conversation. This will
-     * be a user's sip address.
-     * @returns {Conversation} A Conversation object.
-     */
-    /**
-     * Get a conversation object matching the user IDs provided.
-     * If successful, the event 'conversations:change' will be emitted.
-     * Multi-user conversations have a destination comprised of multiple user IDs.
-     *
-     * @public
-     * @memberof Messaging
-     * @requires multiUserConversation
-     * @method get
-     * @param {Array} destination An array of destinations for messages created in this conversation.
-     * These will be a user's sip address.
-     * @returns {Conversation} A Conversation object.
-     */
-    /**
      * Get a conversation object matching the user ID provided.
      *
      * If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created
@@ -38313,8 +38287,9 @@ function api(context) {
      * @method get
      * @param {string} recipient The destination for messages created in this conversation. This
      * will be a user's sip address.
-     * @param {string} type The type of conversation to create. Can be one of "im", "sms" or "group"
-     * @returns {Object} A Conversation object.
+     * @param {Object} [options] Options to use when creating the conversation object.
+     * @param {string} [options.type='im'] The type of conversation to create. Can be one of "im", "sms" or "other"
+     * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: 'im' }) {
       let destination = Array.isArray(recipient) ? [...recipient] : [recipient];
@@ -38356,21 +38331,9 @@ function api(context) {
      * @requires internalAndSmsMessaging
      * @method create
      * @param {string} recipient
-     * @param options
-     * @returns {Object} a Conversation object
-     */
-    /**
-     * Create and return a new conversation object. Any messages being sent through this conversation
-     * object will be sent to the destinations provided
-     *
-     * @public
-     * @memberof Messaging
-     * @requires multiUserConversation
-     * @method create
-     * @param {Array} recipient An array of destinations for messages created in this conversation. These will be a user's sip address.
-     * @param {string} type The type of conversation to create. Can be one of "im", "sms" or "group"
-     * @param options
-     * @returns {Object} a Conversation object
+     * @param {Object} [options] Options to use when creating the conversation object.
+     * @param {string} [options.type='im'] The type of conversation. Can be one of "im", "sms" or "other"
+     * @returns {Conversation} a Conversation object
      */
     create: function (recipient, options = { type: 'im' }) {
       const destination = Array.isArray(recipient) ? recipient : [recipient];
@@ -38392,7 +38355,7 @@ function api(context) {
      * @memberof Messaging
      * @requires internalAndSmsMessaging
      * @method getAll
-     * @returns {Array} An array of conversation objects.
+     * @returns {Array<Conversation>} An array of conversation objects.
      */
     getAll: function () {
       return (0, _selectors.getConversations)(context.getState());
@@ -39305,32 +39268,75 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * A Conversation object represents a conversation between either two users, or a
  * user and a group. A Conversation can create messages via the conversation's
  * createMessage() function.
- * @public
- * @module Conversation
+ *
+ * Once sender sends the initial message (within a conversation) to a recipient, there will be a
+ * conversation object saved in both sender & recipient's state.
+ *
  * @requires richMessagingWithoutLocation
  * @property {string} destination The Id of the remote user with which the current user is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
+ * This property applies only to conversation object stored in recipient's state.
+ * @property {string} type The type associated with all messages within this conversation object (e.g. chat, im, group).
+ * @property {Array<Message>} messages The array of message objects.
+ * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
+ *
+ * @public
+ * @module Conversation
  * @type {Object}
  */
 // `features` and `lastPull` are not documented because they're intended to be internal
 // `type` is not documented because as of now there are no types other than 'im'
 
 /**
- * A Conversation object represents a conversation between either two users, or a
- * user and a group. A Conversation can create messages via the conversation's
- * createMessage() function.
+ * A Part is a custom object representing the payload of a message.
+ *
+ * @property {string} type The payload type. Can be "text", "json", "file".
+ * @property {string} text The text of the message. Messages with file or json attachments are still required to have text associated to it.
+ * @property {Object} [json] The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+ * @property {File} [file] The file to attach to attach to a message. A part cannot have both json and a file.
+ *
  * @public
- * @module Conversation
- * @requires simpleMessagingOnly
- * @property {string} destination The id of the remote user with which the current user is having a conversation.
+ * @module Part
  * @type {Object}
  */
 
 /**
- * A Message object represents an individual message. Messages have parts
- * which represent pieces of a message, such as a text part or a file part. Once
- * all the desired parts have been added, a message can be sent with the send()
- * function.
+ * A Message sender object is a means by which a sender can deliver information to a recipient.
+ *
+ * This sender object can obtained through the createMessage API on an existing conversation.
+ *
+ * Once all the desired parts have been added to it (using appPart function), the message
+ * can be sent using the send function.
+ *
+ * @public
+ * @module MessageSender
+ * @type {Object}
+ */
+
+/**
+ * A Message object represents an individual message that was delivered to a recipient and it is
+ * obtained through the getMessage/getMessages API on an existing conversation.
+ *
+ * Messages have parts which represent pieces of a message, such as a text part, a json object part or a file part.
+ *
+ * Once sender sends a message, this message is saved in sender's state as an object.
+ *
+ * Similarly, once recipient gets a message, this message is saved in recipient's state.
+ *
+ * Below are the properties pertaining to this saved message object in either sender or recipient's state.
+ *
+ * @property {number} timestamp The Unix timestamp in seconds marking the time when message was created by sender.
+ * @property {boolean} isPending Whether message is in pending state or not (delivered by server or not).
+ * @property {boolean} read: Whether message was read by recipient user.
+ * @property {Array<Part>} parts An array of Parts.
+ * @property {string} sender The primary contact address of the sender.
+ * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
+ * than the one associated with message object stored in recipient's state.
+ * @property {string} type The type of message that was sent (e.g. chat, im, group).
+ * This property applies only to message object stored in sender's state.
+ * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
+ * This property applies only to message object stored in sender's state.
+ *
  * @public
  * @module Message
  * @type {Object}
@@ -39341,7 +39347,12 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 /**
  * Base conversation stamp
  * @param {Array} destination The Destination for messages being sent through
- * this conversation in this instance of the SDK. This should be an Array with any number of user IDs
+ * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
+ * @param {string} type='chat' The type of the message.
+ * @param {string} id The unique identifier for base conversation.
+ * @param {string} description='' The description associated with base conversation.
+ * @param {Array} messages=[] An array containing the conversation's messages.
+ * @param {number} lastReceived The timestamp associated with the last received message.
  */
 
 // Events
@@ -39381,47 +39392,9 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @requires richMessaging
-     * @constructs Message
-     * @param {Object} part The part to add to the message.
-     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
-     * @param {string} [part.text] The text of the part. Must be a part of type "text".
-     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
-     * @param {File} [part.file] The file of the part. Must be a part of type "file".
-     * @param {Object} [part.location] The location of the part. Must be a part of type "location".
-     * @param {number} [part.location.longitude] The longitude of the location.
-     * @param {number} [part.location.latitude] The latitude of the location.
-     * @returns {Object} The newly created Message object.
-     *
-     * @example
-     * conversation.createMessage({type: 'text', text: 'This is the message'});
-     */
-    /**
-     * Create and return a message object. You must specify the part. If this is a simple text message, provide a `text` part as demonstrated in the example.
-     *
-     * @public
-     * @memberof Conversation
      * @requires richMessagingWithoutLocation
      * @constructs Message
-     * @param {Object} part The part to add to the message.
-     * @param {string} part.type The type of part. Can be "text", "json", "file".
-     * @param {string} [part.text] The text of the part. Must be a part of type "text".
-     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
-     * @param {File} [part.file] The file of the part. Must be a part of type "file".
-     * @returns {Message} The newly created Message object.
-     *
-     * @example
-     * conversation.createMessage({type: 'text', text: 'This is the message'});
-     */
-    /**
-     * Create and return a message object. You must provide a `text` part as demonstrated in the example.
-     *
-     * @public
-     * @memberof Conversation
-     * @requires simpleMessagingOnly
-     * @param {Object} part The part to add to the message.
-     * @param {string} part.type The type of part. Must be "text" or "file"
-     * @param {string} [part.text] The text of the part. Must be a part of type "text".
+     * @param {Part} part The part to add to the message.
      * @returns {Message} The newly created Message object.
      *
      * @example
@@ -39464,7 +39437,7 @@ const conversationBase = {
      * @public
      * @memberof Conversation
      * @method getMessages
-     * @return {Message[]} An array of messages.
+     * @return {Array<Message>} An array of messages.
      */
     getMessages: function () {
       const conversation = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
@@ -39533,9 +39506,9 @@ const conversationBase = {
      * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
      * @public
      * @memberof Conversation
-     * @requires richMessaging
+     * @requires richMessagingWithoutLocation
      * @method deleteMessages
-     * @param {Array} messageIds An array of message IDs
+     * @param {Array<string>} messageIds An array of message IDs
      */
     deleteMessages: function (messageIds = []) {
       if (messageIds.length === 0) {
@@ -39552,7 +39525,7 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @requires richMessaging
+     * @requires richMessagingWithoutLocation
      * @method delete
      */
     delete: function () {
@@ -39678,7 +39651,7 @@ const conversationBase = {
      *
      * @public
      * @method send
-     * @memberof Message
+     * @memberof MessageSender
      */
     send() {
       log.debug('Send message', this);
@@ -39706,30 +39679,9 @@ const conversationBase = {
      * Add an additional part to a message.
      *
      * @public
-     * @memberof Message
-     * @requires richMessaging
-     * @memberof withParts
-     * @param {Object} part The part to add to the message.
-     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
-     * @param {string} [part.text] The text of the part. Must be a part of type "text".
-     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
-     * @param {File} [part.file] The file of the part. Must be a part of type "file".
-     * @param {Object} [part.location] The location of the part. Must be a part of type "location".
-     * @param {number} [part.location.longitude] The longitude of the location.
-     * @param {number} [part.location.latitude] The latitude of the location.
-     */
-
-    /**
-     * Add an additional part to a message.
-     *
-     * @public
-     * @memberof Message
+     * @memberof MessageSender
      * @requires richMessagingWithoutLocation
-     * @param {Object} part The part to add to the message.
-     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
-     * @param {string} [part.text] The text of the part. Must be a part of type "text".
-     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
-     * @param {File} [part.file] The file of the part. Must be a part of type "file".
+     * @param {Part} part The part to add to the message.
      */
     addPart(part) {
       // Validate the part. If not valid, returns an error.
@@ -39760,8 +39712,8 @@ const conversationBase = {
      * Creates a usable link for the given message
      *
      * @public
-     * @memberof Message
-     * @requires rich
+     * @memberof MessageSender
+     * @requires richMessagingWithoutLocation
      */
     createImageLinks() {
       const { parts, destination, type, messageId } = this;
