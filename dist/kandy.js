@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas2.js
- * Version: 4.4.0-beta.77378
+ * Version: 4.4.0-beta.77806
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -518,7 +518,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 const platforms = exports.platforms = {
   LINK: 'link',
-  CPAAS: 'cpaas',
+  UC: 'uc',
   CPAAS2: 'cpaas2'
 };
 
@@ -785,7 +785,7 @@ function getRequestInfo(state, platform) {
         }
       }
     };
-  } else if (platform === _constants2.platforms.CPAAS) {
+  } else if (platform === _constants2.platforms.UC) {
     requestInfo = {
       baseURL: `${subscription.protocol}://${subscription.server}:${subscription.port}`,
       version: subscription.version,
@@ -799,12 +799,12 @@ function getRequestInfo(state, platform) {
 
       /*
        * If the requested platform was Link but the platform set in state is
-       *    CPaaS, then we're using CPaaS 1.5 but making a request for SPiDR.
+       *    UC, and so we're using UC but making a request for SPiDR.
        * Change the requestInfo provided to ensure the URL will be valid for
        *    SPiDR and authentication will be valid for CIM.
        */
     };const setPlatform = getPlatform(state);
-    if (setPlatform === _constants2.platforms.CPAAS) {
+    if (setPlatform === _constants2.platforms.UC) {
       requestInfo.version = '1';
 
       const connInfo = getConnectionInfo(state, setPlatform);
@@ -6678,11 +6678,11 @@ const authCodes = exports.authCodes = {
   LINK_SUBSCRIBE_FAIL: 'authentication:4',
   LINK_EXTEND_SUBSCRIPTION_FAIL: 'authentication:5',
   LINK_UPDATE_SUBSCRIPTION_FAIL: 'authentication:6',
-  CPAAS_SUBSCRIBE_FAIL: 'authentication:7',
-  CPAAS_REFRESH_TOKEN_FAIL: 'authentication:8',
-  CPAAS_CREATE_TOKEN_FAIL: 'authentication:9',
-  CPAAS_EXTEND_SUBSCRIPTION_FAIL: 'authentication:10',
-  CPAAS_DISCONNECT_FAIL: 'authentication:11',
+  UC_SUBSCRIBE_FAIL: 'authentication:7',
+  UC_REFRESH_TOKEN_FAIL: 'authentication:8',
+  UC_CREATE_TOKEN_FAIL: 'authentication:9',
+  UC_EXTEND_SUBSCRIPTION_FAIL: 'authentication:10',
+  UC_DISCONNECT_FAIL: 'authentication:11',
   MISSING_SERVICE: 'authentication:12'
 
   /**
@@ -12073,8 +12073,8 @@ var _fp = __webpack_require__(1);
  *  }]
  * @return {Function}        [description]
  *
- * INSTRUCTIONS FOR EXPOSING FUNCTION TO CPAAS VERSION OF THE SDK:
- * the following code will need to be added to the appropriate index files (ie: kandy.cpaas.js)
+ * INSTRUCTIONS FOR EXPOSING FUNCTION TO UC VERSION OF THE SDK:
+ * the following code will need to be added to the appropriate index files (ie: kandy.uc.js)
  * this will expose the createCodecRemover function in the browser
     import createCodecRemover from '../../fcs/src/js/sdp/codecRemover';
     kandy.sdpHandlers = {
@@ -15573,8 +15573,8 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.4.0-beta.77378';
-  log.info(`CPaaS SDK version: ${version}`);
+  let version = '4.4.0-beta.77806';
+  log.info(`UC SDK version: ${version}`);
 
   var sagas = [];
   var store;
@@ -37699,7 +37699,7 @@ function* websocketLifecycle(wsConnectAction) {
   } else {
     // If this is a Link websocket, we need to ensure the URL is using the
     //     "latest" access token from state.
-    if (wsConnectAction.meta.platform === _constants.platforms.CPAAS) {
+    if (wsConnectAction.meta.platform === _constants.platforms.UC) {
       let { notificationChannel } = yield (0, _effects.select)(_selectors2.getSubscriptionInfo);
       let { accessToken, oauthToken } = yield (0, _effects.select)(_selectors2.getConnectionInfo);
       wsInfo.url = notificationChannel;
@@ -42237,7 +42237,7 @@ const log = (0, _logs.getLogManager)().getLogger('PRESENCE');
 
 // Other plugins.
 // Presence plugin.
-const activityMapCPaaSToCPaaS2 = {
+const activityMapUcToCPaaS2 = {
   active: _constants2.ACTIVITY.AVAILABLE,
   idle: _constants2.ACTIVITY.BUSY,
   away: _constants2.ACTIVITY.BUSY,
@@ -42252,7 +42252,7 @@ const activityMapCPaaSToCPaaS2 = {
    * Map of old presence status values to new values.
    * @type {Object}
    */
-};const statusMapCPaaSToCPaaS2 = {
+};const statusMapUcToCPaaS2 = {
   open: _constants2.STATUS.OPEN,
   closed: _constants2.STATUS.CLOSED
 
@@ -42263,13 +42263,13 @@ const activityMapCPaaSToCPaaS2 = {
    */
 };function* updatePresence({ payload }) {
   // Convert the status to the CPaaS2 value (if required)
-  if (payload.status in statusMapCPaaSToCPaaS2) {
-    payload.status = statusMapCPaaSToCPaaS2[payload.status];
+  if (payload.status in statusMapUcToCPaaS2) {
+    payload.status = statusMapUcToCPaaS2[payload.status];
   }
 
   // Convert the activity to the CPaaS2 value (if required)
-  if (payload.activity in activityMapCPaaSToCPaaS2) {
-    payload.activity = activityMapCPaaSToCPaaS2[payload.activity];
+  if (payload.activity in activityMapUcToCPaaS2) {
+    payload.activity = activityMapUcToCPaaS2[payload.activity];
   }
 
   // Verify that the status value is a valid CPaaS2 values
@@ -44246,7 +44246,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /**
  * CPaaS subscription implementation factory.
- * @method subscriptionCpaas
+ * @method createSubcriptionPlugin
  * @param {Object} options - Configuration options for subscription. See above.
  * @return {Object} plugin - A subscription plugin.
  */
@@ -44343,7 +44343,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* State Structure
     subscription: {
         notificationChannels: { // An object with key values pairs for channelType -> channelInfo
-            [Websocket] : { ... }, // Channel Info taken directly from CPaaS response.
+            [Websocket] : { ... }, // Channel Info taken directly from UC response.
             [Push]      : { ... }
         }
     }

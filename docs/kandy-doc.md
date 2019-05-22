@@ -1188,6 +1188,27 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][14]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][14]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][14]>** A list of speaker device information.
+
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1213,28 +1234,7 @@ Media is a collection of Track objects.
 
 -   `id` **[string][2]** The ID of the Media object.
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][14]>** A list of Track objects that are contained in this Media object.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][15]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][15]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][15]>** A list of speaker device information.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+-   `tracks` **[Array][7]&lt;[TrackObject][15]>** A list of Track objects that are contained in this Media object.
 
 ## CallObject
 
@@ -1364,6 +1364,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [13]: #part
 
-[14]: #trackobject
+[14]: #deviceinfo
 
-[15]: #deviceinfo
+[15]: #trackobject
