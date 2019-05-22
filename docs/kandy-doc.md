@@ -1188,21 +1188,37 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## TrackObject
+## MediaObject
 
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 **Properties**
 
--   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][2]** The ID of the Track.
--   `kind` **[string][2]** The kind of Track this is (audio, video).
--   `label` **[string][2]** The label of the device this Track uses.
--   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
--   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][14]>** A list of Track objects that are contained in this Media object.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][7]&lt;[DeviceInfo][15]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][15]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][15]>** A list of speaker device information.
 
 ## CallObject
 
@@ -1227,37 +1243,21 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## DeviceInfo
+## TrackObject
 
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][14]>** A list of Track objects that are contained in this Media object.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][7]&lt;[DeviceInfo][15]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][15]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][15]>** A list of speaker device information.
+-   `containers` **[Array][7]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][2]** The ID of the Track.
+-   `kind` **[string][2]** The kind of Track this is (audio, video).
+-   `label` **[string][2]** The label of the device this Track uses.
+-   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
+-   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
 ## Part
 
