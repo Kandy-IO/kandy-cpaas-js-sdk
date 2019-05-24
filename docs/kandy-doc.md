@@ -348,6 +348,15 @@ A track ID can optionally be provided to get a report for the specific track of 
 -   `callId` **[string][2]** The ID of the call to retrieve stats report.
 -   `trackId` **[string][2]?** TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
 
+### forward
+
+Forward an incoming call to another user.
+
+**Parameters**
+
+-   `callId` **[string][2]** ID of the call being acted on.
+-   `destination` **[string][2]** The user to forward the call to.
+
 ### states
 
 Possible states for a call.
@@ -471,6 +480,21 @@ See the "Conversation" and "Message" sections of the documentation for more deta
 
 Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
 
+### fetch
+
+Attempts to retrieve a list of conversations that the current user is a part of.
+These conversations can then be retrieved from the store using get().
+
+**Parameters**
+
+-   `options` **[Object][5]?** An optional configuration object to query for more specific results.
+    If no object is passed, all threads will be retrieved.
+    -   `options.touched` **[string][2]?** The unix timestamp in seconds representing the date from which
+         to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
+         the back-end making use of the most recent date value provided in a previous request
+    -   `options.type` **[string][2]?** Limit results to one of: "internal", "sms", "im" or "group".
+    -   `options.thread` **([string][2] \| [number][9])?** Limit results to one thread specified by its thread handle.
+
 ### get
 
 Get a conversation object matching the user ID provided.
@@ -481,9 +505,10 @@ If a conversation with the given user ID already exists in the store, it will be
 
 -   `recipient` **[string][2]** The destination for messages created in this conversation. This
     will be a user's sip address.
--   `type` **[string][2]** The type of conversation to create. Can be one of "im", "sms" or "other"
+-   `options` **[Object][5]?** Options to use when creating the conversation object.
+    -   `options.type` **[string][2]** The type of conversation to create. Can be one of "im", "sms" or "other" (optional, default `'im'`)
 
-Returns **[Object][5]** A Conversation object.
+Returns **[Conversation][11]** A Conversation object.
 
 ### create
 
@@ -493,26 +518,141 @@ object will be sent to the destination provided
 **Parameters**
 
 -   `recipient` **[string][2]** 
--   `options`  
+-   `options` **[Object][5]?** Options to use when creating the conversation object.
+    -   `options.type` **[string][2]** The type of conversation. Can be one of "im", "sms" or "other" (optional, default `'im'`)
 
-Returns **[Object][5]** a Conversation object
+Returns **[Conversation][11]** a Conversation object
 
 ### getAll
 
 Returns all conversations currently tracked by the SDK
 
-Returns **[Array][7]** An array of conversation objects.
+Returns **[Array][7]&lt;[Conversation][11]>** An array of conversation objects.
+
+## Conversation
+
+A Conversation object represents a conversation between either two users, or a
+user and a group. A Conversation can create messages via the conversation's
+createMessage() function.
+
+Once sender sends the initial message (within a conversation) to a recipient, there will be a
+conversation object saved in both sender & recipient's state.
+
+**Properties**
+
+-   `destination` **[string][2]** The Id of the remote user with which the current user is having a conversation.
+-   `lastReceived` **[number][9]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
+    This property applies only to conversation object stored in recipient's state.
+-   `type` **[string][2]** The type associated with all messages within this conversation object (e.g. chat, im, group).
+-   `messages` **[Array][7]&lt;[Message][12]>** The array of message objects.
+-   `isTypingList` **[Array][7]&lt;[string][2]>** The array indentifying the User IDs of the users who are currently typing.
+
+### createMessage
+
+Create and return a message object. You must specify the part. If this is a simple text message, provide a `text` part as demonstrated in the example.
+
+**Parameters**
+
+-   `part` **[Part][13]** The part to add to the message.
+
+**Examples**
+
+```javascript
+conversation.createMessage({type: 'text', text: 'This is the message'});
+```
+
+Returns **[Message][12]** The newly created Message object.
+
+### clearMessages
+
+Clears all messages in this conversation from local state.
+
+### getMessages
+
+Get the messages associated with this conversation.
+
+Returns **[Array][7]&lt;[Message][12]>** An array of messages.
+
+### getMessage
+
+Get a specific message from this conversation.
+
+**Parameters**
+
+-   `messageId` **[string][2]** ID of the message to retrieve.
+
+Returns **[Object][5]** A message object.
+
+### deleteMessages
+
+Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
+
+**Parameters**
+
+-   `messageIds` **[Array][7]&lt;[string][2]>** An array of message IDs
+
+### delete
+
+Delete this conversation on the server
+
+### subscribe
+
+Subscribe to this conversations messages array.
+
+**Parameters**
+
+-   `subscriber` **[Function][3]** A subscriber function to be triggered when the messages array of this conversation is updated.
+    -   `subscriber.conversationId` **[string][2]** The conversation participant.
+    -   `subscriber.messageId` **[string][2]** The ID of the message that caused the event.
+
+Returns **[Function][3]** The unsubscribe function.
+
+### fetchMessages
+
+Allows the user to fetch messages associated with a specific conversation from the server.
+When the operation is complete, a NEW_MESSAGE event will be emitted.
+Messages can then be retrieved using getMessages.
+
+**Parameters**
+
+-   `amount` **[number][9]** An amount of messages to fetch. (optional, default `50`)
+
+### setIsTyping
+
+Sets the typing status of the conversation for the current user.
+Other participants will be notified of changes to the conversation's typing status.
+See the isTypingList:change event.
+
+**Parameters**
+
+-   `isTyping` **[boolean][6]** Whether the user is typing or not
 
 ## Message
 
-A Message object represents an individual message. Messages have parts
-which represent pieces of a message, such as a text part or a file part. Once
-all the desired parts have been added, a message can be sent with the send()
-function.
+A Message object represents an individual message that was delivered to a recipient and it is
+obtained through the getMessage/getMessages API on an existing conversation.
 
-### send
+Messages have parts which represent pieces of a message, such as a text part, a json object part or a file part.
 
-Sends the message.
+Once sender sends a message, this message is saved in sender's state as an object.
+
+Similarly, once recipient gets a message, this message is saved in recipient's state.
+
+Below are the properties pertaining to this saved message object in either sender or recipient's state.
+
+**Properties**
+
+-   `timestamp` **[number][9]** The Unix timestamp in seconds marking the time when message was created by sender.
+-   `isPending` **[boolean][6]** Whether message is in pending state or not (delivered by server or not).
+-   `read` **[boolean][6]** : Whether message was read by recipient user.
+-   `parts` **[Array][7]&lt;[Part][13]>** An array of Parts.
+-   `sender` **[string][2]** The primary contact address of the sender.
+-   `messageId` **[string][2]** The unique id of the message. The message object (stored in sender's state) has a different id
+    than the one associated with message object stored in recipient's state.
+-   `type` **[string][2]** The type of message that was sent (e.g. chat, im, group).
+    This property applies only to message object stored in sender's state.
+-   `deliveryStatus` **[string][2]** Tracks the status of the outgoing message (i.e. 'Sent', etc).
+    This property applies only to message object stored in sender's state.
 
 ## Groups
 
@@ -879,6 +1019,33 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
+
 ## config
 
 The configuration object. This object defines what different configuration
@@ -965,33 +1132,6 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][9]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][9]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -1048,117 +1188,6 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## Channel
-
-The Channel object that the Proxy module needs to be provided.
-
-**Examples**
-
-```javascript
-// The channel the application uses for communicating with a remote endpoint.
-const appChannel = ...
-
-// The channel the application will provide to the Proxy module for use.
-const channel = {
-   send: function (data) {
-     // Any encoding / wrapping needed for a Proxy message being sent
-     //    over the channel.
-     appChannel.sendMessage(data)
-   },
-   // The Proxy module will set this function.
-   receive: undefined
-}
-appChannel.on('message', data => {
-   // Any decoding / unwrapping needed for the received message.
-   channel.receive(data)
-})
-
-client.proxy.setChannel(channel)
-```
-
-### send
-
-Channel function that the Proxy module will use to send messages to the remote side.
-
-**Parameters**
-
--   `data` **[Object][5]** Message to be sent over the channel.
-
-### receive
-
-API that the Proxy module will assign a listener function for accepting received messages.
-This function should receive all messages sent from the remote side of the channel.
-
-**Parameters**
-
--   `data` **[Object][5]** The message received from the Channel.
-
-## Proxy
-
-The Proxy module allows for a secondary mode for making calls: proxy mode.
-When proxy mode is enabled, the SDK will redirect webRTC / media operations from the current machine to a remote machine using a channel.
-This is an advanced feature that enables support for Calls in particular scenarios that would otherwise not support them.
-
-### setProxyMode
-
-Sets the mode for the Proxy Plugin.
-When enabled, webRTC operations will be proxied over a channel. Enabling
-   proxy mode requires a channel to have been set. See `setChannel` API.
-When disabled, webRTC operation will occur as normal on the local machine.
-
-**Parameters**
-
--   `value` **[boolean][6]** Whether proxy mode should be enabled.
-
-### getProxyMode
-
-Retrieves the current mode of the Proxy Plugin.
-
-Returns **[boolean][6]** Whether proxy mode is currently enabled.
-
-### getProxyDetails
-
-Retrieve information about the proxy's browser being used.
-Browser information being defined indicates that the browser supports
-   basic webRTC scenarios.
-
-**Examples**
-
-```javascript
-const details = client.proxy.getProxyDetails()
-
-log(`Proxy Browser in use: ${details.browser}, version ${details.version}.`)
-```
-
-Returns **[Object][5]** Object containing `browser` and `version` information.
-
-### setChannel
-
-Sets the channel to be used while proxy mode is enabled.
-
-**Parameters**
-
--   `channel` **[Channel][11]** See the `Channel` module for information.
-
-### initializeRemote
-
-Sends an initialization message over the channel with webRTC configurations.
-
-**Parameters**
-
--   `config` **[Object][5]** 
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][12]>** A list of Track objects that are contained in this Media object.
-
 ## DeviceInfo
 
 Contains information about a device.
@@ -1176,9 +1205,9 @@ A collection of devices and their information.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][13]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][13]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][13]>** A list of speaker device information.
+-   `camera` **[Array][7]&lt;[DeviceInfo][14]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][14]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][14]>** A list of speaker device information.
 
 ## TrackObject
 
@@ -1195,6 +1224,17 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][15]>** A list of Track objects that are contained in this Media object.
 
 ## CallObject
 
@@ -1218,6 +1258,42 @@ A Call can be manipulated by using the Call feature's APIs.
     -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+
+## Part
+
+A Part is a custom object representing the payload of a message.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be "text", "json", "file".
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+-   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
+
+## MessageSender
+
+A Message sender object is a means by which a sender can deliver information to a recipient.
+
+This sender object can obtained through the createMessage API on an existing conversation.
+
+Once all the desired parts have been added to it (using appPart function), the message
+can be sent using the send function.
+
+### send
+
+Sends the message.
+
+### addPart
+
+Add an additional part to a message.
+
+**Parameters**
+
+-   `part` **[Part][13]** The part to add to the message.
+
+### createImageLinks
+
+Creates a usable link for the given message
 
 ## Subscription
 
@@ -1282,8 +1358,12 @@ The Basic error object. Provides information about an error that occurred in the
 
 [10]: #mediaobject
 
-[11]: #channel
+[11]: #conversation
 
-[12]: #trackobject
+[12]: #message
 
-[13]: #deviceinfo
+[13]: #part
+
+[14]: #deviceinfo
+
+[15]: #trackobject

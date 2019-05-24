@@ -77,21 +77,21 @@
           {
             name: 'Hide Front Matter',
             extend(api) {
-              api.processMarkdown(md => md.replace(/---(.*?)---/gsm, ''))
+              api.processMarkdown(md => md.replace(/---([^]*?)---/gm, ''))
             }
           },
           {
             name: 'Convert KANDYFQDN',
             extend(api) {
               const kandyFQDN = queryParams.get('KANDYFQDN') || '$KANDYFQDN$'
-              api.processMarkdown(md => md.replace(/\$KANDYFQDN\$/gsm, kandyFQDN))
+              api.processMarkdown(md => md.replace(/\$KANDYFQDN\$/gm, kandyFQDN))
             }
           },
           {
             name: 'Convert KANDY',
             extend(api) {
               const kandy = queryParams.get('KANDY') || '$KANDY$'
-              api.processMarkdown(md => md.replace(/\$KANDY\$/gsm, kandy))
+              api.processMarkdown(md => md.replace(/\$KANDY\$/gm, kandy))
             }
           },
           {
