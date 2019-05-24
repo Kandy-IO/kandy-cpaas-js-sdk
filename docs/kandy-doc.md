@@ -1188,15 +1188,16 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## DevicesObject
+## MediaObject
 
-A collection of devices and their information.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 **Properties**
 
--   `camera` **[Array][7]&lt;[DeviceInfo][14]>** A list of camera device information.
--   `microphone` **[Array][7]&lt;[DeviceInfo][14]>** A list of microphone device information.
--   `speaker` **[Array][7]&lt;[DeviceInfo][14]>** A list of speaker device information.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][7]&lt;[TrackObject][14]>** A list of Track objects that are contained in this Media object.
 
 ## TrackObject
 
@@ -1214,16 +1215,15 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## MediaObject
+## DevicesObject
 
-The state representation of a Media object.
-Media is a collection of Track objects.
+A collection of devices and their information.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][7]&lt;[TrackObject][15]>** A list of Track objects that are contained in this Media object.
+-   `camera` **[Array][7]&lt;[DeviceInfo][15]>** A list of camera device information.
+-   `microphone` **[Array][7]&lt;[DeviceInfo][15]>** A list of microphone device information.
+-   `speaker` **[Array][7]&lt;[DeviceInfo][15]>** A list of speaker device information.
 
 ## DeviceInfo
 
@@ -1259,17 +1259,6 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][9]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
-## Part
-
-A Part is a custom object representing the payload of a message.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be "text", "json", "file".
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
--   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
-
 ## MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1294,6 +1283,17 @@ Add an additional part to a message.
 ### createImageLinks
 
 Creates a usable link for the given message
+
+## Part
+
+A Part is a custom object representing the payload of a message.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be "text", "json", "file".
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+-   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
 
 ## Subscription
 
@@ -1364,6 +1364,6 @@ The Basic error object. Provides information about an error that occurred in the
 
 [13]: #part
 
-[14]: #deviceinfo
+[14]: #trackobject
 
-[15]: #trackobject
+[15]: #deviceinfo
