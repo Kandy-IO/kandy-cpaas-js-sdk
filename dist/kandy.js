@@ -1,7 +1,7 @@
 /**
  * Kandy.js
- * kandy.cpaas.js
- * Version: 4.5.0-beta.15
+ * kandy.newUC.js
+ * Version: 4.5.0-beta.16
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -96,7 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "../kandy/src/index.cpaas.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "../kandy/src/index.newUC.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -147,13 +147,6 @@ module.exports = { "default": __webpack_require__("../../node_modules/core-js/li
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__("../../node_modules/core-js/library/fn/object/define-property.js"), __esModule: true };
-
-/***/ }),
-
-/***/ "../../node_modules/babel-runtime/core-js/object/entries.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = { "default": __webpack_require__("../../node_modules/core-js/library/fn/object/entries.js"), __esModule: true };
 
 /***/ }),
 
@@ -279,6 +272,168 @@ exports.default = function (obj, keys) {
 
 /***/ }),
 
+/***/ "../../node_modules/base-64/base64.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! http://mths.be/base64 v0.1.0 by @mathias | MIT license */
+;(function(root) {
+
+	// Detect free variables `exports`.
+	var freeExports =  true && exports;
+
+	// Detect free variable `module`.
+	var freeModule =  true && module &&
+		module.exports == freeExports && module;
+
+	// Detect free variable `global`, from Node.js or Browserified code, and use
+	// it as `root`.
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var InvalidCharacterError = function(message) {
+		this.message = message;
+	};
+	InvalidCharacterError.prototype = new Error;
+	InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+
+	var error = function(message) {
+		// Note: the error messages used throughout this file match those used by
+		// the native `atob`/`btoa` implementation in Chromium.
+		throw new InvalidCharacterError(message);
+	};
+
+	var TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+	// http://whatwg.org/html/common-microsyntaxes.html#space-character
+	var REGEX_SPACE_CHARACTERS = /[\t\n\f\r ]/g;
+
+	// `decode` is designed to be fully compatible with `atob` as described in the
+	// HTML Standard. http://whatwg.org/html/webappapis.html#dom-windowbase64-atob
+	// The optimized base64-decoding algorithm used is based on @atk’s excellent
+	// implementation. https://gist.github.com/atk/1020396
+	var decode = function(input) {
+		input = String(input)
+			.replace(REGEX_SPACE_CHARACTERS, '');
+		var length = input.length;
+		if (length % 4 == 0) {
+			input = input.replace(/==?$/, '');
+			length = input.length;
+		}
+		if (
+			length % 4 == 1 ||
+			// http://whatwg.org/C#alphanumeric-ascii-characters
+			/[^+a-zA-Z0-9/]/.test(input)
+		) {
+			error(
+				'Invalid character: the string to be decoded is not correctly encoded.'
+			);
+		}
+		var bitCounter = 0;
+		var bitStorage;
+		var buffer;
+		var output = '';
+		var position = -1;
+		while (++position < length) {
+			buffer = TABLE.indexOf(input.charAt(position));
+			bitStorage = bitCounter % 4 ? bitStorage * 64 + buffer : buffer;
+			// Unless this is the first of a group of 4 characters…
+			if (bitCounter++ % 4) {
+				// …convert the first 8 bits to a single ASCII character.
+				output += String.fromCharCode(
+					0xFF & bitStorage >> (-2 * bitCounter & 6)
+				);
+			}
+		}
+		return output;
+	};
+
+	// `encode` is designed to be fully compatible with `btoa` as described in the
+	// HTML Standard: http://whatwg.org/html/webappapis.html#dom-windowbase64-btoa
+	var encode = function(input) {
+		input = String(input);
+		if (/[^\0-\xFF]/.test(input)) {
+			// Note: no need to special-case astral symbols here, as surrogates are
+			// matched, and the input is supposed to only contain ASCII anyway.
+			error(
+				'The string to be encoded contains characters outside of the ' +
+				'Latin1 range.'
+			);
+		}
+		var padding = input.length % 3;
+		var output = '';
+		var position = -1;
+		var a;
+		var b;
+		var c;
+		var d;
+		var buffer;
+		// Make sure any padding is handled outside of the loop.
+		var length = input.length - padding;
+
+		while (++position < length) {
+			// Read three bytes, i.e. 24 bits.
+			a = input.charCodeAt(position) << 16;
+			b = input.charCodeAt(++position) << 8;
+			c = input.charCodeAt(++position);
+			buffer = a + b + c;
+			// Turn the 24 bits into four chunks of 6 bits each, and append the
+			// matching character for each of them to the output.
+			output += (
+				TABLE.charAt(buffer >> 18 & 0x3F) +
+				TABLE.charAt(buffer >> 12 & 0x3F) +
+				TABLE.charAt(buffer >> 6 & 0x3F) +
+				TABLE.charAt(buffer & 0x3F)
+			);
+		}
+
+		if (padding == 2) {
+			a = input.charCodeAt(position) << 8;
+			b = input.charCodeAt(++position);
+			buffer = a + b;
+			output += (
+				TABLE.charAt(buffer >> 10) +
+				TABLE.charAt((buffer >> 4) & 0x3F) +
+				TABLE.charAt((buffer << 2) & 0x3F) +
+				'='
+			);
+		} else if (padding == 1) {
+			buffer = input.charCodeAt(position);
+			output += (
+				TABLE.charAt(buffer >> 2) +
+				TABLE.charAt((buffer << 4) & 0x3F) +
+				'=='
+			);
+		}
+
+		return output;
+	};
+
+	var base64 = {
+		'encode': encode,
+		'decode': decode,
+		'version': '0.1.0'
+	};
+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		true
+	) {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+			return base64;
+		}).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}	else { var key; }
+
+}(this));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__("../../node_modules/webpack/buildin/module.js")(module), __webpack_require__("../../node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "../../node_modules/core-js/library/fn/array/from.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -357,15 +512,6 @@ var $Object = __webpack_require__("../../node_modules/core-js/library/modules/_c
 module.exports = function defineProperty(it, key, desc) {
   return $Object.defineProperty(it, key, desc);
 };
-
-
-/***/ }),
-
-/***/ "../../node_modules/core-js/library/fn/object/entries.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("../../node_modules/core-js/library/modules/es7.object.entries.js");
-module.exports = __webpack_require__("../../node_modules/core-js/library/modules/_core.js").Object.entries;
 
 
 /***/ }),
@@ -3268,22 +3414,6 @@ __webpack_require__("../../node_modules/core-js/library/modules/_set-collection-
 var $export = __webpack_require__("../../node_modules/core-js/library/modules/_export.js");
 
 $export($export.P + $export.R, 'Map', { toJSON: __webpack_require__("../../node_modules/core-js/library/modules/_collection-to-json.js")('Map') });
-
-
-/***/ }),
-
-/***/ "../../node_modules/core-js/library/modules/es7.object.entries.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-// https://github.com/tc39/proposal-object-values-entries
-var $export = __webpack_require__("../../node_modules/core-js/library/modules/_export.js");
-var $entries = __webpack_require__("../../node_modules/core-js/library/modules/_object-to-array.js")(true);
-
-$export($export.S, 'Object', {
-  entries: function entries(it) {
-    return $entries(it);
-  }
-});
 
 
 /***/ }),
@@ -6741,6 +6871,6918 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 
     return defaultLogger;
 }));
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Top level file is just a mixin of submodules & constants
+
+
+var assign    = __webpack_require__("../../node_modules/pako/lib/utils/common.js").assign;
+
+var deflate   = __webpack_require__("../../node_modules/pako/lib/deflate.js");
+var inflate   = __webpack_require__("../../node_modules/pako/lib/inflate.js");
+var constants = __webpack_require__("../../node_modules/pako/lib/zlib/constants.js");
+
+var pako = {};
+
+assign(pako, deflate, inflate, constants);
+
+module.exports = pako;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/deflate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+
+var zlib_deflate = __webpack_require__("../../node_modules/pako/lib/zlib/deflate.js");
+var utils        = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+var strings      = __webpack_require__("../../node_modules/pako/lib/utils/strings.js");
+var msg          = __webpack_require__("../../node_modules/pako/lib/zlib/messages.js");
+var ZStream      = __webpack_require__("../../node_modules/pako/lib/zlib/zstream.js");
+
+var toString = Object.prototype.toString;
+
+/* Public constants ==========================================================*/
+/* ===========================================================================*/
+
+var Z_NO_FLUSH      = 0;
+var Z_FINISH        = 4;
+
+var Z_OK            = 0;
+var Z_STREAM_END    = 1;
+var Z_SYNC_FLUSH    = 2;
+
+var Z_DEFAULT_COMPRESSION = -1;
+
+var Z_DEFAULT_STRATEGY    = 0;
+
+var Z_DEFLATED  = 8;
+
+/* ===========================================================================*/
+
+
+/**
+ * class Deflate
+ *
+ * Generic JS-style wrapper for zlib calls. If you don't need
+ * streaming behaviour - use more simple functions: [[deflate]],
+ * [[deflateRaw]] and [[gzip]].
+ **/
+
+/* internal
+ * Deflate.chunks -> Array
+ *
+ * Chunks of output data, if [[Deflate#onData]] not overridden.
+ **/
+
+/**
+ * Deflate.result -> Uint8Array|Array
+ *
+ * Compressed result, generated by default [[Deflate#onData]]
+ * and [[Deflate#onEnd]] handlers. Filled after you push last chunk
+ * (call [[Deflate#push]] with `Z_FINISH` / `true` param)  or if you
+ * push a chunk with explicit flush (call [[Deflate#push]] with
+ * `Z_SYNC_FLUSH` param).
+ **/
+
+/**
+ * Deflate.err -> Number
+ *
+ * Error code after deflate finished. 0 (Z_OK) on success.
+ * You will not need it in real life, because deflate errors
+ * are possible only on wrong options or bad `onData` / `onEnd`
+ * custom handlers.
+ **/
+
+/**
+ * Deflate.msg -> String
+ *
+ * Error message, if [[Deflate.err]] != 0
+ **/
+
+
+/**
+ * new Deflate(options)
+ * - options (Object): zlib deflate options.
+ *
+ * Creates new deflator instance with specified params. Throws exception
+ * on bad params. Supported options:
+ *
+ * - `level`
+ * - `windowBits`
+ * - `memLevel`
+ * - `strategy`
+ * - `dictionary`
+ *
+ * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)
+ * for more information on these.
+ *
+ * Additional options, for internal needs:
+ *
+ * - `chunkSize` - size of generated data chunks (16K by default)
+ * - `raw` (Boolean) - do raw deflate
+ * - `gzip` (Boolean) - create gzip wrapper
+ * - `to` (String) - if equal to 'string', then result will be "binary string"
+ *    (each char code [0..255])
+ * - `header` (Object) - custom header for gzip
+ *   - `text` (Boolean) - true if compressed data believed to be text
+ *   - `time` (Number) - modification time, unix timestamp
+ *   - `os` (Number) - operation system code
+ *   - `extra` (Array) - array of bytes with extra data (max 65536)
+ *   - `name` (String) - file name (binary string)
+ *   - `comment` (String) - comment (binary string)
+ *   - `hcrc` (Boolean) - true if header crc should be added
+ *
+ * ##### Example:
+ *
+ * ```javascript
+ * var pako = require('pako')
+ *   , chunk1 = Uint8Array([1,2,3,4,5,6,7,8,9])
+ *   , chunk2 = Uint8Array([10,11,12,13,14,15,16,17,18,19]);
+ *
+ * var deflate = new pako.Deflate({ level: 3});
+ *
+ * deflate.push(chunk1, false);
+ * deflate.push(chunk2, true);  // true -> last chunk
+ *
+ * if (deflate.err) { throw new Error(deflate.err); }
+ *
+ * console.log(deflate.result);
+ * ```
+ **/
+function Deflate(options) {
+  if (!(this instanceof Deflate)) return new Deflate(options);
+
+  this.options = utils.assign({
+    level: Z_DEFAULT_COMPRESSION,
+    method: Z_DEFLATED,
+    chunkSize: 16384,
+    windowBits: 15,
+    memLevel: 8,
+    strategy: Z_DEFAULT_STRATEGY,
+    to: ''
+  }, options || {});
+
+  var opt = this.options;
+
+  if (opt.raw && (opt.windowBits > 0)) {
+    opt.windowBits = -opt.windowBits;
+  }
+
+  else if (opt.gzip && (opt.windowBits > 0) && (opt.windowBits < 16)) {
+    opt.windowBits += 16;
+  }
+
+  this.err    = 0;      // error code, if happens (0 = Z_OK)
+  this.msg    = '';     // error message
+  this.ended  = false;  // used to avoid multiple onEnd() calls
+  this.chunks = [];     // chunks of compressed data
+
+  this.strm = new ZStream();
+  this.strm.avail_out = 0;
+
+  var status = zlib_deflate.deflateInit2(
+    this.strm,
+    opt.level,
+    opt.method,
+    opt.windowBits,
+    opt.memLevel,
+    opt.strategy
+  );
+
+  if (status !== Z_OK) {
+    throw new Error(msg[status]);
+  }
+
+  if (opt.header) {
+    zlib_deflate.deflateSetHeader(this.strm, opt.header);
+  }
+
+  if (opt.dictionary) {
+    var dict;
+    // Convert data if needed
+    if (typeof opt.dictionary === 'string') {
+      // If we need to compress text, change encoding to utf8.
+      dict = strings.string2buf(opt.dictionary);
+    } else if (toString.call(opt.dictionary) === '[object ArrayBuffer]') {
+      dict = new Uint8Array(opt.dictionary);
+    } else {
+      dict = opt.dictionary;
+    }
+
+    status = zlib_deflate.deflateSetDictionary(this.strm, dict);
+
+    if (status !== Z_OK) {
+      throw new Error(msg[status]);
+    }
+
+    this._dict_set = true;
+  }
+}
+
+/**
+ * Deflate#push(data[, mode]) -> Boolean
+ * - data (Uint8Array|Array|ArrayBuffer|String): input data. Strings will be
+ *   converted to utf8 byte sequence.
+ * - mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE modes.
+ *   See constants. Skipped or `false` means Z_NO_FLUSH, `true` means Z_FINISH.
+ *
+ * Sends input data to deflate pipe, generating [[Deflate#onData]] calls with
+ * new compressed chunks. Returns `true` on success. The last data block must have
+ * mode Z_FINISH (or `true`). That will flush internal pending buffers and call
+ * [[Deflate#onEnd]]. For interim explicit flushes (without ending the stream) you
+ * can use mode Z_SYNC_FLUSH, keeping the compression context.
+ *
+ * On fail call [[Deflate#onEnd]] with error code and return false.
+ *
+ * We strongly recommend to use `Uint8Array` on input for best speed (output
+ * array format is detected automatically). Also, don't skip last param and always
+ * use the same type in your code (boolean or number). That will improve JS speed.
+ *
+ * For regular `Array`-s make sure all elements are [0..255].
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * push(chunk, false); // push one of data chunks
+ * ...
+ * push(chunk, true);  // push last chunk
+ * ```
+ **/
+Deflate.prototype.push = function (data, mode) {
+  var strm = this.strm;
+  var chunkSize = this.options.chunkSize;
+  var status, _mode;
+
+  if (this.ended) { return false; }
+
+  _mode = (mode === ~~mode) ? mode : ((mode === true) ? Z_FINISH : Z_NO_FLUSH);
+
+  // Convert data if needed
+  if (typeof data === 'string') {
+    // If we need to compress text, change encoding to utf8.
+    strm.input = strings.string2buf(data);
+  } else if (toString.call(data) === '[object ArrayBuffer]') {
+    strm.input = new Uint8Array(data);
+  } else {
+    strm.input = data;
+  }
+
+  strm.next_in = 0;
+  strm.avail_in = strm.input.length;
+
+  do {
+    if (strm.avail_out === 0) {
+      strm.output = new utils.Buf8(chunkSize);
+      strm.next_out = 0;
+      strm.avail_out = chunkSize;
+    }
+    status = zlib_deflate.deflate(strm, _mode);    /* no bad return value */
+
+    if (status !== Z_STREAM_END && status !== Z_OK) {
+      this.onEnd(status);
+      this.ended = true;
+      return false;
+    }
+    if (strm.avail_out === 0 || (strm.avail_in === 0 && (_mode === Z_FINISH || _mode === Z_SYNC_FLUSH))) {
+      if (this.options.to === 'string') {
+        this.onData(strings.buf2binstring(utils.shrinkBuf(strm.output, strm.next_out)));
+      } else {
+        this.onData(utils.shrinkBuf(strm.output, strm.next_out));
+      }
+    }
+  } while ((strm.avail_in > 0 || strm.avail_out === 0) && status !== Z_STREAM_END);
+
+  // Finalize on the last chunk.
+  if (_mode === Z_FINISH) {
+    status = zlib_deflate.deflateEnd(this.strm);
+    this.onEnd(status);
+    this.ended = true;
+    return status === Z_OK;
+  }
+
+  // callback interim results if Z_SYNC_FLUSH.
+  if (_mode === Z_SYNC_FLUSH) {
+    this.onEnd(Z_OK);
+    strm.avail_out = 0;
+    return true;
+  }
+
+  return true;
+};
+
+
+/**
+ * Deflate#onData(chunk) -> Void
+ * - chunk (Uint8Array|Array|String): output data. Type of array depends
+ *   on js engine support. When string output requested, each chunk
+ *   will be string.
+ *
+ * By default, stores data blocks in `chunks[]` property and glue
+ * those in `onEnd`. Override this handler, if you need another behaviour.
+ **/
+Deflate.prototype.onData = function (chunk) {
+  this.chunks.push(chunk);
+};
+
+
+/**
+ * Deflate#onEnd(status) -> Void
+ * - status (Number): deflate status. 0 (Z_OK) on success,
+ *   other if not.
+ *
+ * Called once after you tell deflate that the input stream is
+ * complete (Z_FINISH) or should be flushed (Z_SYNC_FLUSH)
+ * or if an error happened. By default - join collected chunks,
+ * free memory and fill `results` / `err` properties.
+ **/
+Deflate.prototype.onEnd = function (status) {
+  // On success - join
+  if (status === Z_OK) {
+    if (this.options.to === 'string') {
+      this.result = this.chunks.join('');
+    } else {
+      this.result = utils.flattenChunks(this.chunks);
+    }
+  }
+  this.chunks = [];
+  this.err = status;
+  this.msg = this.strm.msg;
+};
+
+
+/**
+ * deflate(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to compress.
+ * - options (Object): zlib deflate options.
+ *
+ * Compress `data` with deflate algorithm and `options`.
+ *
+ * Supported options are:
+ *
+ * - level
+ * - windowBits
+ * - memLevel
+ * - strategy
+ * - dictionary
+ *
+ * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)
+ * for more information on these.
+ *
+ * Sugar (options):
+ *
+ * - `raw` (Boolean) - say that we work with raw stream, if you don't wish to specify
+ *   negative windowBits implicitly.
+ * - `to` (String) - if equal to 'string', then result will be "binary string"
+ *    (each char code [0..255])
+ *
+ * ##### Example:
+ *
+ * ```javascript
+ * var pako = require('pako')
+ *   , data = Uint8Array([1,2,3,4,5,6,7,8,9]);
+ *
+ * console.log(pako.deflate(data));
+ * ```
+ **/
+function deflate(input, options) {
+  var deflator = new Deflate(options);
+
+  deflator.push(input, true);
+
+  // That will never happens, if you don't cheat with options :)
+  if (deflator.err) { throw deflator.msg || msg[deflator.err]; }
+
+  return deflator.result;
+}
+
+
+/**
+ * deflateRaw(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to compress.
+ * - options (Object): zlib deflate options.
+ *
+ * The same as [[deflate]], but creates raw data, without wrapper
+ * (header and adler32 crc).
+ **/
+function deflateRaw(input, options) {
+  options = options || {};
+  options.raw = true;
+  return deflate(input, options);
+}
+
+
+/**
+ * gzip(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to compress.
+ * - options (Object): zlib deflate options.
+ *
+ * The same as [[deflate]], but create gzip wrapper instead of
+ * deflate one.
+ **/
+function gzip(input, options) {
+  options = options || {};
+  options.gzip = true;
+  return deflate(input, options);
+}
+
+
+exports.Deflate = Deflate;
+exports.deflate = deflate;
+exports.deflateRaw = deflateRaw;
+exports.gzip = gzip;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/inflate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+
+var zlib_inflate = __webpack_require__("../../node_modules/pako/lib/zlib/inflate.js");
+var utils        = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+var strings      = __webpack_require__("../../node_modules/pako/lib/utils/strings.js");
+var c            = __webpack_require__("../../node_modules/pako/lib/zlib/constants.js");
+var msg          = __webpack_require__("../../node_modules/pako/lib/zlib/messages.js");
+var ZStream      = __webpack_require__("../../node_modules/pako/lib/zlib/zstream.js");
+var GZheader     = __webpack_require__("../../node_modules/pako/lib/zlib/gzheader.js");
+
+var toString = Object.prototype.toString;
+
+/**
+ * class Inflate
+ *
+ * Generic JS-style wrapper for zlib calls. If you don't need
+ * streaming behaviour - use more simple functions: [[inflate]]
+ * and [[inflateRaw]].
+ **/
+
+/* internal
+ * inflate.chunks -> Array
+ *
+ * Chunks of output data, if [[Inflate#onData]] not overridden.
+ **/
+
+/**
+ * Inflate.result -> Uint8Array|Array|String
+ *
+ * Uncompressed result, generated by default [[Inflate#onData]]
+ * and [[Inflate#onEnd]] handlers. Filled after you push last chunk
+ * (call [[Inflate#push]] with `Z_FINISH` / `true` param) or if you
+ * push a chunk with explicit flush (call [[Inflate#push]] with
+ * `Z_SYNC_FLUSH` param).
+ **/
+
+/**
+ * Inflate.err -> Number
+ *
+ * Error code after inflate finished. 0 (Z_OK) on success.
+ * Should be checked if broken data possible.
+ **/
+
+/**
+ * Inflate.msg -> String
+ *
+ * Error message, if [[Inflate.err]] != 0
+ **/
+
+
+/**
+ * new Inflate(options)
+ * - options (Object): zlib inflate options.
+ *
+ * Creates new inflator instance with specified params. Throws exception
+ * on bad params. Supported options:
+ *
+ * - `windowBits`
+ * - `dictionary`
+ *
+ * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)
+ * for more information on these.
+ *
+ * Additional options, for internal needs:
+ *
+ * - `chunkSize` - size of generated data chunks (16K by default)
+ * - `raw` (Boolean) - do raw inflate
+ * - `to` (String) - if equal to 'string', then result will be converted
+ *   from utf8 to utf16 (javascript) string. When string output requested,
+ *   chunk length can differ from `chunkSize`, depending on content.
+ *
+ * By default, when no options set, autodetect deflate/gzip data format via
+ * wrapper header.
+ *
+ * ##### Example:
+ *
+ * ```javascript
+ * var pako = require('pako')
+ *   , chunk1 = Uint8Array([1,2,3,4,5,6,7,8,9])
+ *   , chunk2 = Uint8Array([10,11,12,13,14,15,16,17,18,19]);
+ *
+ * var inflate = new pako.Inflate({ level: 3});
+ *
+ * inflate.push(chunk1, false);
+ * inflate.push(chunk2, true);  // true -> last chunk
+ *
+ * if (inflate.err) { throw new Error(inflate.err); }
+ *
+ * console.log(inflate.result);
+ * ```
+ **/
+function Inflate(options) {
+  if (!(this instanceof Inflate)) return new Inflate(options);
+
+  this.options = utils.assign({
+    chunkSize: 16384,
+    windowBits: 0,
+    to: ''
+  }, options || {});
+
+  var opt = this.options;
+
+  // Force window size for `raw` data, if not set directly,
+  // because we have no header for autodetect.
+  if (opt.raw && (opt.windowBits >= 0) && (opt.windowBits < 16)) {
+    opt.windowBits = -opt.windowBits;
+    if (opt.windowBits === 0) { opt.windowBits = -15; }
+  }
+
+  // If `windowBits` not defined (and mode not raw) - set autodetect flag for gzip/deflate
+  if ((opt.windowBits >= 0) && (opt.windowBits < 16) &&
+      !(options && options.windowBits)) {
+    opt.windowBits += 32;
+  }
+
+  // Gzip header has no info about windows size, we can do autodetect only
+  // for deflate. So, if window size not set, force it to max when gzip possible
+  if ((opt.windowBits > 15) && (opt.windowBits < 48)) {
+    // bit 3 (16) -> gzipped data
+    // bit 4 (32) -> autodetect gzip/deflate
+    if ((opt.windowBits & 15) === 0) {
+      opt.windowBits |= 15;
+    }
+  }
+
+  this.err    = 0;      // error code, if happens (0 = Z_OK)
+  this.msg    = '';     // error message
+  this.ended  = false;  // used to avoid multiple onEnd() calls
+  this.chunks = [];     // chunks of compressed data
+
+  this.strm   = new ZStream();
+  this.strm.avail_out = 0;
+
+  var status  = zlib_inflate.inflateInit2(
+    this.strm,
+    opt.windowBits
+  );
+
+  if (status !== c.Z_OK) {
+    throw new Error(msg[status]);
+  }
+
+  this.header = new GZheader();
+
+  zlib_inflate.inflateGetHeader(this.strm, this.header);
+
+  // Setup dictionary
+  if (opt.dictionary) {
+    // Convert data if needed
+    if (typeof opt.dictionary === 'string') {
+      opt.dictionary = strings.string2buf(opt.dictionary);
+    } else if (toString.call(opt.dictionary) === '[object ArrayBuffer]') {
+      opt.dictionary = new Uint8Array(opt.dictionary);
+    }
+    if (opt.raw) { //In raw mode we need to set the dictionary early
+      status = zlib_inflate.inflateSetDictionary(this.strm, opt.dictionary);
+      if (status !== c.Z_OK) {
+        throw new Error(msg[status]);
+      }
+    }
+  }
+}
+
+/**
+ * Inflate#push(data[, mode]) -> Boolean
+ * - data (Uint8Array|Array|ArrayBuffer|String): input data
+ * - mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE modes.
+ *   See constants. Skipped or `false` means Z_NO_FLUSH, `true` means Z_FINISH.
+ *
+ * Sends input data to inflate pipe, generating [[Inflate#onData]] calls with
+ * new output chunks. Returns `true` on success. The last data block must have
+ * mode Z_FINISH (or `true`). That will flush internal pending buffers and call
+ * [[Inflate#onEnd]]. For interim explicit flushes (without ending the stream) you
+ * can use mode Z_SYNC_FLUSH, keeping the decompression context.
+ *
+ * On fail call [[Inflate#onEnd]] with error code and return false.
+ *
+ * We strongly recommend to use `Uint8Array` on input for best speed (output
+ * format is detected automatically). Also, don't skip last param and always
+ * use the same type in your code (boolean or number). That will improve JS speed.
+ *
+ * For regular `Array`-s make sure all elements are [0..255].
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * push(chunk, false); // push one of data chunks
+ * ...
+ * push(chunk, true);  // push last chunk
+ * ```
+ **/
+Inflate.prototype.push = function (data, mode) {
+  var strm = this.strm;
+  var chunkSize = this.options.chunkSize;
+  var dictionary = this.options.dictionary;
+  var status, _mode;
+  var next_out_utf8, tail, utf8str;
+
+  // Flag to properly process Z_BUF_ERROR on testing inflate call
+  // when we check that all output data was flushed.
+  var allowBufError = false;
+
+  if (this.ended) { return false; }
+  _mode = (mode === ~~mode) ? mode : ((mode === true) ? c.Z_FINISH : c.Z_NO_FLUSH);
+
+  // Convert data if needed
+  if (typeof data === 'string') {
+    // Only binary strings can be decompressed on practice
+    strm.input = strings.binstring2buf(data);
+  } else if (toString.call(data) === '[object ArrayBuffer]') {
+    strm.input = new Uint8Array(data);
+  } else {
+    strm.input = data;
+  }
+
+  strm.next_in = 0;
+  strm.avail_in = strm.input.length;
+
+  do {
+    if (strm.avail_out === 0) {
+      strm.output = new utils.Buf8(chunkSize);
+      strm.next_out = 0;
+      strm.avail_out = chunkSize;
+    }
+
+    status = zlib_inflate.inflate(strm, c.Z_NO_FLUSH);    /* no bad return value */
+
+    if (status === c.Z_NEED_DICT && dictionary) {
+      status = zlib_inflate.inflateSetDictionary(this.strm, dictionary);
+    }
+
+    if (status === c.Z_BUF_ERROR && allowBufError === true) {
+      status = c.Z_OK;
+      allowBufError = false;
+    }
+
+    if (status !== c.Z_STREAM_END && status !== c.Z_OK) {
+      this.onEnd(status);
+      this.ended = true;
+      return false;
+    }
+
+    if (strm.next_out) {
+      if (strm.avail_out === 0 || status === c.Z_STREAM_END || (strm.avail_in === 0 && (_mode === c.Z_FINISH || _mode === c.Z_SYNC_FLUSH))) {
+
+        if (this.options.to === 'string') {
+
+          next_out_utf8 = strings.utf8border(strm.output, strm.next_out);
+
+          tail = strm.next_out - next_out_utf8;
+          utf8str = strings.buf2string(strm.output, next_out_utf8);
+
+          // move tail
+          strm.next_out = tail;
+          strm.avail_out = chunkSize - tail;
+          if (tail) { utils.arraySet(strm.output, strm.output, next_out_utf8, tail, 0); }
+
+          this.onData(utf8str);
+
+        } else {
+          this.onData(utils.shrinkBuf(strm.output, strm.next_out));
+        }
+      }
+    }
+
+    // When no more input data, we should check that internal inflate buffers
+    // are flushed. The only way to do it when avail_out = 0 - run one more
+    // inflate pass. But if output data not exists, inflate return Z_BUF_ERROR.
+    // Here we set flag to process this error properly.
+    //
+    // NOTE. Deflate does not return error in this case and does not needs such
+    // logic.
+    if (strm.avail_in === 0 && strm.avail_out === 0) {
+      allowBufError = true;
+    }
+
+  } while ((strm.avail_in > 0 || strm.avail_out === 0) && status !== c.Z_STREAM_END);
+
+  if (status === c.Z_STREAM_END) {
+    _mode = c.Z_FINISH;
+  }
+
+  // Finalize on the last chunk.
+  if (_mode === c.Z_FINISH) {
+    status = zlib_inflate.inflateEnd(this.strm);
+    this.onEnd(status);
+    this.ended = true;
+    return status === c.Z_OK;
+  }
+
+  // callback interim results if Z_SYNC_FLUSH.
+  if (_mode === c.Z_SYNC_FLUSH) {
+    this.onEnd(c.Z_OK);
+    strm.avail_out = 0;
+    return true;
+  }
+
+  return true;
+};
+
+
+/**
+ * Inflate#onData(chunk) -> Void
+ * - chunk (Uint8Array|Array|String): output data. Type of array depends
+ *   on js engine support. When string output requested, each chunk
+ *   will be string.
+ *
+ * By default, stores data blocks in `chunks[]` property and glue
+ * those in `onEnd`. Override this handler, if you need another behaviour.
+ **/
+Inflate.prototype.onData = function (chunk) {
+  this.chunks.push(chunk);
+};
+
+
+/**
+ * Inflate#onEnd(status) -> Void
+ * - status (Number): inflate status. 0 (Z_OK) on success,
+ *   other if not.
+ *
+ * Called either after you tell inflate that the input stream is
+ * complete (Z_FINISH) or should be flushed (Z_SYNC_FLUSH)
+ * or if an error happened. By default - join collected chunks,
+ * free memory and fill `results` / `err` properties.
+ **/
+Inflate.prototype.onEnd = function (status) {
+  // On success - join
+  if (status === c.Z_OK) {
+    if (this.options.to === 'string') {
+      // Glue & convert here, until we teach pako to send
+      // utf8 aligned strings to onData
+      this.result = this.chunks.join('');
+    } else {
+      this.result = utils.flattenChunks(this.chunks);
+    }
+  }
+  this.chunks = [];
+  this.err = status;
+  this.msg = this.strm.msg;
+};
+
+
+/**
+ * inflate(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to decompress.
+ * - options (Object): zlib inflate options.
+ *
+ * Decompress `data` with inflate/ungzip and `options`. Autodetect
+ * format via wrapper header by default. That's why we don't provide
+ * separate `ungzip` method.
+ *
+ * Supported options are:
+ *
+ * - windowBits
+ *
+ * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)
+ * for more information.
+ *
+ * Sugar (options):
+ *
+ * - `raw` (Boolean) - say that we work with raw stream, if you don't wish to specify
+ *   negative windowBits implicitly.
+ * - `to` (String) - if equal to 'string', then result will be converted
+ *   from utf8 to utf16 (javascript) string. When string output requested,
+ *   chunk length can differ from `chunkSize`, depending on content.
+ *
+ *
+ * ##### Example:
+ *
+ * ```javascript
+ * var pako = require('pako')
+ *   , input = pako.deflate([1,2,3,4,5,6,7,8,9])
+ *   , output;
+ *
+ * try {
+ *   output = pako.inflate(input);
+ * } catch (err)
+ *   console.log(err);
+ * }
+ * ```
+ **/
+function inflate(input, options) {
+  var inflator = new Inflate(options);
+
+  inflator.push(input, true);
+
+  // That will never happens, if you don't cheat with options :)
+  if (inflator.err) { throw inflator.msg || msg[inflator.err]; }
+
+  return inflator.result;
+}
+
+
+/**
+ * inflateRaw(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to decompress.
+ * - options (Object): zlib inflate options.
+ *
+ * The same as [[inflate]], but creates raw data, without wrapper
+ * (header and adler32 crc).
+ **/
+function inflateRaw(input, options) {
+  options = options || {};
+  options.raw = true;
+  return inflate(input, options);
+}
+
+
+/**
+ * ungzip(data[, options]) -> Uint8Array|Array|String
+ * - data (Uint8Array|Array|String): input data to decompress.
+ * - options (Object): zlib inflate options.
+ *
+ * Just shortcut to [[inflate]], because it autodetects format
+ * by header.content. Done for convenience.
+ **/
+
+
+exports.Inflate = Inflate;
+exports.inflate = inflate;
+exports.inflateRaw = inflateRaw;
+exports.ungzip  = inflate;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/utils/common.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+
+var TYPED_OK =  (typeof Uint8Array !== 'undefined') &&
+                (typeof Uint16Array !== 'undefined') &&
+                (typeof Int32Array !== 'undefined');
+
+function _has(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+exports.assign = function (obj /*from1, from2, from3, ...*/) {
+  var sources = Array.prototype.slice.call(arguments, 1);
+  while (sources.length) {
+    var source = sources.shift();
+    if (!source) { continue; }
+
+    if (typeof source !== 'object') {
+      throw new TypeError(source + 'must be non-object');
+    }
+
+    for (var p in source) {
+      if (_has(source, p)) {
+        obj[p] = source[p];
+      }
+    }
+  }
+
+  return obj;
+};
+
+
+// reduce buffer size, avoiding mem copy
+exports.shrinkBuf = function (buf, size) {
+  if (buf.length === size) { return buf; }
+  if (buf.subarray) { return buf.subarray(0, size); }
+  buf.length = size;
+  return buf;
+};
+
+
+var fnTyped = {
+  arraySet: function (dest, src, src_offs, len, dest_offs) {
+    if (src.subarray && dest.subarray) {
+      dest.set(src.subarray(src_offs, src_offs + len), dest_offs);
+      return;
+    }
+    // Fallback to ordinary array
+    for (var i = 0; i < len; i++) {
+      dest[dest_offs + i] = src[src_offs + i];
+    }
+  },
+  // Join array of chunks to single array.
+  flattenChunks: function (chunks) {
+    var i, l, len, pos, chunk, result;
+
+    // calculate data length
+    len = 0;
+    for (i = 0, l = chunks.length; i < l; i++) {
+      len += chunks[i].length;
+    }
+
+    // join chunks
+    result = new Uint8Array(len);
+    pos = 0;
+    for (i = 0, l = chunks.length; i < l; i++) {
+      chunk = chunks[i];
+      result.set(chunk, pos);
+      pos += chunk.length;
+    }
+
+    return result;
+  }
+};
+
+var fnUntyped = {
+  arraySet: function (dest, src, src_offs, len, dest_offs) {
+    for (var i = 0; i < len; i++) {
+      dest[dest_offs + i] = src[src_offs + i];
+    }
+  },
+  // Join array of chunks to single array.
+  flattenChunks: function (chunks) {
+    return [].concat.apply([], chunks);
+  }
+};
+
+
+// Enable/Disable typed arrays use, for testing
+//
+exports.setTyped = function (on) {
+  if (on) {
+    exports.Buf8  = Uint8Array;
+    exports.Buf16 = Uint16Array;
+    exports.Buf32 = Int32Array;
+    exports.assign(exports, fnTyped);
+  } else {
+    exports.Buf8  = Array;
+    exports.Buf16 = Array;
+    exports.Buf32 = Array;
+    exports.assign(exports, fnUntyped);
+  }
+};
+
+exports.setTyped(TYPED_OK);
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/utils/strings.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// String encode/decode helpers
+
+
+
+var utils = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+
+
+// Quick check if we can use fast array to bin string conversion
+//
+// - apply(Array) can fail on Android 2.2
+// - apply(Uint8Array) can fail on iOS 5.1 Safari
+//
+var STR_APPLY_OK = true;
+var STR_APPLY_UIA_OK = true;
+
+try { String.fromCharCode.apply(null, [ 0 ]); } catch (__) { STR_APPLY_OK = false; }
+try { String.fromCharCode.apply(null, new Uint8Array(1)); } catch (__) { STR_APPLY_UIA_OK = false; }
+
+
+// Table with utf8 lengths (calculated by first byte of sequence)
+// Note, that 5 & 6-byte values and some 4-byte values can not be represented in JS,
+// because max possible codepoint is 0x10ffff
+var _utf8len = new utils.Buf8(256);
+for (var q = 0; q < 256; q++) {
+  _utf8len[q] = (q >= 252 ? 6 : q >= 248 ? 5 : q >= 240 ? 4 : q >= 224 ? 3 : q >= 192 ? 2 : 1);
+}
+_utf8len[254] = _utf8len[254] = 1; // Invalid sequence start
+
+
+// convert string to array (typed, when possible)
+exports.string2buf = function (str) {
+  var buf, c, c2, m_pos, i, str_len = str.length, buf_len = 0;
+
+  // count binary size
+  for (m_pos = 0; m_pos < str_len; m_pos++) {
+    c = str.charCodeAt(m_pos);
+    if ((c & 0xfc00) === 0xd800 && (m_pos + 1 < str_len)) {
+      c2 = str.charCodeAt(m_pos + 1);
+      if ((c2 & 0xfc00) === 0xdc00) {
+        c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+        m_pos++;
+      }
+    }
+    buf_len += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+  }
+
+  // allocate buffer
+  buf = new utils.Buf8(buf_len);
+
+  // convert
+  for (i = 0, m_pos = 0; i < buf_len; m_pos++) {
+    c = str.charCodeAt(m_pos);
+    if ((c & 0xfc00) === 0xd800 && (m_pos + 1 < str_len)) {
+      c2 = str.charCodeAt(m_pos + 1);
+      if ((c2 & 0xfc00) === 0xdc00) {
+        c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+        m_pos++;
+      }
+    }
+    if (c < 0x80) {
+      /* one byte */
+      buf[i++] = c;
+    } else if (c < 0x800) {
+      /* two bytes */
+      buf[i++] = 0xC0 | (c >>> 6);
+      buf[i++] = 0x80 | (c & 0x3f);
+    } else if (c < 0x10000) {
+      /* three bytes */
+      buf[i++] = 0xE0 | (c >>> 12);
+      buf[i++] = 0x80 | (c >>> 6 & 0x3f);
+      buf[i++] = 0x80 | (c & 0x3f);
+    } else {
+      /* four bytes */
+      buf[i++] = 0xf0 | (c >>> 18);
+      buf[i++] = 0x80 | (c >>> 12 & 0x3f);
+      buf[i++] = 0x80 | (c >>> 6 & 0x3f);
+      buf[i++] = 0x80 | (c & 0x3f);
+    }
+  }
+
+  return buf;
+};
+
+// Helper (used in 2 places)
+function buf2binstring(buf, len) {
+  // On Chrome, the arguments in a function call that are allowed is `65534`.
+  // If the length of the buffer is smaller than that, we can use this optimization,
+  // otherwise we will take a slower path.
+  if (len < 65534) {
+    if ((buf.subarray && STR_APPLY_UIA_OK) || (!buf.subarray && STR_APPLY_OK)) {
+      return String.fromCharCode.apply(null, utils.shrinkBuf(buf, len));
+    }
+  }
+
+  var result = '';
+  for (var i = 0; i < len; i++) {
+    result += String.fromCharCode(buf[i]);
+  }
+  return result;
+}
+
+
+// Convert byte array to binary string
+exports.buf2binstring = function (buf) {
+  return buf2binstring(buf, buf.length);
+};
+
+
+// Convert binary string (typed, when possible)
+exports.binstring2buf = function (str) {
+  var buf = new utils.Buf8(str.length);
+  for (var i = 0, len = buf.length; i < len; i++) {
+    buf[i] = str.charCodeAt(i);
+  }
+  return buf;
+};
+
+
+// convert array to string
+exports.buf2string = function (buf, max) {
+  var i, out, c, c_len;
+  var len = max || buf.length;
+
+  // Reserve max possible length (2 words per char)
+  // NB: by unknown reasons, Array is significantly faster for
+  //     String.fromCharCode.apply than Uint16Array.
+  var utf16buf = new Array(len * 2);
+
+  for (out = 0, i = 0; i < len;) {
+    c = buf[i++];
+    // quick process ascii
+    if (c < 0x80) { utf16buf[out++] = c; continue; }
+
+    c_len = _utf8len[c];
+    // skip 5 & 6 byte codes
+    if (c_len > 4) { utf16buf[out++] = 0xfffd; i += c_len - 1; continue; }
+
+    // apply mask on first byte
+    c &= c_len === 2 ? 0x1f : c_len === 3 ? 0x0f : 0x07;
+    // join the rest
+    while (c_len > 1 && i < len) {
+      c = (c << 6) | (buf[i++] & 0x3f);
+      c_len--;
+    }
+
+    // terminated by end of string?
+    if (c_len > 1) { utf16buf[out++] = 0xfffd; continue; }
+
+    if (c < 0x10000) {
+      utf16buf[out++] = c;
+    } else {
+      c -= 0x10000;
+      utf16buf[out++] = 0xd800 | ((c >> 10) & 0x3ff);
+      utf16buf[out++] = 0xdc00 | (c & 0x3ff);
+    }
+  }
+
+  return buf2binstring(utf16buf, out);
+};
+
+
+// Calculate max possible position in utf8 buffer,
+// that will not break sequence. If that's not possible
+// - (very small limits) return max size as is.
+//
+// buf[] - utf8 bytes array
+// max   - length limit (mandatory);
+exports.utf8border = function (buf, max) {
+  var pos;
+
+  max = max || buf.length;
+  if (max > buf.length) { max = buf.length; }
+
+  // go back from last position, until start of sequence found
+  pos = max - 1;
+  while (pos >= 0 && (buf[pos] & 0xC0) === 0x80) { pos--; }
+
+  // Very small and broken sequence,
+  // return max, because we should return something anyway.
+  if (pos < 0) { return max; }
+
+  // If we came to start of buffer - that means buffer is too small,
+  // return max too.
+  if (pos === 0) { return max; }
+
+  return (pos + _utf8len[buf[pos]] > max) ? pos : max;
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/adler32.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Note: adler32 takes 12% for level 0 and 2% for level 6.
+// It isn't worth it to make additional optimizations as in original.
+// Small size is preferable.
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+function adler32(adler, buf, len, pos) {
+  var s1 = (adler & 0xffff) |0,
+      s2 = ((adler >>> 16) & 0xffff) |0,
+      n = 0;
+
+  while (len !== 0) {
+    // Set limit ~ twice less than 5552, to keep
+    // s2 in 31-bits, because we force signed ints.
+    // in other case %= will fail.
+    n = len > 2000 ? 2000 : len;
+    len -= n;
+
+    do {
+      s1 = (s1 + buf[pos++]) |0;
+      s2 = (s2 + s1) |0;
+    } while (--n);
+
+    s1 %= 65521;
+    s2 %= 65521;
+  }
+
+  return (s1 | (s2 << 16)) |0;
+}
+
+
+module.exports = adler32;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/constants.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+module.exports = {
+
+  /* Allowed flush values; see deflate() and inflate() below for details */
+  Z_NO_FLUSH:         0,
+  Z_PARTIAL_FLUSH:    1,
+  Z_SYNC_FLUSH:       2,
+  Z_FULL_FLUSH:       3,
+  Z_FINISH:           4,
+  Z_BLOCK:            5,
+  Z_TREES:            6,
+
+  /* Return codes for the compression/decompression functions. Negative values
+  * are errors, positive values are used for special but normal events.
+  */
+  Z_OK:               0,
+  Z_STREAM_END:       1,
+  Z_NEED_DICT:        2,
+  Z_ERRNO:           -1,
+  Z_STREAM_ERROR:    -2,
+  Z_DATA_ERROR:      -3,
+  //Z_MEM_ERROR:     -4,
+  Z_BUF_ERROR:       -5,
+  //Z_VERSION_ERROR: -6,
+
+  /* compression levels */
+  Z_NO_COMPRESSION:         0,
+  Z_BEST_SPEED:             1,
+  Z_BEST_COMPRESSION:       9,
+  Z_DEFAULT_COMPRESSION:   -1,
+
+
+  Z_FILTERED:               1,
+  Z_HUFFMAN_ONLY:           2,
+  Z_RLE:                    3,
+  Z_FIXED:                  4,
+  Z_DEFAULT_STRATEGY:       0,
+
+  /* Possible values of the data_type field (though see inflate()) */
+  Z_BINARY:                 0,
+  Z_TEXT:                   1,
+  //Z_ASCII:                1, // = Z_TEXT (deprecated)
+  Z_UNKNOWN:                2,
+
+  /* The deflate compression method */
+  Z_DEFLATED:               8
+  //Z_NULL:                 null // Use -1 or null inline, depending on var type
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/crc32.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Note: we can't get significant speed boost here.
+// So write code to minimize size - no pregenerated tables
+// and array tools dependencies.
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+// Use ordinary array, since untyped makes no boost here
+function makeTable() {
+  var c, table = [];
+
+  for (var n = 0; n < 256; n++) {
+    c = n;
+    for (var k = 0; k < 8; k++) {
+      c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+    }
+    table[n] = c;
+  }
+
+  return table;
+}
+
+// Create table on load. Just 255 signed longs. Not a problem.
+var crcTable = makeTable();
+
+
+function crc32(crc, buf, len, pos) {
+  var t = crcTable,
+      end = pos + len;
+
+  crc ^= -1;
+
+  for (var i = pos; i < end; i++) {
+    crc = (crc >>> 8) ^ t[(crc ^ buf[i]) & 0xFF];
+  }
+
+  return (crc ^ (-1)); // >>> 0;
+}
+
+
+module.exports = crc32;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/deflate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+var utils   = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+var trees   = __webpack_require__("../../node_modules/pako/lib/zlib/trees.js");
+var adler32 = __webpack_require__("../../node_modules/pako/lib/zlib/adler32.js");
+var crc32   = __webpack_require__("../../node_modules/pako/lib/zlib/crc32.js");
+var msg     = __webpack_require__("../../node_modules/pako/lib/zlib/messages.js");
+
+/* Public constants ==========================================================*/
+/* ===========================================================================*/
+
+
+/* Allowed flush values; see deflate() and inflate() below for details */
+var Z_NO_FLUSH      = 0;
+var Z_PARTIAL_FLUSH = 1;
+//var Z_SYNC_FLUSH    = 2;
+var Z_FULL_FLUSH    = 3;
+var Z_FINISH        = 4;
+var Z_BLOCK         = 5;
+//var Z_TREES         = 6;
+
+
+/* Return codes for the compression/decompression functions. Negative values
+ * are errors, positive values are used for special but normal events.
+ */
+var Z_OK            = 0;
+var Z_STREAM_END    = 1;
+//var Z_NEED_DICT     = 2;
+//var Z_ERRNO         = -1;
+var Z_STREAM_ERROR  = -2;
+var Z_DATA_ERROR    = -3;
+//var Z_MEM_ERROR     = -4;
+var Z_BUF_ERROR     = -5;
+//var Z_VERSION_ERROR = -6;
+
+
+/* compression levels */
+//var Z_NO_COMPRESSION      = 0;
+//var Z_BEST_SPEED          = 1;
+//var Z_BEST_COMPRESSION    = 9;
+var Z_DEFAULT_COMPRESSION = -1;
+
+
+var Z_FILTERED            = 1;
+var Z_HUFFMAN_ONLY        = 2;
+var Z_RLE                 = 3;
+var Z_FIXED               = 4;
+var Z_DEFAULT_STRATEGY    = 0;
+
+/* Possible values of the data_type field (though see inflate()) */
+//var Z_BINARY              = 0;
+//var Z_TEXT                = 1;
+//var Z_ASCII               = 1; // = Z_TEXT
+var Z_UNKNOWN             = 2;
+
+
+/* The deflate compression method */
+var Z_DEFLATED  = 8;
+
+/*============================================================================*/
+
+
+var MAX_MEM_LEVEL = 9;
+/* Maximum value for memLevel in deflateInit2 */
+var MAX_WBITS = 15;
+/* 32K LZ77 window */
+var DEF_MEM_LEVEL = 8;
+
+
+var LENGTH_CODES  = 29;
+/* number of length codes, not counting the special END_BLOCK code */
+var LITERALS      = 256;
+/* number of literal bytes 0..255 */
+var L_CODES       = LITERALS + 1 + LENGTH_CODES;
+/* number of Literal or Length codes, including the END_BLOCK code */
+var D_CODES       = 30;
+/* number of distance codes */
+var BL_CODES      = 19;
+/* number of codes used to transfer the bit lengths */
+var HEAP_SIZE     = 2 * L_CODES + 1;
+/* maximum heap size */
+var MAX_BITS  = 15;
+/* All codes must not exceed MAX_BITS bits */
+
+var MIN_MATCH = 3;
+var MAX_MATCH = 258;
+var MIN_LOOKAHEAD = (MAX_MATCH + MIN_MATCH + 1);
+
+var PRESET_DICT = 0x20;
+
+var INIT_STATE = 42;
+var EXTRA_STATE = 69;
+var NAME_STATE = 73;
+var COMMENT_STATE = 91;
+var HCRC_STATE = 103;
+var BUSY_STATE = 113;
+var FINISH_STATE = 666;
+
+var BS_NEED_MORE      = 1; /* block not completed, need more input or more output */
+var BS_BLOCK_DONE     = 2; /* block flush performed */
+var BS_FINISH_STARTED = 3; /* finish started, need only more output at next deflate */
+var BS_FINISH_DONE    = 4; /* finish done, accept no more input or output */
+
+var OS_CODE = 0x03; // Unix :) . Don't detect, use this default.
+
+function err(strm, errorCode) {
+  strm.msg = msg[errorCode];
+  return errorCode;
+}
+
+function rank(f) {
+  return ((f) << 1) - ((f) > 4 ? 9 : 0);
+}
+
+function zero(buf) { var len = buf.length; while (--len >= 0) { buf[len] = 0; } }
+
+
+/* =========================================================================
+ * Flush as much pending output as possible. All deflate() output goes
+ * through this function so some applications may wish to modify it
+ * to avoid allocating a large strm->output buffer and copying into it.
+ * (See also read_buf()).
+ */
+function flush_pending(strm) {
+  var s = strm.state;
+
+  //_tr_flush_bits(s);
+  var len = s.pending;
+  if (len > strm.avail_out) {
+    len = strm.avail_out;
+  }
+  if (len === 0) { return; }
+
+  utils.arraySet(strm.output, s.pending_buf, s.pending_out, len, strm.next_out);
+  strm.next_out += len;
+  s.pending_out += len;
+  strm.total_out += len;
+  strm.avail_out -= len;
+  s.pending -= len;
+  if (s.pending === 0) {
+    s.pending_out = 0;
+  }
+}
+
+
+function flush_block_only(s, last) {
+  trees._tr_flush_block(s, (s.block_start >= 0 ? s.block_start : -1), s.strstart - s.block_start, last);
+  s.block_start = s.strstart;
+  flush_pending(s.strm);
+}
+
+
+function put_byte(s, b) {
+  s.pending_buf[s.pending++] = b;
+}
+
+
+/* =========================================================================
+ * Put a short in the pending buffer. The 16-bit value is put in MSB order.
+ * IN assertion: the stream state is correct and there is enough room in
+ * pending_buf.
+ */
+function putShortMSB(s, b) {
+//  put_byte(s, (Byte)(b >> 8));
+//  put_byte(s, (Byte)(b & 0xff));
+  s.pending_buf[s.pending++] = (b >>> 8) & 0xff;
+  s.pending_buf[s.pending++] = b & 0xff;
+}
+
+
+/* ===========================================================================
+ * Read a new buffer from the current input stream, update the adler32
+ * and total number of bytes read.  All deflate() input goes through
+ * this function so some applications may wish to modify it to avoid
+ * allocating a large strm->input buffer and copying from it.
+ * (See also flush_pending()).
+ */
+function read_buf(strm, buf, start, size) {
+  var len = strm.avail_in;
+
+  if (len > size) { len = size; }
+  if (len === 0) { return 0; }
+
+  strm.avail_in -= len;
+
+  // zmemcpy(buf, strm->next_in, len);
+  utils.arraySet(buf, strm.input, strm.next_in, len, start);
+  if (strm.state.wrap === 1) {
+    strm.adler = adler32(strm.adler, buf, len, start);
+  }
+
+  else if (strm.state.wrap === 2) {
+    strm.adler = crc32(strm.adler, buf, len, start);
+  }
+
+  strm.next_in += len;
+  strm.total_in += len;
+
+  return len;
+}
+
+
+/* ===========================================================================
+ * Set match_start to the longest match starting at the given string and
+ * return its length. Matches shorter or equal to prev_length are discarded,
+ * in which case the result is equal to prev_length and match_start is
+ * garbage.
+ * IN assertions: cur_match is the head of the hash chain for the current
+ *   string (strstart) and its distance is <= MAX_DIST, and prev_length >= 1
+ * OUT assertion: the match length is not greater than s->lookahead.
+ */
+function longest_match(s, cur_match) {
+  var chain_length = s.max_chain_length;      /* max hash chain length */
+  var scan = s.strstart; /* current string */
+  var match;                       /* matched string */
+  var len;                           /* length of current match */
+  var best_len = s.prev_length;              /* best match length so far */
+  var nice_match = s.nice_match;             /* stop if match long enough */
+  var limit = (s.strstart > (s.w_size - MIN_LOOKAHEAD)) ?
+      s.strstart - (s.w_size - MIN_LOOKAHEAD) : 0/*NIL*/;
+
+  var _win = s.window; // shortcut
+
+  var wmask = s.w_mask;
+  var prev  = s.prev;
+
+  /* Stop when cur_match becomes <= limit. To simplify the code,
+   * we prevent matches with the string of window index 0.
+   */
+
+  var strend = s.strstart + MAX_MATCH;
+  var scan_end1  = _win[scan + best_len - 1];
+  var scan_end   = _win[scan + best_len];
+
+  /* The code is optimized for HASH_BITS >= 8 and MAX_MATCH-2 multiple of 16.
+   * It is easy to get rid of this optimization if necessary.
+   */
+  // Assert(s->hash_bits >= 8 && MAX_MATCH == 258, "Code too clever");
+
+  /* Do not waste too much time if we already have a good match: */
+  if (s.prev_length >= s.good_match) {
+    chain_length >>= 2;
+  }
+  /* Do not look for matches beyond the end of the input. This is necessary
+   * to make deflate deterministic.
+   */
+  if (nice_match > s.lookahead) { nice_match = s.lookahead; }
+
+  // Assert((ulg)s->strstart <= s->window_size-MIN_LOOKAHEAD, "need lookahead");
+
+  do {
+    // Assert(cur_match < s->strstart, "no future");
+    match = cur_match;
+
+    /* Skip to next match if the match length cannot increase
+     * or if the match length is less than 2.  Note that the checks below
+     * for insufficient lookahead only occur occasionally for performance
+     * reasons.  Therefore uninitialized memory will be accessed, and
+     * conditional jumps will be made that depend on those values.
+     * However the length of the match is limited to the lookahead, so
+     * the output of deflate is not affected by the uninitialized values.
+     */
+
+    if (_win[match + best_len]     !== scan_end  ||
+        _win[match + best_len - 1] !== scan_end1 ||
+        _win[match]                !== _win[scan] ||
+        _win[++match]              !== _win[scan + 1]) {
+      continue;
+    }
+
+    /* The check at best_len-1 can be removed because it will be made
+     * again later. (This heuristic is not always a win.)
+     * It is not necessary to compare scan[2] and match[2] since they
+     * are always equal when the other bytes match, given that
+     * the hash keys are equal and that HASH_BITS >= 8.
+     */
+    scan += 2;
+    match++;
+    // Assert(*scan == *match, "match[2]?");
+
+    /* We check for insufficient lookahead only every 8th comparison;
+     * the 256th check will be made at strstart+258.
+     */
+    do {
+      /*jshint noempty:false*/
+    } while (_win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+             _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+             _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+             _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+             scan < strend);
+
+    // Assert(scan <= s->window+(unsigned)(s->window_size-1), "wild scan");
+
+    len = MAX_MATCH - (strend - scan);
+    scan = strend - MAX_MATCH;
+
+    if (len > best_len) {
+      s.match_start = cur_match;
+      best_len = len;
+      if (len >= nice_match) {
+        break;
+      }
+      scan_end1  = _win[scan + best_len - 1];
+      scan_end   = _win[scan + best_len];
+    }
+  } while ((cur_match = prev[cur_match & wmask]) > limit && --chain_length !== 0);
+
+  if (best_len <= s.lookahead) {
+    return best_len;
+  }
+  return s.lookahead;
+}
+
+
+/* ===========================================================================
+ * Fill the window when the lookahead becomes insufficient.
+ * Updates strstart and lookahead.
+ *
+ * IN assertion: lookahead < MIN_LOOKAHEAD
+ * OUT assertions: strstart <= window_size-MIN_LOOKAHEAD
+ *    At least one byte has been read, or avail_in == 0; reads are
+ *    performed for at least two bytes (required for the zip translate_eol
+ *    option -- not supported here).
+ */
+function fill_window(s) {
+  var _w_size = s.w_size;
+  var p, n, m, more, str;
+
+  //Assert(s->lookahead < MIN_LOOKAHEAD, "already enough lookahead");
+
+  do {
+    more = s.window_size - s.lookahead - s.strstart;
+
+    // JS ints have 32 bit, block below not needed
+    /* Deal with !@#$% 64K limit: */
+    //if (sizeof(int) <= 2) {
+    //    if (more == 0 && s->strstart == 0 && s->lookahead == 0) {
+    //        more = wsize;
+    //
+    //  } else if (more == (unsigned)(-1)) {
+    //        /* Very unlikely, but possible on 16 bit machine if
+    //         * strstart == 0 && lookahead == 1 (input done a byte at time)
+    //         */
+    //        more--;
+    //    }
+    //}
+
+
+    /* If the window is almost full and there is insufficient lookahead,
+     * move the upper half to the lower one to make room in the upper half.
+     */
+    if (s.strstart >= _w_size + (_w_size - MIN_LOOKAHEAD)) {
+
+      utils.arraySet(s.window, s.window, _w_size, _w_size, 0);
+      s.match_start -= _w_size;
+      s.strstart -= _w_size;
+      /* we now have strstart >= MAX_DIST */
+      s.block_start -= _w_size;
+
+      /* Slide the hash table (could be avoided with 32 bit values
+       at the expense of memory usage). We slide even when level == 0
+       to keep the hash table consistent if we switch back to level > 0
+       later. (Using level 0 permanently is not an optimal usage of
+       zlib, so we don't care about this pathological case.)
+       */
+
+      n = s.hash_size;
+      p = n;
+      do {
+        m = s.head[--p];
+        s.head[p] = (m >= _w_size ? m - _w_size : 0);
+      } while (--n);
+
+      n = _w_size;
+      p = n;
+      do {
+        m = s.prev[--p];
+        s.prev[p] = (m >= _w_size ? m - _w_size : 0);
+        /* If n is not on any hash chain, prev[n] is garbage but
+         * its value will never be used.
+         */
+      } while (--n);
+
+      more += _w_size;
+    }
+    if (s.strm.avail_in === 0) {
+      break;
+    }
+
+    /* If there was no sliding:
+     *    strstart <= WSIZE+MAX_DIST-1 && lookahead <= MIN_LOOKAHEAD - 1 &&
+     *    more == window_size - lookahead - strstart
+     * => more >= window_size - (MIN_LOOKAHEAD-1 + WSIZE + MAX_DIST-1)
+     * => more >= window_size - 2*WSIZE + 2
+     * In the BIG_MEM or MMAP case (not yet supported),
+     *   window_size == input_size + MIN_LOOKAHEAD  &&
+     *   strstart + s->lookahead <= input_size => more >= MIN_LOOKAHEAD.
+     * Otherwise, window_size == 2*WSIZE so more >= 2.
+     * If there was sliding, more >= WSIZE. So in all cases, more >= 2.
+     */
+    //Assert(more >= 2, "more < 2");
+    n = read_buf(s.strm, s.window, s.strstart + s.lookahead, more);
+    s.lookahead += n;
+
+    /* Initialize the hash value now that we have some input: */
+    if (s.lookahead + s.insert >= MIN_MATCH) {
+      str = s.strstart - s.insert;
+      s.ins_h = s.window[str];
+
+      /* UPDATE_HASH(s, s->ins_h, s->window[str + 1]); */
+      s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[str + 1]) & s.hash_mask;
+//#if MIN_MATCH != 3
+//        Call update_hash() MIN_MATCH-3 more times
+//#endif
+      while (s.insert) {
+        /* UPDATE_HASH(s, s->ins_h, s->window[str + MIN_MATCH-1]); */
+        s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[str + MIN_MATCH - 1]) & s.hash_mask;
+
+        s.prev[str & s.w_mask] = s.head[s.ins_h];
+        s.head[s.ins_h] = str;
+        str++;
+        s.insert--;
+        if (s.lookahead + s.insert < MIN_MATCH) {
+          break;
+        }
+      }
+    }
+    /* If the whole input has less than MIN_MATCH bytes, ins_h is garbage,
+     * but this is not important since only literal bytes will be emitted.
+     */
+
+  } while (s.lookahead < MIN_LOOKAHEAD && s.strm.avail_in !== 0);
+
+  /* If the WIN_INIT bytes after the end of the current data have never been
+   * written, then zero those bytes in order to avoid memory check reports of
+   * the use of uninitialized (or uninitialised as Julian writes) bytes by
+   * the longest match routines.  Update the high water mark for the next
+   * time through here.  WIN_INIT is set to MAX_MATCH since the longest match
+   * routines allow scanning to strstart + MAX_MATCH, ignoring lookahead.
+   */
+//  if (s.high_water < s.window_size) {
+//    var curr = s.strstart + s.lookahead;
+//    var init = 0;
+//
+//    if (s.high_water < curr) {
+//      /* Previous high water mark below current data -- zero WIN_INIT
+//       * bytes or up to end of window, whichever is less.
+//       */
+//      init = s.window_size - curr;
+//      if (init > WIN_INIT)
+//        init = WIN_INIT;
+//      zmemzero(s->window + curr, (unsigned)init);
+//      s->high_water = curr + init;
+//    }
+//    else if (s->high_water < (ulg)curr + WIN_INIT) {
+//      /* High water mark at or above current data, but below current data
+//       * plus WIN_INIT -- zero out to current data plus WIN_INIT, or up
+//       * to end of window, whichever is less.
+//       */
+//      init = (ulg)curr + WIN_INIT - s->high_water;
+//      if (init > s->window_size - s->high_water)
+//        init = s->window_size - s->high_water;
+//      zmemzero(s->window + s->high_water, (unsigned)init);
+//      s->high_water += init;
+//    }
+//  }
+//
+//  Assert((ulg)s->strstart <= s->window_size - MIN_LOOKAHEAD,
+//    "not enough room for search");
+}
+
+/* ===========================================================================
+ * Copy without compression as much as possible from the input stream, return
+ * the current block state.
+ * This function does not insert new strings in the dictionary since
+ * uncompressible data is probably not useful. This function is used
+ * only for the level=0 compression option.
+ * NOTE: this function should be optimized to avoid extra copying from
+ * window to pending_buf.
+ */
+function deflate_stored(s, flush) {
+  /* Stored blocks are limited to 0xffff bytes, pending_buf is limited
+   * to pending_buf_size, and each stored block has a 5 byte header:
+   */
+  var max_block_size = 0xffff;
+
+  if (max_block_size > s.pending_buf_size - 5) {
+    max_block_size = s.pending_buf_size - 5;
+  }
+
+  /* Copy as much as possible from input to output: */
+  for (;;) {
+    /* Fill the window as much as possible: */
+    if (s.lookahead <= 1) {
+
+      //Assert(s->strstart < s->w_size+MAX_DIST(s) ||
+      //  s->block_start >= (long)s->w_size, "slide too late");
+//      if (!(s.strstart < s.w_size + (s.w_size - MIN_LOOKAHEAD) ||
+//        s.block_start >= s.w_size)) {
+//        throw  new Error("slide too late");
+//      }
+
+      fill_window(s);
+      if (s.lookahead === 0 && flush === Z_NO_FLUSH) {
+        return BS_NEED_MORE;
+      }
+
+      if (s.lookahead === 0) {
+        break;
+      }
+      /* flush the current block */
+    }
+    //Assert(s->block_start >= 0L, "block gone");
+//    if (s.block_start < 0) throw new Error("block gone");
+
+    s.strstart += s.lookahead;
+    s.lookahead = 0;
+
+    /* Emit a stored block if pending_buf will be full: */
+    var max_start = s.block_start + max_block_size;
+
+    if (s.strstart === 0 || s.strstart >= max_start) {
+      /* strstart == 0 is possible when wraparound on 16-bit machine */
+      s.lookahead = s.strstart - max_start;
+      s.strstart = max_start;
+      /*** FLUSH_BLOCK(s, 0); ***/
+      flush_block_only(s, false);
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+      /***/
+
+
+    }
+    /* Flush if we may have to slide, otherwise block_start may become
+     * negative and the data will be gone:
+     */
+    if (s.strstart - s.block_start >= (s.w_size - MIN_LOOKAHEAD)) {
+      /*** FLUSH_BLOCK(s, 0); ***/
+      flush_block_only(s, false);
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+      /***/
+    }
+  }
+
+  s.insert = 0;
+
+  if (flush === Z_FINISH) {
+    /*** FLUSH_BLOCK(s, 1); ***/
+    flush_block_only(s, true);
+    if (s.strm.avail_out === 0) {
+      return BS_FINISH_STARTED;
+    }
+    /***/
+    return BS_FINISH_DONE;
+  }
+
+  if (s.strstart > s.block_start) {
+    /*** FLUSH_BLOCK(s, 0); ***/
+    flush_block_only(s, false);
+    if (s.strm.avail_out === 0) {
+      return BS_NEED_MORE;
+    }
+    /***/
+  }
+
+  return BS_NEED_MORE;
+}
+
+/* ===========================================================================
+ * Compress as much as possible from the input stream, return the current
+ * block state.
+ * This function does not perform lazy evaluation of matches and inserts
+ * new strings in the dictionary only for unmatched strings or for short
+ * matches. It is used only for the fast compression options.
+ */
+function deflate_fast(s, flush) {
+  var hash_head;        /* head of the hash chain */
+  var bflush;           /* set if current block must be flushed */
+
+  for (;;) {
+    /* Make sure that we always have enough lookahead, except
+     * at the end of the input file. We need MAX_MATCH bytes
+     * for the next match, plus MIN_MATCH bytes to insert the
+     * string following the next match.
+     */
+    if (s.lookahead < MIN_LOOKAHEAD) {
+      fill_window(s);
+      if (s.lookahead < MIN_LOOKAHEAD && flush === Z_NO_FLUSH) {
+        return BS_NEED_MORE;
+      }
+      if (s.lookahead === 0) {
+        break; /* flush the current block */
+      }
+    }
+
+    /* Insert the string window[strstart .. strstart+2] in the
+     * dictionary, and set hash_head to the head of the hash chain:
+     */
+    hash_head = 0/*NIL*/;
+    if (s.lookahead >= MIN_MATCH) {
+      /*** INSERT_STRING(s, s.strstart, hash_head); ***/
+      s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[s.strstart + MIN_MATCH - 1]) & s.hash_mask;
+      hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];
+      s.head[s.ins_h] = s.strstart;
+      /***/
+    }
+
+    /* Find the longest match, discarding those <= prev_length.
+     * At this point we have always match_length < MIN_MATCH
+     */
+    if (hash_head !== 0/*NIL*/ && ((s.strstart - hash_head) <= (s.w_size - MIN_LOOKAHEAD))) {
+      /* To simplify the code, we prevent matches with the string
+       * of window index 0 (in particular we have to avoid a match
+       * of the string with itself at the start of the input file).
+       */
+      s.match_length = longest_match(s, hash_head);
+      /* longest_match() sets match_start */
+    }
+    if (s.match_length >= MIN_MATCH) {
+      // check_match(s, s.strstart, s.match_start, s.match_length); // for debug only
+
+      /*** _tr_tally_dist(s, s.strstart - s.match_start,
+                     s.match_length - MIN_MATCH, bflush); ***/
+      bflush = trees._tr_tally(s, s.strstart - s.match_start, s.match_length - MIN_MATCH);
+
+      s.lookahead -= s.match_length;
+
+      /* Insert new strings in the hash table only if the match length
+       * is not too large. This saves time but degrades compression.
+       */
+      if (s.match_length <= s.max_lazy_match/*max_insert_length*/ && s.lookahead >= MIN_MATCH) {
+        s.match_length--; /* string at strstart already in table */
+        do {
+          s.strstart++;
+          /*** INSERT_STRING(s, s.strstart, hash_head); ***/
+          s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[s.strstart + MIN_MATCH - 1]) & s.hash_mask;
+          hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];
+          s.head[s.ins_h] = s.strstart;
+          /***/
+          /* strstart never exceeds WSIZE-MAX_MATCH, so there are
+           * always MIN_MATCH bytes ahead.
+           */
+        } while (--s.match_length !== 0);
+        s.strstart++;
+      } else
+      {
+        s.strstart += s.match_length;
+        s.match_length = 0;
+        s.ins_h = s.window[s.strstart];
+        /* UPDATE_HASH(s, s.ins_h, s.window[s.strstart+1]); */
+        s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[s.strstart + 1]) & s.hash_mask;
+
+//#if MIN_MATCH != 3
+//                Call UPDATE_HASH() MIN_MATCH-3 more times
+//#endif
+        /* If lookahead < MIN_MATCH, ins_h is garbage, but it does not
+         * matter since it will be recomputed at next deflate call.
+         */
+      }
+    } else {
+      /* No match, output a literal byte */
+      //Tracevv((stderr,"%c", s.window[s.strstart]));
+      /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/
+      bflush = trees._tr_tally(s, 0, s.window[s.strstart]);
+
+      s.lookahead--;
+      s.strstart++;
+    }
+    if (bflush) {
+      /*** FLUSH_BLOCK(s, 0); ***/
+      flush_block_only(s, false);
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+      /***/
+    }
+  }
+  s.insert = ((s.strstart < (MIN_MATCH - 1)) ? s.strstart : MIN_MATCH - 1);
+  if (flush === Z_FINISH) {
+    /*** FLUSH_BLOCK(s, 1); ***/
+    flush_block_only(s, true);
+    if (s.strm.avail_out === 0) {
+      return BS_FINISH_STARTED;
+    }
+    /***/
+    return BS_FINISH_DONE;
+  }
+  if (s.last_lit) {
+    /*** FLUSH_BLOCK(s, 0); ***/
+    flush_block_only(s, false);
+    if (s.strm.avail_out === 0) {
+      return BS_NEED_MORE;
+    }
+    /***/
+  }
+  return BS_BLOCK_DONE;
+}
+
+/* ===========================================================================
+ * Same as above, but achieves better compression. We use a lazy
+ * evaluation for matches: a match is finally adopted only if there is
+ * no better match at the next window position.
+ */
+function deflate_slow(s, flush) {
+  var hash_head;          /* head of hash chain */
+  var bflush;              /* set if current block must be flushed */
+
+  var max_insert;
+
+  /* Process the input block. */
+  for (;;) {
+    /* Make sure that we always have enough lookahead, except
+     * at the end of the input file. We need MAX_MATCH bytes
+     * for the next match, plus MIN_MATCH bytes to insert the
+     * string following the next match.
+     */
+    if (s.lookahead < MIN_LOOKAHEAD) {
+      fill_window(s);
+      if (s.lookahead < MIN_LOOKAHEAD && flush === Z_NO_FLUSH) {
+        return BS_NEED_MORE;
+      }
+      if (s.lookahead === 0) { break; } /* flush the current block */
+    }
+
+    /* Insert the string window[strstart .. strstart+2] in the
+     * dictionary, and set hash_head to the head of the hash chain:
+     */
+    hash_head = 0/*NIL*/;
+    if (s.lookahead >= MIN_MATCH) {
+      /*** INSERT_STRING(s, s.strstart, hash_head); ***/
+      s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[s.strstart + MIN_MATCH - 1]) & s.hash_mask;
+      hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];
+      s.head[s.ins_h] = s.strstart;
+      /***/
+    }
+
+    /* Find the longest match, discarding those <= prev_length.
+     */
+    s.prev_length = s.match_length;
+    s.prev_match = s.match_start;
+    s.match_length = MIN_MATCH - 1;
+
+    if (hash_head !== 0/*NIL*/ && s.prev_length < s.max_lazy_match &&
+        s.strstart - hash_head <= (s.w_size - MIN_LOOKAHEAD)/*MAX_DIST(s)*/) {
+      /* To simplify the code, we prevent matches with the string
+       * of window index 0 (in particular we have to avoid a match
+       * of the string with itself at the start of the input file).
+       */
+      s.match_length = longest_match(s, hash_head);
+      /* longest_match() sets match_start */
+
+      if (s.match_length <= 5 &&
+         (s.strategy === Z_FILTERED || (s.match_length === MIN_MATCH && s.strstart - s.match_start > 4096/*TOO_FAR*/))) {
+
+        /* If prev_match is also MIN_MATCH, match_start is garbage
+         * but we will ignore the current match anyway.
+         */
+        s.match_length = MIN_MATCH - 1;
+      }
+    }
+    /* If there was a match at the previous step and the current
+     * match is not better, output the previous match:
+     */
+    if (s.prev_length >= MIN_MATCH && s.match_length <= s.prev_length) {
+      max_insert = s.strstart + s.lookahead - MIN_MATCH;
+      /* Do not insert strings in hash table beyond this. */
+
+      //check_match(s, s.strstart-1, s.prev_match, s.prev_length);
+
+      /***_tr_tally_dist(s, s.strstart - 1 - s.prev_match,
+                     s.prev_length - MIN_MATCH, bflush);***/
+      bflush = trees._tr_tally(s, s.strstart - 1 - s.prev_match, s.prev_length - MIN_MATCH);
+      /* Insert in hash table all strings up to the end of the match.
+       * strstart-1 and strstart are already inserted. If there is not
+       * enough lookahead, the last two strings are not inserted in
+       * the hash table.
+       */
+      s.lookahead -= s.prev_length - 1;
+      s.prev_length -= 2;
+      do {
+        if (++s.strstart <= max_insert) {
+          /*** INSERT_STRING(s, s.strstart, hash_head); ***/
+          s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[s.strstart + MIN_MATCH - 1]) & s.hash_mask;
+          hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];
+          s.head[s.ins_h] = s.strstart;
+          /***/
+        }
+      } while (--s.prev_length !== 0);
+      s.match_available = 0;
+      s.match_length = MIN_MATCH - 1;
+      s.strstart++;
+
+      if (bflush) {
+        /*** FLUSH_BLOCK(s, 0); ***/
+        flush_block_only(s, false);
+        if (s.strm.avail_out === 0) {
+          return BS_NEED_MORE;
+        }
+        /***/
+      }
+
+    } else if (s.match_available) {
+      /* If there was no match at the previous position, output a
+       * single literal. If there was a match but the current match
+       * is longer, truncate the previous match to a single literal.
+       */
+      //Tracevv((stderr,"%c", s->window[s->strstart-1]));
+      /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/
+      bflush = trees._tr_tally(s, 0, s.window[s.strstart - 1]);
+
+      if (bflush) {
+        /*** FLUSH_BLOCK_ONLY(s, 0) ***/
+        flush_block_only(s, false);
+        /***/
+      }
+      s.strstart++;
+      s.lookahead--;
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+    } else {
+      /* There is no previous match to compare with, wait for
+       * the next step to decide.
+       */
+      s.match_available = 1;
+      s.strstart++;
+      s.lookahead--;
+    }
+  }
+  //Assert (flush != Z_NO_FLUSH, "no flush?");
+  if (s.match_available) {
+    //Tracevv((stderr,"%c", s->window[s->strstart-1]));
+    /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/
+    bflush = trees._tr_tally(s, 0, s.window[s.strstart - 1]);
+
+    s.match_available = 0;
+  }
+  s.insert = s.strstart < MIN_MATCH - 1 ? s.strstart : MIN_MATCH - 1;
+  if (flush === Z_FINISH) {
+    /*** FLUSH_BLOCK(s, 1); ***/
+    flush_block_only(s, true);
+    if (s.strm.avail_out === 0) {
+      return BS_FINISH_STARTED;
+    }
+    /***/
+    return BS_FINISH_DONE;
+  }
+  if (s.last_lit) {
+    /*** FLUSH_BLOCK(s, 0); ***/
+    flush_block_only(s, false);
+    if (s.strm.avail_out === 0) {
+      return BS_NEED_MORE;
+    }
+    /***/
+  }
+
+  return BS_BLOCK_DONE;
+}
+
+
+/* ===========================================================================
+ * For Z_RLE, simply look for runs of bytes, generate matches only of distance
+ * one.  Do not maintain a hash table.  (It will be regenerated if this run of
+ * deflate switches away from Z_RLE.)
+ */
+function deflate_rle(s, flush) {
+  var bflush;            /* set if current block must be flushed */
+  var prev;              /* byte at distance one to match */
+  var scan, strend;      /* scan goes up to strend for length of run */
+
+  var _win = s.window;
+
+  for (;;) {
+    /* Make sure that we always have enough lookahead, except
+     * at the end of the input file. We need MAX_MATCH bytes
+     * for the longest run, plus one for the unrolled loop.
+     */
+    if (s.lookahead <= MAX_MATCH) {
+      fill_window(s);
+      if (s.lookahead <= MAX_MATCH && flush === Z_NO_FLUSH) {
+        return BS_NEED_MORE;
+      }
+      if (s.lookahead === 0) { break; } /* flush the current block */
+    }
+
+    /* See how many times the previous byte repeats */
+    s.match_length = 0;
+    if (s.lookahead >= MIN_MATCH && s.strstart > 0) {
+      scan = s.strstart - 1;
+      prev = _win[scan];
+      if (prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan]) {
+        strend = s.strstart + MAX_MATCH;
+        do {
+          /*jshint noempty:false*/
+        } while (prev === _win[++scan] && prev === _win[++scan] &&
+                 prev === _win[++scan] && prev === _win[++scan] &&
+                 prev === _win[++scan] && prev === _win[++scan] &&
+                 prev === _win[++scan] && prev === _win[++scan] &&
+                 scan < strend);
+        s.match_length = MAX_MATCH - (strend - scan);
+        if (s.match_length > s.lookahead) {
+          s.match_length = s.lookahead;
+        }
+      }
+      //Assert(scan <= s->window+(uInt)(s->window_size-1), "wild scan");
+    }
+
+    /* Emit match if have run of MIN_MATCH or longer, else emit literal */
+    if (s.match_length >= MIN_MATCH) {
+      //check_match(s, s.strstart, s.strstart - 1, s.match_length);
+
+      /*** _tr_tally_dist(s, 1, s.match_length - MIN_MATCH, bflush); ***/
+      bflush = trees._tr_tally(s, 1, s.match_length - MIN_MATCH);
+
+      s.lookahead -= s.match_length;
+      s.strstart += s.match_length;
+      s.match_length = 0;
+    } else {
+      /* No match, output a literal byte */
+      //Tracevv((stderr,"%c", s->window[s->strstart]));
+      /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/
+      bflush = trees._tr_tally(s, 0, s.window[s.strstart]);
+
+      s.lookahead--;
+      s.strstart++;
+    }
+    if (bflush) {
+      /*** FLUSH_BLOCK(s, 0); ***/
+      flush_block_only(s, false);
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+      /***/
+    }
+  }
+  s.insert = 0;
+  if (flush === Z_FINISH) {
+    /*** FLUSH_BLOCK(s, 1); ***/
+    flush_block_only(s, true);
+    if (s.strm.avail_out === 0) {
+      return BS_FINISH_STARTED;
+    }
+    /***/
+    return BS_FINISH_DONE;
+  }
+  if (s.last_lit) {
+    /*** FLUSH_BLOCK(s, 0); ***/
+    flush_block_only(s, false);
+    if (s.strm.avail_out === 0) {
+      return BS_NEED_MORE;
+    }
+    /***/
+  }
+  return BS_BLOCK_DONE;
+}
+
+/* ===========================================================================
+ * For Z_HUFFMAN_ONLY, do not look for matches.  Do not maintain a hash table.
+ * (It will be regenerated if this run of deflate switches away from Huffman.)
+ */
+function deflate_huff(s, flush) {
+  var bflush;             /* set if current block must be flushed */
+
+  for (;;) {
+    /* Make sure that we have a literal to write. */
+    if (s.lookahead === 0) {
+      fill_window(s);
+      if (s.lookahead === 0) {
+        if (flush === Z_NO_FLUSH) {
+          return BS_NEED_MORE;
+        }
+        break;      /* flush the current block */
+      }
+    }
+
+    /* Output a literal byte */
+    s.match_length = 0;
+    //Tracevv((stderr,"%c", s->window[s->strstart]));
+    /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/
+    bflush = trees._tr_tally(s, 0, s.window[s.strstart]);
+    s.lookahead--;
+    s.strstart++;
+    if (bflush) {
+      /*** FLUSH_BLOCK(s, 0); ***/
+      flush_block_only(s, false);
+      if (s.strm.avail_out === 0) {
+        return BS_NEED_MORE;
+      }
+      /***/
+    }
+  }
+  s.insert = 0;
+  if (flush === Z_FINISH) {
+    /*** FLUSH_BLOCK(s, 1); ***/
+    flush_block_only(s, true);
+    if (s.strm.avail_out === 0) {
+      return BS_FINISH_STARTED;
+    }
+    /***/
+    return BS_FINISH_DONE;
+  }
+  if (s.last_lit) {
+    /*** FLUSH_BLOCK(s, 0); ***/
+    flush_block_only(s, false);
+    if (s.strm.avail_out === 0) {
+      return BS_NEED_MORE;
+    }
+    /***/
+  }
+  return BS_BLOCK_DONE;
+}
+
+/* Values for max_lazy_match, good_match and max_chain_length, depending on
+ * the desired pack level (0..9). The values given below have been tuned to
+ * exclude worst case performance for pathological files. Better values may be
+ * found for specific files.
+ */
+function Config(good_length, max_lazy, nice_length, max_chain, func) {
+  this.good_length = good_length;
+  this.max_lazy = max_lazy;
+  this.nice_length = nice_length;
+  this.max_chain = max_chain;
+  this.func = func;
+}
+
+var configuration_table;
+
+configuration_table = [
+  /*      good lazy nice chain */
+  new Config(0, 0, 0, 0, deflate_stored),          /* 0 store only */
+  new Config(4, 4, 8, 4, deflate_fast),            /* 1 max speed, no lazy matches */
+  new Config(4, 5, 16, 8, deflate_fast),           /* 2 */
+  new Config(4, 6, 32, 32, deflate_fast),          /* 3 */
+
+  new Config(4, 4, 16, 16, deflate_slow),          /* 4 lazy matches */
+  new Config(8, 16, 32, 32, deflate_slow),         /* 5 */
+  new Config(8, 16, 128, 128, deflate_slow),       /* 6 */
+  new Config(8, 32, 128, 256, deflate_slow),       /* 7 */
+  new Config(32, 128, 258, 1024, deflate_slow),    /* 8 */
+  new Config(32, 258, 258, 4096, deflate_slow)     /* 9 max compression */
+];
+
+
+/* ===========================================================================
+ * Initialize the "longest match" routines for a new zlib stream
+ */
+function lm_init(s) {
+  s.window_size = 2 * s.w_size;
+
+  /*** CLEAR_HASH(s); ***/
+  zero(s.head); // Fill with NIL (= 0);
+
+  /* Set the default configuration parameters:
+   */
+  s.max_lazy_match = configuration_table[s.level].max_lazy;
+  s.good_match = configuration_table[s.level].good_length;
+  s.nice_match = configuration_table[s.level].nice_length;
+  s.max_chain_length = configuration_table[s.level].max_chain;
+
+  s.strstart = 0;
+  s.block_start = 0;
+  s.lookahead = 0;
+  s.insert = 0;
+  s.match_length = s.prev_length = MIN_MATCH - 1;
+  s.match_available = 0;
+  s.ins_h = 0;
+}
+
+
+function DeflateState() {
+  this.strm = null;            /* pointer back to this zlib stream */
+  this.status = 0;            /* as the name implies */
+  this.pending_buf = null;      /* output still pending */
+  this.pending_buf_size = 0;  /* size of pending_buf */
+  this.pending_out = 0;       /* next pending byte to output to the stream */
+  this.pending = 0;           /* nb of bytes in the pending buffer */
+  this.wrap = 0;              /* bit 0 true for zlib, bit 1 true for gzip */
+  this.gzhead = null;         /* gzip header information to write */
+  this.gzindex = 0;           /* where in extra, name, or comment */
+  this.method = Z_DEFLATED; /* can only be DEFLATED */
+  this.last_flush = -1;   /* value of flush param for previous deflate call */
+
+  this.w_size = 0;  /* LZ77 window size (32K by default) */
+  this.w_bits = 0;  /* log2(w_size)  (8..16) */
+  this.w_mask = 0;  /* w_size - 1 */
+
+  this.window = null;
+  /* Sliding window. Input bytes are read into the second half of the window,
+   * and move to the first half later to keep a dictionary of at least wSize
+   * bytes. With this organization, matches are limited to a distance of
+   * wSize-MAX_MATCH bytes, but this ensures that IO is always
+   * performed with a length multiple of the block size.
+   */
+
+  this.window_size = 0;
+  /* Actual size of window: 2*wSize, except when the user input buffer
+   * is directly used as sliding window.
+   */
+
+  this.prev = null;
+  /* Link to older string with same hash index. To limit the size of this
+   * array to 64K, this link is maintained only for the last 32K strings.
+   * An index in this array is thus a window index modulo 32K.
+   */
+
+  this.head = null;   /* Heads of the hash chains or NIL. */
+
+  this.ins_h = 0;       /* hash index of string to be inserted */
+  this.hash_size = 0;   /* number of elements in hash table */
+  this.hash_bits = 0;   /* log2(hash_size) */
+  this.hash_mask = 0;   /* hash_size-1 */
+
+  this.hash_shift = 0;
+  /* Number of bits by which ins_h must be shifted at each input
+   * step. It must be such that after MIN_MATCH steps, the oldest
+   * byte no longer takes part in the hash key, that is:
+   *   hash_shift * MIN_MATCH >= hash_bits
+   */
+
+  this.block_start = 0;
+  /* Window position at the beginning of the current output block. Gets
+   * negative when the window is moved backwards.
+   */
+
+  this.match_length = 0;      /* length of best match */
+  this.prev_match = 0;        /* previous match */
+  this.match_available = 0;   /* set if previous match exists */
+  this.strstart = 0;          /* start of string to insert */
+  this.match_start = 0;       /* start of matching string */
+  this.lookahead = 0;         /* number of valid bytes ahead in window */
+
+  this.prev_length = 0;
+  /* Length of the best match at previous step. Matches not greater than this
+   * are discarded. This is used in the lazy match evaluation.
+   */
+
+  this.max_chain_length = 0;
+  /* To speed up deflation, hash chains are never searched beyond this
+   * length.  A higher limit improves compression ratio but degrades the
+   * speed.
+   */
+
+  this.max_lazy_match = 0;
+  /* Attempt to find a better match only when the current match is strictly
+   * smaller than this value. This mechanism is used only for compression
+   * levels >= 4.
+   */
+  // That's alias to max_lazy_match, don't use directly
+  //this.max_insert_length = 0;
+  /* Insert new strings in the hash table only if the match length is not
+   * greater than this length. This saves time but degrades compression.
+   * max_insert_length is used only for compression levels <= 3.
+   */
+
+  this.level = 0;     /* compression level (1..9) */
+  this.strategy = 0;  /* favor or force Huffman coding*/
+
+  this.good_match = 0;
+  /* Use a faster search when the previous match is longer than this */
+
+  this.nice_match = 0; /* Stop searching when current match exceeds this */
+
+              /* used by trees.c: */
+
+  /* Didn't use ct_data typedef below to suppress compiler warning */
+
+  // struct ct_data_s dyn_ltree[HEAP_SIZE];   /* literal and length tree */
+  // struct ct_data_s dyn_dtree[2*D_CODES+1]; /* distance tree */
+  // struct ct_data_s bl_tree[2*BL_CODES+1];  /* Huffman tree for bit lengths */
+
+  // Use flat array of DOUBLE size, with interleaved fata,
+  // because JS does not support effective
+  this.dyn_ltree  = new utils.Buf16(HEAP_SIZE * 2);
+  this.dyn_dtree  = new utils.Buf16((2 * D_CODES + 1) * 2);
+  this.bl_tree    = new utils.Buf16((2 * BL_CODES + 1) * 2);
+  zero(this.dyn_ltree);
+  zero(this.dyn_dtree);
+  zero(this.bl_tree);
+
+  this.l_desc   = null;         /* desc. for literal tree */
+  this.d_desc   = null;         /* desc. for distance tree */
+  this.bl_desc  = null;         /* desc. for bit length tree */
+
+  //ush bl_count[MAX_BITS+1];
+  this.bl_count = new utils.Buf16(MAX_BITS + 1);
+  /* number of codes at each bit length for an optimal tree */
+
+  //int heap[2*L_CODES+1];      /* heap used to build the Huffman trees */
+  this.heap = new utils.Buf16(2 * L_CODES + 1);  /* heap used to build the Huffman trees */
+  zero(this.heap);
+
+  this.heap_len = 0;               /* number of elements in the heap */
+  this.heap_max = 0;               /* element of largest frequency */
+  /* The sons of heap[n] are heap[2*n] and heap[2*n+1]. heap[0] is not used.
+   * The same heap array is used to build all trees.
+   */
+
+  this.depth = new utils.Buf16(2 * L_CODES + 1); //uch depth[2*L_CODES+1];
+  zero(this.depth);
+  /* Depth of each subtree used as tie breaker for trees of equal frequency
+   */
+
+  this.l_buf = 0;          /* buffer index for literals or lengths */
+
+  this.lit_bufsize = 0;
+  /* Size of match buffer for literals/lengths.  There are 4 reasons for
+   * limiting lit_bufsize to 64K:
+   *   - frequencies can be kept in 16 bit counters
+   *   - if compression is not successful for the first block, all input
+   *     data is still in the window so we can still emit a stored block even
+   *     when input comes from standard input.  (This can also be done for
+   *     all blocks if lit_bufsize is not greater than 32K.)
+   *   - if compression is not successful for a file smaller than 64K, we can
+   *     even emit a stored file instead of a stored block (saving 5 bytes).
+   *     This is applicable only for zip (not gzip or zlib).
+   *   - creating new Huffman trees less frequently may not provide fast
+   *     adaptation to changes in the input data statistics. (Take for
+   *     example a binary file with poorly compressible code followed by
+   *     a highly compressible string table.) Smaller buffer sizes give
+   *     fast adaptation but have of course the overhead of transmitting
+   *     trees more frequently.
+   *   - I can't count above 4
+   */
+
+  this.last_lit = 0;      /* running index in l_buf */
+
+  this.d_buf = 0;
+  /* Buffer index for distances. To simplify the code, d_buf and l_buf have
+   * the same number of elements. To use different lengths, an extra flag
+   * array would be necessary.
+   */
+
+  this.opt_len = 0;       /* bit length of current block with optimal trees */
+  this.static_len = 0;    /* bit length of current block with static trees */
+  this.matches = 0;       /* number of string matches in current block */
+  this.insert = 0;        /* bytes at end of window left to insert */
+
+
+  this.bi_buf = 0;
+  /* Output buffer. bits are inserted starting at the bottom (least
+   * significant bits).
+   */
+  this.bi_valid = 0;
+  /* Number of valid bits in bi_buf.  All bits above the last valid bit
+   * are always zero.
+   */
+
+  // Used for window memory init. We safely ignore it for JS. That makes
+  // sense only for pointers and memory check tools.
+  //this.high_water = 0;
+  /* High water mark offset in window for initialized bytes -- bytes above
+   * this are set to zero in order to avoid memory check warnings when
+   * longest match routines access bytes past the input.  This is then
+   * updated to the new high water mark.
+   */
+}
+
+
+function deflateResetKeep(strm) {
+  var s;
+
+  if (!strm || !strm.state) {
+    return err(strm, Z_STREAM_ERROR);
+  }
+
+  strm.total_in = strm.total_out = 0;
+  strm.data_type = Z_UNKNOWN;
+
+  s = strm.state;
+  s.pending = 0;
+  s.pending_out = 0;
+
+  if (s.wrap < 0) {
+    s.wrap = -s.wrap;
+    /* was made negative by deflate(..., Z_FINISH); */
+  }
+  s.status = (s.wrap ? INIT_STATE : BUSY_STATE);
+  strm.adler = (s.wrap === 2) ?
+    0  // crc32(0, Z_NULL, 0)
+  :
+    1; // adler32(0, Z_NULL, 0)
+  s.last_flush = Z_NO_FLUSH;
+  trees._tr_init(s);
+  return Z_OK;
+}
+
+
+function deflateReset(strm) {
+  var ret = deflateResetKeep(strm);
+  if (ret === Z_OK) {
+    lm_init(strm.state);
+  }
+  return ret;
+}
+
+
+function deflateSetHeader(strm, head) {
+  if (!strm || !strm.state) { return Z_STREAM_ERROR; }
+  if (strm.state.wrap !== 2) { return Z_STREAM_ERROR; }
+  strm.state.gzhead = head;
+  return Z_OK;
+}
+
+
+function deflateInit2(strm, level, method, windowBits, memLevel, strategy) {
+  if (!strm) { // === Z_NULL
+    return Z_STREAM_ERROR;
+  }
+  var wrap = 1;
+
+  if (level === Z_DEFAULT_COMPRESSION) {
+    level = 6;
+  }
+
+  if (windowBits < 0) { /* suppress zlib wrapper */
+    wrap = 0;
+    windowBits = -windowBits;
+  }
+
+  else if (windowBits > 15) {
+    wrap = 2;           /* write gzip wrapper instead */
+    windowBits -= 16;
+  }
+
+
+  if (memLevel < 1 || memLevel > MAX_MEM_LEVEL || method !== Z_DEFLATED ||
+    windowBits < 8 || windowBits > 15 || level < 0 || level > 9 ||
+    strategy < 0 || strategy > Z_FIXED) {
+    return err(strm, Z_STREAM_ERROR);
+  }
+
+
+  if (windowBits === 8) {
+    windowBits = 9;
+  }
+  /* until 256-byte window bug fixed */
+
+  var s = new DeflateState();
+
+  strm.state = s;
+  s.strm = strm;
+
+  s.wrap = wrap;
+  s.gzhead = null;
+  s.w_bits = windowBits;
+  s.w_size = 1 << s.w_bits;
+  s.w_mask = s.w_size - 1;
+
+  s.hash_bits = memLevel + 7;
+  s.hash_size = 1 << s.hash_bits;
+  s.hash_mask = s.hash_size - 1;
+  s.hash_shift = ~~((s.hash_bits + MIN_MATCH - 1) / MIN_MATCH);
+
+  s.window = new utils.Buf8(s.w_size * 2);
+  s.head = new utils.Buf16(s.hash_size);
+  s.prev = new utils.Buf16(s.w_size);
+
+  // Don't need mem init magic for JS.
+  //s.high_water = 0;  /* nothing written to s->window yet */
+
+  s.lit_bufsize = 1 << (memLevel + 6); /* 16K elements by default */
+
+  s.pending_buf_size = s.lit_bufsize * 4;
+
+  //overlay = (ushf *) ZALLOC(strm, s->lit_bufsize, sizeof(ush)+2);
+  //s->pending_buf = (uchf *) overlay;
+  s.pending_buf = new utils.Buf8(s.pending_buf_size);
+
+  // It is offset from `s.pending_buf` (size is `s.lit_bufsize * 2`)
+  //s->d_buf = overlay + s->lit_bufsize/sizeof(ush);
+  s.d_buf = 1 * s.lit_bufsize;
+
+  //s->l_buf = s->pending_buf + (1+sizeof(ush))*s->lit_bufsize;
+  s.l_buf = (1 + 2) * s.lit_bufsize;
+
+  s.level = level;
+  s.strategy = strategy;
+  s.method = method;
+
+  return deflateReset(strm);
+}
+
+function deflateInit(strm, level) {
+  return deflateInit2(strm, level, Z_DEFLATED, MAX_WBITS, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+}
+
+
+function deflate(strm, flush) {
+  var old_flush, s;
+  var beg, val; // for gzip header write only
+
+  if (!strm || !strm.state ||
+    flush > Z_BLOCK || flush < 0) {
+    return strm ? err(strm, Z_STREAM_ERROR) : Z_STREAM_ERROR;
+  }
+
+  s = strm.state;
+
+  if (!strm.output ||
+      (!strm.input && strm.avail_in !== 0) ||
+      (s.status === FINISH_STATE && flush !== Z_FINISH)) {
+    return err(strm, (strm.avail_out === 0) ? Z_BUF_ERROR : Z_STREAM_ERROR);
+  }
+
+  s.strm = strm; /* just in case */
+  old_flush = s.last_flush;
+  s.last_flush = flush;
+
+  /* Write the header */
+  if (s.status === INIT_STATE) {
+
+    if (s.wrap === 2) { // GZIP header
+      strm.adler = 0;  //crc32(0L, Z_NULL, 0);
+      put_byte(s, 31);
+      put_byte(s, 139);
+      put_byte(s, 8);
+      if (!s.gzhead) { // s->gzhead == Z_NULL
+        put_byte(s, 0);
+        put_byte(s, 0);
+        put_byte(s, 0);
+        put_byte(s, 0);
+        put_byte(s, 0);
+        put_byte(s, s.level === 9 ? 2 :
+                    (s.strategy >= Z_HUFFMAN_ONLY || s.level < 2 ?
+                     4 : 0));
+        put_byte(s, OS_CODE);
+        s.status = BUSY_STATE;
+      }
+      else {
+        put_byte(s, (s.gzhead.text ? 1 : 0) +
+                    (s.gzhead.hcrc ? 2 : 0) +
+                    (!s.gzhead.extra ? 0 : 4) +
+                    (!s.gzhead.name ? 0 : 8) +
+                    (!s.gzhead.comment ? 0 : 16)
+        );
+        put_byte(s, s.gzhead.time & 0xff);
+        put_byte(s, (s.gzhead.time >> 8) & 0xff);
+        put_byte(s, (s.gzhead.time >> 16) & 0xff);
+        put_byte(s, (s.gzhead.time >> 24) & 0xff);
+        put_byte(s, s.level === 9 ? 2 :
+                    (s.strategy >= Z_HUFFMAN_ONLY || s.level < 2 ?
+                     4 : 0));
+        put_byte(s, s.gzhead.os & 0xff);
+        if (s.gzhead.extra && s.gzhead.extra.length) {
+          put_byte(s, s.gzhead.extra.length & 0xff);
+          put_byte(s, (s.gzhead.extra.length >> 8) & 0xff);
+        }
+        if (s.gzhead.hcrc) {
+          strm.adler = crc32(strm.adler, s.pending_buf, s.pending, 0);
+        }
+        s.gzindex = 0;
+        s.status = EXTRA_STATE;
+      }
+    }
+    else // DEFLATE header
+    {
+      var header = (Z_DEFLATED + ((s.w_bits - 8) << 4)) << 8;
+      var level_flags = -1;
+
+      if (s.strategy >= Z_HUFFMAN_ONLY || s.level < 2) {
+        level_flags = 0;
+      } else if (s.level < 6) {
+        level_flags = 1;
+      } else if (s.level === 6) {
+        level_flags = 2;
+      } else {
+        level_flags = 3;
+      }
+      header |= (level_flags << 6);
+      if (s.strstart !== 0) { header |= PRESET_DICT; }
+      header += 31 - (header % 31);
+
+      s.status = BUSY_STATE;
+      putShortMSB(s, header);
+
+      /* Save the adler32 of the preset dictionary: */
+      if (s.strstart !== 0) {
+        putShortMSB(s, strm.adler >>> 16);
+        putShortMSB(s, strm.adler & 0xffff);
+      }
+      strm.adler = 1; // adler32(0L, Z_NULL, 0);
+    }
+  }
+
+//#ifdef GZIP
+  if (s.status === EXTRA_STATE) {
+    if (s.gzhead.extra/* != Z_NULL*/) {
+      beg = s.pending;  /* start of bytes to update crc */
+
+      while (s.gzindex < (s.gzhead.extra.length & 0xffff)) {
+        if (s.pending === s.pending_buf_size) {
+          if (s.gzhead.hcrc && s.pending > beg) {
+            strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+          }
+          flush_pending(strm);
+          beg = s.pending;
+          if (s.pending === s.pending_buf_size) {
+            break;
+          }
+        }
+        put_byte(s, s.gzhead.extra[s.gzindex] & 0xff);
+        s.gzindex++;
+      }
+      if (s.gzhead.hcrc && s.pending > beg) {
+        strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+      }
+      if (s.gzindex === s.gzhead.extra.length) {
+        s.gzindex = 0;
+        s.status = NAME_STATE;
+      }
+    }
+    else {
+      s.status = NAME_STATE;
+    }
+  }
+  if (s.status === NAME_STATE) {
+    if (s.gzhead.name/* != Z_NULL*/) {
+      beg = s.pending;  /* start of bytes to update crc */
+      //int val;
+
+      do {
+        if (s.pending === s.pending_buf_size) {
+          if (s.gzhead.hcrc && s.pending > beg) {
+            strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+          }
+          flush_pending(strm);
+          beg = s.pending;
+          if (s.pending === s.pending_buf_size) {
+            val = 1;
+            break;
+          }
+        }
+        // JS specific: little magic to add zero terminator to end of string
+        if (s.gzindex < s.gzhead.name.length) {
+          val = s.gzhead.name.charCodeAt(s.gzindex++) & 0xff;
+        } else {
+          val = 0;
+        }
+        put_byte(s, val);
+      } while (val !== 0);
+
+      if (s.gzhead.hcrc && s.pending > beg) {
+        strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+      }
+      if (val === 0) {
+        s.gzindex = 0;
+        s.status = COMMENT_STATE;
+      }
+    }
+    else {
+      s.status = COMMENT_STATE;
+    }
+  }
+  if (s.status === COMMENT_STATE) {
+    if (s.gzhead.comment/* != Z_NULL*/) {
+      beg = s.pending;  /* start of bytes to update crc */
+      //int val;
+
+      do {
+        if (s.pending === s.pending_buf_size) {
+          if (s.gzhead.hcrc && s.pending > beg) {
+            strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+          }
+          flush_pending(strm);
+          beg = s.pending;
+          if (s.pending === s.pending_buf_size) {
+            val = 1;
+            break;
+          }
+        }
+        // JS specific: little magic to add zero terminator to end of string
+        if (s.gzindex < s.gzhead.comment.length) {
+          val = s.gzhead.comment.charCodeAt(s.gzindex++) & 0xff;
+        } else {
+          val = 0;
+        }
+        put_byte(s, val);
+      } while (val !== 0);
+
+      if (s.gzhead.hcrc && s.pending > beg) {
+        strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
+      }
+      if (val === 0) {
+        s.status = HCRC_STATE;
+      }
+    }
+    else {
+      s.status = HCRC_STATE;
+    }
+  }
+  if (s.status === HCRC_STATE) {
+    if (s.gzhead.hcrc) {
+      if (s.pending + 2 > s.pending_buf_size) {
+        flush_pending(strm);
+      }
+      if (s.pending + 2 <= s.pending_buf_size) {
+        put_byte(s, strm.adler & 0xff);
+        put_byte(s, (strm.adler >> 8) & 0xff);
+        strm.adler = 0; //crc32(0L, Z_NULL, 0);
+        s.status = BUSY_STATE;
+      }
+    }
+    else {
+      s.status = BUSY_STATE;
+    }
+  }
+//#endif
+
+  /* Flush as much pending output as possible */
+  if (s.pending !== 0) {
+    flush_pending(strm);
+    if (strm.avail_out === 0) {
+      /* Since avail_out is 0, deflate will be called again with
+       * more output space, but possibly with both pending and
+       * avail_in equal to zero. There won't be anything to do,
+       * but this is not an error situation so make sure we
+       * return OK instead of BUF_ERROR at next call of deflate:
+       */
+      s.last_flush = -1;
+      return Z_OK;
+    }
+
+    /* Make sure there is something to do and avoid duplicate consecutive
+     * flushes. For repeated and useless calls with Z_FINISH, we keep
+     * returning Z_STREAM_END instead of Z_BUF_ERROR.
+     */
+  } else if (strm.avail_in === 0 && rank(flush) <= rank(old_flush) &&
+    flush !== Z_FINISH) {
+    return err(strm, Z_BUF_ERROR);
+  }
+
+  /* User must not provide more input after the first FINISH: */
+  if (s.status === FINISH_STATE && strm.avail_in !== 0) {
+    return err(strm, Z_BUF_ERROR);
+  }
+
+  /* Start a new block or continue the current one.
+   */
+  if (strm.avail_in !== 0 || s.lookahead !== 0 ||
+    (flush !== Z_NO_FLUSH && s.status !== FINISH_STATE)) {
+    var bstate = (s.strategy === Z_HUFFMAN_ONLY) ? deflate_huff(s, flush) :
+      (s.strategy === Z_RLE ? deflate_rle(s, flush) :
+        configuration_table[s.level].func(s, flush));
+
+    if (bstate === BS_FINISH_STARTED || bstate === BS_FINISH_DONE) {
+      s.status = FINISH_STATE;
+    }
+    if (bstate === BS_NEED_MORE || bstate === BS_FINISH_STARTED) {
+      if (strm.avail_out === 0) {
+        s.last_flush = -1;
+        /* avoid BUF_ERROR next call, see above */
+      }
+      return Z_OK;
+      /* If flush != Z_NO_FLUSH && avail_out == 0, the next call
+       * of deflate should use the same flush parameter to make sure
+       * that the flush is complete. So we don't have to output an
+       * empty block here, this will be done at next call. This also
+       * ensures that for a very small output buffer, we emit at most
+       * one empty block.
+       */
+    }
+    if (bstate === BS_BLOCK_DONE) {
+      if (flush === Z_PARTIAL_FLUSH) {
+        trees._tr_align(s);
+      }
+      else if (flush !== Z_BLOCK) { /* FULL_FLUSH or SYNC_FLUSH */
+
+        trees._tr_stored_block(s, 0, 0, false);
+        /* For a full flush, this empty block will be recognized
+         * as a special marker by inflate_sync().
+         */
+        if (flush === Z_FULL_FLUSH) {
+          /*** CLEAR_HASH(s); ***/             /* forget history */
+          zero(s.head); // Fill with NIL (= 0);
+
+          if (s.lookahead === 0) {
+            s.strstart = 0;
+            s.block_start = 0;
+            s.insert = 0;
+          }
+        }
+      }
+      flush_pending(strm);
+      if (strm.avail_out === 0) {
+        s.last_flush = -1; /* avoid BUF_ERROR at next call, see above */
+        return Z_OK;
+      }
+    }
+  }
+  //Assert(strm->avail_out > 0, "bug2");
+  //if (strm.avail_out <= 0) { throw new Error("bug2");}
+
+  if (flush !== Z_FINISH) { return Z_OK; }
+  if (s.wrap <= 0) { return Z_STREAM_END; }
+
+  /* Write the trailer */
+  if (s.wrap === 2) {
+    put_byte(s, strm.adler & 0xff);
+    put_byte(s, (strm.adler >> 8) & 0xff);
+    put_byte(s, (strm.adler >> 16) & 0xff);
+    put_byte(s, (strm.adler >> 24) & 0xff);
+    put_byte(s, strm.total_in & 0xff);
+    put_byte(s, (strm.total_in >> 8) & 0xff);
+    put_byte(s, (strm.total_in >> 16) & 0xff);
+    put_byte(s, (strm.total_in >> 24) & 0xff);
+  }
+  else
+  {
+    putShortMSB(s, strm.adler >>> 16);
+    putShortMSB(s, strm.adler & 0xffff);
+  }
+
+  flush_pending(strm);
+  /* If avail_out is zero, the application will call deflate again
+   * to flush the rest.
+   */
+  if (s.wrap > 0) { s.wrap = -s.wrap; }
+  /* write the trailer only once! */
+  return s.pending !== 0 ? Z_OK : Z_STREAM_END;
+}
+
+function deflateEnd(strm) {
+  var status;
+
+  if (!strm/*== Z_NULL*/ || !strm.state/*== Z_NULL*/) {
+    return Z_STREAM_ERROR;
+  }
+
+  status = strm.state.status;
+  if (status !== INIT_STATE &&
+    status !== EXTRA_STATE &&
+    status !== NAME_STATE &&
+    status !== COMMENT_STATE &&
+    status !== HCRC_STATE &&
+    status !== BUSY_STATE &&
+    status !== FINISH_STATE
+  ) {
+    return err(strm, Z_STREAM_ERROR);
+  }
+
+  strm.state = null;
+
+  return status === BUSY_STATE ? err(strm, Z_DATA_ERROR) : Z_OK;
+}
+
+
+/* =========================================================================
+ * Initializes the compression dictionary from the given byte
+ * sequence without producing any compressed output.
+ */
+function deflateSetDictionary(strm, dictionary) {
+  var dictLength = dictionary.length;
+
+  var s;
+  var str, n;
+  var wrap;
+  var avail;
+  var next;
+  var input;
+  var tmpDict;
+
+  if (!strm/*== Z_NULL*/ || !strm.state/*== Z_NULL*/) {
+    return Z_STREAM_ERROR;
+  }
+
+  s = strm.state;
+  wrap = s.wrap;
+
+  if (wrap === 2 || (wrap === 1 && s.status !== INIT_STATE) || s.lookahead) {
+    return Z_STREAM_ERROR;
+  }
+
+  /* when using zlib wrappers, compute Adler-32 for provided dictionary */
+  if (wrap === 1) {
+    /* adler32(strm->adler, dictionary, dictLength); */
+    strm.adler = adler32(strm.adler, dictionary, dictLength, 0);
+  }
+
+  s.wrap = 0;   /* avoid computing Adler-32 in read_buf */
+
+  /* if dictionary would fill window, just replace the history */
+  if (dictLength >= s.w_size) {
+    if (wrap === 0) {            /* already empty otherwise */
+      /*** CLEAR_HASH(s); ***/
+      zero(s.head); // Fill with NIL (= 0);
+      s.strstart = 0;
+      s.block_start = 0;
+      s.insert = 0;
+    }
+    /* use the tail */
+    // dictionary = dictionary.slice(dictLength - s.w_size);
+    tmpDict = new utils.Buf8(s.w_size);
+    utils.arraySet(tmpDict, dictionary, dictLength - s.w_size, s.w_size, 0);
+    dictionary = tmpDict;
+    dictLength = s.w_size;
+  }
+  /* insert dictionary into window and hash */
+  avail = strm.avail_in;
+  next = strm.next_in;
+  input = strm.input;
+  strm.avail_in = dictLength;
+  strm.next_in = 0;
+  strm.input = dictionary;
+  fill_window(s);
+  while (s.lookahead >= MIN_MATCH) {
+    str = s.strstart;
+    n = s.lookahead - (MIN_MATCH - 1);
+    do {
+      /* UPDATE_HASH(s, s->ins_h, s->window[str + MIN_MATCH-1]); */
+      s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[str + MIN_MATCH - 1]) & s.hash_mask;
+
+      s.prev[str & s.w_mask] = s.head[s.ins_h];
+
+      s.head[s.ins_h] = str;
+      str++;
+    } while (--n);
+    s.strstart = str;
+    s.lookahead = MIN_MATCH - 1;
+    fill_window(s);
+  }
+  s.strstart += s.lookahead;
+  s.block_start = s.strstart;
+  s.insert = s.lookahead;
+  s.lookahead = 0;
+  s.match_length = s.prev_length = MIN_MATCH - 1;
+  s.match_available = 0;
+  strm.next_in = next;
+  strm.input = input;
+  strm.avail_in = avail;
+  s.wrap = wrap;
+  return Z_OK;
+}
+
+
+exports.deflateInit = deflateInit;
+exports.deflateInit2 = deflateInit2;
+exports.deflateReset = deflateReset;
+exports.deflateResetKeep = deflateResetKeep;
+exports.deflateSetHeader = deflateSetHeader;
+exports.deflate = deflate;
+exports.deflateEnd = deflateEnd;
+exports.deflateSetDictionary = deflateSetDictionary;
+exports.deflateInfo = 'pako deflate (from Nodeca project)';
+
+/* Not implemented
+exports.deflateBound = deflateBound;
+exports.deflateCopy = deflateCopy;
+exports.deflateParams = deflateParams;
+exports.deflatePending = deflatePending;
+exports.deflatePrime = deflatePrime;
+exports.deflateTune = deflateTune;
+*/
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/gzheader.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+function GZheader() {
+  /* true if compressed data believed to be text */
+  this.text       = 0;
+  /* modification time */
+  this.time       = 0;
+  /* extra flags (not used when writing a gzip file) */
+  this.xflags     = 0;
+  /* operating system */
+  this.os         = 0;
+  /* pointer to extra field or Z_NULL if none */
+  this.extra      = null;
+  /* extra field length (valid if extra != Z_NULL) */
+  this.extra_len  = 0; // Actually, we don't need it in JS,
+                       // but leave for few code modifications
+
+  //
+  // Setup limits is not necessary because in js we should not preallocate memory
+  // for inflate use constant limit in 65536 bytes
+  //
+
+  /* space at extra (only when reading header) */
+  // this.extra_max  = 0;
+  /* pointer to zero-terminated file name or Z_NULL */
+  this.name       = '';
+  /* space at name (only when reading header) */
+  // this.name_max   = 0;
+  /* pointer to zero-terminated comment or Z_NULL */
+  this.comment    = '';
+  /* space at comment (only when reading header) */
+  // this.comm_max   = 0;
+  /* true if there was or will be a header crc */
+  this.hcrc       = 0;
+  /* true when done reading gzip header (not used when writing a gzip file) */
+  this.done       = false;
+}
+
+module.exports = GZheader;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/inffast.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+// See state defs from inflate.js
+var BAD = 30;       /* got a data error -- remain here until reset */
+var TYPE = 12;      /* i: waiting for type bits, including last-flag bit */
+
+/*
+   Decode literal, length, and distance codes and write out the resulting
+   literal and match bytes until either not enough input or output is
+   available, an end-of-block is encountered, or a data error is encountered.
+   When large enough input and output buffers are supplied to inflate(), for
+   example, a 16K input buffer and a 64K output buffer, more than 95% of the
+   inflate execution time is spent in this routine.
+
+   Entry assumptions:
+
+        state.mode === LEN
+        strm.avail_in >= 6
+        strm.avail_out >= 258
+        start >= strm.avail_out
+        state.bits < 8
+
+   On return, state.mode is one of:
+
+        LEN -- ran out of enough output space or enough available input
+        TYPE -- reached end of block code, inflate() to interpret next block
+        BAD -- error in block data
+
+   Notes:
+
+    - The maximum input bits used by a length/distance pair is 15 bits for the
+      length code, 5 bits for the length extra, 15 bits for the distance code,
+      and 13 bits for the distance extra.  This totals 48 bits, or six bytes.
+      Therefore if strm.avail_in >= 6, then there is enough input to avoid
+      checking for available input while decoding.
+
+    - The maximum bytes that a single length/distance pair can output is 258
+      bytes, which is the maximum length that can be coded.  inflate_fast()
+      requires strm.avail_out >= 258 for each loop to avoid checking for
+      output space.
+ */
+module.exports = function inflate_fast(strm, start) {
+  var state;
+  var _in;                    /* local strm.input */
+  var last;                   /* have enough input while in < last */
+  var _out;                   /* local strm.output */
+  var beg;                    /* inflate()'s initial strm.output */
+  var end;                    /* while out < end, enough space available */
+//#ifdef INFLATE_STRICT
+  var dmax;                   /* maximum distance from zlib header */
+//#endif
+  var wsize;                  /* window size or zero if not using window */
+  var whave;                  /* valid bytes in the window */
+  var wnext;                  /* window write index */
+  // Use `s_window` instead `window`, avoid conflict with instrumentation tools
+  var s_window;               /* allocated sliding window, if wsize != 0 */
+  var hold;                   /* local strm.hold */
+  var bits;                   /* local strm.bits */
+  var lcode;                  /* local strm.lencode */
+  var dcode;                  /* local strm.distcode */
+  var lmask;                  /* mask for first level of length codes */
+  var dmask;                  /* mask for first level of distance codes */
+  var here;                   /* retrieved table entry */
+  var op;                     /* code bits, operation, extra bits, or */
+                              /*  window position, window bytes to copy */
+  var len;                    /* match length, unused bytes */
+  var dist;                   /* match distance */
+  var from;                   /* where to copy match from */
+  var from_source;
+
+
+  var input, output; // JS specific, because we have no pointers
+
+  /* copy state to local variables */
+  state = strm.state;
+  //here = state.here;
+  _in = strm.next_in;
+  input = strm.input;
+  last = _in + (strm.avail_in - 5);
+  _out = strm.next_out;
+  output = strm.output;
+  beg = _out - (start - strm.avail_out);
+  end = _out + (strm.avail_out - 257);
+//#ifdef INFLATE_STRICT
+  dmax = state.dmax;
+//#endif
+  wsize = state.wsize;
+  whave = state.whave;
+  wnext = state.wnext;
+  s_window = state.window;
+  hold = state.hold;
+  bits = state.bits;
+  lcode = state.lencode;
+  dcode = state.distcode;
+  lmask = (1 << state.lenbits) - 1;
+  dmask = (1 << state.distbits) - 1;
+
+
+  /* decode literals and length/distances until end-of-block or not enough
+     input data or output space */
+
+  top:
+  do {
+    if (bits < 15) {
+      hold += input[_in++] << bits;
+      bits += 8;
+      hold += input[_in++] << bits;
+      bits += 8;
+    }
+
+    here = lcode[hold & lmask];
+
+    dolen:
+    for (;;) { // Goto emulation
+      op = here >>> 24/*here.bits*/;
+      hold >>>= op;
+      bits -= op;
+      op = (here >>> 16) & 0xff/*here.op*/;
+      if (op === 0) {                          /* literal */
+        //Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ?
+        //        "inflate:         literal '%c'\n" :
+        //        "inflate:         literal 0x%02x\n", here.val));
+        output[_out++] = here & 0xffff/*here.val*/;
+      }
+      else if (op & 16) {                     /* length base */
+        len = here & 0xffff/*here.val*/;
+        op &= 15;                           /* number of extra bits */
+        if (op) {
+          if (bits < op) {
+            hold += input[_in++] << bits;
+            bits += 8;
+          }
+          len += hold & ((1 << op) - 1);
+          hold >>>= op;
+          bits -= op;
+        }
+        //Tracevv((stderr, "inflate:         length %u\n", len));
+        if (bits < 15) {
+          hold += input[_in++] << bits;
+          bits += 8;
+          hold += input[_in++] << bits;
+          bits += 8;
+        }
+        here = dcode[hold & dmask];
+
+        dodist:
+        for (;;) { // goto emulation
+          op = here >>> 24/*here.bits*/;
+          hold >>>= op;
+          bits -= op;
+          op = (here >>> 16) & 0xff/*here.op*/;
+
+          if (op & 16) {                      /* distance base */
+            dist = here & 0xffff/*here.val*/;
+            op &= 15;                       /* number of extra bits */
+            if (bits < op) {
+              hold += input[_in++] << bits;
+              bits += 8;
+              if (bits < op) {
+                hold += input[_in++] << bits;
+                bits += 8;
+              }
+            }
+            dist += hold & ((1 << op) - 1);
+//#ifdef INFLATE_STRICT
+            if (dist > dmax) {
+              strm.msg = 'invalid distance too far back';
+              state.mode = BAD;
+              break top;
+            }
+//#endif
+            hold >>>= op;
+            bits -= op;
+            //Tracevv((stderr, "inflate:         distance %u\n", dist));
+            op = _out - beg;                /* max distance in output */
+            if (dist > op) {                /* see if copy from window */
+              op = dist - op;               /* distance back in window */
+              if (op > whave) {
+                if (state.sane) {
+                  strm.msg = 'invalid distance too far back';
+                  state.mode = BAD;
+                  break top;
+                }
+
+// (!) This block is disabled in zlib defaults,
+// don't enable it for binary compatibility
+//#ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR
+//                if (len <= op - whave) {
+//                  do {
+//                    output[_out++] = 0;
+//                  } while (--len);
+//                  continue top;
+//                }
+//                len -= op - whave;
+//                do {
+//                  output[_out++] = 0;
+//                } while (--op > whave);
+//                if (op === 0) {
+//                  from = _out - dist;
+//                  do {
+//                    output[_out++] = output[from++];
+//                  } while (--len);
+//                  continue top;
+//                }
+//#endif
+              }
+              from = 0; // window index
+              from_source = s_window;
+              if (wnext === 0) {           /* very common case */
+                from += wsize - op;
+                if (op < len) {         /* some from window */
+                  len -= op;
+                  do {
+                    output[_out++] = s_window[from++];
+                  } while (--op);
+                  from = _out - dist;  /* rest from output */
+                  from_source = output;
+                }
+              }
+              else if (wnext < op) {      /* wrap around window */
+                from += wsize + wnext - op;
+                op -= wnext;
+                if (op < len) {         /* some from end of window */
+                  len -= op;
+                  do {
+                    output[_out++] = s_window[from++];
+                  } while (--op);
+                  from = 0;
+                  if (wnext < len) {  /* some from start of window */
+                    op = wnext;
+                    len -= op;
+                    do {
+                      output[_out++] = s_window[from++];
+                    } while (--op);
+                    from = _out - dist;      /* rest from output */
+                    from_source = output;
+                  }
+                }
+              }
+              else {                      /* contiguous in window */
+                from += wnext - op;
+                if (op < len) {         /* some from window */
+                  len -= op;
+                  do {
+                    output[_out++] = s_window[from++];
+                  } while (--op);
+                  from = _out - dist;  /* rest from output */
+                  from_source = output;
+                }
+              }
+              while (len > 2) {
+                output[_out++] = from_source[from++];
+                output[_out++] = from_source[from++];
+                output[_out++] = from_source[from++];
+                len -= 3;
+              }
+              if (len) {
+                output[_out++] = from_source[from++];
+                if (len > 1) {
+                  output[_out++] = from_source[from++];
+                }
+              }
+            }
+            else {
+              from = _out - dist;          /* copy direct from output */
+              do {                        /* minimum length is three */
+                output[_out++] = output[from++];
+                output[_out++] = output[from++];
+                output[_out++] = output[from++];
+                len -= 3;
+              } while (len > 2);
+              if (len) {
+                output[_out++] = output[from++];
+                if (len > 1) {
+                  output[_out++] = output[from++];
+                }
+              }
+            }
+          }
+          else if ((op & 64) === 0) {          /* 2nd level distance code */
+            here = dcode[(here & 0xffff)/*here.val*/ + (hold & ((1 << op) - 1))];
+            continue dodist;
+          }
+          else {
+            strm.msg = 'invalid distance code';
+            state.mode = BAD;
+            break top;
+          }
+
+          break; // need to emulate goto via "continue"
+        }
+      }
+      else if ((op & 64) === 0) {              /* 2nd level length code */
+        here = lcode[(here & 0xffff)/*here.val*/ + (hold & ((1 << op) - 1))];
+        continue dolen;
+      }
+      else if (op & 32) {                     /* end-of-block */
+        //Tracevv((stderr, "inflate:         end of block\n"));
+        state.mode = TYPE;
+        break top;
+      }
+      else {
+        strm.msg = 'invalid literal/length code';
+        state.mode = BAD;
+        break top;
+      }
+
+      break; // need to emulate goto via "continue"
+    }
+  } while (_in < last && _out < end);
+
+  /* return unused bytes (on entry, bits < 8, so in won't go too far back) */
+  len = bits >> 3;
+  _in -= len;
+  bits -= len << 3;
+  hold &= (1 << bits) - 1;
+
+  /* update state and return */
+  strm.next_in = _in;
+  strm.next_out = _out;
+  strm.avail_in = (_in < last ? 5 + (last - _in) : 5 - (_in - last));
+  strm.avail_out = (_out < end ? 257 + (end - _out) : 257 - (_out - end));
+  state.hold = hold;
+  state.bits = bits;
+  return;
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/inflate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+var utils         = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+var adler32       = __webpack_require__("../../node_modules/pako/lib/zlib/adler32.js");
+var crc32         = __webpack_require__("../../node_modules/pako/lib/zlib/crc32.js");
+var inflate_fast  = __webpack_require__("../../node_modules/pako/lib/zlib/inffast.js");
+var inflate_table = __webpack_require__("../../node_modules/pako/lib/zlib/inftrees.js");
+
+var CODES = 0;
+var LENS = 1;
+var DISTS = 2;
+
+/* Public constants ==========================================================*/
+/* ===========================================================================*/
+
+
+/* Allowed flush values; see deflate() and inflate() below for details */
+//var Z_NO_FLUSH      = 0;
+//var Z_PARTIAL_FLUSH = 1;
+//var Z_SYNC_FLUSH    = 2;
+//var Z_FULL_FLUSH    = 3;
+var Z_FINISH        = 4;
+var Z_BLOCK         = 5;
+var Z_TREES         = 6;
+
+
+/* Return codes for the compression/decompression functions. Negative values
+ * are errors, positive values are used for special but normal events.
+ */
+var Z_OK            = 0;
+var Z_STREAM_END    = 1;
+var Z_NEED_DICT     = 2;
+//var Z_ERRNO         = -1;
+var Z_STREAM_ERROR  = -2;
+var Z_DATA_ERROR    = -3;
+var Z_MEM_ERROR     = -4;
+var Z_BUF_ERROR     = -5;
+//var Z_VERSION_ERROR = -6;
+
+/* The deflate compression method */
+var Z_DEFLATED  = 8;
+
+
+/* STATES ====================================================================*/
+/* ===========================================================================*/
+
+
+var    HEAD = 1;       /* i: waiting for magic header */
+var    FLAGS = 2;      /* i: waiting for method and flags (gzip) */
+var    TIME = 3;       /* i: waiting for modification time (gzip) */
+var    OS = 4;         /* i: waiting for extra flags and operating system (gzip) */
+var    EXLEN = 5;      /* i: waiting for extra length (gzip) */
+var    EXTRA = 6;      /* i: waiting for extra bytes (gzip) */
+var    NAME = 7;       /* i: waiting for end of file name (gzip) */
+var    COMMENT = 8;    /* i: waiting for end of comment (gzip) */
+var    HCRC = 9;       /* i: waiting for header crc (gzip) */
+var    DICTID = 10;    /* i: waiting for dictionary check value */
+var    DICT = 11;      /* waiting for inflateSetDictionary() call */
+var        TYPE = 12;      /* i: waiting for type bits, including last-flag bit */
+var        TYPEDO = 13;    /* i: same, but skip check to exit inflate on new block */
+var        STORED = 14;    /* i: waiting for stored size (length and complement) */
+var        COPY_ = 15;     /* i/o: same as COPY below, but only first time in */
+var        COPY = 16;      /* i/o: waiting for input or output to copy stored block */
+var        TABLE = 17;     /* i: waiting for dynamic block table lengths */
+var        LENLENS = 18;   /* i: waiting for code length code lengths */
+var        CODELENS = 19;  /* i: waiting for length/lit and distance code lengths */
+var            LEN_ = 20;      /* i: same as LEN below, but only first time in */
+var            LEN = 21;       /* i: waiting for length/lit/eob code */
+var            LENEXT = 22;    /* i: waiting for length extra bits */
+var            DIST = 23;      /* i: waiting for distance code */
+var            DISTEXT = 24;   /* i: waiting for distance extra bits */
+var            MATCH = 25;     /* o: waiting for output space to copy string */
+var            LIT = 26;       /* o: waiting for output space to write literal */
+var    CHECK = 27;     /* i: waiting for 32-bit check value */
+var    LENGTH = 28;    /* i: waiting for 32-bit length (gzip) */
+var    DONE = 29;      /* finished check, done -- remain here until reset */
+var    BAD = 30;       /* got a data error -- remain here until reset */
+var    MEM = 31;       /* got an inflate() memory error -- remain here until reset */
+var    SYNC = 32;      /* looking for synchronization bytes to restart inflate() */
+
+/* ===========================================================================*/
+
+
+
+var ENOUGH_LENS = 852;
+var ENOUGH_DISTS = 592;
+//var ENOUGH =  (ENOUGH_LENS+ENOUGH_DISTS);
+
+var MAX_WBITS = 15;
+/* 32K LZ77 window */
+var DEF_WBITS = MAX_WBITS;
+
+
+function zswap32(q) {
+  return  (((q >>> 24) & 0xff) +
+          ((q >>> 8) & 0xff00) +
+          ((q & 0xff00) << 8) +
+          ((q & 0xff) << 24));
+}
+
+
+function InflateState() {
+  this.mode = 0;             /* current inflate mode */
+  this.last = false;          /* true if processing last block */
+  this.wrap = 0;              /* bit 0 true for zlib, bit 1 true for gzip */
+  this.havedict = false;      /* true if dictionary provided */
+  this.flags = 0;             /* gzip header method and flags (0 if zlib) */
+  this.dmax = 0;              /* zlib header max distance (INFLATE_STRICT) */
+  this.check = 0;             /* protected copy of check value */
+  this.total = 0;             /* protected copy of output count */
+  // TODO: may be {}
+  this.head = null;           /* where to save gzip header information */
+
+  /* sliding window */
+  this.wbits = 0;             /* log base 2 of requested window size */
+  this.wsize = 0;             /* window size or zero if not using window */
+  this.whave = 0;             /* valid bytes in the window */
+  this.wnext = 0;             /* window write index */
+  this.window = null;         /* allocated sliding window, if needed */
+
+  /* bit accumulator */
+  this.hold = 0;              /* input bit accumulator */
+  this.bits = 0;              /* number of bits in "in" */
+
+  /* for string and stored block copying */
+  this.length = 0;            /* literal or length of data to copy */
+  this.offset = 0;            /* distance back to copy string from */
+
+  /* for table and code decoding */
+  this.extra = 0;             /* extra bits needed */
+
+  /* fixed and dynamic code tables */
+  this.lencode = null;          /* starting table for length/literal codes */
+  this.distcode = null;         /* starting table for distance codes */
+  this.lenbits = 0;           /* index bits for lencode */
+  this.distbits = 0;          /* index bits for distcode */
+
+  /* dynamic table building */
+  this.ncode = 0;             /* number of code length code lengths */
+  this.nlen = 0;              /* number of length code lengths */
+  this.ndist = 0;             /* number of distance code lengths */
+  this.have = 0;              /* number of code lengths in lens[] */
+  this.next = null;              /* next available space in codes[] */
+
+  this.lens = new utils.Buf16(320); /* temporary storage for code lengths */
+  this.work = new utils.Buf16(288); /* work area for code table building */
+
+  /*
+   because we don't have pointers in js, we use lencode and distcode directly
+   as buffers so we don't need codes
+  */
+  //this.codes = new utils.Buf32(ENOUGH);       /* space for code tables */
+  this.lendyn = null;              /* dynamic table for length/literal codes (JS specific) */
+  this.distdyn = null;             /* dynamic table for distance codes (JS specific) */
+  this.sane = 0;                   /* if false, allow invalid distance too far */
+  this.back = 0;                   /* bits back of last unprocessed length/lit */
+  this.was = 0;                    /* initial length of match */
+}
+
+function inflateResetKeep(strm) {
+  var state;
+
+  if (!strm || !strm.state) { return Z_STREAM_ERROR; }
+  state = strm.state;
+  strm.total_in = strm.total_out = state.total = 0;
+  strm.msg = ''; /*Z_NULL*/
+  if (state.wrap) {       /* to support ill-conceived Java test suite */
+    strm.adler = state.wrap & 1;
+  }
+  state.mode = HEAD;
+  state.last = 0;
+  state.havedict = 0;
+  state.dmax = 32768;
+  state.head = null/*Z_NULL*/;
+  state.hold = 0;
+  state.bits = 0;
+  //state.lencode = state.distcode = state.next = state.codes;
+  state.lencode = state.lendyn = new utils.Buf32(ENOUGH_LENS);
+  state.distcode = state.distdyn = new utils.Buf32(ENOUGH_DISTS);
+
+  state.sane = 1;
+  state.back = -1;
+  //Tracev((stderr, "inflate: reset\n"));
+  return Z_OK;
+}
+
+function inflateReset(strm) {
+  var state;
+
+  if (!strm || !strm.state) { return Z_STREAM_ERROR; }
+  state = strm.state;
+  state.wsize = 0;
+  state.whave = 0;
+  state.wnext = 0;
+  return inflateResetKeep(strm);
+
+}
+
+function inflateReset2(strm, windowBits) {
+  var wrap;
+  var state;
+
+  /* get the state */
+  if (!strm || !strm.state) { return Z_STREAM_ERROR; }
+  state = strm.state;
+
+  /* extract wrap request from windowBits parameter */
+  if (windowBits < 0) {
+    wrap = 0;
+    windowBits = -windowBits;
+  }
+  else {
+    wrap = (windowBits >> 4) + 1;
+    if (windowBits < 48) {
+      windowBits &= 15;
+    }
+  }
+
+  /* set number of window bits, free window if different */
+  if (windowBits && (windowBits < 8 || windowBits > 15)) {
+    return Z_STREAM_ERROR;
+  }
+  if (state.window !== null && state.wbits !== windowBits) {
+    state.window = null;
+  }
+
+  /* update state and reset the rest of it */
+  state.wrap = wrap;
+  state.wbits = windowBits;
+  return inflateReset(strm);
+}
+
+function inflateInit2(strm, windowBits) {
+  var ret;
+  var state;
+
+  if (!strm) { return Z_STREAM_ERROR; }
+  //strm.msg = Z_NULL;                 /* in case we return an error */
+
+  state = new InflateState();
+
+  //if (state === Z_NULL) return Z_MEM_ERROR;
+  //Tracev((stderr, "inflate: allocated\n"));
+  strm.state = state;
+  state.window = null/*Z_NULL*/;
+  ret = inflateReset2(strm, windowBits);
+  if (ret !== Z_OK) {
+    strm.state = null/*Z_NULL*/;
+  }
+  return ret;
+}
+
+function inflateInit(strm) {
+  return inflateInit2(strm, DEF_WBITS);
+}
+
+
+/*
+ Return state with length and distance decoding tables and index sizes set to
+ fixed code decoding.  Normally this returns fixed tables from inffixed.h.
+ If BUILDFIXED is defined, then instead this routine builds the tables the
+ first time it's called, and returns those tables the first time and
+ thereafter.  This reduces the size of the code by about 2K bytes, in
+ exchange for a little execution time.  However, BUILDFIXED should not be
+ used for threaded applications, since the rewriting of the tables and virgin
+ may not be thread-safe.
+ */
+var virgin = true;
+
+var lenfix, distfix; // We have no pointers in JS, so keep tables separate
+
+function fixedtables(state) {
+  /* build fixed huffman tables if first call (may not be thread safe) */
+  if (virgin) {
+    var sym;
+
+    lenfix = new utils.Buf32(512);
+    distfix = new utils.Buf32(32);
+
+    /* literal/length table */
+    sym = 0;
+    while (sym < 144) { state.lens[sym++] = 8; }
+    while (sym < 256) { state.lens[sym++] = 9; }
+    while (sym < 280) { state.lens[sym++] = 7; }
+    while (sym < 288) { state.lens[sym++] = 8; }
+
+    inflate_table(LENS,  state.lens, 0, 288, lenfix,   0, state.work, { bits: 9 });
+
+    /* distance table */
+    sym = 0;
+    while (sym < 32) { state.lens[sym++] = 5; }
+
+    inflate_table(DISTS, state.lens, 0, 32,   distfix, 0, state.work, { bits: 5 });
+
+    /* do this just once */
+    virgin = false;
+  }
+
+  state.lencode = lenfix;
+  state.lenbits = 9;
+  state.distcode = distfix;
+  state.distbits = 5;
+}
+
+
+/*
+ Update the window with the last wsize (normally 32K) bytes written before
+ returning.  If window does not exist yet, create it.  This is only called
+ when a window is already in use, or when output has been written during this
+ inflate call, but the end of the deflate stream has not been reached yet.
+ It is also called to create a window for dictionary data when a dictionary
+ is loaded.
+
+ Providing output buffers larger than 32K to inflate() should provide a speed
+ advantage, since only the last 32K of output is copied to the sliding window
+ upon return from inflate(), and since all distances after the first 32K of
+ output will fall in the output data, making match copies simpler and faster.
+ The advantage may be dependent on the size of the processor's data caches.
+ */
+function updatewindow(strm, src, end, copy) {
+  var dist;
+  var state = strm.state;
+
+  /* if it hasn't been done already, allocate space for the window */
+  if (state.window === null) {
+    state.wsize = 1 << state.wbits;
+    state.wnext = 0;
+    state.whave = 0;
+
+    state.window = new utils.Buf8(state.wsize);
+  }
+
+  /* copy state->wsize or less output bytes into the circular window */
+  if (copy >= state.wsize) {
+    utils.arraySet(state.window, src, end - state.wsize, state.wsize, 0);
+    state.wnext = 0;
+    state.whave = state.wsize;
+  }
+  else {
+    dist = state.wsize - state.wnext;
+    if (dist > copy) {
+      dist = copy;
+    }
+    //zmemcpy(state->window + state->wnext, end - copy, dist);
+    utils.arraySet(state.window, src, end - copy, dist, state.wnext);
+    copy -= dist;
+    if (copy) {
+      //zmemcpy(state->window, end - copy, copy);
+      utils.arraySet(state.window, src, end - copy, copy, 0);
+      state.wnext = copy;
+      state.whave = state.wsize;
+    }
+    else {
+      state.wnext += dist;
+      if (state.wnext === state.wsize) { state.wnext = 0; }
+      if (state.whave < state.wsize) { state.whave += dist; }
+    }
+  }
+  return 0;
+}
+
+function inflate(strm, flush) {
+  var state;
+  var input, output;          // input/output buffers
+  var next;                   /* next input INDEX */
+  var put;                    /* next output INDEX */
+  var have, left;             /* available input and output */
+  var hold;                   /* bit buffer */
+  var bits;                   /* bits in bit buffer */
+  var _in, _out;              /* save starting available input and output */
+  var copy;                   /* number of stored or match bytes to copy */
+  var from;                   /* where to copy match bytes from */
+  var from_source;
+  var here = 0;               /* current decoding table entry */
+  var here_bits, here_op, here_val; // paked "here" denormalized (JS specific)
+  //var last;                   /* parent table entry */
+  var last_bits, last_op, last_val; // paked "last" denormalized (JS specific)
+  var len;                    /* length to copy for repeats, bits to drop */
+  var ret;                    /* return code */
+  var hbuf = new utils.Buf8(4);    /* buffer for gzip header crc calculation */
+  var opts;
+
+  var n; // temporary var for NEED_BITS
+
+  var order = /* permutation of code lengths */
+    [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ];
+
+
+  if (!strm || !strm.state || !strm.output ||
+      (!strm.input && strm.avail_in !== 0)) {
+    return Z_STREAM_ERROR;
+  }
+
+  state = strm.state;
+  if (state.mode === TYPE) { state.mode = TYPEDO; }    /* skip check */
+
+
+  //--- LOAD() ---
+  put = strm.next_out;
+  output = strm.output;
+  left = strm.avail_out;
+  next = strm.next_in;
+  input = strm.input;
+  have = strm.avail_in;
+  hold = state.hold;
+  bits = state.bits;
+  //---
+
+  _in = have;
+  _out = left;
+  ret = Z_OK;
+
+  inf_leave: // goto emulation
+  for (;;) {
+    switch (state.mode) {
+      case HEAD:
+        if (state.wrap === 0) {
+          state.mode = TYPEDO;
+          break;
+        }
+        //=== NEEDBITS(16);
+        while (bits < 16) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        if ((state.wrap & 2) && hold === 0x8b1f) {  /* gzip header */
+          state.check = 0/*crc32(0L, Z_NULL, 0)*/;
+          //=== CRC2(state.check, hold);
+          hbuf[0] = hold & 0xff;
+          hbuf[1] = (hold >>> 8) & 0xff;
+          state.check = crc32(state.check, hbuf, 2, 0);
+          //===//
+
+          //=== INITBITS();
+          hold = 0;
+          bits = 0;
+          //===//
+          state.mode = FLAGS;
+          break;
+        }
+        state.flags = 0;           /* expect zlib header */
+        if (state.head) {
+          state.head.done = false;
+        }
+        if (!(state.wrap & 1) ||   /* check if zlib header allowed */
+          (((hold & 0xff)/*BITS(8)*/ << 8) + (hold >> 8)) % 31) {
+          strm.msg = 'incorrect header check';
+          state.mode = BAD;
+          break;
+        }
+        if ((hold & 0x0f)/*BITS(4)*/ !== Z_DEFLATED) {
+          strm.msg = 'unknown compression method';
+          state.mode = BAD;
+          break;
+        }
+        //--- DROPBITS(4) ---//
+        hold >>>= 4;
+        bits -= 4;
+        //---//
+        len = (hold & 0x0f)/*BITS(4)*/ + 8;
+        if (state.wbits === 0) {
+          state.wbits = len;
+        }
+        else if (len > state.wbits) {
+          strm.msg = 'invalid window size';
+          state.mode = BAD;
+          break;
+        }
+        state.dmax = 1 << len;
+        //Tracev((stderr, "inflate:   zlib header ok\n"));
+        strm.adler = state.check = 1/*adler32(0L, Z_NULL, 0)*/;
+        state.mode = hold & 0x200 ? DICTID : TYPE;
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        break;
+      case FLAGS:
+        //=== NEEDBITS(16); */
+        while (bits < 16) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        state.flags = hold;
+        if ((state.flags & 0xff) !== Z_DEFLATED) {
+          strm.msg = 'unknown compression method';
+          state.mode = BAD;
+          break;
+        }
+        if (state.flags & 0xe000) {
+          strm.msg = 'unknown header flags set';
+          state.mode = BAD;
+          break;
+        }
+        if (state.head) {
+          state.head.text = ((hold >> 8) & 1);
+        }
+        if (state.flags & 0x0200) {
+          //=== CRC2(state.check, hold);
+          hbuf[0] = hold & 0xff;
+          hbuf[1] = (hold >>> 8) & 0xff;
+          state.check = crc32(state.check, hbuf, 2, 0);
+          //===//
+        }
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        state.mode = TIME;
+        /* falls through */
+      case TIME:
+        //=== NEEDBITS(32); */
+        while (bits < 32) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        if (state.head) {
+          state.head.time = hold;
+        }
+        if (state.flags & 0x0200) {
+          //=== CRC4(state.check, hold)
+          hbuf[0] = hold & 0xff;
+          hbuf[1] = (hold >>> 8) & 0xff;
+          hbuf[2] = (hold >>> 16) & 0xff;
+          hbuf[3] = (hold >>> 24) & 0xff;
+          state.check = crc32(state.check, hbuf, 4, 0);
+          //===
+        }
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        state.mode = OS;
+        /* falls through */
+      case OS:
+        //=== NEEDBITS(16); */
+        while (bits < 16) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        if (state.head) {
+          state.head.xflags = (hold & 0xff);
+          state.head.os = (hold >> 8);
+        }
+        if (state.flags & 0x0200) {
+          //=== CRC2(state.check, hold);
+          hbuf[0] = hold & 0xff;
+          hbuf[1] = (hold >>> 8) & 0xff;
+          state.check = crc32(state.check, hbuf, 2, 0);
+          //===//
+        }
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        state.mode = EXLEN;
+        /* falls through */
+      case EXLEN:
+        if (state.flags & 0x0400) {
+          //=== NEEDBITS(16); */
+          while (bits < 16) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          state.length = hold;
+          if (state.head) {
+            state.head.extra_len = hold;
+          }
+          if (state.flags & 0x0200) {
+            //=== CRC2(state.check, hold);
+            hbuf[0] = hold & 0xff;
+            hbuf[1] = (hold >>> 8) & 0xff;
+            state.check = crc32(state.check, hbuf, 2, 0);
+            //===//
+          }
+          //=== INITBITS();
+          hold = 0;
+          bits = 0;
+          //===//
+        }
+        else if (state.head) {
+          state.head.extra = null/*Z_NULL*/;
+        }
+        state.mode = EXTRA;
+        /* falls through */
+      case EXTRA:
+        if (state.flags & 0x0400) {
+          copy = state.length;
+          if (copy > have) { copy = have; }
+          if (copy) {
+            if (state.head) {
+              len = state.head.extra_len - state.length;
+              if (!state.head.extra) {
+                // Use untyped array for more convenient processing later
+                state.head.extra = new Array(state.head.extra_len);
+              }
+              utils.arraySet(
+                state.head.extra,
+                input,
+                next,
+                // extra field is limited to 65536 bytes
+                // - no need for additional size check
+                copy,
+                /*len + copy > state.head.extra_max - len ? state.head.extra_max : copy,*/
+                len
+              );
+              //zmemcpy(state.head.extra + len, next,
+              //        len + copy > state.head.extra_max ?
+              //        state.head.extra_max - len : copy);
+            }
+            if (state.flags & 0x0200) {
+              state.check = crc32(state.check, input, copy, next);
+            }
+            have -= copy;
+            next += copy;
+            state.length -= copy;
+          }
+          if (state.length) { break inf_leave; }
+        }
+        state.length = 0;
+        state.mode = NAME;
+        /* falls through */
+      case NAME:
+        if (state.flags & 0x0800) {
+          if (have === 0) { break inf_leave; }
+          copy = 0;
+          do {
+            // TODO: 2 or 1 bytes?
+            len = input[next + copy++];
+            /* use constant limit because in js we should not preallocate memory */
+            if (state.head && len &&
+                (state.length < 65536 /*state.head.name_max*/)) {
+              state.head.name += String.fromCharCode(len);
+            }
+          } while (len && copy < have);
+
+          if (state.flags & 0x0200) {
+            state.check = crc32(state.check, input, copy, next);
+          }
+          have -= copy;
+          next += copy;
+          if (len) { break inf_leave; }
+        }
+        else if (state.head) {
+          state.head.name = null;
+        }
+        state.length = 0;
+        state.mode = COMMENT;
+        /* falls through */
+      case COMMENT:
+        if (state.flags & 0x1000) {
+          if (have === 0) { break inf_leave; }
+          copy = 0;
+          do {
+            len = input[next + copy++];
+            /* use constant limit because in js we should not preallocate memory */
+            if (state.head && len &&
+                (state.length < 65536 /*state.head.comm_max*/)) {
+              state.head.comment += String.fromCharCode(len);
+            }
+          } while (len && copy < have);
+          if (state.flags & 0x0200) {
+            state.check = crc32(state.check, input, copy, next);
+          }
+          have -= copy;
+          next += copy;
+          if (len) { break inf_leave; }
+        }
+        else if (state.head) {
+          state.head.comment = null;
+        }
+        state.mode = HCRC;
+        /* falls through */
+      case HCRC:
+        if (state.flags & 0x0200) {
+          //=== NEEDBITS(16); */
+          while (bits < 16) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          if (hold !== (state.check & 0xffff)) {
+            strm.msg = 'header crc mismatch';
+            state.mode = BAD;
+            break;
+          }
+          //=== INITBITS();
+          hold = 0;
+          bits = 0;
+          //===//
+        }
+        if (state.head) {
+          state.head.hcrc = ((state.flags >> 9) & 1);
+          state.head.done = true;
+        }
+        strm.adler = state.check = 0;
+        state.mode = TYPE;
+        break;
+      case DICTID:
+        //=== NEEDBITS(32); */
+        while (bits < 32) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        strm.adler = state.check = zswap32(hold);
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        state.mode = DICT;
+        /* falls through */
+      case DICT:
+        if (state.havedict === 0) {
+          //--- RESTORE() ---
+          strm.next_out = put;
+          strm.avail_out = left;
+          strm.next_in = next;
+          strm.avail_in = have;
+          state.hold = hold;
+          state.bits = bits;
+          //---
+          return Z_NEED_DICT;
+        }
+        strm.adler = state.check = 1/*adler32(0L, Z_NULL, 0)*/;
+        state.mode = TYPE;
+        /* falls through */
+      case TYPE:
+        if (flush === Z_BLOCK || flush === Z_TREES) { break inf_leave; }
+        /* falls through */
+      case TYPEDO:
+        if (state.last) {
+          //--- BYTEBITS() ---//
+          hold >>>= bits & 7;
+          bits -= bits & 7;
+          //---//
+          state.mode = CHECK;
+          break;
+        }
+        //=== NEEDBITS(3); */
+        while (bits < 3) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        state.last = (hold & 0x01)/*BITS(1)*/;
+        //--- DROPBITS(1) ---//
+        hold >>>= 1;
+        bits -= 1;
+        //---//
+
+        switch ((hold & 0x03)/*BITS(2)*/) {
+          case 0:                             /* stored block */
+            //Tracev((stderr, "inflate:     stored block%s\n",
+            //        state.last ? " (last)" : ""));
+            state.mode = STORED;
+            break;
+          case 1:                             /* fixed block */
+            fixedtables(state);
+            //Tracev((stderr, "inflate:     fixed codes block%s\n",
+            //        state.last ? " (last)" : ""));
+            state.mode = LEN_;             /* decode codes */
+            if (flush === Z_TREES) {
+              //--- DROPBITS(2) ---//
+              hold >>>= 2;
+              bits -= 2;
+              //---//
+              break inf_leave;
+            }
+            break;
+          case 2:                             /* dynamic block */
+            //Tracev((stderr, "inflate:     dynamic codes block%s\n",
+            //        state.last ? " (last)" : ""));
+            state.mode = TABLE;
+            break;
+          case 3:
+            strm.msg = 'invalid block type';
+            state.mode = BAD;
+        }
+        //--- DROPBITS(2) ---//
+        hold >>>= 2;
+        bits -= 2;
+        //---//
+        break;
+      case STORED:
+        //--- BYTEBITS() ---// /* go to byte boundary */
+        hold >>>= bits & 7;
+        bits -= bits & 7;
+        //---//
+        //=== NEEDBITS(32); */
+        while (bits < 32) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        if ((hold & 0xffff) !== ((hold >>> 16) ^ 0xffff)) {
+          strm.msg = 'invalid stored block lengths';
+          state.mode = BAD;
+          break;
+        }
+        state.length = hold & 0xffff;
+        //Tracev((stderr, "inflate:       stored length %u\n",
+        //        state.length));
+        //=== INITBITS();
+        hold = 0;
+        bits = 0;
+        //===//
+        state.mode = COPY_;
+        if (flush === Z_TREES) { break inf_leave; }
+        /* falls through */
+      case COPY_:
+        state.mode = COPY;
+        /* falls through */
+      case COPY:
+        copy = state.length;
+        if (copy) {
+          if (copy > have) { copy = have; }
+          if (copy > left) { copy = left; }
+          if (copy === 0) { break inf_leave; }
+          //--- zmemcpy(put, next, copy); ---
+          utils.arraySet(output, input, next, copy, put);
+          //---//
+          have -= copy;
+          next += copy;
+          left -= copy;
+          put += copy;
+          state.length -= copy;
+          break;
+        }
+        //Tracev((stderr, "inflate:       stored end\n"));
+        state.mode = TYPE;
+        break;
+      case TABLE:
+        //=== NEEDBITS(14); */
+        while (bits < 14) {
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+        }
+        //===//
+        state.nlen = (hold & 0x1f)/*BITS(5)*/ + 257;
+        //--- DROPBITS(5) ---//
+        hold >>>= 5;
+        bits -= 5;
+        //---//
+        state.ndist = (hold & 0x1f)/*BITS(5)*/ + 1;
+        //--- DROPBITS(5) ---//
+        hold >>>= 5;
+        bits -= 5;
+        //---//
+        state.ncode = (hold & 0x0f)/*BITS(4)*/ + 4;
+        //--- DROPBITS(4) ---//
+        hold >>>= 4;
+        bits -= 4;
+        //---//
+//#ifndef PKZIP_BUG_WORKAROUND
+        if (state.nlen > 286 || state.ndist > 30) {
+          strm.msg = 'too many length or distance symbols';
+          state.mode = BAD;
+          break;
+        }
+//#endif
+        //Tracev((stderr, "inflate:       table sizes ok\n"));
+        state.have = 0;
+        state.mode = LENLENS;
+        /* falls through */
+      case LENLENS:
+        while (state.have < state.ncode) {
+          //=== NEEDBITS(3);
+          while (bits < 3) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          state.lens[order[state.have++]] = (hold & 0x07);//BITS(3);
+          //--- DROPBITS(3) ---//
+          hold >>>= 3;
+          bits -= 3;
+          //---//
+        }
+        while (state.have < 19) {
+          state.lens[order[state.have++]] = 0;
+        }
+        // We have separate tables & no pointers. 2 commented lines below not needed.
+        //state.next = state.codes;
+        //state.lencode = state.next;
+        // Switch to use dynamic table
+        state.lencode = state.lendyn;
+        state.lenbits = 7;
+
+        opts = { bits: state.lenbits };
+        ret = inflate_table(CODES, state.lens, 0, 19, state.lencode, 0, state.work, opts);
+        state.lenbits = opts.bits;
+
+        if (ret) {
+          strm.msg = 'invalid code lengths set';
+          state.mode = BAD;
+          break;
+        }
+        //Tracev((stderr, "inflate:       code lengths ok\n"));
+        state.have = 0;
+        state.mode = CODELENS;
+        /* falls through */
+      case CODELENS:
+        while (state.have < state.nlen + state.ndist) {
+          for (;;) {
+            here = state.lencode[hold & ((1 << state.lenbits) - 1)];/*BITS(state.lenbits)*/
+            here_bits = here >>> 24;
+            here_op = (here >>> 16) & 0xff;
+            here_val = here & 0xffff;
+
+            if ((here_bits) <= bits) { break; }
+            //--- PULLBYTE() ---//
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+            //---//
+          }
+          if (here_val < 16) {
+            //--- DROPBITS(here.bits) ---//
+            hold >>>= here_bits;
+            bits -= here_bits;
+            //---//
+            state.lens[state.have++] = here_val;
+          }
+          else {
+            if (here_val === 16) {
+              //=== NEEDBITS(here.bits + 2);
+              n = here_bits + 2;
+              while (bits < n) {
+                if (have === 0) { break inf_leave; }
+                have--;
+                hold += input[next++] << bits;
+                bits += 8;
+              }
+              //===//
+              //--- DROPBITS(here.bits) ---//
+              hold >>>= here_bits;
+              bits -= here_bits;
+              //---//
+              if (state.have === 0) {
+                strm.msg = 'invalid bit length repeat';
+                state.mode = BAD;
+                break;
+              }
+              len = state.lens[state.have - 1];
+              copy = 3 + (hold & 0x03);//BITS(2);
+              //--- DROPBITS(2) ---//
+              hold >>>= 2;
+              bits -= 2;
+              //---//
+            }
+            else if (here_val === 17) {
+              //=== NEEDBITS(here.bits + 3);
+              n = here_bits + 3;
+              while (bits < n) {
+                if (have === 0) { break inf_leave; }
+                have--;
+                hold += input[next++] << bits;
+                bits += 8;
+              }
+              //===//
+              //--- DROPBITS(here.bits) ---//
+              hold >>>= here_bits;
+              bits -= here_bits;
+              //---//
+              len = 0;
+              copy = 3 + (hold & 0x07);//BITS(3);
+              //--- DROPBITS(3) ---//
+              hold >>>= 3;
+              bits -= 3;
+              //---//
+            }
+            else {
+              //=== NEEDBITS(here.bits + 7);
+              n = here_bits + 7;
+              while (bits < n) {
+                if (have === 0) { break inf_leave; }
+                have--;
+                hold += input[next++] << bits;
+                bits += 8;
+              }
+              //===//
+              //--- DROPBITS(here.bits) ---//
+              hold >>>= here_bits;
+              bits -= here_bits;
+              //---//
+              len = 0;
+              copy = 11 + (hold & 0x7f);//BITS(7);
+              //--- DROPBITS(7) ---//
+              hold >>>= 7;
+              bits -= 7;
+              //---//
+            }
+            if (state.have + copy > state.nlen + state.ndist) {
+              strm.msg = 'invalid bit length repeat';
+              state.mode = BAD;
+              break;
+            }
+            while (copy--) {
+              state.lens[state.have++] = len;
+            }
+          }
+        }
+
+        /* handle error breaks in while */
+        if (state.mode === BAD) { break; }
+
+        /* check for end-of-block code (better have one) */
+        if (state.lens[256] === 0) {
+          strm.msg = 'invalid code -- missing end-of-block';
+          state.mode = BAD;
+          break;
+        }
+
+        /* build code tables -- note: do not change the lenbits or distbits
+           values here (9 and 6) without reading the comments in inftrees.h
+           concerning the ENOUGH constants, which depend on those values */
+        state.lenbits = 9;
+
+        opts = { bits: state.lenbits };
+        ret = inflate_table(LENS, state.lens, 0, state.nlen, state.lencode, 0, state.work, opts);
+        // We have separate tables & no pointers. 2 commented lines below not needed.
+        // state.next_index = opts.table_index;
+        state.lenbits = opts.bits;
+        // state.lencode = state.next;
+
+        if (ret) {
+          strm.msg = 'invalid literal/lengths set';
+          state.mode = BAD;
+          break;
+        }
+
+        state.distbits = 6;
+        //state.distcode.copy(state.codes);
+        // Switch to use dynamic table
+        state.distcode = state.distdyn;
+        opts = { bits: state.distbits };
+        ret = inflate_table(DISTS, state.lens, state.nlen, state.ndist, state.distcode, 0, state.work, opts);
+        // We have separate tables & no pointers. 2 commented lines below not needed.
+        // state.next_index = opts.table_index;
+        state.distbits = opts.bits;
+        // state.distcode = state.next;
+
+        if (ret) {
+          strm.msg = 'invalid distances set';
+          state.mode = BAD;
+          break;
+        }
+        //Tracev((stderr, 'inflate:       codes ok\n'));
+        state.mode = LEN_;
+        if (flush === Z_TREES) { break inf_leave; }
+        /* falls through */
+      case LEN_:
+        state.mode = LEN;
+        /* falls through */
+      case LEN:
+        if (have >= 6 && left >= 258) {
+          //--- RESTORE() ---
+          strm.next_out = put;
+          strm.avail_out = left;
+          strm.next_in = next;
+          strm.avail_in = have;
+          state.hold = hold;
+          state.bits = bits;
+          //---
+          inflate_fast(strm, _out);
+          //--- LOAD() ---
+          put = strm.next_out;
+          output = strm.output;
+          left = strm.avail_out;
+          next = strm.next_in;
+          input = strm.input;
+          have = strm.avail_in;
+          hold = state.hold;
+          bits = state.bits;
+          //---
+
+          if (state.mode === TYPE) {
+            state.back = -1;
+          }
+          break;
+        }
+        state.back = 0;
+        for (;;) {
+          here = state.lencode[hold & ((1 << state.lenbits) - 1)];  /*BITS(state.lenbits)*/
+          here_bits = here >>> 24;
+          here_op = (here >>> 16) & 0xff;
+          here_val = here & 0xffff;
+
+          if (here_bits <= bits) { break; }
+          //--- PULLBYTE() ---//
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+          //---//
+        }
+        if (here_op && (here_op & 0xf0) === 0) {
+          last_bits = here_bits;
+          last_op = here_op;
+          last_val = here_val;
+          for (;;) {
+            here = state.lencode[last_val +
+                    ((hold & ((1 << (last_bits + last_op)) - 1))/*BITS(last.bits + last.op)*/ >> last_bits)];
+            here_bits = here >>> 24;
+            here_op = (here >>> 16) & 0xff;
+            here_val = here & 0xffff;
+
+            if ((last_bits + here_bits) <= bits) { break; }
+            //--- PULLBYTE() ---//
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+            //---//
+          }
+          //--- DROPBITS(last.bits) ---//
+          hold >>>= last_bits;
+          bits -= last_bits;
+          //---//
+          state.back += last_bits;
+        }
+        //--- DROPBITS(here.bits) ---//
+        hold >>>= here_bits;
+        bits -= here_bits;
+        //---//
+        state.back += here_bits;
+        state.length = here_val;
+        if (here_op === 0) {
+          //Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ?
+          //        "inflate:         literal '%c'\n" :
+          //        "inflate:         literal 0x%02x\n", here.val));
+          state.mode = LIT;
+          break;
+        }
+        if (here_op & 32) {
+          //Tracevv((stderr, "inflate:         end of block\n"));
+          state.back = -1;
+          state.mode = TYPE;
+          break;
+        }
+        if (here_op & 64) {
+          strm.msg = 'invalid literal/length code';
+          state.mode = BAD;
+          break;
+        }
+        state.extra = here_op & 15;
+        state.mode = LENEXT;
+        /* falls through */
+      case LENEXT:
+        if (state.extra) {
+          //=== NEEDBITS(state.extra);
+          n = state.extra;
+          while (bits < n) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          state.length += hold & ((1 << state.extra) - 1)/*BITS(state.extra)*/;
+          //--- DROPBITS(state.extra) ---//
+          hold >>>= state.extra;
+          bits -= state.extra;
+          //---//
+          state.back += state.extra;
+        }
+        //Tracevv((stderr, "inflate:         length %u\n", state.length));
+        state.was = state.length;
+        state.mode = DIST;
+        /* falls through */
+      case DIST:
+        for (;;) {
+          here = state.distcode[hold & ((1 << state.distbits) - 1)];/*BITS(state.distbits)*/
+          here_bits = here >>> 24;
+          here_op = (here >>> 16) & 0xff;
+          here_val = here & 0xffff;
+
+          if ((here_bits) <= bits) { break; }
+          //--- PULLBYTE() ---//
+          if (have === 0) { break inf_leave; }
+          have--;
+          hold += input[next++] << bits;
+          bits += 8;
+          //---//
+        }
+        if ((here_op & 0xf0) === 0) {
+          last_bits = here_bits;
+          last_op = here_op;
+          last_val = here_val;
+          for (;;) {
+            here = state.distcode[last_val +
+                    ((hold & ((1 << (last_bits + last_op)) - 1))/*BITS(last.bits + last.op)*/ >> last_bits)];
+            here_bits = here >>> 24;
+            here_op = (here >>> 16) & 0xff;
+            here_val = here & 0xffff;
+
+            if ((last_bits + here_bits) <= bits) { break; }
+            //--- PULLBYTE() ---//
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+            //---//
+          }
+          //--- DROPBITS(last.bits) ---//
+          hold >>>= last_bits;
+          bits -= last_bits;
+          //---//
+          state.back += last_bits;
+        }
+        //--- DROPBITS(here.bits) ---//
+        hold >>>= here_bits;
+        bits -= here_bits;
+        //---//
+        state.back += here_bits;
+        if (here_op & 64) {
+          strm.msg = 'invalid distance code';
+          state.mode = BAD;
+          break;
+        }
+        state.offset = here_val;
+        state.extra = (here_op) & 15;
+        state.mode = DISTEXT;
+        /* falls through */
+      case DISTEXT:
+        if (state.extra) {
+          //=== NEEDBITS(state.extra);
+          n = state.extra;
+          while (bits < n) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          state.offset += hold & ((1 << state.extra) - 1)/*BITS(state.extra)*/;
+          //--- DROPBITS(state.extra) ---//
+          hold >>>= state.extra;
+          bits -= state.extra;
+          //---//
+          state.back += state.extra;
+        }
+//#ifdef INFLATE_STRICT
+        if (state.offset > state.dmax) {
+          strm.msg = 'invalid distance too far back';
+          state.mode = BAD;
+          break;
+        }
+//#endif
+        //Tracevv((stderr, "inflate:         distance %u\n", state.offset));
+        state.mode = MATCH;
+        /* falls through */
+      case MATCH:
+        if (left === 0) { break inf_leave; }
+        copy = _out - left;
+        if (state.offset > copy) {         /* copy from window */
+          copy = state.offset - copy;
+          if (copy > state.whave) {
+            if (state.sane) {
+              strm.msg = 'invalid distance too far back';
+              state.mode = BAD;
+              break;
+            }
+// (!) This block is disabled in zlib defaults,
+// don't enable it for binary compatibility
+//#ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR
+//          Trace((stderr, "inflate.c too far\n"));
+//          copy -= state.whave;
+//          if (copy > state.length) { copy = state.length; }
+//          if (copy > left) { copy = left; }
+//          left -= copy;
+//          state.length -= copy;
+//          do {
+//            output[put++] = 0;
+//          } while (--copy);
+//          if (state.length === 0) { state.mode = LEN; }
+//          break;
+//#endif
+          }
+          if (copy > state.wnext) {
+            copy -= state.wnext;
+            from = state.wsize - copy;
+          }
+          else {
+            from = state.wnext - copy;
+          }
+          if (copy > state.length) { copy = state.length; }
+          from_source = state.window;
+        }
+        else {                              /* copy from output */
+          from_source = output;
+          from = put - state.offset;
+          copy = state.length;
+        }
+        if (copy > left) { copy = left; }
+        left -= copy;
+        state.length -= copy;
+        do {
+          output[put++] = from_source[from++];
+        } while (--copy);
+        if (state.length === 0) { state.mode = LEN; }
+        break;
+      case LIT:
+        if (left === 0) { break inf_leave; }
+        output[put++] = state.length;
+        left--;
+        state.mode = LEN;
+        break;
+      case CHECK:
+        if (state.wrap) {
+          //=== NEEDBITS(32);
+          while (bits < 32) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            // Use '|' instead of '+' to make sure that result is signed
+            hold |= input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          _out -= left;
+          strm.total_out += _out;
+          state.total += _out;
+          if (_out) {
+            strm.adler = state.check =
+                /*UPDATE(state.check, put - _out, _out);*/
+                (state.flags ? crc32(state.check, output, _out, put - _out) : adler32(state.check, output, _out, put - _out));
+
+          }
+          _out = left;
+          // NB: crc32 stored as signed 32-bit int, zswap32 returns signed too
+          if ((state.flags ? hold : zswap32(hold)) !== state.check) {
+            strm.msg = 'incorrect data check';
+            state.mode = BAD;
+            break;
+          }
+          //=== INITBITS();
+          hold = 0;
+          bits = 0;
+          //===//
+          //Tracev((stderr, "inflate:   check matches trailer\n"));
+        }
+        state.mode = LENGTH;
+        /* falls through */
+      case LENGTH:
+        if (state.wrap && state.flags) {
+          //=== NEEDBITS(32);
+          while (bits < 32) {
+            if (have === 0) { break inf_leave; }
+            have--;
+            hold += input[next++] << bits;
+            bits += 8;
+          }
+          //===//
+          if (hold !== (state.total & 0xffffffff)) {
+            strm.msg = 'incorrect length check';
+            state.mode = BAD;
+            break;
+          }
+          //=== INITBITS();
+          hold = 0;
+          bits = 0;
+          //===//
+          //Tracev((stderr, "inflate:   length matches trailer\n"));
+        }
+        state.mode = DONE;
+        /* falls through */
+      case DONE:
+        ret = Z_STREAM_END;
+        break inf_leave;
+      case BAD:
+        ret = Z_DATA_ERROR;
+        break inf_leave;
+      case MEM:
+        return Z_MEM_ERROR;
+      case SYNC:
+        /* falls through */
+      default:
+        return Z_STREAM_ERROR;
+    }
+  }
+
+  // inf_leave <- here is real place for "goto inf_leave", emulated via "break inf_leave"
+
+  /*
+     Return from inflate(), updating the total counts and the check value.
+     If there was no progress during the inflate() call, return a buffer
+     error.  Call updatewindow() to create and/or update the window state.
+     Note: a memory error from inflate() is non-recoverable.
+   */
+
+  //--- RESTORE() ---
+  strm.next_out = put;
+  strm.avail_out = left;
+  strm.next_in = next;
+  strm.avail_in = have;
+  state.hold = hold;
+  state.bits = bits;
+  //---
+
+  if (state.wsize || (_out !== strm.avail_out && state.mode < BAD &&
+                      (state.mode < CHECK || flush !== Z_FINISH))) {
+    if (updatewindow(strm, strm.output, strm.next_out, _out - strm.avail_out)) {
+      state.mode = MEM;
+      return Z_MEM_ERROR;
+    }
+  }
+  _in -= strm.avail_in;
+  _out -= strm.avail_out;
+  strm.total_in += _in;
+  strm.total_out += _out;
+  state.total += _out;
+  if (state.wrap && _out) {
+    strm.adler = state.check = /*UPDATE(state.check, strm.next_out - _out, _out);*/
+      (state.flags ? crc32(state.check, output, _out, strm.next_out - _out) : adler32(state.check, output, _out, strm.next_out - _out));
+  }
+  strm.data_type = state.bits + (state.last ? 64 : 0) +
+                    (state.mode === TYPE ? 128 : 0) +
+                    (state.mode === LEN_ || state.mode === COPY_ ? 256 : 0);
+  if (((_in === 0 && _out === 0) || flush === Z_FINISH) && ret === Z_OK) {
+    ret = Z_BUF_ERROR;
+  }
+  return ret;
+}
+
+function inflateEnd(strm) {
+
+  if (!strm || !strm.state /*|| strm->zfree == (free_func)0*/) {
+    return Z_STREAM_ERROR;
+  }
+
+  var state = strm.state;
+  if (state.window) {
+    state.window = null;
+  }
+  strm.state = null;
+  return Z_OK;
+}
+
+function inflateGetHeader(strm, head) {
+  var state;
+
+  /* check state */
+  if (!strm || !strm.state) { return Z_STREAM_ERROR; }
+  state = strm.state;
+  if ((state.wrap & 2) === 0) { return Z_STREAM_ERROR; }
+
+  /* save header structure */
+  state.head = head;
+  head.done = false;
+  return Z_OK;
+}
+
+function inflateSetDictionary(strm, dictionary) {
+  var dictLength = dictionary.length;
+
+  var state;
+  var dictid;
+  var ret;
+
+  /* check state */
+  if (!strm /* == Z_NULL */ || !strm.state /* == Z_NULL */) { return Z_STREAM_ERROR; }
+  state = strm.state;
+
+  if (state.wrap !== 0 && state.mode !== DICT) {
+    return Z_STREAM_ERROR;
+  }
+
+  /* check for correct dictionary identifier */
+  if (state.mode === DICT) {
+    dictid = 1; /* adler32(0, null, 0)*/
+    /* dictid = adler32(dictid, dictionary, dictLength); */
+    dictid = adler32(dictid, dictionary, dictLength, 0);
+    if (dictid !== state.check) {
+      return Z_DATA_ERROR;
+    }
+  }
+  /* copy dictionary to window using updatewindow(), which will amend the
+   existing dictionary if appropriate */
+  ret = updatewindow(strm, dictionary, dictLength, dictLength);
+  if (ret) {
+    state.mode = MEM;
+    return Z_MEM_ERROR;
+  }
+  state.havedict = 1;
+  // Tracev((stderr, "inflate:   dictionary set\n"));
+  return Z_OK;
+}
+
+exports.inflateReset = inflateReset;
+exports.inflateReset2 = inflateReset2;
+exports.inflateResetKeep = inflateResetKeep;
+exports.inflateInit = inflateInit;
+exports.inflateInit2 = inflateInit2;
+exports.inflate = inflate;
+exports.inflateEnd = inflateEnd;
+exports.inflateGetHeader = inflateGetHeader;
+exports.inflateSetDictionary = inflateSetDictionary;
+exports.inflateInfo = 'pako inflate (from Nodeca project)';
+
+/* Not implemented
+exports.inflateCopy = inflateCopy;
+exports.inflateGetDictionary = inflateGetDictionary;
+exports.inflateMark = inflateMark;
+exports.inflatePrime = inflatePrime;
+exports.inflateSync = inflateSync;
+exports.inflateSyncPoint = inflateSyncPoint;
+exports.inflateUndermine = inflateUndermine;
+*/
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/inftrees.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+var utils = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+
+var MAXBITS = 15;
+var ENOUGH_LENS = 852;
+var ENOUGH_DISTS = 592;
+//var ENOUGH = (ENOUGH_LENS+ENOUGH_DISTS);
+
+var CODES = 0;
+var LENS = 1;
+var DISTS = 2;
+
+var lbase = [ /* Length codes 257..285 base */
+  3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
+  35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0
+];
+
+var lext = [ /* Length codes 257..285 extra */
+  16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18,
+  19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 72, 78
+];
+
+var dbase = [ /* Distance codes 0..29 base */
+  1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193,
+  257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145,
+  8193, 12289, 16385, 24577, 0, 0
+];
+
+var dext = [ /* Distance codes 0..29 extra */
+  16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22,
+  23, 23, 24, 24, 25, 25, 26, 26, 27, 27,
+  28, 28, 29, 29, 64, 64
+];
+
+module.exports = function inflate_table(type, lens, lens_index, codes, table, table_index, work, opts)
+{
+  var bits = opts.bits;
+      //here = opts.here; /* table entry for duplication */
+
+  var len = 0;               /* a code's length in bits */
+  var sym = 0;               /* index of code symbols */
+  var min = 0, max = 0;          /* minimum and maximum code lengths */
+  var root = 0;              /* number of index bits for root table */
+  var curr = 0;              /* number of index bits for current table */
+  var drop = 0;              /* code bits to drop for sub-table */
+  var left = 0;                   /* number of prefix codes available */
+  var used = 0;              /* code entries in table used */
+  var huff = 0;              /* Huffman code */
+  var incr;              /* for incrementing code, index */
+  var fill;              /* index for replicating entries */
+  var low;               /* low bits for current root entry */
+  var mask;              /* mask for low root bits */
+  var next;             /* next available space in table */
+  var base = null;     /* base value table to use */
+  var base_index = 0;
+//  var shoextra;    /* extra bits table to use */
+  var end;                    /* use base and extra for symbol > end */
+  var count = new utils.Buf16(MAXBITS + 1); //[MAXBITS+1];    /* number of codes of each length */
+  var offs = new utils.Buf16(MAXBITS + 1); //[MAXBITS+1];     /* offsets in table for each length */
+  var extra = null;
+  var extra_index = 0;
+
+  var here_bits, here_op, here_val;
+
+  /*
+   Process a set of code lengths to create a canonical Huffman code.  The
+   code lengths are lens[0..codes-1].  Each length corresponds to the
+   symbols 0..codes-1.  The Huffman code is generated by first sorting the
+   symbols by length from short to long, and retaining the symbol order
+   for codes with equal lengths.  Then the code starts with all zero bits
+   for the first code of the shortest length, and the codes are integer
+   increments for the same length, and zeros are appended as the length
+   increases.  For the deflate format, these bits are stored backwards
+   from their more natural integer increment ordering, and so when the
+   decoding tables are built in the large loop below, the integer codes
+   are incremented backwards.
+
+   This routine assumes, but does not check, that all of the entries in
+   lens[] are in the range 0..MAXBITS.  The caller must assure this.
+   1..MAXBITS is interpreted as that code length.  zero means that that
+   symbol does not occur in this code.
+
+   The codes are sorted by computing a count of codes for each length,
+   creating from that a table of starting indices for each length in the
+   sorted table, and then entering the symbols in order in the sorted
+   table.  The sorted table is work[], with that space being provided by
+   the caller.
+
+   The length counts are used for other purposes as well, i.e. finding
+   the minimum and maximum length codes, determining if there are any
+   codes at all, checking for a valid set of lengths, and looking ahead
+   at length counts to determine sub-table sizes when building the
+   decoding tables.
+   */
+
+  /* accumulate lengths for codes (assumes lens[] all in 0..MAXBITS) */
+  for (len = 0; len <= MAXBITS; len++) {
+    count[len] = 0;
+  }
+  for (sym = 0; sym < codes; sym++) {
+    count[lens[lens_index + sym]]++;
+  }
+
+  /* bound code lengths, force root to be within code lengths */
+  root = bits;
+  for (max = MAXBITS; max >= 1; max--) {
+    if (count[max] !== 0) { break; }
+  }
+  if (root > max) {
+    root = max;
+  }
+  if (max === 0) {                     /* no symbols to code at all */
+    //table.op[opts.table_index] = 64;  //here.op = (var char)64;    /* invalid code marker */
+    //table.bits[opts.table_index] = 1;   //here.bits = (var char)1;
+    //table.val[opts.table_index++] = 0;   //here.val = (var short)0;
+    table[table_index++] = (1 << 24) | (64 << 16) | 0;
+
+
+    //table.op[opts.table_index] = 64;
+    //table.bits[opts.table_index] = 1;
+    //table.val[opts.table_index++] = 0;
+    table[table_index++] = (1 << 24) | (64 << 16) | 0;
+
+    opts.bits = 1;
+    return 0;     /* no symbols, but wait for decoding to report error */
+  }
+  for (min = 1; min < max; min++) {
+    if (count[min] !== 0) { break; }
+  }
+  if (root < min) {
+    root = min;
+  }
+
+  /* check for an over-subscribed or incomplete set of lengths */
+  left = 1;
+  for (len = 1; len <= MAXBITS; len++) {
+    left <<= 1;
+    left -= count[len];
+    if (left < 0) {
+      return -1;
+    }        /* over-subscribed */
+  }
+  if (left > 0 && (type === CODES || max !== 1)) {
+    return -1;                      /* incomplete set */
+  }
+
+  /* generate offsets into symbol table for each length for sorting */
+  offs[1] = 0;
+  for (len = 1; len < MAXBITS; len++) {
+    offs[len + 1] = offs[len] + count[len];
+  }
+
+  /* sort symbols by length, by symbol order within each length */
+  for (sym = 0; sym < codes; sym++) {
+    if (lens[lens_index + sym] !== 0) {
+      work[offs[lens[lens_index + sym]]++] = sym;
+    }
+  }
+
+  /*
+   Create and fill in decoding tables.  In this loop, the table being
+   filled is at next and has curr index bits.  The code being used is huff
+   with length len.  That code is converted to an index by dropping drop
+   bits off of the bottom.  For codes where len is less than drop + curr,
+   those top drop + curr - len bits are incremented through all values to
+   fill the table with replicated entries.
+
+   root is the number of index bits for the root table.  When len exceeds
+   root, sub-tables are created pointed to by the root entry with an index
+   of the low root bits of huff.  This is saved in low to check for when a
+   new sub-table should be started.  drop is zero when the root table is
+   being filled, and drop is root when sub-tables are being filled.
+
+   When a new sub-table is needed, it is necessary to look ahead in the
+   code lengths to determine what size sub-table is needed.  The length
+   counts are used for this, and so count[] is decremented as codes are
+   entered in the tables.
+
+   used keeps track of how many table entries have been allocated from the
+   provided *table space.  It is checked for LENS and DIST tables against
+   the constants ENOUGH_LENS and ENOUGH_DISTS to guard against changes in
+   the initial root table size constants.  See the comments in inftrees.h
+   for more information.
+
+   sym increments through all symbols, and the loop terminates when
+   all codes of length max, i.e. all codes, have been processed.  This
+   routine permits incomplete codes, so another loop after this one fills
+   in the rest of the decoding tables with invalid code markers.
+   */
+
+  /* set up for code type */
+  // poor man optimization - use if-else instead of switch,
+  // to avoid deopts in old v8
+  if (type === CODES) {
+    base = extra = work;    /* dummy value--not used */
+    end = 19;
+
+  } else if (type === LENS) {
+    base = lbase;
+    base_index -= 257;
+    extra = lext;
+    extra_index -= 257;
+    end = 256;
+
+  } else {                    /* DISTS */
+    base = dbase;
+    extra = dext;
+    end = -1;
+  }
+
+  /* initialize opts for loop */
+  huff = 0;                   /* starting code */
+  sym = 0;                    /* starting code symbol */
+  len = min;                  /* starting code length */
+  next = table_index;              /* current table to fill in */
+  curr = root;                /* current table index bits */
+  drop = 0;                   /* current bits to drop from code for index */
+  low = -1;                   /* trigger new sub-table when len > root */
+  used = 1 << root;          /* use root table entries */
+  mask = used - 1;            /* mask for comparing low */
+
+  /* check available table space */
+  if ((type === LENS && used > ENOUGH_LENS) ||
+    (type === DISTS && used > ENOUGH_DISTS)) {
+    return 1;
+  }
+
+  /* process all codes and make table entries */
+  for (;;) {
+    /* create table entry */
+    here_bits = len - drop;
+    if (work[sym] < end) {
+      here_op = 0;
+      here_val = work[sym];
+    }
+    else if (work[sym] > end) {
+      here_op = extra[extra_index + work[sym]];
+      here_val = base[base_index + work[sym]];
+    }
+    else {
+      here_op = 32 + 64;         /* end of block */
+      here_val = 0;
+    }
+
+    /* replicate for those indices with low len bits equal to huff */
+    incr = 1 << (len - drop);
+    fill = 1 << curr;
+    min = fill;                 /* save offset to next table */
+    do {
+      fill -= incr;
+      table[next + (huff >> drop) + fill] = (here_bits << 24) | (here_op << 16) | here_val |0;
+    } while (fill !== 0);
+
+    /* backwards increment the len-bit code huff */
+    incr = 1 << (len - 1);
+    while (huff & incr) {
+      incr >>= 1;
+    }
+    if (incr !== 0) {
+      huff &= incr - 1;
+      huff += incr;
+    } else {
+      huff = 0;
+    }
+
+    /* go to next symbol, update count, len */
+    sym++;
+    if (--count[len] === 0) {
+      if (len === max) { break; }
+      len = lens[lens_index + work[sym]];
+    }
+
+    /* create new sub-table if needed */
+    if (len > root && (huff & mask) !== low) {
+      /* if first time, transition to sub-tables */
+      if (drop === 0) {
+        drop = root;
+      }
+
+      /* increment past last table */
+      next += min;            /* here min is 1 << curr */
+
+      /* determine length of next table */
+      curr = len - drop;
+      left = 1 << curr;
+      while (curr + drop < max) {
+        left -= count[curr + drop];
+        if (left <= 0) { break; }
+        curr++;
+        left <<= 1;
+      }
+
+      /* check for enough space */
+      used += 1 << curr;
+      if ((type === LENS && used > ENOUGH_LENS) ||
+        (type === DISTS && used > ENOUGH_DISTS)) {
+        return 1;
+      }
+
+      /* point entry in root table to sub-table */
+      low = huff & mask;
+      /*table.op[low] = curr;
+      table.bits[low] = root;
+      table.val[low] = next - opts.table_index;*/
+      table[low] = (root << 24) | (curr << 16) | (next - table_index) |0;
+    }
+  }
+
+  /* fill in remaining table entry if code is incomplete (guaranteed to have
+   at most one remaining entry, since if the code is incomplete, the
+   maximum code length that was allowed to get this far is one bit) */
+  if (huff !== 0) {
+    //table.op[next + huff] = 64;            /* invalid code marker */
+    //table.bits[next + huff] = len - drop;
+    //table.val[next + huff] = 0;
+    table[next + huff] = ((len - drop) << 24) | (64 << 16) |0;
+  }
+
+  /* set return parameters */
+  //opts.table_index += used;
+  opts.bits = root;
+  return 0;
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/messages.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+module.exports = {
+  2:      'need dictionary',     /* Z_NEED_DICT       2  */
+  1:      'stream end',          /* Z_STREAM_END      1  */
+  0:      '',                    /* Z_OK              0  */
+  '-1':   'file error',          /* Z_ERRNO         (-1) */
+  '-2':   'stream error',        /* Z_STREAM_ERROR  (-2) */
+  '-3':   'data error',          /* Z_DATA_ERROR    (-3) */
+  '-4':   'insufficient memory', /* Z_MEM_ERROR     (-4) */
+  '-5':   'buffer error',        /* Z_BUF_ERROR     (-5) */
+  '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/trees.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+/* eslint-disable space-unary-ops */
+
+var utils = __webpack_require__("../../node_modules/pako/lib/utils/common.js");
+
+/* Public constants ==========================================================*/
+/* ===========================================================================*/
+
+
+//var Z_FILTERED          = 1;
+//var Z_HUFFMAN_ONLY      = 2;
+//var Z_RLE               = 3;
+var Z_FIXED               = 4;
+//var Z_DEFAULT_STRATEGY  = 0;
+
+/* Possible values of the data_type field (though see inflate()) */
+var Z_BINARY              = 0;
+var Z_TEXT                = 1;
+//var Z_ASCII             = 1; // = Z_TEXT
+var Z_UNKNOWN             = 2;
+
+/*============================================================================*/
+
+
+function zero(buf) { var len = buf.length; while (--len >= 0) { buf[len] = 0; } }
+
+// From zutil.h
+
+var STORED_BLOCK = 0;
+var STATIC_TREES = 1;
+var DYN_TREES    = 2;
+/* The three kinds of block type */
+
+var MIN_MATCH    = 3;
+var MAX_MATCH    = 258;
+/* The minimum and maximum match lengths */
+
+// From deflate.h
+/* ===========================================================================
+ * Internal compression state.
+ */
+
+var LENGTH_CODES  = 29;
+/* number of length codes, not counting the special END_BLOCK code */
+
+var LITERALS      = 256;
+/* number of literal bytes 0..255 */
+
+var L_CODES       = LITERALS + 1 + LENGTH_CODES;
+/* number of Literal or Length codes, including the END_BLOCK code */
+
+var D_CODES       = 30;
+/* number of distance codes */
+
+var BL_CODES      = 19;
+/* number of codes used to transfer the bit lengths */
+
+var HEAP_SIZE     = 2 * L_CODES + 1;
+/* maximum heap size */
+
+var MAX_BITS      = 15;
+/* All codes must not exceed MAX_BITS bits */
+
+var Buf_size      = 16;
+/* size of bit buffer in bi_buf */
+
+
+/* ===========================================================================
+ * Constants
+ */
+
+var MAX_BL_BITS = 7;
+/* Bit length codes must not exceed MAX_BL_BITS bits */
+
+var END_BLOCK   = 256;
+/* end of block literal code */
+
+var REP_3_6     = 16;
+/* repeat previous bit length 3-6 times (2 bits of repeat count) */
+
+var REPZ_3_10   = 17;
+/* repeat a zero length 3-10 times  (3 bits of repeat count) */
+
+var REPZ_11_138 = 18;
+/* repeat a zero length 11-138 times  (7 bits of repeat count) */
+
+/* eslint-disable comma-spacing,array-bracket-spacing */
+var extra_lbits =   /* extra bits for each length code */
+  [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+
+var extra_dbits =   /* extra bits for each distance code */
+  [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+
+var extra_blbits =  /* extra bits for each bit length code */
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,7];
+
+var bl_order =
+  [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
+/* eslint-enable comma-spacing,array-bracket-spacing */
+
+/* The lengths of the bit length codes are sent in order of decreasing
+ * probability, to avoid transmitting the lengths for unused bit length codes.
+ */
+
+/* ===========================================================================
+ * Local data. These are initialized only once.
+ */
+
+// We pre-fill arrays with 0 to avoid uninitialized gaps
+
+var DIST_CODE_LEN = 512; /* see definition of array dist_code below */
+
+// !!!! Use flat array instead of structure, Freq = i*2, Len = i*2+1
+var static_ltree  = new Array((L_CODES + 2) * 2);
+zero(static_ltree);
+/* The static literal tree. Since the bit lengths are imposed, there is no
+ * need for the L_CODES extra codes used during heap construction. However
+ * The codes 286 and 287 are needed to build a canonical tree (see _tr_init
+ * below).
+ */
+
+var static_dtree  = new Array(D_CODES * 2);
+zero(static_dtree);
+/* The static distance tree. (Actually a trivial tree since all codes use
+ * 5 bits.)
+ */
+
+var _dist_code    = new Array(DIST_CODE_LEN);
+zero(_dist_code);
+/* Distance codes. The first 256 values correspond to the distances
+ * 3 .. 258, the last 256 values correspond to the top 8 bits of
+ * the 15 bit distances.
+ */
+
+var _length_code  = new Array(MAX_MATCH - MIN_MATCH + 1);
+zero(_length_code);
+/* length code for each normalized match length (0 == MIN_MATCH) */
+
+var base_length   = new Array(LENGTH_CODES);
+zero(base_length);
+/* First normalized length for each code (0 = MIN_MATCH) */
+
+var base_dist     = new Array(D_CODES);
+zero(base_dist);
+/* First normalized distance for each code (0 = distance of 1) */
+
+
+function StaticTreeDesc(static_tree, extra_bits, extra_base, elems, max_length) {
+
+  this.static_tree  = static_tree;  /* static tree or NULL */
+  this.extra_bits   = extra_bits;   /* extra bits for each code or NULL */
+  this.extra_base   = extra_base;   /* base index for extra_bits */
+  this.elems        = elems;        /* max number of elements in the tree */
+  this.max_length   = max_length;   /* max bit length for the codes */
+
+  // show if `static_tree` has data or dummy - needed for monomorphic objects
+  this.has_stree    = static_tree && static_tree.length;
+}
+
+
+var static_l_desc;
+var static_d_desc;
+var static_bl_desc;
+
+
+function TreeDesc(dyn_tree, stat_desc) {
+  this.dyn_tree = dyn_tree;     /* the dynamic tree */
+  this.max_code = 0;            /* largest code with non zero frequency */
+  this.stat_desc = stat_desc;   /* the corresponding static tree */
+}
+
+
+
+function d_code(dist) {
+  return dist < 256 ? _dist_code[dist] : _dist_code[256 + (dist >>> 7)];
+}
+
+
+/* ===========================================================================
+ * Output a short LSB first on the stream.
+ * IN assertion: there is enough room in pendingBuf.
+ */
+function put_short(s, w) {
+//    put_byte(s, (uch)((w) & 0xff));
+//    put_byte(s, (uch)((ush)(w) >> 8));
+  s.pending_buf[s.pending++] = (w) & 0xff;
+  s.pending_buf[s.pending++] = (w >>> 8) & 0xff;
+}
+
+
+/* ===========================================================================
+ * Send a value on a given number of bits.
+ * IN assertion: length <= 16 and value fits in length bits.
+ */
+function send_bits(s, value, length) {
+  if (s.bi_valid > (Buf_size - length)) {
+    s.bi_buf |= (value << s.bi_valid) & 0xffff;
+    put_short(s, s.bi_buf);
+    s.bi_buf = value >> (Buf_size - s.bi_valid);
+    s.bi_valid += length - Buf_size;
+  } else {
+    s.bi_buf |= (value << s.bi_valid) & 0xffff;
+    s.bi_valid += length;
+  }
+}
+
+
+function send_code(s, c, tree) {
+  send_bits(s, tree[c * 2]/*.Code*/, tree[c * 2 + 1]/*.Len*/);
+}
+
+
+/* ===========================================================================
+ * Reverse the first len bits of a code, using straightforward code (a faster
+ * method would use a table)
+ * IN assertion: 1 <= len <= 15
+ */
+function bi_reverse(code, len) {
+  var res = 0;
+  do {
+    res |= code & 1;
+    code >>>= 1;
+    res <<= 1;
+  } while (--len > 0);
+  return res >>> 1;
+}
+
+
+/* ===========================================================================
+ * Flush the bit buffer, keeping at most 7 bits in it.
+ */
+function bi_flush(s) {
+  if (s.bi_valid === 16) {
+    put_short(s, s.bi_buf);
+    s.bi_buf = 0;
+    s.bi_valid = 0;
+
+  } else if (s.bi_valid >= 8) {
+    s.pending_buf[s.pending++] = s.bi_buf & 0xff;
+    s.bi_buf >>= 8;
+    s.bi_valid -= 8;
+  }
+}
+
+
+/* ===========================================================================
+ * Compute the optimal bit lengths for a tree and update the total bit length
+ * for the current block.
+ * IN assertion: the fields freq and dad are set, heap[heap_max] and
+ *    above are the tree nodes sorted by increasing frequency.
+ * OUT assertions: the field len is set to the optimal bit length, the
+ *     array bl_count contains the frequencies for each bit length.
+ *     The length opt_len is updated; static_len is also updated if stree is
+ *     not null.
+ */
+function gen_bitlen(s, desc)
+//    deflate_state *s;
+//    tree_desc *desc;    /* the tree descriptor */
+{
+  var tree            = desc.dyn_tree;
+  var max_code        = desc.max_code;
+  var stree           = desc.stat_desc.static_tree;
+  var has_stree       = desc.stat_desc.has_stree;
+  var extra           = desc.stat_desc.extra_bits;
+  var base            = desc.stat_desc.extra_base;
+  var max_length      = desc.stat_desc.max_length;
+  var h;              /* heap index */
+  var n, m;           /* iterate over the tree elements */
+  var bits;           /* bit length */
+  var xbits;          /* extra bits */
+  var f;              /* frequency */
+  var overflow = 0;   /* number of elements with bit length too large */
+
+  for (bits = 0; bits <= MAX_BITS; bits++) {
+    s.bl_count[bits] = 0;
+  }
+
+  /* In a first pass, compute the optimal bit lengths (which may
+   * overflow in the case of the bit length tree).
+   */
+  tree[s.heap[s.heap_max] * 2 + 1]/*.Len*/ = 0; /* root of the heap */
+
+  for (h = s.heap_max + 1; h < HEAP_SIZE; h++) {
+    n = s.heap[h];
+    bits = tree[tree[n * 2 + 1]/*.Dad*/ * 2 + 1]/*.Len*/ + 1;
+    if (bits > max_length) {
+      bits = max_length;
+      overflow++;
+    }
+    tree[n * 2 + 1]/*.Len*/ = bits;
+    /* We overwrite tree[n].Dad which is no longer needed */
+
+    if (n > max_code) { continue; } /* not a leaf node */
+
+    s.bl_count[bits]++;
+    xbits = 0;
+    if (n >= base) {
+      xbits = extra[n - base];
+    }
+    f = tree[n * 2]/*.Freq*/;
+    s.opt_len += f * (bits + xbits);
+    if (has_stree) {
+      s.static_len += f * (stree[n * 2 + 1]/*.Len*/ + xbits);
+    }
+  }
+  if (overflow === 0) { return; }
+
+  // Trace((stderr,"\nbit length overflow\n"));
+  /* This happens for example on obj2 and pic of the Calgary corpus */
+
+  /* Find the first bit length which could increase: */
+  do {
+    bits = max_length - 1;
+    while (s.bl_count[bits] === 0) { bits--; }
+    s.bl_count[bits]--;      /* move one leaf down the tree */
+    s.bl_count[bits + 1] += 2; /* move one overflow item as its brother */
+    s.bl_count[max_length]--;
+    /* The brother of the overflow item also moves one step up,
+     * but this does not affect bl_count[max_length]
+     */
+    overflow -= 2;
+  } while (overflow > 0);
+
+  /* Now recompute all bit lengths, scanning in increasing frequency.
+   * h is still equal to HEAP_SIZE. (It is simpler to reconstruct all
+   * lengths instead of fixing only the wrong ones. This idea is taken
+   * from 'ar' written by Haruhiko Okumura.)
+   */
+  for (bits = max_length; bits !== 0; bits--) {
+    n = s.bl_count[bits];
+    while (n !== 0) {
+      m = s.heap[--h];
+      if (m > max_code) { continue; }
+      if (tree[m * 2 + 1]/*.Len*/ !== bits) {
+        // Trace((stderr,"code %d bits %d->%d\n", m, tree[m].Len, bits));
+        s.opt_len += (bits - tree[m * 2 + 1]/*.Len*/) * tree[m * 2]/*.Freq*/;
+        tree[m * 2 + 1]/*.Len*/ = bits;
+      }
+      n--;
+    }
+  }
+}
+
+
+/* ===========================================================================
+ * Generate the codes for a given tree and bit counts (which need not be
+ * optimal).
+ * IN assertion: the array bl_count contains the bit length statistics for
+ * the given tree and the field len is set for all tree elements.
+ * OUT assertion: the field code is set for all tree elements of non
+ *     zero code length.
+ */
+function gen_codes(tree, max_code, bl_count)
+//    ct_data *tree;             /* the tree to decorate */
+//    int max_code;              /* largest code with non zero frequency */
+//    ushf *bl_count;            /* number of codes at each bit length */
+{
+  var next_code = new Array(MAX_BITS + 1); /* next code value for each bit length */
+  var code = 0;              /* running code value */
+  var bits;                  /* bit index */
+  var n;                     /* code index */
+
+  /* The distribution counts are first used to generate the code values
+   * without bit reversal.
+   */
+  for (bits = 1; bits <= MAX_BITS; bits++) {
+    next_code[bits] = code = (code + bl_count[bits - 1]) << 1;
+  }
+  /* Check that the bit counts in bl_count are consistent. The last code
+   * must be all ones.
+   */
+  //Assert (code + bl_count[MAX_BITS]-1 == (1<<MAX_BITS)-1,
+  //        "inconsistent bit counts");
+  //Tracev((stderr,"\ngen_codes: max_code %d ", max_code));
+
+  for (n = 0;  n <= max_code; n++) {
+    var len = tree[n * 2 + 1]/*.Len*/;
+    if (len === 0) { continue; }
+    /* Now reverse the bits */
+    tree[n * 2]/*.Code*/ = bi_reverse(next_code[len]++, len);
+
+    //Tracecv(tree != static_ltree, (stderr,"\nn %3d %c l %2d c %4x (%x) ",
+    //     n, (isgraph(n) ? n : ' '), len, tree[n].Code, next_code[len]-1));
+  }
+}
+
+
+/* ===========================================================================
+ * Initialize the various 'constant' tables.
+ */
+function tr_static_init() {
+  var n;        /* iterates over tree elements */
+  var bits;     /* bit counter */
+  var length;   /* length value */
+  var code;     /* code value */
+  var dist;     /* distance index */
+  var bl_count = new Array(MAX_BITS + 1);
+  /* number of codes at each bit length for an optimal tree */
+
+  // do check in _tr_init()
+  //if (static_init_done) return;
+
+  /* For some embedded targets, global variables are not initialized: */
+/*#ifdef NO_INIT_GLOBAL_POINTERS
+  static_l_desc.static_tree = static_ltree;
+  static_l_desc.extra_bits = extra_lbits;
+  static_d_desc.static_tree = static_dtree;
+  static_d_desc.extra_bits = extra_dbits;
+  static_bl_desc.extra_bits = extra_blbits;
+#endif*/
+
+  /* Initialize the mapping length (0..255) -> length code (0..28) */
+  length = 0;
+  for (code = 0; code < LENGTH_CODES - 1; code++) {
+    base_length[code] = length;
+    for (n = 0; n < (1 << extra_lbits[code]); n++) {
+      _length_code[length++] = code;
+    }
+  }
+  //Assert (length == 256, "tr_static_init: length != 256");
+  /* Note that the length 255 (match length 258) can be represented
+   * in two different ways: code 284 + 5 bits or code 285, so we
+   * overwrite length_code[255] to use the best encoding:
+   */
+  _length_code[length - 1] = code;
+
+  /* Initialize the mapping dist (0..32K) -> dist code (0..29) */
+  dist = 0;
+  for (code = 0; code < 16; code++) {
+    base_dist[code] = dist;
+    for (n = 0; n < (1 << extra_dbits[code]); n++) {
+      _dist_code[dist++] = code;
+    }
+  }
+  //Assert (dist == 256, "tr_static_init: dist != 256");
+  dist >>= 7; /* from now on, all distances are divided by 128 */
+  for (; code < D_CODES; code++) {
+    base_dist[code] = dist << 7;
+    for (n = 0; n < (1 << (extra_dbits[code] - 7)); n++) {
+      _dist_code[256 + dist++] = code;
+    }
+  }
+  //Assert (dist == 256, "tr_static_init: 256+dist != 512");
+
+  /* Construct the codes of the static literal tree */
+  for (bits = 0; bits <= MAX_BITS; bits++) {
+    bl_count[bits] = 0;
+  }
+
+  n = 0;
+  while (n <= 143) {
+    static_ltree[n * 2 + 1]/*.Len*/ = 8;
+    n++;
+    bl_count[8]++;
+  }
+  while (n <= 255) {
+    static_ltree[n * 2 + 1]/*.Len*/ = 9;
+    n++;
+    bl_count[9]++;
+  }
+  while (n <= 279) {
+    static_ltree[n * 2 + 1]/*.Len*/ = 7;
+    n++;
+    bl_count[7]++;
+  }
+  while (n <= 287) {
+    static_ltree[n * 2 + 1]/*.Len*/ = 8;
+    n++;
+    bl_count[8]++;
+  }
+  /* Codes 286 and 287 do not exist, but we must include them in the
+   * tree construction to get a canonical Huffman tree (longest code
+   * all ones)
+   */
+  gen_codes(static_ltree, L_CODES + 1, bl_count);
+
+  /* The static distance tree is trivial: */
+  for (n = 0; n < D_CODES; n++) {
+    static_dtree[n * 2 + 1]/*.Len*/ = 5;
+    static_dtree[n * 2]/*.Code*/ = bi_reverse(n, 5);
+  }
+
+  // Now data ready and we can init static trees
+  static_l_desc = new StaticTreeDesc(static_ltree, extra_lbits, LITERALS + 1, L_CODES, MAX_BITS);
+  static_d_desc = new StaticTreeDesc(static_dtree, extra_dbits, 0,          D_CODES, MAX_BITS);
+  static_bl_desc = new StaticTreeDesc(new Array(0), extra_blbits, 0,         BL_CODES, MAX_BL_BITS);
+
+  //static_init_done = true;
+}
+
+
+/* ===========================================================================
+ * Initialize a new block.
+ */
+function init_block(s) {
+  var n; /* iterates over tree elements */
+
+  /* Initialize the trees. */
+  for (n = 0; n < L_CODES;  n++) { s.dyn_ltree[n * 2]/*.Freq*/ = 0; }
+  for (n = 0; n < D_CODES;  n++) { s.dyn_dtree[n * 2]/*.Freq*/ = 0; }
+  for (n = 0; n < BL_CODES; n++) { s.bl_tree[n * 2]/*.Freq*/ = 0; }
+
+  s.dyn_ltree[END_BLOCK * 2]/*.Freq*/ = 1;
+  s.opt_len = s.static_len = 0;
+  s.last_lit = s.matches = 0;
+}
+
+
+/* ===========================================================================
+ * Flush the bit buffer and align the output on a byte boundary
+ */
+function bi_windup(s)
+{
+  if (s.bi_valid > 8) {
+    put_short(s, s.bi_buf);
+  } else if (s.bi_valid > 0) {
+    //put_byte(s, (Byte)s->bi_buf);
+    s.pending_buf[s.pending++] = s.bi_buf;
+  }
+  s.bi_buf = 0;
+  s.bi_valid = 0;
+}
+
+/* ===========================================================================
+ * Copy a stored block, storing first the length and its
+ * one's complement if requested.
+ */
+function copy_block(s, buf, len, header)
+//DeflateState *s;
+//charf    *buf;    /* the input data */
+//unsigned len;     /* its length */
+//int      header;  /* true if block header must be written */
+{
+  bi_windup(s);        /* align on byte boundary */
+
+  if (header) {
+    put_short(s, len);
+    put_short(s, ~len);
+  }
+//  while (len--) {
+//    put_byte(s, *buf++);
+//  }
+  utils.arraySet(s.pending_buf, s.window, buf, len, s.pending);
+  s.pending += len;
+}
+
+/* ===========================================================================
+ * Compares to subtrees, using the tree depth as tie breaker when
+ * the subtrees have equal frequency. This minimizes the worst case length.
+ */
+function smaller(tree, n, m, depth) {
+  var _n2 = n * 2;
+  var _m2 = m * 2;
+  return (tree[_n2]/*.Freq*/ < tree[_m2]/*.Freq*/ ||
+         (tree[_n2]/*.Freq*/ === tree[_m2]/*.Freq*/ && depth[n] <= depth[m]));
+}
+
+/* ===========================================================================
+ * Restore the heap property by moving down the tree starting at node k,
+ * exchanging a node with the smallest of its two sons if necessary, stopping
+ * when the heap property is re-established (each father smaller than its
+ * two sons).
+ */
+function pqdownheap(s, tree, k)
+//    deflate_state *s;
+//    ct_data *tree;  /* the tree to restore */
+//    int k;               /* node to move down */
+{
+  var v = s.heap[k];
+  var j = k << 1;  /* left son of k */
+  while (j <= s.heap_len) {
+    /* Set j to the smallest of the two sons: */
+    if (j < s.heap_len &&
+      smaller(tree, s.heap[j + 1], s.heap[j], s.depth)) {
+      j++;
+    }
+    /* Exit if v is smaller than both sons */
+    if (smaller(tree, v, s.heap[j], s.depth)) { break; }
+
+    /* Exchange v with the smallest son */
+    s.heap[k] = s.heap[j];
+    k = j;
+
+    /* And continue down the tree, setting j to the left son of k */
+    j <<= 1;
+  }
+  s.heap[k] = v;
+}
+
+
+// inlined manually
+// var SMALLEST = 1;
+
+/* ===========================================================================
+ * Send the block data compressed using the given Huffman trees
+ */
+function compress_block(s, ltree, dtree)
+//    deflate_state *s;
+//    const ct_data *ltree; /* literal tree */
+//    const ct_data *dtree; /* distance tree */
+{
+  var dist;           /* distance of matched string */
+  var lc;             /* match length or unmatched char (if dist == 0) */
+  var lx = 0;         /* running index in l_buf */
+  var code;           /* the code to send */
+  var extra;          /* number of extra bits to send */
+
+  if (s.last_lit !== 0) {
+    do {
+      dist = (s.pending_buf[s.d_buf + lx * 2] << 8) | (s.pending_buf[s.d_buf + lx * 2 + 1]);
+      lc = s.pending_buf[s.l_buf + lx];
+      lx++;
+
+      if (dist === 0) {
+        send_code(s, lc, ltree); /* send a literal byte */
+        //Tracecv(isgraph(lc), (stderr," '%c' ", lc));
+      } else {
+        /* Here, lc is the match length - MIN_MATCH */
+        code = _length_code[lc];
+        send_code(s, code + LITERALS + 1, ltree); /* send the length code */
+        extra = extra_lbits[code];
+        if (extra !== 0) {
+          lc -= base_length[code];
+          send_bits(s, lc, extra);       /* send the extra length bits */
+        }
+        dist--; /* dist is now the match distance - 1 */
+        code = d_code(dist);
+        //Assert (code < D_CODES, "bad d_code");
+
+        send_code(s, code, dtree);       /* send the distance code */
+        extra = extra_dbits[code];
+        if (extra !== 0) {
+          dist -= base_dist[code];
+          send_bits(s, dist, extra);   /* send the extra distance bits */
+        }
+      } /* literal or match pair ? */
+
+      /* Check that the overlay between pending_buf and d_buf+l_buf is ok: */
+      //Assert((uInt)(s->pending) < s->lit_bufsize + 2*lx,
+      //       "pendingBuf overflow");
+
+    } while (lx < s.last_lit);
+  }
+
+  send_code(s, END_BLOCK, ltree);
+}
+
+
+/* ===========================================================================
+ * Construct one Huffman tree and assigns the code bit strings and lengths.
+ * Update the total bit length for the current block.
+ * IN assertion: the field freq is set for all tree elements.
+ * OUT assertions: the fields len and code are set to the optimal bit length
+ *     and corresponding code. The length opt_len is updated; static_len is
+ *     also updated if stree is not null. The field max_code is set.
+ */
+function build_tree(s, desc)
+//    deflate_state *s;
+//    tree_desc *desc; /* the tree descriptor */
+{
+  var tree     = desc.dyn_tree;
+  var stree    = desc.stat_desc.static_tree;
+  var has_stree = desc.stat_desc.has_stree;
+  var elems    = desc.stat_desc.elems;
+  var n, m;          /* iterate over heap elements */
+  var max_code = -1; /* largest code with non zero frequency */
+  var node;          /* new node being created */
+
+  /* Construct the initial heap, with least frequent element in
+   * heap[SMALLEST]. The sons of heap[n] are heap[2*n] and heap[2*n+1].
+   * heap[0] is not used.
+   */
+  s.heap_len = 0;
+  s.heap_max = HEAP_SIZE;
+
+  for (n = 0; n < elems; n++) {
+    if (tree[n * 2]/*.Freq*/ !== 0) {
+      s.heap[++s.heap_len] = max_code = n;
+      s.depth[n] = 0;
+
+    } else {
+      tree[n * 2 + 1]/*.Len*/ = 0;
+    }
+  }
+
+  /* The pkzip format requires that at least one distance code exists,
+   * and that at least one bit should be sent even if there is only one
+   * possible code. So to avoid special checks later on we force at least
+   * two codes of non zero frequency.
+   */
+  while (s.heap_len < 2) {
+    node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+    tree[node * 2]/*.Freq*/ = 1;
+    s.depth[node] = 0;
+    s.opt_len--;
+
+    if (has_stree) {
+      s.static_len -= stree[node * 2 + 1]/*.Len*/;
+    }
+    /* node is 0 or 1 so it does not have extra bits */
+  }
+  desc.max_code = max_code;
+
+  /* The elements heap[heap_len/2+1 .. heap_len] are leaves of the tree,
+   * establish sub-heaps of increasing lengths:
+   */
+  for (n = (s.heap_len >> 1/*int /2*/); n >= 1; n--) { pqdownheap(s, tree, n); }
+
+  /* Construct the Huffman tree by repeatedly combining the least two
+   * frequent nodes.
+   */
+  node = elems;              /* next internal node of the tree */
+  do {
+    //pqremove(s, tree, n);  /* n = node of least frequency */
+    /*** pqremove ***/
+    n = s.heap[1/*SMALLEST*/];
+    s.heap[1/*SMALLEST*/] = s.heap[s.heap_len--];
+    pqdownheap(s, tree, 1/*SMALLEST*/);
+    /***/
+
+    m = s.heap[1/*SMALLEST*/]; /* m = node of next least frequency */
+
+    s.heap[--s.heap_max] = n; /* keep the nodes sorted by frequency */
+    s.heap[--s.heap_max] = m;
+
+    /* Create a new node father of n and m */
+    tree[node * 2]/*.Freq*/ = tree[n * 2]/*.Freq*/ + tree[m * 2]/*.Freq*/;
+    s.depth[node] = (s.depth[n] >= s.depth[m] ? s.depth[n] : s.depth[m]) + 1;
+    tree[n * 2 + 1]/*.Dad*/ = tree[m * 2 + 1]/*.Dad*/ = node;
+
+    /* and insert the new node in the heap */
+    s.heap[1/*SMALLEST*/] = node++;
+    pqdownheap(s, tree, 1/*SMALLEST*/);
+
+  } while (s.heap_len >= 2);
+
+  s.heap[--s.heap_max] = s.heap[1/*SMALLEST*/];
+
+  /* At this point, the fields freq and dad are set. We can now
+   * generate the bit lengths.
+   */
+  gen_bitlen(s, desc);
+
+  /* The field len is now set, we can generate the bit codes */
+  gen_codes(tree, max_code, s.bl_count);
+}
+
+
+/* ===========================================================================
+ * Scan a literal or distance tree to determine the frequencies of the codes
+ * in the bit length tree.
+ */
+function scan_tree(s, tree, max_code)
+//    deflate_state *s;
+//    ct_data *tree;   /* the tree to be scanned */
+//    int max_code;    /* and its largest code of non zero frequency */
+{
+  var n;                     /* iterates over all tree elements */
+  var prevlen = -1;          /* last emitted length */
+  var curlen;                /* length of current code */
+
+  var nextlen = tree[0 * 2 + 1]/*.Len*/; /* length of next code */
+
+  var count = 0;             /* repeat count of the current code */
+  var max_count = 7;         /* max repeat count */
+  var min_count = 4;         /* min repeat count */
+
+  if (nextlen === 0) {
+    max_count = 138;
+    min_count = 3;
+  }
+  tree[(max_code + 1) * 2 + 1]/*.Len*/ = 0xffff; /* guard */
+
+  for (n = 0; n <= max_code; n++) {
+    curlen = nextlen;
+    nextlen = tree[(n + 1) * 2 + 1]/*.Len*/;
+
+    if (++count < max_count && curlen === nextlen) {
+      continue;
+
+    } else if (count < min_count) {
+      s.bl_tree[curlen * 2]/*.Freq*/ += count;
+
+    } else if (curlen !== 0) {
+
+      if (curlen !== prevlen) { s.bl_tree[curlen * 2]/*.Freq*/++; }
+      s.bl_tree[REP_3_6 * 2]/*.Freq*/++;
+
+    } else if (count <= 10) {
+      s.bl_tree[REPZ_3_10 * 2]/*.Freq*/++;
+
+    } else {
+      s.bl_tree[REPZ_11_138 * 2]/*.Freq*/++;
+    }
+
+    count = 0;
+    prevlen = curlen;
+
+    if (nextlen === 0) {
+      max_count = 138;
+      min_count = 3;
+
+    } else if (curlen === nextlen) {
+      max_count = 6;
+      min_count = 3;
+
+    } else {
+      max_count = 7;
+      min_count = 4;
+    }
+  }
+}
+
+
+/* ===========================================================================
+ * Send a literal or distance tree in compressed form, using the codes in
+ * bl_tree.
+ */
+function send_tree(s, tree, max_code)
+//    deflate_state *s;
+//    ct_data *tree; /* the tree to be scanned */
+//    int max_code;       /* and its largest code of non zero frequency */
+{
+  var n;                     /* iterates over all tree elements */
+  var prevlen = -1;          /* last emitted length */
+  var curlen;                /* length of current code */
+
+  var nextlen = tree[0 * 2 + 1]/*.Len*/; /* length of next code */
+
+  var count = 0;             /* repeat count of the current code */
+  var max_count = 7;         /* max repeat count */
+  var min_count = 4;         /* min repeat count */
+
+  /* tree[max_code+1].Len = -1; */  /* guard already set */
+  if (nextlen === 0) {
+    max_count = 138;
+    min_count = 3;
+  }
+
+  for (n = 0; n <= max_code; n++) {
+    curlen = nextlen;
+    nextlen = tree[(n + 1) * 2 + 1]/*.Len*/;
+
+    if (++count < max_count && curlen === nextlen) {
+      continue;
+
+    } else if (count < min_count) {
+      do { send_code(s, curlen, s.bl_tree); } while (--count !== 0);
+
+    } else if (curlen !== 0) {
+      if (curlen !== prevlen) {
+        send_code(s, curlen, s.bl_tree);
+        count--;
+      }
+      //Assert(count >= 3 && count <= 6, " 3_6?");
+      send_code(s, REP_3_6, s.bl_tree);
+      send_bits(s, count - 3, 2);
+
+    } else if (count <= 10) {
+      send_code(s, REPZ_3_10, s.bl_tree);
+      send_bits(s, count - 3, 3);
+
+    } else {
+      send_code(s, REPZ_11_138, s.bl_tree);
+      send_bits(s, count - 11, 7);
+    }
+
+    count = 0;
+    prevlen = curlen;
+    if (nextlen === 0) {
+      max_count = 138;
+      min_count = 3;
+
+    } else if (curlen === nextlen) {
+      max_count = 6;
+      min_count = 3;
+
+    } else {
+      max_count = 7;
+      min_count = 4;
+    }
+  }
+}
+
+
+/* ===========================================================================
+ * Construct the Huffman tree for the bit lengths and return the index in
+ * bl_order of the last bit length code to send.
+ */
+function build_bl_tree(s) {
+  var max_blindex;  /* index of last bit length code of non zero freq */
+
+  /* Determine the bit length frequencies for literal and distance trees */
+  scan_tree(s, s.dyn_ltree, s.l_desc.max_code);
+  scan_tree(s, s.dyn_dtree, s.d_desc.max_code);
+
+  /* Build the bit length tree: */
+  build_tree(s, s.bl_desc);
+  /* opt_len now includes the length of the tree representations, except
+   * the lengths of the bit lengths codes and the 5+5+4 bits for the counts.
+   */
+
+  /* Determine the number of bit length codes to send. The pkzip format
+   * requires that at least 4 bit length codes be sent. (appnote.txt says
+   * 3 but the actual value used is 4.)
+   */
+  for (max_blindex = BL_CODES - 1; max_blindex >= 3; max_blindex--) {
+    if (s.bl_tree[bl_order[max_blindex] * 2 + 1]/*.Len*/ !== 0) {
+      break;
+    }
+  }
+  /* Update opt_len to include the bit length tree and counts */
+  s.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
+  //Tracev((stderr, "\ndyn trees: dyn %ld, stat %ld",
+  //        s->opt_len, s->static_len));
+
+  return max_blindex;
+}
+
+
+/* ===========================================================================
+ * Send the header for a block using dynamic Huffman trees: the counts, the
+ * lengths of the bit length codes, the literal tree and the distance tree.
+ * IN assertion: lcodes >= 257, dcodes >= 1, blcodes >= 4.
+ */
+function send_all_trees(s, lcodes, dcodes, blcodes)
+//    deflate_state *s;
+//    int lcodes, dcodes, blcodes; /* number of codes for each tree */
+{
+  var rank;                    /* index in bl_order */
+
+  //Assert (lcodes >= 257 && dcodes >= 1 && blcodes >= 4, "not enough codes");
+  //Assert (lcodes <= L_CODES && dcodes <= D_CODES && blcodes <= BL_CODES,
+  //        "too many codes");
+  //Tracev((stderr, "\nbl counts: "));
+  send_bits(s, lcodes - 257, 5); /* not +255 as stated in appnote.txt */
+  send_bits(s, dcodes - 1,   5);
+  send_bits(s, blcodes - 4,  4); /* not -3 as stated in appnote.txt */
+  for (rank = 0; rank < blcodes; rank++) {
+    //Tracev((stderr, "\nbl code %2d ", bl_order[rank]));
+    send_bits(s, s.bl_tree[bl_order[rank] * 2 + 1]/*.Len*/, 3);
+  }
+  //Tracev((stderr, "\nbl tree: sent %ld", s->bits_sent));
+
+  send_tree(s, s.dyn_ltree, lcodes - 1); /* literal tree */
+  //Tracev((stderr, "\nlit tree: sent %ld", s->bits_sent));
+
+  send_tree(s, s.dyn_dtree, dcodes - 1); /* distance tree */
+  //Tracev((stderr, "\ndist tree: sent %ld", s->bits_sent));
+}
+
+
+/* ===========================================================================
+ * Check if the data type is TEXT or BINARY, using the following algorithm:
+ * - TEXT if the two conditions below are satisfied:
+ *    a) There are no non-portable control characters belonging to the
+ *       "black list" (0..6, 14..25, 28..31).
+ *    b) There is at least one printable character belonging to the
+ *       "white list" (9 {TAB}, 10 {LF}, 13 {CR}, 32..255).
+ * - BINARY otherwise.
+ * - The following partially-portable control characters form a
+ *   "gray list" that is ignored in this detection algorithm:
+ *   (7 {BEL}, 8 {BS}, 11 {VT}, 12 {FF}, 26 {SUB}, 27 {ESC}).
+ * IN assertion: the fields Freq of dyn_ltree are set.
+ */
+function detect_data_type(s) {
+  /* black_mask is the bit mask of black-listed bytes
+   * set bits 0..6, 14..25, and 28..31
+   * 0xf3ffc07f = binary 11110011111111111100000001111111
+   */
+  var black_mask = 0xf3ffc07f;
+  var n;
+
+  /* Check for non-textual ("black-listed") bytes. */
+  for (n = 0; n <= 31; n++, black_mask >>>= 1) {
+    if ((black_mask & 1) && (s.dyn_ltree[n * 2]/*.Freq*/ !== 0)) {
+      return Z_BINARY;
+    }
+  }
+
+  /* Check for textual ("white-listed") bytes. */
+  if (s.dyn_ltree[9 * 2]/*.Freq*/ !== 0 || s.dyn_ltree[10 * 2]/*.Freq*/ !== 0 ||
+      s.dyn_ltree[13 * 2]/*.Freq*/ !== 0) {
+    return Z_TEXT;
+  }
+  for (n = 32; n < LITERALS; n++) {
+    if (s.dyn_ltree[n * 2]/*.Freq*/ !== 0) {
+      return Z_TEXT;
+    }
+  }
+
+  /* There are no "black-listed" or "white-listed" bytes:
+   * this stream either is empty or has tolerated ("gray-listed") bytes only.
+   */
+  return Z_BINARY;
+}
+
+
+var static_init_done = false;
+
+/* ===========================================================================
+ * Initialize the tree data structures for a new zlib stream.
+ */
+function _tr_init(s)
+{
+
+  if (!static_init_done) {
+    tr_static_init();
+    static_init_done = true;
+  }
+
+  s.l_desc  = new TreeDesc(s.dyn_ltree, static_l_desc);
+  s.d_desc  = new TreeDesc(s.dyn_dtree, static_d_desc);
+  s.bl_desc = new TreeDesc(s.bl_tree, static_bl_desc);
+
+  s.bi_buf = 0;
+  s.bi_valid = 0;
+
+  /* Initialize the first block of the first file: */
+  init_block(s);
+}
+
+
+/* ===========================================================================
+ * Send a stored block
+ */
+function _tr_stored_block(s, buf, stored_len, last)
+//DeflateState *s;
+//charf *buf;       /* input block */
+//ulg stored_len;   /* length of input block */
+//int last;         /* one if this is the last block for a file */
+{
+  send_bits(s, (STORED_BLOCK << 1) + (last ? 1 : 0), 3);    /* send block type */
+  copy_block(s, buf, stored_len, true); /* with header */
+}
+
+
+/* ===========================================================================
+ * Send one empty static block to give enough lookahead for inflate.
+ * This takes 10 bits, of which 7 may remain in the bit buffer.
+ */
+function _tr_align(s) {
+  send_bits(s, STATIC_TREES << 1, 3);
+  send_code(s, END_BLOCK, static_ltree);
+  bi_flush(s);
+}
+
+
+/* ===========================================================================
+ * Determine the best encoding for the current block: dynamic trees, static
+ * trees or store, and output the encoded block to the zip file.
+ */
+function _tr_flush_block(s, buf, stored_len, last)
+//DeflateState *s;
+//charf *buf;       /* input block, or NULL if too old */
+//ulg stored_len;   /* length of input block */
+//int last;         /* one if this is the last block for a file */
+{
+  var opt_lenb, static_lenb;  /* opt_len and static_len in bytes */
+  var max_blindex = 0;        /* index of last bit length code of non zero freq */
+
+  /* Build the Huffman trees unless a stored block is forced */
+  if (s.level > 0) {
+
+    /* Check if the file is binary or text */
+    if (s.strm.data_type === Z_UNKNOWN) {
+      s.strm.data_type = detect_data_type(s);
+    }
+
+    /* Construct the literal and distance trees */
+    build_tree(s, s.l_desc);
+    // Tracev((stderr, "\nlit data: dyn %ld, stat %ld", s->opt_len,
+    //        s->static_len));
+
+    build_tree(s, s.d_desc);
+    // Tracev((stderr, "\ndist data: dyn %ld, stat %ld", s->opt_len,
+    //        s->static_len));
+    /* At this point, opt_len and static_len are the total bit lengths of
+     * the compressed block data, excluding the tree representations.
+     */
+
+    /* Build the bit length tree for the above two trees, and get the index
+     * in bl_order of the last bit length code to send.
+     */
+    max_blindex = build_bl_tree(s);
+
+    /* Determine the best encoding. Compute the block lengths in bytes. */
+    opt_lenb = (s.opt_len + 3 + 7) >>> 3;
+    static_lenb = (s.static_len + 3 + 7) >>> 3;
+
+    // Tracev((stderr, "\nopt %lu(%lu) stat %lu(%lu) stored %lu lit %u ",
+    //        opt_lenb, s->opt_len, static_lenb, s->static_len, stored_len,
+    //        s->last_lit));
+
+    if (static_lenb <= opt_lenb) { opt_lenb = static_lenb; }
+
+  } else {
+    // Assert(buf != (char*)0, "lost buf");
+    opt_lenb = static_lenb = stored_len + 5; /* force a stored block */
+  }
+
+  if ((stored_len + 4 <= opt_lenb) && (buf !== -1)) {
+    /* 4: two words for the lengths */
+
+    /* The test buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.
+     * Otherwise we can't have processed more than WSIZE input bytes since
+     * the last block flush, because compression would have been
+     * successful. If LIT_BUFSIZE <= WSIZE, it is never too late to
+     * transform a block into a stored block.
+     */
+    _tr_stored_block(s, buf, stored_len, last);
+
+  } else if (s.strategy === Z_FIXED || static_lenb === opt_lenb) {
+
+    send_bits(s, (STATIC_TREES << 1) + (last ? 1 : 0), 3);
+    compress_block(s, static_ltree, static_dtree);
+
+  } else {
+    send_bits(s, (DYN_TREES << 1) + (last ? 1 : 0), 3);
+    send_all_trees(s, s.l_desc.max_code + 1, s.d_desc.max_code + 1, max_blindex + 1);
+    compress_block(s, s.dyn_ltree, s.dyn_dtree);
+  }
+  // Assert (s->compressed_len == s->bits_sent, "bad compressed size");
+  /* The above check is made mod 2^32, for files larger than 512 MB
+   * and uLong implemented on 32 bits.
+   */
+  init_block(s);
+
+  if (last) {
+    bi_windup(s);
+  }
+  // Tracev((stderr,"\ncomprlen %lu(%lu) ", s->compressed_len>>3,
+  //       s->compressed_len-7*last));
+}
+
+/* ===========================================================================
+ * Save the match info and tally the frequency counts. Return true if
+ * the current block must be flushed.
+ */
+function _tr_tally(s, dist, lc)
+//    deflate_state *s;
+//    unsigned dist;  /* distance of matched string */
+//    unsigned lc;    /* match length-MIN_MATCH or unmatched char (if dist==0) */
+{
+  //var out_length, in_length, dcode;
+
+  s.pending_buf[s.d_buf + s.last_lit * 2]     = (dist >>> 8) & 0xff;
+  s.pending_buf[s.d_buf + s.last_lit * 2 + 1] = dist & 0xff;
+
+  s.pending_buf[s.l_buf + s.last_lit] = lc & 0xff;
+  s.last_lit++;
+
+  if (dist === 0) {
+    /* lc is the unmatched char */
+    s.dyn_ltree[lc * 2]/*.Freq*/++;
+  } else {
+    s.matches++;
+    /* Here, lc is the match length - MIN_MATCH */
+    dist--;             /* dist = match distance - 1 */
+    //Assert((ush)dist < (ush)MAX_DIST(s) &&
+    //       (ush)lc <= (ush)(MAX_MATCH-MIN_MATCH) &&
+    //       (ush)d_code(dist) < (ush)D_CODES,  "_tr_tally: bad match");
+
+    s.dyn_ltree[(_length_code[lc] + LITERALS + 1) * 2]/*.Freq*/++;
+    s.dyn_dtree[d_code(dist) * 2]/*.Freq*/++;
+  }
+
+// (!) This block is disabled in zlib defaults,
+// don't enable it for binary compatibility
+
+//#ifdef TRUNCATE_BLOCK
+//  /* Try to guess if it is profitable to stop the current block here */
+//  if ((s.last_lit & 0x1fff) === 0 && s.level > 2) {
+//    /* Compute an upper bound for the compressed length */
+//    out_length = s.last_lit*8;
+//    in_length = s.strstart - s.block_start;
+//
+//    for (dcode = 0; dcode < D_CODES; dcode++) {
+//      out_length += s.dyn_dtree[dcode*2]/*.Freq*/ * (5 + extra_dbits[dcode]);
+//    }
+//    out_length >>>= 3;
+//    //Tracev((stderr,"\nlast_lit %u, in %ld, out ~%ld(%ld%%) ",
+//    //       s->last_lit, in_length, out_length,
+//    //       100L - out_length*100L/in_length));
+//    if (s.matches < (s.last_lit>>1)/*int /2*/ && out_length < (in_length>>1)/*int /2*/) {
+//      return true;
+//    }
+//  }
+//#endif
+
+  return (s.last_lit === s.lit_bufsize - 1);
+  /* We avoid equality with lit_bufsize because of wraparound at 64K
+   * on 16 bit machines and because stored blocks are restricted to
+   * 64K-1 bytes.
+   */
+}
+
+exports._tr_init  = _tr_init;
+exports._tr_stored_block = _tr_stored_block;
+exports._tr_flush_block  = _tr_flush_block;
+exports._tr_tally = _tr_tally;
+exports._tr_align = _tr_align;
+
+
+/***/ }),
+
+/***/ "../../node_modules/pako/lib/zlib/zstream.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+function ZStream() {
+  /* next input byte */
+  this.input = null; // JS specific, because we have no pointers
+  this.next_in = 0;
+  /* number of bytes available at input */
+  this.avail_in = 0;
+  /* total number of input bytes read so far */
+  this.total_in = 0;
+  /* next output byte should be put there */
+  this.output = null; // JS specific, because we have no pointers
+  this.next_out = 0;
+  /* remaining free space at output */
+  this.avail_out = 0;
+  /* total number of bytes output so far */
+  this.total_out = 0;
+  /* last error message, NULL if no error */
+  this.msg = ''/*Z_NULL*/;
+  /* not visible by applications */
+  this.state = null;
+  /* best guess about the data type: binary or text */
+  this.data_type = 2/*Z_UNKNOWN*/;
+  /* adler32 value of the uncompressed data */
+  this.adler = 0;
+}
+
+module.exports = ZStream;
 
 
 /***/ }),
@@ -14043,6 +21085,245 @@ function toSpaceCase(string) {
 
 /***/ }),
 
+/***/ "../../node_modules/utf8/utf8.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/utf8js v2.1.2 by @mathias */
+;(function(root) {
+
+	// Detect free variables `exports`
+	var freeExports =  true && exports;
+
+	// Detect free variable `module`
+	var freeModule =  true && module &&
+		module.exports == freeExports && module;
+
+	// Detect free variable `global`, from Node.js or Browserified code,
+	// and use it as `root`
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var stringFromCharCode = String.fromCharCode;
+
+	// Taken from https://mths.be/punycode
+	function ucs2decode(string) {
+		var output = [];
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
+			} else {
+				output.push(value);
+			}
+		}
+		return output;
+	}
+
+	// Taken from https://mths.be/punycode
+	function ucs2encode(array) {
+		var length = array.length;
+		var index = -1;
+		var value;
+		var output = '';
+		while (++index < length) {
+			value = array[index];
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
+		}
+		return output;
+	}
+
+	function checkScalarValue(codePoint) {
+		if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+			throw Error(
+				'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
+				' is not a scalar value'
+			);
+		}
+	}
+	/*--------------------------------------------------------------------------*/
+
+	function createByte(codePoint, shift) {
+		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+	}
+
+	function encodeCodePoint(codePoint) {
+		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
+			return stringFromCharCode(codePoint);
+		}
+		var symbol = '';
+		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
+		}
+		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
+			checkScalarValue(codePoint);
+			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
+			symbol += createByte(codePoint, 6);
+		}
+		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
+			symbol += createByte(codePoint, 12);
+			symbol += createByte(codePoint, 6);
+		}
+		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+		return symbol;
+	}
+
+	function utf8encode(string) {
+		var codePoints = ucs2decode(string);
+		var length = codePoints.length;
+		var index = -1;
+		var codePoint;
+		var byteString = '';
+		while (++index < length) {
+			codePoint = codePoints[index];
+			byteString += encodeCodePoint(codePoint);
+		}
+		return byteString;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	function readContinuationByte() {
+		if (byteIndex >= byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		var continuationByte = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		if ((continuationByte & 0xC0) == 0x80) {
+			return continuationByte & 0x3F;
+		}
+
+		// If we end up here, it’s not a continuation byte
+		throw Error('Invalid continuation byte');
+	}
+
+	function decodeSymbol() {
+		var byte1;
+		var byte2;
+		var byte3;
+		var byte4;
+		var codePoint;
+
+		if (byteIndex > byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		if (byteIndex == byteCount) {
+			return false;
+		}
+
+		// Read first byte
+		byte1 = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		// 1-byte sequence (no continuation bytes)
+		if ((byte1 & 0x80) == 0) {
+			return byte1;
+		}
+
+		// 2-byte sequence
+		if ((byte1 & 0xE0) == 0xC0) {
+			byte2 = readContinuationByte();
+			codePoint = ((byte1 & 0x1F) << 6) | byte2;
+			if (codePoint >= 0x80) {
+				return codePoint;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 3-byte sequence (may include unpaired surrogates)
+		if ((byte1 & 0xF0) == 0xE0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
+			if (codePoint >= 0x0800) {
+				checkScalarValue(codePoint);
+				return codePoint;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 4-byte sequence
+		if ((byte1 & 0xF8) == 0xF0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			byte4 = readContinuationByte();
+			codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
+				(byte3 << 0x06) | byte4;
+			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
+				return codePoint;
+			}
+		}
+
+		throw Error('Invalid UTF-8 detected');
+	}
+
+	var byteArray;
+	var byteCount;
+	var byteIndex;
+	function utf8decode(byteString) {
+		byteArray = ucs2decode(byteString);
+		byteCount = byteArray.length;
+		byteIndex = 0;
+		var codePoints = [];
+		var tmp;
+		while ((tmp = decodeSymbol()) !== false) {
+			codePoints.push(tmp);
+		}
+		return ucs2encode(codePoints);
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var utf8 = {
+		'version': '2.1.2',
+		'encode': utf8encode,
+		'decode': utf8decode
+	};
+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		true
+	) {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+			return utf8;
+		}).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}	else { var key, hasOwnProperty, object; }
+
+}(this));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__("../../node_modules/webpack/buildin/module.js")(module), __webpack_require__("../../node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "../../node_modules/util/support/isBufferBrowser.js":
 /***/ (function(module, exports) {
 
@@ -18846,113 +26127,6 @@ const SUBSCRIPTION_STATE = exports.SUBSCRIPTION_STATE = {
 
 /***/ }),
 
-/***/ "../kandy/src/auth/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = authCpaas;
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _events = __webpack_require__("../kandy/src/auth/interface/events.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _interface = __webpack_require__("../kandy/src/auth/interface/index.js");
-
-var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
-
-var _utils = __webpack_require__("../kandy/src/common/utils.js");
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Utilities.
-
-
-// The interface to follow.
-// Redux-Saga
-const log = (0, _logs.getLogManager)().getLogger('AUTH');
-
-/**
- * Configuration options for the Authentication feature.
- * @public
- * @name config.authentication
- * @memberof config
- * @instance
- * @param {Object} authentication Authentication configs.
- * @param {Object} authentication.server Information for how to reach the platform.
- * @param {string} authentication.server.base Server to be used for requests.
- * @param {string} [authentication.server.protocol=https] Protocol to be used for requests.
- * @param {Number} [authentication.server.port=443] Port to be used for requests.
- * @param {string} [authentication.server.version=v1] Version of the REST API to be used.
- * @param {string} authentication.clientCorrelator Unique ID for the client. This is required by the platform to identify an instance of the application used by the specific device.
- */
-
-/**
- * CPaaS authentication implementation factory.
- * @method authCpaas
- * @param {Object} options - Configuration options for authentication. See above.
- * @return {Object} plugin - An authentication plugin.
- */
-
-
-/**
- * selector for exposed authentication state
- */
-
-
-// State setters.
-
-// Events
-function authCpaas(options = {}) {
-  const defaultOptions = {
-    server: {
-      protocol: 'https',
-      base: undefined,
-      version: 'v1',
-      port: '443'
-    },
-    clientCorrelator: undefined
-  };
-
-  options = (0, _utils.mergeValues)(defaultOptions, options);
-
-  if (!options.server.base || !options.clientCorrelator) {
-    log.error('Missing required configurations. Please provide proper authentication configurations.');
-  }
-
-  function* init() {
-    // Send the provided options to the store.
-    // This will be `state.config[name]`.
-    yield (0, _effects.put)((0, _actions2.update)(options, _interface.name));
-    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
-  }
-
-  const capabilities = ['cpaasAuth'];
-
-  return {
-    capabilities,
-    init,
-    api: _interface.api,
-    selector: _selectors.getExposedState,
-    reducer: _interface.reducer,
-    name: _interface.name
-  };
-}
-
-/***/ }),
-
 /***/ "../kandy/src/auth/interface/actionTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20178,6 +27352,1150 @@ function getRequestInfo(state, platform) {
 
 /***/ }),
 
+/***/ "../kandy/src/auth/subscription/requests.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.subscribe = subscribe;
+exports.unsubscribe = unsubscribe;
+exports.resubscribe = resubscribe;
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _services = __webpack_require__("../kandy/src/auth/subscription/services.js");
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _utils = __webpack_require__("../kandy/src/common/utils.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Other plugins.
+// Authentication plugin.
+const log = (0, _logs.getLogManager)().getLogger('AUTH');
+
+/**
+ * Subscribe to SPiDR with the provided information.
+ * @method subscribe
+ * @param  {Object} connection Server information.
+ * @param  {Object} credentials User information.
+ * @return {Object} Subscription response.
+ */
+
+
+// Constants
+
+
+// Libraries.
+function* subscribe(connection, credentials, extras = {}) {
+  let subscribeType = connection.isAnonymous ? 'anonymous' : 'user';
+  let requestOptions = {};
+  requestOptions.method = 'POST';
+
+  requestOptions.url = `${connection.protocol}://${connection.server}:${connection.port}` + `/rest/version/${connection.version}` + `/${subscribeType}/${credentials.username}/subscription`;
+
+  requestOptions.body = (0, _stringify2.default)({
+    subscribeRequest: {
+      expires: connection.expires,
+      service: connection.service,
+      localization: connection.localization || 'English_US',
+      useTurn: connection.useTurn || true,
+      notificationType: connection.notificationType || 'WebSocket',
+      supported: ['RingingFeedback']
+    }
+  });
+
+  // If there were any extra request options, merge them into the
+  //      options for this request. Priority is for the options defined here.
+  requestOptions = (0, _utils.mergeValues)(extras, requestOptions);
+
+  // Send the subscription request.
+  const response = yield (0, _effects2.default)(requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      let { statusCode } = response.payload.body.subscribeResponse;
+      log.debug(`Failed user subscription with status code ${statusCode}.`);
+
+      // Handle errors from the server.
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Failed to subscribe user. Code: ${statusCode}.`,
+          code: _errors.authCodes.LINK_SUBSCRIBE_FAIL
+        })
+      };
+    } else {
+      log.debug('Failed user subscription.', response.payload.result.message);
+      // Handle errors from the request plugin.
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Subscribe request failed: ${response.payload.result.message}.`,
+          // TODO: Shared error codes.
+          code: _errors.authCodes.LINK_SUBSCRIBE_FAIL
+        })
+      };
+    }
+  } else {
+    // Request was successful.
+    let subscribeResponse = response.payload.body.subscribeResponse;
+
+    let subscribedServices = subscribeResponse.subscriptionParams.service;
+    let servicesInfo = yield (0, _effects3.call)(_services.parseSpidrServices, connection.service, subscribedServices);
+    log.debug(`Subscribed user. Service subscription status: ${servicesInfo.status}`);
+
+    return (0, _extends3.default)({
+      error: false,
+      servicesInfo
+    }, subscribeResponse);
+  }
+}
+
+/**
+ * Unsubscribe from SPiDR with the provided subscription info.
+ * @method unsubscribe
+ * @param  {Object}    connection Server information for the service in use.
+ * @param  {string}    connection.server Server information for generating the URL.
+ * @param  {string}    connection.requestOptions Common request options to be added.
+ * @param  {string}    subscriptionURL URL of the user's subscription instance.
+ * @return {Object}    Unsubscription response.
+ */
+function* unsubscribe(connection, subscriptionURL) {
+  let requestOptions = {};
+  requestOptions.method = 'DELETE';
+
+  requestOptions.url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}` + subscriptionURL;
+
+  requestOptions.headers = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+
+    // Send the unsubscribe request.
+  };const response = yield (0, _effects2.default)(requestOptions, connection.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.subscribeResponse;
+      log.debug(`Failed to unsubscribe user with status code ${statusCode}.`);
+
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Failed to unsubscribe user. Code: ${statusCode}.`,
+          code: _errors.authCodes.LINK_UNSUBSCRIBE_FAIL
+        })
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug('Failed user unsubscription.', message);
+
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Unsubscribe request failed: ${message}.`,
+          // TODO: Shared error codes.
+          code: _errors.authCodes.LINK_UNSUBSCRIBE_FAIL
+        })
+      };
+    }
+  } else {
+    // Request was successful.
+    let unsubResponse = response.payload.body.subscribeResponse;
+    let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+
+    if (platform === _constants.platforms.LINK && unsubResponse.statusCode === 0) {
+      // Link success response.
+      return (0, _extends3.default)({
+        error: false
+      }, unsubResponse);
+    } else if (platform === _constants.platforms.UC && unsubResponse.statusCode === 0) {
+      // Link success response.
+      return (0, _extends3.default)({
+        error: false
+      }, unsubResponse);
+    } else {
+      // Unknown statusCode, consider as failure.
+      return {
+        error: new _errors2.default({
+          message: `Unknown error; statusCode: ${unsubResponse.statusCode}.`,
+          code: _errors.authCodes.LINK_UNSUBSCRIBE_FAIL
+        })
+      };
+    }
+  }
+}
+
+/**
+ * Resubscribe to SPiDR to extend an existing subscription.
+ * @method resubscribe
+ * @param  {Object}    connection Server information for the service in use.
+ * @param  {string}    connection.server Server information for generating the URL.
+ * @param  {string}    connection.requestOptions Common request options to be added.
+ * @param  {Object}    subscription Information about the subscription instance.
+ * @param  {string}    subscription.expires - The time (in seconds) until subscription expiry.
+ * @param  {Array}     subscription.service - The SPiDR services to resubscribe to.
+ * @param  {Array}     subscription.url - The URL of the user's subscription instance.
+ * @return {Object}    Resubscription response.
+ */
+function* resubscribe(connection, subscription) {
+  let requestOptions = {};
+  requestOptions.method = 'PUT';
+
+  requestOptions.url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}` + subscription.url;
+
+  requestOptions.headers = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+    // TODO: Don't hardcode the defaults here. Should be shared with
+    //      the subscribe request as well.
+  };requestOptions.body = (0, _stringify2.default)({
+    subscribeRequest: {
+      expires: subscription.expires,
+      service: subscription.service,
+      localization: subscription.localization || 'English_US',
+      useTurn: subscription.useTurn || true,
+      notificationType: subscription.notificationType || 'WebSocket'
+    }
+  });
+
+  // Send the subscription update request.
+  const response = yield (0, _effects2.default)(requestOptions, connection.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.subscribeResponse;
+      log.debug(`Failed to update user subscription with status code ${statusCode}.`);
+
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Failed to update user subscription. Code: ${statusCode}.`,
+          code: _errors.authCodes.LINK_UPDATE_SUBSCRIPTION_FAIL
+        })
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug('User subscription update request failed.', message);
+
+      return {
+        // TODO: Better error; more info.
+        error: new _errors2.default({
+          message: `Update subscription request failed.: ${message}.`,
+          // TODO: Shared error codes.
+          code: _errors.authCodes.LINK_UPDATE_SUBSCRIPTION_FAIL
+        })
+      };
+    }
+  } else {
+    // Request was successful.
+    let resubResponse = response.payload.body.subscribeResponse;
+
+    if (resubResponse.statusCode === 0 || resubResponse.statusCode === 2) {
+      let subscribedServices = resubResponse.subscriptionParams.service;
+      let servicesInfo = yield (0, _effects3.call)(_services.parseSpidrServices, subscription.service, subscribedServices);
+      log.debug(`Resubscribed user. Service resubscription status: ${servicesInfo.status}`);
+
+      // Success.
+      return (0, _extends3.default)({
+        error: false,
+        servicesInfo
+      }, resubResponse);
+    } else {
+      // Unknown statusCode, consider as failure.
+      return {
+        error: new _errors2.default({
+          message: `Unknown error; statusCode: ${resubResponse.statusCode}.`,
+          code: _errors.authCodes.LINK_UPDATE_SUBSCRIPTION_FAIL
+        })
+      };
+    }
+  }
+}
+
+/***/ }),
+
+/***/ "../kandy/src/auth/subscription/services.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parseSpidrServices = parseSpidrServices;
+
+var _constants = __webpack_require__("../kandy/src/auth/constants.js");
+
+/**
+ * Uses the requested and received SPiDR [subscription] services to determine
+ *      the SDK subscription status for each service.
+ * @method parseSpidrServices
+ * @param  {Array}  requested The list of requested SPiDR services.
+ * @param  {Array}  received The list of received SPiDR services.
+ * @return {Object} Information about the SDK's subscriptions.
+ */
+function parseSpidrServices(requested, received) {
+  // UC platform is not case-sensitive (Link is), so filter without caring about case.
+  let upperReceived = received.map(service => service.toUpperCase());
+
+  // Find the missing services.
+  let missing = requested.filter(function (reqService) {
+    // If the requested service was received (not caring about case),
+    //      it is not missing.
+    return upperReceived.indexOf(reqService.toUpperCase()) === -1;
+  });
+
+  let subscriptions = {
+    requested,
+    received,
+    missing,
+    status: 'UNKNOWN',
+    services: {}
+
+    // Determine the overall subscription status.
+  };if (received.length === 0) {
+    subscriptions.status = _constants.SUBSCRIPTION_STATE.NONE;
+  } else if (received.length > 0 && missing.length > 0) {
+    subscriptions.status = _constants.SUBSCRIPTION_STATE.PARTIAL;
+  } else if (received.length > 0 && requested.length === received.length) {
+    subscriptions.status = _constants.SUBSCRIPTION_STATE.FULL;
+  } else {}
+  // Should never reach this case.
+
+
+  // List the individual service statuses.
+  received.forEach(function (service) {
+    subscriptions.services[service] = true;
+  });
+  missing.forEach(function (service) {
+    subscriptions.services[service] = false;
+  });
+
+  return subscriptions;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/auth/tokens/uc.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createToken = createToken;
+exports.refreshToken = refreshToken;
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _base = __webpack_require__("../../node_modules/base-64/base64.js");
+
+var _base2 = _interopRequireDefault(_base);
+
+var _utf = __webpack_require__("../../node_modules/utf8/utf8.js");
+
+var _utf2 = _interopRequireDefault(_utf);
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Helpers.
+
+
+// Libraries.
+const log = (0, _logs.getLogManager)().getLogger('AUTH');
+
+/**
+ * Generates a token using the user credentials.
+ * @method createToken
+ * @param  {Object} action A CONNECT action.
+ * @param  {Object} config Authentication configurations.
+ * @return {Object} Token information or error object.
+ */
+// Other plugins.
+function* createToken(action, config) {
+  const { protocol, server, version, port } = config.subscription;
+  const credentials = action.payload.credentials;
+
+  log.info(`Generating access token for user ${credentials.username}.`);
+  const response = yield (0, _effects2.default)({
+    url: `${protocol}://${server}:${port}/${version}/auth/mk_token`,
+    queryParams: {
+      expires: credentials.expires
+    },
+    headers: {
+      Authorization: 'basic ' + _base2.default.encode(_utf2.default.encode(credentials.username + ':' + credentials.password))
+    }
+  });
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      log.debug('Failed to generate access token.', response.payload.body);
+      return {
+        error: new _errors2.default({
+          message: `There was an error connecting. Error: ${response.payload.body.error.human}`,
+          code: _errors.authCodes.UC_CREATE_TOKEN_FAIL
+        })
+      };
+    } else {
+      // Handle errors from the request plugin.
+      log.debug('Failed to generate access token.', response.payload.result);
+      return {
+        error: new _errors2.default({
+          message: 'Login request failed. Check your credentials.',
+          code: _errors.authCodes.UC_CREATE_TOKEN_FAIL
+        })
+      };
+    }
+  } else {
+    log.debug('Successfully generated access token.');
+    // Return the token information.
+    return {
+      accessToken: response.payload.body.success.access_token,
+      refreshToken: response.payload.body.success.refresh_token,
+      tokenExpires: response.payload.body.success.expires,
+      username: credentials.username
+    };
+  }
+}
+
+function* refreshToken(action, config) {
+  const { protocol, server, version, port } = config.subscription;
+  const credentials = action.payload.credentials;
+
+  const queryParams = {
+    token: credentials.refreshToken
+  };
+  if (credentials.expires) {
+    queryParams.expires = credentials.expires;
+  }
+
+  const response = yield (0, _effects2.default)({
+    url: `${protocol}://${server}:${port}/${version}/auth/refresh_token`,
+    queryParams
+  });
+
+  if (response.error) {
+    let info = response.payload.body ? response.payload.body : response.payload.result;
+    log.debug('Failed to refresh token.', info);
+
+    return {
+      error: new _errors2.default({
+        message: 'Something went wrong while attempting to create an accessToken from the supplied refreshToken.',
+        code: _errors.authCodes.UC_CREATE_TOKEN_FAIL
+      })
+    };
+  } else {
+    log.debug('Successfully generated access token.');
+    // Return the token information.
+    return {
+      accessToken: response.payload.body.success.access_token,
+      refreshToken: response.payload.body.success.refresh_token,
+      tokenExpires: response.payload.body.success.expires,
+      username: credentials.username
+    };
+  }
+}
+
+/***/ }),
+
+/***/ "../kandy/src/auth/uc/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = authCpaas;
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _events = __webpack_require__("../kandy/src/auth/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _interface = __webpack_require__("../kandy/src/auth/interface/index.js");
+
+var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
+
+var _utils = __webpack_require__("../kandy/src/common/utils.js");
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _sagas = __webpack_require__("../kandy/src/auth/uc/sagas.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * selector for exposed authentication state
+ */
+
+
+// State setters.
+
+// Events
+const log = (0, _logs.getLogManager)().getLogger('AUTH');
+
+/**
+ * Configuration options for the Authentication feature.
+ * @public
+ * @name config.authentication
+ * @memberof config
+ * @instance
+ * @param {Object} authentication Authentication configs.
+ * @param {Object} authentication.subscription
+ * @param {string} authentication.subscription.server Hostname of the server to be used for subscription requests.
+ * @param {string} [authentication.subscription.protocol=https] Protocol to be used for subscription requests.
+ * @param {Number} [authentication.subscription.port=443] Port to be used for subscription requests.
+ * @param {string} [authentication.subscription.version=1] Version of the REST API to be used.
+ * @param {Number} [authentication.subscription.expires=3600] Time duration, in seconds, until a subscription should expire.
+ * @param {Array} [authentication.subscription.service] Services to subscribe to for notifications. Default value is ['call', 'IM', 'presence'].
+ * @param {string} [authentication.subscription.localization=English_US]
+ * @param {Boolean} [authentication.subscription.useTurn=true]
+ * @param {string} [authentication.subscription.notificationType=Websocket]
+ * @param {Object} authentication.websocket
+ * @param {string} authentication.websocket.server Hostname of the server to be used for websocket notifications.
+ * @param {string} [authentication.websocket.protocol=wss] Protocol to be used for websocket notifications.
+ * @param {Number} [authentication.websocket.port=443] Port to be used for websocket notifications.
+ * @param {Number} [authentication.earlyRefreshMargin=300]
+ */
+
+/**
+ * Authentication implementation factory.
+ * @method authCpaas
+ * @param {Object} options - Configuration options for authentication. See above.
+ * @return {Object} plugin - An authentication plugin.
+ */
+
+
+// Utilities.
+
+
+// The interface to follow.
+// Redux-Saga
+function authCpaas(options = {}) {
+  const defaultOptions = {
+    subscription: {
+      protocol: 'https',
+      version: 'v2.0',
+      port: '443',
+      expires: 3600,
+      service: ['call', 'IM', 'Presence'],
+      localization: 'English_US',
+      useTurn: true,
+      notificationType: 'WebSocket'
+    },
+    websocket: {
+      protocol: 'wss',
+      port: '443'
+    },
+    earlyRefreshMargin: 300
+  };
+
+  options = (0, _utils.mergeValues)(defaultOptions, options);
+
+  if (!options.subscription.server) {
+    log.error('No server configuration provided. Please provide proper authentication configurations.');
+  }
+
+  function* init() {
+    // Send the provided options to the store.
+    // This will be `state.config[name]`.
+    yield (0, _effects.put)((0, _actions2.update)(options, _interface.name));
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+  }
+
+  const capabilities = ['connect', 'userCredentialsAuth', 'accessTokenAuth', 'services', 'oauthToken'];
+
+  return {
+    sagas: [_sagas.connectFlow, _sagas.updateTokenSaga, _sagas.extendSubscription, _sagas.onConnectionLostEntry],
+    capabilities,
+    init,
+    api: _interface.api,
+    selector: _selectors.getExposedState,
+    reducer: _interface.reducer,
+    name: _interface.name
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/auth/uc/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.connectFlow = connectFlow;
+exports.subscribe = subscribe;
+exports.extendSubscription = extendSubscription;
+exports.updateTokenSaga = updateTokenSaga;
+exports.onConnectionLostEntry = onConnectionLostEntry;
+exports.onConnectionLost = onConnectionLost;
+
+var _actions = __webpack_require__("../kandy/src/auth/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _actionTypes = __webpack_require__("../kandy/src/auth/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _uc = __webpack_require__("../kandy/src/auth/tokens/uc.js");
+
+var _requests = __webpack_require__("../kandy/src/auth/subscription/requests.js");
+
+var _actionTypes2 = __webpack_require__("../kandy/src/connectivity/interface/actionTypes.js");
+
+var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _effects = __webpack_require__("../kandy/src/connectivity/interface/effects.js");
+
+var _selectors2 = __webpack_require__("../kandy/src/connectivity/interface/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _effects2 = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects3 = _interopRequireDefault(_effects2);
+
+var _effects4 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+const platform = _constants.platforms.UC;
+
+// Constants
+// Auth plugin.
+
+const log = (0, _logs.getLogManager)().getLogger('AUTH');
+
+/**
+ * Top level saga that acts as an "entry point" for authentication.
+ * Handles the flow for connecting and disconnecting users.
+ * @method connectFlow
+ */
+function* connectFlow() {
+  while (true) {
+    // Wait for a CONNECT action.
+    const action = yield (0, _effects4.take)(actionTypes.CONNECT);
+
+    // Fork a non-blocking task for the connection process.
+    let task = yield (0, _effects4.fork)(connect, action);
+
+    // Take the actions for if an error or disconnect occurs.
+    const finishOrError = yield (0, _effects4.take)([actionTypes.CONNECT_FINISHED, actionTypes.DISCONNECT]);
+
+    if (finishOrError.type === actionTypes.DISCONNECT) {
+      // If disconnect was called before connect finished, then cancel the connect.
+      yield (0, _effects4.cancel)(task);
+    } else if (finishOrError.type === actionTypes.CONNECT_FINISHED && finishOrError.error) {
+      // If an error occurred during connection, then connect flow stops.
+      continue;
+    } else if (finishOrError.type === actionTypes.CONNECT_FINISHED && !finishOrError.error) {
+      // If connection finished successfully, then wait for a disconnect.
+      yield (0, _effects4.take)([actionTypes.DISCONNECT]);
+      yield (0, _effects4.call)(disconnect);
+    }
+  }
+}
+
+/**
+ * Handles the connection process for username/password and token scenarios.
+ * @method connect
+ * @param  {Object} action A CONNECT action.
+ */
+function* connect(action) {
+  const credentials = action.payload.credentials;
+
+  // Retrieve the connection info.
+  const config = yield (0, _effects4.select)(_selectors.getAuthConfig);
+
+  let tokenInfo;
+  if (credentials.username && credentials.password) {
+    log.info('Attempting to connect using Username / Password');
+    // If this is a username/password connect scenario, we need to generate
+    //      the token ourselves.
+    tokenInfo = yield (0, _effects4.call)(_uc.createToken, action, config);
+
+    if (tokenInfo.error) {
+      // If token generation failed, stop the connection process.
+      yield (0, _effects4.put)(actions.connectFinished(tokenInfo));
+      return;
+    }
+  } else if (credentials.accessToken) {
+    log.info('Attempting to connect using an AccessToken');
+    // In a token scenario, all the information is provided to us.
+    tokenInfo = {
+      accessToken: credentials.accessToken,
+      refreshToken: credentials.refreshToken,
+      tokenExpires: credentials.expires,
+      username: credentials.username
+    };
+  } else if (!credentials.accessToken && credentials.refreshToken && credentials.username) {
+    log.info('Attempting to connect using a RefreshToken');
+    // The user is attempting to log in with a refreshToken (and username).
+
+    tokenInfo = yield (0, _effects4.call)(_uc.refreshToken, action, config);
+
+    if (tokenInfo.error) {
+      // If token generation failed, stop the connection process.
+      log.debug('Something went wrong while attempting to create an accessToken from the supplied refreshToken.');
+      yield (0, _effects4.put)(actions.connectFinished(tokenInfo));
+      return;
+    }
+  } else if (credentials.oauthToken && credentials.username) {
+    /**
+     * OAuth token handling
+     * Unlike the conventional authToken method, we won't be making use of the refreshToken
+     */
+
+    log.info('Setting Connection with OAuth in UC');
+    tokenInfo = {
+      oauthToken: credentials.oauthToken,
+      username: credentials.username
+    };
+  } else {
+    // Other connect scenarios not supported.
+    yield (0, _effects4.put)(actions.connectFinished({
+      error: new _errors2.default({
+        message: 'This login signature is not valid.',
+        code: _errors.authCodes.INVALID_CREDENTIALS
+      })
+    }));
+    return;
+  }
+
+  try {
+    // Use the token to subscribe.
+    yield (0, _effects4.call)(subscribe, config, tokenInfo);
+  } catch (error) {
+    yield (0, _effects4.put)(actions.connectFinished({ error }));
+  } finally {
+    if (yield (0, _effects4.cancelled)()) {
+      yield (0, _effects4.call)(disconnect);
+    }
+  }
+}
+
+/**
+ * This subscribe function makes a request to the UC gateway for a subscription.
+ * If successful it triggers a connectFinished action containing subscription and connection information.
+ * @method subscribe
+ * @param  {Object}    config       Config values.
+ * @param  {Object}    tokenInfo
+ * @param  {string}    tokenInfo.username     Username passed in by user.
+ * @param  {string}    tokenInfo.accessToken  Access Token either from the user or the server.
+ * @param  {string}    tokenInfo.refreshToken Refresh Token either from the user or the server.
+ * @param  {number}    tokenInfo.tokenExpires Expires time for the access token.
+ */
+function* subscribe(config, tokenInfo) {
+  const { username, accessToken, refreshToken, tokenExpires, oauthToken } = tokenInfo;
+
+  let requestOptions = {};
+  // UC requires a token attached to every request.
+  if (oauthToken && !accessToken) {
+    // For subscription requests using an OAuth Token, attach is as a header.
+    // TODO: setting of the `Content-Type` header should be managed elsewhere
+    requestOptions = {
+      headers: {
+        Authorization: `Bearer ${oauthToken}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  } else {
+    // For a usual token, attach it to the URL and add the Contet-Type header.
+    requestOptions = {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      queryParams: {
+        token: accessToken
+      }
+    };
+  }
+
+  let connection = (0, _extends3.default)({}, config.subscription, {
+    // Hardcode the version number for SPiDR requests, since it is
+    //      different than the Gateway version number in configs.
+    version: '1'
+  });
+
+  log.info(`Subscribing user ${username}.`);
+  const response = yield (0, _effects4.call)(_requests.subscribe, connection, { username }, requestOptions);
+
+  // If the subscription failed, dispatch an error action and stop here.
+  if (response.error) {
+    yield (0, _effects4.put)(actions.connectFinished(response));
+    return;
+  }
+
+  // WS stuff
+  let subscription = (0, _extends3.default)({}, response.subscriptionParams, {
+    servicesInfo: response.servicesInfo,
+    url: response.subscription
+  });
+
+  let params = {};
+
+  if (oauthToken && !accessToken) {
+    log.debug('We have an OAuth token but no Access token. Adding OAuth token to parameters as "access_token"');
+    // If using OAuth token, set the param token property to its value
+    params.access_token = oauthToken;
+  } else {
+    // Otherwise, use the normal access token
+    params.token = accessToken;
+  }
+  const websocketInfo = (0, _extends3.default)({}, config.websocket, {
+    url: subscription.notificationChannel,
+    params: params
+
+    // Request the websocket connection.
+  });const wsOpenOrError = yield (0, _effects.connectWebsocket)(websocketInfo, platform);
+
+  if (wsOpenOrError.error) {
+    yield (0, _effects4.put)(actions.connectFinished({
+      error: new _errors2.default({
+        message: 'Websocket connection failed.',
+        code: _errors.authCodes.CONNECT_FAIL_WS_ERROR
+      })
+    }));
+  } else {
+    // Filter out null values from subscribed services before storing in state.
+    subscription.service = subscription.service.filter(service => service !== null);
+    log.info('Subscribed to following services: ', subscription.service);
+
+    yield (0, _effects4.put)(actions.connectFinished({
+      connection: {
+        // Information for other plugins to make requests.
+        server: {
+          protocol: config.subscription.protocol,
+          server: config.subscription.server,
+          port: config.subscription.port,
+          version: config.subscription.version
+        },
+        accessToken,
+        oauthToken,
+        refreshToken,
+        tokenExpires,
+        username,
+        // Request options that all other plugins will use.
+        requestOptions
+      },
+      userInfo: {
+        username,
+        accessToken,
+        refreshToken
+      },
+      // Information about the current subscription.
+      subscription
+    }, platform, false));
+
+    if (refreshToken) {
+      yield (0, _effects4.fork)(refreshTokenSaga);
+    }
+  }
+}
+
+/**
+ * Saga for extending a user's subscription.
+ * When triggered, make a resub request to SPiDR for a specific subscription.
+ * @method extendSubscription
+ */
+function* extendSubscription() {
+  // TODO: Refactor and combine with Link subscription logic. Parameterize everything.
+  // Re-subscription timer is triggered by a successful connect or a previous resub finishing.
+  // Use a channel to queue the triggers (so it can catch the put resub action at the end).
+  const resubTriggers = yield (0, _effects4.actionChannel)([actionTypes.CONNECT_FINISHED, actionTypes.RESUBSCRIPTION_FINISHED]);
+  while (true) {
+    const action = yield (0, _effects4.take)(resubTriggers);
+
+    // If the action was a connection error, ignore it.
+    if (action.type === actionTypes.CONNECT_FINISHED && action.error) {
+      continue;
+    }
+
+    const subscription = yield (0, _effects4.select)(_selectors.getSubscriptionInfo, platform);
+
+    let attemptNum;
+    // If the action was a failed resubscription, increment the attempt number.
+    if (action.type === actionTypes.RESUBSCRIPTION_FINISHED && action.error) {
+      attemptNum = action.payload.attemptNum + 1;
+    } else {
+      attemptNum = 1;
+    }
+
+    // Set the delay to be halfway between now and when the subscription expires.
+    let resubDelay = subscription.expires * 1000 / Math.pow(2, attemptNum);
+    // Don't try to resub more often than every 5 minutes.
+    resubDelay = resubDelay > 30000 ? resubDelay : 30000;
+
+    // Wait for either the resub delay or a disconnect action.
+    const { expiry } = yield (0, _effects4.race)({
+      expiry: (0, _effects4.delay)(resubDelay),
+      disconnect: (0, _effects4.take)(actionTypes.DISCONNECT_FINISHED)
+    });
+
+    // If the resubDelay expired, attempt resubscription
+    if (expiry) {
+      log.info('Extending user subscription.');
+      const connection = yield (0, _effects4.select)(_selectors.getConnectionInfo, platform);
+      const subscription = yield (0, _effects4.select)(_selectors.getSubscriptionInfo, platform);
+
+      const response = yield (0, _effects4.call)(_requests.resubscribe, connection, subscription);
+
+      if (response.error) {
+        yield (0, _effects4.put)(actions.resubscribeFinished({
+          error: response.error,
+          attemptNum
+        }, platform));
+      } else {
+        // TODO: Check response.serviceInfo for full/partial resubscription.
+        yield (0, _effects4.put)(actions.resubscribeFinished({ attemptNum }, platform));
+      }
+    }
+  }
+}
+
+/**
+ * The logic for disconnecting from the server. This includes token revocation.
+ * @method disconnect
+ */
+function* disconnect() {
+  log.info('Disconnecting user.');
+  const connection = yield (0, _effects4.select)(_selectors.getConnectionInfo, platform);
+  const { protocol, server, version, port } = connection.server;
+
+  const wsState = yield (0, _effects4.select)(_selectors2.getConnectionState, platform);
+  if (wsState.connected) {
+    // Dispatch a WS disconnect action and wait for a response
+    yield (0, _effects.disconnectWebsocket)(undefined, platform);
+  }
+
+  const subscription = yield (0, _effects4.select)(_selectors.getSubscriptionInfo);
+
+  const subscribeResponse = yield (0, _effects4.call)(_requests.unsubscribe, connection, subscription.url);
+
+  const tokenResponse = yield (0, _effects3.default)({
+    url: `${protocol}://${server}:${port}/${version}/auth/revoke_token`
+  }, connection.requestOptions);
+
+  if (tokenResponse.error) {
+    if (tokenResponse.payload.body) {
+      // Handle errors from the server.
+      log.debug('Disconnect error encountered.', tokenResponse.payload.body.error);
+      yield (0, _effects4.put)(actions.disconnectFinished({
+        error: new _errors2.default({
+          message: `There was an error revoking the token. Error: ${tokenResponse.payload.body.error.human}`,
+          code: _errors.authCodes.UC_DISCONNECT_FAIL
+        })
+      }));
+    } else {
+      // Handle errors from the request plugin.
+      log.debug('Disconnect error encountered.', tokenResponse.payload.result);
+      yield (0, _effects4.put)(actions.disconnectFinished({
+        error: new _errors2.default({
+          message: 'Request to revoke token failed. Access and refresh tokens removed from state.',
+          code: _errors.authCodes.UC_DISCONNECT_FAIL
+        })
+      }));
+    }
+  } else if (subscribeResponse.error) {
+    // Handle errors from the unsubscription.
+    yield (0, _effects4.put)(actions.disconnectFinished(subscribeResponse));
+  } else {
+    log.debug('Successfully disconnected user.');
+    yield (0, _effects4.put)(actions.disconnectFinished());
+  }
+}
+
+/**
+ * The logic for refreshing accessToken / refreshToken. Adds new tokens to the store.
+ * @method refreshTokenSaga
+ */
+function* refreshTokenSaga() {
+  while (true) {
+    const connection = yield (0, _effects4.select)(_selectors.getConnectionInfo, platform);
+    const authConfig = yield (0, _effects4.select)(_selectors.getAuthConfig);
+    const { protocol, server, version, port } = connection.server;
+
+    const { disconnect } = yield (0, _effects4.race)({
+      disconnect: (0, _effects4.take)(actionTypes.DISCONNECT_FINISHED),
+      expiry: (0, _effects4.delay)((connection.tokenExpires - authConfig.earlyRefreshMargin) * 1000)
+    });
+
+    // On disconnection we need to end this saga. Since it is not a root saga, it will get re-triggered
+    // after the next connection.
+    if (disconnect) {
+      return;
+    } else {
+      const response = yield (0, _effects3.default)({
+        url: `${protocol}://${server}:${port}/${version}/auth/refresh_token`,
+        queryParams: {
+          token: connection.refreshToken,
+          expires: connection.tokenExpires
+        }
+      }, connection.requestOptions);
+
+      if (response.error) {
+        let info = response.payload.body ? response.payload.body : response.payload.result;
+        log.warn('Attempt to refresh the accessToken failed. This may be due to server or permissions issues.', info);
+        yield (0, _effects4.put)(actions.disconnect());
+        return;
+      } else {
+        const {
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          expires: tokenExpires
+        } = response.payload.body.success;
+        yield (0, _effects4.put)(actions.refreshTokensFinished({
+          connection: {
+            accessToken,
+            refreshToken,
+            tokenExpires,
+            // Ensure the extra options for requests is updated
+            //      with the new token.
+            requestExtras: {
+              queryParams: {
+                token: accessToken
+              }
+            }
+          }
+        }, platform));
+      }
+    }
+  }
+}
+/**
+ * The logic for updating the store's tokens by the user.
+ * @method updateTokenSaga
+ */
+function* updateTokenSaga() {
+  const tokenChannel = yield (0, _effects4.actionChannel)([actionTypes.REFRESH_TOKENS]);
+  while (true) {
+    const action = yield (0, _effects4.take)(tokenChannel);
+
+    const { username, accessToken, oauthToken } = action.payload.credentials;
+
+    let requestOptions = {};
+
+    if (oauthToken && username && !accessToken) {
+      // For subscription requests using an OAuth Token, attach is as a header.
+      // TODO: setting of the `Content-Type` header should be managed elsewhere
+      requestOptions = {
+        headers: {
+          Authorization: `Bearer ${oauthToken}`,
+          'Content-Type': 'application/json'
+        }
+      };
+    } else if (accessToken && username && !oauthToken) {
+      // Ensure the extra options for requests is updated with the new token.
+      requestOptions.queryParams = {
+        token: action.payload.credentials.accessToken
+      };
+    } else {
+      log.debug('updateToken called without the necessary parameters');
+    }
+
+    yield (0, _effects4.put)(actions.refreshTokensFinished({
+      connection: (0, _extends3.default)({}, action.payload.credentials, {
+        requestOptions
+      })
+    }, platform));
+  }
+}
+
+/**
+ * Triggers onConnectionLost saga when a WS_RECONNECT_FAILED actionType occurs
+ * @method onConnectionLostEntry
+ */
+function* onConnectionLostEntry() {
+  yield (0, _effects4.takeEvery)(connectivityActionTypes.WS_RECONNECT_FAILED, onConnectionLost);
+}
+
+/**
+ * Handles lost connections from the connectivity plugin
+ * @method onConnectionLost
+ */
+function* onConnectionLost() {
+  yield (0, _effects4.put)(actions.disconnect());
+}
+
+/***/ }),
+
 /***/ "../kandy/src/basePlugins.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20410,1246 +28728,6 @@ const CALL_STATES = exports.CALL_STATES = {
 
 /***/ }),
 
-/***/ "../kandy/src/call/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = cpaasCalls;
-
-var _interfaceNew = __webpack_require__("../kandy/src/call/interfaceNew/index.js");
-
-var _interfaceNew2 = _interopRequireDefault(_interfaceNew);
-
-var _sagas = __webpack_require__("../kandy/src/call/cpaas/sagas/index.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _events = __webpack_require__("../kandy/src/call/interfaceNew/events.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
-
-var _utils = __webpack_require__("../kandy/src/callstack/utils/index.js");
-
-var _utils2 = __webpack_require__("../kandy/src/common/utils.js");
-
-var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
-
-var _codecRemover2 = _interopRequireDefault(_codecRemover);
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Configuration options for the call feature.
- * @public
- * @name config.call
- * @memberof config
- * @instance
- * @param {Object} call The call configuration object.
- * @param {Object} [call.iceServers] ICE servers to be used for calls.
- * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
- * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
- * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
- */
-
-// Libraries.
-
-
-// Helpers.
-// Call plugin.
-function cpaasCalls(options = {}) {
-  const defaultOptions = {
-    // The list of TURN/STUN servers to use.
-
-    // TODO: Remove this default once the CPaaS server configuration feature is implemented. These
-    // servers should be sent to us by CPaaS. This default is just here fo ease of use in production.
-    iceServers: [{
-      url: 'turns:turn-ucc-1.genband.com:443?transport=tcp',
-      credential: ''
-    }, {
-      url: 'turns:turn-ucc-2.genband.com:443?transport=tcp',
-      credential: ''
-    }],
-    // TODO: Remove this once all the browsers use unified-plan
-    sdpSemantics: 'unified-plan',
-    // Whether the SDK should fetch turn credentials.
-    serverTurnCredentials: true,
-    // Trickle ICE method to use for calls.
-    trickleIceMode: 'NONE',
-    // SDP handlers to be included in the pipeline for every operation.
-    sdpHandlers: [],
-    // filter out H264 Codec
-    removeH264Codecs: true,
-    // Set this to false to bypass sip address normalization
-    normalizeDestination: true
-  };
-
-  options = (0, _utils2.mergeValues)(defaultOptions, options);
-
-  function* init({ webRTC }) {
-    yield (0, _effects.put)((0, _actions2.update)(options, _interfaceNew2.default.name));
-    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
-
-    /*
-     * Set SDP handlers to be used for every operation:
-     *
-     * 1. Application provided SDP handlers.
-     *
-     * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
-     *    crypto method enabled. WebRTC only allows one method to be enabled.
-     *    This is needed for interopability with non-browser endpoints that include
-     *    SDES as a fallback method.
-     *
-     * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
-     *
-     */
-    let sdpHandlers = options.sdpHandlers;
-    if (options.removeH264Codecs) {
-      sdpHandlers.push((0, _codecRemover2.default)(['H264']));
-    }
-    sdpHandlers.push(_utils.sanitizeSdesFromSdp);
-    webRTC.sdp.pipeline.setHandlers(sdpHandlers);
-
-    // Wrap the call sagas in a function that provides them with the webRTC stack.
-    const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
-      return (0, _utils2.autoRestart)(() => saga(webRTC.managers));
-    });
-
-    // Run all of the sagas.
-    for (let saga of wrappedSagas) {
-      yield (0, _effects.fork)(saga);
-    }
-  }
-
-  return {
-    name: _interfaceNew2.default.name,
-    api: _interfaceNew2.default.api,
-    reducer: _interfaceNew2.default.reducer,
-    init
-  };
-}
-
-// Other plugins.
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/requests/calls.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.createSession = createSession;
-exports.answerSession = answerSession;
-exports.fetchCredentials = fetchCredentials;
-exports.updateSession = updateSession;
-exports.updateSessionStatus = updateSessionStatus;
-exports.endSession = endSession;
-exports.rejectSession = rejectSession;
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Creates a webRTC session on the server. CPaaS-specific signalling function.
- *
- * This saga "starts a call" between the current user and another, specified
- *    user.
- * Assumptions:
- *    1. The current user is authenticated.
- * Responsibilities:
- *    1. Format parameters as needed for signalling.
- *    2. Perform the REST request.
- *    3. Return the response, formatted.
- * @method createSession
- * @param  {Object} callInfo
- * @param  {string} callInfo.participantAddress The user to receive the call.
- * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
- * @return {Object} response Signalling response.
- * @return {string} [response.wrtcsSessionId] ID that the server uses to track this call.
- * @return {Object} [response.error] An error object, if signalling failed.
- */
-
-
-// Helpers.
-function* createSession(callInfo) {
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/webrtcsignaling/${requestInfo.version}/${requestInfo.username}/sessions`,
-    body: (0, _stringify2.default)({
-      wrtcsSession: {
-        clientCorrelator: requestInfo.clientCorrelator,
-        tParticipantAddress: callInfo.participantAddress,
-        // The backend does not use/support participant name yet.
-        tParticipantName: undefined,
-        offer: {
-          sdp: callInfo.offer
-        }
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Create session')
-    };
-  } else {
-    const sessionInfo = response.payload.body.wrtcsSession;
-    return {
-      error: false,
-      wrtcsSessionId: sessionInfo.resourceURL.split('sessions/')[1]
-    };
-  }
-}
-
-/**
- * Updates a webRTC session on the server with an answer.
- * CPaaS-specific signaling function.
- *
- * This saga "answers a call" from another user.
- * Assumptions:
- *    1. The current user is authenticated.
- * Responsibilities:
- *    1. Format parameters as needed for signalling.
- *    2. Perform the REST request.
- *    3. Return the response, formatted.
- * @method answerSession
- * @param  {Object} callInfo
- * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
- * @param  {string} callInfo.answer The local SDP to complete negotiation. This may be an offer is performing slow start answer.
- * @return {Object} response Signalling response.
- * @return {Object} [response.error] An error object, if signalling failed.
- */
-
-
-// Libraries.
-// Other plugins.
-function* answerSession(callInfo) {
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  const requestOptions = {
-    method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/answer`,
-    body: (0, _stringify2.default)({
-      wrtcsAnswer: {
-        clientCorrelator: requestInfo.clientCorrelator,
-        sdp: callInfo.answer
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Answer session')
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * Fetch a set of TURN credentials.
- * @method fetchCredentials
- * @param  {Object} requestInfo
- */
-function* fetchCredentials(requestInfo) {
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `turn`,
-    body: (0, _stringify2.default)({
-      wrtcsTurnCredentials: {
-        clientCorrelator: requestInfo.clientCorrelator
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Fetch credentials')
-    };
-  } else {
-    return response.payload.body.wrtcsTurnCredentials;
-  }
-}
-
-/**
- * Updates an existing webRTC session on the server.
- * CPaaS-specific signalling function.
- *
- * This saga "updates a session" between the current user and another, specified
- *    user.
- * Assumptions:
- *    1. The current user is authenticated.
- * Responsibilities:
- *    1. Format parameters as needed for signalling.
- *    2. Perform the REST request.
- *    3. Return the response, formatted.
- * @method updateSession
- * @param  {Object} callInfo
- * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
- * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
- * @return {Object} response Signalling response.
- * @return {Object} response.error An error object, if signalling failed.
- */
-function* updateSession(callInfo) {
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  const requestOptions = {
-    method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/update`,
-    body: (0, _stringify2.default)({
-      wrtcsOffer: {
-        clientCorrelator: requestInfo.clientCorrelator,
-        sdp: callInfo.offer
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Update session')
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * Updates a webRTC session on the server with a new state.
- * CPaaS-specific signaling function.
- *
- * The saga updates the server's session to be in a provided state. This can be
- *    used for multiple purposes, such as to indicate ringing or as call audit.
- * Assumptions:
- *    1. The current user is authenticated.
- * Responsibilities:
- *    1. Format parameters as needed for signalling.
- *    2. Perform the REST request.
- *    3. Return the response, formatted.
- * @method updateSessionStatus
- * @param  {Object} callInfo
- * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
- * @param  {string} status   The status to put the server session into.
- * @return {Object} response Signalling response.
- * @return {Object} [response.error] An error object, if signalling failed.
- */
-function* updateSessionStatus(callInfo, status) {
-  // Collect the information needed to make the request.
-  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  const requestOptions = {
-    method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}/status`,
-    body: (0, _stringify2.default)({
-      wrtcsSessionStatus: {
-        clientCorrelator: requestInfo.clientCorrelator,
-        status
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Session Status Update'),
-      status: 'Retry'
-    };
-  } else {
-    return {
-      error: false,
-      status: response.payload.body.wrtcsSessionStatus.status
-    };
-  }
-}
-
-/**
- * REST request to end a webRTC session.
- * @method endSession
- * @param  {Object} callInfo
- * @param  {Object} callInfo.wrtcsSessionId ID that the server uses to identify the session.
- * @return {Object} response Signalling response.
- * @return {Object} [response.error] An BasicError object, if signalling failed.
- */
-function* endSession(callInfo) {
-  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'End session')
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * REST request to reject a webRTC session. (Same as ending a webRTC session)
- * @method rejectSession
- * @param  {Object} callInfo
- * @param  {Object} callInfo.wrtcsSessionId ID that the server uses to identify the session.
- * @return {Object} response Signalling response.
- * @return {Object} [response.error] An BasicError object, if signalling failed.
- */
-function* rejectSession(callInfo) {
-  return yield (0, _effects3.call)(endSession, callInfo);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/requests/subscriptions.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.callSubscribe = callSubscribe;
-exports.callUnsubscribe = callUnsubscribe;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Request saga. Generates and sends a REST request to the backend.
- * @method callSubscribe
- * @param  {Object} requestInfo
- * @param  {Object} subInfo
- * @return {Object}
- */
-// Helpers.
-function* callSubscribe(requestInfo, channelInfo) {
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `subscriptions`,
-    body: (0, _stringify2.default)({
-      wrtcsNotificationSubscription: {
-        callbackReference: {
-          notifyURL: channelInfo.callbackURL
-        },
-        clientCorrelator: requestInfo.clientCorrelator
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      // TODO: An actual error.
-      error: new _errors2.default({
-        message: 'Failed to subscribe for call notifications',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      subscription: response.payload.body.wrtcsNotificationSubscription
-    };
-  }
-}
-
-/**
- * Request saga. Generates and sends a REST request to the backend.
- * @method callUnsubscribe
- * @param  {Object} requestInfo
- * @param  {Object} subInfo
- * @return {Object}
- */
-function* callUnsubscribe(requestInfo, subInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `subscriptions/${subInfo.subscriptionId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to unsubscribe from call notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.registerCall = registerCall;
-exports.createCall = createCall;
-exports.answerCallEntry = answerCallEntry;
-exports.holdCall = holdCall;
-exports.unholdCall = unholdCall;
-exports.addMediaEntry = addMediaEntry;
-exports.removeMediaEntry = removeMediaEntry;
-exports.sendDTMFEntry = sendDTMFEntry;
-exports.incomingCallNotification = incomingCallNotification;
-exports.callAcceptedNotification = callAcceptedNotification;
-exports.callStatusNotification = callStatusNotification;
-exports.callAudit = callAudit;
-exports.callOfferNotification = callOfferNotification;
-exports.callAnswerNotification = callAnswerNotification;
-exports.endCallEntry = endCallEntry;
-exports.ignoreCallEntry = ignoreCallEntry;
-exports.rejectCallEntry = rejectCallEntry;
-exports.getStatsEntry = getStatsEntry;
-exports.setTurnCredentials = setTurnCredentials;
-
-var _subscriptions = __webpack_require__("../kandy/src/call/cpaas/sagas/subscriptions.js");
-
-var subSagas = _interopRequireWildcard(_subscriptions);
-
-var _notifications = __webpack_require__("../kandy/src/call/cpaas/sagas/notifications.js");
-
-var notificationSagas = _interopRequireWildcard(_notifications);
-
-var _support = __webpack_require__("../kandy/src/call/cpaas/sagas/support.js");
-
-var supportSagas = _interopRequireWildcard(_support);
-
-var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _calls = __webpack_require__("../kandy/src/call/cpaas/requests/calls.js");
-
-var requests = _interopRequireWildcard(_calls);
-
-var _establish = __webpack_require__("../kandy/src/callstack/call/establish.js");
-
-var establishSagas = _interopRequireWildcard(_establish);
-
-var _midcall = __webpack_require__("../kandy/src/callstack/call/midcall.js");
-
-var midcallSagas = _interopRequireWildcard(_midcall);
-
-var _notifications2 = __webpack_require__("../kandy/src/callstack/call/notifications.js");
-
-var _support2 = __webpack_require__("../kandy/src/callstack/call/support.js");
-
-var _effects = __webpack_require__("../kandy/src/subscription/interface/effects.js");
-
-var _actionTypes2 = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
-
-var _actionTypes3 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
-
-var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-/**
- * Register the call service for subscriptions.
- * @method registerCall
- */
-
-
-// Other plugins.
-
-
-// Callstack plugin.
-function* registerCall() {
-  yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
-}
-
-/**
- * Call operations.
- */
-
-/**
- * Start an outgoing call.
- * @method createCall
- * @param  {Object} webRTC The webRTC stack.
- */
-
-
-// Libraries.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
-
-// Call plugin.
-function* createCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, { webRTC, requests });
-}
-
-/**
- * Answer a ringing call.
- * @method answerCall
- */
-function* answerCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, { webRTC, requests });
-}
-
-/**
- * Put a call on hold.
- * Currently, "hold" is defined as setting media directions to inactive.
- * TODO: There will be different "hold" scenarios. Need to determine how to
- *    differentiate between them to know which saga to trigger.
- * @method holdCall
- */
-function* holdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, { webRTC, requests });
-}
-
-/**
- * Take a call off hold.
- * Currently, "unhold" is defined as setting media directions to sendrecv.
- * TODO: There will be different "unhold" scenarios. Need to determine how to
- *    differentiate between them to know which saga to trigger.
- * @method unholdCall
- */
-function* unholdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, { webRTC, requests });
-}
-
-/**
- * Add media to a call.
- * @method addMedia
- */
-function* addMediaEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, { webRTC, requests });
-}
-
-/**
- * Remove media from a call.
- * @method removeMedia
- */
-function* removeMediaEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, { webRTC, requests });
-}
-
-/**
- * Send DTMF tones for a call.
- * @method sendDTMF
- */
-function* sendDTMFEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, { webRTC });
-}
-
-/**
- * Call notifications.
- */
-
-/**
- * Handle a "call incoming" notification.
- * @method incomingCallNotification
- * @param  {Object} webRTC The webRTC stack.
- */
-function* incomingCallNotification(webRTC) {
-  // Curry the signaling function to specify the status.
-  function* updateSessionRinging(...args) {
-    return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Ringing');
-  }
-
-  // Dependencies provided to the Callstack saga.
-  const deps = {
-    webRTC,
-    requests: {
-      // Add the wrapped request to CPaaS's set of requests.
-      updateCallRinging: updateSessionRinging
-    }
-
-    /**
-     * Intercept the CPaaS-specific notification, ensuring parameters are given
-     *    to the Callstack sagas into a generic format.
-     * @method cpaasIncomingCall
-     * @param {Object} action An "incoming call notification" action.
-     */
-  };function* cpaasIncomingCall(action) {
-    const notification = action.payload.wrtcsSessionInvitationNotification;
-
-    // Massage data into a generic format, instead of CPaaS-specific.
-    const params = {
-      sdp: notification.offer.sdp,
-      wrtcsSessionId: notification.link[0].href.split('sessions/')[1],
-      // Remote participant information.
-      remoteName: notification.originatorName,
-      remoteNumber: notification.originatorAddress
-
-      // Pass the incoming call parameters to the Callstack for handling.
-    };yield (0, _effects2.call)(_notifications2.incomingCall, deps, params);
-  }
-
-  // Redux-saga take() pattern.
-  function incomingCallPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
-  }
-  yield (0, _effects2.takeEvery)(incomingCallPattern, cpaasIncomingCall);
-}
-
-/**
- * Handle a "call accepted" notification.
- * @method callAcceptedNotification
- * @param  {Object} webRTC The webRTC stack.
- */
-function* callAcceptedNotification(webRTC) {
-  /**
-   * Intercept the CPaaS-specific notification, ensuring parameters are given
-   *    to the Callstack sagas into a generic format.
-   * @method parseAcceptedNotification
-   * @param {Object} action
-   */
-  function* parseAcceptedNotification(action) {
-    const notification = action.payload.wrtcsAcceptanceNotification;
-
-    // Pull-out the parameters into a standard format for the Callstack.
-    const params = {
-      sdp: notification.answer.sdp,
-      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
-    };
-
-    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
-  }
-
-  // Redux-saga take() pattern.
-  function callAcceptedPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
-  }
-
-  yield (0, _effects2.takeEvery)(callAcceptedPattern, parseAcceptedNotification);
-}
-
-/**
- * Handle a call status websocket notification.
- * @method callStatusNotification
- * @param  {Object} webRTC The webRTC stack.
- */
-function* callStatusNotification(webRTC) {
-  function statusUpdatePattern(status) {
-    return function statusPattern(action) {
-      return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
-    };
-  }
-
-  function* parseStatusNotification(action) {
-    const eventType = action.payload.wrtcsEventNotification.eventType;
-    const deps = { webRTC };
-    const params = {
-      wrtcsSessionId: action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1]
-    };
-    if (eventType === 'SessionEnded') {
-      yield (0, _effects2.call)(_notifications2.callStatusUpdateEnded, deps, params);
-    } else if (eventType === 'Ringing') {
-      yield (0, _effects2.call)(_notifications2.callStatusUpdateRinging, deps, params);
-    }
-  }
-
-  // Handle specific call statuses
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('Ringing'), parseStatusNotification);
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('SessionEnded'), parseStatusNotification);
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('Cancelled'), notificationSagas.callStatusUpdateCancelled, webRTC);
-}
-
-/**
- * Handle sending a call audit request
- * TODO: Move the common "setup" logic into the Callstack?
- * @method callAudit
- * @param  {Object} webRTC The webRTC stack.
- */
-function* callAudit(webRTC) {
-  const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED];
-
-  // Curry the signaling function to specify the status.
-  function* auditCall(...args) {
-    // For CPaaS, "call audit" is to update the call's status to 'Connected'.
-    return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Connected');
-  }
-
-  function callStartAuditPattern(action) {
-    return actionTypesToDoAuditOn.indexOf(action.type) !== -1 && !action.error;
-  }
-
-  yield (0, _effects2.takeEvery)([callStartAuditPattern, actionTypes.CALL_AUDIT], _support2.sendCallAudit, {
-    requests: {
-      auditCall
-    }
-  });
-}
-
-/**
- * Handle receiving remote offer notifications in a CPaaS format.
- * Uses properties in the notification to create a standardized data object to
- *    be used by the Callstack.
- * @method callOfferNotification
- * @param  {Object} webRTC The webRTC stack.
- */
-function* callOfferNotification(webRTC) {
-  // Dependencies provided to the Callstack saga.
-  const deps = {
-    webRTC,
-    requests: {
-      /*
-       * CPaaS uses the same REST endpoint for both answering a call and
-       *    answering a renegotiation. Rename the saga so that the Callstack
-       *    uses the correct REST saga.
-       */
-      updateSessionResponse: requests.answerSession
-    }
-
-    /**
-     * Intercept the CPaaS-specific notification, ensuring parameters are given
-     *    to the Callstack sagas into a generic format.
-     * @method parseOfferNotification
-     * @param {Object} action
-     */
-  };function* parseOfferNotification(action) {
-    const notification = action.payload.wrtcsOfferNotification;
-
-    // Pull-out the parameters into a standard format for the Callstack.
-    const params = {
-      sdp: notification.offer.sdp,
-      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
-    };
-
-    yield (0, _effects2.call)(_notifications2.parseCallRequest, deps, params);
-  }
-
-  // Redux-saga take() pattern.
-  function callOfferPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
-  }
-
-  yield (0, _effects2.takeEvery)(callOfferPattern, parseOfferNotification);
-}
-
-/**
- * Handle a "call answer" notification.
- * @method callAnswerNotification
- * @param  {Object} webRTC The webRTC stack.
- */
-function* callAnswerNotification(webRTC) {
-  /**
-   * Intercept the CPaaS-specific notification, ensuring parameters are given
-   *    to the Callstack sagas into a generic format.
-   * @method parseAnswerNotification
-   * @param {Object} action
-   */
-  function* parseAnswerNotification(action) {
-    const notification = action.payload.wrtcsAnswerNotification;
-
-    // Pull-out the parameters into a standard format for the Callstack.
-    const params = {
-      sdp: notification.answer.sdp,
-      wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
-    };
-
-    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
-  }
-
-  // Redux-saga take() pattern.
-  function callAnswerPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
-  }
-
-  yield (0, _effects2.takeEvery)(callAnswerPattern, parseAnswerNotification);
-}
-
-/**
- * End an ongoing call.
- * @method endCall
- * @param  {Object} webRTC The webRTC stack.
- */
-function* endCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, { webRTC, requests });
-}
-
-/**
- * Ignore an incoming call.
- * @method ignoreCall
- * @param  {Object} webRTC The webRTC stack.
- */
-function* ignoreCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.IGNORE_CALL, establishSagas.ignoreCall, { webRTC });
-}
-
-/**
- * Reject an incoming call.
- * @method rejectCall
- * @param  {Object} webRTC The webRTC stack.
- */
-function* rejectCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.REJECT_CALL, establishSagas.rejectCall, { webRTC, requests });
-}
-
-/**
- * Get RTCStatsReport.
- * @method getStats
- * @param  {Object} webRTC The webRTC stack.
- */
-function* getStatsEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, { webRTC });
-}
-
-/**
- * Other.
- */
-
-/**
- * After subscribing for the call service, set turn information for calls.
- * @method setTurnCredentials
- */
-function* setTurnCredentials() {
-  function callSubscribePattern(action) {
-    return action.type === _actionTypes2.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === 'call' && !action.error;
-  }
-
-  yield (0, _effects2.takeEvery)(callSubscribePattern, supportSagas.setTurnCredentials);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/sagas/notifications.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.callStatusUpdateCancelled = callStatusUpdateCancelled;
-
-var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
-
-var _constants = __webpack_require__("../kandy/src/call/constants.js");
-
-var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _midcall = __webpack_require__("../kandy/src/callstack/webrtc/midcall.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-/**
- * "Notification sagas" handle received notifications.
- * Each saga handles a single websocket notification that may be received from
- *    the backend.
- *
- * There may not be an established webRTC session for these sagas. This may be
- *    because (1) the notification is a new incoming call, or (2) there is a
- *    de-sync between SDK state and server state. This may or may not be
- *    considered as an error scenario (eg. a "call ended" notification for a
- *    call the SDK doesn't know about may be safely ignored).
- */
-
-// Call plugin.
-const log = (0, _logs.getLogManager)().getLogger('CALL');
-
-/**
- * Handles a notification that the remote end call status is 'Cancelled'.
- * @method callStatusUpdateCancelled
- * @param  {Object} action An action representing a call notification.
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-function* callStatusUpdateCancelled(webRTC, action) {
-  const wrtcsSessionId = action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1];
-
-  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
-
-  if (!targetCall) {
-    log.debug(`Call for session ${wrtcsSessionId} not found.`);
-    return;
-  }
-
-  if (targetCall.state === _constants.CALL_STATES.ENDED) {
-    log.debug(`Call ${targetCall.id} is already in ENDED state`);
-    return;
-  }
-
-  yield (0, _effects.call)(_midcall.closeCall, webRTC, targetCall.id);
-
-  yield (0, _effects.put)(_actions.callActions.callCancelled(targetCall.id));
-}
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/sagas/subscriptions.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.subscribe = subscribe;
-exports.unsubscribe = unsubscribe;
-
-var _subscriptions = __webpack_require__("../kandy/src/call/cpaas/requests/subscriptions.js");
-
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
-
-var _selectors = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Subscription saga. Creates a new call subscription channel.
- * @method callSubscribe
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-function* subscribe(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const channels = yield (0, _effects.select)(_selectors.getNotificationChannels);
-  const channelInfo = channels.notificationChannels[action.payload.type];
-
-  _loglevel2.default.debug(`Subscribing to call service on ${action.payload.type} channel.`);
-  const requestOptions = {};
-  requestOptions.method = 'POST';
-  requestOptions.url = `${requestInfo.baseURL}` + `/cpaas/webrtcsignaling/${requestInfo.version}/${requestInfo.username}` + `/subscriptions`;
-
-  _loglevel2.default.debug(`Subscribing to call service on ${action.payload.type} channel.`);
-  const response = yield (0, _effects.call)(_subscriptions.callSubscribe, requestInfo, channelInfo);
-
-  yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'call',
-    type: action.payload.type
-  })));
-}
-
-/**
- * Unsubscription saga. Deletes an existing call subscription.
- * @method unsubscribe
- */
-
-
-// Helpers.
-// Call plugin.
-function* unsubscribe(action) {
-  const { subscriptions } = yield (0, _effects.select)(_selectors.getNotificationChannels);
-  let callSubscription = subscriptions.filter(sub => {
-    return sub.service === 'call' && sub.channelType === action.payload.type;
-  });
-
-  if (callSubscription.length === 0) {
-    // "Error" scenario: Can't unsubscribe to a service
-    //    that we don't have.
-  } else if (callSubscription.length > 1) {
-    // "Error" scenario: There shouldn't be able to have
-    //    more than 1 of the same service.
-  } else {
-    callSubscription = callSubscription[0];
-  }
-
-  _loglevel2.default.info(`Unsubscribing from call service on ${action.payload.type} channel.`);
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-
-  const response = yield (0, _effects.call)(_subscriptions.callUnsubscribe, requestInfo, callSubscription);
-
-  yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'call',
-    type: action.payload.type
-  })));
-}
-
-/***/ }),
-
-/***/ "../kandy/src/call/cpaas/sagas/support.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setTurnCredentials = setTurnCredentials;
-
-var _calls = __webpack_require__("../kandy/src/call/cpaas/requests/calls.js");
-
-var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
-
-var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-// Helpers.
-
-
-// Other plugins.
-const log = (0, _logs.getLogManager)().getLogger('CALL');
-
-/**
- * Handles setting/getting turn/stun information.
- * Fetches TURN credentials from the backend if configured.
- * @method setTurnCredentials
- */
-
-
-// Libraries.
-/**
- * "Support sagas" handle call behaviours that are not directly related to calls
- *    themselves, but are required for establishing/maintaining a call.
- *
- * Some sagas do assume that there is an established session (both webRTC and
- *    server; eg. call audits), while others do not (eg. turn credentials).
- */
-
-// Call plugin.
-function* setTurnCredentials() {
-  const { iceServers, serverTurnCredentials } = yield (0, _effects.select)(_selectors.getOptions);
-
-  // Must have ICE servers configured.
-  if (!iceServers) {
-    log.debug('No ICE servers provided during setup; not using TURN/STUN for calls.');
-    return;
-  }
-
-  const turnInfo = {
-    servers: iceServers
-  };
-
-  if (serverTurnCredentials) {
-    log.debug('Retrieving turn credentials from server.');
-
-    // Collect the information needed to make the request.
-    const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-
-    const response = yield (0, _effects.call)(_calls.fetchCredentials, requestInfo);
-
-    if (response.error) {
-      // TODO: Better error handling; do more than just stop.
-      log.debug('Failed to retrieve turn credentials.');
-      return;
-    } else {
-      turnInfo.credentials = response;
-
-      // Map the server-provided credentials to the ICE server list.
-      turnInfo.servers = turnInfo.servers.map(server => {
-        return {
-          urls: server.urls || server.url,
-          username: response.username,
-          credential: response.password
-        };
-      });
-    }
-  } else {
-    log.debug('Using application provided turn credentials.');
-  }
-
-  yield (0, _effects.put)(_actions.turnActions.turnChanged(turnInfo));
-}
-
-/***/ }),
-
 /***/ "../kandy/src/call/cpaas/utils/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21834,6 +28912,245 @@ function sanitizeSdesFromSdp(newSdp, info, originalSdp) {
     }
   }
   return newSdp;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/interface/actionTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const PREFIX = '@@KANDY/';
+
+const MAKE_CALL = exports.MAKE_CALL = PREFIX + 'MAKE_CALL';
+const MAKE_CALL_FINISH = exports.MAKE_CALL_FINISH = PREFIX + 'MAKE_CALL_FINISH';
+const CALL_INCOMING = exports.CALL_INCOMING = PREFIX + 'CALL_INCOMING';
+const ANSWER_CALL = exports.ANSWER_CALL = PREFIX + 'ANSWER_CALL';
+const ANSWER_CALL_FINISH = exports.ANSWER_CALL_FINISH = PREFIX + 'ANSWER_CALL_FINISH';
+const IGNORE_CALL = exports.IGNORE_CALL = PREFIX + 'IGNORE_CALL';
+const IGNORE_CALL_FINISH = exports.IGNORE_CALL_FINISH = PREFIX + 'IGNORE_CALL_FINISH';
+const REJECT_CALL = exports.REJECT_CALL = PREFIX + 'REJECT_CALL';
+const REJECT_CALL_FINISH = exports.REJECT_CALL_FINISH = PREFIX + 'REJECT_CALL_FINISH';
+const END_CALL = exports.END_CALL = PREFIX + 'END_CALL';
+const END_CALL_FINISH = exports.END_CALL_FINISH = PREFIX + 'END_CALL_FINISH';
+
+const CALL_STATE_CHANGE = exports.CALL_STATE_CHANGE = PREFIX + 'CALL_STATE_CHANGE';
+const CALL_MEDIA_STATE_CHANGE = exports.CALL_MEDIA_STATE_CHANGE = PREFIX + 'CALL_MEDIA_STATE_CHANGE';
+
+const START_LOCAL_VIDEO = exports.START_LOCAL_VIDEO = PREFIX + 'START_LOCAL_VIDEO';
+const START_LOCAL_VIDEO_FINISH = exports.START_LOCAL_VIDEO_FINISH = PREFIX + 'START_LOCAL_VIDEO_FINISH';
+const STOP_LOCAL_VIDEO = exports.STOP_LOCAL_VIDEO = PREFIX + 'STOP_LOCAL_VIDEO';
+const STOP_LOCAL_VIDEO_FINISH = exports.STOP_LOCAL_VIDEO_FINISH = PREFIX + 'STOP_LOCAL_VIDEO_FINISH';
+
+/*
+ *   Mid-Call operations.
+ */
+const MUTE_CALL = exports.MUTE_CALL = PREFIX + 'MUTE_CALL';
+const MUTE_CALL_FINISH = exports.MUTE_CALL_FINISH = PREFIX + 'MUTE_CALL_FINISH';
+const UNMUTE_CALL = exports.UNMUTE_CALL = PREFIX + 'UNMUTE_CALL';
+const UNMUTE_CALL_FINISH = exports.UNMUTE_CALL_FINISH = PREFIX + 'UNMUTE_CALL_FINISH';
+
+const SILENCE_CALL = exports.SILENCE_CALL = PREFIX + 'SILENCE_CALL';
+const SILENCE_CALL_FINISH = exports.SILENCE_CALL_FINISH = PREFIX + 'SILENCE_CALL_FINISH';
+const UNSILENCE_CALL = exports.UNSILENCE_CALL = PREFIX + 'UNSILENCE_CALL';
+const UNSILENCE_CALL_FINISH = exports.UNSILENCE_CALL_FINISH = PREFIX + 'UNSILENCE_CALL_FINISH';
+
+const SET_CUSTOM_PARAMETERS = exports.SET_CUSTOM_PARAMETERS = PREFIX + 'SET_CUSTOM_PARAMETERS';
+
+const START_VIDEO = exports.START_VIDEO = PREFIX + 'START_VIDEO';
+const START_VIDEO_FINISH = exports.START_VIDEO_FINISH = PREFIX + 'START_VIDEO_FINISH';
+const STOP_VIDEO = exports.STOP_VIDEO = PREFIX + 'STOP_VIDEO';
+const STOP_VIDEO_FINISH = exports.STOP_VIDEO_FINISH = PREFIX + 'STOP_VIDEO_FINISH';
+
+const HOLD_CALL = exports.HOLD_CALL = PREFIX + 'HOLD_CALL';
+const HOLD_CALL_FINISH = exports.HOLD_CALL_FINISH = PREFIX + 'HOLD_CALL_FINISH';
+const UNHOLD_CALL = exports.UNHOLD_CALL = PREFIX + 'UNHOLD_CALL';
+const UNHOLD_CALL_FINISH = exports.UNHOLD_CALL_FINISH = PREFIX + 'UNHOLD_CALL_FINISH';
+
+const START_SCREENSHARE = exports.START_SCREENSHARE = PREFIX + 'START_SCREENSHARE';
+const START_SCREENSHARE_FINISH = exports.START_SCREENSHARE_FINISH = PREFIX + 'START_SCREENSHARE_FINISH';
+const STOP_SCREENSHARE = exports.STOP_SCREENSHARE = PREFIX + 'STOP_SCREENSHARE';
+const STOP_SCREENSHARE_FINISH = exports.STOP_SCREENSHARE_FINISH = PREFIX + 'STOP_SCREENSHARE_FINISH';
+
+const FORWARD_CALL = exports.FORWARD_CALL = PREFIX + 'FORWARD_CALL';
+const FORWARD_CALL_FINISH = exports.FORWARD_CALL_FINISH = PREFIX + 'FORWARD_CALL_FINISH';
+
+const DIRECT_TRANSFER = exports.DIRECT_TRANSFER = PREFIX + 'DIRECT_TRANSFER';
+const DIRECT_TRANSFER_FINISH = exports.DIRECT_TRANSFER_FINISH = PREFIX + 'DIRECT_TRANSFER_FINISH';
+
+const CONSULTATIVE_TRANSFER = exports.CONSULTATIVE_TRANSFER = PREFIX + 'CONSULTATIVE_TRANSFER';
+const CONSULTATIVE_TRANSFER_FINISH = exports.CONSULTATIVE_TRANSFER_FINISH = PREFIX + 'CONSULTATIVE_TRANSFER_FINISH';
+
+const JOIN_CALL = exports.JOIN_CALL = PREFIX + 'JOIN_CALL';
+const JOIN_CALL_FINISH = exports.JOIN_CALL_FINISH = PREFIX + 'JOIN_CALL_FINISH';
+
+const SEND_CUSTOM_PARAMETERS = exports.SEND_CUSTOM_PARAMETERS = PREFIX + 'SEND_CUSTOM_PARAMETERS';
+const SEND_CUSTOM_PARAMETERS_FINISH = exports.SEND_CUSTOM_PARAMETERS_FINISH = PREFIX + 'SEND_CUSTOM_PARAMETERS_FINISH';
+
+const SEND_DTMF = exports.SEND_DTMF = PREFIX + 'SEND_DTMF';
+const SEND_DTMF_FINISH = exports.SEND_DTMF_FINISH = PREFIX + 'SEND_DTMF_FINISH';
+
+// Media devices.
+const CHECK_DEVICES = exports.CHECK_DEVICES = PREFIX + 'CHECK_DEVICES';
+const CHECK_DEVICES_FINISH = exports.CHECK_DEVICES_FINISH = PREFIX + 'CHECK_DEVICES_FINISH';
+
+const SET_DEFAULT_DEVICES = exports.SET_DEFAULT_DEVICES = PREFIX + 'SET_DEFAULT_DEVICES';
+const SET_DEFAULT_DEVICES_FINISH = exports.SET_DEFAULT_DEVICES_FINISH = PREFIX + 'SET_DEFAULT_DEVICES_FINISH';
+
+const PROMPT_USER_MEDIA = exports.PROMPT_USER_MEDIA = PREFIX + 'PROMPT_USER_MEDIA';
+const PROMPT_USER_MEDIA_FINISH = exports.PROMPT_USER_MEDIA_FINISH = PREFIX + 'PROMPT_USER_MEDIA_FINISH';
+
+const CHANGE_SPEAKER = exports.CHANGE_SPEAKER = PREFIX + 'CHANGE_SPEAKER';
+const CHANGE_SPEAKER_FINISH = exports.CHANGE_SPEAKER_FINISH = PREFIX + 'CHANGE_SPEAKER_FINISH';
+
+const CHANGE_INPUT_DEVICES = exports.CHANGE_INPUT_DEVICES = PREFIX + 'CHANGE_INPUT_DEVICES';
+const CHANGE_INPUT_DEVICES_FINISH = exports.CHANGE_INPUT_DEVICES_FINISH = PREFIX + 'CHANGE_INPUT_DEVICES_FINISH';
+
+// Media
+const INIT_MEDIA = exports.INIT_MEDIA = PREFIX + 'INIT_MEDIA';
+const INIT_MEDIA_FINISH = exports.INIT_MEDIA_FINISH = PREFIX + 'INIT_MEDIA_FINISH';
+
+// Call Me
+const MAKE_CALL_ANONYMOUS = exports.MAKE_CALL_ANONYMOUS = PREFIX + 'MAKE_CALL_ANONYMOUS';
+
+// Audio Bridge
+const CREATE_AUDIO_BRIDGE = exports.CREATE_AUDIO_BRIDGE = PREFIX + 'CREATE_AUDIO_BRIDGE';
+const CREATE_AUDIO_BRIDGE_FINISH = exports.CREATE_AUDIO_BRIDGE_FINISH = PREFIX + 'CREATE_AUDIO_BRIDGE_FINISH';
+
+const CLOSE_AUDIO_BRIDGE = exports.CLOSE_AUDIO_BRIDGE = PREFIX + 'CLOSE_AUDIO_BRIDGE';
+const CLOSE_AUDIO_BRIDGE_FINISH = exports.CLOSE_AUDIO_BRIDGE_FINISH = PREFIX + 'CLOSE_AUDIO_BRIDGE_FINISH';
+
+const BRIDGE_ADD_CALL = exports.BRIDGE_ADD_CALL = PREFIX + 'BRIDGE_ADD_CALL';
+const BRIDGE_ADD_CALL_FINISH = exports.BRIDGE_ADD_CALL_FINISH = PREFIX + 'BRIDGE_ADD_CALL_FINISH';
+
+const BRIDGE_REMOVE_CALL = exports.BRIDGE_REMOVE_CALL = PREFIX + 'BRIDGE_REMOVE_CALL';
+const BRIDGE_REMOVE_CALL_FINISH = exports.BRIDGE_REMOVE_CALL_FINISH = PREFIX + 'BRIDGE_REMOVE_CALL_FINISH';
+
+const MUTE_AUDIO_BRIDGE = exports.MUTE_AUDIO_BRIDGE = PREFIX + 'MUTE_AUDIO_BRIDGE';
+const MUTE_AUDIO_BRIDGE_FINISH = exports.MUTE_AUDIO_BRIDGE_FINISH = PREFIX + 'MUTE_AUDIO_BRIDGE_FINISH';
+
+const UNMUTE_AUDIO_BRIDGE = exports.UNMUTE_AUDIO_BRIDGE = PREFIX + 'UNMUTE_AUDIO_BRIDGE';
+const UNMUTE_AUDIO_BRIDGE_FINISH = exports.UNMUTE_AUDIO_BRIDGE_FINISH = PREFIX + 'UNMUTE_AUDIO_BRIDGE_FINISH';
+
+const SILENCE_AUDIO_BRIDGE = exports.SILENCE_AUDIO_BRIDGE = PREFIX + 'SILENCE_AUDIO_BRIDGE';
+const SILENCE_AUDIO_BRIDGE_FINISH = exports.SILENCE_AUDIO_BRIDGE_FINISH = PREFIX + 'SILENCE_AUDIO_BRIDGE_FINISH';
+
+const UNSILENCE_AUDIO_BRIDGE = exports.UNSILENCE_AUDIO_BRIDGE = PREFIX + 'UNSILENCE_AUDIO_BRIDGE';
+const UNSILENCE_AUDIO_BRIDGE_FINISH = exports.UNSILENCE_AUDIO_BRIDGE_FINISH = PREFIX + 'UNSILENCE_AUDIO_BRIDGE_FINISH';
+
+const UPDATE_AUDIO_BRIDGE_CALLS = exports.UPDATE_AUDIO_BRIDGE_CALLS = PREFIX + 'UPDATE_AUDIO_BRIDGE_CALLS';
+
+/***/ }),
+
+/***/ "../kandy/src/call/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getCallConfig = getCallConfig;
+exports.getCalls = getCalls;
+exports.getCallById = getCallById;
+exports.getCustomParametersById = getCustomParametersById;
+exports.getDevices = getDevices;
+exports.getMediaInfo = getMediaInfo;
+exports.getAudioBridges = getAudioBridges;
+exports.getBridgeCalls = getBridgeCalls;
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+/**
+ * Retrieves the config options provided by the call plugin.
+ * @method getCallConfig
+ * @return {Object}
+ */
+function getCallConfig(state) {
+  return (0, _fp.cloneDeep)(state.config.call);
+}
+
+/**
+ * Retrieves all calls in state.
+ * @method getCalls
+ * @param  {Object} state    Redux state.
+ * @return {Array} Call objects.
+ */
+function getCalls(state) {
+  return (0, _fp.cloneDeep)(state.call.calls);
+}
+
+/**
+ * Retrieves a call from state with a specific call ID.
+ * @method getCallById
+ * @param  {Object}    state  Redux state.
+ * @param  {string}    callId The ID of the call to retrieve.
+ * @return {Object} A call object.
+ */
+function getCallById(state, callId) {
+  return (0, _fp.find)(call => call.id === callId, getCalls(state));
+}
+
+/**
+ * Retrieves custom parameters from a call with a specific call ID.
+ * @method getCustomParametersById
+ * @param  {Object}    state  Redux state.
+ * @param  {string}    callId The ID of the call to retrieve.
+ * @return {Object} A call object.
+ */
+function getCustomParametersById(state, callId) {
+  let call = (0, _fp.find)(call => call.id === callId, getCalls(state));
+  if (call && call.customParameters) {
+    return call.customParameters;
+  }
+  return [];
+}
+
+/**
+ * Retrieves media devices available on the system.
+ * @method getDevices
+ * @param  {Object}    state  Redux state.
+ * @return {Object}
+ */
+function getDevices(state) {
+  return (0, _fp.cloneDeep)(state.call.devices);
+}
+
+/**
+ * Retrieves media support information.
+ * @method getMediaInfo
+ * @param  {Object} state Redux state.
+ * @return {Object}
+ */
+function getMediaInfo(state) {
+  return (0, _fp.cloneDeep)(state.call.media);
+}
+
+/**
+ * Retrieves audio bridge information.
+ * @method getAudioBridges
+ * @param  {Object} state Redux state.
+ * @return {Object}
+ */
+function getAudioBridges(state) {
+  return (0, _fp.cloneDeep)(state.call.audioBridges);
+}
+
+/**
+ * Retrieve all calls currently part of an audio bridge.
+ * @method getBridgeCalls
+ * @param state
+ * @param bridgeId
+ * @return {Array} List of calls currently part of the specified audio bridge.
+ */
+function getBridgeCalls(state, bridgeId) {
+  return (0, _fp.cloneDeep)((0, _fp.find)(bridge => bridge.id === bridgeId, getAudioBridges(state)).calls);
 }
 
 /***/ }),
@@ -23829,6 +31146,1527 @@ function getTurnInfo(state) {
 
 /***/ }),
 
+/***/ "../kandy/src/call/link/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = callsLink;
+
+var _interfaceNew = __webpack_require__("../kandy/src/call/interfaceNew/index.js");
+
+var _interfaceNew2 = _interopRequireDefault(_interfaceNew);
+
+var _sagas = __webpack_require__("../kandy/src/call/link/sagas/index.js");
+
+var sagas = _interopRequireWildcard(_sagas);
+
+var _events = __webpack_require__("../kandy/src/call/interfaceNew/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
+
+var _utils = __webpack_require__("../kandy/src/callstack/utils/index.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _utils2 = __webpack_require__("../kandy/src/common/utils.js");
+
+var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
+
+var _codecRemover2 = _interopRequireDefault(_codecRemover);
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Configuration options for the call feature.
+ * @public
+ * @name config.call
+ * @memberof config
+ * @instance
+ * @param {Object} call The call configuration object.
+ * @param {Object} [call.iceServers] ICE servers to be used for calls.
+ * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
+ * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
+ */
+
+// Call plugin.
+function callsLink(options = {}) {
+  const defaultOptions = {
+    // The list of TURN/STUN servers to use.
+
+    // TODO: Remove this default once the UC server configuration feature is implemented. These
+    // servers should be sent to us by UC. This default is just here fo ease of use in production.
+    iceServers: [{
+      url: 'turns:turn-ucc-1.genband.com:443?transport=tcp',
+      credential: ''
+    }, {
+      url: 'turns:turn-ucc-2.genband.com:443?transport=tcp',
+      credential: ''
+    }],
+    // TODO: Remove this once all the browsers use unified-plan
+    sdpSemantics: 'plan-b',
+    // Whether the SDK should fetch turn credentials.
+    serverTurnCredentials: true,
+    // Trickle ICE method to use for calls.
+    trickleIceMode: 'NONE',
+    // SDP handlers to be included in the pipeline for every operation.
+    sdpHandlers: [],
+    // filter out H264 Codec
+    removeH264Codecs: true,
+    // Set this to false to bypass sip address normalization
+    normalizeDestination: true
+
+    // For backwards compatibility between old ICE config and new config.
+  };if (options.iceserver && !options.iceServers) {
+    log.warn('Call configuration `iceserver` is being replaced by `iceServers`. Please update to the config.');
+    options.iceServers = options.iceserver;
+    delete options.iceserver;
+  }
+
+  options = (0, _utils2.mergeValues)(defaultOptions, options);
+
+  function* init({ webRTC }) {
+    yield (0, _effects.put)((0, _actions2.update)(options, _interfaceNew2.default.name));
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+
+    /*
+     * Set SDP handlers to be used for every operation:
+     *
+     * 1. Application provided SDP handlers.
+     *
+     * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
+     *    crypto method enabled. WebRTC only allows one method to be enabled.
+     *    This is needed for interopability with non-browser endpoints that include
+     *    SDES as a fallback method.
+     *
+     * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
+     *
+     */
+    let sdpHandlers = options.sdpHandlers;
+    if (options.removeH264Codecs) {
+      sdpHandlers.push((0, _codecRemover2.default)(['H264']));
+    }
+    sdpHandlers.push(_utils.sanitizeSdesFromSdp);
+    webRTC.sdp.pipeline.setHandlers(sdpHandlers);
+
+    // Wrap the call sagas in a function that provides them with the webRTC stack.
+    const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
+      return (0, _utils2.autoRestart)(() => saga(webRTC.managers));
+    });
+
+    // Run all of the sagas.
+    for (let saga of wrappedSagas) {
+      yield (0, _effects.fork)(saga);
+    }
+  }
+
+  return {
+    name: _interfaceNew2.default.name,
+    api: _interfaceNew2.default.api,
+    reducer: _interfaceNew2.default.reducer,
+    init
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/link/requests/calls.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.createSession = createSession;
+exports.updateCallRinging = updateCallRinging;
+exports.endSession = endSession;
+exports.answerSession = answerSession;
+exports.rejectSession = rejectSession;
+exports.forwardSession = forwardSession;
+exports.consultativeTransferSessions = consultativeTransferSessions;
+exports.directTransferSession = directTransferSession;
+exports.joinSessions = joinSessions;
+exports.updateSession = updateSession;
+exports.auditCall = auditCall;
+exports.updateSessionResponse = updateSessionResponse;
+exports.linkCallRequest = linkCallRequest;
+
+var _normalization = __webpack_require__("../kandy/src/call/utils/normalization.js");
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Creates a webRTC session on the server. Link-specific signalling function.
+ *
+ * This saga "starts a call" between the current user and another, specified
+ *    user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method createSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.participantAddress The user to receive the call.
+ * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
+ * @return {Object} response Signalling response.
+ * @return {string} [response.wrtcsSessionId] ID that the server uses to track this call.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+
+
+// Helpers.
+// Call plugin.
+function* createSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  // requestInfo.username isn't normalized and link requires a normalized
+  // address to make a call.  Since we also user username to build the request
+  // url, we need it both normalized and straight up.  So I'm normalizing it and
+  // putting it on the requestInfo object under a new property name 'fromAddress'
+  if (requestInfo.username) {
+    const domain = yield (0, _effects3.select)(_selectors.getDomain);
+    // Normalize callee addresses
+    callInfo.fromAddress = (0, _normalization.normalizeSipUri)(requestInfo.username, domain);
+    log.info('Caller address normalized to: ', callInfo.fromAddress);
+  }
+
+  const requestOptions = {
+    method: 'POST',
+    url: `${requestInfo.baseURL}/rest/version/${requestInfo.version}/user/${requestInfo.username}/callControl`,
+    body: (0, _stringify2.default)({
+      callControlRequest: {
+        type: 'callStart',
+        from: callInfo.fromAddress,
+        to: callInfo.participantAddress,
+        sdp: callInfo.offer
+      }
+    })
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.requestOptions);
+
+  if (response.error) {
+    return {
+      error: handleLinkCallRequestError(response)
+    };
+  } else {
+    return {
+      error: false,
+      wrtcsSessionId: response.payload.body.callControlResponse.sessionData
+    };
+  }
+}
+
+/**
+ * Updates a webRTC session on the server with a new state.
+ * Link-specific signaling function.
+ *
+ * The saga updates the server's session to be in "ringing" state.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method updateCallRinging
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @param  {string} callInfo.isAnonymous    Whether the call is an anonymous call.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* updateCallRinging(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  const requestType = callInfo.isAnonymous ? 'callMe' : 'callControl';
+  options.endUrl = `${requestType}/callSessions/${callInfo.wrtcsSessionId}`;
+
+  const bodyType = callInfo.isAnonymous ? 'callMeRequest' : 'callControlRequest';
+  options.body = (0, _stringify2.default)({
+    [bodyType]: {
+      type: 'ringing'
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * REST DELETE request to send webRTC session call end requests.
+ * @method endSession
+ * @param  {Object} requestInfo
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @param  {boolean} callInfo.isAnonymous whether the call is anonymous or not
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An BasicError object, if signalling failed.
+ */
+function* endSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+  const options = {
+    method: 'DELETE'
+  };
+
+  const requestType = callInfo.isAnonymous ? 'callMe' : 'callControl';
+  options.endUrl = `${requestType}/callSessions/${callInfo.wrtcsSessionId}`;
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: handleLinkCallRequestError(response)
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Updates a webRTC session on the server with an answer.
+ * Link-specific signaling function.
+ *
+ * This saga "answers a call" from another user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method answerSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId ID that the server uses to identify the session.
+ * @param  {string} callInfo.answer The local SDP to complete negotiation. This may be an offer is performing slow start answer.
+ * @return {Object} response Signalling response.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* answerSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'callAnswer',
+      sdp: callInfo.answer
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Rejects an incoming session.
+ * Link-specific signaling function.
+ *
+ * This saga "rejects" the server session.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ *    2. There is an incoming session.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * REST request to reject a webRTC session.
+ * @method rejectSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* rejectSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'POST'
+  };
+
+  options.endUrl = `calldisposition`;
+
+  options.body = (0, _stringify2.default)({
+    callDispositionRequest: {
+      action: 'reject',
+      sessionData: callInfo.wrtcsSessionId
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Forwards an incoming session to another destination address.
+ * Link-specific signaling function.
+ *
+ * This saga "forwards" the server session to a specified destination address.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ *    2. There is an incoming session.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method forwardSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.address The address to forward the session to.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* forwardSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'POST'
+  };
+
+  options.endUrl = `calldisposition`;
+
+  options.body = (0, _stringify2.default)({
+    callDispositionRequest: {
+      action: 'forward',
+      sessionData: callInfo.wrtcsSessionId,
+      address: callInfo.address
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Transfers ongoing sessions into one another.
+ * Link-specific signaling function.
+ *
+ * This saga "transfers" the server sessions.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method consultativeTransferSessions
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.otherWrtcsSessionId The ID the backend uses to track the other session.
+ * @param  {string} callInfo.destination The address of the other session to transfer to.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ * @return {string} [response.newWrtcsSessionId] The back-end session id, if signalling succeeded.
+ */
+function* consultativeTransferSessions(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'transfer',
+      sessionData: callInfo.otherWrtcsSessionId,
+      address: callInfo.destination
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Direct Transfers an incoming session to another destination address.
+ * Link-specific signaling function.
+ *
+ * This saga "direct transfers" the server session to a specified destination address.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method directTransferSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.address The address to forward the session to.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* directTransferSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'transfer',
+      address: callInfo.address
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Joins ongoing sessions into a new session.
+ * Link-specific signaling function.
+ *
+ * This saga "joins" the server sessions.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method joinSessions
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.otherWrtcsSessionId
+ * @param  {string} callInfo.sdp The new sdp to use.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ * @return {string} [response.newWrtcsSessionId] The back-end session id, if signalling succeeded.
+ */
+function* joinSessions(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'POST'
+  };
+
+  options.endUrl = `callControl/`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'join',
+      firstSessionData: callInfo.wrtcsSessionId,
+      secondSessionData: callInfo.otherWrtcsSessionId,
+      sdp: callInfo.sdp
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false,
+      newWrtcsSessionId: response.callControlResponse.sessionData
+    };
+  }
+}
+
+/**
+ * Updates an existing webRTC session on the server.
+ * Link-specific signalling function.
+ *
+ * This saga "updates a session" between the current user and another, specified
+ *    user.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method updateSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.offer The local SDP offer to begin negotiation.
+ * @return {Object} response Signalling response.
+ * @return {Object} response.error An error object, if signalling failed.
+ */
+function* updateSession(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'startCallUpdate',
+      sdp: callInfo.offer
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Updates a webRTC session on the server to ensure it's state.
+ * Link-specific signaling function.
+ *
+ * This saga "audits" the server session to:
+ *    1. notify the server that the call is still on-going locally, and
+ *    2. ensure that the server is still handling the server session.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method auditCall
+ * @param  {Object} callInfo
+ * @param  {Object} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @return {Object} response Signalling response.
+ * @return {Object} response.error An error object, if signalling failed.
+ */
+function* auditCall(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = { method: 'PUT' };
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'audit'
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+  if (response.error) {
+    return {
+      error: response.error,
+      // Indicate whether the error was that the session doesn't exist
+      //    anymore (and audits should stop) or if it was an unknown error.
+      // 42 == RESOURCE_DOES_NOT_EXIST
+      status: response.error.code === 42 ? 'Closed' : 'Retry'
+    };
+  } else {
+    return {
+      error: false,
+      status: 'Connected'
+    };
+  }
+}
+
+/**
+ * Responds to a received remote offer to update the webRTC session.
+ * Link-specific signaling function.
+ *
+ * This saga responds to a "call update" request as part of renegotiation. This
+ *    updates the server session with an answer SDP, which in turn should notify
+ *    the remote end of the session with the response.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Perform the REST request.
+ *    2. Return the response, formatted.
+ * @method updateSessionResponse
+ * @param  {Object} callInfo
+ * @param  {Object} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.answer The local SDP to complete renegotiation. This may be an offer if performing slow start.
+ * @return {Object} response Signalling response.
+ * @return {Object} response.error An error object, if signalling failed.
+ */
+function* updateSessionResponse(callInfo) {
+  // Collect the information needed to make the request.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.LINK);
+
+  const options = {
+    method: 'PUT'
+  };
+
+  options.endUrl = `callControl/callSessions/${callInfo.wrtcsSessionId}`;
+
+  options.body = (0, _stringify2.default)({
+    callControlRequest: {
+      type: 'respondCallUpdate',
+      sdp: callInfo.answer
+    }
+  });
+
+  const response = yield (0, _effects3.call)(linkCallRequest, requestInfo, options);
+
+  if (response.error) {
+    return {
+      error: response.error
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+function* linkCallRequest(requestInfo, options) {
+  options.url = `${requestInfo.baseURL}/rest/version/${requestInfo.version}/user/${requestInfo.username}/${options.endUrl}`;
+
+  const response = yield (0, _effects2.default)(options, requestInfo.requestOptions);
+
+  if (response.error) {
+    return {
+      error: handleLinkCallRequestError(response)
+    };
+  } else {
+    return response.payload.body;
+  }
+}
+
+function handleLinkCallRequestError(response) {
+  function getMessage(code) {
+    switch (code) {
+      case 5:
+        return 'Request failed: Invalid or missing request body';
+      case 26:
+        return 'Request failed: Internal Server Error';
+      case 1004:
+        return 'Request failed: Bad request';
+      default:
+        return 'Request failed: Unknown error';
+    }
+  }
+
+  let message, code;
+
+  if (response && response.payload) {
+    if (response.payload.body) {
+      if ('callControlResponse' in response.payload.body) {
+        // The response includes a body with an error message.
+        const { callControlResponse } = response.payload.body;
+        message = getMessage(callControlResponse.statusCode);
+        // TODO: Do we want to wrap the backend's error codes?
+        code = callControlResponse.statusCode;
+      } else {
+        // As serviceException details not available, we will capture general error information
+        message = response.payload.body.message;
+        code = response.payload.result.code;
+      }
+    } else if (response.payload.result) {
+      message = `Request failed: ${response.payload.result.message}`;
+      code = response.payload.result.code;
+    }
+  } else {
+    message = `Request failed: Unknown error.`;
+  }
+
+  return new _errors2.default({ message, code });
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/link/sagas/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.createCall = createCall;
+exports.answerCallEntry = answerCallEntry;
+exports.rejectCallEntry = rejectCallEntry;
+exports.addMediaEntry = addMediaEntry;
+exports.removeMediaEntry = removeMediaEntry;
+exports.sendDtmfEntry = sendDtmfEntry;
+exports.incomingCallNotification = incomingCallNotification;
+exports.callStatusNotification = callStatusNotification;
+exports.receiveRemoteOffer = receiveRemoteOffer;
+exports.receiveRemoteAnswer = receiveRemoteAnswer;
+exports.endCallEntry = endCallEntry;
+exports.ignoreCallEntry = ignoreCallEntry;
+exports.holdCall = holdCall;
+exports.unholdCall = unholdCall;
+exports.callAudit = callAudit;
+exports.getStatsEntry = getStatsEntry;
+exports.setTurnCredentials = setTurnCredentials;
+exports.forwardCallEntry = forwardCallEntry;
+exports.consultativeTransferEntry = consultativeTransferEntry;
+exports.directTransferEntry = directTransferEntry;
+exports.joinEntry = joinEntry;
+
+var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _notifications = __webpack_require__("../kandy/src/call/link/sagas/notifications.js");
+
+var notificationSagas = _interopRequireWildcard(_notifications);
+
+var _support = __webpack_require__("../kandy/src/call/link/sagas/support.js");
+
+var supportSagas = _interopRequireWildcard(_support);
+
+var _calls = __webpack_require__("../kandy/src/call/link/requests/calls.js");
+
+var requests = _interopRequireWildcard(_calls);
+
+var _utils = __webpack_require__("../kandy/src/call/link/sagas/utils.js");
+
+var _establish = __webpack_require__("../kandy/src/callstack/call/establish.js");
+
+var _midcall = __webpack_require__("../kandy/src/callstack/call/midcall.js");
+
+var midcallSagas = _interopRequireWildcard(_midcall);
+
+var _notifications2 = __webpack_require__("../kandy/src/callstack/call/notifications.js");
+
+var _support2 = __webpack_require__("../kandy/src/callstack/call/support.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
+
+var _actionTypes3 = __webpack_require__("../kandy/src/auth/interface/actionTypes.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Call operations.
+ */
+
+/**
+ * Start an outgoing call.
+ * @method createCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+
+
+// Other plugins
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// Call plugin.
+function* createCall(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.MAKE_CALL, _establish.makeCall, { webRTC, requests });
+}
+
+/**
+ * Answer a ringing call.
+ * @method answerCall
+ */
+
+
+// Libraries.
+
+
+// Callstack plugin.
+function* answerCallEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.ANSWER_CALL, _establish.answerCall, { webRTC, requests });
+}
+
+/**
+ * Reject a ringing call.
+ * @method rejectCall
+ */
+function* rejectCallEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.REJECT_CALL, _establish.rejectCall, { webRTC, requests });
+}
+
+/**
+ * Add media to a call.
+ * @method addMedia
+ */
+function* addMediaEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, { webRTC, requests });
+}
+
+/**
+ * Remove media from a call.
+ * @method removeMedia
+ */
+function* removeMediaEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, { webRTC, requests });
+}
+
+/**
+ * Send DTMF tones for a call.
+ * @method sendDTMF
+ */
+function* sendDtmfEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, { webRTC });
+}
+
+/**
+ * Call notifications.
+ */
+
+/**
+ * Handle a Link "call incoming" notification.
+ * @method incomingCallNotification
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* incomingCallNotification(webRTC) {
+  /**
+   * Intercept the Link-specific notification, ensuring parameters are given
+   *    to the Callstack sagas into a generic format.
+   * @method linkIncomingCall
+   * @param {Object} action An "incoming call notification" action.
+   */
+  function* linkIncomingCall(action) {
+    const message = action.payload.notificationMessage;
+
+    // Massage data into a generic format, instead of Link-specific.
+    const params = {
+      // The remote SDP offer included with the notification (if any).
+      sdp: message.sessionParams.sdp,
+      // ID that the server uses to identify the session.
+      wrtcsSessionId: message.sessionParams.sessionData,
+      // Remote participant information.
+      remoteName: message.callNotificationParams.callerName,
+      remoteNumber: message.callNotificationParams.callerDisplayNumber
+
+      // Pass the incoming call parameters to the Callstack for handling.
+    };yield (0, _effects.call)(_notifications2.incomingCall, { webRTC, requests }, params);
+  }
+
+  // Redux-saga take() pattern.
+  function incomingCallPattern(action) {
+    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage.eventType === 'call';
+  }
+  yield (0, _effects.takeEvery)(incomingCallPattern, linkIncomingCall);
+}
+
+/**
+ * Handle a call status websocket notification.
+ * @method callStatusNotification
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* callStatusNotification(webRTC) {
+  function statusUpdatePattern(status) {
+    return function statusPattern(action) {
+      return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage.eventType === status;
+    };
+  }
+
+  function* parseStatusNotification(action) {
+    const message = action.payload.notificationMessage;
+    const { eventType } = message;
+    const { sessionData: wrtcsSessionId, reasonText, statusCode } = message.sessionParams;
+    const remoteInfo = yield (0, _effects.call)(_utils.getRemoteParticipant, message);
+
+    const deps = { webRTC };
+    const params = (0, _extends3.default)({
+      wrtcsSessionId,
+      reasonText,
+      statusCode
+    }, remoteInfo);
+    if (eventType === 'callEnd' || eventType === 'sessionComplete') {
+      yield (0, _effects.call)(_notifications2.callStatusUpdateEnded, deps, params);
+    } else if (eventType === 'ringing') {
+      yield (0, _effects.call)(_notifications2.callStatusUpdateRinging, deps, params);
+    } else if (eventType === 'sessionFail') {
+      yield (0, _effects.call)(_notifications2.callStatusUpdateFailed, deps, params);
+    }
+  }
+
+  // Handle specific call statuses
+  yield (0, _effects.takeEvery)(statusUpdatePattern('ringing'), parseStatusNotification);
+  yield (0, _effects.takeEvery)(statusUpdatePattern('callEnd'), parseStatusNotification);
+  yield (0, _effects.takeEvery)(statusUpdatePattern('sessionComplete'), parseStatusNotification);
+  yield (0, _effects.takeEvery)(statusUpdatePattern('callCancel'), notificationSagas.parseCallRejectedResponse, webRTC);
+  yield (0, _effects.takeEvery)(statusUpdatePattern('sessionFail'), parseStatusNotification);
+}
+
+/**
+ * Handle receiving remote offer notifications in a Link format.
+ * Uses properties in the notification to create a standardized data object to
+ *    be used by the Callstack.
+ * @method receiveRemoteOffer
+ * @param  {Object} webRTC The webRTC stack for sagas to use.
+ */
+function* receiveRemoteOffer(webRTC) {
+  /**
+   * Intercept the Link-specific notification, ensuring parameters are given
+   *    to the Callstack sagas into a generic format.
+   * @method parseOfferNotification
+   * @param {Object} action
+   */
+  function* parseOfferNotification(action) {
+    const message = action.payload.notificationMessage;
+    const remoteInfo = yield (0, _effects.call)(_utils.getRemoteParticipant, message);
+
+    // Pull-out the parameters into a standard format for the Callstack.
+    const params = (0, _extends3.default)({
+      wrtcsSessionId: message.sessionParams.sessionData,
+      sdp: message.sessionParams.sdp
+    }, remoteInfo);
+
+    // Pass the call parameters to the Callstack for handling.
+    yield (0, _effects.call)(_notifications2.parseCallRequest, { webRTC, requests }, params);
+  }
+
+  // take() pattern for "update call w/ offer" notifications.
+  function receiveOfferPattern(action) {
+    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage.eventType === 'startCallUpdate';
+  }
+
+  yield (0, _effects.takeEvery)(receiveOfferPattern, parseOfferNotification);
+}
+
+/**
+ * Handle receiving remote answer notifications in a Link format.
+ * Uses properties in the notification to create a standardized data object to
+ *    be used by the Callstack.
+ * @method receiveRemoteAnswer
+ * @param  {Object} webRTC The webRTC stack for sagas to use.
+ */
+function* receiveRemoteAnswer(webRTC) {
+  /**
+   * Intercept the Link-specific notification, ensuring parameters are given
+   *    to the Callstack sagas into a generic format.
+   * @method parseAnswerNotification
+   * @param {Object} action
+   */
+  function* parseAnswerNotification(action) {
+    const message = action.payload.notificationMessage;
+    const remoteInfo = yield (0, _effects.call)(_utils.getRemoteParticipant, message);
+
+    // Pull-out the parameters into a standard format for the Callstack.
+    const params = (0, _extends3.default)({
+      wrtcsSessionId: message.sessionParams.sessionData,
+      sdp: message.sessionParams.sdp,
+
+      retryAfter: message.sessionParams.retryAfter,
+      message: message.sessionParams.reasonText,
+      code: message.statusCode
+
+    }, remoteInfo);
+
+    // Pass the call parameters to the Callstack for handling.
+    yield (0, _effects.call)(_notifications2.parseCallResponse, { webRTC, requests }, params);
+  }
+
+  // take() pattern for "update call with answer" notifications.
+  function receiveAnswerPattern(action) {
+    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage.eventType === 'respondCallUpdate';
+  }
+
+  yield (0, _effects.takeEvery)(receiveAnswerPattern, parseAnswerNotification);
+}
+
+/**
+ * End an ongoing call.
+ * @method endCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* endCallEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, { webRTC, requests });
+}
+
+/**
+ * Ignore an incoming call.
+ * @method ignoreCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* ignoreCallEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.IGNORE_CALL, _establish.ignoreCall, { webRTC });
+}
+
+/**
+ * Put a call on hold.
+ * Currently, "hold" is defined as setting media directions to inactive.
+ * TODO: There will be different "hold" scenarios. Need to determine how to
+ *    differentiate between them to know which saga to trigger.
+ * @method holdCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* holdCall(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, { webRTC, requests });
+}
+
+/**
+ * Take a call off hold.
+ * Currently, "unhold" is defined as setting media directions to sendrecv.
+ * TODO: There will be different "unhold" scenarios. Need to determine how to
+ *    differentiate between them to know which saga to trigger.
+ * @method unholdCall
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* unholdCall(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, { webRTC, requests });
+}
+
+/**
+ * Handle sending a call audit request
+ * TODO: Move the common "setup" logic into the Callstack?
+ * @method callAudit
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* callAudit(webRTC) {
+  const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED];
+
+  function callStartAuditPattern(action) {
+    return actionTypesToDoAuditOn.indexOf(action.type) !== -1 && !action.error;
+  }
+
+  yield (0, _effects.takeEvery)([callStartAuditPattern, actionTypes.CALL_AUDIT], _support2.sendCallAudit, {
+    requests
+  });
+}
+
+/**
+ * Get RTCStatsReport.
+ * @method getStats
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* getStatsEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, { webRTC });
+}
+
+/**
+ * Handles updating TURN information after the user connects.
+ * @method setTurnCredentials
+ */
+function* setTurnCredentials() {
+  // Check that the action is a succesful connect that includes
+  //    TURN information from the server.
+  function hasTurnCredentials(action) {
+    return action.type === _actionTypes3.CONNECT_FINISHED && !action.error && action.payload.subscription.turnCredentials;
+  }
+
+  yield (0, _effects.takeEvery)(hasTurnCredentials, supportSagas.setTurnCredentials);
+}
+
+/**
+ * Forward an incoming call.
+ * @method forwardCallEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* forwardCallEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.FORWARD_CALL, _establish.forwardCall, { webRTC, requests });
+}
+
+/**
+ * Transfers 2 ongoing calls to one another.
+ * @method consultativeTransferEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* consultativeTransferEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.CONSULTATIVE_TRANSFER, midcallSagas.consultativeTransfer, { webRTC, requests });
+}
+
+/**
+ * Direct Transfer an ongoing call.
+ * @method directTransferEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* directTransferEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.DIRECT_TRANSFER, midcallSagas.directTransfer, { webRTC, requests });
+}
+
+/**
+ * Joins 2 ongoing calls.
+ * @method joinEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* joinEntry(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.JOIN, midcallSagas.join, { webRTC, requests });
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/link/sagas/notifications.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parseCallRejectedResponse = parseCallRejectedResponse;
+exports.getCurrentCall = getCurrentCall;
+
+var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _midcall = __webpack_require__("../kandy/src/callstack/webrtc/midcall.js");
+
+var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Helpers.
+
+
+// Other plugins
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Handles a notification reject call response from the remote side.
+ * @method parseCallRejectedResponse
+ * @param  {Object} webRTC The webRTC stack.
+ * @param  {Object} action An action representing a call notification response.
+ */
+
+
+// Libraries.
+function* parseCallRejectedResponse(webRTC, action) {
+  /*
+   * Workaround: Delay a short time before processing the notification.
+   * The backend sends a "callCancel" notification immediately after answering
+   *    a call for an unknown reason. This breaks things if the notification
+   *    is processed before the "anwer call" process is finished. So delay to
+   *    ensure that "answer call" finishes.
+   * Slower networks may need a longer delay...
+   * TODO: Investigate why we receive that notification and a better solution.
+   */
+  yield (0, _effects.delay)(3000);
+
+  // Get the current call
+  const { sessionData } = action.payload.notificationMessage.sessionParams;
+  const currentCall = yield (0, _effects.call)(getCurrentCall, sessionData);
+
+  if (currentCall && currentCall.state !== _constants.CALL_STATES.RINGING && currentCall.state !== _constants.CALL_STATES.INITIATED) {
+    // We often get a 'callCancel' request right after the remote party answers.
+    // We don't want to process this as it will end the call.
+    log.debug(`Received request cancel call when state is ${currentCall.state}. Ignoring.`);
+    return;
+  }
+
+  if (currentCall.webrtcSessionId) {
+    yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
+  }
+
+  yield (0, _effects.put)(_actions.callActions.updateCall(currentCall.id, {
+    state: _constants.CALL_STATES.ENDED
+  }));
+}
+
+/**
+ * Helper function that returns the call associated with the sessionData passed in.
+ * @method getCurrentCall
+ * @param  {Object} Information about a session.
+ */
+function* getCurrentCall(sessionData) {
+  const calls = yield (0, _effects.select)(_selectors.getCalls);
+  // TODO: `find` --> IE11 support.
+  const currentCall = calls.find(call => call.wrtcsSessionId === sessionData);
+
+  if (!currentCall) {
+    log.error(`Error: wrtcs session call ${sessionData} not found.`);
+  }
+
+  return currentCall;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/link/sagas/support.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.setTurnCredentials = setTurnCredentials;
+
+var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Handles setting turn/stun information that has been
+ *    received from the server.
+ * @method setTurnCredentials
+ * @param {Object} action A "connect finished" action.
+ */
+
+
+// Libraries.
+function* setTurnCredentials(action) {
+  const { iceServers, serverTurnCredentials } = yield (0, _effects.select)(_selectors.getOptions);
+
+  // Must have ICE servers configured.
+  if (!iceServers) {
+    log.debug('No ICE servers provided during setup; not using TURN/STUN for calls.');
+    return;
+  }
+
+  if (!serverTurnCredentials) {
+    log.debug('Using application provided turn credentials.');
+    return;
+  }
+
+  // TURN credentials received from the server.
+  const turnCredentials = action.payload.subscription.turnCredentials;
+
+  const turnInfo = {
+    credentials: turnCredentials,
+    // Map the server-provided credentials to the ICE server list.
+    servers: iceServers.map(iceInfo => {
+      return (0, _extends3.default)({}, iceInfo, {
+        username: turnCredentials.username,
+        credential: turnCredentials.password
+      });
+    })
+  };
+
+  yield (0, _effects.put)(_actions.turnActions.turnChanged(turnInfo));
+}
+
+/***/ }),
+
+/***/ "../kandy/src/call/link/sagas/utils.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getRemoteParticipant = getRemoteParticipant;
+
+var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Call plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Gets the remote participant data from a notification object's `callNotificationParams` property if it exists.
+ * @param {Object} notification The notification object to extract remote participant data from.
+ * @returns {Object} Object containing `remoteName` & `remoteNumber` properties.
+ *                   Empty object if `callNotificationParams` property does not exist.
+ */
+
+
+// Libraries.
+
+
+// Other plugins.
+function* getRemoteParticipant(notification) {
+  const wrtcsSessionId = notification.sessionParams.sessionData;
+  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  let remoteInfo = {};
+  if (!notification.callNotificationParams) {
+    // `sessionComplete` notifications don't have `callNotificationParams`.
+    log.debug(`Notification does not contain property 'callNotificationParams'.`);
+  } else {
+    /**
+     * SPiDR notifications seem to have different "remote participant" properties
+     *    in different scenarios. Determine which scenario the call is in to know
+     *    how to parse the notification.
+     */
+    if (targetCall.direction === 'incoming') {
+      remoteInfo = {
+        remoteName: notification.callNotificationParams.callerName,
+        remoteNumber: notification.callNotificationParams.callerDisplayNumber
+      };
+    } else {
+      remoteInfo = {
+        remoteName: notification.callNotificationParams.remoteName,
+        remoteNumber: notification.callNotificationParams.remoteDisplayNumber
+      };
+    }
+  }
+
+  /*
+   * Sometimes the "display number" doesn't include a domain. Make sure it has
+   *    a domain so that it is always consistent.
+   * TODO: Figure out in which cases this was needed. Transfer?
+   *    Ref: KAA-746
+   */
+  if (remoteInfo.remoteNumber && !remoteInfo.remoteNumber.includes('@')) {
+    const domain = yield (0, _effects.select)(_selectors2.getDomain);
+    remoteInfo.remoteNumber += domain;
+  }
+
+  // If the data from the notification is undefined, use whatever the existing
+  //    value on the call was.
+  return {
+    remoteName: remoteInfo.remoteName || targetCall.remoteParticipant.displayName,
+    remoteNumber: remoteInfo.remoteNumber || targetCall.remoteParticipant.displayNumber
+  };
+}
+
+/***/ }),
+
 /***/ "../kandy/src/call/utils/normalization.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24202,6 +33040,1073 @@ function isRemoteHold(callState) {
  */
 function isDualHold(callState) {
   return callState.state === _constants.CALL_STATES.ON_HOLD && callState.localHold && callState.remoteHold;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = callHistory;
+
+var _interface = __webpack_require__("../kandy/src/callHistory/interface/index.js");
+
+var _sagas = __webpack_require__("../kandy/src/callHistory/sagas/index.js");
+
+var sagas = _interopRequireWildcard(_sagas);
+
+var _events = __webpack_require__("../kandy/src/callHistory/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Call History plugin factory.
+ * @method callHistory
+ * @return {Object} plugin - An sdk plugin.
+ */
+
+
+// Libraries.
+// Call History plugin.
+function callHistory() {
+  function* init() {
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+  }
+
+  return {
+    name: _interface.name,
+    capabilities: ['callHistory'],
+    init,
+    api: _interface.api,
+    reducer: _interface.reducer,
+    sagas: (0, _fp.values)(sagas)
+  };
+}
+
+// Other plugins.
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/actionTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const prefix = '@@KANDY/';
+
+const FETCH_CALL_HISTORY = exports.FETCH_CALL_HISTORY = prefix + 'FETCH_CALL_HISTORY';
+const FETCH_CALL_HISTORY_FINISH = exports.FETCH_CALL_HISTORY_FINISH = prefix + 'FETCH_CALL_HISTORY_FINISH';
+
+const DELETE_CALL_HISTORY = exports.DELETE_CALL_HISTORY = prefix + 'DELETE_CALL_HISTORY';
+const DELETE_CALL_HISTORY_FINISH = exports.DELETE_CALL_HISTORY_FINISH = prefix + 'DELETE_CALL_HISTORY_FINISH';
+
+const ADD_CALL_HISTORY_ENTRY = exports.ADD_CALL_HISTORY_ENTRY = prefix + 'ADD_CALL_HISTORY_ENTRY';
+
+const SET_CACHE = exports.SET_CACHE = prefix + 'SET_CACHE';
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/actions.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.retrieveCallLogs = retrieveCallLogs;
+exports.retrieveCallLogsFinish = retrieveCallLogsFinish;
+exports.removeCallLogs = removeCallLogs;
+exports.removeCallLogsFinish = removeCallLogsFinish;
+exports.addCallLogEntry = addCallLogEntry;
+exports.setCache = setCache;
+
+var _actionTypes = __webpack_require__("../kandy/src/callHistory/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Represents a request to fetch call logs.
+ * @method retrieveCallLogs
+ * @param  {number} amount The number of records to retrieve.
+ * @param  {number} offset Starting offset for records to retrieve.
+ * @return {Object} A flux standard action.
+ */
+function retrieveCallLogs(amount, offset) {
+  return {
+    type: actionTypes.FETCH_CALL_HISTORY,
+    payload: {
+      amount,
+      offset
+    }
+  };
+}
+
+/**
+ * Represents a received response from fetching call logs.
+ * @method retrieveCallLogsFinish
+ * @param  {Object} $0
+ * @param  {Object} $0.logs Retrieved call logs.
+ * @param  {BasicError} $0.error  Error object, in the case of an error.
+ * @return {Object} A flux standard action.
+ */
+function retrieveCallLogsFinish({ logs, error }) {
+  return {
+    type: actionTypes.FETCH_CALL_HISTORY_FINISH,
+    error: !!error,
+    payload: error || logs
+  };
+}
+
+/**
+ * Represents a request to delete call logs.
+ * @method removeCallLogs
+ * @param  {number} recordId Which logs to delete.
+ * @return {Object} A flux standard action.
+ */
+function removeCallLogs(recordId) {
+  return {
+    type: actionTypes.DELETE_CALL_HISTORY,
+    payload: recordId
+  };
+}
+
+/**
+ * Represents a received response from deleting call logs.
+ * @method removeCallLogsFinish
+ * @param  {Object} $0
+ * @param  {number|string} $0.recordId The ID of the removed record. Can also be 'all'.
+ * @param  {BasicError} $0.error  Error object, in the case of an error.
+ * @return {Object} A flux standard action.
+ */
+function removeCallLogsFinish({ recordId, error }) {
+  return {
+    type: actionTypes.DELETE_CALL_HISTORY_FINISH,
+    error: !!error,
+    payload: error || recordId
+  };
+}
+
+/**
+ * Represents a request to add a new entry to the call logs.
+ * @method addCallLogEntry
+ * @param  {Object} $0 The call log entry to add
+ * @return {Object} A flux standard action.
+ */
+function addCallLogEntry(logEntry) {
+  return {
+    type: actionTypes.ADD_CALL_HISTORY_ENTRY,
+    payload: logEntry
+  };
+}
+
+/**
+ * Represents a call to set the cache in the call history
+ * @method setCache
+ * @param  {Object} $0 call log state to hydrate into app state
+ * @return {Object} A flux standard action.
+ */
+function setCache(data) {
+  return {
+    type: actionTypes.SET_CACHE,
+    payload: data
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/api.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.default = api;
+
+var _actions = __webpack_require__("../kandy/src/callHistory/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("../kandy/src/callHistory/interface/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = (0, _logs.getLogManager)().getLogger('CALLHISTORY');
+
+/**
+ * Call History API.
+ * @method api
+ * @param  {Function} $0
+ * @param  {Function} $0.dispatch The redux store's dispatch function.
+ * @param {Function} $0.getState - The redux store's getState function.
+ * @return {Object} API.
+ */
+/**
+ * The call history feature is used to retrieve and inspect the authenticated
+ * users call logs.
+ *
+ * CallHistory functions are all part of the 'call.history' namespace.
+ *
+ * @public
+ * @module CallHistory
+ */
+
+// Call History interface.
+function api({ dispatch, getState }) {
+  const callHistoryApi = {
+    /**
+     * Fetches the list of call logs and stores them locally. The API
+     * `getCallLogs` can then be used to get the logs from local state after
+     * it has been updated.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method fetch
+     * @param  {number} [amount=50] The number of records to retrieve.
+     * @param  {number} [offset=0] Starting offset for records to retrieve.
+     */
+    fetch(amount = 50, offset = 0) {
+      log.debug(_logs.API_LOG_TAG + 'call.history.fetch: ', amount, offset);
+      dispatch(actions.retrieveCallLogs(amount, offset));
+    },
+
+    /**
+     * Deletes the specified call log.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method remove
+     * @param  {number} recordId The ID of the call log to be removed.
+     */
+    remove(recordId) {
+      log.debug(_logs.API_LOG_TAG + 'call.history.remove: ', recordId);
+      dispatch(actions.removeCallLogs(recordId));
+    },
+
+    /**
+     * Deletes all call logs.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method clear
+     */
+    clear() {
+      log.debug(_logs.API_LOG_TAG + 'call.history.clear');
+      dispatch(actions.removeCallLogs('all'));
+    },
+
+    /**
+     * Gets the list of call logs cached locally. The event
+     * `callHistory:changed` is used to indicate the local state of logs
+     * has been updated.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method get
+     * @example
+     * client.on('callHistory:change', function() {
+     *     // Get all call logs when they've been updated.
+     *     let callLogs = client.call.history.get();
+     * });
+     * @returns {Array} A list of call log records, ordered by latest first.
+     */
+    get() {
+      log.debug(_logs.API_LOG_TAG + 'call.history.get');
+      return (0, _selectors.getCallHistory)(getState());
+    },
+
+    /**
+     * Gets the cached call history data and returns stringified data.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method getCache
+     * @returns {Array} A list of call log records from the cache, ordered by latest first.
+     */
+    getCache() {
+      log.debug(_logs.API_LOG_TAG + 'call.history.getCache');
+      return (0, _stringify2.default)((0, _selectors.getCachedHistory)(getState()));
+    },
+
+    /**
+     * Sets the cached call history data, expects stringified data as it will be parsed.
+     * @public
+     * @memberof CallHistory
+     * @requires callHistory
+     * @method setCache
+     * @param {*} data The data to restore in the cache.
+     */
+    setCache(data) {
+      log.debug(_logs.API_LOG_TAG + 'call.history.setCache: ', data);
+      dispatch(actions.setCache(JSON.parse(data)));
+    }
+  };
+
+  return { call: { history: callHistoryApi } };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/eventTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Call history state has been updated. See `getCallLogs()` to retrieve new state.
+ * @public
+ * @memberof CallHistory
+ * @event callHistory:change
+ */
+const CALL_HISTORY_CHANGE = exports.CALL_HISTORY_CHANGE = 'callHistory:change';
+
+/**
+ * An error occured while performing a call history operation.
+ * @public
+ * @memberof CallHistory
+ * @event callHistory:error
+ * @param {Object} params
+ * @param {BasicError} params.error The Basic error object.
+ */
+const CALL_HISTORY_ERROR = exports.CALL_HISTORY_ERROR = 'callHistory:error';
+
+/**
+ * Call history cached state has been updated
+ * @public
+ * @memberof CallHistory
+ * @event callHistoryCache:change
+ */
+const CALL_HISTORY_CACHE_CHANGE = exports.CALL_HISTORY_CACHE_CHANGE = 'callHistoryCache:change';
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/events.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _eventTypes = __webpack_require__("../kandy/src/callHistory/interface/eventTypes.js");
+
+var eventTypes = _interopRequireWildcard(_eventTypes);
+
+var _actionTypes = __webpack_require__("../kandy/src/callHistory/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function callHistoryEvent(action) {
+  if (!action.error) {
+    return [{
+      type: eventTypes.CALL_HISTORY_CHANGE,
+      args: {}
+    }, {
+      type: eventTypes.CALL_HISTORY_CACHE_CHANGE,
+      args: {}
+    }];
+  } else {
+    return {
+      type: eventTypes.CALL_HISTORY_ERROR,
+      args: { error: action.payload }
+    };
+  }
+}
+
+var events = {};
+
+events[actionTypes.FETCH_CALL_HISTORY_FINISH] = callHistoryEvent;
+events[actionTypes.DELETE_CALL_HISTORY_FINISH] = callHistoryEvent;
+events[actionTypes.ADD_CALL_HISTORY_ENTRY] = callHistoryEvent;
+
+exports.default = events;
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.reducer = exports.api = exports.name = undefined;
+
+var _api = __webpack_require__("../kandy/src/callHistory/interface/api.js");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _reducers = __webpack_require__("../kandy/src/callHistory/interface/reducers.js");
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const name = 'callHistory';
+
+exports.name = name;
+exports.api = _api2.default;
+exports.reducer = _reducers2.default;
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/reducers.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _actionTypes = __webpack_require__("../kandy/src/callHistory/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const reducers = {};
+
+reducers[actionTypes.FETCH_CALL_HISTORY_FINISH] = {
+  next(state, action) {
+    // Note: If a conflict occurs in the below unionBy, the newer log is
+    //      preferred over the older log. This is because SPiDR only keeps
+    //      50 records at a time, and it re-uses old recordIds when it
+    //      creates new record logs. It's stupid.
+
+    // Get local Logs. Local logs are identified by having a recordID of 16 characters
+    let localLogs = state.filter(function (log) {
+      return log.recordId.length === 36 && log.duration !== '0';
+    });
+
+    // Remove the local logs
+    let localLogsRemoved = state.filter(function (log) {
+      return log.resourceLocation !== '';
+    });
+
+    // Generate a list of unique logs (ie; not found in server logs)
+    let uniqueLogs = localLogs.filter(function (log) {
+      var result = action.payload.some(isSimilar, log);
+      return !result;
+    });
+
+    // Combine server logs and new logs.
+    let newLogs = (0, _fp.concat)((0, _fp.unionBy)('recordId', action.payload, localLogsRemoved), uniqueLogs);
+
+    // Sort start time, in descending order.
+    return (0, _fp.reverse)((0, _fp.sortBy)('startTime', newLogs));
+  }
+};
+
+reducers[actionTypes.DELETE_CALL_HISTORY_FINISH] = {
+  next(state, action) {
+    if (action.payload === 'all') {
+      return [];
+    } else {
+      return state.map(function (log) {
+        return log.recordId !== action.payload;
+      });
+    }
+  }
+};
+
+reducers[actionTypes.ADD_CALL_HISTORY_ENTRY] = {
+  next(state, action) {
+    return (0, _fp.concat)(action.payload, state);
+  }
+};
+
+// rehydrate cache with previously stored data
+reducers[actionTypes.SET_CACHE] = {
+  next(state, action) {
+    return action.payload;
+  }
+};
+
+// Call History default state is an empty array.
+const reducer = (0, _reduxActions.handleActions)(reducers, []);
+exports.default = reducer;
+
+/*
+ * A helper function to determine if 2 log entries are similar.
+ * A log is considered similar under the following conditions:
+ *   - the startTime is within 10 seconds
+ *   - the duration is within 5 seconds
+ *   - the direction is the same
+ */
+
+let isSimilar = function (serverLogEntry) {
+  const startTimePadding = 10000;
+  const durationPadding = 5000;
+
+  if (Math.abs(serverLogEntry.startTime - this.startTime) > startTimePadding) {
+    return false;
+  }
+  if (Math.abs(serverLogEntry.duration - this.duration) > durationPadding) {
+    return false;
+  }
+  if (serverLogEntry.direction !== this.direction) {
+    return false;
+  }
+  return true;
+};
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getCallHistory = getCallHistory;
+exports.getCachedHistory = getCachedHistory;
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+/**
+ * Retrieves call history stored in state.
+ * @method getCallHistory
+ * @param  {Object} state Redux state.
+ * @return {Array}
+ */
+function getCallHistory(state) {
+  return (0, _fp.cloneDeep)(state.callHistory);
+}
+
+/**
+ * Retrieves call history stored in state
+ * @method getCachedHistory
+ * @param  {Object} state Redux state.
+ * @return {Array}
+ */
+function getCachedHistory(state) {
+  return (0, _fp.cloneDeep)(state.callHistory);
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/sagas/client.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.oldStoreCallLogs = oldStoreCallLogs;
+exports.storeCallLogs = storeCallLogs;
+
+var _actions = __webpack_require__("../kandy/src/callHistory/interface/actions.js");
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+var _selectors2 = __webpack_require__("../kandy/src/call/interface/selectors.js");
+
+var _selectors3 = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+// Helpers.
+/**
+ * Sagas related to client generated call history.
+ */
+
+// Call History plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALLHISTORY');
+
+/**
+ * Constructs a local call log from a "call ended" action.
+ * Old callstack specific.
+ *
+ * This saga defines how a "local call log" is created after a call has ended.
+ *    The format of the log mimics the format of server-side call logs.
+ * Assumptions:
+ *    1. The provided action is a "call ended" action for the old callstack.
+ * Responsibilities:
+ *    1. Gather all information needed for a call log.
+ *    2. Create / format the call log.
+ *    3. Update redux state (via actions).
+ * @method oldStoreCallLogs
+ * @param {Object} action A `CALL_STATE_CHANGE` action representing a call end.
+ */
+
+
+// Libraries
+
+
+// Other plugins.
+function* oldStoreCallLogs(action) {
+  // Make sure this is a call end state change.
+  if (action.payload.state !== _constants.CALL_STATES_FCS['ENDED']) {
+    return;
+  }
+
+  // Get call state needed for the log.
+  const call = yield (0, _effects.select)(_selectors2.getCallById, action.payload.callId);
+
+  if (!call) {
+    log.debug(`Call info (${action.payload.callId}) not in state to create local log.`);
+    return;
+  }
+
+  var logEntry = {
+    recordId: action.payload.callId,
+    startTime: '' + call.startTime,
+    duration: '' + (call.endTime - call.startTime),
+    callerDisplayNumber: call.from,
+    calleeDisplayNumber: call.to,
+    calleeName: call.calleeName,
+    remoteParticipant: call.remoteParticipant,
+    originalRemoteParticipant: call.originalRemoteParticipant,
+    resourceLocation: ''
+  };
+
+  if (call.direction === 'incoming') {
+    // If the previous state was ringing, and the change was not because the call was
+    //      answered by another device (ie. code 9904), then it is a missed call.
+    if (action.payload.transition.prevState === _constants.CALL_STATES_FCS['RINGING'] && action.payload.transition.code !== '9904') {
+      logEntry.direction = 'missed';
+    } else {
+      logEntry.direction = 'incoming';
+    }
+    logEntry.callerName = call.callerName;
+  } else {
+    logEntry.direction = 'outgoing';
+    // Use the contact name provided to the call as the current user's name.
+    let contactName = (call.contact.firstName + ' ' + call.contact.lastName).trim();
+    logEntry.callerName = contactName || call.from.split('@')[0];
+  }
+
+  log.debug('Adding call event to the local call history:', logEntry);
+  yield (0, _effects.put)((0, _actions.addCallLogEntry)(logEntry));
+}
+
+/**
+ * Constructs a local call log from a "call ended" action.
+ * New callstack specific.
+ *
+ * This saga defines how a "local call log" is created after a call has ended.
+ *    The format of the log mimics the format of server-side call logs.
+ * Assumptions:
+ *    1. The provided action is a "call ended" action for the new callstack.
+ * Responsibilities:
+ *    1. Gather all information needed for a call log.
+ *    2. Create / format the call log.
+ *    3. Update redux state (via actions).
+ * @method storeCallLogs
+ * @param {Object} action An action representing a call ending.
+ */
+function* storeCallLogs(action) {
+  if (![_actionTypes.END_CALL_FINISH, _actionTypes.REJECT_CALL_FINISH].includes(action.type)) {
+    return;
+  }
+
+  // Get call state needed for the log.
+  const call = yield (0, _effects.select)(_selectors3.getCallById, action.payload.id);
+
+  if (!call) {
+    log.debug(`Call info (${action.payload.id}) not in state to create local log.`);
+    return;
+  }
+
+  // TODO: Call state doesn't have a property with the current user's name.
+  //    Get it from auth state for now.
+  const userInfo = yield (0, _effects.select)(_selectors.getUserInfo);
+
+  var logEntry = {
+    recordId: action.payload.id,
+    startTime: '' + call.startTime,
+    duration: '' + (call.endTime - call.startTime),
+    direction: call.direction,
+    callerDisplayNumber: call.isCaller ? userInfo.username : call.remoteParticipant.displayNumber,
+    calleeDisplayNumber: call.isCaller ? call.remoteParticipant.displayNumber : userInfo.username,
+    calleeName: call.isCaller ? call.remoteParticipant.displayName || call.remoteParticipant.displayNumber : userInfo.username,
+    callerName: call.isCaller ? userInfo.username : call.remoteParticipant.displayName || call.remoteParticipant.displayNumber,
+    remoteParticipant: call.remoteParticipant,
+    originalRemoteParticipant: null,
+    resourceLocation: ''
+
+    // TODO: We can't yet check for all scenarios that the old saga checks for.
+    //  1. Need to be able to determine if the call was missed.
+    //  2. Need to support the caller providing their own contact name.
+
+  };log.debug('Adding call event to the local call history:', logEntry);
+  yield (0, _effects.put)((0, _actions.addCallLogEntry)(logEntry));
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/sagas/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.fetchLogs = fetchLogs;
+exports.removeLogs = removeLogs;
+exports.createLocalLog = createLocalLog;
+
+var _server = __webpack_require__("../kandy/src/callHistory/sagas/server.js");
+
+var _client = __webpack_require__("../kandy/src/callHistory/sagas/client.js");
+
+var _actionTypes = __webpack_require__("../kandy/src/callHistory/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actionTypes2 = __webpack_require__("../kandy/src/call/interface/actionTypes.js");
+
+var _actionTypes3 = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Fetch server call history.
+ * @method fetchLogs
+ */
+
+
+// Other plugins.
+function* fetchLogs() {
+  yield (0, _effects.takeEvery)(actionTypes.FETCH_CALL_HISTORY, _server.retrieveCallLogs);
+}
+
+/**
+ * Delete server call history.
+ * @method removeLogs
+ */
+
+
+// Libraries.
+/**
+ * Call History saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// Call History plugin.
+function* removeLogs() {
+  yield (0, _effects.takeEvery)(actionTypes.DELETE_CALL_HISTORY, _server.removeCallLogs);
+}
+
+/**
+ * Create local call log after a call ends.
+ * Handles actions from both the new and old call interfaces (new/old callstacks).
+ * @method createLocalLog
+ */
+function* createLocalLog() {
+  // Matches "call ended" actions from the old call interface (ie. old
+  //    callstack). The old "call ended" actions are "state change" actions
+  //    where the new state is "ended".
+  function oldCallEndedPattern(action) {
+    return action.type === _actionTypes2.CALL_STATE_CHANGE && action.payload.state === _constants.CALL_STATES_FCS['ENDED'];
+  }
+
+  // Matches "call ended" actions from the new call interface (ie. new
+  //    callstack). The "call ended" actions are straight-forward "end call"
+  //    actions, but since the old interface also uses these actions, we need
+  //    to make sure they're the new interface "end call" actions. This is done
+  //    by checking how the call ID is stored in the payload.
+  //    new = action.payload.id; old = action.payload.callId
+  function callEndedPattern(action) {
+    return (action.type === _actionTypes3.END_CALL_FINISH || action.type === _actionTypes3.REJECT_CALL_FINISH) && action.payload.id;
+  }
+
+  // Forward "call ended" actions to the appropriate saga.
+  yield (0, _effects.takeEvery)(oldCallEndedPattern, _client.oldStoreCallLogs);
+  yield (0, _effects.takeEvery)(callEndedPattern, _client.storeCallLogs);
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callHistory/sagas/server.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.retrieveCallLogs = retrieveCallLogs;
+exports.removeCallLogs = removeCallLogs;
+
+var _actions = __webpack_require__("../kandy/src/callHistory/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Helpers.
+/**
+ * Sagas related to server call history.
+ */
+
+// Call History plugin.
+const log = (0, _logs.getLogManager)().getLogger('CALLHISTORY');
+
+/**
+ * Saga for fetching call log records.
+ * @method retrieveCallLogs
+ * @param {Object} action Action of type `FETCH_CALL_HISTORY`.
+ */
+
+
+// Constants
+
+
+// Libraries.
+
+
+// Other plugins.
+function* retrieveCallLogs(action) {
+  log.debug(`Attempting to retrieve ${action.payload.amount} call log(s),` + ` offset of ${action.payload.offset}.`);
+
+  // Catch invalid input (which breaks SPiDR) before making the request.
+  if (!(0, _fp.isNumber)(action.payload.amount) || action.payload.amount < 0 || !(0, _fp.isNumber)(action.payload.offset)) {
+    log.info('Could not retrieve log(s): Invalid input.');
+    yield (0, _effects3.put)(actions.retrieveCallLogsFinish({
+      error: new _errors2.default({
+        code: _errors.callHistoryCodes.BAD_REQUEST,
+        message: 'Could not retrieve call logs: Invalid input.'
+      })
+    }));
+    return;
+  }
+
+  // TODO: Break the callHistory requests into its own file.
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : requestInfo.version;
+  let url = `${requestInfo.baseURL}/rest/version/${version}/user/${requestInfo.username}/logHistory`;
+
+  let queryParams = {
+    startIndex: action.payload.offset,
+    count: action.payload.amount
+  };
+
+  let response = yield (0, _effects2.default)({
+    url,
+    queryParams,
+    method: 'GET'
+  }, requestInfo.requestOptions);
+
+  if (response.error) {
+    let error;
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.logHistory;
+      log.debug(`Failed to retrieve call logs with status code ${statusCode}.`);
+
+      error = new _errors2.default({
+        code: statusCode === 37 ? _errors.callHistoryCodes.BAD_REQUEST : _errors.callHistoryCodes.UNKNOWN_ERROR,
+        message: `Failed to retrieve call logs. Code: ${statusCode}.`
+      });
+    } else {
+      // Handle errrs from the request helper.
+      let { message } = response.payload.result;
+      log.debug('Failed call log retrieval', message);
+
+      error = new _errors2.default({
+        code: _errors.callHistoryCodes.UNKNOWN_ERROR,
+        message: `Call log fetch failed: ${message}.`
+      });
+    }
+
+    yield (0, _effects3.put)(actions.retrieveCallLogsFinish({ error }));
+  } else {
+    log.info('Successfully retrieved log(s) from call history.');
+    // Massage the call logs into a more concise format.
+    let logs = response.payload.body.logHistory.logItems.map(function (log) {
+      if (log.type === 'CallLog') {
+        return log.params;
+      }
+    });
+
+    // Massage the call logs to include the remoteParticipant property.
+    logs = logs.map(function (log) {
+      /**
+       * There is a bug in SPiDR where it always uses the keys `callerName` and
+       * `callerDisplayNumber` for ALL logs, instead of only incoming logs.
+       * Because of this, callerDisplayNumber is always the remote participant,
+       * even when the local user is the caller.
+       * This if statement is a workaround for this problem.
+       * // TODO: Remove this if when the SPiDR issue is resolved.
+       */
+      if (log.direction === 'outgoing' && !log.calleeDisplayNumber && !log.calleeName) {
+        log.calleeDisplayNumber = log.callerDisplayNumber;
+        log.calleeName = log.callerName;
+        // Keep callerDisplayNumber and callerName properties unchanged for
+        //    backwards compatibility.
+      }
+
+      if (log.direction === 'outgoing') {
+        log.remoteParticipant = {
+          displayName: log.calleeName,
+          displayNumber: log.calleeDisplayNumber
+        };
+      } else {
+        log.remoteParticipant = {
+          displayName: log.callerName,
+          displayNumber: log.callerDisplayNumber
+        };
+      }
+      return log;
+    });
+
+    yield (0, _effects3.put)(actions.retrieveCallLogsFinish({ logs }));
+  }
+}
+
+/**
+ * Saga for deleting call logs.
+ * @method removeCallLogs
+ * @param {Object} action Action of type `DELETE_CALL_HISTORY`.
+ */
+function* removeCallLogs(action) {
+  log.debug(`Attempting to remove call log(s): ${action.payload}.`);
+
+  if (!action.payload) {
+    log.info('Could not remove call logs from history: Invalid input.');
+    yield (0, _effects3.put)(actions.removeCallLogsFinish({
+      error: new _errors2.default({
+        code: _errors.callHistoryCodes.BAD_REQUEST,
+        message: 'Could not remove call logs: Invalid input.'
+      })
+    }));
+    return;
+  }
+
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : requestInfo.version;
+  let url = `${requestInfo.baseURL}/rest/version/${version}/user/${requestInfo.username}/`;
+
+  if (action.payload === 'all') {
+    url += 'logHistory';
+  } else {
+    url += `logRecord/${action.payload}`;
+  }
+
+  let response = yield (0, _effects2.default)({
+    url,
+    method: 'DELETE'
+  }, requestInfo.requestOptions);
+
+  if (response.error) {
+    let error;
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.logRecord;
+      log.info(`Failed to remove log(s) from call history (status ${statusCode}).`);
+
+      error = new _errors2.default({
+        code: statusCode === 42 ? _errors.callHistoryCodes.NOT_FOUND : _errors.callHistoryCodes.UNKNOWN_ERROR,
+        message: `Failed to remove call log. Code: ${statusCode}.`
+      });
+    } else {
+      // Handle errrs from the request helper.
+      let { message } = response.payload.result;
+      log.debug('Failed call log removal.', message);
+
+      error = new _errors2.default({
+        code: _errors.callHistoryCodes.UNKNOWN_ERROR,
+        message: `Call log removal failed: ${message}.`
+      });
+    }
+
+    yield (0, _effects3.put)(actions.removeCallLogsFinish({ error }));
+  } else {
+    log.info('Successfully removed log(s) from call history.');
+    yield (0, _effects3.put)(actions.removeCallLogsFinish({ recordId: action.payload.body }));
+  }
 }
 
 /***/ }),
@@ -27205,7 +37110,7 @@ function* receivedAnswer(webRTC, sessionInfo, targetCall) {
 
 /***/ }),
 
-/***/ "../kandy/src/common/effects/index.js":
+/***/ "../kandy/src/clickToCall/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27214,19 +37119,66 @@ function* receivedAnswer(webRTC, sessionInfo, targetCall) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = clickToCallImplementation;
 
-var _waitFor = __webpack_require__("../kandy/src/common/effects/waitFor.js");
+var _interface = __webpack_require__("../kandy/src/clickToCall/interface/index.js");
 
-Object.defineProperty(exports, 'waitFor', {
-  enumerable: true,
-  get: function () {
-    return _waitFor.waitFor;
+var _interface2 = _interopRequireDefault(_interface);
+
+var _sagas = __webpack_require__("../kandy/src/clickToCall/sagas.js");
+
+var _events = __webpack_require__("../kandy/src/clickToCall/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * clickToCall Plugin (that is implemented using a saga).
+ *
+ * @method clickToCallImplementation
+ * @return {Object} An instance of the "clickToCall" plugin.
+ */
+
+
+// Other plugins.
+
+
+// Sagas
+function clickToCallImplementation() {
+  function* init() {
+    // Map events
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
-});
+
+  return {
+    // Interface Components:
+    name: _interface2.default.name,
+    capabilities: ['clickToCall'],
+    api: _interface2.default.api,
+    reducer: _interface2.default.reducer,
+    // Implementation Components
+    sagas: [_sagas.clickToCallSaga],
+    init
+  };
+}
+
+// Libraries.
+
+
+// Events
+/**
+ * This file is a plugin for the "clickToCall" feature. It is meant to connect two specified devices
+ * Reference info: https://confluence.genband.com/display/KSDK/Plugins
+ */
 
 /***/ }),
 
-/***/ "../kandy/src/common/effects/waitFor.js":
+/***/ "../kandy/src/clickToCall/interface/actionTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27235,216 +37187,485 @@ Object.defineProperty(exports, 'waitFor', {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.waitFor = waitFor;
+const PREFIX = '@@KANDY/';
+
+const CLICK_TO_CALL = exports.CLICK_TO_CALL = PREFIX + 'CLICK_TO_CALL';
+const CLICK_TO_CALL_FINISH = exports.CLICK_TO_CALL_FINISH = PREFIX + 'CLICK_TO_CALL_FINISH';
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/actions.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.clickToCall = clickToCall;
+exports.clickToCallFinish = clickToCallFinish;
+
+var _actionTypes = __webpack_require__("../kandy/src/clickToCall/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Represents a request to POST clickToCall data.
+ * @method clickToCall
+ * @param  {string} callId
+ * @param  {string} caller
+ * @param  {string} callee
+ * @return {Action} A redux action.
+ */
+function clickToCall(callId, caller, callee) {
+  return {
+    type: actionTypes.CLICK_TO_CALL,
+    payload: {
+      callId,
+      caller,
+      callee
+    }
+  };
+}
+
+/**
+ * Represents that a response was received for a clickToCall request.
+ * @method clickToCallFinish
+ * @param  {string} callId
+ * @param  {string} caller
+ * @param  {string} callee
+ * @param  {number} requestTime time that the request was made at
+ * @param  {Boolean}  [error] A parameter to indicate if there was an issue.
+ * @return {Action} A redux action.
+ */
+function clickToCallFinish({ callId, caller, callee, requestTime, error }) {
+  if (error) {
+    return {
+      type: actionTypes.CLICK_TO_CALL_FINISH,
+      error: true,
+      payload: {
+        error
+      }
+    };
+  } else {
+    return {
+      type: actionTypes.CLICK_TO_CALL_FINISH,
+      error: false,
+      payload: {
+        callId,
+        caller,
+        callee,
+        requestTime
+      }
+    };
+  }
+}
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/api.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = api;
+
+var _actions = __webpack_require__("../kandy/src/clickToCall/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("../kandy/src/clickToCall/interface/selectors.js");
+
+var _v = __webpack_require__("../../node_modules/uuid/v4.js");
+
+var _v2 = _interopRequireDefault(_v);
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * The clickToCall feature is used to bridge a call between two specified devices
+ *
+ * @public
+ * @module ClickToCall
+ * @requires clickToCall
+ */
+const log = (0, _logs.getLogManager)().getLogger('CLICKTOCALL');
+
+function api(context) {
+  const clickToCallApi = {
+    /**
+     * Attempts to establish a call between two specified devices
+     *
+     * @public
+     * @memberof ClickToCall
+     * @method clickToCall
+     * @param  {string} caller A string representing the person making the call
+     * @param  {string} callee A string representing the person receiving the call
+     * @returns {string} callId A unique id representing the call
+     */
+    make: function (caller, callee) {
+      log.debug(_logs.API_LOG_TAG + 'clickToCall.make: ', caller, callee);
+      const callId = (0, _v2.default)();
+      context.dispatch(actions.clickToCall(callId, caller, callee));
+      return callId;
+    },
+    /**
+     * Gets all local clickToCall calls
+     *
+     * @public
+     * @memberof ClickToCall
+     * @requires clickToCall
+     * @method get
+     * @returns {Array} A list of clickToCall records, ordered by earliest requestTime
+     */
+    get: function () {
+      log.debug(_logs.API_LOG_TAG + 'clickToCall.get');
+      return (0, _selectors.getAll)(context.getState());
+    }
+  };
+
+  return {
+    clickToCall: clickToCallApi
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/eventTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * ClickToCall has successfully started.
+ *
+ * @public
+ * @memberof ClickToCall
+ * @requires clickToCall
+ * @event clickToCall:start
+ * @param {Object} params
+ * @param {string} params.callId A unique id representing the call made
+ */
+const CLICK_TO_CALL_STARTED = exports.CLICK_TO_CALL_STARTED = 'clickToCall:start';
+
+/**
+ * ClickToCall had an error.
+ *
+ * @public
+ * @memberof ClickToCall
+ * @requires clickToCall
+ * @event clickToCall:error
+ * @param {Object} params
+ * @param {string} params.callId A unique id representing the call made
+ * @param {BasicError} params.error The Basic error object.
+ *
+ */
+const CLICK_TO_CALL_ERROR = exports.CLICK_TO_CALL_ERROR = 'clickToCall:error';
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/events.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _eventTypes = __webpack_require__("../kandy/src/clickToCall/interface/eventTypes.js");
+
+var eventTypes = _interopRequireWildcard(_eventTypes);
+
+var _actionTypes = __webpack_require__("../kandy/src/clickToCall/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Helper function for clickToCall error events.
+ *
+ * @method clickToCallEvent
+ * @param  {Object} action
+ * @return {Object}
+ */
+function clickToCallEvent(action) {
+  if (!action.error) {
+    return {
+      type: eventTypes.CLICK_TO_CALL_STARTED,
+      args: {
+        callId: action.payload.callId
+      }
+    };
+  } else {
+    return {
+      type: eventTypes.CLICK_TO_CALL_ERROR,
+      args: {
+        callId: action.payload.callId,
+        error: action.payload
+      }
+    };
+  }
+}
+
+var events = {};
+
+events[actionTypes.CLICK_TO_CALL_FINISH] = clickToCallEvent;
+
+exports.default = events;
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _api = __webpack_require__("../kandy/src/clickToCall/interface/api.js");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _reducers = __webpack_require__("../kandy/src/clickToCall/interface/reducers.js");
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This interface is for a clickToCall plugin.
+ * @type {string}
+ */
+const name = 'clickToCall';
+
+exports.default = {
+  reducer: _reducers2.default,
+  name,
+  api: _api2.default
+};
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/reducers.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
+
+var _actionTypes = __webpack_require__("../kandy/src/clickToCall/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * clicktoCall Plugin.
+ *
+ * Handles the clicktoCall plugin substate. Defines how to communicate back to
+ * the Interface (ie. which actions to use).
+ * @param  {Object} [state={}] Default state for the reducer is an empty object.
+ * @param  {Action} action A dispatched action.
+ * @return {Object} state The new example sub-state.
+ */
+
+const reducers = {};
+
+reducers[actionTypes.CLICK_TO_CALL_FINISH] = {
+  next(state, action) {
+    if (action.error) {
+      return state;
+    } else {
+      return state.concat({
+        callId: action.payload.callId,
+        caller: action.payload.caller,
+        callee: action.payload.callee,
+        requestTime: action.payload.requestTime
+      });
+    }
+  }
+};
+
+// clickToCall default state is empty array
+const reducer = (0, _reduxActions.handleActions)(reducers, []);
+exports.default = reducer;
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getAll = getAll;
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+/**
+ * Retrieves clickToCall calls stored in state
+ *
+ * @method getAll
+ * @param  {Object} state Redux state.
+ * @return {Array}
+ */
+function getAll(state) {
+  return (0, _fp.cloneDeep)(state.clickToCall);
+} // Other Libraries
+
+/***/ }),
+
+/***/ "../kandy/src/clickToCall/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.clickToCallSaga = clickToCallSaga;
+
+var _actionTypes = __webpack_require__("../kandy/src/clickToCall/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actions = __webpack_require__("../kandy/src/clickToCall/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-const log = (0, _logs.getLogManager)().getLogger('EFFECTS');
-const WAIT_SAGA_CONTEXT = 'waitSagaContext';
+var _effects2 = __webpack_require__("../kandy/src/request/effects.js");
 
-/**
- * Simple saga that simply does a take, to allow a take effect to be forked.
- *
- * @param {(string|Function|Array)} pattern The action or action selector to wait for.
- */
-function* processTake(pattern) {
-  const result = yield (0, _effects.take)(pattern);
-
-  const waitContext = yield (0, _effects.getContext)(WAIT_SAGA_CONTEXT);
-  if (waitContext) {
-    log.debug(`Finished wait (${++waitContext.numFinishedWaits} of ${waitContext.numTotalWaits})`);
-    log.trace(`Wait processed action: : ${pattern}`);
-  }
-
-  return result;
-}
-
-/**
- * Saga that processes the wait effect.
- * @param {number} timeout The number of milliseconds to wait for the actions to be dispatched.
- * @param {Array.<(string|Function|Array)>} waitPatterns An array of actions or action selectors to wait for.
- */
-function* waitSaga(timeout, waitPatterns) {
-  const waitSagaContext = {
-    numFinishedWaits: 0,
-    numTotalWaits: waitPatterns.length
-
-    // Use a context to add debugging information for the child saga processTake to use.
-  };yield (0, _effects.setContext)({
-    [WAIT_SAGA_CONTEXT]: waitSagaContext
-  });
-
-  // Fork all of the takes
-  const waitTasks = yield (0, _effects.all)(waitPatterns.map(pattern => (0, _effects.fork)(processTake, pattern)));
-
-  log.debug(`Waiting ${timeout} msecs for ${waitSagaContext.numTotalWaits} actions to happen.`);
-
-  // Race between the wait tasks and a delay.
-  let { results, timeoutResult } = yield (0, _effects.race)({
-    results: (0, _effects.join)(...waitTasks),
-    timeoutResult: (0, _effects.delay)(timeout)
-  });
-
-  // If we have a timeout, gather partial results.
-  if (timeoutResult) {
-    // Get partial results from tasks
-    results = waitTasks.map(task => task.result());
-
-    // Cancel remaining wait tasks
-    yield (0, _effects.cancel)(...waitTasks);
-
-    log.debug(`Waiting for actions timed out. ${waitSagaContext.numFinishedWaits} actions were processed out of ${waitSagaContext.numTotalWaits}.`);
-  } else {
-    log.debug(`Waiting for actions completed, all ${waitSagaContext.numTotalWaits} actions were processed`);
-  }
-
-  return {
-    timeout: !!timeoutResult,
-    results
-  };
-}
-
-/**
- * Type defining the result of a yielded wait effect.
- *
- * @typedef {Object} WaitEffectResult
- * @property {Array.<Action>} results The array of results for all of the patterns. This can contain partial results.
- *                                    Action patterns that have timed out will be undefined.
- * @property {boolean} timeout The wait timed out.
- */
-
-/**
- * A redux-saga wait effect. This effect will wait for a specified set of actions to occur an return the result
- * of each `take` effect performed on each action. If the wait times out, then the result will contain partial results
- * as well as mark the result as having timed out.
- *
- * @param {number} timeout
- * @param {Array.<ActionPattern>} waitPatterns The list of wait patterns.
- * @return A blocking redux-saga effect that will instruct the middleware to wait for the actions matching the wait
- *         patterns or until a timeout is reached. The result from the yielded will be of type {@link WaitEffectResult}.
- * @see {@link https://redux-saga.js.org/docs/api/#takepattern Redux-saga's take documentation} for supported patterns.
- */
-function waitFor(timeout, waitPatterns) {
-  return (0, _effects.call)(waitSaga, timeout, waitPatterns);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/common/helpers/handleRequestError.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.handleRequestError = handleRequestError;
+var _effects3 = _interopRequireDefault(_effects2);
 
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
 
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * The CPaaS handleRequestError helper is intended to parse "response" actions
- *    representing error responses for REST requests. CPaaS provides consistent
- *    error responses, so a single parser is able to handle most scenarios.
- * @method handleRequestError
- * @param  {Object}     response    A "response" action.
- * @param  {string}     [operation] The name of the operation that was performed.
- * @return {BasicError}
- */
-function handleRequestError(response, operation) {
-  let message = (operation ? `${operation} request` : 'Request') + ' failed: ';
-  let code;
+// Get the logger
 
-  if (response && response.payload) {
-    /**
-     * Extract the data from the action.
-     *    The `body` is the REST response body (if present).
-     *    The `result` is meta-info about the REST request (always present).
-     *
-     * An expected body looks like:
-     *    body: {
-     *      requestError: {
-     *        <exceptionType>: {
-     *          messageId, text, variables
-     *        }
-     *      }
-     *    }
-     */
-    const { body, result } = response.payload;
-    /**
-     * Scenario: CPaaS provided a nice error object. Figure out the type of
-     *    error and parse out the error information it has.
-     */
-    if (body && body.requestError) {
-      // Possible errors are serviceException or policyException.
-      const { serviceException, policyException } = body.requestError;
-      // There should only ever be one or the other.
-      let exception = serviceException || policyException;
 
-      // Format the information in the except to be a proper sentence.
-      message = formatString(exception.text, exception.variables);
+// Error handling
+// clickToCall plugin.
+const log = (0, _logs.getLogManager)().getLogger('CLICKTOCALL');
 
-      // TODO: Do we want to wrap the backend's error codes?
-      code = exception.messageId;
-    } else {
-      /**
-       * Scenario: CPaaS provided a response body with the error, but with an
-       *    unexpected format. Revert to using the information from the
-       *    REST request "result" instead of the body.
-       */
-      message += result.message;
-      code = result.code;
+// Other plugins.
+
+
+// Libraries.
+function* clickToCallSaga() {
+  while (true) {
+    // wait for CLICK_TO_CALL action dispatch.
+    const action = yield (0, _effects.take)(actionTypes.CLICK_TO_CALL);
+
+    // ensure both caller and callee are provided in payload.
+    if (!action.payload.caller || !action.payload.callee) {
+      log.info('Missing call particiant information');
+      yield (0, _effects.put)(actions.clickToCallFinish({
+        payload: {
+          error: new _errors2.default({
+            message: 'callee or caller were not provided in CLICK_TO_CALL action payload',
+            code: _errors.clickToCallCodes.MISSING_ARGS
+          }),
+          callId: action.payload.callId
+        }
+      }));
+      continue;
     }
-  } else {
-    /**
-     * Scenario: Something really wrong happened, where the response action
-     *    doesn't even have a payload.
-     */
-    message += 'Unknown error.';
-    // TODO: Real code.
-    code = 4;
+
+    const conn = yield (0, _effects.select)(_selectors.getConnectionInfo);
+    const platform = yield (0, _effects.select)(_selectors.getPlatform);
+
+    const { server, username, requestOptions } = conn;
+
+    const version = platform === _constants.platforms.UC ? 1 : server.version;
+
+    const url = `${server.protocol}://${server.server}:${server.port}/rest/version/${version}/user/${username}/clicktocall`;
+
+    const data = {
+      clickToCallRequest: {
+        callingParty: action.payload.caller,
+        calledParty: action.payload.callee
+      }
+    };
+
+    const options = {
+      url,
+      method: 'POST',
+      body: (0, _stringify2.default)(data)
+    };
+
+    const requestTime = new Date().getTime();
+    // wait until we get a response from /clicktocall service
+    const response = yield (0, _effects3.default)(options, requestOptions);
+
+    // determine what type of response was received.
+    if (response.error) {
+      yield (0, _effects.put)(actions.clickToCallFinish({
+        payload: {
+          error: new _errors2.default({
+            message: response.payload.result.message,
+            code: _errors.clickToCallCodes.RESPONSE_ERROR
+          }),
+          callId: action.payload.callId
+        }
+      }));
+    } else {
+      yield (0, _effects.put)(actions.clickToCallFinish({
+        callId: action.payload.callId,
+        caller: action.payload.caller,
+        callee: action.payload.callee,
+        requestTime
+      }));
+    }
   }
-
-  return new _errors2.default({ message, code });
 }
-
-/**
- * Utility function for formatting a CPaaS error response.
- * // TODO: Move this to a more common/utils location.
- */
-function formatString(text, variables) {
-  return text.replace(/%(\d+)/g, function (_, m) {
-    return variables[--m];
-  });
-}
-
-/***/ }),
-
-/***/ "../kandy/src/common/helpers/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _handleRequestError = __webpack_require__("../kandy/src/common/helpers/handleRequestError.js");
-
-Object.defineProperty(exports, 'handleRequestError', {
-  enumerable: true,
-  get: function () {
-    return _handleRequestError.handleRequestError;
-  }
-});
 
 /***/ }),
 
@@ -30068,7 +40289,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.15';
+  let version = '4.5.0-beta.16';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -30279,2094 +40500,6 @@ const factoryDefaults = {
 
 /***/ }),
 
-/***/ "../kandy/src/groups/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _interface = __webpack_require__("../kandy/src/groups/interface/index.js");
-
-var _sagas = __webpack_require__("../kandy/src/groups/cpaas/sagas/index.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _events = __webpack_require__("../kandy/src/groups/interface/events.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-// Libraries.
-// Groups plugin.
-const name = 'groups';
-
-// Other plugins.
-
-
-const capabilities = ['groups'];
-
-exports.default = () => {
-  return {
-    name,
-    capabilities,
-    api: _interface.api,
-    reducer: _interface.reducer,
-    init: () => [(0, _effects.put)((0, _actions.mapEvents)(_events2.default))],
-    sagas: (0, _fp.values)(sagas)
-  };
-};
-
-/***/ }),
-
-/***/ "../kandy/src/groups/cpaas/requests/groups.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.createRequest = createRequest;
-exports.deleteRequest = deleteRequest;
-exports.addParticipantRequest = addParticipantRequest;
-exports.removeParticipantRequest = removeParticipantRequest;
-exports.leaveGroupRequest = leaveGroupRequest;
-exports.fetchRequest = fetchRequest;
-exports.fetchRequestByGroupId = fetchRequestByGroupId;
-exports.acceptInvitationRequest = acceptInvitationRequest;
-exports.rejectInvitationRequest = rejectInvitationRequest;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * REST request to create a new group.
- * @method create
- * @param {Object} params
- * @param {string[]} [params.participants] - List of participants to add to group when created.
- * @param {string} [params.subject] - Subject of the group chat session.
- * @param {string} params.name - Name of the group chat session.
- * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
- * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {group}
- */
-// Groups plugin.
-
-// Helpers.
-function* createRequest(params, requestInfo) {
-  // Add the group owner (current user) to list of group participants
-  const groupOwner = {
-    address: requestInfo.username,
-    'x-isAdmin': true
-  };
-  const participants = [groupOwner, ...params.participants];
-
-  const requestBody = {
-    groupChatSessionInformation: {
-      participant: participants,
-      subject: params.subject,
-      'x-image': params['image'],
-      'x-name': params['name'],
-      'x-type': params['type']
-    }
-  };
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`,
-    body: (0, _stringify2.default)(requestBody)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Create group')
-    };
-  } else {
-    return response.payload;
-  }
-}
-
-/**
- * Request to delete a specified group.
- * @method deleteRequest
- * @param  {string} groupId - The ID of the group to delete.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Object}
- */
-function* deleteRequest(groupId, requestInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}`,
-    responseType: 'text'
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Delete Group')
-    };
-  } else {
-    // response does not contain the groupId of the group deleted so it is
-    // appended to the response for the reducer to access.
-    response.payload.groupId = groupId;
-    return response.payload;
-  }
-}
-
-/**
- * REST request to add a participant to a specified group.
- * @method addParticipantRequest
- * @param  {Object} payload
- * @param  {string} payload.groupId - The ID of the group to remove the participant from.
- * @param  {string} payload.participant - The participant address.
- * @param  {Object} requestInfo - Info needed to perform the request.
- */
-function* addParticipantRequest({ groupId, participant }, requestInfo) {
-  const requestBody = {
-    participantInformation: {
-      address: participant,
-      'x-isAdmin': false
-    }
-  };
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants`,
-    body: (0, _stringify2.default)(requestBody)
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Add Participant')
-    };
-  } else {
-    return response.payload.body.participantInformation;
-  }
-}
-
-/**
- * REST request to remove a participant from a specified group.
- * @method removeParticipantRequest
- * @param  {Object} payload
- * @param  {string} payload.groupId - The ID of the group.
- * @param  {string} payload.participant - The participant to remove from the group.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Object}
- */
-function* removeParticipantRequest({ groupId, participant }, requestInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${participant}`
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Remove participant')
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * REST request to leave a specified group.
- * @method leaveGroupRequest
- * @param  {string} groupId - The ID of the group to leave.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
- * @return {Object}
- */
-function* leaveGroupRequest(groupId, requestInfo, userInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}`
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Leave group')
-    };
-  } else {
-    return response.payload;
-  }
-}
-
-/**
- * REST request to fetch groups from server.
- * @method fetchRequest
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Group[]} - An array of Groups.
- */
-function* fetchRequest(requestInfo) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Fetch groups')
-    };
-  } else {
-    return response.payload.body.groupChatSessionInformationList.groupChatSessionInformation;
-  }
-}
-
-/**
- * REST request to fetch a group with a specific groupId from server.
- * @method fetchRequestByGroupId
- * @param  {string} groupId - The ID of the group to fetch.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Object}
- */
-function* fetchRequestByGroupId(groupId, requestInfo) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Fetch group by groupId')
-    };
-  } else {
-    return response.payload.body.groupChatSessionInformation;
-  }
-}
-
-/**
- * Request to accept an invitation to a specified group.
- * @method acceptInvitationRequest
- * @param  {string} groupId - The ID of the group to accept invitation to.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
- * @return {Object}
- */
-function* acceptInvitationRequest(groupId, requestInfo, userInfo) {
-  const requestBody = {
-    participantSessionStatus: {
-      status: 'Connected'
-    }
-  };
-  const requestOptions = {
-    method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/` + `${userInfo.identity}/status`,
-    body: (0, _stringify2.default)(requestBody)
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Accept Invitation')
-    };
-  } else {
-    return response.payload;
-  }
-}
-
-/**
- * Request to reject an invitation to a specified group.
- * @method rejectInvitationRequest
- * @param  {string} groupId - The ID of the group to reject invitation to.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
- * @return {Object}
- */
-function* rejectInvitationRequest(groupId, requestInfo, userInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/` + `${userInfo.identity}`
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Reject Invitation')
-    };
-  } else {
-    return response.payload;
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/groups/cpaas/sagas/groups.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.createGroup = createGroup;
-exports.deleteGroup = deleteGroup;
-exports.addParticipant = addParticipant;
-exports.removeParticipant = removeParticipant;
-exports.leaveGroup = leaveGroup;
-exports.fetch = fetch;
-exports.acceptInvitation = acceptInvitation;
-exports.rejectInvitation = rejectInvitation;
-exports.handleInvitationNotification = handleInvitationNotification;
-exports.handleParticipantStatusNotification = handleParticipantStatusNotification;
-exports.handleEventNotification = handleEventNotification;
-
-var _groups = __webpack_require__("../kandy/src/groups/cpaas/requests/groups.js");
-
-var _actions = __webpack_require__("../kandy/src/groups/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Constants
-const log = (0, _logs.getLogManager)().getLogger('GROUPS');
-
-/**
- * Create a group.
- * @method create
- * @param  {Object} action An action of type `CREATE`.
- */
-
-
-// Libraries.
-
-
-// Helpers.
-
-
-// Other plugins.
-// groups plugin.
-function* createGroup({ payload }) {
-  const params = payload.params;
-  log.info(`Creating group ${params.name}.`);
-
-  // Verify that name has been supplied
-  if (!params['name']) {
-    log.info('name value is mandatory.');
-    yield (0, _effects.put)(actions.createFinish({}, new _errors2.default({
-      code: _errors.groupsCodes.MISSING_PARAMETERS,
-      message: 'Failed to create group. No name value was provided.'
-    })));
-    return;
-  }
-
-  // add the provided participants to the createListFinish
-  let participantInvites = [];
-  if (params.participants) {
-    participantInvites = params.participants.map(participant => {
-      return { address: participant.address, 'x-isAdmin': false };
-    });
-  }
-
-  const requestParams = (0, _extends3.default)({}, params, { participants: participantInvites });
-
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.createRequest, requestParams, requestInfo);
-  log.debug('Received response from create group request:', response);
-
-  if (!response.error) {
-    // parse the resourceURL to get the groupID to save in state.
-    const resourceURL = response.body.groupChatSessionInformation.resourceURL;
-    const groupId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-    response.body.groupChatSessionInformation.groupId = groupId;
-
-    yield (0, _effects.put)(actions.createFinish(response.body));
-  } else {
-    yield (0, _effects.put)(actions.createFinish({}, response.error));
-  }
-  return true;
-}
-
-/**
- * Delete a group.
- * @method deleteGroup
- * @param  {Object} payload Information about the group to be deleted.
- * @return {Object}
- */
-function* deleteGroup({ payload }) {
-  const groupId = payload.groupId;
-  log.info(`Deleting group ${groupId}.`);
-
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for delete group operation.');
-    yield (0, _effects.put)(actions.deleteGroupFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to delete group. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.deleteRequest, groupId, requestInfo);
-  log.debug('Received response from deleteGroup request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.deleteGroupFinish({ groupId: response.groupId }));
-  } else {
-    yield (0, _effects.put)(actions.deleteGroupFinish({ error: response.error }));
-  }
-}
-
-/**
- * Add a participant to a specified group.
- * @method addParticipant
- * @param  {Object} payload Information about the group and participant.
- * @return {Object}
- */
-function* addParticipant({ payload }) {
-  const groupId = payload.groupId;
-  const participant = payload.participant;
-  log.info(`Adding participant ${participant} to group ${groupId}.`);
-
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for add participant operation.');
-    yield (0, _effects.put)(actions.addParticipantFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to add participant. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-
-  // verify that a participant was supplied
-  if (!participant) {
-    log.info('participant parameter is required for add participant operation.');
-    yield (0, _effects.put)(actions.addParticipantFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to add participant. Participant parameter is required.'
-      })
-    }));
-    return;
-  }
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.addParticipantRequest, payload, requestInfo);
-  log.debug('Received response from addParticipant request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.addParticipantFinish({
-      groupId,
-      participant: response
-    }));
-  } else {
-    yield (0, _effects.put)(actions.addParticipantFinish({ error: response.error }));
-  }
-}
-
-/**
- * Remove a participant to a group.
- * @method removeParticipant
- * @param  {Object} payload Information about the group modified.
- * @return {Object}
- */
-function* removeParticipant({ payload }) {
-  const groupId = payload.groupId;
-  const participant = payload.participant;
-  log.info(`Removing participant ${participant} from group ${groupId}.`);
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for remove participant operation.');
-    yield (0, _effects.put)(actions.removeParticipantFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to remove participant. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-  // verify that a participant was supplied
-  if (!participant) {
-    log.info('participant parameter is required for remove participant operation.');
-    yield (0, _effects.put)(actions.removeParticipantFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to remove participant. Participant parameter is required.'
-      })
-    }));
-    return;
-  }
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.removeParticipantRequest, payload, requestInfo);
-  log.debug('Received response from removeParticipant request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.removeParticipantFinish({
-      groupId,
-      participant
-    }));
-  } else {
-    yield (0, _effects.put)(actions.removeParticipantFinish({ error: response.error }));
-  }
-}
-
-/**
- * Leave a specified group.
- * @method leaveGroup
- * @param  {Object} payload Information about the group modified.
- * @return {Object}
- */
-function* leaveGroup({ payload }) {
-  log.info('leaveGroup saga called: ', payload.groupId);
-  const groupId = payload.groupId;
-
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for leave group operation.');
-    yield (0, _effects.put)(actions.leaveGroupFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to leave group. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const userInfo = yield (0, _effects.select)(_selectors.getUserInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.leaveGroupRequest, groupId, requestInfo, userInfo);
-  log.debug('Received response from leave group request:', response);
-
-  if (!response.error) {
-    const userIdentifier = userInfo.identity;
-    yield (0, _effects.put)(actions.leaveGroupFinish({
-      groupId,
-      participant: userIdentifier
-    }));
-  } else {
-    yield (0, _effects.put)(actions.leaveGroupFinish({ error: response.error }));
-  }
-}
-
-/**
- * Fetches all existing groups from the server.
- * @method fetch
- * @return {Group[]} - An array of Groups.
- */
-function* fetch() {
-  log.info(`Fetching groups.`);
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.fetchRequest, requestInfo);
-  if (!response.error) {
-    yield (0, _effects.put)(actions.fetchGroupsFinish({ groups: response }));
-  } else {
-    yield (0, _effects.put)(actions.fetchGroupsFinish({ error: response.error }));
-  }
-
-  log.debug('Received response from fetch request:', response);
-}
-
-/**
- * Accept invitation to a group.
- * @method acceptInvitation
- * @param  {Object} payload Information about the group to accept an invitation to.
- * @return {Object}
- */
-function* acceptInvitation({ payload }) {
-  log.info('accept invitation saga called: ', payload);
-  const groupId = payload.groupId;
-
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for accepting invitation operation.');
-    yield (0, _effects.put)(actions.acceptInvitationFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to accept invitation. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-
-  // Need to accept the invitation before you can fetch the group. Otherewise, The
-  // request will fail with a 404 because you are not actually in the chat group yet.
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const userInfo = yield (0, _effects.select)(_selectors.getUserInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.acceptInvitationRequest, groupId, requestInfo, userInfo);
-
-  if (response.error) {
-    yield (0, _effects.put)(actions.acceptInvitationFinish({ error: response.error }));
-    return;
-  }
-
-  // Before accepting an invitation, we need to have the current state of
-  // the group in state.
-  const groupResponse = yield (0, _effects.call)(_groups.fetchRequestByGroupId, groupId, requestInfo);
-
-  if (groupResponse.error) {
-    yield (0, _effects.put)(actions.acceptInvitationFinish({ error: groupResponse.error }));
-    return;
-  }
-
-  if (!response.error && !groupResponse.error) {
-    yield (0, _effects.put)(actions.acceptInvitationFinish({
-      groupId,
-      participant: userInfo.identity,
-      group: groupResponse
-    }));
-  }
-}
-
-/**
- * Reject invitation to a group.
- * @method rejectInvitation
- * @param  {Object} payload Information about the group to reject an invitation to.
- * @return {Object}
- */
-function* rejectInvitation({ payload }) {
-  log.info('reject invitation saga called: ', payload);
-  const groupId = payload.groupId;
-
-  // verify that a groupId was supplied
-  if (!groupId) {
-    log.info('groupId parameter is required for rejecting invitation operation.');
-    yield (0, _effects.put)(actions.rejectInvitationFinish({
-      error: new _errors2.default({
-        code: _errors.groupsCodes.MISSING_PARAMETERS,
-        message: 'Failed to reject invitation. groupId parameter is required.'
-      })
-    }));
-    return;
-  }
-
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const userInfo = yield (0, _effects.select)(_selectors.getUserInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.rejectInvitationRequest, groupId, requestInfo, userInfo);
-  if (!response.error) {
-    yield (0, _effects.put)(actions.rejectInvitationFinish({
-      groupId,
-      participant: userInfo.identity
-    }));
-  } else {
-    yield (0, _effects.put)(actions.rejectInvitationFinish({ error: response.error }));
-  }
-}
-
-/**
- * Handle incoming 'groupChatSessionInvitationNotification'.
- * @method handleInvitationNotification
- * @param  {string} groupId groupId
- */
-function* handleInvitationNotification(wsAction) {
-  // parse the href to get the groupId and add to invitation
-  const invite = wsAction.payload.groupChatSessionInvitationNotification;
-  const link = invite.link.find(link => link.rel === 'groupChatSessionInformation');
-  const groupId = link.href.substring(link.href.lastIndexOf('/') + 1);
-  const invitation = (0, _extends3.default)({}, invite, {
-    groupId: groupId
-  });
-  yield (0, _effects.put)(actions.invitationReceived({ invitation }));
-}
-
-/**
- * Handle incoming 'chatParticipantStatusNotification'.
- * @method handleParticipantStatusNotification
- * @param  {string} groupId groupId
- */
-function* handleParticipantStatusNotification(wsAction) {
-  const notification = wsAction.payload.chatParticipantStatusNotification;
-  const link = notification.link.find(link => link.rel === 'groupChatSessionInformation');
-  const groupId = link.href.substring(link.href.lastIndexOf('/') + 1);
-
-  yield (0, _effects.put)(actions.statusNotificationReceived({ groupId, notification }));
-}
-
-/**
- * Handle incoming 'chatEventNotification'.
- * @method handleEventNotification
- * @param  {string} userId userId
- */
-function* handleEventNotification(wsAction) {
-  const notification = wsAction.payload.chatEventNotification;
-  const link = notification.link.find(link => link.rel === 'groupChatSessionInformation');
-  const groupId = link.href.substring(link.href.lastIndexOf('/') + 1);
-
-  yield (0, _effects.put)(actions.eventNotificationReceived({ groupId, notification }));
-}
-
-/***/ }),
-
-/***/ "../kandy/src/groups/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.processCreateGroup = processCreateGroup;
-exports.processDeleteGroup = processDeleteGroup;
-exports.processAddParticipant = processAddParticipant;
-exports.processRemoveParticipant = processRemoveParticipant;
-exports.leaveGroup = leaveGroup;
-exports.fetch = fetch;
-exports.acceptInvitation = acceptInvitation;
-exports.rejectInvitation = rejectInvitation;
-exports.receiveInvitationNotification = receiveInvitationNotification;
-exports.receiveParticipantStatusNotification = receiveParticipantStatusNotification;
-exports.receiveEventNotification = receiveEventNotification;
-
-var _groups = __webpack_require__("../kandy/src/groups/cpaas/sagas/groups.js");
-
-var groupSagas = _interopRequireWildcard(_groups);
-
-var _actionTypes = __webpack_require__("../kandy/src/groups/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-/**
- * Create group.
- * @method processCreateGroup
- */
-
-
-// Libraries.
-/**
- * Groups saga index.
- * Defines which actions trigger which sagas.
- */
-
-// groups plugin.
-function* processCreateGroup() {
-  yield (0, _effects.takeEvery)(actionTypes.CREATE_GROUP, groupSagas.createGroup);
-}
-
-/**
- * Delete group.
- * @method processDeleteGroup
- */
-
-
-// Other plugins.
-function* processDeleteGroup() {
-  yield (0, _effects.takeEvery)(actionTypes.DELETE_GROUP, groupSagas.deleteGroup);
-}
-
-/**
- * Add a participant to a group.
- * @method processAddParticipant
- */
-function* processAddParticipant() {
-  yield (0, _effects.takeEvery)(actionTypes.ADD_PARTICIPANT, groupSagas.addParticipant);
-}
-
-/**
- * Remove a participant from a group.
- * @method processRemoveParticipant
- */
-function* processRemoveParticipant() {
-  yield (0, _effects.takeEvery)(actionTypes.REMOVE_PARTICIPANT, groupSagas.removeParticipant);
-}
-
-/**
- * Leave group.
- * @method leaveGroup
- */
-function* leaveGroup() {
-  yield (0, _effects.takeEvery)(actionTypes.LEAVE_GROUP, groupSagas.leaveGroup);
-}
-
-/**
- * Fetch groups.
- * @method fetch
- */
-function* fetch() {
-  yield (0, _effects.takeEvery)(actionTypes.FETCH_GROUPS, groupSagas.fetch);
-}
-
-/**
- * Accept invitation.
- * @method acceptInvitation
- */
-function* acceptInvitation() {
-  yield (0, _effects.takeEvery)(actionTypes.ACCEPT_INVITATION, groupSagas.acceptInvitation);
-}
-
-/**
- * Reject invitation.
- * @method rejectInvitation
- */
-function* rejectInvitation() {
-  yield (0, _effects.takeEvery)(actionTypes.REJECT_INVITATION, groupSagas.rejectInvitation);
-}
-
-/**
- * Receive invitation. (groupChatSessionInvitationNotification)
- * @method receiveInvitationNotification
- */
-function* receiveInvitationNotification() {
-  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.groupChatSessionInvitationNotification, groupSagas.handleInvitationNotification);
-}
-
-/**
- * Receive participant status. (chatParticipantStatusNotification)
- * @method receiveParticipantStatusNotification
- */
-function* receiveParticipantStatusNotification() {
-  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.chatParticipantStatusNotification, groupSagas.handleParticipantStatusNotification);
-}
-
-/**
- * Receive chat event notification. (chatEventNotification)
- * @method receiveEventNotification
- */
-function* receiveEventNotification() {
-  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.chatEventNotification, groupSagas.handleEventNotification);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/actionTypes.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const prefix = '@@KANDY/GROUPS/';
-
-// Admin actions
-const ADD_PARTICIPANT = exports.ADD_PARTICIPANT = prefix + 'ADD_PARTICIPANT';
-const ADD_PARTICIPANT_FINISH = exports.ADD_PARTICIPANT_FINISH = prefix + 'ADD_PARTICIPANT_FINISH';
-const REMOVE_PARTICIPANT = exports.REMOVE_PARTICIPANT = prefix + 'REMOVE_PARTICIPANT';
-const REMOVE_PARTICIPANT_FINISH = exports.REMOVE_PARTICIPANT_FINISH = prefix + 'REMOVE_PARTICIPANT_FINISH';
-const GET_PARTICIPANTS = exports.GET_PARTICIPANTS = prefix + 'GET_PARTICIPANTS';
-const DELETE_GROUP = exports.DELETE_GROUP = prefix + 'DELETE_GROUP';
-const DELETE_GROUP_FINISH = exports.DELETE_GROUP_FINISH = prefix + 'DELETE_GROUP_FINISH';
-
-// User actions
-const GET_ALL_GROUPS = exports.GET_ALL_GROUPS = prefix + 'GET_ALL_GROUPS';
-const GET_GROUP = exports.GET_GROUP = prefix + 'GET_GROUP';
-const FETCH_GROUPS = exports.FETCH_GROUPS = prefix + 'FETCH_GROUPS';
-const FETCH_GROUPS_FINISH = exports.FETCH_GROUPS_FINISH = prefix + 'FETCH_GROUPS_FINISH';
-const CREATE_GROUP = exports.CREATE_GROUP = prefix + 'CREATE_GROUP';
-const CREATE_GROUP_FINISH = exports.CREATE_GROUP_FINISH = prefix + 'CREATE_GROUP_FINISH';
-const LEAVE_GROUP = exports.LEAVE_GROUP = prefix + 'LEAVE_GROUP';
-const LEAVE_GROUP_FINISH = exports.LEAVE_GROUP_FINISH = prefix + 'LEAVE_GROUP_FINISH';
-
-// Invitations
-const ACCEPT_INVITATION = exports.ACCEPT_INVITATION = prefix + 'ACCEPT_INVITATION';
-const ACCEPT_INVITATION_FINISH = exports.ACCEPT_INVITATION_FINISH = prefix + 'ACCEPT_INVITATION_FINISH';
-const REJECT_INVITATION = exports.REJECT_INVITATION = prefix + 'REJECT_INVITATION';
-const REJECT_INVITATION_FINISH = exports.REJECT_INVITATION_FINISH = prefix + 'REJECT_INVITATION_FINISH';
-
-// event notification actions
-const INVITATION_RECEIVED = exports.INVITATION_RECEIVED = prefix + 'INVITATION_RECEIVED';
-const STATUS_NOTIFICATION_RECEIVED = exports.STATUS_NOTIFICATION_RECEIVED = prefix + 'STATUS_NOTIFICATION_RECEIVED';
-const EVENT_NOTIFICATION_RECEIVED = exports.EVENT_NOTIFICATION_RECEIVED = prefix + 'EVENT_NOTIFICATION_RECEIVED';
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/actions.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.getAll = getAll;
-exports.get = get;
-exports.fetchGroups = fetchGroups;
-exports.fetchGroupsFinish = fetchGroupsFinish;
-exports.create = create;
-exports.createFinish = createFinish;
-exports.leave = leave;
-exports.leaveGroupFinish = leaveGroupFinish;
-exports.acceptInvitation = acceptInvitation;
-exports.acceptInvitationFinish = acceptInvitationFinish;
-exports.rejectInvitation = rejectInvitation;
-exports.rejectInvitationFinish = rejectInvitationFinish;
-exports.addParticipant = addParticipant;
-exports.addParticipantFinish = addParticipantFinish;
-exports.removeParticipant = removeParticipant;
-exports.removeParticipantFinish = removeParticipantFinish;
-exports.getParticipants = getParticipants;
-exports.deleteGroup = deleteGroup;
-exports.deleteGroupFinish = deleteGroupFinish;
-exports.invitationReceived = invitationReceived;
-exports.statusNotificationReceived = statusNotificationReceived;
-exports.eventNotificationReceived = eventNotificationReceived;
-
-var _actionTypes = __webpack_require__("../kandy/src/groups/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Helper function for formatting actions.
- * Ensures that actions follow an expectable format.
- * @method actionFormatter
- * @param  {string}  actionType   [description]
- * @param  {Object} [payload={}] The action payload.
- * @param  {BasicError} [payload.error] For an error action, the error should be provided.
- * @param  {Object} [meta={}] The action meta data.
- * @return {Object}
- */
-function actionFormatter(actionType, payload = {}, meta = {}) {
-  return {
-    type: actionType,
-    payload: (0, _extends3.default)({}, payload),
-    error: !!payload.error,
-    meta: (0, _extends3.default)({}, meta)
-  };
-}
-
-/**
- * Retrieves existing groups from state
- * @method getAll
- * @return {Object}          A Flux Standard Action for GET_ALL
- */
-// Groups plugin.
-function getAll() {
-  return {
-    type: actionTypes.GET_ALL
-  };
-}
-
-/**
- * Retrieve a group from state
- * @method get
- * @param {string} groupId - The ID of the group to retrieve.
- * @return {Object}          A Flux Standard Action for GET_GROUP
- */
-function get(groupId) {
-  return {
-    type: actionTypes.GET_GROUP,
-    payload: {
-      groupId
-    }
-  };
-}
-
-/**
- * Fetches existing groups from the server
- * @method fetchGroups
- * @return {Object} A Flux Standard Action for FETCH_GROUPS
- */
-function fetchGroups() {
-  return {
-    type: actionTypes.FETCH_GROUPS
-  };
-}
-
-/**
- * A notice that fetchGroups has finished.
- * @method fetchGroupsFinish
- * @param {Object} params
- * @param {[Object]} params.groups - Array of groups.
- * @param {Object} [params.error] An error object.
- * @return {Object} A flux standard action.
- */
-function fetchGroupsFinish({ groups, error }) {
-  return actionFormatter(actionTypes.FETCH_GROUPS_FINISH, { groups, error });
-}
-
-/**
- * Create a new group
- * @method create
- * @param {Object} params
- * @param {string} params.userId - The Id of the current user.
- * @param {string[]} params.users - Array of users to add to group upon creation.
- * @param {string} params.image - The image for the group.
- * @param {string} params.type - Type of group: ie 'Open', 'Closed'. //ToDo Verify this
- * @return {Object}          A Flux Standard Action for CREATE_GROUP
- */
-function create(params = {}) {
-  return actionFormatter(actionTypes.CREATE_GROUP, { params });
-}
-
-/**
- * @method createFinish
- * @param {Object} group - The group that was created.
- * @param {Object} [error] An error object.
- * @return {Object} A flux standard action.
- */
-function createFinish(group, error) {
-  return actionFormatter(actionTypes.CREATE_GROUP_FINISH, { group, error });
-}
-
-/**
- * Leave a group
- * @method leave
- * @param {string} groupId - The ID of the group to leave.
- * @return {Object}          A Flux Standard Action for LEAVE_GROUP
- */
-function leave(groupId) {
-  return actionFormatter(actionTypes.LEAVE_GROUP, { groupId });
-}
-
-/**
- * Leave a specified group
- /**
- * @param {Object} $0
- * @param {string} $0.groupId The ID of the group that id being left.
- * @param {string} $0.participant The participant that is leaving.
- * @param {Object} [$0.error] An error object.
- * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
- */
-function leaveGroupFinish({ groupId, participant, error }) {
-  return actionFormatter(actionTypes.LEAVE_GROUP_FINISH, { groupId, participant, error });
-}
-
-/**
- * Accept a group invitation
- * @method acceptInvitation
- * @param {string} groupId - The ID of the group to retrieve.
- * @return {Object}          A Flux Standard Action for ACCEPT_INVITATION
- */
-function acceptInvitation(groupId) {
-  return actionFormatter(actionTypes.ACCEPT_INVITATION, { groupId });
-}
-
-/**
- * Accept a group invitation
- * @param {Object} $0
- * @param {string} $0.groupId - GroupId to accept invitation to.
- * @param {Object} $0.participant - Participant that the invitation is for.
- * @param {Object} $0.group - Information about the group.
- * @param {string} $0.status - 'Connected' status to indicate that invitation is accepted.
- * @param {string} [$0.error] - An error object.
- * @return {Object}          A Flux Standard Action      A Flux Standard Action
- */
-function acceptInvitationFinish({ groupId, participant, group, status, error }) {
-  return actionFormatter(actionTypes.ACCEPT_INVITATION_FINISH, { groupId, participant, group, status, error });
-}
-
-/**
- * Reject a group invitation
- * @method rejectInvitation
- * @param {string} groupId - The ID of the group to reject.
- * @return {Object}          A Flux Standard Action for REJECT_INVITATION
- */
-function rejectInvitation(groupId) {
-  return actionFormatter(actionTypes.REJECT_INVITATION, { groupId });
-}
-
-/**
- * Reject a group invitation
- * @param {Object} $0
- * @param {string} $0.groupId - GroupId to reject invitation from.
- * @param {Object} $0.participant - Participant that the invitation is for.
- * @param {Object} $0.status - 'Disconnected' status to indicate that invitation is rejected.
- * @param {string} [$0.error] - An error object.
- * @return {Object}          A Flux Standard Action
- */
-function rejectInvitationFinish({ groupId, participant, status, error }) {
-  return actionFormatter(actionTypes.REJECT_INVITATION_FINISH, { groupId, participant, status, error });
-}
-
-/**
- * Add a participant to a group
- * @method addParticipant
- * @param {string} groupId - The ID of the group to add a participant to.
- * @param {string} participant - Participant to add to the group.
- * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
- */
-function addParticipant(groupId, participant) {
-  return actionFormatter(actionTypes.ADD_PARTICIPANT, { groupId, participant });
-}
-
-/**
- * A notice that addParticipant has finished.
- * @method addParticipantFinish
- * @param {Object} $0
- * @param  {string} $0.groupId The ID of the group to be modified.
- * @param  {Object} $0.participant Participant to add to the group.
- * @param  {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function addParticipantFinish({ groupId, participant, error }) {
-  return actionFormatter(actionTypes.ADD_PARTICIPANT_FINISH, { groupId, participant, error });
-}
-
-/**
- * Remove a participant from a group
- * @method removeParticipant
- * @param {string} groupId - The ID of the group to remove a participant from.
- * @param {Object} participant - Participant to remove from the group.
- * @return {Object} A Flux Standard Action for REMOVE_PARTICIPANT
- */
-function removeParticipant(groupId, participant) {
-  return actionFormatter(actionTypes.REMOVE_PARTICIPANT, { groupId, participant });
-}
-
-/**
- * A notice that removeParticipant has finished.
- * @method removeParticipantFinish
- * @param {Object} $0
- * @param  {string} $0.groupId The ID of the group to be modified.
- * @param  {Object} $0.participant Participant to remove from the group.
- * @param  {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function removeParticipantFinish({ groupId, participant, error }) {
-  return actionFormatter(actionTypes.REMOVE_PARTICIPANT_FINISH, { groupId, participant, error });
-}
-
-/**
- * Get participants
- * @method getParticipants
- * @param {string} groupId - The ID of the group to request participants from.
- * @return {Object}          A Flux Standard Action for GET_PARTICIPANTS
- */
-function getParticipants(groupId) {
-  return {
-    type: actionTypes.GET_PARTICIPANTS,
-    payload: {
-      groupId
-    }
-  };
-}
-
-/**
- * A request to delete a group.
- * @method deleteGroup
- * @param {string} groupId - The ID of the the group to delete.
- * @return {Object}          A Flux Standard Action for DELETE_GROUP
- */
-function deleteGroup(groupId) {
-  return actionFormatter(actionTypes.DELETE_GROUP, { groupId });
-}
-
-/**
- * A notice that deleteGroup has finished.
- * @method deleteGroupFinish
- * @param {Object} $0
- * @param {string} $0.groupId The ID of the group that was deleted.
- * @param {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function deleteGroupFinish({ groupId, error }) {
-  return actionFormatter(actionTypes.DELETE_GROUP_FINISH, { groupId, error });
-}
-
-/**
-  Notification handlers
-  */
-
-/**
- * A notice that a 'groupChatSessionInvitationNotification' has been recieved.
- * @method invitationReceived
- * @param {Object} $0
- * @param  {Object} $0.invitation Invitation (groupChatSessionInvitationNotification).
- * @param  {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function invitationReceived({ invitation, error }) {
-  return actionFormatter(actionTypes.INVITATION_RECEIVED, { invitation, error });
-}
-
-/**
- * A notice that a 'chatParticipantStatusNotification' has been recieved.
- * @method statusNotificationReceived
- * @param {Object} $0
- * @param  {Object} $0.groupId Id of the group that the notification is for.
- * @param  {Object} $0.notification Notification (chatParticipantStatusNotification).
- * @param  {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function statusNotificationReceived({ groupId, notification, error }) {
-  return actionFormatter(actionTypes.STATUS_NOTIFICATION_RECEIVED, { groupId, notification, error });
-}
-
-/**
- * A notice that a 'chatEventNotification' has been received.
- * @method eventNotificationReceived
- * @param {Object} $0
- * @param  {Object} $0.groupId Id of the group that the notification is for.
- * @param  {Object} $0.notification Information (chatEventNotification).
- * @param  {Object} [$0.error] An error object.
- * @return {Object} A flux standard action.
- */
-function eventNotificationReceived({ groupId, notification, error }) {
-  return actionFormatter(actionTypes.EVENT_NOTIFICATION_RECEIVED, { groupId, notification, error });
-}
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/api.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (context) {
-  const groupsApi = {
-    /**
-     * Create a group.
-     * User creating group will become the admin of that group.
-     *
-     * @public
-     * @memberof Groups
-     * @method create
-     * @param {Object} params
-     * @param {string[]} [params.participants] - List of participants to add to group when created.
-     * @param {string} [params.subject] - Subject of the grour chat session.
-     * @param {string} params.name - Name of the grour chat session.
-     * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
-     * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
-     */
-    create(params) {
-      log.debug(_logs.API_LOG_TAG + 'groups.create: ', params);
-      context.dispatch(actions.create(params));
-    },
-
-    /**
-     * Fetches existing groups from the server.
-     * This will update the store with the retrieved groups, making them
-     * known locally. They can then be accessed using `get` or 'getAll'.
-     *
-     * @public
-     * @memberof Groups
-     * @method fetch
-     *
-     */
-    fetch() {
-      log.debug(_logs.API_LOG_TAG + 'groups.fetch');
-      context.dispatch(actions.fetchGroups());
-    },
-
-    /**
-     * Get information for all groups known locally.
-     *
-     * @public
-     * @memberof Groups
-     * @method getAll
-     * @return {Group[]} - An array of Groups.
-     */
-    getAll() {
-      log.debug(_logs.API_LOG_TAG + 'groups.getAll');
-      return selectors.getAllGroups(context.getState());
-    },
-
-    /**
-     * Retrieve information about a paticular group known locally.
-     *
-     * @public
-     * @memberof Groups
-     * @method get
-     * @param {string} groupId - The Id of the group to retrieve information for.
-     * @return {Group} - Group information.
-     */
-    get(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.get: ', groupId);
-      return selectors.getGroup(context.getState(), groupId);
-    },
-
-    /**
-     * Retrieve list of particpants from a group known locally.
-     *
-     * @public
-     * @memberof Groups
-     * @method getParticipants
-     * @param {string} groupId - The Id of the group to get participants list.
-     * @return {Participant[]} - A list of participants.
-     */
-    getParticipants(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.getParticipants: ', groupId);
-      return selectors.getParticipants(context.getState(), groupId);
-    },
-
-    /**
-     * Retrieve list of invitations known locally.
-     *
-     * @public
-     * @memberof Groups
-     * @method getInvitations
-     * @return {Invitations[]} - A list of invitations.
-     */
-    getInvitations(groupId) {
-      return selectors.getInvitations(context.getState());
-    },
-
-    /**
-     * Leave a group.
-     *
-     * @public
-     * @memberof Groups
-     * @method leave
-     * @param {string} groupId - The Id of the group to leave.
-     */
-    leave(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.leave: ', groupId);
-      context.dispatch(actions.leave(groupId));
-    },
-
-    /**
-     * Accept invitation to a group.
-     *
-     * @public
-     * @memberof Groups
-     * @method acceptInvitation
-     * @param {string} groupId - The Id of the group to accept an invitation to.
-     */
-    acceptInvitation(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.acceptInvitation: ', groupId);
-      context.dispatch(actions.acceptInvitation(groupId));
-    },
-
-    /**
-     * Reject invitation to a group.
-     *
-     * @public
-     * @memberof Groups
-     * @method rejectInvitation
-     * @param {string} groupId - The Id of the group to reject an invitation to.
-     */
-    rejectInvitation(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.rejectInvitation: ', groupId);
-      context.dispatch(actions.rejectInvitation(groupId));
-    },
-
-    /**
-     * Add participant to a group.
-     *
-     * @public
-     * @memberof Groups
-     * @method addParticipant
-     * @param {string} groupId - The Id of the group to add participant to.
-     * @param {string} participant - The userId of participant to add.
-     */
-    addParticipant(groupId, participant) {
-      log.debug(_logs.API_LOG_TAG + 'groups.addParticipant: ', groupId, participant);
-      context.dispatch(actions.addParticipant(groupId, participant));
-    },
-
-    /**
-     * Remove participant from a group.
-     *
-     * @public
-     * @memberof Groups
-     * @method removeParticipant
-     * @param {string} groupId - The Id of the group to remove participant from.
-     * @param {string} participant - The userId of participant to remove.
-     */
-    removeParticipant(groupId, participant) {
-      log.debug(_logs.API_LOG_TAG + 'groups.removeParticipant: ', groupId, participant);
-      context.dispatch(actions.removeParticipant(groupId, participant));
-    },
-
-    /**
-     * Delete a group.
-     * The group is deleted and all participants will receive a 'group:delete' notification.
-     *
-     * @public
-     * @memberof Groups
-     * @method delete
-     * @param {string} groupId - The Id of the group to delete.
-     */
-    delete(groupId) {
-      log.debug(_logs.API_LOG_TAG + 'groups.delete: ', groupId);
-      context.dispatch(actions.deleteGroup(groupId));
-    }
-  };
-  return { groups: groupsApi };
-};
-
-var _actions = __webpack_require__("../kandy/src/groups/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _selectors = __webpack_require__("../kandy/src/groups/interface/selectors.js");
-
-var selectors = _interopRequireWildcard(_selectors);
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
-                                                             * The Groups feature is used to manage groups.
-                                                             *
-                                                             * Group functions are all part of the 'groups' namespace.
-                                                             *
-                                                             * @public
-                                                             * @requires groups
-                                                             * @module Groups
-                                                             */
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/constants.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * The valid status values for inivtation accept / reject
- * @name INVITATION_STATUS
- * @type {Object}
- */
-const INVITATION_STATUS = exports.INVITATION_STATUS = {
-  CONNECTED: 'Connected',
-  DISCONNECTED: 'Disconnected'
-};
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/eventTypes.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * An new group has been created.
- *
- * @public
- * @memberof Groups
- * @event group:new
- * @param {Object} params
- * @param {string} params.groupId The group that was created.
- * @param {Array}  params.participants List of participants added to the new group.
- */
-const GROUP_NEW = exports.GROUP_NEW = 'group:new';
-
-/**
- * A group has been modified.
- *
- * @public
- * @memberof Groups
- * @event group:change
- * @param {Object} params
- * @param {string} params.groupId The group that changed.
- * @param {Array}  params.participants List of participants in the group.
- */
-const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
-
-/**
- * A group has been deleted.
- *
- * @public
- * @memberof Groups
- * @event group:delete
- * @param {Object} params
- * @param {string} params.groupId The group that was deleted.
- */
-const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
-
-/**
- * An invitation to a group has been received.
- *
- * @public
- * @memberof Groups
- * @event group:invitation_received
- * @param {Object} params
- * @param {string} params.groupId The group that invitation is for.
- * @param {string} params.participant The name of the participant.
- * @param {string} params.status The status of the participant.
- */
-const GROUP_INVITATION_RECEIVED = exports.GROUP_INVITATION_RECEIVED = 'group:invitation_received';
-
-/**
- * An invitation to a group has been accepted or rejected.
- * A status of 'Connected' means the participant has accpeted the invitation.
- * A status of 'Disconnected' means the participant has declined the invitation.
- *
- * @public
- * @memberof Groups
- * @event group:invitation_changed
- * @param {Object} params
- * @param {string} params.groupId The group that invitation is for.
- * @param {string} params.participant The name of the participant.
- * @param {string} params.status The status of the participant.
- */
-const GROUP_INVITATION = exports.GROUP_INVITATION = 'group:invitation';
-
-/**
- * An error occured with groups.
- *
- * @public
- * @memberof Groups
- * @event group:error
- * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
- */
-const GROUP_ERROR = exports.GROUP_ERROR = 'group:error';
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/events.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _actionTypes = __webpack_require__("../kandy/src/groups/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _eventTypes = __webpack_require__("../kandy/src/groups/interface/eventTypes.js");
-
-var eventTypes = _interopRequireWildcard(_eventTypes);
-
-var _constants = __webpack_require__("../kandy/src/groups/interface/constants.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-// Helper function for error events.
-function groupsError(action) {
-  if (action.error) {
-    return {
-      type: eventTypes.ERROR,
-      args: { error: action.payload }
-    };
-  }
-}
-
-let events = {};
-
-events[actionTypes.CREATE_GROUP_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_NEW,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_NEW,
-      args: {
-        group: action.payload.group.groupChatSessionInformation
-      }
-    };
-  }
-};
-
-events[actionTypes.DELETE_GROUP_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_DELETE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_DELETE,
-      args: {
-        groupId: action.payload.groupId
-      }
-    };
-  }
-};
-
-events[actionTypes.ADD_PARTICIPANT_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant
-      }
-    };
-  }
-};
-
-events[actionTypes.REMOVE_PARTICIPANT_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant
-      }
-    };
-  }
-};
-
-events[actionTypes.LEAVE_GROUP] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId
-      }
-    };
-  }
-};
-
-events[actionTypes.ACCEPT_INVITATION_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: {
-        groupId: action.payload.groupId,
-        group: action.payload.group,
-        participant: action.payload.participant,
-        status: _constants.INVITATION_STATUS.CONNECTED
-      }
-    };
-  }
-};
-
-events[actionTypes.REJECT_INVITATION_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant,
-        status: _constants.INVITATION_STATUS.DISCONNECTED
-      }
-    };
-  }
-};
-
-events[actionTypes.INVITATION_RECEIVED] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_INVITATION_RECEIVED,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_INVITATION_RECEIVED,
-      args: {
-        invitation: action.payload.invitation
-      }
-    };
-  }
-};
-
-// TODO: Should have events to notifiy of successful operations for these actions.
-events[actionTypes.GET_ALL_GROUPS] = groupsError;
-events[actionTypes.GET_GROUP] = groupsError;
-events[actionTypes.FETCH_GROUPS] = groupsError;
-events[actionTypes.GET_PARTICIPANTS] = groupsError;
-
-exports.default = events;
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _api = __webpack_require__("../kandy/src/groups/interface/api.js");
-
-Object.defineProperty(exports, 'api', {
-  enumerable: true,
-  get: function () {
-    return _interopRequireDefault(_api).default;
-  }
-});
-
-var _reducers = __webpack_require__("../kandy/src/groups/interface/reducers.js");
-
-Object.defineProperty(exports, 'reducer', {
-  enumerable: true,
-  get: function () {
-    return _interopRequireDefault(_reducers).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/reducers.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _actionTypes = __webpack_require__("../kandy/src/groups/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const reducers = {};
-
-// Libraries
-
-
-reducers[actionTypes.CREATE_GROUP_FINISH] = {
-  next(state, action) {
-    const newGroup = action.payload.group.groupChatSessionInformation;
-    return (0, _extends3.default)({}, state, { groups: [...state.groups, newGroup] });
-  }
-};
-
-/*
- * Removes the specified group from state.
- */
-reducers[actionTypes.DELETE_GROUP_FINISH] = {
-  next(state, action) {
-    const { groupId } = action.payload;
-
-    return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId)
-    });
-  }
-};
-
-/*
- * Adds a participant to the specified group.
- */
-reducers[actionTypes.ADD_PARTICIPANT_FINISH] = {
-  next(state, action) {
-    const { groupId, participant } = action.payload;
-
-    return (0, _extends3.default)({}, state, {
-      groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
-          return (0, _extends3.default)({}, group, {
-            participant: [...group.participant, participant]
-          });
-        }
-        return group;
-      })
-    });
-  }
-};
-
-/*
- * Removes a participant from the specified group.
- */
-reducers[actionTypes.REMOVE_PARTICIPANT_FINISH] = {
-  next(state, action) {
-    const { groupId, participant } = action.payload;
-    return (0, _extends3.default)({}, state, {
-      groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
-          return (0, _extends3.default)({}, group, {
-            participant: group.participant.filter(member => member.address !== participant)
-          });
-        }
-        return group;
-      })
-    });
-  }
-};
-
-/*
- * Leave a specified group and remove invitation in state if it exists.
- */
-reducers[actionTypes.LEAVE_GROUP_FINISH] = {
-  next(state, action) {
-    const { groupId } = action.payload;
-
-    return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId),
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
-    });
-  }
-};
-
-/*
- * Fetch list of groups from server and update state.
- */
-reducers[actionTypes.FETCH_GROUPS_FINISH] = {
-  next(state, action) {
-    const { groups } = action.payload;
-
-    // add groupId as a new property to each group. The groupId is
-    // parsed from the group's resourceURL.
-    return (0, _extends3.default)({}, state, {
-      groups: groups.map(function (group) {
-        group.groupId = group.resourceURL.substring(group.resourceURL.lastIndexOf('/') + 1);
-        return group;
-      })
-    });
-  }
-};
-
-/*
- * Accept the invitation and update the state.
- */
-reducers[actionTypes.ACCEPT_INVITATION_FINISH] = {
-  next(state, action) {
-    const { groupId, group } = action.payload;
-    const newGroup = (0, _extends3.default)({}, group, {
-      groupId
-
-      // remove the invitation and replace the group in state.
-    });return (0, _extends3.default)({}, state, {
-      groups: [...state.groups.filter(group => group.groupId !== groupId), newGroup],
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
-    });
-  }
-};
-
-/*
- * Reject the invitation and update the state.
- */
-reducers[actionTypes.REJECT_INVITATION_FINISH] = {
-  next(state, action) {
-    const { groupId } = action.payload;
-
-    // remove the invitation and the group from state.
-    return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId),
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
-    });
-  }
-};
-
-/*
- * Invitation has been received.
- */
-reducers[actionTypes.INVITATION_RECEIVED] = {
-  next(state, action) {
-    const { invitation } = action.payload;
-
-    // add the new invitation to the state.
-    return (0, _extends3.default)({}, state, {
-      invitations: [...state.invitations, invitation]
-    });
-  }
-};
-
-/*
- * A group that you belong to has been deleted.
- */
-reducers[actionTypes.EVENT_NOTIFICATION_RECEIVED] = {
-  next(state, action) {
-    const { groupId, notification } = action.payload;
-
-    // if the eventType is 'SessionInvited' (ie you have an unaccepted invitation),
-    // remove the group and invitation from state.
-    if (notification.eventType === 'SessionCancelled') {
-      return (0, _extends3.default)({}, state, {
-        groups: state.groups.filter(group => group.groupId !== groupId),
-        invitations: state.invitations.filter(invite => invite.groupId !== groupId)
-        // otherwise, just remove the group
-      });
-    } else if (notification.eventType === 'SessionEnded') {
-      return (0, _extends3.default)({}, state, {
-        groups: state.groups.filter(group => group.groupId !== groupId)
-      });
-    }
-  }
-};
-/*
- * A group that you belong to has been modified.
- */
-reducers[actionTypes.STATUS_NOTIFICATION_RECEIVED] = {
-  next(state, action) {
-    // need to update the state.... if the group exists in state, update this participants
-    const { groupId, notification } = action.payload;
-    const changedParticipant = notification.participant[0];
-    const newState = (0, _extends3.default)({}, state, {
-      groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
-          let newGroup = (0, _extends3.default)({}, group, {
-            participant: group.participant.filter(participant => participant.address !== changedParticipant.address)
-          });
-          newGroup.participant.push(changedParticipant);
-          return (0, _extends3.default)({}, newGroup);
-        }
-        return group;
-      })
-    });
-    return newState;
-  }
-};
-
-const reducer = (0, _reduxActions.handleActions)(reducers, { groups: [], invitations: [] });
-exports.default = reducer;
-
-/***/ }),
-
-/***/ "../kandy/src/groups/interface/selectors.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getAllGroups = getAllGroups;
-exports.getGroup = getGroup;
-exports.getParticipants = getParticipants;
-exports.getInvitations = getInvitations;
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-/**
- * Retrieves all the groups in state.
- * @method getAllGroups
- * @param  {Object} state Redux state.
- * @return {[Object]}  List of groups.
- */
-function getAllGroups(state) {
-  return (0, _fp.cloneDeep)(state.groups.groups);
-}
-
-/**
- * Retrieves group information for a specified group in state.
- * @method get
- * @param  {Object} state Redux state.
- * @return {Object}  Group information of specified group.
- */
-function getGroup(state, groupId) {
-  const group = state.groups.groups.find(groups => groups.groupId === groupId);
-  if (group) {
-    return (0, _fp.cloneDeep)(group);
-  }
-}
-
-/**
- * Retrieves list of participants from a specified group in state.
- * @method getParticipants
- * @param  {Object} state Redux state.
- * @return {[Object]}  List of participants in specified group.
- */
-function getParticipants(state, groupId) {
-  const group = state.groups.groups.find(groups => groups.groupId === groupId);
-  if (group) {
-    return (0, _fp.cloneDeep)(group.participant);
-  }
-}
-
-/**
- * Retrieves all the invitations in state.
- * @method getInvitations
- * @param  {Object} state Redux state.
- * @return {[Object]}  List of invitations.
- */
-function getInvitations(state, groupId) {
-  return (0, _fp.cloneDeep)(state.groups.invitations);
-}
-
-/***/ }),
-
 /***/ "../kandy/src/index.common.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -32459,7 +40592,7 @@ function commonIndex(options = {}, plugins = []) {
 
 /***/ }),
 
-/***/ "../kandy/src/index.cpaas.js":
+/***/ "../kandy/src/index.newUC.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32473,54 +40606,62 @@ var _basePlugins = __webpack_require__("../kandy/src/basePlugins.js");
 
 var _basePlugins2 = _interopRequireDefault(_basePlugins);
 
-var _cpaas = __webpack_require__("../kandy/src/auth/cpaas/index.js");
+var _uc = __webpack_require__("../kandy/src/auth/uc/index.js");
 
-var _cpaas2 = _interopRequireDefault(_cpaas);
+var _uc2 = _interopRequireDefault(_uc);
+
+var _link = __webpack_require__("../kandy/src/call/link/index.js");
+
+var _link2 = _interopRequireDefault(_link);
 
 var _webrtc = __webpack_require__("../kandy/src/webrtc/index.js");
 
 var _webrtc2 = _interopRequireDefault(_webrtc);
 
-var _cpaas3 = __webpack_require__("../kandy/src/call/cpaas/index.js");
+var _callHistory = __webpack_require__("../kandy/src/callHistory/index.js");
 
-var _cpaas4 = _interopRequireDefault(_cpaas3);
+var _callHistory2 = _interopRequireDefault(_callHistory);
+
+var _clickToCall = __webpack_require__("../kandy/src/clickToCall/index.js");
+
+var _clickToCall2 = _interopRequireDefault(_clickToCall);
 
 var _connectivity = __webpack_require__("../kandy/src/connectivity/index.js");
 
 var _connectivity2 = _interopRequireDefault(_connectivity);
 
-var _cpaas5 = __webpack_require__("../kandy/src/messaging/cpaas/index.js");
+var _uc3 = __webpack_require__("../kandy/src/messaging/uc/index.js");
 
-var _cpaas6 = _interopRequireDefault(_cpaas5);
+var _uc4 = _interopRequireDefault(_uc3);
 
-var _cpaas7 = __webpack_require__("../kandy/src/notifications/cpaas/index.js");
+var _link3 = __webpack_require__("../kandy/src/mwi/link/index.js");
 
-var _cpaas8 = _interopRequireDefault(_cpaas7);
+var _link4 = _interopRequireDefault(_link3);
 
-var _cpaas9 = __webpack_require__("../kandy/src/presence/cpaas/index.js");
+var _link5 = __webpack_require__("../kandy/src/notifications/link/index.js");
 
-var _cpaas10 = _interopRequireDefault(_cpaas9);
+var _link6 = _interopRequireDefault(_link5);
 
-var _cpaas11 = __webpack_require__("../kandy/src/groups/cpaas/index.js");
+var _link7 = __webpack_require__("../kandy/src/presence/link/index.js");
 
-var _cpaas12 = _interopRequireDefault(_cpaas11);
+var _link8 = _interopRequireDefault(_link7);
 
-var _cpaas13 = __webpack_require__("../kandy/src/subscription/cpaas/index.js");
+var _sipEvents = __webpack_require__("../kandy/src/sipEvents/index.js");
 
-var _cpaas14 = _interopRequireDefault(_cpaas13);
+var _sipEvents2 = _interopRequireDefault(_sipEvents);
+
+var _link9 = __webpack_require__("../kandy/src/users/link.js");
+
+var _link10 = _interopRequireDefault(_link9);
 
 var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
 
 var _codecRemover2 = _interopRequireDefault(_codecRemover);
 
-var _cpaas15 = __webpack_require__("../kandy/src/users/cpaas/index.js");
-
-var _cpaas16 = _interopRequireDefault(_cpaas15);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Plugins
-const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'groups', fn: _cpaas12.default }, { name: 'subscription', fn: _cpaas14.default }, { name: 'users', fn: _cpaas16.default }];
+const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _uc2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _link2.default }, { name: 'callHistory', fn: _callHistory2.default }, { name: 'clickToCall', fn: _clickToCall2.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _uc4.default }, { name: 'mwi', fn: _link4.default }, { name: 'notifications', fn: _link6.default }, { name: 'presence', fn: _link8.default }, { name: 'sipEvents', fn: _sipEvents2.default }, { name: 'users', fn: _link10.default }];
 
 function root(options = {}, plugins = []) {
   return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
@@ -33227,80 +41368,7 @@ function titleFormatter(action, time, took) {
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = cpaasMessaging;
-
-var _interface = __webpack_require__("../kandy/src/messaging/cpaas/interface/index.js");
-
-var _interface2 = _interopRequireDefault(_interface);
-
-var _sagas = __webpack_require__("../kandy/src/messaging/cpaas/sagas/index.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _events = __webpack_require__("../kandy/src/messaging/cpaas/interface/events.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Factory function for the CPaaS messaging plugin.
- * @method cpaasMessaging
- * @param  {Object} [options={}]
- * @return {Object} A plugin object.
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-function cpaasMessaging(options = {}) {
-  const defaultOptions = {
-    features: ['base', 'history', 'rich', 'parts', 'isTyping']
-  };
-  options = (0, _fp.defaults)(defaultOptions, options);
-
-  function* init() {
-    yield (0, _effects.put)((0, _actions2.update)(options, _interface2.default.name));
-    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
-  }
-
-  const capabilities = ['sms', 'chat', 'parts', 'history', 'internalAndSmsMessaging', 'isTyping', 'richMessagingWithoutLocation', 'fetchConversations'];
-
-  return {
-    capabilities,
-    api: _interface2.default.api,
-    name: _interface2.default.name,
-    reducer: _interface2.default.reducer,
-    mixins: _interface2.default.mixins,
-    sagas: (0, _fp.values)(sagas),
-    init
-  };
-} // Messaging plugin.
-
-/***/ }),
-
-/***/ "../kandy/src/messaging/cpaas/interface/actionTypes.js":
+/***/ "../kandy/src/messaging/interface/actionTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33336,19 +41404,11 @@ const UPDATE_CONVERSATION = exports.UPDATE_CONVERSATION = PREFIX + 'UPDATE_CONVE
 const FETCH_MESSAGES = exports.FETCH_MESSAGES = PREFIX + 'FETCH_MESSAGES';
 const FETCH_MESSAGES_FINISHED = exports.FETCH_MESSAGES_FINISHED = PREFIX + 'FETCH_MESSAGES_FINISHED';
 
-const RECEIVE_DELIVERY_RECEIPT = exports.RECEIVE_DELIVERY_RECEIPT = PREFIX + 'RECEIVE_DELIVERY_RECEIPT';
-
 const FILE_UPLOAD_FAIL = exports.FILE_UPLOAD_FAIL = PREFIX + 'FILE_UPLOAD_FAIL';
-
-const SET_IS_TYPING = exports.SET_IS_TYPING = PREFIX + 'SET_IS_TYPING';
-const SET_IS_TYPING_FINISHED = exports.SET_IS_TYPING_FINISHED = PREFIX + 'SET_IS_TYPING_FINISHED';
-
-const GET_IMAGE_LINKS = exports.GET_IMAGE_LINKS = PREFIX + 'GET_IMAGE_LINKS';
-const GET_IMAGE_LINKS_FINISH = exports.GET_IMAGE_LINKS_FINISH = PREFIX + 'GET_IMAGE_LINKS_FINISH';
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/actions/conversations.js":
+/***/ "../kandy/src/messaging/interface/actions/conversations.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33368,10 +41428,8 @@ exports.fetchConversationsFinished = fetchConversationsFinished;
 exports.updateConversation = updateConversation;
 exports.deleteConversation = deleteConversation;
 exports.deleteConversationFinish = deleteConversationFinish;
-exports.setIsTyping = setIsTyping;
-exports.setIsTypingFinished = setIsTypingFinished;
 
-var _actionTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/messaging/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -33439,7 +41497,7 @@ function fetchConversationsFinished({ conversations, error }) {
  * @param {Object} conversation The conversation object
  * @param {Array} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
  * @param {number} [conversation.id] The conversation object's corresponding thread ID
- * @param {string} [conversation.type] The conversation type, which is expected to be one of: "chat-oneToOne", "chat-group", "sms".
+ * @param {string} [conversation.type] The conversation type, which is expected to be one of: "im", "sms", "group".
  * @returns {Object} A flux standard action representing the create conversation action.
  */
 function updateConversation(conversation) {
@@ -33453,7 +41511,7 @@ function updateConversation(conversation) {
  * Request to delete all the messages from a conversation.
  * @method deleteConversation
  * @param  {string} destination The destination for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @returns {Object} A flux standard action.
  */
 function deleteConversation(destination, type) {
@@ -33467,11 +41525,11 @@ function deleteConversation(destination, type) {
 }
 
 /**
- * Creates a delete conversations finished action.
+ * Creates a fetch messages finished action.
  * @method deleteConversationFinish
  * @param {Object} $0
  * @param {Array} $0.destination An array of destinations for messages created in this conversation.
- * @param {string} $0.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} $0.type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @param {Object} [$0.error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
@@ -33483,41 +41541,9 @@ function deleteConversationFinish({ destination, type, error }) {
   };
 }
 
-/**
- *
- * @param {Object} $0
- * @param {string} $0.state (active/idle) state of the typing user
- * @param {string} $0.destination the target user to send the notification to
- * @returns {Object}
- */
-function setIsTyping({ state, destination, type }) {
-  return {
-    type: actionTypes.SET_IS_TYPING,
-    payload: { state, destination, type }
-  };
-}
-
-/**
- *
- * @param {Object} $0
- * @param {string} $0.state (active/idle) state of the typing user
- * @param {string} $0.senderAddress the username of the user who sent the notification
- * @param {string} $0.destination the target user to send the notification to
- * @param {string} $0.type a standard error object
- * @param {BasicError} $0.error a standard error object
- * @returns {Object}
- */
-function setIsTypingFinished({ state, senderAddress, destination, type, error }) {
-  return {
-    type: actionTypes.SET_IS_TYPING_FINISHED,
-    payload: error || { state, senderAddress, destination, type },
-    error: !!error
-  };
-}
-
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/actions/index.js":
+/***/ "../kandy/src/messaging/interface/actions/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33528,11 +41554,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.convoActions = exports.messageActions = undefined;
 
-var _messages = __webpack_require__("../kandy/src/messaging/cpaas/interface/actions/messages.js");
+var _messages = __webpack_require__("../kandy/src/messaging/interface/actions/messages.js");
 
 var messageActionsImport = _interopRequireWildcard(_messages);
 
-var _conversations = __webpack_require__("../kandy/src/messaging/cpaas/interface/actions/conversations.js");
+var _conversations = __webpack_require__("../kandy/src/messaging/interface/actions/conversations.js");
 
 var convoActionsImport = _interopRequireWildcard(_conversations);
 
@@ -33553,7 +41579,7 @@ const convoActions = exports.convoActions = convoActionsImport;
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/actions/messages.js":
+/***/ "../kandy/src/messaging/interface/actions/messages.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33562,7 +41588,7 @@ const convoActions = exports.convoActions = convoActionsImport;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sendMessageRead = exports.incomingMessageRead = exports.sendMessageFinish = exports.sendMessage = exports.deliveryReceiptReceived = undefined;
+exports.sendMessageRead = exports.incomingMessageRead = exports.sendMessageFinish = exports.sendMessage = undefined;
 exports.messageReceived = messageReceived;
 exports.sendMessageReadFinish = sendMessageReadFinish;
 exports.fetchMessages = fetchMessages;
@@ -33570,14 +41596,10 @@ exports.fetchMessagesFinished = fetchMessagesFinished;
 exports.clearMessages = clearMessages;
 exports.deleteMessage = deleteMessage;
 exports.deleteMessageFinish = deleteMessageFinish;
-exports.getImageLinks = getImageLinks;
-exports.getImageLinksFinish = getImageLinksFinish;
 
-var _actionTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/messaging/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -33615,31 +41637,14 @@ function messageReadHelper(actionType, messageId, participant) {
  */
 
 /**
- * An action fired when a delivery receipt is received
- *
- * @method deliveryReceiptReceived
- * @param {string} messageId the id of the sent message
- * @param {string} deliveryStatus the status of sent message
- * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
- * @returns {Object} A flux standard action representing the send message action.
- */
-const deliveryReceiptReceived = exports.deliveryReceiptReceived = (messageId, deliveryStatus, destination, type) => {
-  return {
-    type: actionTypes.RECEIVE_DELIVERY_RECEIPT,
-    payload: { messageId, deliveryStatus, destination, type }
-  };
-};
-
-/**
  * Creates a send message action. Triggered when the user initiates the send message process.
  *
  * @method sendMessage
  * @param {Array} destination An array of destinations for messages created in this conversation.
  * @param {Array} parts The message parts, as a formatted object.
- * @param {number} timestamp A timestamp for the sent message.
+ * @param {number} timestamp A timestamp for the sent message in seconds.
  * @param {number} id The ID of the conversation as it exists in the back end.
- * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
+ * @param {string} type Type of message. 'im', 'group' or 'sms'.
  * @returns {Object} A flux standard action representing the send message action.
  */
 const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, id) => sendMessageHelper(actionTypes.SEND_MESSAGE, destination, parts, timestamp, type, id);
@@ -33651,9 +41656,9 @@ const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, 
  * @param {Object} $0
  * @param {Array} $0.destination An array of destinations for messages created in this conversation.
  * @param {string} $0.sender The sender of the outgoing message.
- * @param {string} $0.type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
+ * @param {string} $0.type The type of conversation: can be one of 'im', 'sms' or 'group'
  * @param {Array} $0.parts The message parts.
- * @param {number} $0.timestamp A timestamp for the sent message.
+ * @param {number} $0.timestamp A timestamp for the sent message in seconds.
  * @param {string} [$0.messageId] The returned messageId of the message if sent successfully.
  * @param {string} [$0.deliveryStatus] The status of sent message
  * @param {Object} [$0.error] A basic error object
@@ -33686,11 +41691,11 @@ const sendMessageFinish = exports.sendMessageFinish = ({
  * @param {string} sender The user who sent the message. This is the user who the conversation is with.
  * @param {number} timestamp A timestamp for the sent message.
  * @param {Object} meta - A meta object.
- * @param {string} meta.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} meta.type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @param {boolean} meta.newConversation - A boolean value indicating whether the message corresponds to a conversation not yet in the store.
  * @returns {Object} A flux standard action representing the message received action.
  */
-function messageReceived(destination, parts, messageId, sender, timestamp, meta = { type: _mappings.chatTypes.ONETOONE, newConversation: false }) {
+function messageReceived(destination, parts, messageId, sender, timestamp, meta = { type: 'im', newConversation: false }) {
   return {
     type: actionTypes.MESSAGE_RECEIVED,
     meta: meta,
@@ -33764,7 +41769,7 @@ function fetchMessages(destination, amount, type) {
  * Creates a fetch messages finished action.
  * @method fetchMessagesFinished
  * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @param {Array} messages An array of formatted messages to put into the store.
  * @param {Object} [error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
@@ -33781,7 +41786,7 @@ function fetchMessagesFinished(destination, type, messages, error) {
  * Request to clear messages from a conversation's state.
  * @method clearMessages
  * @param  {string} destination The destination for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of "chat-OneToOne", "chat-group" or "sms".
+ * @param {string} type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @returns {Object} A flux standard action.
  */
 function clearMessages(destination, type) {
@@ -33798,7 +41803,7 @@ function clearMessages(destination, type) {
  * Request to delete all the messages from a conversation.
  * @method deleteMessage
  * @param  {string} destination The destination for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @param {string} messageId The ID of the message targeted for deletion
  * @returns {Object} A flux standard action.
  */
@@ -33818,7 +41823,7 @@ function deleteMessage(destination, type, messageId) {
  * @method deleteMessagesFinish
  * @param {Object} $0
  * @param {Array} $0.destination An array of destinations for messages created in this conversation.
- * @param {string} $0.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} $0.type The type of conversation: can be one of "im", "sms", "group" or "other"
  * @param {string} $0.messageId The ID of the message that was targeted for deletion
  * @param {Object} [$0.error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
@@ -33831,46 +41836,9 @@ function deleteMessageFinish({ destination, type, messageId, error }) {
   };
 }
 
-/**
- * Returns a get image links action
- * @method getImageLinks
- * @param {Object} $0
- * @param {Array} $0.parts the different parts of the message
- * @param {string} $0.destination the destination address(es)
- * @param {string} $0.type the type of message (chat, group, SMS
- * @param {string} $0.messageId id for looking up the message
- * @returns {Object}
- */
-function getImageLinks({ parts, destination, type, messageId }) {
-  return {
-    type: actionTypes.GET_IMAGE_LINKS,
-    payload: { parts, destination, type, messageId }
-  };
-}
-
-/**
- * Returns a get image links finish action
- * @method getImageLinksFinish
- * @param {Object} $0
- * @param {string} $0.url the url that returns an attachment
- * @param {string} $0.rawURL the url returned when we upload an image
- * @param {Array} $0.destination the destination address(es)
- * @param {string} $0.typethe type of message (chat, group, SMS
- * @param {string} $0.messageId id for looking up the message
- * @param {Object} [$0.error] a standard error object
- * @returns {Object}
- */
-function getImageLinksFinish({ url, rawURL, destination, type, messageId, error }) {
-  return {
-    type: actionTypes.GET_IMAGE_LINKS_FINISH,
-    payload: error || { url, rawURL, destination, type, messageId },
-    error: !!error
-  };
-}
-
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/api.js":
+/***/ "../kandy/src/messaging/interface/api.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33881,29 +41849,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _actions = __webpack_require__("../kandy/src/messaging/cpaas/interface/actions/index.js");
+var _actions = __webpack_require__("../kandy/src/messaging/interface/actions/index.js");
 
-var _selectors = __webpack_require__("../kandy/src/messaging/cpaas/interface/selectors.js");
+var _selectors = __webpack_require__("../kandy/src/messaging/interface/selectors.js");
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
-
 // Retrieve logger
-/**
- * The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
- * and its messages, and return conversation objects when requested.
- *
- * See the "Conversation" and "Message" sections of the documentation for more details.
- *
- *
- * Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
- *
- * @public
- * @module Messaging
- */
-
-const log = (0, _logs.getLogManager)().getLogger('Messaging');
+const log = (0, _logs.getLogManager)().getLogger('MESSAGING'); /**
+                                                                * The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
+                                                                * and its messages, and return conversation objects when requested.
+                                                                *
+                                                                * See the "Conversation" and "Message" sections of the documentation for more details.
+                                                                *
+                                                                *
+                                                                * Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
+                                                                *
+                                                                * @public
+                                                                * @module Messaging
+                                                                */
 
 function api(context) {
   const messagingApi = {
@@ -33918,15 +41882,48 @@ function api(context) {
      * @param {string} [options.touched] The unix timestamp in seconds representing the date from which
      *  to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
      *  the back-end making use of the most recent date value provided in a previous request
-     * @param {string} [options.type] Limit results to one of: "chat-oneToOne", "chat-group"or "sms".
+     * @param {string} [options.type] Limit results to one of: "internal", "sms", "group" or "unknown".
      * @param {string|number} [options.thread] Limit results to one thread specified by its thread handle.
      * @memberof Messaging
      * @requires fetchConversations
      * @method fetch
      */
     fetch: function (options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.fetch: ', options);
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
+    /**
+     * Get a conversation object matching the user ID provided
+     * If successful, the event 'conversations:change' will be emitted.
+     * If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created.
+     *
+     * @public
+     * @memberof Messaging
+     * @requires onlyInternalMessaging
+     * @method get
+     * @param {string} destination The destination for messages created in this conversation. This will
+     * be a user's sip address.
+     * @param {Object} [options] An optional configuration object to query for more specific results.
+     * If this object is not passed, the function will query for "im" conversation with that recipient.
+     * @param {string} [options.type] The type of conversation to retrieve. Can be one of "im", "sms" or "other".
+     * @returns {Conversation} A Conversation object.
+     */
+    /**
+     * Get a conversation object matching the user IDs provided.
+     * If successful, the event 'conversations:change' will be emitted.
+     * Multi-user conversations have a destination comprised of multiple user IDs.
+     *
+     * @public
+     * @memberof Messaging
+     * @requires multiUserConversation
+     * @method get
+     * @param {Array} destination An array of destinations for messages created in this conversation.
+     * These will be a user's sip address.
+     * @param {Object} [options] An optional configuration object to query for more specific results.
+     * If this object is not passed, the function will query for "im" conversations associated with those destinations.
+     * @param {string} [options.type] The type of conversation to retrieve. Can be one of "im", "sms" or "other".
+     * @returns {Conversation} A Conversation object.
+     */
     /**
      * Get a conversation object matching the user ID provided.
      *
@@ -33938,11 +41935,13 @@ function api(context) {
      * @method get
      * @param {string} recipient The destination for messages created in this conversation. This
      * will be a user's sip address.
-     * @param {Object} [options] Options to use when creating the conversation object.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms".
-     * @returns {Conversation} A Conversation object.
+     * @param {Object} [options] An optional configuration object to query for more specific results.
+     * If this object is not passed, the function will query for "im" conversation with that recipient.
+     * @param {string} [options.type] The type of conversation to retrieve. Can be one of "im", "sms" or "other".
+     * @returns {Object} A Conversation object.
      */
-    get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+    get: function (recipient, options = { type: 'im' }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.get: ', recipient, options);
       let destination = Array.isArray(recipient) ? [...recipient] : [recipient];
       let description = 'Conversation';
       let messages;
@@ -33961,6 +41960,7 @@ function api(context) {
             id: id,
             description,
             messages: messages,
+            lastMessage: conversation.lastMessage,
             isTypingList: conversation.isTypingList,
             lastReceived: conversation ? conversation.lastReceived : undefined,
             lastPull: conversation ? conversation.lastPull : undefined
@@ -33982,11 +41982,24 @@ function api(context) {
      * @requires internalAndSmsMessaging
      * @method create
      * @param {string} recipient
-     * @param {Object} [options] Options to use when creating the conversation object.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation. Can be one of "chat-oneToOne", "chat-group" or "sms".
-     * @returns {Conversation} a Conversation object
+     * @param options
+     * @returns {Object} a Conversation object
      */
-    create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+    /**
+     * Create and return a new conversation object. Any messages being sent through this conversation
+     * object will be sent to the destinations provided
+     *
+     * @public
+     * @memberof Messaging
+     * @requires multiUserConversation
+     * @method create
+     * @param {Array} recipient An array of destinations for messages created in this conversation. These will be a user's sip address.
+     * @param {string} type The type of conversation to create. Can be one of "im", "sms", "group" or "other"
+     * @param options
+     * @returns {Object} a Conversation object
+     */
+    create: function (recipient, options = { type: 'im' }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.create: ', recipient, options);
       const destination = Array.isArray(recipient) ? recipient : [recipient];
       const prevConv = (0, _selectors.findConversation)(context.getState(), destination, options.type);
 
@@ -34006,32 +42019,19 @@ function api(context) {
      * @memberof Messaging
      * @requires internalAndSmsMessaging
      * @method getAll
-     * @returns {Array<Conversation>} An array of conversation objects.
+     * @returns {Array} An array of conversation objects.
      */
     getAll: function () {
+      log.debug(_logs.API_LOG_TAG + 'conversation.getAll');
       return (0, _selectors.getConversations)(context.getState());
-    },
-    /**
-     * Possible types of conversations.
-     *
-     * @public
-     * @memberof Messaging
-     * @type {Object}
-     * @property {string} ONETOONE A simple chat between two users.
-     * @property {string} GROUP A chat between groups of users
-     * @property {string} SMS A chat using SMS.
-     * @example
-     * // Use the chat types to fetch group conversations.
-     * client.messaging.fetch({type: client.messaging.chatTypes.GROUP}) {
-     */
-    chatTypes: _mappings.chatTypes
+    }
   };
   return { conversation: messagingApi };
 }
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/eventTypes.js":
+/***/ "../kandy/src/messaging/interface/eventTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34057,7 +42057,7 @@ const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
  * @event conversations:change
  * @param {Array} params An array of objects containing information about the conversations that have changed
  * @param {Array} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-OneToOne", "chat-group" or "sms"
+ * @param {string} params.type The type of conversation to create. Can be one of "chat", "im", "sms" or "group"
  */
 const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:change';
 
@@ -34071,7 +42071,7 @@ const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:chang
  * @event messages:change
  * @param {Object} params
  * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms"
+ * @param {string} params.type The type of conversation to create. Can be one of "chat", "im", "sms" or "group"
  * @param {string} [params.messageId] The ID of the message affected.
  * @param {string} [params.sender] The username of the sender of the message which caused the `messages:change` event to be triggered.
  */
@@ -34088,23 +42088,9 @@ const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
  */
 const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
 
-/**
- * The List of users that are currently typing has changed.
- *
- * @public
- * @requires isTyping
- * @memberof Messaging
- * @event isTypingList:change
- * @param {Object} params
- * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms"
- * @param {string} [params.sender] The username of the sender that caused the event to trigger
- */
-const IS_TYPING_LIST_CHANGE = exports.IS_TYPING_LIST_CHANGE = 'isTypingList:change';
-
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/events.js":
+/***/ "../kandy/src/messaging/interface/events.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34114,11 +42100,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _actionTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/messaging/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _eventTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/eventTypes.js");
+var _eventTypes = __webpack_require__("../kandy/src/messaging/interface/eventTypes.js");
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
@@ -34248,43 +42234,11 @@ eventsMap[actionTypes.DELETE_MESSAGE_FINISH] = function (action) {
   }
 };
 
-eventsMap[actionTypes.RECEIVE_DELIVERY_RECEIPT] = function (action) {
-  return {
-    type: eventTypes.MESSAGES_CHANGE,
-    args: {
-      destination: action.payload.destination,
-      messageId: action.payload.messageId,
-      type: action.payload.type
-    }
-  };
-};
-
-eventsMap[actionTypes.SET_IS_TYPING_FINISHED] = function (action) {
-  return {
-    type: eventTypes.IS_TYPING_LIST_CHANGE,
-    args: {
-      destination: action.payload.destination,
-      sender: action.payload.senderAddress,
-      type: action.payload.type
-    }
-  };
-};
-
-eventsMap[actionTypes.GET_IMAGE_LINKS_FINISH] = function (action) {
-  return {
-    type: eventTypes.MESSAGES_CHANGE,
-    args: {
-      destination: action.payload.destination,
-      type: action.payload.type
-    }
-  };
-};
-
 exports.default = eventsMap;
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/index.js":
+/***/ "../kandy/src/messaging/interface/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34294,15 +42248,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _api = __webpack_require__("../kandy/src/messaging/cpaas/interface/api.js");
+var _api = __webpack_require__("../kandy/src/messaging/interface/api.js");
 
 var _api2 = _interopRequireDefault(_api);
 
-var _reducers = __webpack_require__("../kandy/src/messaging/cpaas/interface/reducers.js");
+var _reducers = __webpack_require__("../kandy/src/messaging/interface/reducers.js");
 
 var _reducers2 = _interopRequireDefault(_reducers);
 
-var _mixins = __webpack_require__("../kandy/src/messaging/cpaas/interface/mixins.js");
+var _mixins = __webpack_require__("../kandy/src/messaging/interface/mixins.js");
 
 var _mixins2 = _interopRequireDefault(_mixins);
 
@@ -34322,7 +42276,7 @@ exports.default = {
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/mixins.js":
+/***/ "../kandy/src/messaging/interface/mixins.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34338,11 +42292,9 @@ var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
-var _actions = __webpack_require__("../kandy/src/messaging/cpaas/interface/actions/index.js");
+var _actions = __webpack_require__("../kandy/src/messaging/interface/actions/index.js");
 
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
-
-var _selectors = __webpack_require__("../kandy/src/messaging/cpaas/interface/selectors.js");
+var _selectors = __webpack_require__("../kandy/src/messaging/interface/selectors.js");
 
 var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
 
@@ -34352,119 +42304,79 @@ var _compose2 = _interopRequireDefault(_compose);
 
 var _actions2 = __webpack_require__("../kandy/src/events/interface/actions.js");
 
-var _eventTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/eventTypes.js");
+var _eventTypes = __webpack_require__("../kandy/src/messaging/interface/eventTypes.js");
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
-
-/**
- * Base conversation stamp
- * @param {Array} destination The Destination for messages being sent through
- * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} type='chat' The type of the message.
- * @param {string} id The unique identifier for base conversation.
- * @param {string} description='' The description associated with base conversation.
- * @param {Array} messages=[] An array containing the conversation's messages.
- * @param {number} lastReceived The timestamp associated with the last received message.
- */
-
-// Events
 /**
  * A Conversation object represents a conversation between either two users, or a
  * user and a group. A Conversation can create messages via the conversation's
  * createMessage() function.
- *
- * Once sender sends the initial message (within a conversation) to a recipient, there will be a
- * conversation object saved in both sender & recipient's state.
- *
+ * @public
+ * @module Conversation
  * @requires richMessagingWithoutLocation
  * @property {string} destination The Id of the remote user with which the current user is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
- * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type associated with all messages within this conversation object (e.g. chat, im, group).
- * @property {Array<Message>} messages The array of message objects.
- * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
- *
- * @public
- * @module Conversation
  * @type {Object}
  */
 // `features` and `lastPull` are not documented because they're intended to be internal
 // `type` is not documented because as of now there are no types other than 'im'
 
 /**
- * A Part is a custom object representing the payload of a message.
- *
- * @property {string} type The payload type. Can be "text", "json", "file".
- * @property {string} text The text of the message. Messages with file or json attachments are still required to have text associated to it.
- * @property {Object} [json] The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
- * @property {File} [file] The file to attach to attach to a message. A part cannot have both json and a file.
- *
+ * A Conversation object represents a conversation between either two users, or a
+ * user and a group. A Conversation can create messages via the conversation's
+ * createMessage() function.
  * @public
- * @module Part
+ * @module Conversation
+ * @requires simpleMessagingOnly
+ * @property {string} destination The id of the remote user with which the current user is having a conversation.
  * @type {Object}
  */
 
 /**
- * A Message sender object is a means by which a sender can deliver information to a recipient.
- *
- * This sender object can obtained through the createMessage API on an existing conversation.
- *
- * Once all the desired parts have been added to it (using appPart function), the message
- * can be sent using the send function.
- *
- * @public
- * @module MessageSender
- * @type {Object}
- */
-
-/**
- * A Message object represents an individual message that was delivered to a recipient and it is
- * obtained through the getMessage/getMessages API on an existing conversation.
- *
- * Messages have parts which represent pieces of a message, such as a text part, a json object part or a file part.
- *
- * Once sender sends a message, this message is saved in sender's state as an object.
- *
- * Similarly, once recipient gets a message, this message is saved in recipient's state.
- *
- * Below are the properties pertaining to this saved message object in either sender or recipient's state.
- *
- * @property {number} timestamp The Unix timestamp in seconds marking the time when message was created by sender.
- * @property {boolean} isPending Whether message is in pending state or not (delivered by server or not).
- * @property {boolean} read: Whether message was read by recipient user.
- * @property {Array<Part>} parts An array of Parts.
- * @property {string} sender The primary contact address of the sender.
- * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
- * than the one associated with message object stored in recipient's state.
- * @property {string} type The type of message that was sent (e.g. chat, im, group).
- * This property applies only to message object stored in sender's state.
- * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
- * This property applies only to message object stored in sender's state.
- *
+ * A Message object represents an individual message. Messages have parts
+ * which represent pieces of a message, such as a text part or a file part. Once
+ * all the desired parts have been added, a message can be sent with the send()
+ * function.
  * @public
  * @module Message
  * @type {Object}
  */
 
+const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
+
+/**
+ * Base conversation stamp
+ * @param {Array} destination The Destination for messages being sent through
+ * this conversation in this instance of the SDK. This should be an Array with any number of user IDs
+ * @param {string} type='im' The type of the message.
+ * @param {string} id=undefined The unique identifier for base conversation.
+ * @param {string} description='' The description associated with base conversation.
+ * @param {Array} messages=[] An array containing the conversation's messages.
+ * @param {number} lastReceived The timestamp associated with the last received message.
+ * @param {string} lastMessage This is the last received message in a given conversation, as delivered by server.
+ */
+
+// Events
 const conversationBase = {
   initializers: [function ({
     destination,
-    type = _mappings.chatTypes.ONETOONE,
+    type = 'im',
     id = undefined,
     description = '',
     messages = [],
     isTypingList = [],
     lastReceived,
-    lastPull
+    lastPull,
+    lastMessage = ''
   }) {
     this.destination = destination;
     this.type = type;
     this.description = description;
     this.messages = messages;
+    this.lastMessage = lastMessage;
     this.isTypingList = isTypingList;
     this.id = id;
     const features = (0, _selectors.getMessagingConfig)(this.context.getState()).features;
@@ -34486,20 +42398,53 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
+     * @requires richMessaging
+     * @constructs Message
+     * @param {Object} part The part to add to the message.
+     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
+     * @param {string} [part.text] The text of the part. Must be a part of type "text".
+     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
+     * @param {File} [part.file] The file of the part. Must be a part of type "file".
+     * @param {Object} [part.location] The location of the part. Must be a part of type "location".
+     * @param {number} [part.location.longitude] The longitude of the location.
+     * @param {number} [part.location.latitude] The latitude of the location.
+     * @returns {Object} The newly created Message object.
+     *
+     * @example
+     * conversation.createMessage({type: 'text', text: 'This is the message'});
+     */
+    /**
+     * Create and return a message object. You must specify the part. If this is a simple text message, provide a `text` part as demonstrated in the example.
+     *
+     * @public
+     * @memberof Conversation
      * @requires richMessagingWithoutLocation
      * @constructs Message
-     * @param {Part} part The part to add to the message.
+     * @param {Object} part The part to add to the message.
+     * @param {string} part.type The type of part. Can be "text", "json", "file".
+     * @param {string} [part.text] The text of the part. Must be a part of type "text".
+     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
+     * @param {File} [part.file] The file of the part. Must be a part of type "file".
+     * @returns {Message} The newly created Message object.
+     *
+     * @example
+     * conversation.createMessage({type: 'text', text: 'This is the message'});
+     */
+    /**
+     * Create and return a message object. You must provide a `text` part as demonstrated in the example.
+     *
+     * @public
+     * @memberof Conversation
+     * @requires simpleMessagingOnly
+     * @param {Object} part The part to add to the message.
+     * @param {string} part.type The type of part. Must be "text".
+     * @param {string} part.text The text of the part. Must be a part of type "text".
      * @returns {Message} The newly created Message object.
      *
      * @example
      * conversation.createMessage({type: 'text', text: 'This is the message'});
      */
     createMessage(part) {
-      if (typeof part === 'string') {
-        part = { type: 'text', text: part };
-      }
-      let parts = Array.isArray(part) ? part : [part];
-
       const messageContext = {
         features: this.features,
         isGroup: this.destination.length > 1,
@@ -34508,7 +42453,7 @@ const conversationBase = {
       };
       return this.context.primitives.Message({
         destination: this.destination,
-        parts: parts,
+        part,
         context: messageContext,
         type: this.type
       });
@@ -34516,7 +42461,6 @@ const conversationBase = {
 
     /**
      * Clears all messages in this conversation from local state.
-     *
      * @public
      * @memberof Conversation
      * @method clearMessages
@@ -34530,24 +42474,37 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @method getMessages
-     * @return {Array<Message>} An array of messages.
+     * @returns {Object[]} messages An array containing the conversation's messages.
+     * @returns {Function} messages.markRead Marks the message as read.
+     * @returns {Function} messages.forward Forward the message to another user.
+     * @returns {string} messages.messageId The Id of the message.
+     * @returns {string} messages.sender The user Id of the user who sent the message.
+     * @returns {number} messages.timestamp The time at which the message was sent.
+     * @returns {boolean} messages.read Whether the message has been marked as read.
+     * @returns {boolean} messages.isPending Whether the message has finished being sent to the server.
+     * @returns {Array} messages.parts The parts of the message.
      */
     getMessages: function () {
-      const conversation = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
+      const convo = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
 
-      return conversation.messages.map(message => {
-        if (!message.parts) {
-          log.debug('no message parts found on message, skipping message');
-          return;
+      return convo.messages.map(message => {
+        message.forward = participant => {
+          this.context.dispatch(_actions.messageActions.sendMessage(participant, message.parts, Date.now(), this.type, this.id));
+        };
+
+        const userInfo = (0, _selectors2.getUserInfo)(this.context.getState());
+        // Only allow the end user to markRead on message that were incoming.
+        if (message.sender !== userInfo.username) {
+          message.markRead = () => {
+            this.context.dispatch(_actions.messageActions.sendMessageRead(message.messageId, this.destination));
+          };
         }
-        return this.getMessage(message.messageId);
+        return message;
       });
     },
 
     /**
      * Get a specific message from this conversation.
-     *
      * @public
      * @method getMessage
      * @memberof Conversation
@@ -34563,46 +42520,28 @@ const conversationBase = {
         return;
       }
 
-      const { parts, sender, timestamp, isFetchingLinks } = message;
-      const { type, features, destination, id } = this;
-      let mixinMessage = this.context.primitives.Message({
-        parts,
-        sender,
-        timestamp,
-        isFetchingLinks,
-        destination,
-        type,
-        messageId,
-        context: {
-          features,
-          id,
-          type,
-          isGroup: destination.length > 1
-        }
-      });
-
-      // TODO: Have these functions as proper mixin functions, instead of adding them manually afterwards.
-      mixinMessage.forward = participant => {
-        this.context.dispatch(_actions.messageActions.sendMessage(participant, mixinMessage.parts, Date.now(), this.type, this.id));
+      // TODO: Have a helper that "augments" messages.
+      // "Augment" the message like we do in `getMessages`.
+      message.forward = participant => {
+        this.context.dispatch(_actions.messageActions.sendMessage(participant, message.parts, Date.now(), this.type, this.id));
       };
       // Only allow the end user to markRead on message that were incoming.
       const userInfo = (0, _selectors2.getUserInfo)(this.context.getState());
-      if (mixinMessage.sender !== userInfo.username) {
-        // TODO: Have these functions as proper mixin functions, instead of adding them manually afterwards.
-        mixinMessage.markRead = () => {
-          this.context.dispatch(_actions.messageActions.sendMessageRead(mixinMessage.messageId, this.destination));
+      if (message.sender !== userInfo.username) {
+        message.markRead = () => {
+          this.context.dispatch(_actions.messageActions.sendMessageRead(message.messageId, this.destination));
         };
       }
-      return mixinMessage;
+      return message;
     },
 
     /**
      * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
      * @public
      * @memberof Conversation
-     * @requires richMessagingWithoutLocation
+     * @requires richMessaging
      * @method deleteMessages
-     * @param {Array<string>} messageIds An array of message IDs
+     * @param {Array} messageIds An array of message IDs
      */
     deleteMessages: function (messageIds = []) {
       if (messageIds.length === 0) {
@@ -34619,7 +42558,7 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @requires richMessagingWithoutLocation
+     * @requires richMessaging
      * @method delete
      */
     delete: function () {
@@ -34683,70 +42622,27 @@ const conversationBase = {
       this.context.dispatch(_actions.messageActions.fetchMessages(this.destination, amount, this.type));
     }
   }
-  /*
-   * Conversation is Typing. Responsible for updating the state of who is idling or actively typing
-   */
-};const conversationIsTyping = {
-  initializers: [function () {
-    const features = (0, _selectors.getMessagingConfig)(this.context.getState()).features;
-    if (!(0, _fp.includes)('isTyping', features)) {
-      const prototype = (0, _getPrototypeOf2.default)(this);
-      delete prototype.setIsTyping;
-    }
-    return this;
-  }],
-  methods: {
-    /**
-     * Sets the typing status of the conversation for the current user.
-     * Other participants will be notified of changes to the conversation's typing status.
-     * See the isTypingList:change event.
-     *
-     * @public
-     * @requires isTyping
-     * @memberof Conversation
-     * @method setIsTyping
-     * @param {boolean} isTyping Whether the user is typing or not
-     */
-    setIsTyping: function (isTyping) {
-      const typingState = isTyping ? 'active' : 'idle';
-      this.context.dispatch(_actions.convoActions.setIsTyping({ state: typingState, destination: this.destination, type: this.type }));
-    }
-  }
 
   /*
-   * Base Message stamp
+   * base Message stamp
    * @param {string} destination The Destination for messages being sent through
    * this conversation in this instance of the SDK. This can be one or many users,
    * separated by commas `,`
-   * @param  {Object} parts - Initial part to the message.
+   * @param  {Object} part - Initial part to the message.
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
    * @param  {Array} context.features - List of features the conversation supports.
    * @param  {Function} context.send - Function for sending the message.
-   * @param  {number} timestamp unix timestamp in seconds
-   * @param  {boolean} isFetchingLinks
-   * @param  {string} sender The author of the message
-   * @param  {string} messageId a unique id for looking up the message
-   * @param  {string} [type='chat-oneToOne'] - The type of the message
+   * @param  {string} type=im - The type of the message
    */
 };const messageBase = {
-  initializers: [function ({
-    destination,
-    parts,
-    context,
-    timestamp,
-    isFetchingLinks,
-    sender,
-    messageId,
-    type = _mappings.chatTypes.ONETOONE
-  }) {
+  initializers: [function ({ destination, part, context, type = 'im' }) {
     this.destination = Array.isArray(destination) ? destination : [destination];
     this.convoContext = context;
-    this.type = type;
-    this.messageId = messageId;
-    this.sender = sender;
-    this.timestamp = timestamp;
-    this.isFetchingLinks = isFetchingLinks;
-    this.parts = parts;
+    this.type = destination.length > 1 ? 'group' : type;
+    if (typeof part === 'string') {
+      part = { type: 'text', text: part };
+    }
+    this.parts = [part];
   }],
   methods: {
     /**
@@ -34754,12 +42650,11 @@ const conversationBase = {
      *
      * @public
      * @method send
-     * @memberof MessageSender
+     * @memberof Message
      */
     send() {
       log.debug('Send message', this);
-      const dateInSeconds = Date.now() / 1000 | 0;
-      this.context.dispatch(_actions.messageActions.sendMessage(this.destination, this.parts, dateInSeconds, this.type, this.convoContext.id));
+      this.context.dispatch(_actions.messageActions.sendMessage(this.destination, this.parts, Date.now(), this.type, this.convoContext.id));
     }
   }
 
@@ -34782,9 +42677,29 @@ const conversationBase = {
      * Add an additional part to a message.
      *
      * @public
-     * @memberof MessageSender
+     * @memberof Message
+     * @requires richMessaging
+     * @memberof withParts
+     * @param {Object} part The part to add to the message.
+     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
+     * @param {string} [part.text] The text of the part. Must be a part of type "text".
+     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
+     * @param {File} [part.file] The file of the part. Must be a part of type "file".
+     * @param {Object} [part.location] The location of the part. Must be a part of type "location".
+     * @param {number} [part.location.longitude] The longitude of the location.
+     * @param {number} [part.location.latitude] The latitude of the location.
+     */
+    /**
+     * Add an additional part to a message.
+     *
+     * @public
+     * @memberof Message
      * @requires richMessagingWithoutLocation
-     * @param {Part} part The part to add to the message.
+     * @param {Object} part The part to add to the message.
+     * @param {string} part.type The type of part. Can be "text", "json", "file", or "location".
+     * @param {string} [part.text] The text of the part. Must be a part of type "text".
+     * @param {Object} [part.json] The json of the part. Must be a part of type "json".
+     * @param {File} [part.file] The file of the part. Must be a part of type "file".
      */
     addPart(part) {
       // Validate the part. If not valid, returns an error.
@@ -34796,68 +42711,44 @@ const conversationBase = {
     }
   }
 
-  /**
-   * stamp to allow creation of multimedia links
-   * @name multimediaLinks
-   * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
-   */
-};const multimediaLinks = {
-  initializers: [function ({ context: { features = [] } }) {
-    if (!(0, _fp.includes)('rich', features)) {
-      const prototype = (0, _getPrototypeOf2.default)(this);
-      delete prototype.createImageLinks;
-    }
-    return this;
-  }],
-  methods: {
-    /**
-     * Creates a usable link for the given message
-     *
-     * @public
-     * @memberof MessageSender
-     * @requires richMessagingWithoutLocation
-     */
-    createImageLinks() {
-      const { parts, destination, type, messageId } = this;
-      this.context.dispatch(_actions.messageActions.getImageLinks({ parts, destination, type, messageId }));
-    }
-  }
-
   /*
    * A helper function to validate inputs. Will be progressively updated as we
    * allow for more and more input types.
    */
 };let validatePart = function (part, features) {
   if (part.hasOwnProperty('type')) {
-    let validTypeFlag = false;
-    switch (part.type) {
-      case 'text':
-        validTypeFlag = true;
-        break;
-      case 'file':
-        validTypeFlag = features.indexOf('rich') !== -1;
-        break;
-      case 'location':
-        validTypeFlag = features.indexOf('rich') !== -1;
-        break;
-      case 'json':
-        validTypeFlag = features.indexOf('rich') !== -1;
+    if (part.hasOwnProperty(part.type)) {
+      let validTypeFlag = false;
+      switch (part.type) {
+        case 'text':
+          validTypeFlag = true;
+          break;
+        case 'file':
+          validTypeFlag = features.indexOf('rich') !== -1;
+          break;
+        case 'location':
+          validTypeFlag = features.indexOf('rich') !== -1;
+          break;
+        case 'json':
+          validTypeFlag = features.indexOf('rich') !== -1;
+      }
+      return validTypeFlag || new Error(`Part of type "${part.type}" is not supported`);
+    } else {
+      return new Error('A message part must have a payload corresponding with its declared type');
     }
-    return validTypeFlag || new Error(`Part of type "${part.type}" is not supported`);
   } else {
     return new Error('A message part must have a type. Options are: [text, file, location, json]');
   }
 };
 
 exports.default = {
-  Conversation: (0, _compose2.default)(conversationBase, conversationHistory, conversationIsTyping),
-  Message: (0, _compose2.default)(messageBase, withParts, multimediaLinks)
+  Conversation: (0, _compose2.default)(conversationBase, conversationHistory),
+  Message: (0, _compose2.default)(messageBase, withParts)
 };
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/reducers.js":
+/***/ "../kandy/src/messaging/interface/reducers.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34871,7 +42762,7 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/messaging/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -35012,8 +42903,7 @@ reducers[actionTypes.MESSAGE_RECEIVED] = {
           destination: action.payload.destination,
           messages: [action.payload.message],
           type: action.meta.type,
-          lastReceived: action.payload.message.timestamp,
-          isTypingList: []
+          lastReceived: action.payload.message.timestamp
         }]
       });
     } else {
@@ -35094,108 +42984,6 @@ reducers[actionTypes.DELETE_CONVERSATION_FINISH] = {
   }
 };
 
-reducers[actionTypes.RECEIVE_DELIVERY_RECEIPT] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      conversations: state.conversations.map(conversation => {
-        if ((0, _fp.isEqual)(conversation.destination, action.payload.destination) && conversation.type === action.payload.type) {
-          return (0, _extends3.default)({}, conversation, {
-            messages: conversation.messages.map(message => {
-              if (message.messageId === action.payload.messageId) {
-                return (0, _extends3.default)({}, message, {
-                  deliveryStatus: action.payload.deliveryStatus
-                });
-              }
-              return message;
-            })
-          });
-        }
-        return conversation;
-      })
-    });
-  }
-};
-
-reducers[actionTypes.SET_IS_TYPING_FINISHED] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      conversations: state.conversations.map(conversation => {
-        if ((0, _fp.isEqual)(conversation.destination, action.payload.destination) && conversation.type === action.payload.type) {
-          let isTypingList = [...conversation.isTypingList];
-          if (action.payload.state === 'active') {
-            if (!conversation.isTypingList.includes(action.payload.senderAddress)) {
-              isTypingList = conversation.isTypingList.concat([action.payload.senderAddress]);
-            }
-          } else if (action.payload.state === 'idle') {
-            if (conversation.isTypingList.includes(action.payload.senderAddress)) {
-              isTypingList = conversation.isTypingList.filter(username => action.payload.senderAddress !== username);
-            }
-          }
-          return (0, _extends3.default)({}, conversation, {
-            isTypingList
-          });
-        }
-        return conversation;
-      })
-    });
-  }
-};
-
-reducers[actionTypes.GET_IMAGE_LINKS] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      conversations: state.conversations.map(conversation => {
-        if ((0, _fp.isEqual)(conversation.destination, action.payload.destination) && conversation.type === action.payload.type) {
-          return (0, _extends3.default)({}, conversation, {
-            messages: conversation.messages.map(message => {
-              // iterate over messages find ours using messageId
-              if ((0, _fp.isEqual)(message.messageId, action.payload.messageId)) {
-                return (0, _extends3.default)({}, message, {
-                  isFetchingLinks: true
-                });
-              }
-              return message;
-            })
-          });
-        }
-        return conversation;
-      })
-    });
-  }
-};
-
-reducers[actionTypes.GET_IMAGE_LINKS_FINISH] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      conversations: state.conversations.map(conversation => {
-        if ((0, _fp.isEqual)(conversation.destination, action.payload.destination) && conversation.type === action.payload.type) {
-          return (0, _extends3.default)({}, conversation, {
-            messages: conversation.messages.map(message => {
-              // iterate over messages find ours using messageId
-              if ((0, _fp.isEqual)(message.messageId, action.payload.messageId)) {
-                return (0, _extends3.default)({}, message, {
-                  isFetchingLinks: false,
-                  parts: message.parts.map(part => {
-                    // iterate over message parts and find ours using oldURL
-                    if ((0, _fp.isEqual)(part.rawURL, action.payload.rawURL)) {
-                      return (0, _extends3.default)({}, part, {
-                        url: action.payload.url
-                      });
-                    }
-                    return part;
-                  })
-                });
-              }
-              return message;
-            })
-          });
-        }
-        return conversation;
-      })
-    });
-  }
-};
-
 /*
  * Combine all of reducers into a single reducer, with
  *      a default state of an empty array.
@@ -35241,7 +43029,7 @@ function sendMessageFinishHelper(message, action) {
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/interface/selectors.js":
+/***/ "../kandy/src/messaging/interface/selectors.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35257,8 +43045,6 @@ exports.findConversation = findConversation;
 exports.findMember = findMember;
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 
 /*
  * Redux-saga selector functions.
@@ -35301,10 +43087,10 @@ function getMessages(state, conversationId) {
  * @param state
  * @param {Array} destination A subscriber handle or a comma-separated list
  * of subscriber handles
- * @param {string} type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
+ * @param {string} type The type of conversation: can be one of 'im', 'sms' or 'group'
  * @returns {Object}
  */
-function findConversation(state, destination, type = _mappings.chatTypes.ONETOONE) {
+function findConversation(state, destination, type = 'im') {
   return (0, _fp.cloneDeep)(state.messaging.conversations.find(conversation => {
     return (0, _fp.isEqual)(conversation.destination, destination) && conversation.type === type;
   }));
@@ -35328,7 +43114,74 @@ function findMember(state, destination, id) {
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/requests.js":
+/***/ "../kandy/src/messaging/uc/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = ucMessaging;
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _events = __webpack_require__("../kandy/src/messaging/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _sagas = __webpack_require__("../kandy/src/messaging/uc/sagas.js");
+
+var _interface = __webpack_require__("../kandy/src/messaging/interface/index.js");
+
+var _interface2 = _interopRequireDefault(_interface);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Sagas
+
+// Config
+
+// Events
+function ucMessaging(options = {}) {
+  const defaultOptions = {
+    features: ['base', 'parts', 'rich', 'history', 'group']
+  };
+  options = (0, _fp.defaults)(defaultOptions, options);
+
+  function* init() {
+    yield (0, _effects.put)((0, _actions2.update)(options, _interface2.default.name));
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+  }
+
+  const capabilities = ['richMessagingWithoutLocation', 'conversationHistory', 'multiUserConversation', 'fetchConversations'];
+
+  return {
+    sagas: [_sagas.send, _sagas.fetchConversations, _sagas.fetchMessages, _sagas.receiveMessage, _sagas.deleteMessage, _sagas.deleteConversation],
+    capabilities,
+    init,
+    api: _interface2.default.api,
+    name: _interface2.default.name,
+    reducer: _interface2.default.reducer,
+    mixins: _interface2.default.mixins
+  };
+}
+
+// The interface to implement.
+
+// Helpers
+// Redux-Saga
+
+/***/ }),
+
+/***/ "../kandy/src/messaging/uc/sagas.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35338,28 +43191,32 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
 
 var _stringify2 = _interopRequireDefault(_stringify);
 
-exports.setIsTypingRequest = setIsTypingRequest;
-exports.uploadFile = uploadFile;
-exports.sendChatMessageRequest = sendChatMessageRequest;
-exports.sendGroupChatMessageRequest = sendGroupChatMessageRequest;
-exports.chatSubscribe = chatSubscribe;
-exports.chatUnsubscribe = chatUnsubscribe;
-exports.sendSMSRequest = sendSMSRequest;
-exports.smsInboundSubscribe = smsInboundSubscribe;
-exports.smsInboundUnsubscribe = smsInboundUnsubscribe;
-exports.smsOutboundSubscribe = smsOutboundSubscribe;
-exports.smsOutboundUnsubscribe = smsOutboundUnsubscribe;
-exports.fetchConversationsRequest = fetchConversationsRequest;
-exports.chatFetchMessages = chatFetchMessages;
-exports.fetchImageLinks = fetchImageLinks;
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.send = send;
+exports.receiveMessage = receiveMessage;
+exports.fetchMessages = fetchMessages;
+exports.fetchConversations = fetchConversations;
+exports.deleteConversation = deleteConversation;
+exports.deleteMessage = deleteMessage;
+
+var _actionTypes = __webpack_require__("../kandy/src/messaging/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actions = __webpack_require__("../kandy/src/messaging/interface/actions/index.js");
+
+var _selectors = __webpack_require__("../kandy/src/messaging/interface/selectors.js");
+
+var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
 
 var _effects = __webpack_require__("../kandy/src/request/effects.js");
 
@@ -35369,1278 +43226,669 @@ var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Maps values from a nested object structure to a single object for easy use
- * assumes that each object in the list has a name and value property
- * @method _marshalData
- * @param {Array<Object>} attributes an list of objects with attributes
- * @return {Object} a remapped object that is easier to work with
- */
-
-
-// Libraries.
-function _marshalData(attributes) {
-  return attributes.reduce((accum, current, index) => {
-    accum[current.name] = attributes[index].value;
-    return accum;
-  }, {});
-}
-
-/**
- * Makes a REST request to notify other users that the user is typing
- * @method setIsTypingRequest
- * @param {Object} requestInfo
- * @param {string} destination to send the notification to
- * @param {string} state (idle/active) the state of the user typing
- * @param {string} type The type of conversation. Can be one of "chat", "sms" or "group"
- * @param {string} [refresh='60'] a string integer representing in seconds how long before the server refreshes the state
- * @returns {Object}
- */
-// Helpers.
-function* setIsTypingRequest(requestInfo, destination, state, type, refresh = '60') {
-  let url;
-  if (type === _mappings.chatTypes.ONETOONE) {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
-  } else if (type === _mappings.chatTypes.GROUP) {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination[0]}/messages`;
-  }
-  const requestOptions = {
-    url: url,
-    method: 'POST',
-    body: (0, _stringify2.default)({
-      isComposing: {
-        contenttype: 'text/plain',
-        refresh: refresh,
-        state: state,
-        lastactive: Date.now()
-      }
-    })
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SET_IS_TYPING_FAIL,
-        message: 'setIsTypingRequest has failed'
-      })
-    };
-  } else {
-    return (0, _extends3.default)({}, response.payload.body.isComposing, {
-      error: false
-    });
-  }
-}
-
-/**
- * Makes a REST request to a file upload API, storing images for use later
- * @method uploadFile
- * @param {Object} requestInfo data used to make the request
- * @param {Object} file contains file data to be uploaded
- */
-function* uploadFile(requestInfo, file) {
-  const formData = new FormData();
-  const reqInfo = (0, _fp.cloneDeep)(requestInfo);
-
-  const placeholderData = {
-    object: {
-      attributes: { attribute: [] },
-      flags: { flag: [] }
-    }
-  };
-  formData.append('root-fields', (0, _stringify2.default)(placeholderData));
-  formData.append('raw', file, file.name);
-  const requestOptions = {
-    url: `${reqInfo.baseURL}/cpaas/nms/v1/chat/${reqInfo.username}/objects`,
-    body: formData,
-    method: 'POST'
-
-    // FormData autopopulates Content-Type with a unique Boundry
-    // we need to make sure that don't have one when we make the request
-    // request merges requestInfo and request options so delete it
-  };delete reqInfo.options.headers['Content-Type']; // Needed to prevent request helper from assuming request is application/json
-  const response = yield (0, _effects2.default)(requestOptions, reqInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.FILE_UPLOAD_FAIL,
-        message: 'Failed to upload file'
-      })
-    };
-  } else {
-    const responseData = _marshalData(response.payload.body.object.attributes.attribute);
-    return {
-      attachment: responseData,
-      error: false
-    };
-  }
-}
-
-/**
- * Used to send Simple Chat messages
- * sends a chat message to another user (can include attachments)
- * @method sendChatMessageRequest
- * @param {Object} requestInfo
- * @param {Object} payload
- * @param {Object} payload.destination a target destination for the message
- * @param {Object} payload.textParts text parts of the message
- * @param {Object} payload.fileParts parts of the message required for sending files
- * @returns {Object}
- */
-function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts) {
-  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
-
-  const requestOptions = {
-    method: 'POST',
-    url: url,
-    body: (0, _stringify2.default)({
-      chatMessage: {
-        text: textParts,
-        attachment: fileParts
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    // Request error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.error);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
-    };
-  } else {
-    // Success scenario.
-    return (0, _extends3.default)({}, response.payload.body.chatMessage, {
-      error: false
-    });
-  }
-}
-
-/**
- * Used to send Group Chat messages
- * sends a chat message to another user (can include attachments)
- * @method sendGroupChatMessageRequest
- * @param {Object} requestInfo
- * @param {Object} payload
- * @param {Object} payload.destination a target destination for the message
- * @param {Object} payload.textParts text parts of the message
- * @param {Object} payload.fileParts parts of the message required for sending files
- * @returns {Object}
- */
-function* sendGroupChatMessageRequest(requestInfo, destination, textParts, fileParts) {
-  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${destination}/messages`;
-
-  const requestOptions = {
-    method: 'POST',
-    url: url,
-    body: (0, _stringify2.default)({
-      chatMessage: {
-        text: textParts,
-        attachment: fileParts
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    // Request error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.error);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
-    };
-  } else {
-    // Success scenario.
-    return (0, _extends3.default)({}, response.payload.body.chatMessage, {
-      error: false
-    });
-  }
-}
-
-/**
- * Performs a REST request for a chat subscription.
- * @method chatSubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} channel
- * @return {Object}
- */
-function* chatSubscribe(requestInfo, channel) {
-  const requestOptions = {};
-  requestOptions.method = 'POST';
-  requestOptions.url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/subscriptions`;
-
-  requestOptions.body = (0, _stringify2.default)({
-    chatNotificationSubscription: {
-      callbackReference: {
-        notifyURL: channel.callbackURL
-      },
-      clientCorrelator: requestInfo.clientCorrelator
-    }
-  });
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to subscribe for chat notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false,
-      subscription: response.payload.body.chatNotificationSubscription
-    };
-  }
-}
-
-/**
- * Performs a REST request for a chat unsubscription.
- * @method chatUnsubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} subInfo Info about the subscription being ..unsubscribed.
- * @return {Object}
- */
-function* chatUnsubscribe(requestInfo, subInfo) {
-  const requestOptions = {};
-  requestOptions.method = 'DELETE';
-
-  requestOptions.url = `${requestInfo.baseURL}/cpaas/` + `chat/${requestInfo.version}/${requestInfo.username}/` + `subscriptions/${subInfo.subscriptionId}`;
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to unsubscribe from chat notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_UNSUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * Makes a REST request to the 'Send SMS' CPaaS endpoint.
- * @method sendSMSRequest
- * @param  {Object} connection Information needed for the request.
- * @param  {Object} payload Information needed for the SMS.
- * @return {Object} Formatted response object.
- */
-function* sendSMSRequest(requestInfo, destination, message) {
-  let requestOptions = {};
-  requestOptions.method = 'POST';
-
-  requestOptions.url = `${requestInfo.baseURL}` + `/cpaas/smsmessaging/v1/${requestInfo.username}` + `/outbound/${requestInfo.senderAddress}/requests`;
-
-  requestOptions.body = (0, _stringify2.default)({
-    outboundSMSMessageRequest: {
-      address: [destination],
-      clientCorrelator: requestInfo.clientCorrelator,
-      outboundSMSTextMessage: {
-        message: message
-      }
-    }
-  });
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    // Request error.
-    _loglevel2.default.debug('Failed to send SMS message.', response.error);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send SMS message.'
-      })
-    };
-  } else if (response.payload.error) {
-    // Server error.
-    _loglevel2.default.debug('Failed to send SMS message.', response.payload.error);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send SMS message.'
-      })
-    };
-  } else {
-    // Success scenario.
-    return (0, _extends3.default)({}, response.payload.body.outboundSMSMessageRequest, {
-      error: false
-    });
-  }
-}
-
-/**
- * Performs a REST request for inbound SMS subscription.
- * @method smsInboundSubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} channelInfo
- * @return {Object}
- */
-function* smsInboundSubscribe(requestInfo, channelInfo) {
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `inbound/subscriptions`,
-    body: (0, _stringify2.default)({
-      subscription: {
-        callbackReference: {
-          notifyURL: channelInfo.callbackURL
-        },
-        clientCorrelator: requestInfo.clientCorrelator,
-
-        // TODO: Shouldn't this be sender address?
-        destinationAddress: requestInfo.destinationAddress
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to subscribe for inbound SMS notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false,
-      subscription: response.payload.body.subscription
-    };
-  }
-}
-
-/**
- * Performs a REST request for a inbound SMS unsubscription.
- * @method smsInboundUnsubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} subInfo Info about the subscription being ..unsubscribed.
- * @return {Object}
- */
-function* smsInboundUnsubscribe(requestInfo, subInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `inbound/subscriptions/${subInfo.subscriptionId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to unsubscribe from inbound SMS notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_UNSUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * Performs a REST request for outbound SMS subscription.
- * @method smsOutboundSubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} channelInfo
- * @return {Object}
- */
-function* smsOutboundSubscribe(requestInfo, channelInfo) {
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `outbound/${requestInfo.username}/subscriptions`,
-    body: (0, _stringify2.default)({
-      deliveryReceiptSubscription: {
-        callbackReference: {
-          notifyURL: channelInfo.callbackURL
-        },
-        clientCorrelator: requestInfo.clientCorrelator
-      }
-    })
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to subscribe for outbound SMS notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false,
-      subscription: response.payload.body.deliveryReceiptSubscription
-    };
-  }
-}
-
-/**
- * Performs a REST request for a outbound SMS unsubscription.
- * @method smsOutboundUnsubscribe
- * @param  {Object} requestInfo Info needed to perform the request.
- * @param  {Object} subInfo Info about the subscription being ..unsubscribed.
- * @return {Object}
- */
-function* smsOutboundUnsubscribe(requestInfo, subInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `outbound/${requestInfo.username}/subscriptions/${subInfo.subscriptionId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to unsubscribe from outbound SMS notifications.',
-        code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-      })
-    };
-  } else {
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * Performs a REST request to fetch a list of chat sessions
- * @method fetchConversationsRequest
- * @param {Object} requestInfo
- * @return {Object} a list of chat sessions
- */
-
-function* fetchConversationsRequest(requestInfo, type) {
-  let url;
-  if (type === _mappings.chatTypes.GROUP) {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/sessions`;
-  } else if (type === _mappings.chatTypes.ONETOONE) {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/sessions`;
-  } else {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/sessions`;
-  }
-  const requestOptions = {
-    method: 'GET',
-    url: url
-  };
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to fetch conversations.',
-        code: _errors.messagingCodes.FETCH_CONVERSATIONS_FAIL
-      })
-    };
-  } else {
-    // return a list of conversations
-    return {
-      chatSession: response.payload.body.chatSessionList.chatSession,
-      error: false
-    };
-  }
-}
-
-/**
- * Performs a REST request to fetch a list of messages for a particular conversation
- * @method chatFetchMessages
- * @param {Object} requestInfo
- * @param {Object} destination a target to send the message to
- * @return {Object}
- */
-function* chatFetchMessages(requestInfo, destination) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to fetch chat messages.',
-        code: _errors.subscriptionCodes.FETCH_MESSAGES_FAIL
-      })
-    };
-  } else {
-    return (0, _extends3.default)({}, response.payload.body.chatMessageList, {
-      error: false
-    });
-  }
-}
-
-/**
- * Used to fetch links for images with authentication,
- * url is passed as a parameter because it is a unique url
- * returned via the uploadFile API
- * @method fetchImageLinks
- * @param {Object} requestInfo
- * @param {string} url where we get the image blob
- * @return {Object}
- */
-function* fetchImageLinks(requestInfo, url) {
-  const response = yield (0, _effects2.default)({ url, method: 'GET', responseType: 'blob' }, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: new _errors2.default({
-        message: 'Failed to fetch image link.',
-        code: _errors.messagingCodes.FETCH_IMAGE_LINKS_FAIL
-      })
-    };
-  } else {
-    return {
-      blob: response.payload.body,
-      error: false
-    };
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/messaging/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.registerChat = registerChat;
-exports.registerInboundSMS = registerInboundSMS;
-exports.registerOutboundSMS = registerOutboundSMS;
-exports.sendChatMessage = sendChatMessage;
-exports.receiveChatMessageNotification = receiveChatMessageNotification;
-exports.sendSMS = sendSMS;
-exports.receiveSMS = receiveSMS;
-exports.receiveDeliveryReceipt = receiveDeliveryReceipt;
-exports.fetchConversations = fetchConversations;
-exports.fetchChatMessages = fetchChatMessages;
-exports.setIsTyping = setIsTyping;
-exports.receiveIsTypingNotification = receiveIsTypingNotification;
-exports.getImageLinks = getImageLinks;
-
-var _messaging = __webpack_require__("../kandy/src/messaging/cpaas/sagas/messaging.js");
-
-var messagingSagas = _interopRequireWildcard(_messaging);
-
-var _subscriptions = __webpack_require__("../kandy/src/messaging/cpaas/sagas/subscriptions.js");
-
-var subsSagas = _interopRequireWildcard(_subscriptions);
-
-var _actionTypes = __webpack_require__("../kandy/src/messaging/cpaas/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
 
 var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects = __webpack_require__("../kandy/src/subscription/interface/effects.js");
-
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
-
-var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * Register For Services
- */
-
-/**
- * Saga to register the chat service with the subscription plugin.
- * Runs immediately.
- * @method registerChat
- */
-
-
-// Libraries.
-function* registerChat() {
-  yield (0, _effects.registerService)('chat', subsSagas.chatSubscription, subsSagas.chatUnsubscription);
-}
-
-/**
- * Saga to register the SMS service with the subscription plugin.
- * Runs immediately.
- * @method registerInboundSMS
- */
-function* registerInboundSMS() {
-  yield (0, _effects.registerService)('smsinbound', subsSagas.smsInboundSubscription, subsSagas.smsInboundUnsubscription);
-}
-
-/**
- * Saga to register the SMS service with the subscription plugin.
- * Runs immediately.
- * @method registerOutboundSMS
- */
-function* registerOutboundSMS() {
-  yield (0, _effects.registerService)('smsoutbound', subsSagas.smsOutboundSubscription, subsSagas.smsOutboundUnsubscription);
-}
-
-/**
- * Chat Operations
- */
-
-/**
- * Send an outgoing Simple Chat Message
- * @method sendChatMessage
- */
-function* sendChatMessage() {
-  function sendChatPattern(action) {
-    return action.type === actionTypes.SEND_MESSAGE && (action.payload.message.type === _mappings.chatTypes.ONETOONE || action.payload.message.type === _mappings.chatTypes.GROUP);
-  }
-
-  yield (0, _effects2.takeEvery)(sendChatPattern, messagingSagas.sendChatMessage);
-}
-
-/**
- * Handle an incoming Simple Chat Message
- * @method receiveChatMessage
- */
-function* receiveChatMessageNotification() {
-  function incomingChatMessagePattern(action) {
-    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.chatMessageNotification && action.payload.chatMessageNotification.chatMessage && action.payload.chatMessageNotification.chatMessage['x-type'] === 'inbound';
-  }
-
-  yield (0, _effects2.takeEvery)(incomingChatMessagePattern, messagingSagas.handleChatMessageNotification);
-}
-
-/**
- * SMS Operations
- */
-
-/**
- * Waits for SMS send message actions and triggers sendSMS saga
- * @method sendSMS
- */
-function* sendSMS() {
-  function sendSMSPattern(action) {
-    return action.type === actionTypes.SEND_MESSAGE && action.payload.message.type === _mappings.chatTypes.SMS;
-  }
-
-  yield (0, _effects2.takeEvery)(sendSMSPattern, messagingSagas.sendSMS);
-}
-
-/**
- * Waits for incoming SMS notification actions and triggers handleIncomingSMS saga
- * @method receiveSMS
- */
-function* receiveSMS() {
-  // Redux-saga take() pattern.
-  function incomingSMSPattern(action) {
-    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.inboundSMSMessageNotification;
-  }
-
-  yield (0, _effects2.takeEvery)(incomingSMSPattern, messagingSagas.handleIncomingSMS);
-}
-
-/**
- * Waits for delivery receipts notification actions and triggers handleDeliveryReceipts saga
- * @method receiveDeliveryReceipt
- */
-function* receiveDeliveryReceipt() {
-  function deliveryReceiptPattern(action) {
-    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.meta.platform === _constants.platforms.CPAAS && (0, _fp.has)('payload.deliveryInfoNotification.deliveryInfo.deliveryStatus', action);
-  }
-
-  yield (0, _effects2.takeEvery)(deliveryReceiptPattern, messagingSagas.handleDeliveryReceipts);
-}
-
-/**
- * Waits for fetch conversation actions and triggers fetchChatConversations saga
- * @method fetchChatConversations
- */
-function* fetchConversations() {
-  function fetchConversationPattern(action) {
-    return action.type === actionTypes.FETCH_CONVERSATIONS;
-  }
-  yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchConversations);
-}
-
-/**
- * Waits for fetch message actions and triggers fetchChatMessages saga
- * @method fetchChatMessages
- */
-function* fetchChatMessages() {
-  function fetchConversationPattern(action) {
-    return action.type === actionTypes.FETCH_MESSAGES;
-  }
-  yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchChatMessages);
-}
-
-/**
- * Waits for isTyping notifications and triggers up[dateIsTyping saga
- * @method setIsTyping
- */
-function* setIsTyping() {
-  function isTypingPattern(action) {
-    return action.type === actionTypes.SET_IS_TYPING;
-  }
-  yield (0, _effects2.takeEvery)(isTypingPattern, messagingSagas.setIsTyping);
-}
-
-/**
- * Waits for isTyping notifications and triggers up[dateIsTyping saga
- * @method receiveIsTypingNotification
- */
-function* receiveIsTypingNotification() {
-  function isTypingPattern(action) {
-    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && (0, _fp.has)('payload.chatMessageNotification.isComposing', action) && (0, _fp.get)('payload.chatMessageNotification.isComposing["x-type"]', action) === 'inbound';
-  }
-  yield (0, _effects2.takeEvery)(isTypingPattern, messagingSagas.receiveIsTypingNotification);
-}
-
-/**
- * Waits for get image links notifications and triggers getImageLinks saga
- * @method getImageLinks
- */
-function* getImageLinks() {
-  function getImageLinksPattern(action) {
-    return action.type === actionTypes.GET_IMAGE_LINKS;
-  }
-  yield (0, _effects2.takeEvery)(getImageLinksPattern, messagingSagas.getImageLinks);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/messaging/cpaas/sagas/messaging.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.receiveIsTypingNotification = receiveIsTypingNotification;
-exports.setIsTyping = setIsTyping;
-exports.sendChatMessage = sendChatMessage;
-exports.handleChatMessageNotification = handleChatMessageNotification;
-exports.handleDeliveryReceipts = handleDeliveryReceipts;
-exports.sendSMS = sendSMS;
-exports.handleIncomingSMS = handleIncomingSMS;
-exports.fetchConversations = fetchConversations;
-exports.fetchChatMessages = fetchChatMessages;
-exports.getImageLinks = getImageLinks;
-
-var _actions = __webpack_require__("../kandy/src/messaging/cpaas/interface/actions/index.js");
-
-var _requests = __webpack_require__("../kandy/src/messaging/cpaas/requests.js");
-
-var _selectors = __webpack_require__("../kandy/src/messaging/cpaas/interface/selectors.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Logging
-
-
 // Other plugins.
-const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
+const platform = _constants.platforms.UC;
 
-/**
- * Handles isTypingNotifications and sets isTypingList in redux state
- * @method receiveIsTypingNotification
- * @param {Object} action
- */
+// Constants
 
 
 // Libraries.
 // Messaging plugin.
-function* receiveIsTypingNotification(action) {
-  const {
-    state,
-    senderAddress,
-    'x-destinationAddress': destinationAddress
-  } = action.payload.chatMessageNotification.isComposing;
 
-  // use helper function to get sessionType from notifications
-  const sessionType = getNotificationType(action.payload.chatMessageNotification, 'chatSession');
-  if (sessionType !== _mappings.chatTypes.GROUP && sessionType !== _mappings.chatTypes.ONETOONE) {
-    yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
-      error: new _errors2.default({
-        message: `Invalid chat type. Type must be ${_mappings.chatTypes.GROUP} or ${_mappings.chatTypes.ONETOONE}.`,
-        code: _errors.messagingCodes.SET_IS_TYPING_FAIL
-      })
-    }));
-  }
-  // For group chat, we need to use the destinationAddress (groupId)
-  const destination = sessionType === _mappings.chatTypes.ONETOONE ? senderAddress : destinationAddress;
-
-  yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
-    state,
-    senderAddress: senderAddress,
-    destination: [destination],
-    type: sessionType
-  }));
-}
+const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
- * Sets the typing status of the current user in redux state
- * @method setIsTyping
- * @param {Object} action
+ * UC send message saga.
+ * Performs the workflow of forming a CIM readable message URL and sending the message.
+ * @method send
  */
-function* setIsTyping(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const type = action.payload.type;
-  const response = yield (0, _effects.call)(_requests.setIsTypingRequest, requestInfo, action.payload.destination, action.payload.state, type);
-  const { state, senderAddress, 'x-destinationAddress': destination, error } = response;
+function* send() {
+  const sendMessageChannel = yield (0, _effects3.actionChannel)(actionTypes.SEND_MESSAGE);
+  while (true) {
+    const action = yield (0, _effects3.take)(sendMessageChannel);
+    const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+    const { protocol, server, version, port } = config.server;
+    const { destination, id } = action.payload;
+    const isGroup = destination.length > 1;
+    const userInfo = yield (0, _effects3.select)(_selectors2.getUserInfo);
+    const message = action.payload.message;
+    const type = message.type;
 
-  if (error) {
-    yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
-      error: error
-    }));
-  } else {
-    yield (0, _effects.put)(_actions.convoActions.setIsTypingFinished({
-      state,
-      senderAddress: senderAddress,
-      destination: [destination],
+    let url = `${protocol}://${server}:${port}/${version}/rm/send`;
+
+    let queryParams = {};
+    if (isGroup) {
+      queryParams['tos'] = destination;
+    } else {
+      queryParams['to'] = destination;
+    }
+    const parts = message.parts;
+    // CIM's send endpoint allows a text and file param in the URL.
+    // It allows multiple attachment params.
+    let usedParts = {};
+    let attachments = [];
+    for (let part of parts) {
+      if (part.type === 'text' && !usedParts.text && part.text) {
+        usedParts.text = (0, _extends3.default)({}, part);
+        queryParams['txt'] = part.text;
+      } else if (part.type === 'file' && part.file) {
+        usedParts.file = (0, _extends3.default)({}, part);
+        const upload = yield (0, _effects3.call)(uploadFile, part.file);
+        if (!upload.error && !upload.payload.body.error) {
+          attachments.push(upload.payload.body.success.handle);
+        }
+      } else if (part.type === 'json' && part.json) {
+        // Ensure json is stringified for sending.
+        let jsonObject = tryParseJSON(part.json);
+        let jsonString = '';
+        if (jsonObject) {
+          // The input part was a JSON string
+          jsonString = part.json;
+          part.json = jsonObject;
+        } else {
+          // The input part was an Object.
+          jsonString = (0, _stringify2.default)(part.json);
+        }
+        usedParts.json = (0, _extends3.default)({}, part);
+        const jsonBlob = new Blob([jsonString], {
+          type: 'application/vdn.kandy.json'
+        });
+        const upload = yield (0, _effects3.call)(uploadFile, jsonBlob);
+        if (!upload.error && !upload.payload.body.error) {
+          attachments.push(upload.payload.body.success.handle);
+        }
+      }
+    }
+
+    if (!usedParts.text && !usedParts.file && !usedParts.json) {
+      // We have no usable parts.
+      yield (0, _effects3.put)(_actions.messageActions.sendMessageFinish({
+        sender: userInfo.username,
+        destination: action.payload.recipient,
+        type: type,
+        parts: action.payload.message.parts,
+        timestamp: action.payload.message.timestamp,
+        error: new _errors2.default({
+          message: 'There were no usable parts to send with this message. Add parts.',
+          code: _errors.messagingCodes.SEND_MESSAGE_FAIL
+        })
+      }));
+      return;
+    }
+    if (attachments.length > 0) {
+      queryParams['attach'] = attachments;
+    }
+    const response = yield (0, _effects2.default)({ url, queryParams }, config.requestOptions);
+    if (response.error) {
+      let message;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        message = `Failed to send message. Code: ${response.payload.error.code}.`;
+      } else {
+        // Handle errors from the plugin helper.
+        message = `Send message request failed: ${response.payload.result.message}.`;
+      }
+      log.debug(message);
+
+      yield (0, _effects3.put)(_actions.messageActions.sendMessageFinish({
+        sender: userInfo.username,
+        destination: action.payload.recipient,
+        type: type,
+        parts: action.payload.message.parts,
+        timestamp: action.payload.message.timestamp,
+        error: new _errors2.default({
+          message: message,
+          code: _errors.messagingCodes.SEND_MESSAGE_FAIL
+        })
+      }));
+    } else {
+      if (usedParts.file) {
+        delete usedParts.file.file;
+        usedParts.file = (0, _extends3.default)({}, usedParts.file, response.payload.body.success.attachments[0]);
+      }
+      if (response.payload.body.success) {
+        yield (0, _effects3.put)(_actions.messageActions.sendMessageFinish({
+          sender: userInfo.username,
+          destination: action.payload.destination,
+          type: type,
+          parts: (0, _fp.values)(usedParts),
+          timestamp: action.payload.message.timestamp,
+          messageId: response.payload.body.success.id
+        }));
+      } else if (response.payload.body.error) {
+        yield (0, _effects3.put)(_actions.messageActions.sendMessageFinish({
+          sender: userInfo.username,
+          destination: action.payload.destination,
+          type: type,
+          parts: (0, _fp.values)(usedParts),
+          timestamp: action.payload.message.timestamp,
+          error: new _errors2.default({
+            message: response.payload.body.error.human,
+            code: response.payload.body.error.code
+          })
+        }));
+      }
+
+      if (isGroup && !id) {
+        // If a group conversation as created in tandem with the sending of this message, then we need to update that conversation in the state and provide it with its ID as it exists in the back end. This will allow us to send REST requests that are related to this conversation.
+        yield (0, _effects3.put)(_actions.convoActions.updateConversation({
+          destination: action.payload.destination,
+          id: response.payload.body.success.group,
+          type: type
+        }));
+      }
+    }
+  }
+}
+
+function* receiveMessage() {
+  const messageReceivedChannel = (0, _effects3.actionChannel)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.meta.platform === platform && (action.payload.notificationMessage.event === 'im' || action.payload.notificationMessage.event === 'sms') && action.payload.notificationMessage.direction === 'in');
+  const messageReceived = yield messageReceivedChannel;
+  while (true) {
+    const action = yield (0, _effects3.take)(messageReceived);
+    const message = action.payload.notificationMessage;
+    let parts = [];
+    const sender = message.From;
+    const destination = [sender];
+    const messageId = message.id;
+    const type = message.type === 'internal' ? 'im' : message.type;
+
+    if (message.txt) {
+      parts.push({ type: 'text', text: message.txt });
+    }
+    if (message.Attach) {
+      const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+      const { protocol, server, version, port } = config.server;
+      const url = `${protocol}://${server}:${port}/${version}/rm/thread/${sender}`;
+      const queryParams = {
+        type: type,
+        id: messageId
+      };
+
+      const response = yield (0, _effects2.default)({ url, queryParams }, config.requestOptions);
+
+      // TODO: Create and use formal basic errors here.
+      if (response.error) {
+        log.error('Could not retrieve the thread for an incoming rich message.');
+        continue;
+      } else if (response.payload.body.error) {
+        log.error('There was an issue attempting to retrieve a rich message.');
+        continue;
+      } else if (response.payload.body.success) {
+        if (!response.payload.body.success[0] || !response.payload.body.success[0].attachments) {
+          log.error('Not able to get info for received message from the server or it was received and there were no attachments');
+          continue;
+        }
+
+        const attachments = response.payload.body.success[0].attachments;
+
+        for (let attachment of attachments) {
+          if (attachment.mime === 'application/vdn.kandy.json') {
+            // Hit the file endpoint
+            const jsonBlobResponse = yield (0, _effects2.default)({ url: attachment.url }, config.requestOptions);
+            if (!jsonBlobResponse.error && !jsonBlobResponse.payload.body.error) {
+              // Grab the json from the response
+              const json = jsonBlobResponse.payload.body;
+              // Put json into a part and push into parts
+              parts.push({
+                type: 'json',
+                json
+              });
+            } else {
+              log.error('Attempting to retrieve the JSON blob resulted in an error.');
+            }
+          } else {
+            parts.push((0, _extends3.default)({
+              type: 'file'
+            }, attachment));
+          }
+        }
+      }
+    }
+    const conversation = yield (0, _effects3.select)(_selectors.findConversation, destination);
+    let newConversation = false;
+
+    // If this message should correspond to a conversation which doesn't exist
+    // the state, we will need to dispatch an action to create it
+    if (!conversation) {
+      newConversation = true;
+    }
+    // Dispatch the messageReceived action so we can update the conversation
+    yield (0, _effects3.put)(_actions.messageActions.messageReceived(destination, parts, messageId, sender, Date.now(), {
+      newConversation: newConversation,
       type: type
     }));
   }
 }
-
 /**
- * Sends chat messages via POST request
- * @method sendChatMessage
- * @param  {Object} action A `SEND_MESSAGE` action
+ * UC fetch message saga.
+ * Performs the workflow of fetching the CIM `thread` of a specific conversation / user.
+ * @method fetchMessages
  */
-function* sendChatMessage(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+function* fetchMessages() {
+  const fetchMessageChannel = yield (0, _effects3.actionChannel)(actionTypes.FETCH_MESSAGES);
+  while (true) {
+    const action = yield (0, _effects3.take)(fetchMessageChannel);
+    const { destination, amount, type } = action.payload;
+    const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+    const userInfo = yield (0, _effects3.select)(_selectors2.getUserInfo, platform);
+    const { protocol, server, version, port } = config.server;
+    const conversation = yield (0, _effects3.select)(_selectors.findConversation, destination, type);
 
-  let chatResponse;
-  const chatType = action.payload.message.type;
+    let error;
 
-  let textParts = [];
-  let fileParts = [];
-  action.payload.message.parts.forEach(part => {
-    if (part.type === 'text') {
-      textParts = textParts.concat([part]);
-    } else if (part.type === 'file') {
-      fileParts = fileParts.concat([part]);
+    // Convert the SDK IM conversation type to the type that CIM expects.
+    const convType = type === 'im' ? 'internal' : type;
+
+    if (!conversation.id) {
+      // TODO: Create a better fallback for this situation. It's possible that a conversation can have no id if it was instantiated from scratch. This means that the conversation either doesn't exist in the back end, or it does and its `thread id` still needs to be fetched.
+      error = new _errors2.default({
+        code: _errors.messagingCodes.FETCH_MESSAGES_FAIL,
+        message: `Unable to fetch messages for a conversation with no thread ID. Destination: ${destination.join(', ')}`
+      });
+      log.debug('Attempting to retrieve messages for a Conversation with no ID', conversation);
     } else {
-      log.info('Unknown part type' + part.type);
-    }
-  });
+      const response = yield (0, _effects2.default)({
+        url: `${protocol}://${server}:${port}/${version}/rm/thread/${conversation.id}`,
+        queryParams: {
+          type: convType,
+          max: amount
+        }
+      }, config.requestOptions);
 
-  // TODO: when the backend API expands its functionality this log/error should be removed
-  if (fileParts.length > 1) {
-    log.info('Too many fileParts to upload, API  doesnt currently support multiple fileParts.');
-    yield (0, _effects.put)(_actions.messageActions.sendMessageFinish({
-      error: new _errors2.default({
-        message: 'Too many fileParts to upload, API  doesnt currently support multiple fileParts.',
-        code: _errors.messagingCodes.INVALID_FILE_PARTS
-      })
-    }));
-  }
-
-  let attachmentParts = [];
-  if (fileParts.length > 0) {
-    const uploadResponseList = yield (0, _effects.all)(fileParts.map(filePart => (0, _effects.call)(_requests.uploadFile, requestInfo, filePart.file)));
-
-    attachmentParts = uploadResponseList.map(response => {
-      return (0, _extends3.default)({}, response.attachment, { type: 'file', rawURL: response.attachment.link });
-    });
-    // multimedia messaging requires a specific format for each uploaded file
-    const chatMediaParts = attachmentParts.map(part => {
-      return { name: part.name, 'x-id': part['x-id'] };
-    });
-
-    if (chatType === _mappings.chatTypes.ONETOONE) {
-      chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text, chatMediaParts);
-    } else if (chatType === _mappings.chatTypes.GROUP) {
-      chatResponse = yield (0, _effects.call)(_requests.sendGroupChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text, chatMediaParts);
-    }
-  } else {
-    // hardcoding textParts because API only allows sending one text part
-    if (chatType === _mappings.chatTypes.ONETOONE) {
-      chatResponse = yield (0, _effects.call)(_requests.sendChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text);
-    } else if (chatType === _mappings.chatTypes.GROUP) {
-      chatResponse = yield (0, _effects.call)(_requests.sendGroupChatMessageRequest, requestInfo, action.payload.destination[0], textParts[0].text);
-    }
-  }
-  const allParts = textParts.concat(attachmentParts);
-  let finishInfo = {
-    type: chatType,
-    destination: action.payload.destination,
-    sender: chatResponse.senderAddress,
-    deliveryStatus: chatResponse.status,
-    parts: allParts,
-    timestamp: action.payload.message.timestamp
-  };
-
-  if (chatResponse.error) {
-    yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
-      error: chatResponse.error
-    })));
-  } else {
-    const messageId = chatResponse.resourceURL.split('/messages/')[1];
-    yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
-      messageId
-    })));
-  }
-}
-
-/**
- * Handles incoming chat message notifications
- * @method handleChatMessageNotification
- * @param  {Object} action A `NOTIFICATION_RECEIVED` action.
- */
-function* handleChatMessageNotification(action) {
-  const {
-    dateTime,
-    senderAddress,
-    text,
-    attachment,
-    'x-destinationAddress': destinationAddress
-  } = action.payload.chatMessageNotification.chatMessage;
-
-  // use helper function to get message type from notification
-  const messageType = getNotificationType(action.payload.chatMessageNotification, 'chatMessage');
-
-  // Grab the messageId from the end of link.href
-  const messageId = action.payload.chatMessageNotification.link[0].href.split('/messages/')[1];
-
-  let destination;
-  if (messageType === _mappings.chatTypes.GROUP) {
-    destination = [destinationAddress];
-  } else {
-    destination = [senderAddress];
-  }
-
-  const existingConversation = yield (0, _effects.select)(_selectors.findConversation, destination, messageType);
-  const newConversation = !existingConversation;
-
-  let parts = [];
-  if (text) {
-    const textPart = [{ type: 'text', text }];
-    parts = parts.concat(textPart);
-  }
-
-  if (attachment) {
-    const fileParts = attachment.map(file => {
-      return {
-        type: 'file',
-        rawURL: file.link,
-        name: file.name,
-        size: file.size,
-        'x-id': file['x-id']
-      };
-    });
-    parts = parts.concat(fileParts);
-  }
-
-  yield (0, _effects.put)(_actions.messageActions.messageReceived(destination, parts, messageId, senderAddress, dateTime, {
-    type: messageType,
-    newConversation: newConversation
-  }));
-}
-
-/**
- * Handles delivery receipts for SMS messages via websocket messages
- * @method handleDeliveryReceipts
- * @param  {Object} action A `RECEIVE_DELIVERY_RECEIPT` action representing a deliveryReceipt.
- */
-function* handleDeliveryReceipts(action) {
-  const deliveryInfo = action.payload.deliveryInfoNotification.deliveryInfo;
-  let deliveryStatus = null;
-  if (_mappings.DeliveryStatuses[deliveryInfo.deliveryStatus]) {
-    deliveryStatus = _mappings.DeliveryStatuses[deliveryInfo.deliveryStatus];
-  } else {
-    log.info(`Invalid deliveryStatus: ${deliveryInfo.deliveryStatus}, defaulting to Unknown`);
-    deliveryStatus = _mappings.DeliveryStatuses['Unknown'];
-  }
-  const messageId = deliveryInfo.messageId;
-  const destination = `${deliveryInfo.address}`;
-  yield (0, _effects.put)(_actions.messageActions.deliveryReceiptReceived(messageId, deliveryStatus, [destination], _mappings.chatTypes.SMS));
-}
-
-/**
- * Handles "send message" actions specifically for SMS.
- * @method sendSMS
- * @param  {Object} action A `SEND_MESSAGE` action representing a SMS Message.
- */
-function* sendSMS(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-
-  // TODO: Remove this big workaround ---
-  const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-  requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
-  // END Workaround
-
-  const { destination, message } = action.payload;
-  const response = yield (0, _effects.call)(_requests.sendSMSRequest, requestInfo, destination[0], message.parts[0].text);
-
-  // TODO: Do something with the rest of the information from the response?
-  //      The finish action is specific for pre-CPaaS messages, so its
-  //      awkward to pass on/store all the new information.
-  let finishInfo = {
-    sender: requestInfo.username,
-    destination: destination,
-    parts: message.parts,
-    timestamp: message.timestamp,
-    type: message.type
-  };
-
-  if (response.error) {
-    yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
-      deliveryStatus: _mappings.DeliveryStatuses['DeliveryImpossible'],
-      error: response.error
-    })));
-  } else {
-    // the ID is in the end of a string (`.../messages/<ID>`), so get it.
-    const messageId = response.resourceURL.split('/messages/')[1];
-    yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
-      deliveryStatus: _mappings.DeliveryStatuses[response.deliveryInfoList.deliveryInfo[0].deliveryStatus],
-      messageId
-    })));
-  }
-}
-
-/**
- * Saga for receiving an incoming SMS message.
- * @method handleIncomingSMS
- * @param  {Object} action A `NOTIFICATION_RECEIVED` action representing an inbound SMS.
- */
-// TODO: Have a single "handleIncoming" saga that handles both IM and SMS?
-function* handleIncomingSMS(action) {
-  const notification = action.payload.inboundSMSMessageNotification;
-  let { message, messageId, senderAddress } = notification.inboundSMSMessage;
-  const { dateTime } = notification;
-
-  if (!senderAddress) {
-    // Incorrect property name: AEB-2485
-    senderAddress = notification.inboundSMSMessage.senderAdress;
-  }
-
-  const existingConversation = yield (0, _effects.select)(_selectors.findConversation, [senderAddress], _mappings.chatTypes.SMS);
-  const newConversation = !existingConversation;
-
-  yield (0, _effects.put)(_actions.messageActions.messageReceived([senderAddress], [{ type: 'text', text: message }], messageId, senderAddress, dateTime, {
-    newConversation: newConversation,
-    type: _mappings.chatTypes.SMS
-  }));
-}
-
-/**
- * Saga that fetches a list of Chat Conversations
- * @method fetchConversations
- * @param {Object} action
- */
-function* fetchConversations(action) {
-  const type = action.payload.type;
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_requests.fetchConversationsRequest, requestInfo, type);
-
-  if (response.error) {
-    yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
-      error: response.error
-    }));
-  } else {
-    const chatSessions = response.chatSession.map(chatSession => {
-      const { sessionId, sessionType, remoteAddress, localAddress, sessionDetails } = chatSession;
-      const { lastText, lastPullTime, lastMessageTime } = sessionDetails;
-
-      return {
-        id: sessionId,
-        destination: [remoteAddress],
-        address: localAddress,
-        type: _mappings.chatTypes[sessionType.toUpperCase()],
-        lastMessage: lastText,
-        lastReceived: lastMessageTime,
-        lastPull: lastPullTime,
-        isTypingList: [],
-        messages: []
-      };
-    });
-
-    yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
-      conversations: chatSessions,
-      error: false
-    }));
-  }
-}
-
-/**
- * Saga that fetches all chat messages for a particular conversation
- * @method fetchChatMessages
- * @param {Object} action
- */
-function* fetchChatMessages(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_requests.chatFetchMessages, requestInfo, action.payload.destination[0]);
-
-  const sessionType = getResourceType(response.resourceURL);
-
-  let destination;
-  const messageList = response.chatMessage.map(message => {
-    destination = message['x-destinationAddress']; // FIXME: make this less ugly
-
-    let parts = [];
-    if (message.text) {
-      parts = parts.concat({ type: 'text', text: message.text });
-    }
-    if (message.attachment) {
-      parts = parts.concat(message.attachment.map(attachment => {
-        return (0, _extends3.default)({
-          type: 'file'
-        }, attachment, {
-          rawURL: attachment.link,
-          name: attachment.name
+      if (response.error) {
+        // Handle errors from the request helper.
+        // TODO: Proper error.
+        error = new _errors2.default({
+          code: response.payload.result.code,
+          message: `Message request failed: ${response.payload.result.message}`
         });
-      }));
+      } else if (response.payload.body && response.payload.body.error) {
+        // Handle errors from the server.
+        // TODO: Proper error.
+        error = new _errors2.default({
+          code: response.payload.body.error.code,
+          message: `Failed to fetch messages: ${response.payload.body.error.human}`
+        });
+      } else {
+        const messages = response.payload.body.success;
+        const formattedMessageArray = [];
+
+        for (let message of messages) {
+          let parts = [];
+          if (message.txt) {
+            parts.push({ type: 'text', text: message.txt });
+          }
+          if (message.attachments) {
+            for (let attachment of message.attachments) {
+              if (attachment.mime === 'application/vdn.kandy.json') {
+                // Hit the file endpoint
+                const jsonBlobResponse = yield (0, _effects2.default)({ url: attachment.url }, config.requestOptions);
+                if (!jsonBlobResponse.error && !jsonBlobResponse.payload.body.error) {
+                  // Grab the json from the response
+                  const json = jsonBlobResponse.payload.body;
+                  // Put json into a part and push into parts
+                  parts.push({
+                    type: 'json',
+                    json
+                  });
+                } else {
+                  log.error('Attempting to retrieve the JSON blob resulted in an error.');
+                }
+              } else {
+                parts.push((0, _extends3.default)({ type: 'file' }, attachment));
+              }
+            }
+          }
+          // TODO: Speak to CIM to find out why messages don't have a `sender` value
+          const senderName = findMessageSender(conversation, message.sender, message.dir);
+          formattedMessageArray.push({
+            timestamp: message.when,
+            sender: senderName || userInfo.username,
+            messageId: message.id,
+            parts
+          });
+        }
+        if (!error) {
+          yield (0, _effects3.put)(_actions.messageActions.fetchMessagesFinished(destination, type, formattedMessageArray));
+        } else {
+          // Handle all cases where an error occurred
+          yield (0, _effects3.put)(_actions.messageActions.fetchMessagesFinished(destination, convType, undefined, error));
+        }
+      }
     }
-
-    return {
-      parts: parts,
-      sender: message.senderAddress,
-      destination: message['x-destinationAddress'],
-      timestamp: message.dateTime,
-      messageId: message.resourceURL.split('/messages/')[1] // messageID is affter /messages/
-    };
-  });
-
-  if (response.error) {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished([destination], sessionType, null, response.error));
-  } else {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished([destination], sessionType, messageList, null));
   }
 }
 
-/**
- * Creates URLs for multimedia attachments and dispatches an action to update the store with the new url
- * @param {Object} action
- */
-function* getImageLinks(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const { parts, destination, type, messageId } = action.payload;
-  const fileParts = parts.filter(part => part.type === 'file');
-  const responseList = yield (0, _effects.all)(fileParts.map(filePart => (0, _effects.call)(_requests.fetchImageLinks, requestInfo, filePart.rawURL)));
+function* fetchConversations() {
+  while (true) {
+    const action = yield (0, _effects3.take)(actionTypes.FETCH_CONVERSATIONS);
+    const options = action.payload;
+    const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+    const { protocol, server, version, port } = config.server;
+    const queryParams = {};
+    let url;
 
-  yield (0, _effects.all)(responseList.map((response, index) => {
+    if (options) {
+      if ('id' in options) {
+        // If id is provided, we only need to fetch a single thread
+        url = `${protocol}://${server}:${port}/${version}/rm/thread`;
+        queryParams.id = options.id;
+      } else {
+        // Otherwise, check to see if other options have been provided to filter the results
+        url = `${protocol}://${server}:${port}/${version}/rm/threads`;
+
+        if ('touched' in options) {
+          queryParams.touched = prepareTouchedParam(options.touched);
+        }
+
+        if ('type' in options) {
+          queryParams.type = options.type;
+        }
+
+        if ('thread' in options) {
+          queryParams.thread = options.thread;
+        }
+      }
+    }
+    const response = yield (0, _effects2.default)({ url, queryParams }, config.requestOptions);
     if (response.error) {
-      return (0, _effects.put)(_actions.messageActions.getImageLinksFinish({ error: response.error }));
+      let error;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        // TODO: Proper error.
+        error = new _errors2.default({
+          code: response.payload.body.error.code,
+          message: `Failed to fetch conversations: ${response.payload.body.error.human}`
+        });
+      } else {
+        // Handle errors from the request helper.
+        // TODO: Proper error.
+        error = new _errors2.default({
+          code: response.payload.result.code,
+          message: `Conversation request failed: ${response.payload.result.message}`
+        });
+      }
+      yield (0, _effects3.put)(_actions.convoActions.fetchConversationsFinished({ error }));
     } else {
-      // create a url from the blob and save it to the store.
-      const url = URL.createObjectURL(response.blob);
-      return (0, _effects.put)(_actions.messageActions.getImageLinksFinish({
-        url,
-        rawURL: fileParts[index].rawURL,
-        destination,
-        type,
-        messageId
-      }));
+      let formattedConversationsArray = [];
+      response.payload.body.success.forEach(convo => {
+        const { handle, handles, members, thread, type, lastreceived, lastpull, lastmsg } = convo;
+        // TODO: we should use a better naming convention than `handle`, as this complicates things for group convos
+        if (handle && !handles) {
+          formattedConversationsArray.push({
+            // Convert `type` from the CIM term to the SDK term to store in state.
+            // Ensure that destination is an Array
+            id: thread,
+            destination: [handle],
+            type: type === 'internal' ? 'im' : type,
+            lastReceived: lastreceived ? lastreceived * 1000 : undefined, // convert seconds to miliseconds
+            lastPull: lastpull ? lastpull * 1000 : undefined, // convert seconds to miliseconds
+            lastMessage: lastmsg,
+            messages: []
+          });
+        } else if (handles && !handle) {
+          const users = [];
+          handles.forEach((handle, i) => users.push({ handle: handle, id: members[i] }));
+          // Sorting on handle to ensure that destination name is always consistent
+          users.sort((a, b) => a.handle > b.handle ? 1 : -1);
+
+          formattedConversationsArray.push({
+            // Convert `type` from the CIM term to the SDK term to store in state.
+            destination: users.map(user => user.handle),
+            id: thread,
+            type: 'group',
+            members: users,
+            lastReceived: lastreceived ? lastreceived * 1000 : undefined, // convert seconds to miliseconds
+            lastPull: lastpull ? lastpull * 1000 : undefined, // convert seconds to miliseconds
+            messages: []
+          });
+        }
+      });
+      yield (0, _effects3.put)(_actions.convoActions.fetchConversationsFinished((0, _extends3.default)({
+        conversations: formattedConversationsArray
+      }, options)));
+
+      if ('fetchMessages' in options) {
+        // This indicates that fetchMessages was previously called on a conversation whose ID was not previously known. This would have caused fetchConversations to be called, in which case that conversation will be updated
+      }
     }
-  }));
-}
-
-/**
- * Helper function to determine the session or message type from the notification.
- * @param {Object} notification
- * @param {string} notificationType
- * @return {string} resourceType
- */
-function getNotificationType(notification, notificationType) {
-  // determine type of resource by parsing the notification link
-  const link = notification.link.find(link => link.rel === notificationType);
-  let resourceType;
-  if (link) {
-    resourceType = getResourceType(link.href);
   }
-  return resourceType;
 }
 
 /**
- * Helper function to determine the resource type from the resourceURL.
- * @param {string} resourceURL
- * @return {string} resourceType
+ * delete a conversation
+ * @method deleteConversation
  */
-function getResourceType(resourceURL) {
-  // determine type of resource by looking for '/group/' or '/oneToOne' in the string
-  // determine if the href is for a group type resource by searching for
-  // '/path-string/path-string/path-string/group/' in the link's href
-  let resourceType;
-  if (resourceURL.search(/\/\S*\/\S*\/\S*\/group\//) !== -1) {
-    resourceType = _mappings.chatTypes.GROUP;
-    // determine if the href is for a chat type resource by searching for
-    // '/path-string/path-string/path-string/oneToOne/' in the link's href
-  } else if (resourceURL.search(/\/\S*\/\S*\/\S*\/oneToOne\//) !== -1) {
-    resourceType = _mappings.chatTypes.ONETOONE;
+function* deleteConversation() {
+  while (true) {
+    const action = yield (0, _effects3.take)(actionTypes.DELETE_CONVERSATION);
+    yield (0, _effects3.fork)(handleDeleteConversation, action);
+  }
+}
+
+/**
+ * Handle a forked deleteConversation action
+ * @method handleDeleteConversation
+ * @param {Object} action An action of type DELETE_CONVERSATION
+ */
+function* handleDeleteConversation(action) {
+  const destination = action.payload.destination;
+  const type = action.payload.type === 'im' ? 'internal' : action.payload.type;
+  const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+  const conversation = yield (0, _effects3.select)(_selectors.findConversation, destination, action.payload.type);
+  const response = yield (0, _effects3.call)(deleteRequest, config, { type: type }, [conversation.id]);
+  const handledResponse = handleDeleteResponse(response);
+
+  if (handledResponse.error) {
+    yield (0, _effects3.put)(_actions.convoActions.deleteConversationFinish({ destination, type, error: handledResponse.result }));
   } else {
-    log.info('Unknown chat type.');
+    const { destination, type } = action.payload;
+    yield (0, _effects3.put)(_actions.convoActions.deleteConversationFinish({ destination, type }));
   }
-  return resourceType;
+}
+
+/**
+ * Delete one or more messages
+ * @method deleteMessage
+ */
+function* deleteMessage() {
+  const deleteMessageChannel = yield (0, _effects3.actionChannel)(actionTypes.DELETE_MESSAGE);
+  while (true) {
+    const action = yield (0, _effects3.take)(deleteMessageChannel);
+    yield (0, _effects3.fork)(handleDeleteMessage, action);
+  }
+}
+
+/**
+ * Handle a forked deleteMessage action
+ * @method handleDeleteMessage
+ * @param {Object} action an action of type DELETE_MESSAGE
+ */
+function* handleDeleteMessage(action) {
+  const messageId = action.payload.messageId;
+  const type = action.payload.type;
+  const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+  const conversation = yield (0, _effects3.select)(_selectors.findConversation, action.payload.destination, action.payload.type);
+
+  const response = yield (0, _effects3.call)(deleteRequest, config, { type: type === 'im' ? 'internal' : type }, [conversation.id, messageId]);
+  const handledResponse = handleDeleteResponse(response);
+
+  if (handledResponse.error) {
+    yield (0, _effects3.put)(_actions.messageActions.deleteMessageFinish({
+      destination: action.payload.destination,
+      type,
+      messageId,
+      error: handledResponse.result
+    }));
+  } else {
+    yield (0, _effects3.put)(_actions.messageActions.deleteMessageFinish({
+      destination: action.payload.destination,
+      type: action.payload.type,
+      messageId
+    }));
+  }
+}
+
+/**
+ * Execute a delete request and return the response
+ *
+ * @method deleteRequest
+ * @param {Object} config Configuration dictionary object
+ * @param {string} config.server Server information
+ * @param {string} config.requestOptions
+ * @param {Object} queryParams Parameters for use in the query string
+ * @param {Array} pathParams Parameters for use in the path
+ */
+function* deleteRequest(config, queryParams = {}, pathParams = []) {
+  const { protocol, server, port, version } = config.server;
+  const url = `${protocol}://${server}:${port}/${version}/rm/delete/${pathParams.join('/')}`;
+
+  return yield (0, _effects2.default)({ url, queryParams }, config.requestOptions);
+}
+
+/**
+ * Helper function to parse responses of delete requests
+ * @param {Object} response The response object returned from a request to the "delete" endpoint
+ */
+function handleDeleteResponse(response) {
+  if (response.error) {
+    const error = new _errors2.default({
+      code: response.payload.result.code,
+      message: `Delete request failed: ${response.payload.result.message}`
+    });
+    return { error: true, result: error };
+  } else if (response.payload.body && response.payload.body.error) {
+    const error = new _errors2.default({
+      code: response.payload.body.error.code,
+      message: `Request delivered but delete was unsuccessful: ${response.payload.body.error.human}`
+    });
+    return { error: true, result: error };
+  } else {
+    return { error: false };
+  }
+}
+
+function* uploadFile(file) {
+  const config = yield (0, _effects3.select)(_selectors2.getConnectionInfo, platform);
+  const { protocol, server, version, port } = config.server;
+
+  const formData = new FormData();
+  const name = file.name || 'Custom Json Blob';
+  formData.append('raw', file, name);
+  formData.append('token', config.accessToken);
+
+  const requestObject = {
+    url: `${protocol}://${server}:${port}/${version}/rm/upload`,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    body: formData,
+    method: 'POST'
+  };
+
+  const response = yield (0, _effects2.default)(requestObject, config.requestOptions);
+  return response;
+}
+
+function tryParseJSON(jsonString) {
+  try {
+    var jsonObject = JSON.parse(jsonString);
+    if (jsonObject && typeof jsonObject === 'object') {
+      return jsonObject;
+    }
+  } catch (error) {
+    // Do nothing
+  }
+
+  return false;
+}
+
+/**
+ * findMessageSender
+ *
+ * Helper function to determine the name of the sender of a message in a conversation
+ *
+ * @param conversation
+ * @param id
+ * @param dir
+ * @returns {string} The name of sender of the message
+ */
+function findMessageSender(conversation, id, dir) {
+  if (conversation) {
+    if (conversation.type === 'group' && dir === 0) {
+      const result = conversation.members.find(member => member.id = id);
+      if (result && 'handle' in result) {
+        return result.handle;
+      }
+      return 'Unknown';
+    }
+    if (dir === 0) {
+      return Array.isArray(conversation.destination) ? conversation.destination[0] : conversation.destination;
+    }
+  }
+}
+
+/**
+ * cimDateFormat
+ *
+ * Helper function to convert a unix timestamp to the date format which the messaging service expects in the back end
+ *
+ * @param {string|number} unixtime
+ * @returns {string} The UTC date formatted as YYYYMMDDhhmmss
+ */
+function cimDateFormat(unixtime) {
+  const time = new Date(unixtime);
+  return `${time.getUTCFullYear()}${time.getUTCMonth() + 1}${time.getUTCDay()}${time.getUTCHours()}${time.getUTCMinutes()}${time.getUTCSeconds()}`;
+}
+
+/**
+ * prepareTouchedParam
+ *
+ * Helper function to prepare the `touched` URL parameter for use in conversation fetching requests
+ *
+ * @param {string|number} param
+ * @returns {string} The string literal `lastcheck` or the UTC date formatted as YYYYMMDDhhmmss
+ */
+function prepareTouchedParam(param) {
+  if (param && param === 'lastcheck') {
+    return param;
+  } else {
+    return cimDateFormat(param);
+  }
 }
 
 /***/ }),
 
-/***/ "../kandy/src/messaging/cpaas/sagas/subscriptions.js":
+/***/ "../kandy/src/mwi/interface/actionTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const PREFIX = '@@KANDY/';
+
+const MWI_UPDATE = exports.MWI_UPDATE = PREFIX + 'MWI_UPDATE';
+const FETCH_MWI = exports.FETCH_MWI = PREFIX + 'FETCH_MWI';
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/actions.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36654,22 +43902,403 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-exports.chatSubscription = chatSubscription;
-exports.chatUnsubscription = chatUnsubscription;
-exports.smsInboundSubscription = smsInboundSubscription;
-exports.smsInboundUnsubscription = smsInboundUnsubscription;
-exports.smsOutboundSubscription = smsOutboundSubscription;
-exports.smsOutboundUnsubscription = smsOutboundUnsubscription;
+exports.mwiUpdate = mwiUpdate;
+exports.fetchMwi = fetchMwi;
 
-var _requests = __webpack_require__("../kandy/src/messaging/cpaas/requests.js");
+var _actionTypes = __webpack_require__("../kandy/src/mwi/interface/actionTypes.js");
 
-var _selectors = __webpack_require__("../kandy/src/messaging/cpaas/interface/selectors.js");
+var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var _selectors3 = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
+/**
+ * Creates a message waiting indicator update action.
+ *
+ * @method mwiUpdate
+ * @param {Object} $0
+ * @param {string} $0.mwiEvent An mwiEvent object from spidr.
+ * @param {Object} $0.error A Basic error object.
+ * @returns {Object} A flux standard action.
+ */
+function mwiUpdate({ mwiData, error }) {
+  if (error) {
+    return {
+      type: actionTypes.MWI_UPDATE,
+      payload: error,
+      error: true
+    };
+  } else {
+    return {
+      type: actionTypes.MWI_UPDATE,
+      payload: (0, _extends3.default)({}, mwiData)
+    };
+  }
+}
+
+/**
+ * Creates a fetch message waiting indicator action.
+ *
+ * @method fetchMwi
+ * @returns {Object} A flux standard action.
+ */
+function fetchMwi() {
+  return {
+    type: actionTypes.FETCH_MWI
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/api.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = api;
+
+var _actions = __webpack_require__("../kandy/src/mwi/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors = __webpack_require__("../kandy/src/mwi/interface/selectors.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const log = (0, _logs.getLogManager)().getLogger('MWI'); /**
+                                                          * The voicemail features are used to retrieve and view
+                                                          * voicemail indicators.
+                                                          *
+                                                          * Voicemail functions are all part of the 'voicemail' namespace.
+                                                          *
+                                                          * @public
+                                                          * @requires voicemail
+                                                          * @module Voicemail
+                                                          */
+
+function api({ dispatch, getState }) {
+  const mwiApi = {
+    /**
+     * Attempts to retrieve voicemail information from the server.
+     * A `voicemail:new` event is emitted upon completion.
+     *
+     * @public
+     * @requires voicemail
+     * @memberof Voicemail
+     * @method fetch
+     */
+    fetch() {
+      log.debug(_logs.API_LOG_TAG + 'voicemail.fetch');
+      dispatch(actions.fetchMwi());
+    },
+
+    /**
+     * Returns voicemail data from the store.
+     *
+     * @public
+     * @requires voicemail
+     * @memberof Voicemail
+     * @method get
+     */
+    get() {
+      log.debug(_logs.API_LOG_TAG + 'voicemail.get');
+      return (0, _selectors.getMwi)(getState());
+    }
+  };
+
+  return { voicemail: mwiApi };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/eventTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// TODO: Fix params in this file, move to voicemail over MWI on all public wording.
+/**
+ * A voicemail event has been received.
+ *
+ * @requires voicemail
+ * @public
+ * @memberof Voicemail
+ * @event voicemail:change
+ * @param {Object} params An object containing voicemail info.
+ * @param {number} params.lastUpdated Timestamp of the last time voicemail data was checked.
+ * @param {boolean} params.newMessagesWaiting Whether there are new messages.
+ * @param {number} params.totalVoice The total number of voicemail messages.
+ * @param {number} params.unheardVoice Number of unheard voicemail messages.
+ * @param {Object} params.voice Object containing individual counts of new, old, urgent voicemails.
+ * @param {Object} params.fax Object containing individual counts of new, old, urgent faxes.
+ * @param {Object} params.multimedia Object containing individual counts of new, old, urgent multimedia messages.
+ */
+const MWI_CHANGE = exports.MWI_CHANGE = 'voicemail:change';
+
+/**
+ * An error has occured while attempting to retrieve voicemail data.
+ *
+ * @requires voicemail
+ * @public
+ * @memberof Voicemail
+ * @event voicemail:error
+ * @param {Object} params
+ * @param {BasicError} params.error The Basic error object.
+ */
+const MWI_ERROR = exports.MWI_ERROR = 'voicemail:error';
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/events.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _actionTypes = __webpack_require__("../kandy/src/mwi/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _eventTypes = __webpack_require__("../kandy/src/mwi/interface/eventTypes.js");
+
+var eventTypes = _interopRequireWildcard(_eventTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const eventsMap = {};
+
+eventsMap[actionTypes.MWI_UPDATE] = function (action) {
+  if (action.error) {
+    return {
+      type: eventTypes.MWI_ERROR,
+      args: { error: action.payload }
+    };
+  } else {
+    return {
+      type: eventTypes.MWI_CHANGE,
+      args: {
+        lastUpdated: action.payload.lastUpdated,
+        newMessagesWaiting: action.payload.newMessagesWaiting,
+        totalVoice: action.payload.totalVoice,
+        unheardVoice: action.payload.unheardVoice,
+        voice: action.payload.voice,
+        fax: action.payload.fax,
+        multimedia: action.payload.multimedia
+      }
+    };
+  }
+};
+
+exports.default = eventsMap;
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _api = __webpack_require__("../kandy/src/mwi/interface/api.js");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _reducers = __webpack_require__("../kandy/src/mwi/interface/reducers.js");
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This interface is for a mwi plugin.
+ * @type {string}
+ */
+// Import the components of the interface.
+const name = 'mwi';
+
+exports.default = {
+  name,
+  api: _api2.default,
+  reducer: _reducers2.default
+};
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/reducers.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _actionTypes = __webpack_require__("../kandy/src/mwi/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const reducers = {};
+
+reducers[actionTypes.MWI_UPDATE] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, action.payload);
+  }
+};
+
+const reducer = (0, _reduxActions.handleActions)(reducers, {});
+exports.default = reducer;
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getMwi = getMwi;
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+/*
+ * Redux-saga selector functions.
+ * Used with the `select` effect in sagas to retrieve
+ *      specific portions of the state.
+ */
+
+/**
+ * Retrieves the message waiting indicator data from the state.
+ * @method getMwi
+ * @return {Object}
+ */
+function getMwi(state) {
+  return (0, _fp.cloneDeep)(state.mwi);
+}
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/link/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = mwiLink;
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _events = __webpack_require__("../kandy/src/mwi/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _interface = __webpack_require__("../kandy/src/mwi/interface/index.js");
+
+var _interface2 = _interopRequireDefault(_interface);
+
+var _sagas = __webpack_require__("../kandy/src/mwi/link/sagas.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Plugin for voicemail service.
+ * Provides the SDK with the Voicemail feature.
+ */
+
+
+// Import the interface to implement.
+
+// Events
+function mwiLink() {
+  function* init() {
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
+  }
+
+  const capabilities = ['voicemail'];
+
+  return {
+    capabilities,
+    api: _interface2.default.api,
+    name: _interface2.default.name,
+    reducer: _interface2.default.reducer,
+    init,
+    sagas: [_sagas.mwiReceived, _sagas.fetchMwi]
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/mwi/link/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.mwiReceived = mwiReceived;
+exports.fetchMwi = fetchMwi;
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _actionTypes = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
+
+var _actions = __webpack_require__("../kandy/src/mwi/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _actionTypes2 = __webpack_require__("../kandy/src/mwi/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _effects2 = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects3 = _interopRequireDefault(_effects2);
 
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
@@ -36677,413 +44306,99 @@ var _errors2 = _interopRequireDefault(_errors);
 
 var _constants = __webpack_require__("../kandy/src/constants.js");
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Plugin chat subscription saga.
- * Handles subscribing to the chat service needed for the messaging plugin.
- * @method chatSubscription
- */
-
-// Libraries.
-function* chatSubscription(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
-
-  _loglevel2.default.info(`Subscribing to chat service on ${action.payload.type} channel.`);
-
-  const response = yield (0, _effects.call)(_requests.chatSubscribe, requestInfo, channel);
-
-  if (response.error) {
-    yield (0, _effects.put)(
-    // TODO: Create a subscription effect for this?
-    (0, _actions.reportSubscriptionFinished)({
-      service: 'chat',
-      type: action.payload.type,
-      error: response.error
-    }));
-  } else {
-    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-      service: 'chat',
-      type: action.payload.type,
-      subscription: response.subscription
-    }));
-  }
-}
-
-/**
- * Plugin chat unsubscription saga.
- * Handles unsubscribing from chat service needed for the messaging plugin.
- * @method chatUnsubscription
- */
-
-
-// Other plugins.
-// Messaging plugin.
-function* chatUnsubscription(action) {
-  const { subscriptions } = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  let chatSubscription = subscriptions.filter(sub => {
-    return sub.service === 'chat' && sub.channelType === action.payload.type;
-  });
-
-  if (chatSubscription.length === 0) {
-    // This scenario should not occur because we should not be able to subscribe
-    //    to an already subscribed-to service.
-    _loglevel2.default.debug(`No chat subscription on ${action.payload.type} channel found to unsubscribe.`);
-    yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)({
-      error: new _errors2.default({
-        message: 'Multiple chat subscriptions found. Cannot unsubscribe.',
-        code: _errors.subscriptionCodes.CPAAS_UNSUBSCRIBE_FAIL
-      }),
-      service: 'chat',
-      type: action.payload.type
-    }));
-    return;
-  } else if (chatSubscription.length > 1) {
-    // "Error" scenario, why are there more than 1 chat subscriptions?
-    // TODO: Report ...something.
-    yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)());
-    return;
-  } else {
-    chatSubscription = chatSubscription[0];
-  }
-
-  _loglevel2.default.info(`Unsubcribing from chat service on ${action.payload.type} channel.`);
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-
-  const response = yield (0, _effects.call)(_requests.chatUnsubscribe, requestInfo, chatSubscription);
-
-  yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'chat',
-    type: action.payload.type
-  })));
-}
-
-/**
- * Subscription saga for inbound SMS notifications.
- * @method smsInboundSubscription
- * @param  {Object} action
- */
-function* smsInboundSubscription(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
-
-  // TODO: Remove this workaround -----
-  const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-  requestInfo.destinationAddress = messagingConfig.smsFrom;
-  // END Workaround -----
-
-  _loglevel2.default.debug(`Subscribing to SMS inbound service on ${action.payload.type} channel.`);
-  const response = yield (0, _effects.call)(_requests.smsInboundSubscribe, requestInfo, channel);
-
-  yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'smsinbound',
-    type: action.payload.type
-  })));
-}
-
-/**
- * Unsubscription saga for inbound SMS notifications.
- * @method smsInboundUnsubscription
- * @param  {Object} action
- */
-function* smsInboundUnsubscription(action) {
-  const { subscriptions } = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  let smsSubscription = subscriptions.filter(sub => {
-    return sub.service === 'smsinbound' && sub.channelType === action.payload.type;
-  });
-
-  if (smsSubscription.length === 1) {
-    smsSubscription = smsSubscription[0];
-
-    _loglevel2.default.debug(`Unsubscribing from inbound SMS service on ${action.payload.type} channel.`);
-    const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-    const response = yield (0, _effects.call)(_requests.smsInboundUnsubscribe, requestInfo, smsSubscription);
-
-    yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)((0, _extends3.default)({}, response, {
-      service: 'smsinbound',
-      type: action.payload.type
-    })));
-  } else {
-    // "Error" scenario: Should only be one subscription like this.
-  }
-}
-
-/**
- * Subscription saga for outbound SMS notifications.
- * @method smsOutboundSubscription
- * @param  {Object} action
- */
-function* smsOutboundSubscription(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
-
-  _loglevel2.default.debug(`Subscribing to SMS outbound service on ${action.payload.type} channel.`);
-  const response = yield (0, _effects.call)(_requests.smsOutboundSubscribe, requestInfo, channel);
-
-  yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'smsoutbound',
-    type: action.payload.type
-  })));
-}
-
-/**
- * Unsubscription saga for outbound SMS notifications.
- * @method smsOutboundUnsubscription
- * @param  {Object} action
- */
-function* smsOutboundUnsubscription(action) {
-  const { subscriptions } = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  let smsSubscription = subscriptions.filter(sub => {
-    return sub.service === 'smsoutbound' && sub.channelType === action.payload.type;
-  });
-
-  if (smsSubscription.length === 1) {
-    smsSubscription = smsSubscription[0];
-
-    _loglevel2.default.debug(`Unsubscribing from outbound SMS service on ${action.payload.type} channel.`);
-    const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-    const response = yield (0, _effects.call)(_requests.smsOutboundUnsubscribe, requestInfo, smsSubscription);
-
-    yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)((0, _extends3.default)({}, response, {
-      service: 'smsoutbound',
-      type: action.payload.type
-    })));
-  } else {
-    // "Error" scenario: Should only be one subscription like this.
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/messaging/mappings.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-// Statuses we receive from the REST responses/websocket messages
-const DeliveryStatuses = exports.DeliveryStatuses = {
-  DeliveredToNetwork: 'Pending',
-  DeliveredToTerminal: 'Delivered',
-  DeliveryImpossible: 'Failed',
-  Unknown: 'Unknown'
-
-  /**
-   * Chat types
-   * Chat types used in the cpaas2 messaging plugin
-   * @name chatTypes
-   */
-};const chatTypes = exports.chatTypes = {
-  SMS: 'sms',
-  ONETOONE: 'chat-oneToOne',
-  GROUP: 'chat-group'
-};
-
-/***/ }),
-
-/***/ "../kandy/src/notifications/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = notifications;
-
-var _interface = __webpack_require__("../kandy/src/notifications/interface/index.js");
-
-var _events = __webpack_require__("../kandy/src/notifications/interface/events.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _sagas = __webpack_require__("../kandy/src/notifications/cpaas/sagas.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Configuration options for the notification feature.
- * @public
- * @name config.notifications
- * @memberof config
- * @instance
- * @param {Object} notifications - The notifications configuration object.
- * @param {number} [notifications.idCacheLength=100] - Default amount of event ids to remember for de-duplication purposes.
- */
-
-/**
- * CPaaS Notifications plugin factory.
- * @method notifications
- * @param {configs.notifications} options - Configuration options for authentication.
- * @return {Object} plugin - A notifications plugin.
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-function notifications(options = {}) {
-  const defaultOptions = {
-    idCacheLength: 100
-  };
-  const pluginOptions = (0, _fp.defaultsDeep)(defaultOptions, options);
-
-  function* init() {
-    yield (0, _effects.put)((0, _actions2.update)(pluginOptions, _interface.name));
-    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
-  }
-
-  const capabilities = [];
-
-  return {
-    name: _interface.name,
-    capabilities,
-    init,
-    api: _interface.api,
-    reducer: _interface.reducer,
-    sagas: (0, _fp.values)(sagas)
-  };
-} // Notification plugin.
-
-/***/ }),
-
-/***/ "../kandy/src/notifications/cpaas/sagas.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
-
-var _keys2 = _interopRequireDefault(_keys);
-
-exports.processNotifications = processNotifications;
-
-var _actions = __webpack_require__("../kandy/src/notifications/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _actionTypes = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _selectors = __webpack_require__("../kandy/src/notifications/interface/selectors.js");
-
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Get the logger
+// Constants
 
+// Request
+
+// MWI Actions
+
+// Auth
+const log = (0, _logs.getLogManager)().getLogger('MWI');
 
 // Logs
-const log = (0, _logs.getLogManager)().getLogger('NOTIFICATION');
 
-/**
- * Tries to find the id of the notification.
- *
- * CPaaS notifications do not have a consistent path to their ID.
- * The ID is one level down in the object, but we need to dynamically
- * find the key that its in.
- *
- * @param {Object} notification
- * @returns The notification id if it finds one, undefined otherwise.
- */
-// Notification plugin.
-function findNotificationId(notification) {
-  for (let key in notification) {
-    if (notification[key].id) {
-      return notification[key].id;
-    }
+// Errors
+
+// Notifications
+function* mwiReceived() {
+  const mwiEventChannel = (0, _effects.actionChannel)(action => action.type === _actionTypes.NOTIFICATION_RECEIVED && action.payload.notificationMessage && action.payload.notificationMessage.eventType === 'mwi');
+  const mwiReceived = yield mwiEventChannel;
+  while (true) {
+    const action = yield (0, _effects.take)(mwiReceived);
+
+    // Parse the mwi data
+    let mwiData = (0, _extends3.default)({}, action.payload.notificationMessage.mwiNotificationParams);
+    mwiData.newMessagesWaiting = mwiData.mwi === 'yes';
+    delete mwiData.mwi;
+    mwiData.lastUpdated = action.payload.notificationMessage.time;
+
+    yield (0, _effects.put)(actions.mwiUpdate({ mwiData }));
   }
 }
 
-function* processNotifications() {
-  const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
-  const idCache = [];
+function* fetchMwi() {
+  while (true) {
+    const action = yield (0, _effects.take)(actionTypes.FETCH_MWI);
+    const connInfo = yield (0, _effects.select)(_selectors.getConnectionInfo);
+    const options = (0, _extends3.default)({}, action.payload, connInfo);
 
-  /**
-   * Checks whether a notification has already been received,
-   *      judging by its event ID.
-   * @method isDuplicate
-   * @param  {string} id
-   * @return {boolean}
-   */
-  function isDuplicate(id) {
-    if (idCache.indexOf(id) !== -1) {
-      return true; // duplicate.
-    } else {
-      // Not a duplicate.
-      idCache.push(id);
-      if (idCache.length > config.idCacheLength) {
-        idCache.shift();
+    let platform = yield (0, _effects.select)(_selectors.getPlatform);
+    const version = platform === _constants.platforms.UC ? 1 : options.server.version;
+    const response = yield (0, _effects3.default)({
+      url: `${options.server.protocol}://${options.server.server}:${options.server.port}/rest/version/${version}/user/${options.username}/voicemail`,
+      method: 'GET'
+    }, connInfo.requestOptions);
+
+    if (response.error) {
+      let error;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        let { statusCode } = response.payload.body.mwiresponse;
+        log.debug(`Failed to fetch voicemails with status code ${statusCode}.`);
+
+        error = new _errors2.default({
+          code: _errors.mwiCodes.FETCH_MWI_FAIL,
+          message: `Failed to fetch voicemail. Code: ${statusCode}.`
+        });
+      } else {
+        // Handle errors from the request helper.
+        let { message } = response.payload.result;
+        log.debug('Fetch voicemail request failed.', message);
+
+        error = new _errors2.default({
+          code: _errors.mwiCodes.FETCH_MWI_FAIL,
+          message: `Fetch voicemail request failed: ${message}.`
+        });
       }
 
-      return false;
-    }
-  }
-
-  while (true) {
-    const { payload: notification, meta } = yield (0, _effects.take)(actionTypes.PROCESS_NOTIFICATION);
-
-    // Only process notifications from enabled channels, ie. "silence" the channel.
-    let channel = yield (0, _effects.select)(_selectors.getNotificationsInfo, meta.channel);
-    if (!channel.channelEnabled) {
-      log.debug('Notification received on disabled channel. Ignoring it.', meta.channel);
-      continue;
-    }
-
-    // Find the unique ID of the received notification.
-    const notificationId = findNotificationId(notification);
-    if (!notificationId) {
-      log.error('Received notification without a findable ID.', (0, _keys2.default)(notification));
-      continue;
-    }
-
-    if (!isDuplicate(notificationId)) {
-      // Notify others (plugins) that a new notification was receive.
-      yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
-
-      // Finish processing the notification.
-      yield (0, _effects.put)(actions.processNotificationFinish(notification));
+      yield (0, _effects.put)(actions.mwiUpdate({ error }));
     } else {
-      const error = new Error(`Notification id ${notificationId} is duplicate.`);
-      yield (0, _effects.put)(actions.processNotificationFinish(error));
+      let mwiData = {};
+      if (response.payload.body.mwiresponse.statusCode === 52) {
+        // This statusCode means this user has absolutely no messages, new or old.
+        // It is therefore accompanied with absolutely no data, so we make some for the store.
+        mwiData = {
+          lastUpdated: Date.now(),
+          newMessagesWaiting: false,
+          totalVoice: '0',
+          unheardVoice: '0'
+        };
+      } else {
+        mwiData = (0, _extends3.default)({}, response.payload.body.mwiresponse);
+        delete mwiData.statusCode;
+
+        // Parse the mwi data
+        mwiData.newMessagesWaiting = mwiData.mwi === 'yes';
+        delete mwiData.mwi;
+        mwiData.lastUpdated = Date.now();
+      }
+      yield (0, _effects.put)(actions.mwiUpdate({ mwiData }));
     }
   }
 }
@@ -37615,7 +44930,7 @@ function getNotificationConfig(state) {
 
 /***/ }),
 
-/***/ "../kandy/src/presence/cpaas/constants.js":
+/***/ "../kandy/src/notifications/link/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37624,813 +44939,88 @@ function getNotificationConfig(state) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-/**
- * The valid status values
- * @name STATUS
- * @type {Object}
- */
-const STATUS = exports.STATUS = {
-  OPEN: 'Open',
-  CLOSED: 'Closed'
+exports.default = notifications;
 
-  /**
-   * The valid activities values
-   * @name ACTIVITY
-   * @type {Object}
-   */
-};const ACTIVITY = exports.ACTIVITY = {
-  AVAILABLE: 'Available',
-  BUSY: 'Busy',
-  LUNCH: 'Lunch',
-  VACATION: 'Vacation',
-  ON_THE_PHONE: 'OnThePhone',
-  ACTIVITIES_UNKNOWN: 'ActivitiesUnknown',
-  ACTIVITIES_OTHER: 'ActivitiesOther'
-};
+var _interface = __webpack_require__("../kandy/src/notifications/interface/index.js");
 
-/***/ }),
-
-/***/ "../kandy/src/presence/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _interface = __webpack_require__("../kandy/src/presence/interface/index.js");
-
-var _sagas = __webpack_require__("../kandy/src/presence/cpaas/sagas/index.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _events = __webpack_require__("../kandy/src/presence/interface/events.js");
+var _events = __webpack_require__("../kandy/src/notifications/interface/events.js");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _constants = __webpack_require__("../kandy/src/presence/cpaas/constants.js");
+var _sagas = __webpack_require__("../kandy/src/notifications/link/sagas.js");
+
+var sagas = _interopRequireWildcard(_sagas);
 
 var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _actions2 = __webpack_require__("../kandy/src/config/interface/actions.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Configuration options for the notification feature.
+ * @public
+ * @name config.notifications
+ * @memberof config
+ * @instance
+ * @param {Object} notifications - The notifications configuration object.
+ * @param {number} [notifications.idCacheLength=100] - Default amount of event ids to remember for de-duplication purposes.
+ * @param {Object} [notifications.pushRegistration] - Object describing the server to use for push services.
+ * @param {string} [notifications.pushRegistration.server] - Hostname for the push registration server.
+ * @param {string} [notifications.pushRegistration.port] - Port for the push registration server.
+ * @param {string} [notifications.pushRegistration.protocol] - Protocol for the push registration server.
+ * @param {string} [notifications.pushRegistration.version] - Version for the push registration server.
+ * @param {string} [notifications.realm] - The realm used for push notifications
+ * @param {string} [notifications.bundleId] - The bundle id used for push notifications
+ */
+
+/**
+ * Notifications plugin factory.
+ * @method notifications
+ * @param {configs.notifications} options - Configuration options for authentication.
+ * @return {Object} plugin - A notifications plugin.
+ */
+
+
 // Libraries.
-const name = 'presence';
+
 
 // Other plugins.
-// Presence plugin.
+function notifications(options = {}) {
+  const defaultOptions = {
+    idCacheLength: 100,
+    pushRegistration: undefined,
+    realm: undefined,
+    bundleId: undefined
+  };
+  const pluginOptions = (0, _fp.defaultsDeep)(defaultOptions, options);
 
-
-const capabilities = ['presence'];
-
-exports.default = () => {
-  // Add plugin-specific things to the API.
-  function augmentedApi(context) {
-    const newApi = (0, _interface.api)(context);
-    /**
-     * Possible status values.
-     * @public
-     * @memberof Presence
-     * @type {Object}
-     * @property {string} OPEN
-     * @property {string} CLOSED
-     * @example
-     * const { statuses, activities } = client.presence
-     * // Use the values when updating presence.
-     * client.presence.update(statuses.OPEN, activities.AVAILABLE)
-     */
-    newApi.presence.statuses = _constants.STATUS;
-    /**
-     * Possible activity values.
-     * @public
-     * @memberof Presence
-     * @type {Object}
-     * @property {string} AVAILABLE
-     * @property {string} BUSY
-     * @property {string} LUNCH
-     * @property {string} VACATION
-     * @property {string} ON_THE_PHONE
-     * @property {string} ACTIVITIES_UNKNOWN
-     * @property {string} ACTIVITIES_OTHER
-     */
-    newApi.presence.activities = _constants.ACTIVITY;
-    return newApi;
+  function* init() {
+    yield (0, _effects.put)((0, _actions2.update)(pluginOptions, _interface.name));
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
+
+  const capabilities = ['push', 'registerPushNotifications', 'externalNotifications'];
 
   return {
-    name,
+    name: _interface.name,
     capabilities,
-    api: augmentedApi,
+    init,
+    api: _interface.api,
     reducer: _interface.reducer,
-    init: () => [(0, _effects.put)((0, _actions.mapEvents)(_events2.default))],
     sagas: (0, _fp.values)(sagas)
   };
-};
+} // Notification plugin.
 
 /***/ }),
 
-/***/ "../kandy/src/presence/cpaas/requests/presence.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.publish = publish;
-exports.createList = createList;
-exports.deleteList = deleteList;
-exports.getList = getList;
-exports.getPresenceLists = getPresenceLists;
-exports.retrievePresence = retrievePresence;
-exports.addUser = addUser;
-exports.removeUser = removeUser;
-
-var _constants = __webpack_require__("../kandy/src/presence/cpaas/constants.js");
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * REST request to create a new presence source with initial presence state.
- * @method publish
- * @param  {Object} userPresence
- * @param  {string} userPresence.status - user presence status
- * @param  {string} userPresence.activity - user presence activity
- * @param  {string} userPresence.note - user presence note
- * @param  {Object} requestInfo
- * @return {Object}
- */
-
-
-// Helpers.
-function* publish({ status, activity, note }, requestInfo) {
-  let requestBody = {
-    presenceSource: {
-      clientCorrelator: requestInfo.clientCorrelator,
-      presence: {
-        person: {
-          'overriding-willingness': {
-            overridingWillingnessValue: status
-          },
-          activities: {
-            activityValue: activity
-          }
-        }
-      }
-    }
-  };
-  if (note && activity === _constants.ACTIVITY.ACTIVITIES_OTHER) {
-    requestBody.presenceSource.presence.person.activities.other = note;
-  }
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceSources`,
-    body: (0, _stringify2.default)(requestBody)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Presence publish')
-    };
-  } else {
-    return response.payload.body.presenceSource;
-  }
-}
-
-/**
- * REST request to create a new presence list.
- * @method createList
- * @param  {string} user User ID of presentity
- * @param  {Object} requestInfo
- * @return {Object}
- */
-// Presence plugin.
-function* createList(user, requestInfo) {
-  let requestBody = {
-    presenceList: {
-      'x-listName': 'myList',
-      presenceContact: user
-    }
-  };
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/${requestInfo.username}/presenceLists`,
-    body: (0, _stringify2.default)(requestBody)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Create presence list')
-    };
-  } else {
-    return response.payload.body.presenceList;
-  }
-}
-/**
- * REST request to delete a presence list.
- * @method deleteList
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* deleteList(presenceListId, requestInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Delete presence list')
-    };
-  } else {
-    return response;
-  }
-}
-
-/**
- * REST request to retrieve a presence list.
- * @method getList
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* getList(presenceListId, requestInfo) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Get presence list')
-    };
-  } else {
-    return response;
-  }
-}
-/**
- * REST request to retrieve all presence lists.
- * @method getPresenceLists
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* getPresenceLists(requestInfo) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Get presence lists')
-    };
-  } else {
-    return response.payload.body.presenceListCollection;
-  }
-}
-
-/**
- * REST request to retrieve presence states of requested presentities.
- * @method retrievePresence
- * @param  {Array} users Array of userId's
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {string} subscriptionId Resource ID of the subscription
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* retrievePresence(users, presenceListId, subscriptionId, requestInfo) {
-  let adhocPresenceList = {
-    adhocPresenceList: {
-      presentityUserId: users
-    }
-  };
-
-  const requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/adhocPresenceList`,
-    body: (0, _stringify2.default)(adhocPresenceList)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Fetch users presence')
-    };
-  } else {
-    return response.payload.body.presenceList;
-  }
-}
-/**
- * REST request to add a new presentity to the presence list.
- * @method addUser
- * @param  {string} user userId
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* addUser(userId, presenceListId, requestInfo) {
-  let presenceContact = {
-    presenceContact: {
-      presentityUserId: userId
-    }
-  };
-
-  const requestOptions = {
-    method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}/` + `presenceContacts/${userId}`,
-    body: (0, _stringify2.default)(presenceContact)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Add presence user')
-    };
-  } else {
-    return response.payload.body.presenceContact;
-  }
-}
-/**
- * REST request to delete a presentity from a presence list.
- * @method removeUser
- * @param  {string} user userId
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* removeUser(userId, presenceListId, requestInfo) {
-  const requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}/` + `presenceContacts/${userId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Remove presence user')
-    };
-  } else {
-    return response.payload.result;
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/presence/cpaas/requests/subscriptions.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.subscribe = subscribe;
-exports.unsubscribe = unsubscribe;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * REST request to create a presence list subscription.
- * @method subscribe
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {string} callbackURL Callback URL of websocket channel
- * @param  {Object} requestInfo
- * @return {Object}
- */
-// Presence plugin.
-
-// Helpers.
-function* subscribe(presenceListId, callbackURL, requestInfo) {
-  let presenceListSubscription = {
-    presenceListSubscription: {
-      callbackReference: {
-        notifyURL: callbackURL
-      },
-      clientCorrelator: requestInfo.clientCorrelator,
-      duration: 86400
-    }
-  };
-
-  let requestOptions = {
-    method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/subscriptions/presenceListSubscriptions/` + `${presenceListId}`,
-    body: (0, _stringify2.default)(presenceListSubscription)
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Subscribe to presence list')
-    };
-  } else {
-    return response.payload.body;
-  }
-}
-
-/**
- * REST request to delete a subscription against a presence list.
- * @method unsubscribe
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {string} subscriptionId Resource ID of the subscription
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* unsubscribe(presenceListId, subscriptionId, requestInfo) {
-  let requestOptions = {
-    method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/subscriptions/presenceListSubscriptions/` + `${presenceListId}/${subscriptionId}`
-  };
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Unsubscribe from presence list')
-    };
-  } else {
-    return response.payload.body;
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/presence/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.registerPresence = registerPresence;
-exports.subscribePresence = subscribePresence;
-exports.unsubscribePresence = unsubscribePresence;
-exports.updatePresence = updatePresence;
-exports.fetchPresence = fetchPresence;
-exports.receivePresence = receivePresence;
-
-var _subscriptions = __webpack_require__("../kandy/src/presence/cpaas/sagas/subscriptions.js");
-
-var subscriptionSagas = _interopRequireWildcard(_subscriptions);
-
-var _presence = __webpack_require__("../kandy/src/presence/cpaas/sagas/presence.js");
-
-var presenceSagas = _interopRequireWildcard(_presence);
-
-var _actionTypes = __webpack_require__("../kandy/src/presence/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _effects2 = __webpack_require__("../kandy/src/subscription/interface/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-/**
- * Register the presence service for subscriptions.
- * @method registerPresence
- */
-
-
-// Libraries.
-/**
- * Presence saga index.
- * Defines which actions trigger which sagas.
- */
-
-// Presence plugin.
-function* registerPresence() {
-  yield (0, _effects2.registerService)('presence', subscriptionSagas.presenceSubscribe, subscriptionSagas.presenceUnsubscribe);
-}
-
-/**
- * Presence operations.
- */
-
-/**
- * Subscribe user presence.
- * @method subscribePresence
- */
-
-
-// Other plugins.
-function* subscribePresence() {
-  yield (0, _effects.takeEvery)(actionTypes.SUBSCRIBE, presenceSagas.subscribePresence);
-}
-
-/**
- * Unsubscribe user presence.
- * @method unsubscribePresence
- */
-function* unsubscribePresence() {
-  yield (0, _effects.takeEvery)(actionTypes.UNSUBSCRIBE, presenceSagas.unsubscribePresence);
-}
-
-/**
- * Update user presence.
- * @method updatePresence
- */
-function* updatePresence() {
-  yield (0, _effects.takeEvery)(actionTypes.UPDATE, presenceSagas.updatePresence);
-}
-
-/**
- * Fetch user(s) presence.
- * @method fetchPresence
- */
-function* fetchPresence() {
-  yield (0, _effects.takeEvery)(actionTypes.GET, presenceSagas.fetchPresence);
-}
-
-function* receivePresence() {
-  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.presenceNotification, presenceSagas.handleIncomingPresence);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/presence/cpaas/sagas/presence.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
-
-var _values2 = _interopRequireDefault(_values);
-
-exports.updatePresence = updatePresence;
-exports.fetchPresence = fetchPresence;
-exports.subscribePresence = subscribePresence;
-exports.unsubscribePresence = unsubscribePresence;
-exports.handleIncomingPresence = handleIncomingPresence;
-
-var _presence = __webpack_require__("../kandy/src/presence/cpaas/requests/presence.js");
-
-var _actions = __webpack_require__("../kandy/src/presence/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _constants2 = __webpack_require__("../kandy/src/presence/cpaas/constants.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Helpers.
-const log = (0, _logs.getLogManager)().getLogger('PRESENCE');
-
-/**
- * Map of old presence activity values to new values.
- * @type {Object}
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-// Presence plugin.
-const activityMapUcToCPaaS = {
-  active: _constants2.ACTIVITY.AVAILABLE,
-  idle: _constants2.ACTIVITY.BUSY,
-  away: _constants2.ACTIVITY.BUSY,
-  lunch: _constants2.ACTIVITY.LUNCH,
-  other: _constants2.ACTIVITY.ACTIVITIES_OTHER,
-  busy: _constants2.ACTIVITY.BUSY,
-  vacation: _constants2.ACTIVITY.VACATION,
-  'on-the-phone': _constants2.ACTIVITY.ON_THE_PHONE,
-  unknown: _constants2.ACTIVITY.ACTIVITIES_UNKNOWN
-
-  /*
-   * Map of old presence status values to new values.
-   * @type {Object}
-   */
-};const statusMapUcToCPaaS = {
-  open: _constants2.STATUS.OPEN,
-  closed: _constants2.STATUS.CLOSED
-
-  /**
-   * Update presence.
-   * @method updatePresence
-   * @param  {Object} action An action of type `PUBLISH_PRESENCE`.
-   */
-};function* updatePresence({ payload }) {
-  // Convert the status to the CPaaS value (if required)
-  if (payload.status in statusMapUcToCPaaS) {
-    payload.status = statusMapUcToCPaaS[payload.status];
-  }
-
-  // Convert the activity to the CPaaS value (if required)
-  if (payload.activity in activityMapUcToCPaaS) {
-    payload.activity = activityMapUcToCPaaS[payload.activity];
-  }
-
-  // Verify that the status value is a valid CPaaS values
-  if ((0, _values2.default)(_constants2.STATUS).indexOf(payload.status) === -1) {
-    log.info('Could not update presence: Invalid status.');
-    yield (0, _effects.put)(actions.updatePresenceFinish(new _errors2.default({
-      code: _errors.presenceCodes.INVALID_STATUS,
-      message: 'Invalid status in presence update request.'
-    })));
-    return;
-  }
-
-  // Verify that the activity value is a valid CPaaS value
-  if ((0, _values2.default)(_constants2.ACTIVITY).indexOf(payload.activity) === -1) {
-    log.info('Could not update presence: Invalid activity.');
-    yield (0, _effects.put)(actions.updatePresenceFinish(new _errors2.default({
-      code: _errors.presenceCodes.INVALID_ACTIVITY,
-      message: 'Invalid activity in presence update request.'
-    })));
-    return;
-  }
-
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_presence.publish, payload, requestInfo);
-  log.debug('Received response from getRequestInfo request:', response);
-
-  if (!response.error) {
-    let presenceValues = {};
-    presenceValues.status = response.presence.person['overriding-willingness'].overridingWillingnessValue;
-    presenceValues.activity = response.presence.person.activities.activityValue;
-    presenceValues.note = response.presence.person.activities.other;
-
-    yield (0, _effects.put)(actions.updatePresenceFinish(presenceValues));
-  } else {
-    yield (0, _effects.put)(actions.updatePresenceFinish(response.error));
-  }
-}
-
-/**
- * fetchPresence.
- * @method fetchPresence
- * @param  {Array<string>|string} users A single userId or array of userIds
- */
-function* fetchPresence({ payload }) {
-  const users = payload;
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  // get current presenceListId
-  const subscriptions = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
-    return sub.service === 'presence';
-  });
-  const presenceListId = presenceSubscription[0].presenceListId;
-  const resourceURL = presenceSubscription[0].resourceURL;
-  const subscriptionId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-
-  const response = yield (0, _effects.call)(_presence.retrievePresence, users, presenceListId, subscriptionId, requestInfo);
-  log.debug('Received response from retrievePresence request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.getPresenceFinish(response));
-  } else {
-    yield (0, _effects.put)(actions.getPresenceFinish(response.error));
-  }
-}
-
-/**
- * subscribePresence.
- * @method subscribePresence
- * @param  {string} userId userId
- */
-function* subscribePresence({ payload }) {
-  const userId = payload;
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  // get current presenceListId
-  const subscriptions = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
-    return sub.service === 'presence';
-  });
-  const presenceListId = presenceSubscription[0].presenceListId;
-  const response = yield (0, _effects.call)(_presence.addUser, userId, presenceListId, requestInfo);
-  log.debug('Received response from addUser request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.subscribePresenceFinish(response));
-  } else {
-    yield (0, _effects.put)(actions.subscribePresenceFinish(response.error));
-  }
-}
-/**
- * unsubscribePresence.
- * @method unsubscribePresence
- * @param  {string} userId userId
- */
-function* unsubscribePresence({ payload }) {
-  const userId = payload;
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-
-  // get current presenceListId
-  const subscriptions = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
-    return sub.service === 'presence';
-  });
-  const presenceListId = presenceSubscription[0].presenceListId;
-
-  const response = yield (0, _effects.call)(_presence.removeUser, userId, presenceListId, requestInfo);
-  log.debug('Received response from removeUser request:', response);
-
-  if (!response.error) {
-    yield (0, _effects.put)(actions.unsubscribePresenceFinish(userId));
-  } else {
-    yield (0, _effects.put)(actions.unsubscribePresenceFinish(response.error));
-  }
-}
-
-/**
- * handle incoming presence notification.
- * @method handleIncomingPresence
- * @param  {string} userId userId
- */
-function* handleIncomingPresence(wsAction) {
-  const notification = wsAction.payload.presenceNotification;
-  //
-  if (notification.presence) {
-    let presence = {};
-    presence.userId = notification.presentityUserId;
-    presence.activity = notification.presence.person.activities.activityValue;
-    presence.status = notification.presence.person['overriding-willingness'].overridingWillingnessValue;
-    presence.note = notification.presence.person.activities.other;
-    yield (0, _effects.put)(actions.presenceReceived(presence));
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/presence/cpaas/sagas/subscriptions.js":
+/***/ "../kandy/src/notifications/link/requests.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38444,140 +45034,475 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-exports.presenceSubscribe = presenceSubscribe;
-exports.presenceUnsubscribe = presenceUnsubscribe;
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
 
-var _presence = __webpack_require__("../kandy/src/presence/cpaas/requests/presence.js");
+var _stringify2 = _interopRequireDefault(_stringify);
 
-var _subscriptions = __webpack_require__("../kandy/src/presence/cpaas/requests/subscriptions.js");
+exports.pushNotificationsRegistration = pushNotificationsRegistration;
+exports.pushNotificationsDeRegistration = pushNotificationsDeRegistration;
+exports.fetchSDP = fetchSDP;
 
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
 
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+var _effects2 = _interopRequireDefault(_effects);
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-var _selectors2 = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Helpers.
-
-
-// Other plugins.
-// Presence plugin.
-const log = (0, _logs.getLogManager)().getLogger('PRESENCE');
+// Request
+const log = (0, _logs.getLogManager)().getLogger('NOTIFICATIONS');
 
 /**
- * Subscription saga. Creates a new presence subscription channel.
- * @method presenceSubscribe
+ * Registers a device token with On-Prem services.
+ * @method pushNotificationsRegistration
+ * @param  {Object} connection - Information for formatting the request.
+ * @param  {Object} options
+ * @param  {string} options.deviceToken
+ * @param  {string[]} options.services - Push service to register to; either 'google' or 'apple'.
+ * @param {string} options.pushProvider - The push provider, can be either 'apple' or 'google'.
+ * @param  {string} options.bundleId - The bundle id to use for registration.
+ * @param  {string} options.clientCorrelator - Unique identifier for a client device.
+ * @return {Object} response
  */
 
+// Logs
+function* pushNotificationsRegistration(connection, options) {
+  const { server, requestOptions } = connection;
+  let url = `${server.protocol}://${server.server}:${server.port}/` + `rest/version/${server.version}/` + `user/${connection.username}/` + 'push/' + options.pushProvider.toLowerCase() + '/devices/';
+  const method = 'POST';
+  const body = (0, _stringify2.default)({
+    deviceToken: options.deviceToken,
+    bundleID: options.bundleId,
+    service: options.services,
+    clientCorrelator: options.clientCorrelator,
+    realm: connection.realm
+  });
 
-// Libraries.
-function* presenceSubscribe() {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const channels = yield (0, _effects.select)(_selectors2.getNotificationChannels);
+  const response = yield (0, _effects2.default)({ url, method, body }, requestOptions);
 
-  const callbackURL = channels.notificationChannels.websocket.callbackURL;
-
-  // either use an existing presence list, or create a new one
-  const presenceListResponse = yield (0, _effects.call)(_presence.getPresenceLists, requestInfo);
-  log.debug('Received presenceLists response:', presenceListResponse);
-
-  // check if there is a presence list already
-  let presenceListId, newListResponse;
-  if (!presenceListResponse.error) {
-    // check if there is an existing presenceList
-    if (presenceListResponse.presenceList.length > 0) {
-      const url = presenceListResponse.presenceList[0].resourceURL;
-      if (url) {
-        let lastIndex = url.lastIndexOf('/');
-        presenceListId = url.slice(lastIndex + 1);
-      }
-    } else {
-      //  create a new presenceList
-      newListResponse = yield (0, _effects.call)(_presence.createList, [], requestInfo);
-
-      if (newListResponse.error) {
-        yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-          service: 'presence',
-          type: 'websocket',
-          error: newListResponse.error
-        }));
-        return;
-      }
-
-      const resourceURL = newListResponse.resourceURL;
-      if (resourceURL) {
-        presenceListId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-      }
-    }
-  } else {
-    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-      service: 'presence',
-      type: 'websocket',
-      error: presenceListResponse.error
-    }));
-    return;
+  let registrationResponse;
+  let responseName = options.pushProvider.toLowerCase() + 'DeviceRegistrationResponse';
+  if (response.payload.body && response.payload.body[responseName]) {
+    registrationResponse = response.payload.body[responseName];
   }
 
-  // Subscribe to the presence list subscription
-  const response = yield (0, _effects.call)(_subscriptions.subscribe, presenceListId, callbackURL, requestInfo);
-  log.debug('Received subscribe presence response:', response);
-
   if (response.error) {
-    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-      service: 'presence',
-      type: 'websocket',
-      error: response.error
-    }));
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let statusCode = registrationResponse.statusCode;
+      log.debug(`Failed to register device token for push notifications. Status: ${statusCode}`);
+
+      return {
+        error: true,
+        status: statusCode,
+        text: `Failed to register device token. Error: ${response.payload.statusCode}`
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Device registration request failed: ${message}.`);
+
+      return {
+        error: true,
+        status: response.payload.result.code,
+        text: `Failed to register device token. Error: ${response.payload.result.message}`
+      };
+    }
+  } else if (registrationResponse && registrationResponse.statusCode !== 0) {
+    // TODO: Is this else-if needed?
+    return {
+      error: true,
+      status: registrationResponse.statuscode,
+      text: `Failed to register device token. Error: ${registrationResponse.statusCode}`
+    };
   } else {
-    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-      service: 'presence',
-      type: 'websocket',
-      subscription: response.presenceListSubscription
-    }));
+    log.debug('Successfully registered device token for push notifications.', registrationResponse.statusCode);
+    return (0, _extends3.default)({
+      error: false
+    }, registrationResponse);
   }
 }
 
 /**
- * Unsubscription saga. Deletes an existing presence subscription.
- * @method presenceUnsubscribe
+ * De-Registers a device token with On-Prem services.
+ * @method pushNotificationsDeRegistration
+ * @param  {Object} connection - Information for formatting the request.
+ * @param  {Object} options
+ * @param  {string} options.registration
+ * @return {Object} response
  */
-function* presenceUnsubscribe(action) {
-  const { subscriptions } = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  let presenceSubscription = subscriptions.filter(sub => {
-    return sub.service === 'presence' && sub.channelType === action.payload.type;
-  });
+function* pushNotificationsDeRegistration(connection, options) {
+  const { server, requestOptions } = connection;
+  let url = `${server.protocol}://${server.server}:${server.port}${options.registration}`;
+  const method = 'DELETE';
 
-  if (presenceSubscription.length === 0) {
-    // "Error" scenario: Can't unsubscribe to a service
-    //    that we don't have.
-  } else if (presenceSubscription.length > 1) {
-    // "Error" scenario: There shouldn't be able to have
-    //    more than 1 of the same service.
+  const response = yield (0, _effects2.default)({ url, method }, requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body;
+      log.debug(`Failed to deregister device token for push. Status: ${statusCode}.`);
+      // TODO: Proper errors.
+      return {
+        error: true,
+        status: statusCode,
+        text: `Failed to deregister device token. Code: ${statusCode}.`
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Device token deregistration request failed: ${message}`);
+      // TODO: Proper error.
+      return {
+        error: true,
+        status: response.payload.result.code,
+        text: `Device token deregistration request failed: ${message}`
+      };
+    }
   } else {
-    presenceSubscription = presenceSubscription[0];
+    log.debug('Successfully de-registered device token for push notifications.');
+    // Successful de-register has no response.
+    return {
+      error: false
+    };
   }
-  const presenceListId = presenceSubscription.presenceListId;
-  const subscription = presenceSubscription.subscriptionId;
-  const subscriptionId = subscription.substring(subscription.lastIndexOf('/') + 1);
+}
 
-  log.info(`Unsubscribing from presence service on ${action.payload.type} channel.`);
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
+/**
+ * Fetches SDP data from a given partial URL.
+ * @method fetchSDP
+ * @param  {Object} partialUrl - A partial URL. Contains everything after the protocol://server:port
+ * @return {Object} response A response payload
+ */
+function* fetchSDP(connection, partialUrl) {
+  const { server, requestOptions } = connection;
+  const response = yield (0, _effects2.default)({
+    url: `${server.protocol}://${server.server}:${server.port}${partialUrl}`,
+    method: 'GET'
+  }, requestOptions);
 
-  // Unsubscribe from the presence list subscription
-  const response = yield (0, _effects.call)(_subscriptions.unsubscribe, presenceListId, subscriptionId, requestInfo);
+  if (!response.error) {
+    // TODO: test and see what this format actually is.
+    return response.payload.body;
+  }
+}
 
-  yield (0, _effects.put)((0, _actions.reportUnsubscriptionFinished)((0, _extends3.default)({}, response, {
-    service: 'presence',
-    type: action.payload.type
-  })));
+/***/ }),
+
+/***/ "../kandy/src/notifications/link/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+exports.processNotification = processNotification;
+exports.registerPushDeviceToken = registerPushDeviceToken;
+exports.deregisterPushDeviceToken = deregisterPushDeviceToken;
+exports.enableWebsocketChannel = enableWebsocketChannel;
+
+var _actions = __webpack_require__("../kandy/src/notifications/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _actionTypes = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _selectors = __webpack_require__("../kandy/src/notifications/interface/selectors.js");
+
+var _requests = __webpack_require__("../kandy/src/notifications/link/requests.js");
+
+var requests = _interopRequireWildcard(_requests);
+
+var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _pako = __webpack_require__("../../node_modules/pako/index.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _reduxSaga = __webpack_require__("../../node_modules/redux-saga/es/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Logs
+
+
+// Libraries.
+const INITIAL_BUFFER_SIZE = 10;
+// Get the logger
+
+
+// Constants
+
+
+// Other plugins.
+// Notification plugin.
+const log = (0, _logs.getLogManager)().getLogger('NOTIFICATION');
+
+function* processNotification() {
+  const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
+  var idCache = [];
+  /**
+   * Checks whether a notification has already been received,
+   *      judging by its event ID.
+   * @method isDuplicate
+   * @param  {string} id
+   * @return {boolean}
+   */
+  function isDuplicate(id) {
+    if (idCache.indexOf(id) !== -1) {
+      return true; // duplicate.
+    } else {
+      // Not a duplicate.
+      idCache.push(id);
+      if (idCache.length > config.idCacheLength) {
+        idCache.shift();
+      }
+
+      return false;
+    }
+  }
+
+  const externalNotifications = yield (0, _effects.actionChannel)(actionTypes.PROCESS_NOTIFICATION, _reduxSaga.buffers.expanding(INITIAL_BUFFER_SIZE));
+  while (true) {
+    const action = yield (0, _effects.take)(externalNotifications);
+
+    // Only process notifications from enabled channels, ie. "silence" the channel.
+    let channel = yield (0, _effects.select)(_selectors.getNotificationsInfo, action.meta.channel);
+    if (!channel.channelEnabled) {
+      log.debug('Notification received on disabled channel. Ignoring it.', action.meta.channel);
+      continue;
+    }
+
+    // Find the unique ID of the received notification.
+    let notificationId;
+    switch (action.meta.platform) {
+      case _constants.platforms.LINK:
+        notificationId = action.payload.notificationMessage.eventId;
+        break;
+      case _constants.platforms.UC:
+        // A Link notification can be in either the Link format or the SPiDR format (for calls).
+        notificationId = action.payload.notificationMessage.id || action.payload.notificationMessage.eventId;
+        break;
+      case _constants.platforms.CPAAS:
+        // CPaaS notifications do not have a consistent path to their ID.
+        //    The ID is one level down in the object, but we need to dynamically
+        //    find the key that its in.
+        const notification = action.payload;
+        for (let key in notification) {
+          if (notification[key].id) {
+            notificationId = notification[key].id;
+            break;
+          }
+        }
+        if (!notificationId) {
+          log.error('Received notification without a findable ID.', (0, _keys2.default)(notification));
+        }
+        break;
+      default:
+        log.debug('Received notification from unknown platform.');
+    }
+
+    let formattedPayload = action.payload;
+    if ((0, _fp.has)('payload.notificationMessage.sessionParams.sdpFormat', action)) {
+      log.debug('Notification contains SDP. Normalizing.');
+      formattedPayload = yield (0, _effects.call)(normalizeSDP, action.payload);
+    }
+
+    if (!isDuplicate(notificationId)) {
+      yield (0, _effects.put)(actions.notificationReceived(formattedPayload, action.meta.platform));
+    } else {
+      const error = new Error(`Notification id ${notificationId} is duplicate.`);
+      // TODO: Tech-debt; this action should be a notificationReceived error action.
+      //      But that requires all sagas listening for notifications to filter out
+      //      error actions ..which requires their take() patterns changed, which
+      //      is another tech-debt item.
+      yield (0, _effects.put)(actions.processNotificationFinish(error));
+    }
+  }
+}
+/**
+ * This function accepts a notification payload. If the payload is a spidr payload
+ * and contains an sdpFormat that needs manipulating, it is done here.
+ * @method normalizeSDP
+ * @param payload A processNotification action payload
+ * @returns payload A processNotification action payload
+ */
+function* normalizeSDP(payload) {
+  // Copy the payload to not disturb the action.
+  payload = (0, _extends3.default)({}, payload);
+
+  if (payload.notificationMessage.sessionParams.sdpFormat === 'compressed') {
+    log.debug('sdpFormat: compressed. Deflating compressed SDP...');
+    // convert based64 encoded string into bytes
+    const sdpCompressedBytes = atob(payload.notificationMessage.sessionParams.sdp);
+    // uncompress the bytes
+    const sdpUnCompressedBytes = yield (0, _effects.call)(_pako.inflate, sdpCompressedBytes);
+    // convert uncompress bytes back into string
+    const sdpString = String.fromCharCode.apply(null, new Uint16Array(sdpUnCompressedBytes));
+    payload.notificationMessage.sessionParams.sdp = sdpString;
+    return payload;
+  } else if (payload.notificationMessage.sessionParams.sdpFormat === 'url') {
+    log.debug('sdpFormat: url. Fetching SDP...');
+    const connection = yield (0, _effects.select)(_selectors2.getConnectionInfo);
+    const { pushRegistration } = yield (0, _effects.select)(_selectors.getNotificationConfig);
+
+    // If a push registration endpoint was configured, use that instead of default.
+    if (pushRegistration) {
+      connection.server = (0, _fp.defaults)(connection.server, pushRegistration);
+      connection.protocol = (0, _fp.defaults)(connection.protocol, pushRegistration);
+      connection.port = (0, _fp.defaults)(connection.port, pushRegistration);
+      connection.version = (0, _fp.defaults)(connection.version, pushRegistration);
+    }
+
+    const response = yield (0, _effects.call)(requests.fetchSDP, connection, payload.notificationMessage.sessionParams.sdp);
+    payload.notificationMessage.sessionParams.sdp = response.eventDataResponse.sdp;
+    return payload;
+  } else {
+    log.debug(`Unknown sdpFormat received: ${payload.notificationMessage.sessionParams.sdpFormat}.`);
+    return payload;
+  }
+}
+
+/**
+ * Saga for registering a device token for push notifications.
+ * @method registerPushDeviceToken
+ */
+function* registerPushDeviceToken() {
+  // Redux-saga take() pattern.
+  // Take 'enable PUSH channel' actions.
+  function takePushRegistrations(action) {
+    return action.type === actionTypes.ENABLE_NOTIFICATION_CHANNEL && action.meta.channel === 'PUSH' && action.payload.channelEnabled;
+  }
+
+  while (true) {
+    // Wait for a registration action.
+    const action = yield (0, _effects.take)(takePushRegistrations);
+
+    // TODO: This saga's request won't work using Link. Link requires the token
+    //      as a query string parameter.
+    const connection = yield (0, _effects.select)(_selectors2.getConnectionInfo);
+    const { pushRegistration, realm, bundleId } = yield (0, _effects.select)(_selectors.getNotificationConfig);
+
+    // If a push registration endpoint was configured, use that instead of default.
+    if (pushRegistration) {
+      connection.server = (0, _fp.defaults)(connection.server, pushRegistration);
+      connection.protocol = (0, _fp.defaults)(connection.protocol, pushRegistration);
+      connection.port = (0, _fp.defaults)(connection.port, pushRegistration);
+      connection.version = (0, _fp.defaults)(connection.version, pushRegistration);
+    }
+
+    connection.realm = realm;
+
+    log.debug('Registering device token for push notifications.');
+    const response = yield (0, _effects.call)(requests.pushNotificationsRegistration, connection, (0, _extends3.default)({}, action.payload, {
+      bundleId
+    }));
+
+    if (response.error) {
+      yield (0, _effects.put)(actions.enableNotificationChannelFinish(action.meta.channel, {
+        params: action.payload,
+        error: response.text
+      }));
+    } else {
+      yield (0, _effects.put)(actions.enableNotificationChannelFinish(action.meta.channel, {
+        params: {
+          channelEnabled: action.payload.channelEnabled,
+          registration: response.registration,
+          services: response.subscriptionParams.service
+        }
+      }));
+    }
+  }
+}
+
+/**
+ * Saga for deregistering a device token for push notifications.
+ * @method deregisterPushDeviceToken
+ */
+function* deregisterPushDeviceToken() {
+  // Redux-saga take() pattern.
+  // Take 'disable PUSH channel' actions.
+  function takePushDeregistrations(action) {
+    return action.type === actionTypes.ENABLE_NOTIFICATION_CHANNEL && action.meta.channel === 'PUSH' && !action.payload.channelEnabled;
+  }
+
+  while (true) {
+    // Wait for a deregistration action.
+    const action = yield (0, _effects.take)(takePushDeregistrations);
+
+    // TODO: This saga's request won't work using Link. Link requires the token
+    //      as a query string parameter.
+    const connection = yield (0, _effects.select)(_selectors2.getConnectionInfo);
+    const { pushRegistration, realm } = yield (0, _effects.select)(_selectors.getNotificationConfig);
+
+    // If a push registration endpoint was configured, use that instead of default.
+    if (pushRegistration) {
+      connection.server = (0, _fp.defaults)(connection.server, pushRegistration);
+      connection.protocol = (0, _fp.defaults)(connection.protocol, pushRegistration);
+      connection.port = (0, _fp.defaults)(connection.port, pushRegistration);
+      connection.version = (0, _fp.defaults)(connection.version, pushRegistration);
+    }
+    connection.realm = realm;
+
+    const pushInfo = yield (0, _effects.select)(_selectors.getNotificationsInfo, action.meta.channel);
+    log.debug('De-registering device token for push notifications.');
+    const response = yield (0, _effects.call)(requests.pushNotificationsDeRegistration, connection, pushInfo);
+    if (response.error) {
+      yield (0, _effects.put)(actions.enableNotificationChannelFinish(action.meta.channel, {
+        params: action.payload,
+        error: response.text
+      }));
+    } else {
+      yield (0, _effects.put)(actions.enableNotificationChannelFinish(action.meta.channel, {
+        params: action.payload
+      }));
+    }
+  }
+}
+
+function* enableWebsocketChannel() {
+  // Redux-saga take() pattern.
+  // Take 'WEBSOCKET channel' actions.
+  function takeWebsocketChannel(action) {
+    return action.type === actionTypes.ENABLE_NOTIFICATION_CHANNEL && action.meta.channel === 'WEBSOCKET';
+  }
+
+  while (true) {
+    const action = yield (0, _effects.take)(takeWebsocketChannel);
+
+    if (action.payload.enable) {}
+    // TODO: If websockets are not connected, connect them here.
+
+
+    // TODO: Handle possible error case when connecting websockets.
+    //      Otherwise, plain dispatch to update state.
+    yield (0, _effects.put)(actions.enableNotificationChannelFinish(action.meta.channel, {
+      params: action.payload
+    }));
+  }
 }
 
 /***/ }),
@@ -39268,6 +46193,400 @@ function getSelfPresence(state) {
 
 /***/ }),
 
+/***/ "../kandy/src/presence/link/constants.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * The status of the presence state
+ * @name STATUS
+ */
+const STATUS = exports.STATUS = {
+  OPEN: 'open',
+  CLOSED: 'closed'
+
+  /**
+   * The presence activity
+   * @name ACTIVITY
+   */
+};const ACTIVITY = exports.ACTIVITY = {
+  ACTIVE: 'active',
+  IDLE: 'idle',
+  AWAY: 'away',
+  LUNCH: 'lunch',
+  OTHER: 'other',
+  BUSY: 'busy',
+  VACATION: 'vacation',
+  ON_THE_PHONE: 'on-the-phone',
+  UNKNOWN: 'unknown'
+};
+
+/***/ }),
+
+/***/ "../kandy/src/presence/link/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = linkPresence;
+
+var _interface = __webpack_require__("../kandy/src/presence/interface/index.js");
+
+var _sagas = __webpack_require__("../kandy/src/presence/link/sagas.js");
+
+var sagas = _interopRequireWildcard(_sagas);
+
+var _events = __webpack_require__("../kandy/src/presence/interface/events.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _constants = __webpack_require__("../kandy/src/presence/link/constants.js");
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Libraries
+const name = 'presence';
+
+// Other plugins.
+// Presence plugin.
+
+
+const capabilities = ['presence'];
+
+/**
+ * Link Presence plugin factory.
+ * @method linkPresence
+ * @return {Object} A plugin.
+ */
+function linkPresence() {
+  // Add plugin-specific things to the API.
+  function augmentedApi(context) {
+    const newApi = (0, _interface.api)(context);
+
+    /**
+     * Possible status values.
+     * @public
+     * @memberof Presence
+     * @type {Object}
+     * @property {string} OPEN
+     * @property {string} CLOSED
+     * @example
+     * const { statuses, activities } = client.presence
+     * // Use the values when updating presence.
+     * client.presence.update(statuses.OPEN, activities.AVAILABLE)
+     */
+    newApi.presence.statuses = _constants.STATUS;
+
+    /**
+     * Possible activity values.
+     * @public
+     * @memberof Presence
+     * @type {Object}
+     * @property {string} AVAILABLE
+     * @property {string} IDLE
+     * @property {string} AWAY
+     * @property {string} LUNCH
+     * @property {string} BUSY
+     * @property {string} VACATION
+     * @property {string} ON_THE_PHONE
+     * @property {string} UNKNOWN
+     */
+    newApi.presence.activities = _constants.ACTIVITY;
+    return newApi;
+  }
+
+  return {
+    name,
+    capabilities,
+    api: augmentedApi,
+    reducer: _interface.reducer,
+    init: () => [(0, _effects.put)((0, _actions.mapEvents)(_events2.default))],
+    sagas: (0, _fp.values)(sagas)
+  };
+}
+
+/***/ }),
+
+/***/ "../kandy/src/presence/link/requests.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.updatePresenceRequest = updatePresenceRequest;
+exports.watchPresenceRequest = watchPresenceRequest;
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Request
+const log = (0, _logs.getLogManager)().getLogger('PRESENCE');
+// Logs
+function* updatePresenceRequest({ status, activity, note }, requestInfo) {
+  let url = `${requestInfo.baseURL}/rest/version/${requestInfo.version}/user/${requestInfo.username}/presence`;
+
+  const data = { status, activity };
+  if (note) {
+    data.note = note;
+  }
+  const body = (0, _stringify2.default)({ presenceRequest: data });
+
+  const method = 'POST';
+
+  const response = yield (0, _effects2.default)({ url, body, method }, requestInfo.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.presenceResponse;
+      log.debug(`Failed to update presence with status code ${statusCode}.`);
+
+      // TODO: Proper error.
+      return new Error(`Failed to update presence with status code ${statusCode}.`);
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Update presence request failed: ${message}.`);
+
+      // TODO: Proper error.
+      return new Error(`Update presence request failed: ${message}.`);
+    }
+  } else {
+    if (response.payload.body.presenceResponse.statusCode === 0) {
+      return true; // success!
+    }
+    return new Error('Failed to update presence. Code: ' + response.payload.body.presenceResponse.statusCode + '.');
+  }
+}
+
+/**
+ * Make a request to the presenceWatcher resource
+ * @param  {array<User>}  users  a lits of users for the watch request
+ * @param  {string}       action watch     Starts watching the presence updates
+ *                                         for the users in the users array.
+ *                               stopwatch Stops watching the presence updates
+ *                                         for the users in the users array.
+ *                               get       Gets the presence updates one time
+ *                                         only for the users in the users array.
+ */
+function* watchPresenceRequest(users, action, requestInfo) {
+  let url = `${requestInfo.baseURL}/rest/version/${requestInfo.version}/user/${requestInfo.username}/presenceWatcher`;
+
+  const body = (0, _stringify2.default)({
+    presenceWatcherRequest: {
+      userList: users,
+      action
+    }
+  });
+
+  const method = 'POST';
+
+  const response = yield (0, _effects2.default)({ url, method, body }, requestInfo.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.presenceWatcherResponse;
+      log.debug(`Failed to watch presence with status code ${statusCode}.`);
+
+      // TODO: Proper error.
+      return new Error(`Failed to watch presence with status code ${statusCode}.`);
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Watch presence request failed: ${message}.`);
+
+      // TODO: Proper error.
+      return new Error(`Watch presence request failed: ${message}.`);
+    }
+  } else {
+    if (response.payload.body.presenceWatcherResponse.statusCode === 0) {
+      return response.payload.body; // success!
+    }
+    return new Error('Failed to execute presence operation (' + action + '). Code: ' + response.payload.body.presenceResponse.statusCode + '.');
+  }
+}
+
+/***/ }),
+
+/***/ "../kandy/src/presence/link/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
+exports.presenceUpdateSaga = presenceUpdateSaga;
+exports.presenceGetSaga = presenceGetSaga;
+exports.presenceSubscribeSaga = presenceSubscribeSaga;
+exports.presenceUnsubscribeSaga = presenceUnsubscribeSaga;
+exports.presenceReceivedSaga = presenceReceivedSaga;
+
+var _actionTypes = __webpack_require__("../kandy/src/presence/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actions = __webpack_require__("../kandy/src/presence/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _requests = __webpack_require__("../kandy/src/presence/link/requests.js");
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _constants = __webpack_require__("../kandy/src/presence/link/constants.js");
+
+var _constants2 = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Constants
+
+// Libraries.
+
+// Other plugins.
+function* presenceUpdateSaga() {
+  yield (0, _effects.takeEvery)(actionTypes.UPDATE, updatePresence);
+}
+// Helpers
+// Presence plugin.
+function* presenceGetSaga() {
+  yield (0, _effects.takeEvery)(actionTypes.GET, getPresence);
+}
+
+function* presenceSubscribeSaga() {
+  yield (0, _effects.takeEvery)(actionTypes.SUBSCRIBE, subscribePresence);
+}
+
+function* presenceUnsubscribeSaga() {
+  yield (0, _effects.takeEvery)(actionTypes.UNSUBSCRIBE, unsubscribePresence);
+}
+
+function* presenceReceivedSaga() {
+  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage && action.payload.notificationMessage.eventType === 'presenceWatcher', receivePresence);
+}
+
+function* updatePresence({ payload }) {
+  // Verify that the status value is a valid
+  if ((0, _values2.default)(_constants.STATUS).indexOf(payload.status) === -1) {
+    yield (0, _effects.put)(actions.updatePresenceFinish({
+      error: new _errors2.default({
+        code: _errors.presenceCodes.INVALID_STATUS,
+        message: 'Invalid status in presence update request.'
+      })
+    }));
+    return;
+  }
+
+  // Verify that the activity value is a valid
+  if ((0, _values2.default)(_constants.ACTIVITY).indexOf(payload.activity) === -1) {
+    yield (0, _effects.put)(actions.updatePresenceFinish({
+      error: new _errors2.default({
+        code: _errors.presenceCodes.INVALID_ACTIVITY,
+        message: 'Invalid activity in presence update request.'
+      })
+    }));
+    return;
+  }
+
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects.select)(_selectors.getPlatform);
+  requestInfo.version = platform === _constants2.platforms.UC ? 1 : requestInfo.version;
+  const res = yield (0, _effects.call)(_requests.updatePresenceRequest, payload, requestInfo);
+  if (res instanceof Error) {
+    yield (0, _effects.put)(actions.updatePresenceFinish(res));
+  } else {
+    yield (0, _effects.put)(actions.updatePresenceFinish(payload));
+  }
+}
+
+function* getPresence({ payload }) {
+  const users = Array.isArray(payload) ? payload : [payload];
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects.select)(_selectors.getPlatform);
+  requestInfo.version = platform === _constants2.platforms.UC ? 1 : requestInfo.version;
+  const res = yield (0, _effects.call)(_requests.watchPresenceRequest, users, 'get', requestInfo);
+  yield (0, _effects.put)(actions.getPresenceFinish(res));
+}
+
+function* subscribePresence({ payload }) {
+  const users = Array.isArray(payload) ? payload : [payload];
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects.select)(_selectors.getPlatform);
+  requestInfo.version = platform === _constants2.platforms.UC ? 1 : requestInfo.version;
+  const res = yield (0, _effects.call)(_requests.watchPresenceRequest, users, 'watch', requestInfo);
+  yield (0, _effects.put)(actions.subscribePresenceFinish(res));
+}
+
+function* unsubscribePresence({ payload }) {
+  const users = Array.isArray(payload) ? payload : [payload];
+  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo);
+  let platform = yield (0, _effects.select)(_selectors.getPlatform);
+  requestInfo.version = platform === _constants2.platforms.UC ? 1 : requestInfo.version;
+  const res = yield (0, _effects.call)(_requests.watchPresenceRequest, users, 'stopwatch', requestInfo);
+  yield (0, _effects.put)(actions.unsubscribePresenceFinish(res));
+}
+
+function* receivePresence(wsAction) {
+  const params = wsAction.payload.notificationMessage.presenceWatcherNotificationParams;
+  const presence = {
+    userId: params.name,
+    activity: params.activity,
+    status: params.status,
+    note: params.note
+  };
+  yield (0, _effects.put)(actions.presenceReceived(presence));
+}
+
+/***/ }),
+
 /***/ "../kandy/src/request/effects.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -39605,7 +46924,7 @@ function response(requestId, result, error = false) {
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/cpaas/index.js":
+/***/ "../kandy/src/sipEvents/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39614,849 +46933,62 @@ function response(requestId, result, error = false) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = createSubcriptionPlugin;
+exports.default = sipEvents;
 
-var _interface = __webpack_require__("../kandy/src/subscription/interface/index.js");
+var _interface = __webpack_require__("../kandy/src/sipEvents/interface/index.js");
 
-var _events = __webpack_require__("../kandy/src/subscription/interface/events.js");
+var _interface2 = _interopRequireDefault(_interface);
+
+var _sagas = __webpack_require__("../kandy/src/sipEvents/sagas.js");
+
+var sagas = _interopRequireWildcard(_sagas);
+
+var _events = __webpack_require__("../kandy/src/sipEvents/interface/events.js");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _sagas = __webpack_require__("../kandy/src/subscription/cpaas/sagas/index.js");
-
-var _actions = __webpack_require__("../kandy/src/config/interface/actions.js");
-
-var _actions2 = __webpack_require__("../kandy/src/events/interface/actions.js");
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
-var _utils = __webpack_require__("../kandy/src/common/utils.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Configuration options for the Subscription feature.
- * @public
- * @name config.subscription
- * @memberof config
- * @instance
- * @param {Object} subscription Subscription configs.
- * @param {number} [subscription.channelLifetime=3600] The amount of time (in seconds) for which to keep subscription channels up and alive.
- * @param {number} [subscription.timeout=20] The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out.
- */
-
-/**
- * CPaaS subscription implementation factory.
- * @method createSubcriptionPlugin
- * @param {Object} options - Configuration options for subscription. See above.
- * @return {Object} plugin - A subscription plugin.
- */
-
-
-// Libraries.
-
-
-// Other plugins.
-function createSubcriptionPlugin(options = {}) {
-  const defaultOptions = {
-    channelLifetime: 3600, // sec
-    timeout: 20 // sec
-  };
-
-  options = (0, _utils.mergeValues)(defaultOptions, options);
-
-  function* init() {
-    // Send the provided options to the store.
-    // This will be `state.config[name]`.
-    yield (0, _effects.put)((0, _actions.update)(options, _interface.name));
-    yield (0, _effects.put)((0, _actions2.mapEvents)(_events2.default));
-  }
-
-  return {
-    sagas: [_sagas.subscriptionFlow, _sagas.onConnectionLostEntry],
-    init,
-    api: _interface.api,
-    reducer: _interface.reducer,
-    name: _interface.name
-  };
-}
-
-// Helpers.
-// Subscription plugin.
-
-/***/ }),
-
-/***/ "../kandy/src/subscription/cpaas/requests.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.requestWebsocket = requestWebsocket;
-exports.deleteChannel = deleteChannel;
-exports.revokeWebsocket = revokeWebsocket;
-exports.refreshWebsocket = refreshWebsocket;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const log = (0, _logs.getLogManager)().getLogger('AUTH');
-
-/**
- * This function requests a websocket to connect to the backend.
- * @method requestWebsocket
- * @param  {Object}    requestInfo
- * @param  {Object}    subscriptionInfo
- * @return {Object} Returns an object containing the websocket connection information, most importantly a URL to connect to a websocket.
- */
-
-// Other plugins.
-function* requestWebsocket(requestInfo, subscriptionInfo, connectivityInfo) {
-  const req = {};
-  req.method = 'POST';
-  req.url = `${requestInfo.baseURL}/cpaas/notificationchannel/${requestInfo.version}/${requestInfo.username}/channels`;
-  req.body = (0, _stringify2.default)({
-    notificationChannel: {
-      channelLifetime: subscriptionInfo.expires,
-      channelType: 'Websockets',
-      clientCorrelator: requestInfo.clientCorrelator,
-      'x-connCheckRole': connectivityInfo.method.responsibleParty
-    }
-  });
-
-  const response = yield (0, _effects2.default)(req, requestInfo.options);
-
-  if (response.error) {
-    if (response.payload.body) {
-      log.debug('Websocket request failed.', response.payload.body);
-      // Handle errors from the server.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Failed to retrieve a websocket.',
-          code: _errors.subscriptionCodes.CPAAS_WSREQUEST_FAIL
-        })
-      };
-    } else {
-      log.debug('Failed requesting a websocket.', response.payload.result.message);
-      // Handle errors from the request plugin.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Retrieve websocket request failed.',
-          // TODO: Shared error codes.
-          code: _errors.subscriptionCodes.CPAAS_WSREQUEST_FAIL
-        })
-      };
-    }
-  } else {
-    // Request was successful.
-    return (0, _extends3.default)({
-      error: false
-    }, response.payload.body);
-  }
-}
-/**
- * Request to delete a specified notification channel.
- * @method deleteChannel
- * @param  {string} channelId The ID of the channel to delete.
- * @param  {Object} requestInfo
- * @return {Object}
- */
-function* deleteChannel(channelId, requestInfo) {
-  const requestOptions = {};
-  requestOptions.method = 'DELETE';
-  requestOptions.url = `${requestInfo.baseURL}` + `/cpaas/notificationchannel/${requestInfo.version}/${requestInfo.username}` + `/channels/${channelId}`;
-
-  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
-
-  if (response.error) {
-    if (response.payload.body) {
-      // Handle errors from the server.
-      // TODO: Better error; more info.
-      return {
-        error: new _errors2.default({
-          message: 'Failed to delete notification channel.',
-          code: _errors.subscriptionCodes.CPAAS_UNSUBSCRIBE_FAIL
-        })
-      };
-    } else {
-      // Handle errors from the request helper.
-      // TODO: Better error; more info.
-      return {
-        error: new _errors2.default({
-          message: 'Delete channel request failed',
-          code: _errors.subscriptionCodes.CPAAS_UNSUBSCRIBE_FAIL
-        })
-      };
-    }
-  } else {
-    // Request was successful.
-    return (0, _extends3.default)({
-      error: false
-    }, response.payload.body);
-  }
-}
-
-/**
- * Revoke a websocket connection.
- * @method revokeWebsocket
- * @param  {Object}    connection Server information for the service in use.
- * @param  {string}    connection.server Server information for generating the URL.
- * @param  {string}    connection.requestOptions Common request options to be added.
- * @param  {string}    subscriptionURL URL of the user's websocket instance.
- * @return {Object}    Revoke websocket response.
- */
-function* revokeWebsocket(connection, subscriptionURL, credentials) {
-  // Build the revokeWebsocket request.
-  let requestOptions = {};
-  requestOptions.method = 'DELETE';
-
-  requestOptions.url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}` + subscriptionURL;
-
-  requestOptions.headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${credentials.accessToken}`
-
-    // Send the revokeWebsocket request.
-  };const response = yield (0, _effects2.default)(requestOptions);
-
-  // Handle the response and any possible errors.
-  if (response.error) {
-    if (response.payload.body) {
-      // Handle errors from the server.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Failed to revoke websocket.',
-          code: _errors.subscriptionCodes.CPAAS_WSREVOKE_FAIL
-        })
-      };
-    } else {
-      // Handle errors from the request helper.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Revoke websocket request failed.',
-          // TODO: Shared error codes.
-          code: _errors.subscriptionCodes.CPAAS_WSREVOKE_FAIL
-        })
-      };
-    }
-  } else {
-    // Request was successful.
-    return {
-      error: false
-    };
-  }
-}
-
-/**
- * CPaaS refreshWebsocket. All this call does is ask the backend to extend the lifetime
- * of the websocket.
- * @method refreshWebsocket
- * @param  {Object}    connection Server information for the service in use.
- * @param  {string}    connection.server Server information for generating the URL.
- * @param  {string}    connection.requestOptions Common request options to be added.
- * @param  {Object}    subscription Information about the subscription instance.
- * @param  {string}    subscription.expires - The time (in seconds) until subscription expiry.
- * @param  {Array}     subscription.service - The services to resubscribe to.
- * @param  {Array}     subscription.url - The URL of the user's subscription instance.
- * @return {Object}    Resubscription response.
- */
-function* refreshWebsocket(connection, subscription, credentials) {
-  let requestOptions = {};
-  requestOptions.method = 'PUT';
-
-  requestOptions.url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}` + subscription.url + '/channelLifetime';
-
-  requestOptions.headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${credentials.accessToken}`
-  };
-
-  requestOptions.body = (0, _stringify2.default)({
-    notificationChannelLifetime: {
-      channelLifetime: subscription.channelLifetime
-    }
-  });
-
-  const response = yield (0, _effects2.default)(requestOptions);
-
-  if (response.error) {
-    if (response.payload.body) {
-      // Handle errors from the server.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Failed to refresh websocket connection.',
-          code: _errors.subscriptionCodes.CPAAS_WSREFRESH_FAIL
-        })
-      };
-    } else {
-      // Handle errors from the request helper.
-      return {
-        // TODO: Better error; more info.
-        error: new _errors2.default({
-          message: 'Refresh websocket request failed.',
-          // TODO: Shared error codes.
-          code: _errors.subscriptionCodes.CPAAS_WSREFRESH_FAIL
-        })
-      };
-    }
-  } else {
-    // Request was successful.
-    const extendResponse = response.payload.body;
-    log.debug('Websocket lifetime extended.');
-
-    // Success.
-    return (0, _extends3.default)({
-      error: false
-    }, extendResponse);
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/subscription/cpaas/sagas/channels.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.ensureChannelOpen = ensureChannelOpen;
-exports.openWebsocketChannel = openWebsocketChannel;
-exports.closeChannel = closeChannel;
-
-var _requests = __webpack_require__("../kandy/src/subscription/cpaas/requests.js");
-
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _selectors = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _effects = __webpack_require__("../kandy/src/connectivity/interface/effects.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _selectors3 = __webpack_require__("../kandy/src/connectivity/interface/selectors.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Subscription plugin.
-const platform = _constants.platforms.CPAAS;
-
-// Libraries.
-
-// Helpers.
-
-
-// Other plugins.
-
-const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
-
-/**
- * Ensures that a notification channel of `type` is open.
- * If already open, does nothing. If not open, requests/opens it.
- * @method ensureChannel
- * @param {string} type The type of notification channel.
- */
-function* ensureChannelOpen(type) {
-  /**
-   * Assumed format of the subInfo object:
-   * @param {Object} subInfo
-   * @param {Object} subInfo.notificationChannels A mapping of types to the channel info.
-   * @param {Array} subInfo.subscriptions A list of active subscriptions.
-   */
-  const subInfo = yield (0, _effects2.select)(_selectors.getNotificationChannels);
-
-  // If there is no open notification channel for `type`, request it.
-  if (!subInfo.notificationChannels[type]) {
-    let channelResponse;
-    if (type === _constants.notificationTypes.WEBSOCKET) {
-      channelResponse = yield (0, _effects2.call)(openWebsocketChannel, platform);
-    } else if (type === _constants.notificationTypes.PUSH) {
-      // TODO: CPaaS Push subscription here.
-    } else {
-        // Bad scenario.
-      }
-
-    if (channelResponse.error) {
-      // Error scenario: Could not open websocket channel.
-      return false;
-    }
-
-    // Save newly opened channel info in state.
-    yield (0, _effects2.put)(actions.channelOpened((0, _extends3.default)({}, channelResponse.notificationChannel, {
-      channelId: channelResponse.notificationChannel.resourceURL.split('/channels/')[1]
-    }), type));
-    return true;
-  } else {
-    // If there is already a channel, use it.
-    return true;
-  }
-}
-
-/**
- * This wsSubscribe function makes a request to the CPAAS gateway for a subscription.
- * If successful it triggers a subscribeFinished action containing subscription information.
- * @method openWebsocketChannel
- */
-function* openWebsocketChannel(platform) {
-  const requestInfo = yield (0, _effects2.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const subscriptionInfo = yield (0, _effects2.select)(_selectors.getSubscriptionConfig);
-  const connectivityInfo = yield (0, _effects2.select)(_selectors3.getConnectivityConfig);
-
-  // Request a websocket to subscribe to.
-  const response = yield (0, _effects2.call)(_requests.requestWebsocket, requestInfo, subscriptionInfo, connectivityInfo);
-
-  if (response.error) {
-    return response;
-  }
-
-  const subscription = (0, _extends3.default)({}, response.notificationChannel, {
-    service: 'CPaaS',
-    url: response.notificationChannel.channelData.channelURL
-  });
-
-  const connectionInfo = yield (0, _effects2.select)(_selectors2.getAuthConfig);
-  // Format the response to pass off to the connectivity plugin.
-  const websocketInfo = {
-    protocol: 'wss',
-    server: connectionInfo.server.base,
-    port: connectionInfo.server.port,
-    url: subscription.url,
-    params: {
-      access_token: requestInfo.token
-    }
-
-    // Request the websocket connection.
-  };const wsOpenOrError = yield (0, _effects.connectWebsocket)(websocketInfo, platform);
-
-  if (wsOpenOrError.error) {
-    // TODO: the connectivity plugin should be creating (and passing on) the websocket errors.
-    throw new _errors2.default({
-      message: 'Failed to connect to the websocket.',
-      code: _errors.subscriptionCodes.WS_CONNECTION_ERROR
-    });
-  } else {
-    // We're connected. Finish subscription process.
-    // TODO: Once auth is complete, fill the data.
-    return {
-      // We will only ever have one of each notificationChannel type. So this should be the only websocket channel in state.
-      notificationChannel: response.notificationChannel,
-      type: _constants.notificationTypes.WEBSOCKET
-    };
-  }
-}
-/**
- * Close the specified channel by cleaning up its resources then deleting it.
- * @method closeChannel
- * @param  {Object} channel Information about the channel to be closed.
- * @param  {string} platform
- * @return {Object}
- */
-function* closeChannel(channel, platform) {
-  const { channelId, channelType } = channel;
-
-  // TODO: Don't hardcode a constant.
-  if (channelType === 'websockets') {
-    // Ask the connectivity plugin to disconnect this platform's websocket if it exists
-    const wsState = yield (0, _effects2.select)(_selectors3.getConnectionState, platform);
-    if (wsState.connected) {
-      const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
-
-      if (closeAction.error) {
-        log.debug('Failed to close websocket. Continuing anyway.');
-      }
-    }
-
-    const requestInfo = yield (0, _effects2.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-
-    // Delete the notification channel resource.
-    const response = yield (0, _effects2.call)(_requests.deleteChannel, channelId, requestInfo);
-    return response;
-  } else {
-    // TODO: Handle closing other channel types.
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/subscription/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.subscriptionFlow = subscriptionFlow;
-exports.refreshWebsocketSaga = refreshWebsocketSaga;
-exports.onConnectionLostEntry = onConnectionLostEntry;
-exports.onConnectionLost = onConnectionLost;
-
-var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _channels = __webpack_require__("../kandy/src/subscription/cpaas/sagas/channels.js");
-
-var _requests = __webpack_require__("../kandy/src/subscription/cpaas/requests.js");
-
-var _selectors = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _actionTypes2 = __webpack_require__("../kandy/src/connectivity/interface/actionTypes.js");
-
-var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _effects = __webpack_require__("../kandy/src/common/effects/index.js");
-
-var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
-var _constants = __webpack_require__("../kandy/src/constants.js");
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-// Helpers.
-
-
-// Other plugins
-const platform = _constants.platforms.CPAAS;
-
-// Constants
+/**
+ * Sip Events Plugin Factory.
+ * @method sipEvents
+ * @return {Object} Sip Events plugin.
+ */
 
 
 // Libraries.
-// Subscription plugin.
+// Sip Events plugin.
+function sipEvents() {
+  const { name, api, reducer } = _interface2.default;
+  const capabilities = ['sipEvents'];
 
-const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
-
-/**
- * Entry point for ALL subscription change actions.
- * Queues all subscription changes (ie. subscribe, unsubscribe) to avoid async
- * scenarios. This ensures channels and subscriptions are not duplicated
- * and that resources are created/clean-up when needed.
- * @method subscriptionFlow
- */
-function* subscriptionFlow() {
-  // Use a channel to queue ALL subscription change requests.
-  const subscriptionChannel = yield (0, _effects2.actionChannel)([actionTypes.SUBSCRIBE, actionTypes.UNSUBSCRIBE]);
-
-  while (true) {
-    const action = yield (0, _effects2.take)(subscriptionChannel);
-
-    // Handle the action appropriately.
-    if (action.type === actionTypes.SUBSCRIBE) {
-      if (!action.payload.services || action.payload.services.length === 0) {
-        // Error scenario: No services specified.
-        // TODO: Better error.
-        yield (0, _effects2.put)(actions.subscribeFinished({ error: true }));
-        continue;
-      }
-
-      // Open the notification channel if it isn't already.
-      const hasChannel = yield (0, _effects2.call)(_channels.ensureChannelOpen, action.payload.type);
-      if (!hasChannel) {
-        // Error scenario: Could not open channel.
-        // TODO: Better error.
-        yield (0, _effects2.put)(actions.subscribeFinished({ error: true }));
-        continue;
-      }
-
-      // Subscribe to the services and retrieve a list of their responses.
-      const subResponses = yield (0, _effects2.call)(subscribeForServices, action);
-
-      // Report that the subscription flow has finished.
-      if (subResponses.error) {
-        yield (0, _effects2.put)(actions.subscribeFinished({
-          error: subResponses.error,
-          type: action.payload.type
-        }));
-      } else {
-        yield (0, _effects2.put)(actions.subscribeFinished({
-          subscriptions: subResponses,
-          type: action.payload.type
-        }));
-      }
-    } else {
-      // TODO: How to do a "unsubscribe all" services?
-      // ie. not need the application to specify them all individually.
-      // Might be simpler for the API to be sub/unsub(type, services).
-
-      // Unsubscribe the services.
-      const unsubResponses = yield (0, _effects2.call)(unsubscribeServices, action);
-
-      if (unsubResponses.error) {
-        yield (0, _effects2.put)(actions.unsubscribeFinished({
-          error: unsubResponses.error,
-          type: action.payload.type
-        }));
-        continue;
-      }
-
-      const connectionInfo = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
-      const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
-
-      // if we're not connected or connection info is not available, unsub from all services.
-      if ((0, _fp.isUndefined)(connectionInfo)) {
-        yield (0, _effects2.put)(actions.unsubscribeFinished({
-          unsubscriptions: subscribedServices,
-          type: action.payload.type
-        }));
-        continue;
-      }
-
-      // Get the channel information of the channel to be closed.
-      const { notificationChannels } = yield (0, _effects2.select)(_selectors.getNotificationChannels);
-      const channel = notificationChannels[action.payload.type];
-
-      // If there are no longer any subscribed services for this channel (and
-      //    the channel is open), close it.
-      if (subscribedServices.length === 0 && channel) {
-        const closeResponse = yield (0, _effects2.call)(_channels.closeChannel, channel, platform);
-
-        if (closeResponse.error) {
-          // TODO: Error scenario?
-        } else {
-          // TODO: Parameters.
-          yield (0, _effects2.put)(actions.channelClosed(action.payload.type));
-        }
-      }
-
-      // Report that the unsubscription flow has finished.
-      yield (0, _effects2.put)(actions.unsubscribeFinished({
-        unsubscriptions: unsubResponses,
-        type: action.payload.type
-      }));
-    }
-  }
-}
-
-/**
- * This function handles the flow of subscribing for CPaaS services.
- * This means it dispatches a command action to tell other plugins to subscribe.
- * Once all plugins have done their subscription (if they need one), we return
- * the subscription response information.
- * @method subscribeForServices
- * @param  {Object} action A subscription action.
- * @return {Object}
- */
-function* subscribeForServices(action) {
-  const registeredServices = yield (0, _effects2.select)(_selectors.getRegisteredServices);
-
-  // Get the list of services that were requested, but plugins did not register.
-  const notRegistered = (0, _fp.difference)(registeredServices, action.payload.services);
-  if (notRegistered.length > 0) {
-    log.debug(`Not registered for requested services: ${notRegistered}.`);
+  function* init() {
+    yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
 
-  // TODO: Don't allow subscribing for services with existing subscription.
-  // Get the list of services that were requested, and plugins did register.
-  const validServices = (0, _fp.intersection)(registeredServices, action.payload.services);
-  log.info(`Requesting subscriptions for services: ${validServices}.`);
-
-  if (validServices.length === 0) {
-    // TODO: Proper error / return.
-    return {
-      error: new _errors2.default({
-        message: 'No valid services to subscribe provided.',
-        // TODO: Proper error code.
-        code: 'BAD_INPUT'
-      })
-    };
-  }
-
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
-
-  // Announce to all plugins that subscriptions should happen.
-  yield (0, _effects2.put)(actions.doPluginSubscriptions(validServices, action.payload.type));
-
-  // What we're waiting for.
-  const waitPatterns = validServices.map(service => action => action.type === actionTypes.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === service);
-
-  // Wait for a response from each plugin.
-  const { results } = yield (0, _effects.waitFor)(subscriptionConfig.timeout * 1000, waitPatterns);
-
-  // TODO: Would it be better to handle partial results here?
-  return (0, _fp.compact)(results);
+  return {
+    name,
+    init,
+    api,
+    reducer,
+    capabilities,
+    sagas: (0, _fp.values)(sagas)
+  };
 }
 
-/**
- * This function handles the flow of unsubscribing for CPaaS services.
- * This means it dispatches a command action to tell other plugins to unsubscribe.
- * Once all plugins have done their unsubscription (if they need one), we return
- * the unsubscription response information.
- * The logic in this saga is a copy from the `subscribeForServices` saga.
- * @method unsubscribeServices
- * @param  {Object} action An unsubscription action.
- * @return {Object}
- */
-function* unsubscribeServices(action) {
-  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
-
-  // Get the list of services we want to unsubscribe, but aren't subscribed.
-  const notSubscribed = action.payload.services.filter(service => {
-    return subscribedServices.indexOf(service) === -1;
-  });
-  if (notSubscribed.length > 0) {
-    log.debug(`Not subscribed for services for unsubscription: ${notSubscribed}.`);
-  }
-
-  // Get the list of subscribed services we want to unsubscribe.
-  const validServices = (0, _fp.intersection)(subscribedServices, action.payload.services);
-  log.info(`Unsubscribing from services: ${validServices}.`);
-
-  if (validServices.length === 0) {
-    // TODO: Proper error / return.
-    return {
-      error: new _errors2.default({
-        message: 'No valid services to subscribe provided.',
-        // TODO: Proper error code.
-        code: 'BAD_INPUT'
-      })
-    };
-  }
-
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
-
-  // Announce to all plugins that unsubscriptions should happen
-  yield (0, _effects2.put)(actions.doPluginUnsubscriptions(validServices, action.payload.type));
-
-  // What we're waiting for.
-  const waitPatterns = validServices.map(service => action => action.type === actionTypes.PLUGIN_UNSUBSCRIPTION_FINISHED && action.payload.service === service);
-
-  // Wait for a response from each plugin.
-  const { results } = yield (0, _effects.waitFor)(subscriptionConfig.timeout * 1000, waitPatterns);
-
-  // TODO: Would it be better to handle partial results here?
-  return (0, _fp.compact)(results);
-}
-
-/**
- * Saga for extending a websocket subscription.
- * When triggered, make a resub request to CPaaS.
- * @method refreshWebsocketSaga
- */
-function* refreshWebsocketSaga() {
-  const resubTriggers = yield (0, _effects2.actionChannel)([actionTypes.SUBSCRIBE_FINISHED, actionTypes.RESUBSCRIPTION_FINISHED]);
-  while (true) {
-    const action = yield (0, _effects2.take)(resubTriggers);
-
-    // If the action was an error, ignore it.
-    if (action.error) {
-      continue;
-    }
-
-    const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
-
-    const resubDelay = subscription.channelLifetime * 1000 / 2;
-
-    // Wait for either the resub delay or a unsubscribe action.
-    const { expiry } = yield (0, _effects2.race)({
-      expiry: (0, _effects2.delay)(resubDelay),
-      unsubscribe: (0, _effects2.take)(actionTypes.UNSUBSCRIBE_FINISHED)
-    });
-
-    // If the resubDelay has elapsed, resubscribe.
-    if (expiry) {
-      log.info('Extending user subscription.');
-      const connection = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
-      const subscription = yield (0, _effects2.select)(_selectors2.getSubscriptionInfo, platform);
-      const credentials = yield (0, _effects2.select)(_selectors2.getUserInfo);
-
-      const response = yield (0, _effects2.call)(_requests.refreshWebsocket, connection, subscription, credentials);
-
-      if (response.error) {
-        yield (0, _effects2.put)(actions.resubscribeFinished(response, platform));
-      } else {
-        yield (0, _effects2.put)(actions.resubscribeFinished({}, platform));
-      }
-    }
-  }
-}
-
-/**
- * Triggers onConnectionLost saga when a WS_RECONNECT_FAILED actionType occurs
- * @method onConnectionLostEntry
- */
-function* onConnectionLostEntry() {
-  yield (0, _effects2.takeEvery)(connectivityActionTypes.WS_RECONNECT_FAILED, onConnectionLost);
-}
-
-/**
- * Handles lost connections from the connectivity plugin
- * @method onConnectionLost
- */
-function* onConnectionLost() {
-  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices);
-  yield (0, _effects2.put)(actions.unsubscribe(subscribedServices));
-}
+// Other plugins.
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/actionTypes.js":
+/***/ "../kandy/src/sipEvents/interface/actionTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40465,26 +46997,22 @@ function* onConnectionLost() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const prefix = '@@KANDY/';
+const PREFIX = '@@KANDY/';
 
-const SUBSCRIBE = exports.SUBSCRIBE = prefix + 'SUBSCRIBE';
-const SUBSCRIBE_FINISHED = exports.SUBSCRIBE_FINISHED = prefix + 'SUBSCRIBE_FINISHED';
+const SIP_EVENT_SUBSCRIBE = exports.SIP_EVENT_SUBSCRIBE = PREFIX + 'SIP_EVENT_SUBSCRIBE';
+const SIP_EVENT_SUBSCRIBE_FINISH = exports.SIP_EVENT_SUBSCRIBE_FINISH = PREFIX + 'SIP_EVENT_SUBSCRIBE_FINISH';
 
-const UNSUBSCRIBE = exports.UNSUBSCRIBE = prefix + 'UNSUBSCRIBE';
-const UNSUBSCRIBE_FINISHED = exports.UNSUBSCRIBE_FINISHED = prefix + 'UNSUBSCRIBE_FINISHED';
+const SIP_EVENT_UPDATE = exports.SIP_EVENT_UPDATE = PREFIX + 'SIP_EVENT_UPDATE';
+const SIP_EVENT_UPDATE_FINISH = exports.SIP_EVENT_UPDATE_FINISH = PREFIX + 'SIP_EVENT_UPDATE_FINISH';
 
-const REGISTER_SUB_SERVICE = exports.REGISTER_SUB_SERVICE = prefix + 'REGISTER_SUB_SERVICE';
-const PLUGIN_SUBSCRIPTION = exports.PLUGIN_SUBSCRIPTION = prefix + 'PLUGIN_SUBSCRIPTION';
-const PLUGIN_SUBSCRIPTION_FINISHED = exports.PLUGIN_SUBSCRIPTION_FINISHED = prefix + 'PLUGIN_SUBSCRIPTION_FINISHED';
-const PLUGIN_UNSUBSCRIPTION = exports.PLUGIN_UNSUBSCRIPTION = prefix + 'PLUGIN_UNSUBSCRIPTION';
-const PLUGIN_UNSUBSCRIPTION_FINISHED = exports.PLUGIN_UNSUBSCRIPTION_FINISHED = prefix + 'PLUGIN_UNSUBSCRIPTION_FINISHED';
+const SIP_EVENT_UNSUBSCRIBE = exports.SIP_EVENT_UNSUBSCRIBE = PREFIX + 'SIP_EVENT_UNSUBSCRIBE';
+const SIP_EVENT_UNSUBSCRIBE_FINISH = exports.SIP_EVENT_UNSUBSCRIBE_FINISH = PREFIX + 'SIP_EVENT_UNSUBSCRIBE_FINISH';
 
-const CHANNEL_OPENED = exports.CHANNEL_OPENED = prefix + 'CHANNEL_OPENED';
-const CHANNEL_CLOSED = exports.CHANNEL_CLOSED = prefix + 'CHANNEL_CLOSED';
+const SIP_EVENT_RECEIVED = exports.SIP_EVENT_RECEIVED = PREFIX + 'SIP_EVENT_RECEIVED';
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/actions.js":
+/***/ "../kandy/src/sipEvents/interface/actions.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40494,23 +47022,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _keys2 = _interopRequireDefault(_keys);
 
-exports.subscribe = subscribe;
-exports.subscribeFinished = subscribeFinished;
-exports.unsubscribe = unsubscribe;
-exports.unsubscribeFinished = unsubscribeFinished;
-exports.registerService = registerService;
-exports.doPluginSubscriptions = doPluginSubscriptions;
-exports.reportSubscriptionFinished = reportSubscriptionFinished;
-exports.doPluginUnsubscriptions = doPluginUnsubscriptions;
-exports.reportUnsubscriptionFinished = reportUnsubscriptionFinished;
-exports.channelOpened = channelOpened;
-exports.channelClosed = channelClosed;
+exports.sipEventSubscribe = sipEventSubscribe;
+exports.sipEventSubscribeFinish = sipEventSubscribeFinish;
+exports.sipEventUpdate = sipEventUpdate;
+exports.sipEventUpdateFinish = sipEventUpdateFinish;
+exports.sipEventUnsubscribe = sipEventUnsubscribe;
+exports.sipEventUnsubscribeFinish = sipEventUnsubscribeFinish;
+exports.sipEventReceived = sipEventReceived;
 
-var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/sipEvents/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -40518,165 +47042,133 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Helper function for formatting actions.
- * Ensures that actions follow an expectable format.
- * @method actionFormatter
- * @param  {string}  actionType   [description]
- * @param  {Object} [payload={}] The action payload.
- * @param  {BasicError} [payload.error] For an error action, the error should be provided.
- * @param  {Object} [meta={}] The action meta data.
- * @return {Object}
- */
-function actionFormatter(actionType, payload = {}, meta = {}) {
+// Helper function for formatting _FINISH actions.
+function finishActionHelper(actionType, { response, error }) {
   return {
     type: actionType,
-    payload: (0, _extends3.default)({}, payload),
-    error: !!payload.error,
-    meta: (0, _extends3.default)({}, meta)
+    error: !!error,
+    payload: error || response
   };
 }
 
 /**
- * Represents a request to subscribe to services and connect to a notification
- * channel.
- * @method subscribe
- * @param  {Array}   services  An array containing the request services.
- * @param  {string}  type      The type of notification channel to connect to.
- * @return {Object}            A flux standard action.
+ * Represents a request to subscribe to a specific sip event.
+ * @method sipEventSubscribe
+ * @param  {string} eventType
+ * @param  {Array}  subscribeUserList
+ * @param  {string} clientCorrelator
+ * @param  {Object} customParameters
+ * @returns {Object} A flux standard action.
  */
-function subscribe(services = [], type) {
-  return actionFormatter(actionTypes.SUBSCRIBE, { services, type });
+function sipEventSubscribe(eventType, subscribeUserList, clientCorrelator, customParameters) {
+  return {
+    type: actionTypes.SIP_EVENT_SUBSCRIBE,
+    payload: {
+      eventType,
+      subscribeUserList,
+      clientCorrelator,
+      customParameters
+    }
+  };
 }
 
 /**
- * Indicates that the subscription process has finished.
- * @method subscribeFinished
- * @param  {Object}  subscriptions  An object representing the subscriptions.
- * @param  {string}  type                 The type of notificaitonChannel for this subscription.
- * @param  {Object}  error                An error object.
- * @return {Object}                       A flux standard action.
+ * Represents the response/error of a sip event subscription request.
+ * @method sipEventSubscribeFinish
+ * @param  {Object} $0
+ * @param  {Object} $0.response Information about the subscription response.
+ * @param  {BasicError} $0.error An error object, in the case of an issue.
+ * @returns {Object} A flux standard action.
  */
-function subscribeFinished({ subscriptions, type, error }) {
-  return actionFormatter(actionTypes.SUBSCRIBE_FINISHED, { subscriptions, type, error });
-}
-
-/**
- * A request to unsubscribe from services.
- * @method unsubscribe
- * @param  {Array} services A list of services.
- * @param  {string} type The type of notificationChannel.
- * @return {Object} A flux standard action.
- */
-function unsubscribe(services = [], type) {
-  return actionFormatter(actionTypes.UNSUBSCRIBE, { services, type });
-}
-
-/**
- * A notice that unsubscription has finished.
- * @method unsubscribeFinished
- * @param  {string} type The type of notificationChannel.
- * @param  {Object} [error] An error object.
- * @return {Object} A flux standard action.
- */
-function unsubscribeFinished({ unsubscriptions, type, error }) {
-  return actionFormatter(actionTypes.UNSUBSCRIBE_FINISHED, { unsubscriptions, type, error });
-}
-
-/**
- * Signifies that a plugin has subscription logic for certain services.
- * @method registerService
- * @param  {Array}  [services=[]] A list of services.
- * @return {Object} A flux standard action.
- */
-function registerService(services = []) {
-  return actionFormatter(actionTypes.REGISTER_SUB_SERVICE, { services });
-}
-
-/**
- * Indicates that the subscription plugin expects plugins to subscribe
- * for the specified services.
- * @method doPluginSubscriptions
- * @param  {Array}  services The list of services that should be subscribed to.
- * @param  {string} type The type of notification channel for these subscriptions.
- * @return {Object} A flux standard action.
- */
-function doPluginSubscriptions(services, type) {
-  return actionFormatter(actionTypes.PLUGIN_SUBSCRIPTION, { services, type });
-}
-
-/**
- * Indicates that a plugin has finished a subscription for the specified service.
- * @method reportSubscriptionFinished
- * @param  {Object} params
- * @param  {string} params.service The service that the subscription was for.
- * @param  {string} params.type The type of notification channel for this subscription.
- * @param  {Object} params.subscription The subscription response from the backend.
- * @param  {BasicError} [params.error] An error object.
- * @return {Object} A flux standard action.
- */
-function reportSubscriptionFinished({ service, type, subscription, error }) {
-  const subscriptionId = subscription ? subscription.resourceURL.split('/subscriptions/')[1] : null;
-  return actionFormatter(actionTypes.PLUGIN_SUBSCRIPTION_FINISHED, (0, _extends3.default)({}, subscription, {
-    subscriptionId: subscriptionId,
-    service,
-    channelType: type,
+function sipEventSubscribeFinish({ response, error }) {
+  return finishActionHelper(actionTypes.SIP_EVENT_SUBSCRIBE_FINISH, {
+    response,
     error
-  }));
-}
-
-/**
- * Indicates that the subscription plugin expects plugins to unsubscribe
- * for the specified services.
- * @method doPluginUnsubscriptions
- * @param  {Array}  services The list of services that should be unsubscribed.
- * @param  {string} type The type of notification channel for these unsubscriptions.
- * @return {Object} A flux standard action.
- */
-function doPluginUnsubscriptions(services, type) {
-  return actionFormatter(actionTypes.PLUGIN_UNSUBSCRIPTION, { services, type });
-}
-
-/**
- * Indicates that a plugin has finished an unsubscription for the specified service.
- * @method reportUnsubscriptionFinished
- * @param  {Object} params
- * @param  {string} params.service The service that the unsubscription was for.
- * @param  {string} params.type The type of notification channel for this unsubscription.
- * @param  {BasicError} [params.error] An error object.
- * @return {Object} A flux standard action.
- */
-function reportUnsubscriptionFinished({ service, type, error }) {
-  return actionFormatter(actionTypes.PLUGIN_UNSUBSCRIPTION_FINISHED, {
-    service,
-    channelType: type
   });
 }
 
 /**
- * Indicates that a notification channel has been opened / created.
- * @method channelOpened
- * @param {Object} channelInfo Data about the notification channel.
- * @param {string} type The type of notification channel.
- * @return {Object} A flux standard action.
+ * Represents a request to update a sip event subscription or resubscribe for it.
+ * @method sipEventUpdate
+ * @param  {string} eventType
+ * @param  {Object} userLists
+ * @param  {Object} customParameters
+ * @returns {Object} A flux standard action.
  */
-function channelOpened(channelInfo, type) {
-  return actionFormatter(actionTypes.CHANNEL_OPENED, (0, _extends3.default)({}, channelInfo), { type });
+function sipEventUpdate(eventType, userLists = {}, customParameters) {
+  // If no userList changes, this should just be a resubscription.
+  let isResub = (0, _keys2.default)(userLists).length === 0;
+  return {
+    type: actionTypes.SIP_EVENT_UPDATE,
+    payload: {
+      eventType,
+      subscribeUserList: userLists.subscribeUserList || [],
+      unsubscribeUserList: userLists.unsubscribeUserList || [],
+      customParameters
+    },
+    meta: isResub ? { isResub: true } : {}
+  };
 }
 
 /**
- * Indicates that a notification channel has been closed / deleted.
- * @method channelClosed
- * @param {string} type The type of notification channel.
- * @return {Object} A flux standard action.
+ * Represents the response/error of a sip event update/resub request.
+ * @method sipEventUpdateFinish
+ * @param  {Object} $0
+ * @param  {Object} $0.response Information about the update/resub response.
+ * @param  {BasicError} $0.error An error object, in the case of an issue.
+ * @returns {Object} A flux standard action.
  */
-function channelClosed(type) {
-  return actionFormatter(actionTypes.CHANNEL_CLOSED, {}, { type });
+function sipEventUpdateFinish({ response, error }) {
+  return finishActionHelper(actionTypes.SIP_EVENT_UPDATE_FINISH, {
+    response,
+    error
+  });
+}
+
+/**
+ * Represents a request to unsubscribe from sip event subscriptions.
+ * @method sipEventUnsubscribe
+ * @param  {string} eventType The sip event subscription to unsubscribe from.
+ * @returns {Object} A flux standard action.
+ */
+function sipEventUnsubscribe(eventType) {
+  return {
+    type: actionTypes.SIP_EVENT_UNSUBSCRIBE,
+    payload: eventType
+  };
+}
+
+/**
+ * Represents the response/error of a sip event unsubscribe request.
+ * @method sipEventUnsubscribeFinish
+ * @param  {Object} $0
+ * @param  {Object} $0.response Information about the unsubscribe response.
+ * @param  {BasicError} $0.error An error object, in the case of an issue.
+ * @returns {Object} A flux standard action.
+ */
+function sipEventUnsubscribeFinish({ response, error }) {
+  return finishActionHelper(actionTypes.SIP_EVENT_UNSUBSCRIBE_FINISH, {
+    response,
+    error
+  });
+}
+
+/**
+ * Represents that a sip event notification has been received.
+ * @method sipEventReceived
+ * @param  {Object} sipEvent
+ * @returns {Object} A flux standard action.
+ */
+function sipEventReceived(sipEvent) {
+  return {
+    type: actionTypes.SIP_EVENT_RECEIVED,
+    payload: sipEvent
+  };
 }
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/api.js":
+/***/ "../kandy/src/sipEvents/interface/api.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40687,118 +47179,106 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
+var _selectors = __webpack_require__("../kandy/src/sipEvents/interface/selectors.js");
+
+var _actions = __webpack_require__("../kandy/src/sipEvents/interface/actions.js");
 
 var actions = _interopRequireWildcard(_actions);
-
-var _selectors = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
+const log = (0, _logs.getLogManager)().getLogger('SIPEVENTS');
 
 /**
- * Service API. All functions in this plugin are part of the 'services' namespace.
+ * Sip Events API.
  * @method api
- * @param  {Function} $0
- * @param  {Function} $0.dispatch - The redux store's dispatch function.
- * @param  {Function} $0.getState - The redux store's getState function.
- * @return {Object} api - The subscription API object.
+ * @param  {Object} $0
+ * @param  {Function} $0.dispatch Redux dispatch.
+ * @param  {Function} $0.getState Redux getState.
+ * @return {Object} Sip Events' plugin API.
  */
-
-
-// Logs
-
-
-// Auth plugin.
 /**
- * The Service feature allows applications to subscribe for receiving
- * communications from the platform's services. It allows an application to manage the
- * features that they will receive notifications for, and on which type of
- * channel they wish to receive them on.
+ * Allows a user to subscribe to, and receive notifications for, sip events.
  *
- * Service functions are all part of the 'services' namespace.
+ * SipEvents functions are all part of the 'sip' namespace.
  *
  * @public
- * @module Subscription
+ * @requires sipEvents
+ * @module SipEvents
  */
 
-// Subscription plugin.
 function api({ dispatch, getState }) {
-  const subscriptionApi = {
+  var api = {
     /**
-     * Perform a backend subscription. This will subscribe to the requested
-     * services, as well as connect to the request notification channel.
+     * Subscribe for a sip event.
      * @public
-     * @memberof Subscription
      * @method subscribe
-     * @param {Array} services The services that you would like to subscribe for.
-     * @param {String} [type='websocket'] The type of subscription you would like to subscribe for.
+     * @requires sipEvents
+     * @memberof SipEvents
+     * @param  {string} eventType The sip event type to subscribe for.
+     * @param  {Array}  subscribeUserList The list of users to subcribe to.
+     * @param  {string} clientCorrelator
+     * @param  {Array} [customParameters] List of custom options provided as part of the subscription.
      */
-    subscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
-      log.debug(_logs.API_LOG_TAG + 'services.subscribe: ', services, type);
-      const userInfo = (0, _selectors2.getUserInfo)(getState());
-      if (userInfo && userInfo.accessToken) {
-        services = services.map(service => service.toLowerCase());
-        dispatch(actions.subscribe(services, type));
-      } else {
-        // TODO: Directly emit error event
-      }
+    subscribe(eventType, subscribeUserList, clientCorrelator, customParameters = []) {
+      log.debug(_logs.API_LOG_TAG + 'sip.subscribe: ', eventType, subscribeUserList, clientCorrelator, customParameters);
+      dispatch(actions.sipEventSubscribe(eventType, subscribeUserList, clientCorrelator, customParameters));
     },
 
     /**
-     * Unsubscribe from notification subscriptions.
+     * Update a subscription for a sip event.
      * @public
-     * @memberof Subscription
+     * @method update
+     * @requires sipEvents
+     * @memberof SipEvents
+     * @param  {string} eventType The sip event subscription to update.
+     * @param  {Object} userLists
+     * @param  {Array}  userLists.subscribeUserList The list of users to subcribe to.
+     * @param  {Array}  userLists.unsubscribeUserList The list of users to unsubscribe from. If all users are unsubscribed from, the event subscription is removed completly.
+     * @param  {Array} [customParameters] List of custom options provided as part of the subscription.
+     */
+    update(eventType, userLists, customParameters = []) {
+      log.debug(_logs.API_LOG_TAG + 'sip.update: ', eventType, userLists, customParameters);
+      dispatch(actions.sipEventUpdate(eventType, userLists, customParameters));
+    },
+
+    /**
+     * Unsubscribe from a sip event.
+     * @public
      * @method unsubscribe
-     * @param {Array} services The subscribed services that should be unsubscribed.
-     * @param {String} [type='websocket'] The type of channelto be used for the notifications.
+     * @requires sipEvents
+     * @memberof SipEvents
+     * @param  {string} eventType The sip event to unsubscribe from.
      */
-    unsubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
-      log.debug(_logs.API_LOG_TAG + 'services.unsubscribe: ', services, type);
-      const userInfo = (0, _selectors2.getUserInfo)(getState());
-      if (userInfo && userInfo.accessToken) {
-        services = services.map(service => service.toLowerCase());
-        dispatch(actions.unsubscribe(services, type));
-      } else {
-        // TODO: Directly emit error event
-      }
-    },
-
-    resubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
-      log.debug(_logs.API_LOG_TAG + 'services.resubscribe: ', services, type);
-      log.info(`THIS FUNCTIONALITY IS NOT YET SUPPORTED. Services: ${services}. Type: ${type}`);
+    unsubscribe(eventType) {
+      log.debug(_logs.API_LOG_TAG + 'sip.unsubscribe: ', eventType);
+      dispatch(actions.sipEventUnsubscribe(eventType));
     },
 
     /**
-     * Retrieve information about currently subscribed services and available services.
+     * Retrieve information about a specified sip event.
      * @public
-     * @memberof Subscription
-     * @method getSubscriptions
-     * @return {Object} Lists of subscribed and available services.
+     * @method getDetails
+     * @requires sipEvents
+     * @memberof SipEvents
+     * @param  {string} [eventType] Type of sip event to retrieve.
+     * @return {Object} Returns all information related to the chosen eventType that is contained in the store. If no eventType is specified, it will return information for all eventTypes.
      */
-    getSubscriptions() {
-      log.debug(_logs.API_LOG_TAG + 'services.getSubscriptions');
-      return {
-        subscribed: (0, _selectors.getSubscribedServices)(getState()),
-        available: (0, _selectors.getRegisteredServices)(getState()),
-        isPending: getState().subscription.isPending
-      };
+    getDetails(eventType) {
+      log.debug(_logs.API_LOG_TAG + 'sip.getDetails: ', eventType);
+      return (0, _selectors.getSipEventInfo)(getState(), eventType);
     }
   };
 
-  return { services: subscriptionApi };
+  // Namespace the API.
+  return { sip: api };
 }
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/effects.js":
+/***/ "../kandy/src/sipEvents/interface/eventTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40807,95 +47287,47 @@ function api({ dispatch, getState }) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.registerService = registerService;
-
-var _actions = __webpack_require__("../kandy/src/subscription/interface/actions.js");
-
-var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-// Libraries.
-const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
+/**
+ * A change in SIP event subscriptions has occurred.
+ * @public
+ * @requires sipEvents
+ * @memberof SipEvents
+ * @event sip:subscriptionChange
+ * @param {Object} params
+ * @param {string} params.eventType The type of sip event.
+ * @param {Object} params.change The change operation that occurred.
+ * @param {Array} params.subscribedUsers Users that were subscribed to.
+ * @param {Array} params.unsubscribedUsers Users that were unsubscribed from.
+ */
+const EVENT_SUBSCRIPTION_CHANGED = exports.EVENT_SUBSCRIPTION_CHANGED = 'sip:subscriptionChange';
 
 /**
- * Effect for plugins to register a service with the subscription plugin.
- * @method registerService
- * @param  {string} service The name of the service.
- * @param  {Saga} subscribe The saga to be called when subscription is requested.
- * @param  {Saga} unsubscribe The saga to be called when unsubscription is requested.
+ * An error occurred while performing a SIP event action.
+ * @public
+ * @requires sipEvents
+ * @memberof SipEvents
+ * @event sip:error
+ * @param {Object} params
+ * @param {BasicError} params.error The Basic error object.
  */
+const EVENT_ERROR = exports.EVENT_ERROR = 'sip:error';
 
-
-// Helpers.
-// Subscription plugin.
-function* registerService(service, subscribeSaga, unsubscribeSaga) {
-  // "Register" the service with the subscription plugin, so it knows a plugin
-  //    has subscription/unsubscription logic for it.
-  yield (0, _effects.put)((0, _actions.registerService)(service));
-
-  // Redux-saga take() pattern.
-  function serviceSubscribePattern(action) {
-    return action.type === _actionTypes.PLUGIN_SUBSCRIPTION && action.payload.services.indexOf(service) !== -1;
-  }
-  // Redux-saga take() pattern.
-  function serviceUnsubscribePattern(action) {
-    return action.type === _actionTypes.PLUGIN_UNSUBSCRIPTION && action.payload.services.indexOf(service) !== -1;
-  }
-
-  // Ensure that `takeEvery` is only called when an actual function/saga is provided.
-  //    Otherwise it may cause infinite loop error issues.
-  if ((0, _fp.isFunction)(subscribeSaga)) {
-    // Perform subscription logic when triggered by the action.
-    yield (0, _effects.takeEvery)(serviceSubscribePattern, subscribeSaga);
-  } else {
-    log.error(`Registering ${service} service without subscribe functionality.`);
-  }
-
-  if ((0, _fp.isFunction)(unsubscribeSaga)) {
-    // Perform unsubscription logic when triggered by the action.
-    yield (0, _effects.takeEvery)(serviceUnsubscribePattern, unsubscribeSaga);
-  } else {
-    log.error(`Registering ${service} service without unsubscribe functionality.`);
-  }
-}
+/**
+ * A SIP event notification has been received.
+ * @public
+ * @requires sipEvents
+ * @memberof SipEvents
+ * @event sip:eventsChange
+ * @param {Object} params Information about the notification.
+ * @param {string} params.eventType The type of sip event.
+ * @param {string} params.eventId The ID of the event.
+ * @param {Object} params.event The full event object.
+ */
+const EVENT_RECEIVED = exports.EVENT_RECEIVED = 'sip:eventsChange';
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/eventTypes.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
- * @public
- * @memberof Subscription
- * @event subscription:change
- */
-const SUB_CHANGE = exports.SUB_CHANGE = 'subscription:change';
-
-/**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
- * @public
- * @memberof Subscription
- * @event subscription:error
- */
-const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
-
-/***/ }),
-
-/***/ "../kandy/src/subscription/interface/events.js":
+/***/ "../kandy/src/sipEvents/interface/events.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40905,38 +47337,76 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _eventTypes = __webpack_require__("../kandy/src/subscription/interface/eventTypes.js");
+var _eventTypes = __webpack_require__("../kandy/src/sipEvents/interface/eventTypes.js");
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/sipEvents/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function subChangeEvent(action) {
-  return {
-    type: action.error ? eventTypes.SUB_ERROR : eventTypes.SUB_CHANGE,
-    args: action.error ? { error: action.payload } : {}
-  };
+// Helper function for formatting "changed" events.
+function subscriptionChange({ change, action }) {
+  if (action.error) {
+    return {
+      type: eventTypes.EVENT_ERROR,
+      args: { error: action.payload }
+    };
+  } else {
+    return {
+      type: eventTypes.EVENT_SUBSCRIPTION_CHANGED,
+      args: {
+        eventType: action.payload.eventType,
+        change,
+        subscribedUsers: action.payload.subscribedUsers,
+        unsubscribedUsers: action.payload.unsubscribedUsers
+      }
+    };
+  }
 }
 
-const eventsMap = {};
+var events = {};
 
-// Emit an event on start action for isPending change.
-eventsMap[actionTypes.SUBSCRIBE] = subChangeEvent;
-eventsMap[actionTypes.UNSUBSCRIBE] = subChangeEvent;
+events[actionTypes.SIP_EVENT_SUBSCRIBE_FINISH] = function (action) {
+  return subscriptionChange({
+    change: 'newSubscription',
+    action
+  });
+};
 
-// Emit an event on finish action for results.
-eventsMap[actionTypes.SUBSCRIBE_FINISHED] = subChangeEvent;
-eventsMap[actionTypes.UNSUBSCRIBE_FINISHED] = subChangeEvent;
+events[actionTypes.SIP_EVENT_UPDATE_FINISH] = function (action) {
+  return subscriptionChange({
+    change: 'updateSubscription',
+    action
+  });
+};
 
-exports.default = eventsMap;
+events[actionTypes.SIP_EVENT_UNSUBSCRIBE_FINISH] = function (action) {
+  return subscriptionChange({
+    change: 'unsubscribe',
+    action
+  });
+};
+
+events[actionTypes.SIP_EVENT_RECEIVED] = function (action) {
+  // Pass the notification straight through.
+  return {
+    type: eventTypes.EVENT_RECEIVED,
+    args: {
+      eventType: action.payload.eventType,
+      eventId: action.payload.eventId,
+      event: action.payload
+    }
+  };
+};
+
+exports.default = events;
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/index.js":
+/***/ "../kandy/src/sipEvents/interface/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40945,47 +47415,29 @@ exports.default = eventsMap;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.api = exports.name = exports.reducer = undefined;
 
-var _reducers = __webpack_require__("../kandy/src/subscription/interface/reducers.js");
-
-var _reducers2 = _interopRequireDefault(_reducers);
-
-var _name = __webpack_require__("../kandy/src/subscription/interface/name.js");
-
-var _name2 = _interopRequireDefault(_name);
-
-var _api = __webpack_require__("../kandy/src/subscription/interface/api.js");
+var _api = __webpack_require__("../kandy/src/sipEvents/interface/api.js");
 
 var _api2 = _interopRequireDefault(_api);
 
+var _reducer = __webpack_require__("../kandy/src/sipEvents/interface/reducer.js");
+
+var _reducer2 = _interopRequireDefault(_reducer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.reducer = _reducers2.default;
-exports.name = _name2.default;
-exports.api = _api2.default;
+// Import the components of the interface.
+const name = 'sipEvents';
+
+exports.default = {
+  name,
+  api: _api2.default,
+  reducer: _reducer2.default
+};
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/name.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * This interface is for an subscription plugin.
- * @type {string}
- */
-const name = 'subscription';
-exports.default = name;
-
-/***/ }),
-
-/***/ "../kandy/src/subscription/interface/reducers.js":
+/***/ "../kandy/src/sipEvents/interface/reducer.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40999,7 +47451,7 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/sipEvents/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -41011,136 +47463,72 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* State Structure
-    subscription: {
-        notificationChannels: { // An object with key values pairs for channelType -> channelInfo
-            [Websocket] : { ... }, // Channel Info taken directly from UC response.
-            [Push]      : { ... }
-        }
-    }
- */
-
-// Libraries.
-const defaultState = {
-  // Information about the open notification channels.
-  notificationChannels: {},
-  // The list of active subscriptions.
-  subscriptions: [],
-  // The list of services that plugins can subscribe to.
-  registeredServices: [],
-  // Whether a subscription change is currently in progress.
-  isPending: false
-};
-
 const reducers = {};
 
-// Helper function for changing the pending value.
-function pendingChange(value) {
-  return (state, action) => {
-    return (0, _extends3.default)({}, state, { isPending: value });
-  };
-}
-// Change isPending depending on the start/finish of subscriptions.
-reducers[actionTypes.SUBSCRIBE] = pendingChange(true);
-reducers[actionTypes.SUBSCRIBE_FINISHED] = pendingChange(false);
-reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
+// Libraries.
 
-/*
- * Remove subscriptions that are in the unsubscriptions list
- */
-reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
+
+reducers[actionTypes.SIP_EVENT_SUBSCRIBE_FINISH] = {
   next(state, action) {
-    const subscribedServices = state.subscriptions.map(subscription => subscription.service);
     return (0, _extends3.default)({}, state, {
-      isPending: false,
-      subscriptions: (0, _fp.difference)(subscribedServices, action.payload.unsubscriptions)
+      // Add a new sip event section to state.
+      [action.payload.eventType]: {
+        sessionData: action.payload.sessionData,
+        subscribedUsers: action.payload.subscribedUsers
+      }
     });
   }
 };
 
-/*
- * When a plugin reports a succesful subscription, store it in state.
- */
-reducers[actionTypes.PLUGIN_SUBSCRIPTION_FINISHED] = {
+reducers[actionTypes.SIP_EVENT_UPDATE_FINISH] = {
   next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      subscriptions: state.subscriptions.concat(action.payload)
-    });
-  }
-};
+    let subscribedUsers = state[action.payload.eventType].subscribedUsers;
+    // Add the new subscribed users.
+    subscribedUsers = (0, _fp.union)(action.payload.subscribeUserList, subscribedUsers);
+    // Remove the unsubscribed users.
+    subscribedUsers = (0, _fp.without)(action.payload.unsubscribeUserList, subscribedUsers);
 
-/*
- * When a plugin reports a succesful unsubscription, remove it from state.
- */
-reducers[actionTypes.PLUGIN_UNSUBSCRIPTION_FINISHED] = {
-  next(state, action) {
-    function removeSubscription(subscription) {
-      return subscription.channelType === action.payload.channelType && subscription.service === action.payload.service;
+    // Update the subscribed users for the sip event section.
+    if (subscribedUsers.length === 0) {
+      // If there are no subscribed users for this session, the session is deleted.
+      let newState = (0, _extends3.default)({}, state);
+      delete newState[action.payload.eventType];
+      return newState;
+    } else {
+      return (0, _extends3.default)({}, state, {
+        [action.payload.eventType]: (0, _extends3.default)({}, state[action.payload.eventType], {
+          subscribedUsers
+        })
+      });
     }
-
-    return (0, _extends3.default)({}, state, {
-      subscriptions: (0, _fp.remove)(removeSubscription)(state.subscriptions)
-    });
   }
 };
 
-/*
- * Store the services that plugins can subscribe to in state.
- */
-reducers[actionTypes.REGISTER_SUB_SERVICE] = {
+reducers[actionTypes.SIP_EVENT_UNSUBSCRIBE_FINISH] = {
   next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      // TODO: Worry about duplicate services?
-      registeredServices: state.registeredServices.concat(action.payload.services)
-    });
+    // Remove the specified sip event section.
+    return (0, _fp.omit)(action.payload.eventType, state);
   }
 };
 
-/*
- * Store the new notifiction channel into state.
- * Assumption: A channel of the same type should NOT already exist.
- */
-reducers[actionTypes.CHANNEL_OPENED] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      notificationChannels: (0, _extends3.default)({}, state.notificationChannels, {
-        [action.meta.type]: action.payload
-      })
-    });
-  }
+reducers[actionTypes.SIP_EVENT_RECEIVED] = function (state, action) {
+  // Ensure everything is defined.
+  let eventInfo = state[action.payload.eventType] || {};
+  let notifications = eventInfo.notifications || [];
+  // Concat the notification to the specified sip event section.
+  return (0, _extends3.default)({}, state, {
+    [action.payload.eventType]: (0, _extends3.default)({}, state[action.payload.eventType], {
+      notifications: (0, _fp.concat)(notifications, action.payload)
+    })
+  });
 };
 
-/*
- * Remove the notification channel info when it has been closed.
- */
-reducers[actionTypes.CHANNEL_CLOSED] = {
-  next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      notificationChannels: (0, _extends3.default)({}, state.notificationChannels, {
-        [action.meta.type]: undefined
-      })
-    });
-  }
-};
-
-/**
- * Subscription Interface reducer
- * @method reducer
- * @param  {Object}  state - The current redux state.
- * @param  {Object}  action - A flux standard action.
- * @return {Object}  - The new redux state.
- * @example
- * Subscription state structure example; connected.
- * subscriptionState = {
- *
- * }
- */
-const reducer = (0, _reduxActions.handleActions)(reducers, defaultState);
+const reducer = (0, _reduxActions.handleActions)(reducers, {});
 exports.default = reducer;
 
 /***/ }),
 
-/***/ "../kandy/src/subscription/interface/selectors.js":
+/***/ "../kandy/src/sipEvents/interface/selectors.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41149,132 +47537,27 @@ exports.default = reducer;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getSubscriptionConfig = getSubscriptionConfig;
-exports.getRegisteredServices = getRegisteredServices;
-exports.getNotificationChannels = getNotificationChannels;
-exports.getSubscribedServices = getSubscribedServices;
+exports.getSipEventInfo = getSipEventInfo;
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 /**
- * Retrieves the config options provided by the subscription plugin.
- * @method getSubscriptionConfig
+ * Retrieves information about a sip event.
+ * @method getSipEventInfo
+ * @param  {string} eventType
  * @return {Object}
  */
-function getSubscriptionConfig(state) {
-  return (0, _fp.cloneDeep)(state.config.subscription);
-}
-
-/**
- * Retrieves the list of services that plugins have registered for.
- * @method getRegisteredServices
- * @return {Array}
- */
-function getRegisteredServices(state) {
-  return (0, _fp.cloneDeep)(state.subscription.registeredServices);
-}
-
-/**
- * Retrieves the open notifications channels' info and their active subscriptions.
- * @method getNotificationChannels
- * @return {Object}
- */
-// TODO: Rename this selector. It gets more than notification channels.
-function getNotificationChannels(state) {
-  return (0, _fp.cloneDeep)({
-    notificationChannels: state.subscription.notificationChannels,
-    subscriptions: state.subscription.subscriptions
-  });
-}
-
-/**
- * Retrieve the list of services with current subscriptions.
- * @method getSubscribedServices
- * @param {string} type the type of subscription we want to get specifically
- * @return {Array}
- */
-function getSubscribedServices(state, type) {
-  let subscriptions = state.subscription.subscriptions;
-
-  // If a type was specified, filter out subscriptions of other types.
-  if (type) {
-    subscriptions = subscriptions.filter(subscription => subscription.channelType === type);
+function getSipEventInfo(state, eventType) {
+  if (eventType) {
+    return (0, _fp.cloneDeep)(state.sipEvents[eventType]);
+  } else {
+    return (0, _fp.cloneDeep)(state.sipEvents);
   }
-
-  // Massage the subscriptions to be a list of service names.
-  subscriptions = subscriptions.map(subscription => subscription.service);
-  return (0, _fp.cloneDeep)(subscriptions);
 }
 
 /***/ }),
 
-/***/ "../kandy/src/users/cpaas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
-
-var _values2 = _interopRequireDefault(_values);
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.default = cpaasUsers;
-
-var _index = __webpack_require__("../kandy/src/users/interface/index.js");
-
-var _index2 = _interopRequireDefault(_index);
-
-var _sagas = __webpack_require__("../kandy/src/users/cpaas/sagas/index.js");
-
-var sagas = _interopRequireWildcard(_sagas);
-
-var _contacts = __webpack_require__("../kandy/src/users/interface/events/contacts.js");
-
-var _contacts2 = _interopRequireDefault(_contacts);
-
-var _users = __webpack_require__("../kandy/src/users/interface/events/users.js");
-
-var _users2 = _interopRequireDefault(_users);
-
-var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Other plugins.
-// Users plugin.
-const capabilities = ['addContactAsBuddy'];
-
-// Libraries.
-function cpaasUsers() {
-  function* init() {
-    yield (0, _effects.put)((0, _actions.mapEvents)((0, _extends3.default)({}, _contacts2.default, _users2.default)));
-  }
-
-  return {
-    name: _index2.default.name,
-    sagas: (0, _values2.default)(sagas),
-    api: _index2.default.api,
-    reducer: _index2.default.reducer,
-    capabilities,
-    init
-  };
-}
-
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/requests/contacts.js":
+/***/ "../kandy/src/sipEvents/sagas.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41287,565 +47570,43 @@ Object.defineProperty(exports, "__esModule", {
 var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
 
 var _extends3 = _interopRequireDefault(_extends2);
-
-exports.addContactRequest = addContactRequest;
-exports.updateContactRequest = updateContactRequest;
-exports.deleteContactRequest = deleteContactRequest;
-exports.fetchContactRequest = fetchContactRequest;
-exports.refreshContactsRequest = refreshContactsRequest;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _handleRequestError = __webpack_require__("../kandy/src/common/helpers/handleRequestError.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _codes = __webpack_require__("../kandy/src/errors/codes.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * addContactRequest
- *
- * Perform an HTTP request to create one contact resource
- * @method addContactRequest
- * @param {Object} requestInfo Platform connection and user info for the request
- * @param {string} [body] The request body for a POST request
- */
-// Helpers.
-function* addContactRequest(requestInfo, body) {
-  const response = yield (0, _effects2.default)({
-    url: `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts`,
-    body: body,
-    method: 'POST',
-    headers: {}
-  }, requestInfo.options);
-
-  if (response.error) {
-    // Handle errors from the server.
-    return {
-      error: (0, _handleRequestError.handleRequestError)(response, 'Add Contact Request')
-    };
-  } else if (response.payload.body) {
-    return { result: response.payload.body.contact };
-  } else {
-    // No error, but response does not contain a body
-    return { result: response.payload.result };
-  }
-}
-
-/**
- * updateContactRequest
- *
- * Perform an HTTP request to update one contact resource
- * @method updateContactRequest
- * @param {Object} requestInfo Platform connection and user info for the request
- * @param {string} [body] The request body for a POST request
- */
-function* updateContactRequest(requestInfo, contactId, body) {
-  const response = yield (0, _effects2.default)({
-    url: `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts/${contactId}`,
-    body: body,
-    method: 'PUT',
-    headers: {}
-  }, requestInfo.options);
-
-  if (response.error) {
-    // Handle errors from the server.
-    return {
-      error: (0, _handleRequestError.handleRequestError)(response, 'Update Contact Request')
-    };
-  } else if (response.payload.body) {
-    return { result: response.payload.body.contact };
-  } else {
-    // No error, but no body in the response
-    return { result: response.payload.result };
-  }
-}
-
-/**
- * deleteContactRequest
- *
- * Send an HTTP DELETE request to delete one contact
- * @method deleteContactRequest
- * @param {Object} requestInfo Platform connection and user information necessary to create the request
- * @param {string} contactId The uniquely identifier for the contact
- */
-function* deleteContactRequest(requestInfo, contactId) {
-  const url = `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts/${contactId}`;
-
-  const options = {
-    method: 'DELETE'
-  };
-
-  const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, options), requestInfo.options);
-
-  if (response.error) {
-    // Handle errors from the server.
-    return {
-      error: (0, _handleRequestError.handleRequestError)(response, 'Delete Contact Request')
-    };
-  } else {
-    // Successful DELETE requests sent to this endpoint do not return a body, thus we will return a boolean
-    return { result: true };
-  }
-}
-
-/**
- * fetchContactRequest
- *
- * Perform an HTTP request to retrieve one contact resource
- * @method fetchContactRequest
- * @param {Object} requestInfo Platform connection and user info for the request
- * @param {string} [contactId] The unique identifier of the contact
- */
-function* fetchContactRequest(requestInfo, contactId) {
-  const response = yield (0, _effects2.default)({
-    url: `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts/${contactId}`,
-    method: 'GET'
-  }, requestInfo.options);
-
-  if (response.error) {
-    // Handle errors from the server.
-    return {
-      error: (0, _handleRequestError.handleRequestError)(response, 'Fetch Contact Request')
-    };
-  } else if (response.payload.body) {
-    return { result: response.payload.body.contact };
-  } else {
-    // No error, but response does not contain a body
-    return { result: true };
-  }
-}
-
-/**
- * refreshContactsRequest
- *
- * Perform an HTTP request to retrieve all of a user's address book contacts
- * @method refreshContactsRequest
- * @param {Object} requestInfo Platform connection and user info for the request
- */
-function* refreshContactsRequest(requestInfo) {
-  const url = `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts`;
-  const options = { method: 'GET' };
-
-  const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, options), requestInfo.options);
-
-  if (response.error) {
-    // Handle errors from the server.
-    return {
-      error: (0, _handleRequestError.handleRequestError)(response, 'Refresh Contact Request')
-    };
-  } else if (response.payload.body) {
-    return { result: response.payload.body.contactCollection.contact };
-  } else {
-    // Response does not contain an error, but no body was provided. As this request expects a body, we treat it as an error.
-    return {
-      error: new _errors2.default({
-        message: 'Request succeeded but no body was provided in the response',
-        code: _codes.usersCodes.UNKNOWN
-      })
-    };
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/requests/users.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.directorySearch = directorySearch;
-
-var _effects = __webpack_require__("../kandy/src/request/effects.js");
-
-var _effects2 = _interopRequireDefault(_effects);
-
-var _handleRequestError = __webpack_require__("../kandy/src/common/helpers/handleRequestError.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Libraries
-// Helpers.
-const log = (0, _logs.getLogManager)().getLogger('USERS');
-
-/**
- * directorySearch
- *
- * Composes and executes a REST request to the directory service
- * @method directorySearch
- * @param {Object} requestInfo
- * @param {Object} params
- */
-function* directorySearch(requestInfo, params = {}) {
-  const directoryId = params.directoryId || 'default';
-  const method = 'GET';
-  const url = `${requestInfo.baseURL}/cpaas/directory/v1/${requestInfo.username}/${directoryId}/search`;
-  const queryParams = (0, _fp.mapKeys)(mapSearchKey, (0, _fp.pick)(validKeys, params));
-
-  const response = yield (0, _effects2.default)({ url, queryParams, method }, requestInfo.options);
-
-  if (response.error) {
-    // Handle the error similarly regardless of whether or not the response has a body value
-    const error = (0, _handleRequestError.handleRequestError)(response, 'User Request');
-    log.debug('Error performing directorySearch request', error);
-    return {
-      error: error
-    };
-  } else if (response.payload.body) {
-    // Request was successful
-    return response.payload.body.directoryItemList;
-  } else {
-    // Request was successful but no body was provided
-    return { result: true };
-  }
-}
-
-/**
- * valid directory search query keys
- *
- * @type {Array}
- */
-const validKeys = ['name', 'firstName', 'lastName', 'userId', 'userName', 'phoneNumber', 'order', 'sortBy', 'max', 'next'];
-
-/**
- * Helper function to return a validated parameter for directory searches
- * @param {string} key
- * @returns {string}
- */
-function mapSearchKey(key) {
-  switch (key) {
-    case 'userId':
-      return 'userName';
-    default:
-      return key;
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/sagas/contacts.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
 
 var _stringify2 = _interopRequireDefault(_stringify);
 
-exports.addContact = addContact;
-exports.updateContact = updateContact;
-exports.removeContact = removeContact;
-exports.fetchContact = fetchContact;
-exports.refreshContacts = refreshContacts;
+exports.sipEventSubscribe = sipEventSubscribe;
+exports.sipEventUpdate = sipEventUpdate;
+exports.sipEventUnsubscribe = sipEventUnsubscribe;
+exports.receiveEventNotify = receiveEventNotify;
 
-var _contacts = __webpack_require__("../kandy/src/users/interface/actions/contacts.js");
-
-var actions = _interopRequireWildcard(_contacts);
-
-var _contacts2 = __webpack_require__("../kandy/src/users/cpaas/requests/contacts.js");
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _utils = __webpack_require__("../kandy/src/users/cpaas/utils.js");
-
-var _errors = __webpack_require__("../kandy/src/errors/index.js");
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _codes = __webpack_require__("../kandy/src/errors/codes.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Add a contact to the Address Book
- * @method addContact
- * @param {Object} action an action of type ADD_CONTACT
- */
-
-
-// Helpers
-function* addContact(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, 'cpaas');
-  const contactBody = (0, _utils.remoteContactFromLocal)(action.payload, true);
-  const res = yield (0, _effects.call)(_contacts2.addContactRequest, requestInfo, (0, _stringify2.default)(contactBody));
-  if (res.error) {
-    yield (0, _effects.put)(actions.addContactFinish({ error: res.error }));
-  } else {
-    yield (0, _effects.put)(actions.addContactFinish({ contact: action.payload }));
-  }
-}
-
-/**
- * Update a contact in the address book
- * @method updateContact
- * @param {Object} action an action of type UPDATE_CONTACT
- */
-
-
-// Libraries
-
-
-// Other plugins.
-// Users plugin
-function* updateContact(action) {
-  // validate
-  if (!action.payload.contact.contactId) {
-    // contactId is a mandatory field
-    yield (0, _effects.put)(actions.updateContactFinish({
-      error: new _errors2.default({
-        code: _codes.usersCodes.INVALID_PARAM,
-        message: 'Missing property: contactId'
-      })
-    }));
-    return;
-  }
-
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, 'cpaas');
-  const contactBody = (0, _utils.remoteContactFromLocal)(action.payload.contact, false);
-  const res = yield (0, _effects.call)(_contacts2.updateContactRequest, requestInfo, action.payload.contact.contactId, (0, _stringify2.default)(contactBody));
-  if (res.error) {
-    yield (0, _effects.put)(actions.updateContactFinish({ error: res.error }));
-  } else {
-    yield (0, _effects.put)(actions.updateContactFinish({ contact: action.payload.contact }));
-  }
-}
-
-/**
- * Remove a contact from the address book
- * @method removeContact
- * @param {Object} action an action of type REMOVE_CONTACT
- */
-function* removeContact(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, 'cpaas');
-  const res = yield (0, _effects.call)(_contacts2.deleteContactRequest, requestInfo, action.payload);
-  if (res.error) {
-    yield (0, _effects.put)(actions.removeContactFinish({ error: res.error }));
-  } else {
-    yield (0, _effects.put)(actions.removeContactFinish({ contactId: action.payload }));
-  }
-}
-
-/**
- * Fetch a contact from the personal address book of the subscribed user.
- * @method fetchContact
- * @param {Object} action an action of type FETCH_CONTACT
- */
-function* fetchContact(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, 'cpaas');
-  const res = yield (0, _effects.call)(_contacts2.fetchContactRequest, requestInfo, action.payload);
-  if (res.error) {
-    yield (0, _effects.put)(actions.fetchContactFinish({ error: res.error }));
-  } else {
-    yield (0, _effects.put)(actions.fetchContactFinish({ contact: (0, _utils.localContactFromRemote)(res.result) }));
-  }
-}
-
-/**
- * Refresh the state's contacts by fetching the latest contacts from the user's address book
- * @method refreshContacts
- * @param {Object} action an action of type REFRESH_CONTACTS
- */
-function* refreshContacts(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, 'cpaas');
-  const res = yield (0, _effects.call)(_contacts2.refreshContactsRequest, requestInfo);
-  if (res.error) {
-    yield (0, _effects.put)(actions.refreshContactsFinish({ error: res.error }));
-  } else {
-    yield (0, _effects.put)(actions.refreshContactsFinish({ contacts: res.result.map(_utils.localContactFromRemote) }));
-  }
-}
-
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/sagas/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.addContact = addContact;
-exports.updateContact = updateContact;
-exports.removeContact = removeContact;
-exports.fetchContact = fetchContact;
-exports.refreshContacts = refreshContacts;
-exports.searchDirectory = searchDirectory;
-exports.fetchUser = fetchUser;
-exports.fetchSelfInfo = fetchSelfInfo;
-
-var _contacts = __webpack_require__("../kandy/src/users/cpaas/sagas/contacts.js");
-
-var contactsSagas = _interopRequireWildcard(_contacts);
-
-var _users = __webpack_require__("../kandy/src/users/cpaas/sagas/users.js");
-
-var usersSagas = _interopRequireWildcard(_users);
-
-var _actionTypes = __webpack_require__("../kandy/src/users/interface/actions/actionTypes.js");
+var _actionTypes = __webpack_require__("../kandy/src/sipEvents/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+var _actions = __webpack_require__("../kandy/src/sipEvents/interface/actions.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var actions = _interopRequireWildcard(_actions);
 
-// Contacts sagas
+var _selectors = __webpack_require__("../kandy/src/sipEvents/interface/selectors.js");
 
-/**
- * addContact
- *
- * Add a contact to the personal address book of the subscribed user.
- * @method addContact
- */
-/**
- * Users saga index.
- * Defines which actions trigger which sagas.
- */
+var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
 
-// Users plugin.
-function* addContact() {
-  yield (0, _effects.takeEvery)(actionTypes.ADD_CONTACT, contactsSagas.addContact);
-}
+var _actionTypes2 = __webpack_require__("../kandy/src/notifications/interface/actionTypes.js");
 
-/**
- * updateContact
- *
- * Update a contact to the personal address book of the subscribed user.
- * @method updateContact
- */
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
 
-
-// Libraries.
-function* updateContact() {
-  yield (0, _effects.takeEvery)(actionTypes.UPDATE_CONTACT, contactsSagas.updateContact);
-}
-
-/**
- * removeContact
- *
- * Remove a contact from the currently subscribed user's address book.
- * @method removeContact
- */
-function* removeContact() {
-  yield (0, _effects.takeEvery)(actionTypes.REMOVE_CONTACT, contactsSagas.removeContact);
-}
-
-/**
- * fetchContact
- *
- * Fetch a contact from the personal address book of the subscribed user.
- * @method fetchContact
- */
-function* fetchContact() {
-  yield (0, _effects.takeEvery)(actionTypes.FETCH_CONTACT, contactsSagas.fetchContact);
-}
-
-/**
- * refreshContacts
- *
- * Refresh the contacts of the currently subscribed user.
- * @method refreshContacts
- */
-function* refreshContacts() {
-  yield (0, _effects.takeEvery)(actionTypes.REFRESH_CONTACTS, contactsSagas.refreshContacts);
-}
-
-// Users sagas
-
-/**
- * searchDirectory
- *
- * Search the user directory.
- * @method searchDirectory
- */
-function* searchDirectory() {
-  yield (0, _effects.takeEvery)(actionTypes.SEARCH_DIRECTORY, usersSagas.searchDirectory);
-}
-
-/**
- * fetchUser
- *
- * Fetch a user from the directory service.
- * @method fetchUser
- */
-function* fetchUser() {
-  yield (0, _effects.takeEvery)(actionTypes.FETCH_USER, usersSagas.fetchUser);
-}
-
-/**
- * fetchSelfInfo
- *
- * Fetch user information for the currently logged in user.
- * @method fetchSelfInfo
- */
-function* fetchSelfInfo() {
-  yield (0, _effects.takeEvery)(actionTypes.FETCH_SELF_INFO, usersSagas.fetchSelfInfo);
-}
-
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/sagas/users.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.searchDirectory = searchDirectory;
-exports.fetchUser = fetchUser;
-exports.fetchSelfInfo = fetchSelfInfo;
-
-var _users = __webpack_require__("../kandy/src/users/interface/actions/users.js");
-
-var actions = _interopRequireWildcard(_users);
-
-var _users2 = __webpack_require__("../kandy/src/users/cpaas/requests/users.js");
-
-var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
+var _effects2 = _interopRequireDefault(_effects);
 
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__("../kandy/src/errors/codes.js");
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
-var _utils = __webpack_require__("../kandy/src/users/cpaas/utils.js");
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 var _constants = __webpack_require__("../kandy/src/constants.js");
 
@@ -41853,174 +47614,355 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (0, _logs.getLogManager)().getLogger('Users');
+// Get the logger
+
+
+// Libraries.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('SIPEVENTS');
 
 /**
- * Search the directory for users
- * @method searchDirectory
- * @param {Object} action an action of type SEARCH_DIRECTORY
+ * Saga for subscribing to specified Sip Events.
+ * @method sipEventSubscribe
  */
 
 
 // Constants
 
 
-// Libraries
+// Logs
+// Sip Events plugin.
+function* sipEventSubscribe() {
+  while (true) {
+    const action = yield (0, _effects3.take)(actionTypes.SIP_EVENT_SUBSCRIBE);
+    // TODO: Have the client correlator be provided as a config, not through the API.
+    log.debug(`Subscribing for sip ${action.payload.eventType}.`, action.payload.clientCorrelator);
 
+    // Determine if the user is subscribed to the specified sip event.
+    let { received: subscribedServices } = yield (0, _effects3.select)(_selectors2.getServices);
+    let sipEvents = subscribedServices.filter(service => service.startsWith('event:'));
 
-// Helpers
+    if (!(0, _fp.includes)(action.payload.eventType, sipEvents)) {
+      log.info(`Cannot subcribe to sip ${action.payload.eventType}; service not provisioned.`);
+      yield (0, _effects3.put)(actions.sipEventSubscribeFinish({
+        error: new _errors2.default({
+          code: _errors.sipEventCodes.NOT_PROVISIONED,
+          message: 'Cannot subscribe to sip event; service was not provisioned during connection.'
+        })
+      }));
+      continue;
+    }
 
+    // Use the same subscription duration as the auth subscription.
+    let { expires } = yield (0, _effects3.select)(_selectors2.getSubscriptionInfo);
 
-// Other plugins.
-// Users plugin
-function* searchDirectory(action) {
-  const { filters, options } = action.payload;
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const res = yield (0, _effects.call)(_users2.directorySearch, requestInfo, (0, _extends3.default)({}, filters, options));
-  if (res.error) {
-    const error = new _errors2.default({
-      code: _codes.usersCodes.DIRECTORY_REQUEST_FAIL,
-      message: 'Directory search request resulted in an error being returned from the server'
-    });
-    yield (0, _effects.put)(actions.searchDirectoryFinish({ error }));
-  } else {
-    const users = res.directoryItem.map(_utils.localUserFromRemote);
-    yield (0, _effects.put)(actions.searchDirectoryFinish({ users }));
-  }
-}
+    let platform = yield (0, _effects3.select)(_selectors2.getPlatform);
+    let { server, username, token, accessToken, requestOptions: commonOptions } = yield (0, _effects3.select)(_selectors2.getConnectionInfo);
 
-/**
- * fetch one user by their userId
- * @method fetchUser
- * @param {Object} action an action of type FETCH_USER
- */
-function* fetchUser(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const res = yield (0, _effects.call)(_users2.directorySearch, requestInfo, { userId: action.payload, sortBy: 'name', order: 'asc' });
-  if (res.error) {
-    const error = new _errors2.default({
-      code: _codes.usersCodes.DIRECTORY_REQUEST_FAIL,
-      message: 'Directory search request resulted in an error being returned from the server'
-    });
-    yield (0, _effects.put)(actions.fetchUserFinish({ error }));
-  } else {
-    if (res.directoryItem.length > 0) {
-      if (res.directoryItem.length > 1) {
-        log.info('Fetch User request returned more than 1 user', res.directoryItem);
+    // TODO: UC should store it's token the same way as Link.
+    if (platform === _constants.platforms.UC && !token) {
+      token = accessToken;
+    }
+
+    const requestOptions = {};
+    requestOptions.method = 'POST';
+
+    requestOptions.url = `${server.protocol}://${server.server}:${server.port}/` + `rest/version/${server.version}/` + `user/${username}/` + 'eventSubscription';
+
+    requestOptions.body = {
+      eventSubscriptionRequest: {
+        subscribeUserList: action.payload.subscribeUserList,
+        clientCorrelator: action.payload.clientCorrelator,
+        eventType: action.payload.eventType,
+        expires
       }
-      yield (0, _effects.put)(actions.fetchUserFinish((0, _utils.localUserFromRemote)(res.directoryItem[0])));
+    };
+    if (action.payload.customParameters.length) {
+      requestOptions.body.eventSubscriptionRequest.customParameters = action.payload.customParameters;
     }
-  }
-}
+    requestOptions.body = (0, _stringify2.default)(requestOptions.body);
 
-/**
- * fetch the user information from the directory for the current user
- * @method fetchSelfInfo
- * @param {Object} action an action of type FETCH_SELF_INFO
- */
-function* fetchSelfInfo(action) {
-  const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const res = yield (0, _effects.call)(_users2.directorySearch, requestInfo, {
-    name: requestInfo.username.split('@')[0],
-    sortBy: 'name',
-    order: 'asc'
-  });
-  if (res.error) {
-    const error = new _errors2.default({
-      code: _codes.usersCodes.DIRECTORY_REQUEST_FAIL,
-      message: 'Directory search request resulted in an error being returned from the server'
-    });
-    yield (0, _effects.put)(actions.fetchSelfInfoFinish({ error }));
-  } else {
-    if (res.directoryItem.length > 0) {
-      if (res.directoryItem.length > 1) {
-        log.info('Fetch Self Info returned more than 1 user', res.directoryItem);
+    const response = yield (0, _effects2.default)(requestOptions, commonOptions);
+
+    if (response.error) {
+      let error;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        let { statusCode } = response.payload.body.eventSubscriptionResponse;
+        log.info(`Failed to subscribe to sip event ${action.payload.eventType}, ` + `status code ${statusCode}`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `Failed to subscribe to sip event ${action.payload.eventType}, ` + `status code ${statusCode}`
+        });
+      } else {
+        // Handler errors from the request helper.
+        let { message } = response.payload.result;
+        log.info(`SIP event subscription request failed: ${message}.`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `SIP event subscription request failed: ${message}.`
+        });
       }
-      yield (0, _effects.put)(actions.fetchSelfInfoFinish((0, _utils.localUserFromRemote)(res.directoryItem[0])));
+
+      yield (0, _effects3.put)(actions.sipEventSubscribeFinish({ error }));
+    } else {
+      log.info(`Successfully subscribed to sip event ${action.payload.eventType}.`);
+      let finishAction = actions.sipEventSubscribeFinish({
+        response: (0, _extends3.default)({}, response.payload.body.eventSubscriptionResponse, {
+          eventType: action.payload.eventType,
+          subscribedUsers: action.payload.subscribeUserList
+        })
+      });
+      // Spawn a non-blocking saga to handle resubscriptions.
+      yield (0, _effects3.spawn)(sipEventResub, finishAction);
+      yield (0, _effects3.put)(finishAction);
     }
   }
 }
 
-/***/ }),
-
-/***/ "../kandy/src/users/cpaas/utils.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _entries = __webpack_require__("../../node_modules/babel-runtime/core-js/object/entries.js");
-
-var _entries2 = _interopRequireDefault(_entries);
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-exports.localContactFromRemote = localContactFromRemote;
-exports.remoteContactFromLocal = remoteContactFromLocal;
-exports.localUserFromRemote = localUserFromRemote;
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /**
- * localContactFromRemote
- *
- * Convert a contact object from the back end format used in REST calls, to the local format maintained in the state.
- *
- * @param {Object} contact A remote contact object
+ * Saga to handle automatic resubscription to subscribed sip event.
+ * @method sipEventResub
+ * @param  {Object} action A SIP_EVENT_SUBSCRIBE_FINISH action.
  */
-function localContactFromRemote(contact) {
-  if (contact) {
-    const formattedContact = (0, _fp.reduce)((result, item) => (0, _extends3.default)({}, result, { [item.name]: item.value }), {}, contact.attributeList.attribute);
+function* sipEventResub(action) {
+  let shouldResub = true;
+  while (shouldResub) {
+    const resubDelay = action.payload.expires * 1000 / 2;
+    // Wait for either the resub delay or an unsubscribe action.
+    const { expiry } = yield (0, _effects3.race)({
+      expiry: (0, _effects3.delay)(resubDelay),
+      unsubscribe: (0, _effects3.take)(unsubAction => {
+        return unsubAction.type === actionTypes.SIP_EVENT_UNSUBSCRIBE_FINISH && unsubAction.payload.eventType === action.payload.eventType;
+      })
+    });
 
-    formattedContact.contactId = contact.contactId;
-    return formattedContact;
-  }
-}
+    // If the resubDelay has elapsed, attempt resubscribe.
+    if (expiry) {
+      let eventInfo = yield (0, _effects3.select)(_selectors.getSipEventInfo, action.payload.eventType);
 
-/**
- * Helper function to restructure local contact data for use in a REST request.
- *
- * @param {Object} contact The contact object
- * @param {boolean} [newContact] Flag to indicate that the data being processed is for a new contact
- */
-// Libraries
-function remoteContactFromLocal(contact, newContact = true) {
-  // Cloning the contact to facilitate the removal of `contactId` from the attributes portion of the REST body
-  const omittedKeys = newContact ? ['contactId'] : ['contactId', 'name'];
-  const contactData = (0, _fp.omit)(omittedKeys, contact);
-  const attributes = (0, _fp.map)(([key, value]) => ({ name: key, value: String(value) }), (0, _entries2.default)(contactData));
-
-  return {
-    contact: {
-      attributeList: {
-        attribute: attributes
-      },
-      contactId: contact.contactId
+      if (eventInfo) {
+        log.info(`Re-subscribing for sip ${action.payload.eventType}.`);
+        yield (0, _effects3.put)(actions.sipEventUpdate(action.payload.eventType, {}));
+      } else {
+        shouldResub = false;
+      }
+    } else {
+      shouldResub = false;
     }
-  };
+  }
 }
 
 /**
- * Helper function to organize user information into an object structure for storage in state
+ * Saga to update/resubscribe to a subscribed sip event.
+ * @method sipEventUpdate
  */
-function localUserFromRemote(data) {
-  const user = {};
-  for (let attribute of data.attribute) {
-    user[attribute.name] = attribute.value;
+function* sipEventUpdate() {
+  while (true) {
+    const action = yield (0, _effects3.take)(actionTypes.SIP_EVENT_UPDATE);
+    log.debug(`Updating sip event subscription: ${action.payload.eventType}.`);
+    let eventInfo = yield (0, _effects3.select)(_selectors.getSipEventInfo, action.payload.eventType);
+
+    if (!eventInfo) {
+      if (action.meta.isResub) {
+        // Don't need to resub, since we're not subscribed anymore.
+        // TODO: Tech-Debt: BasicError isn't very useful for these scenarios. The emitted event provides
+        //      the BasicError, except there's no (easy to use) info indicating _which_ event was being
+        //      acted on. BasicError needs the ability to provide extra information.
+        const error = new _errors2.default({
+          code: _errors.sipEventCodes.NOT_SUBSCRIBED,
+          message: `Cannot resubscribe for ${action.payload.eventType} subscription; user not subscribed.`
+        });
+        yield (0, _effects3.put)(actions.sipEventUpdateFinish({ error }));
+      } else {
+        // Error: Not subscribed to this sip event. Cannot update.
+        const error = new _errors2.default({
+          code: _errors.sipEventCodes.NOT_SUBSCRIBED,
+          message: `Cannot update subscription for ${action.payload.eventType}; user not subscribed.`
+        });
+        yield (0, _effects3.put)(actions.sipEventUpdateFinish({ error }));
+      }
+      continue;
+    }
+
+    let platform = yield (0, _effects3.select)(_selectors2.getPlatform);
+    let { server, username, token, accessToken, requestOptions: commonOptions } = yield (0, _effects3.select)(_selectors2.getConnectionInfo);
+
+    // TODO: UC should store it's token the same way as Link.
+    if (platform === _constants.platforms.UC && !token) {
+      token = accessToken;
+    }
+
+    const requestOptions = {};
+    requestOptions.method = 'PUT';
+
+    requestOptions.url = `${server.protocol}://${server.server}:${server.port}/` + `rest/version/${server.version}/` + `user/${username}/` + `eventSubscription/${eventInfo.sessionData}`;
+
+    // Only include user lists in the request body if there are entries.
+    let userLists = {};
+    if (action.payload.subscribeUserList.length > 0) {
+      userLists.subscribeUserList = action.payload.subscribeUserList;
+    }
+    if (action.payload.unsubscribeUserList.length > 0) {
+      userLists.unsubscribeUserList = action.payload.unsubscribeUserList;
+    }
+
+    requestOptions.body = (0, _stringify2.default)({
+      eventSubscriptionRequest: (0, _extends3.default)({}, userLists, {
+        eventType: action.payload.eventType,
+        customParameters: action.payload.customParameters,
+        expires: eventInfo.expires
+      })
+    });
+
+    const response = yield (0, _effects2.default)(requestOptions, commonOptions);
+
+    if (response.error) {
+      let error;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        let { statusCode } = response.payload.body.eventSubscriptionResponse;
+        log.info(`Failed to update sip event subscription; ${action.payload.eventType}, ` + `status code ${statusCode}`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `Failed to update to sip event subscription; ${action.payload.eventType}, ` + `status code ${statusCode}`
+        });
+      } else {
+        // Handler errors from the request helper.
+        let { message } = response.payload.result;
+        log.info(`SIP event update subscription request failed: ${message}.`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `SIP event update subscription request failed: ${message}.`
+        });
+      }
+
+      yield (0, _effects3.put)(actions.sipEventUpdateFinish({ error }));
+    } else {
+      log.info(`Updated sip event subscription: ${action.payload.eventType}.`);
+      yield (0, _effects3.put)(actions.sipEventUpdateFinish({
+        response: (0, _extends3.default)({}, response.payload.body.eventSubscriptionResponse, {
+          eventType: action.payload.eventType,
+          subscribeUserList: action.payload.subscribeUserList || [],
+          unsubscribeUserList: action.payload.unsubscribeUserList || []
+        })
+      }));
+    }
   }
-  if ('primaryContact' in user) {
-    user.userId = user.primaryContact;
-    delete user.primaryContact;
+}
+
+/**
+ * Saga to unsubscribe from [all currently subscribed] sip events.
+ * @method sipEventUnsubscribe
+ */
+function* sipEventUnsubscribe() {
+  while (true) {
+    const action = yield (0, _effects3.take)(actionTypes.SIP_EVENT_UNSUBSCRIBE);
+    log.debug(`Unsubscribing from sip event subscriptions: ${action.payload}.`);
+    let eventInfo = yield (0, _effects3.select)(_selectors.getSipEventInfo, action.payload);
+
+    if (!eventInfo) {
+      log.info(`Cannot unsubscribe from sip event ${action.payload}; no subscription exists.`);
+      const error = new _errors2.default({
+        code: _errors.sipEventCodes.NOT_SUBSCRIBED,
+        message: `Cannot unsubscribe from ${action.payload}; no subscription found.`
+      });
+      yield (0, _effects3.put)(actions.sipEventUnsubscribeFinish({ error }));
+      continue;
+    }
+
+    let platform = yield (0, _effects3.select)(_selectors2.getPlatform);
+    let { server, username, token, accessToken, requestOptions: commonOptions } = yield (0, _effects3.select)(_selectors2.getConnectionInfo);
+
+    // TODO: UC should store it's token the same way as Link.
+    if (platform === _constants.platforms.UC && !token) {
+      token = accessToken;
+    }
+
+    const requestOptions = {};
+    requestOptions.method = 'DELETE';
+
+    requestOptions.url = `${server.protocol}://${server.server}:${server.port}/` + `rest/version/${server.version}/` + `user/${username}/` + `eventSubscription/${eventInfo.sessionData}`;
+
+    const response = yield (0, _effects2.default)(requestOptions, commonOptions);
+
+    if (response.error) {
+      let error;
+      if (response.payload.body) {
+        // Handle errors from the server.
+        let { statusCode } = response.payload.body.eventSubscriptionResponse;
+        log.info(`Failed to unsubscribe from sip event ${action.payload.eventType}, ` + `status code ${statusCode}`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `Failed to unsubscribe from sip event ${action.payload.eventType}, ` + `status code ${statusCode}`
+        });
+      } else {
+        // Handler errors from the request helper.
+        let { message } = response.payload.result;
+        log.info(`SIP event unsubscription request failed: ${message}.`);
+
+        error = new _errors2.default({
+          code: _errors.sipEventCodes.UNKNOWN_ERROR,
+          message: `SIP event unsubscription request failed: ${message}.`
+        });
+      }
+
+      yield (0, _effects3.put)(actions.sipEventUnsubscribeFinish({ error }));
+    } else {
+      log.info(`Successfully unsubscribed from sip ${action.payload}.`);
+      yield (0, _effects3.put)(actions.sipEventUnsubscribeFinish({
+        response: {
+          eventType: action.payload
+        }
+      }));
+    }
   }
-  return user;
+}
+
+/**
+ * Saga to handle received sip event notifications.
+ * @method receiveEventNotify
+ */
+function* receiveEventNotify() {
+  // Redux-saga take() pattern.
+  // Take notification actions that MAY be for sip events.
+  function receiveEventNotifyPattern(action) {
+    return action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.notificationMessage.hasOwnProperty('genericNotificationParams');
+  }
+
+  while (true) {
+    const action = yield (0, _effects3.take)(receiveEventNotifyPattern);
+
+    // Determine which sip events the user is subscribed/connected for.
+    let { received: subscribedServices } = yield (0, _effects3.select)(_selectors2.getServices);
+    let sipEvents = subscribedServices.filter(service => service.startsWith('event:'));
+
+    let notification = action.payload.notificationMessage;
+
+    // Determine if this notification is for a sip event the user subscribed/connected for.
+    if ((0, _fp.includes)(notification.eventType, sipEvents)) {
+      let eventInfo = yield (0, _effects3.select)(_selectors.getSipEventInfo, notification.eventType);
+
+      // Determine if there is a subscription for this sip event in state.
+      if (eventInfo) {
+        log.info(`Received sip event notification of type ${notification.eventType}.`);
+        yield (0, _effects3.put)(actions.sipEventReceived(notification));
+      } else {
+        // Subscribed to sip event, but received a notification for it?
+        log.debug('Received sip event notification for untracked event.', notification);
+      }
+    } else {
+      // Not subscribed to sip event, but received a notification for it?
+      log.debug('Received sip event notification without subscription.', action.payload.eventType);
+    }
+  }
 }
 
 /***/ }),
@@ -43216,6 +49158,579 @@ function getUsers(state) {
  */
 function getUser(state, name) {
   return (0, _fp.cloneDeep)(state.users.users[name]);
+}
+
+/***/ }),
+
+/***/ "../kandy/src/users/link.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.default = usersLink;
+exports.contactRequest = contactRequest;
+exports.fetchSelfInfo = fetchSelfInfo;
+exports.fetchUserLocale = fetchUserLocale;
+
+var _actionTypes = __webpack_require__("../kandy/src/users/interface/actions/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _users = __webpack_require__("../kandy/src/users/interface/actions/users.js");
+
+var userActions = _interopRequireWildcard(_users);
+
+var _contacts = __webpack_require__("../kandy/src/users/interface/actions/contacts.js");
+
+var contactActions = _interopRequireWildcard(_contacts);
+
+var _selectors = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _interface = __webpack_require__("../kandy/src/users/interface/index.js");
+
+var _interface2 = _interopRequireDefault(_interface);
+
+var _contacts2 = __webpack_require__("../kandy/src/users/interface/events/contacts.js");
+
+var _contacts3 = _interopRequireDefault(_contacts2);
+
+var _users2 = __webpack_require__("../kandy/src/users/interface/events/users.js");
+
+var _users3 = _interopRequireDefault(_users2);
+
+var _actions = __webpack_require__("../kandy/src/events/interface/actions.js");
+
+var _effects = __webpack_require__("../kandy/src/request/effects.js");
+
+var _effects2 = _interopRequireDefault(_effects);
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _effects3 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Get the logger
+
+// Request
+const log = (0, _logs.getLogManager)().getLogger('USERS');
+
+// Constants
+
+
+// Logs
+
+
+const { api, name, reducer } = _interface2.default;
+
+const capabilities = ['addContactAsFriend'];
+
+function usersLink() {
+  function* init() {
+    yield (0, _effects3.put)((0, _actions.mapEvents)((0, _extends3.default)({}, _contacts3.default, _users3.default)));
+  }
+
+  function* refreshContacts() {
+    while (true) {
+      const action = yield (0, _effects3.take)([actionTypes.REFRESH_CONTACTS]);
+      if (action.error) {
+        continue;
+      }
+
+      const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+      const res = yield (0, _effects3.call)(contactRequest, 'GET', connection);
+      if (res.error) {
+        yield (0, _effects3.put)(contactActions.refreshContactsFinish({ error: res.error }));
+      } else {
+        var contacts = res.result.addressBookEntries ? res.result.addressBookEntries.map(localContactFromRemote) : [];
+        yield (0, _effects3.put)(contactActions.refreshContactsFinish({
+          contacts: contacts
+        }));
+      }
+    }
+  }
+
+  /**
+   * fetch a contact from the user's Personal Address Book.
+   *
+   * @return {Generator} [description]
+   */
+  function* fetchContact() {
+    while (true) {
+      const action = yield (0, _effects3.take)([actionTypes.FETCH_CONTACT]);
+
+      if (action.error) {
+        log.debug(action.error);
+      }
+
+      const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+      const res = yield (0, _effects3.call)(contactRequest, 'GET', connection, `contacts/${action.payload}`);
+
+      if (res.error) {
+        const error = new Error(res.error);
+        yield (0, _effects3.put)(contactActions.fetchContactFinish({ error }));
+      } else {
+        const contact = localContactFromRemote(res.result.addressBookEntries[0]);
+        yield (0, _effects3.put)(contactActions.fetchContactFinish({ contact }));
+      }
+    }
+  }
+
+  function* addContact() {
+    while (true) {
+      try {
+        // Wait for ADD_CONTACT action.
+        const action = yield (0, _effects3.take)(actionTypes.ADD_CONTACT);
+
+        var contactData = {
+          addressBookRequest: {
+            addressBookEntries: [remoteContactFromLocal((0, _extends3.default)({}, action.payload))]
+          }
+        };
+        const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+        const res = yield (0, _effects3.call)(contactRequest, 'POST', connection, 'contacts/', (0, _stringify2.default)(contactData));
+        if (res.error) {
+          throw new Error(res.error);
+        } else {
+          const contact = localContactFromRemote(action.payload);
+          yield (0, _effects3.put)(contactActions.addContactFinish({ contact }));
+        }
+      } catch (error) {
+        yield (0, _effects3.put)(contactActions.addContactFinish({ error }));
+      }
+    }
+  }
+
+  function* removeContact() {
+    while (true) {
+      try {
+        // Wait for REMOVE_CONTACT action.
+        const action = yield (0, _effects3.take)(actionTypes.REMOVE_CONTACT);
+        const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+        const res = yield (0, _effects3.call)(contactRequest, 'DELETE', connection, 'contacts/' + encodeURIComponent(action.payload));
+
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        yield (0, _effects3.put)(contactActions.removeContactFinish({ contactId: action.payload }));
+      } catch (err) {
+        yield (0, _effects3.put)(contactActions.removeContactFinish({ error: err }));
+      }
+    }
+  }
+
+  function* updateContact() {
+    while (true) {
+      try {
+        const action = yield (0, _effects3.take)(actionTypes.UPDATE_CONTACT);
+        const { contact } = action.payload;
+        const contactRestObject = remoteContactFromLocal((0, _extends3.default)({}, contact));
+        var contactData = {
+          addressBookRequest: {
+            addressBookEntries: [contactRestObject]
+          }
+        };
+        const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+        const res = yield (0, _effects3.call)(contactRequest, 'PUT', connection, 'contacts/' + contact.contactId, (0, _stringify2.default)(contactData));
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        yield (0, _effects3.put)(contactActions.updateContactFinish({ contact }));
+      } catch (error) {
+        yield (0, _effects3.put)(contactActions.updateContactFinish({ error }));
+      }
+    }
+  }
+
+  function* searchDirectory() {
+    while (true) {
+      // Wait for SEARCH_DIRECTORY action.
+      const action = yield (0, _effects3.take)(actionTypes.SEARCH_DIRECTORY);
+      // TODO: Ensure the value is defined.
+      const type = (0, _keys2.default)(action.payload.filters)[0];
+
+      var body = {
+        searchCriteria: action.payload.filters[type],
+        searchType: searchTypeInteger(type)
+      };
+      const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+      const res = yield (0, _effects3.call)(getDirectory, connection, body);
+      if (res.error) {
+        const error = new Error(res.error);
+        yield (0, _effects3.put)(userActions.searchDirectoryFinish({ error }));
+      } else {
+        var users = res.result.directoryItems || [];
+        yield (0, _effects3.put)(userActions.searchDirectoryFinish({ users: users.map(localUserFromRemote) }));
+      }
+    }
+  }
+
+  /**
+   * On-Premises fetchUser saga
+   * Performs to uworkflow of caching a user.
+   * @return {Generator} [description]
+   */
+  function* fetchUser() {
+    while (true) {
+      // Wait for SEARCH_DIRECTORY action.
+      const { payload: userId } = yield (0, _effects3.take)(actionTypes.FETCH_USER);
+      var body = {
+        searchCriteria: userId,
+        searchType: searchTypeInteger('user_id')
+      };
+      const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+      const res = yield (0, _effects3.call)(getDirectory, connection, body);
+      if (res.error) {
+        yield (0, _effects3.put)(userActions.fetchUserFinish(new Error(res.error)));
+      } else {
+        if (res.result.directoryItems) {
+          yield (0, _effects3.put)(userActions.fetchUserFinish(res.result.directoryItems[0]));
+        } else {
+          log.debug('Fetch user request was successful, but result was empty');
+        }
+      }
+    }
+  }
+
+  /**
+   * On-Premises getUserDetails saga.
+   * Performs the workflow of fetching user profile data for the currently logged in user.
+   * @method getUserDetails
+   */
+  function* fetchSelf() {
+    while (true) {
+      // Wait for a GET_USER_DETAILS action.
+      const action = yield (0, _effects3.take)(actionTypes.FETCH_SELF_INFO);
+      const userData = {};
+
+      if (action.error) {
+        continue;
+      }
+
+      const connection = yield (0, _effects3.select)(_selectors.getConnectionInfo);
+      // Fetch the user details
+      const { userProfile, currentLocale } = yield (0, _effects3.all)({
+        userProfile: (0, _effects3.call)(fetchSelfInfo, connection),
+        currentLocale: (0, _effects3.call)(fetchUserLocale, connection)
+      });
+
+      // Set as much user data as possible, but log an error if any of our calls failed
+      if (!userProfile.error) {
+        userData.data = userProfile;
+      } else {
+        log.debug('Error retrieving user profile informaion', userProfile.text);
+      }
+
+      if (!currentLocale.error) {
+        userData.currentLocale = currentLocale;
+      } else {
+        log.debug('Error retrieving user locale', currentLocale.text);
+      }
+      userData.primaryContact = connection.username;
+
+      yield (0, _effects3.put)(userActions.fetchUserFinish(userData));
+    }
+  }
+
+  return {
+    sagas: [refreshContacts, addContact, removeContact, updateContact, fetchContact, searchDirectory, fetchUser, fetchSelf],
+    api,
+    name,
+    init,
+    reducer,
+    capabilities
+  };
+}
+
+function* contactRequest(method, conn, extraURL, body) {
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : conn.server.version;
+  var url;
+  if (extraURL) {
+    url = `${conn.server.protocol}://${conn.server.server}:${conn.server.port}/rest/version/${version}/user/${conn.username}/addressbook/${extraURL}`;
+  } else {
+    url = `${conn.server.protocol}://${conn.server.server}:${conn.server.port}/rest/version/${version}/user/${conn.username}/addressbook`;
+  }
+  const options = {
+    method: method
+  };
+  if (body) {
+    options.body = body;
+  }
+
+  const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, options), conn.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let statusCode, errorMessage;
+      if (response.payload.body.addressBookResponse) {
+        statusCode = response.payload.body.addressBookResponse.statusCode;
+      } else if (response.payload.body.message && response.payload.result.code) {
+        statusCode = response.payload.result.code;
+        errorMessage = response.payload.body.message;
+      }
+      log.debug(`Failed to search addressbook with status code ${statusCode}.`);
+      // TODO: Proper errors.
+      return {
+        error: new Error(`Failed to search addressbook; status ${statusCode}.\n message ${errorMessage}`)
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Addressbook search request failed: ${message}`);
+      // TODO: Proper errors.
+      return {
+        error: new Error(`Addressbook search request failed: ${message}`)
+      };
+    }
+  } else if (response.payload.body && response.payload.body.addressBookResponse.statusCode === 0) {
+    return { result: response.payload.body.addressBookResponse || {} };
+  } else {
+    // Unknown case.
+    log.debug('Unknown error case for addressbook search.');
+    let err = new Error('Unknown error.');
+    return { error: err };
+  }
+}
+
+// see SPiDR 4.3 REST API Documentation - 12.11.3
+function searchTypeInteger(searchType) {
+  switch (searchType) {
+    case 'first_name':
+    case 'firstName':
+    case 'FIRSTNAME':
+      return 1;
+    case 'last_name':
+    case 'lastName':
+    case 'LASTNAME':
+      return 2;
+    case 'name':
+    case 'NAME':
+      return 3;
+    case 'phone_number':
+    case 'phoneNumber':
+    case 'PHONENUMBER':
+      return 4;
+    case 'user_id':
+    case 'userId':
+    case 'USERID':
+    case 'user_name':
+    case 'userName':
+    case 'USERNAME':
+      return 5;
+  }
+}
+
+function* getDirectory(conn, params = {}) {
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : conn.server.version;
+  var url = `${conn.server.protocol}://${conn.server.server}:${conn.server.port}/rest/version/${version}/user/${conn.username}/directory`;
+
+  let queryParams = {};
+  if (params.searchType) {
+    queryParams['criteria'] = params.searchCriteria;
+    queryParams['criteriaType'] = params.searchType;
+  } else if (params.searchCriteria) {
+    queryParams['criteria'] = params.searchCriteria;
+  }
+  const method = 'GET';
+
+  const response = yield (0, _effects2.default)({ url, queryParams, method }, conn.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.directory;
+      log.debug(`Failed to search directory with status code ${statusCode}.`);
+      // TODO: Proper errors.
+      return {
+        error: new Error(`Failed to search directory; status ${statusCode}.`)
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`Directory search request failed: ${message}`);
+      // TODO: Proper errors.
+      return { error: new Error(`Directory search request failed: ${message}`) };
+    }
+  } else if (response.payload.body && response.payload.body.directory.statusCode === 0) {
+    // Request was successful.
+    return { result: response.payload.body.directory || {} };
+  } else {
+    // Unknown case.
+    log.debug('Unknown error case for directory search.');
+    let err = new Error('Unknown error.');
+    return { error: err };
+  }
+}
+
+/**
+ * Fetch userProfileData from SPiDR with the provided connection info.
+ * @param  {Object}     connection Connection information for the platform in use.
+ * @return {Object}            Fetch request's response, parsed.
+ */
+function* fetchSelfInfo(connection) {
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : connection.server.version;
+  var url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}/rest/version/${version}/user/${connection.username}/userProfileData`;
+
+  var params = {
+    method: 'GET'
+  };
+
+  const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, params), connection.requestOptions);
+
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      let { statusCode } = response.payload.body.userProfileData;
+      log.debug(`Failed to fetch user details with status code ${statusCode}.`);
+      // TODO: Proper errors.
+      return {
+        error: true,
+        status: statusCode,
+        text: `Failed to fetch user details with status code ${statusCode}.`
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`User details fetch request failed: ${message}`);
+      // TODO: Proper errors.
+      return {
+        error: true,
+        text: `User details fetch request failed: ${message}`
+      };
+    }
+  } else if (response.payload.body && response.payload.body.userProfileData && response.payload.body.userProfileData.statusCode === 0) {
+    // Request was successful.
+    return response.payload.body.userProfileData;
+  } else {
+    // Unknown case.
+    log.debug('Unknown error case for user details fetch.');
+    return {
+      error: true,
+      text: 'Unknown error case fetching user details.'
+    };
+  }
+}
+
+/**
+ * Fetch user localeinformation from SPiDR with the provided connection info.
+ * @param  {Object}     connection Connection information for the platform in use.
+ * @return {Object}            Fetch request's response.
+ */
+function* fetchUserLocale(connection) {
+  let platform = yield (0, _effects3.select)(_selectors.getPlatform);
+  const version = platform === _constants.platforms.UC ? 1 : connection.server.version;
+  const url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}/rest/version/${version}/localization`;
+
+  var params = {
+    method: 'GET'
+  };
+
+  const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, params), connection.requestOptions);
+  if (response.error) {
+    if (response.payload.body) {
+      // Handle errors from the server.
+      log.debug(`Failed to fetch user locale.`);
+      // TODO: Proper errors.
+      return {
+        error: true,
+        text: `Failed to fetch user locale .`
+      };
+    } else {
+      // Handle errors from the request helper.
+      let { message } = response.payload.result;
+      log.debug(`User locale fetch request failed: ${message}`);
+      // TODO: Proper errors.
+      return {
+        error: true,
+        text: `User locale fetch request failed: ${message}`
+      };
+    }
+  } else if (response.payload.body && response.payload.body.acceptLanguage) {
+    // Locale request was successful.
+    return response.payload.body.acceptLanguage;
+  } else {
+    // Unknown case.
+    log.debug('Unknown error case for user locale fetch.');
+    return {
+      error: true,
+      text: 'Unknown error case fetching user locale.'
+    };
+  }
+}
+
+/**
+ * remoteContactFromLocal
+ *
+ * At the time of development, `nickName` is the property by which contact resources are keyed in the back end. Since the manner in which a `nickName` is used and regarded in common practice suggests that it can be changed, we are exposing it as a property named `contactId` and informing developers that this is a unique property. This function is used to normalize the naming convention when preparing contact data to be sent for a REST request
+ *
+ * @param {Object} contact A contact object
+ */
+function remoteContactFromLocal(contact) {
+  if ('contactId' in contact) {
+    contact.nickname = contact.contactId;
+    delete contact.contactId;
+  }
+  // We must remove all empty values, as the back end servicing Link does not permit them
+  for (let prop in contact) {
+    if (!contact[prop] || contact[prop].length === 0) {
+      delete contact[prop];
+    }
+  }
+  return contact;
+}
+
+/**
+ * localContactFromRemote
+ *
+ * Convert a contact object from the back end format used in REST calls, to the format maintained in the state
+ *
+ * @param {Object} contact A contact object
+ */
+function localContactFromRemote(contact) {
+  if ('nickname' in contact) {
+    contact.contactId = contact.nickname;
+    delete contact.nickname;
+  }
+  return contact;
+}
+
+/**
+ * localUserFromRemote
+ *
+ * Converts a user object from the back end format used in REST calls, to the format maintained in the state. In particular, it ensures that the user object has a `userId` property, as this is the property by which users are keyed in our state.
+ *
+ * @param {Object} user A user object
+ * @returns {Object} The user object
+ */
+function localUserFromRemote(user) {
+  return (0, _extends3.default)({}, user, {
+    userId: user.primaryContact || user.userId
+  });
 }
 
 /***/ }),
@@ -49013,4 +55528,4 @@ function makeSafeForCSS(name) {
 
 /******/ });
 });
-//# sourceMappingURL=kandy.cpaas.js.map
+//# sourceMappingURL=kandy.newUC.js.map
