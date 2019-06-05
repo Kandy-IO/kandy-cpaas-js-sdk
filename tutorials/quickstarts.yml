@@ -1,0 +1,43 @@
+# "Display" data about quickstarts.
+# Information to be displayed on the Quickstarts page.
+
+- name: Get Started
+  description: # Get Started
+  link: /quickstarts/javascript/cpaas/Get%20Started
+
+- name: Configurations
+  description: # Configurations
+  link: /quickstarts/javascript/cpaas/Configurations
+
+- name: Authentication
+  description: # Authentication
+  link: /quickstarts/javascript/cpaas/Authentication
+
+- name: Voice and Video Calls
+  description: # Voice and Video Calls
+  link: /quickstarts/javascript/cpaas/Voice%20and%20Video%20Calls
+
+- name: Anonymous Calls
+  description: # Anonymous Calls
+  link: /quickstarts/javascript/cpaas/Anonymous%20Calls
+
+- name: Chat
+  description: # Chat
+  link: /quickstarts/javascript/cpaas/Chat
+
+- name: SMS Messaging
+  description: # SMS Messaging
+  link: /quickstarts/javascript/cpaas/SMS%20Messaging
+
+- name: Address Book and Directory
+  description: # Address Book and Directory
+  link: /quickstarts/javascript/cpaas/Address%20Book%20and%20Directory
+
+- name: Presence
+  description: # Presence
+  link: /quickstarts/javascript/cpaas/Presence
+
+- name: Troubleshooting and Logs
+  description: # Capturing Logs and Troubleshooting Problems
+  link: /quickstarts/javascript/cpaas/Troubleshooting%20and%20Logs
+
