@@ -5,73 +5,33 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.5.0 - beta
+## 3.5.0 - beta
 
-## 4.4.0 - 2019-05-24
+### Compatibility Warning
+- Removed the first parameter (contactId) from kandy.contacts.update() API. The user will need to remove such parameter from any calls made to this API and ensure that contactId is now being supplied as part of the contact object which is passed to this API. `KAA-1600`
 
-### Added
-- Added Ignore Call functionality. `KAA-1512`
-
-### Fixed
-- Fixed call states not having `startTime` and/or `endTime` properties in certain scenarios when the call does not establish. `KAA-1620`
-
-## 4.3.1 - 2019-04-26
+## 3.4.1 - 2019-04-26
 
 ### Fixed
 - Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
 
-## 4.3.0 - 2019-04-26
+## 3.4.0-beta
 
 ### Added
 
 - Added a DEBUG log at the start of every public API invocation, which will better help with future investigations `KAA-1353`
-
-## 4.2.1 - 2019-04-16
-
-### Added
-
-- Added a new call configuration property "removeH264Codecs" to disable removing "H264" Codecs from the SDP by default `KAA-1585`
+- Added the error event to the `subscription`, to prevent subscription change to emmited when there is a subscription failure `KAA-1351`
 
 ### Changed
+- The `subscription:change` event is no longer emmitted when there is an error. User will have to subscribe to `subscription:error` as well. `KAA-1351`
+- No longer stores call stats in localstorage by default. Use the `recordCallStats` configuration to turn this back on. `KAA-1552`
 
-- Changed the default SDP handling to remove "H264" Codecs. `KAA-1585`
-
-## 4.2.0 - 2019-03-29
+## 3.3.0 - 2019-03-29
 
 ### Fixed
 
+- Fixed an issue where JOIN_CALL was not emitting a call:error event when it failed. `KAA-922`
 - Fixed an issue where disconnecting from the network would leave isConnected in the wrong state `KAA-1547`
-
-## 4.1.0 - 2019-03-01
-
-### Added
-
-- Added new Presence event, `presence:selfChange`, to notify when self-presence information has changed. `KAA-1153`
-- Added Presence APIs for retrieving presence information. See `kandy.presence.getAll` and `kandy.presence.getSelf`. KAA-1152.
-- Added Presence constants to the API. See `kandy.presence.statuses` and `kandy.presence.activities`. `KAA-1151`
-
-### Fixed
-
-- Fixed an issue where the states property was not being defined on the call namespace (kandy.call.states). `KAA-1349`
-- Fixed a crash when using the Presence `fetch` API and receiving no data. `KAA-1169`.
-
-### Changed
-
-- Changed the default sdpSemantics to "unified-plan". `KAA-1427`
-
-## 4.0.0 - 2019-02-01
-
-### Compatibility Warning
-
-Version 4.0.0 has many breaking changes for call APIs. Please see the API reference documentation to see the new Call API.
-
-### Added
-
-- Added support to make calls on Safari 12.
-
-### Changed
-
-- Refactored all of the WebRTC-related code.
 
 ### Changed
 
@@ -123,7 +83,7 @@ The function to instantiate the SDK has been renamed from `createKandy()` to `Ka
 
 ### Added
 
-- [CPaaS 2.0] Added chat functionality with support for sending and receiving messages `KAA-617`
+- [CPaaS] Added chat functionality with support for sending and receiving messages `KAA-617`
 - Added user's locale to data returned in fetchSelfInfo(). `KAA-787`
 - Added new Authorization name (authname) to the Kandy connect method. `KAA-606`
 - Implemented originalRemoteParticipant field to call and callHistory for keeping track of the initial call "to" `feat/KAA-959`
