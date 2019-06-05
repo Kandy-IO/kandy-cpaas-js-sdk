@@ -29,6 +29,10 @@
   description: # SMS Messaging
   link: /quickstarts/javascript/cpaas/SMS%20Messaging
 
+- name: Multimedia Chat
+  description: # Multimedia Chat
+  link: /quickstarts/javascript/cpaas/Multimedia%20Chat
+
 - name: Address Book and Directory
   description: # Address Book and Directory
   link: /quickstarts/javascript/cpaas/Address%20Book%20and%20Directory

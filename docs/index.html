@@ -993,6 +993,34 @@
               
                 
                 <li><a
+                  href='#sdphandlers'
+                  class=" toggle-sibling">
+                  sdpHandlers
+                  <span class='icon'>▸</span>
+                </a>
+                
+                <div class='toggle-target display-none'>
+                  
+                  <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Static members</span></li>
+                    
+                      <li><a
+                        href='#sdphandlerscreatecodecremover'
+                        class='regular pre-open'>
+                        .createCodecRemover
+                      </a></li>
+                    
+                    </ul>
+                  
+                  
+                  
+                  
+                </div>
+                
+                </li>
+              
+                
+                <li><a
                   href='#config'
                   class=" toggle-sibling">
                   config
@@ -1042,34 +1070,6 @@
                       </a></li>
                       
                     </ul>
-                  
-                  
-                  
-                </div>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#sdphandlers'
-                  class=" toggle-sibling">
-                  sdpHandlers
-                  <span class='icon'>▸</span>
-                </a>
-                
-                <div class='toggle-target display-none'>
-                  
-                  <ul class='list-reset py1-ul pl1'>
-                    <li class='h5'><span>Static members</span></li>
-                    
-                      <li><a
-                        href='#sdphandlerscreatecodecremover'
-                        class='regular pre-open'>
-                        .createCodecRemover
-                      </a></li>
-                    
-                    </ul>
-                  
                   
                   
                   
@@ -1161,19 +1161,9 @@
               
                 
                 <li><a
-                  href='#mediaconstraint'
+                  href='#mediaobject'
                   class="">
-                  MediaConstraint
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#deviceinfo'
-                  class="">
-                  DeviceInfo
+                  MediaObject
                   
                 </a>
                 
@@ -1201,9 +1191,19 @@
               
                 
                 <li><a
-                  href='#mediaobject'
+                  href='#deviceinfo'
                   class="">
-                  MediaObject
+                  DeviceInfo
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#mediaconstraint'
+                  class="">
+                  MediaConstraint
                   
                 </a>
                 
@@ -11334,6 +11334,122 @@ Will trigger the <code>contacts:change</code> event.</p>
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='sdphandlers'>
+      sdpHandlers
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.</p>
+
+
+  <div class='pre p1 fill-light mt0'>sdpHandlers</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>API Functions</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='sdphandlerscreatecodecremover'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>createCodecRemover()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.</p>
+<p>To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.</p>
+<p>The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.</p>
+
+
+  <div class='pre p1 fill-light mt0'>createCodecRemover()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">import</span> { create, sdpHandlers } <span class="hljs-keyword">from</span> <span class="hljs-string">'kandy'</span>;
+<span class="hljs-keyword">const</span> codecRemover = sdpHandlers.createCodecRemover([<span class="hljs-string">'VP8'</span>, <span class="hljs-string">'VP9'</span>])
+<span class="hljs-keyword">const</span> client = create({
+  <span class="hljs-attr">call</span>: {
+    <span class="hljs-attr">sdpHandlers</span>: [codecRemover]
+  }
+})</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='config'>
       config
     </h3>
@@ -12211,122 +12327,6 @@ values you can use when instantiating the SDK.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='sdphandlers'>
-      sdpHandlers
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.</p>
-
-
-  <div class='pre p1 fill-light mt0'>sdpHandlers</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>API Functions</div>
-    <div class="clearfix">
-  
-    <div class='border-bottom' id='sdphandlerscreatecodecremover'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createCodecRemover()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.</p>
-<p>To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.</p>
-<p>The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.</p>
-
-
-  <div class='pre p1 fill-light mt0'>createCodecRemover()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">import</span> { create, sdpHandlers } <span class="hljs-keyword">from</span> <span class="hljs-string">'kandy'</span>;
-<span class="hljs-keyword">const</span> codecRemover = sdpHandlers.createCodecRemover([<span class="hljs-string">'VP8'</span>, <span class="hljs-string">'VP9'</span>])
-<span class="hljs-keyword">const</span> client = create({
-  <span class="hljs-attr">call</span>: {
-    <span class="hljs-attr">sdpHandlers</span>: [codecRemover]
-  }
-})</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-</div>
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='logger'>
       Logger
     </h3>
@@ -12866,29 +12866,19 @@ A Call can be manipulated by using the Call feature's APIs.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='mediaconstraint'>
-      MediaConstraint
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
     </h3>
     
     
   </div>
   
 
-  <p>The MediaConstraint type defines the format for configuring media options.
-Either the <code>exact</code> or <code>ideal</code> property should be provided. If both are present, the
-<code>exact</code> value will be used.</p>
-<p>When the <code>exact</code> value is provided, it will be the only value considered for the option.
-If it cannot be used, the constraint will be considered an error.</p>
-<p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
-If it cannot be used, the closest acceptable value will be used instead.</p>
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
 
 
-  <div class='pre p1 fill-light mt0'>MediaConstraint</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
   
   
 
@@ -12906,112 +12896,22 @@ If it cannot be used, the closest acceptable value will be used instead.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>exact</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : The required value for the constraint. Other values will not be accepted.
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>ideal</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : The ideal value for the constraint. Other values will be considered if necessary.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify video resolution when making a call.</span>
-client.call.make(destination, {
-   <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">videoOptions</span>: {
-     <span class="hljs-comment">// Set height and width constraints to ideally be 1280x720.</span>
-     height: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">720</span> },
-     <span class="hljs-attr">width</span>: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">1280</span> }
-   }
-})</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Contains information about a device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
 
           
         </div>
@@ -13222,19 +13122,18 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
     </h3>
     
     
   </div>
   
 
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
+  <p>Contains information about a device.</p>
 
 
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
   
   
 
@@ -13252,22 +13151,31 @@ Media is a collection of Track objects.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
 
           
         </div>
@@ -13279,6 +13187,98 @@ Media is a collection of Track objects.</p>
 
   
 
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='mediaconstraint'>
+      MediaConstraint
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The MediaConstraint type defines the format for configuring media options.
+Either the <code>exact</code> or <code>ideal</code> property should be provided. If both are present, the
+<code>exact</code> value will be used.</p>
+<p>When the <code>exact</code> value is provided, it will be the only value considered for the option.
+If it cannot be used, the constraint will be considered an error.</p>
+<p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
+If it cannot be used, the closest acceptable value will be used instead.</p>
+
+
+  <div class='pre p1 fill-light mt0'>MediaConstraint</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>exact</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+          : The required value for the constraint. Other values will not be accepted.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>ideal</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+          : The ideal value for the constraint. Other values will be considered if necessary.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify video resolution when making a call.</span>
+client.call.make(destination, {
+   <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">videoOptions</span>: {
+     <span class="hljs-comment">// Set height and width constraints to ideally be 1280x720.</span>
+     height: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">720</span> },
+     <span class="hljs-attr">width</span>: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">1280</span> }
+   }
+})</pre>
+    
   
 
   

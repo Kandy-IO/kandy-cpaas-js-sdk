@@ -92,5 +92,3 @@ The best way to learn is usually by example. Our quickstarts will provided you w
 | Firefox | Latest 3 Major Versions |
 | Safari  |  Latest Major Version   |
 
-
-
