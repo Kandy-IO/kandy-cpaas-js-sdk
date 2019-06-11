@@ -1276,39 +1276,28 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## MediaConstraint
+## CallObject
 
-The MediaConstraint type defines the format for configuring media options.
-Either the `exact` or `ideal` property should be provided. If both are present, the
-   `exact` value will be used.
-
-When the `exact` value is provided, it will be the only value considered for the option.
-   If it cannot be used, the constraint will be considered an error.
-
-When the `ideal` value is provided, it will be considered as the optimal value for the option.
-   If it cannot be used, the closest acceptable value will be used instead.
-
-Type: [Object][5]
+The state representation of a Call.
+Can be retrieved using the Call feature's `getAll` or `getById` APIs.
+A Call can be manipulated by using the Call feature's APIs.
 
 **Properties**
 
--   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
--   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
-
-**Examples**
-
-```javascript
-// Specify video resolution when making a call.
-client.call.make(destination, {
-   audio: true,
-   video: true,
-   videoOptions: {
-     // Set height and width constraints to ideally be 1280x720.
-     height: { ideal: 720 },
-     width: { ideal: 1280 }
-   }
-})
-```
+-   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
+-   `id` **[string][2]** The ID of the call.
+-   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
+-   `localTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
+    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
+    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
+-   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
+-   `remoteTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
+    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
+-   `startTime` **[number][10]** The start time of the call in milliseconds since the epoch.
+-   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
 ## MediaObject
 
@@ -1358,28 +1347,50 @@ Contains information about a device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
 
-## CallObject
+## MediaConstraint
 
-The state representation of a Call.
-Can be retrieved using the Call feature's `getAll` or `getById` APIs.
-A Call can be manipulated by using the Call feature's APIs.
+The MediaConstraint type defines the format for configuring media options.
+Either the `exact` or `ideal` property should be provided. If both are present, the
+   `exact` value will be used.
+
+When the `exact` value is provided, it will be the only value considered for the option.
+   If it cannot be used, the constraint will be considered an error.
+
+When the `ideal` value is provided, it will be considered as the optimal value for the option.
+   If it cannot be used, the closest acceptable value will be used instead.
+
+Type: [Object][5]
 
 **Properties**
 
--   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
--   `id` **[string][2]** The ID of the call.
--   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
--   `localTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
-    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
-    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
--   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
--   `remoteTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
-    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
--   `startTime` **[number][10]** The start time of the call in milliseconds since the epoch.
--   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+-   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
+-   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
+
+**Examples**
+
+```javascript
+// Specify video resolution when making a call.
+client.call.make(destination, {
+   audio: true,
+   video: true,
+   videoOptions: {
+     // Set height and width constraints to ideally be 1280x720.
+     height: { ideal: 720 },
+     width: { ideal: 1280 }
+   }
+})
+```
+
+## Part
+
+A Part is a custom object representing the payload of a message.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be "text", "json", "file".
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+-   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
 
 ## MessageSender
 
@@ -1405,17 +1416,6 @@ Add an additional part to a message.
 ### createImageLinks
 
 Creates a usable link for the given message
-
-## Part
-
-A Part is a custom object representing the payload of a message.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be "text", "json", "file".
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
--   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
 
 ## Subscription
 

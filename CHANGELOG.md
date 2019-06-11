@@ -25,6 +25,9 @@ Kandy.js change log.
 ### Fixed
 - Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
 
+### Changed
+- The valid conversation types have been changed to `chat-oneToOne`, `chat-group` and `sms`. Previous types `im` and `group` can still be used and will be converted to the newer types. `KAA-1744`.
+
 ## 4.3.0 - 2019-04-26
 
 ### Added

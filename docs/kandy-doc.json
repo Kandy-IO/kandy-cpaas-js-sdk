@@ -19377,7 +19377,7 @@
                 "column": 4
               },
               "end": {
-                "line": 42,
+                "line": 46,
                 "column": 5
               }
             },
@@ -19853,22 +19853,22 @@
           ],
           "loc": {
             "start": {
-              "line": 43,
+              "line": 47,
               "column": 4
             },
             "end": {
-              "line": 57,
+              "line": 61,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 58,
+                "line": 62,
                 "column": 4
               },
               "end": {
-                "line": 92,
+                "line": 98,
                 "column": 5
               }
             },
@@ -20289,22 +20289,22 @@
           ],
           "loc": {
             "start": {
-              "line": 93,
+              "line": 99,
               "column": 4
             },
             "end": {
-              "line": 105,
+              "line": 111,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 106,
+                "line": 112,
                 "column": 4
               },
               "end": {
-                "line": 118,
+                "line": 127,
                 "column": 5
               }
             },
@@ -20637,22 +20637,22 @@
           ],
           "loc": {
             "start": {
-              "line": 119,
+              "line": 128,
               "column": 4
             },
             "end": {
-              "line": 127,
+              "line": 136,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 128,
+                "line": 137,
                 "column": 4
               },
               "end": {
-                "line": 130,
+                "line": 139,
                 "column": 5
               }
             },
@@ -20870,22 +20870,22 @@
           ],
           "loc": {
             "start": {
-              "line": 131,
+              "line": 140,
               "column": 4
             },
             "end": {
-              "line": 143,
+              "line": 152,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 144,
+                "line": 153,
                 "column": 4
               },
               "end": {
-                "line": 144,
+                "line": 153,
                 "column": 13
               }
             },
@@ -45569,7 +45569,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
+              "value": "The state representation of a Call.\nCan be retrieved using the Call feature's ",
               "position": {
                 "start": {
                   "line": 1,
@@ -45578,8 +45578,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 12,
-                  "offset": 86
+                  "column": 43,
+                  "offset": 78
                 },
                 "indent": [
                   1
@@ -45588,17 +45588,17 @@
             },
             {
               "type": "inlineCode",
-              "value": "exact",
+              "value": "getAll",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 12,
-                  "offset": 86
+                  "column": 43,
+                  "offset": 78
                 },
                 "end": {
                   "line": 2,
-                  "column": 19,
-                  "offset": 93
+                  "column": 51,
+                  "offset": 86
                 },
                 "indent": []
               }
@@ -45609,85 +45609,51 @@
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 19,
-                  "offset": 93
+                  "column": 51,
+                  "offset": 86
                 },
                 "end": {
                   "line": 2,
-                  "column": 23,
-                  "offset": 97
+                  "column": 55,
+                  "offset": 90
                 },
                 "indent": []
               }
             },
             {
               "type": "inlineCode",
-              "value": "ideal",
+              "value": "getById",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 23,
-                  "offset": 97
+                  "column": 55,
+                  "offset": 90
                 },
                 "end": {
                   "line": 2,
-                  "column": 30,
-                  "offset": 104
+                  "column": 64,
+                  "offset": 99
                 },
                 "indent": []
               }
             },
             {
               "type": "text",
-              "value": " property should be provided. If both are present, the\n   ",
+              "value": " APIs.\nA Call can be manipulated by using the Call feature's APIs.",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 30,
-                  "offset": 104
+                  "column": 64,
+                  "offset": 99
                 },
                 "end": {
                   "line": 3,
-                  "column": 4,
-                  "offset": 162
+                  "column": 60,
+                  "offset": 165
                 },
                 "indent": [
                   1
                 ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "exact",
-              "position": {
-                "start": {
-                  "line": 3,
-                  "column": 4,
-                  "offset": 162
-                },
-                "end": {
-                  "line": 3,
-                  "column": 11,
-                  "offset": 169
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value will be used.",
-              "position": {
-                "start": {
-                  "line": 3,
-                  "column": 11,
-                  "offset": 169
-                },
-                "end": {
-                  "line": 3,
-                  "column": 31,
-                  "offset": 189
-                },
-                "indent": []
               }
             }
           ],
@@ -45699,157 +45665,11 @@
             },
             "end": {
               "line": 3,
-              "column": 31,
-              "offset": 189
+              "column": 60,
+              "offset": 165
             },
             "indent": [
               1,
-              1
-            ]
-          }
-        },
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "When the ",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 1,
-                  "offset": 191
-                },
-                "end": {
-                  "line": 5,
-                  "column": 10,
-                  "offset": 200
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "exact",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 10,
-                  "offset": 200
-                },
-                "end": {
-                  "line": 5,
-                  "column": 17,
-                  "offset": 207
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 17,
-                  "offset": 207
-                },
-                "end": {
-                  "line": 6,
-                  "column": 69,
-                  "offset": 348
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 5,
-              "column": 1,
-              "offset": 191
-            },
-            "end": {
-              "line": 6,
-              "column": 69,
-              "offset": 348
-            },
-            "indent": [
-              1
-            ]
-          }
-        },
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "When the ",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 1,
-                  "offset": 350
-                },
-                "end": {
-                  "line": 8,
-                  "column": 10,
-                  "offset": 359
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "ideal",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 10,
-                  "offset": 359
-                },
-                "end": {
-                  "line": 8,
-                  "column": 17,
-                  "offset": 366
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 17,
-                  "offset": 366
-                },
-                "end": {
-                  "line": 9,
-                  "column": 76,
-                  "offset": 520
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 8,
-              "column": 1,
-              "offset": 350
-            },
-            "end": {
-              "line": 9,
-              "column": 76,
-              "offset": 520
-            },
-            "indent": [
               1
             ]
           }
@@ -45862,9 +45682,9 @@
           "offset": 0
         },
         "end": {
-          "line": 9,
-          "column": 76,
-          "offset": 520
+          "line": 3,
+          "column": 60,
+          "offset": 165
         }
       }
     },
@@ -45872,65 +45692,182 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 11,
+        "lineNumber": 5,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 12,
+        "lineNumber": 6,
         "type": null,
-        "name": "MediaConstraint"
+        "name": "CallObject"
       },
       {
-        "title": "typedef",
-        "description": null,
-        "lineNumber": 13,
+        "title": "property",
+        "description": "The direction in which the call was created (outgoing/incoming).",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "direction"
+      },
+      {
+        "title": "property",
+        "description": "The ID of the call.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "id"
+      },
+      {
+        "title": "property",
+        "description": "Indicates whether this call is currently being held locally.",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "localHold"
+      },
+      {
+        "title": "property",
+        "description": "A list of Track IDs that the call is sending to the remote participant.",
+        "lineNumber": 10,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        },
+        "name": "localTracks"
+      },
+      {
+        "title": "property",
+        "description": "This indicates the media types that the call was initialized with.",
+        "lineNumber": 11,
         "type": {
           "type": "NameExpression",
           "name": "Object"
         },
-        "name": "MediaConstraint"
+        "name": "mediaConstraints"
       },
       {
         "title": "property",
-        "description": "The required value for the constraint. Other values will not be accepted.",
+        "description": "Whether the call was initialized with audio.",
+        "lineNumber": 12,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "mediaConstraints.audio"
+      },
+      {
+        "title": "property",
+        "description": "Whether the call was initialized with video.",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        },
+        "name": "mediaConstraints.video"
+      },
+      {
+        "title": "property",
+        "description": "Indicates whether this call is currently being held remotely.",
         "lineNumber": 14,
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
+          "type": "NameExpression",
+          "name": "boolean"
         },
-        "name": "exact"
+        "name": "remoteHold"
       },
       {
         "title": "property",
-        "description": "The ideal value for the constraint. Other values will be considered if necessary.",
+        "description": "A list of Track IDs that the call is receiving from the remote participant.",
         "lineNumber": 15,
         "type": {
-          "type": "OptionalType",
+          "type": "TypeApplication",
           "expression": {
             "type": "NameExpression",
-            "name": "string"
-          }
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
         },
-        "name": "ideal"
+        "name": "remoteTracks"
       },
       {
-        "title": "example",
-        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
-        "lineNumber": 16
+        "title": "property",
+        "description": "Information about the other call participant.",
+        "lineNumber": 16,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "remoteParticipant"
+      },
+      {
+        "title": "property",
+        "description": "The username with domain of the callee in the form \"username@domain\"",
+        "lineNumber": 17,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "remoteParticipant.displayNumber"
+      },
+      {
+        "title": "property",
+        "description": "The display name of the callee",
+        "lineNumber": 18,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "remoteParticipant.displayName"
+      },
+      {
+        "title": "property",
+        "description": "The start time of the call in milliseconds since the epoch.",
+        "lineNumber": 19,
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "name": "startTime"
+      },
+      {
+        "title": "property",
+        "description": "The current state of the call. See `Call.states` for possible states.",
+        "lineNumber": 20,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "state"
       }
     ],
     "loc": {
       "start": {
-        "line": 47,
+        "line": 14,
         "column": 0
       },
       "end": {
-        "line": 74,
+        "line": 35,
         "column": 3
       }
     },
@@ -45948,16 +45885,450 @@
       "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
-    "examples": [
-      {
-        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
-      }
-    ],
+    "examples": [],
     "params": [],
     "properties": [
       {
         "title": "property",
-        "name": "exact",
+        "name": "direction",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The direction in which the call was created (outgoing/incoming).",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 65,
+                      "offset": 64
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 65,
+                  "offset": 64
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 65,
+              "offset": 64
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "id",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ID of the call.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 20,
+                      "offset": 19
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 20,
+                  "offset": 19
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 20,
+              "offset": 19
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "localHold",
+        "lineNumber": 9,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Indicates whether this call is currently being held locally.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 61,
+                      "offset": 60
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 61,
+                  "offset": 60
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 61,
+              "offset": 60
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "boolean"
+        }
+      },
+      {
+        "title": "property",
+        "name": "localTracks",
+        "lineNumber": 10,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of Track IDs that the call is sending to the remote participant.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 72,
+                      "offset": 71
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 72,
+                  "offset": 71
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 72,
+              "offset": 71
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "mediaConstraints",
+        "lineNumber": 11,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "This indicates the media types that the call was initialized with.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 67,
+                      "offset": 66
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 67,
+                  "offset": 66
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 67,
+              "offset": 66
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "properties": [
+          {
+            "title": "property",
+            "name": "mediaConstraints.audio",
+            "lineNumber": 12,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Whether the call was initialized with audio.",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 45,
+                          "offset": 44
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "boolean"
+            }
+          },
+          {
+            "title": "property",
+            "name": "mediaConstraints.video",
+            "lineNumber": 13,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Whether the call was initialized with video.",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 45,
+                          "offset": 44
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "boolean"
+            }
+          }
+        ]
+      },
+      {
+        "title": "property",
+        "name": "remoteHold",
         "lineNumber": 14,
         "description": {
           "type": "root",
@@ -45967,7 +46338,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The required value for the constraint. Other values will not be accepted.",
+                  "value": "Indicates whether this call is currently being held remotely.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -45976,8 +46347,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 74,
-                      "offset": 73
+                      "column": 62,
+                      "offset": 61
                     },
                     "indent": []
                   }
@@ -45991,8 +46362,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 74,
-                  "offset": 73
+                  "column": 62,
+                  "offset": 61
                 },
                 "indent": []
               }
@@ -46006,22 +46377,19 @@
             },
             "end": {
               "line": 1,
-              "column": 74,
-              "offset": 73
+              "column": 62,
+              "offset": 61
             }
           }
         },
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
+          "type": "NameExpression",
+          "name": "boolean"
         }
       },
       {
         "title": "property",
-        "name": "ideal",
+        "name": "remoteTracks",
         "lineNumber": 15,
         "description": {
           "type": "root",
@@ -46031,7 +46399,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The ideal value for the constraint. Other values will be considered if necessary.",
+                  "value": "A list of Track IDs that the call is receiving from the remote participant.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -46040,8 +46408,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 82,
-                      "offset": 81
+                      "column": 76,
+                      "offset": 75
                     },
                     "indent": []
                   }
@@ -46055,8 +46423,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 82,
-                  "offset": 81
+                  "column": 76,
+                  "offset": 75
                 },
                 "indent": []
               }
@@ -46070,17 +46438,364 @@
             },
             "end": {
               "line": 1,
-              "column": 82,
-              "offset": 81
+              "column": 76,
+              "offset": 75
             }
           }
         },
         "type": {
-          "type": "OptionalType",
+          "type": "TypeApplication",
           "expression": {
             "type": "NameExpression",
-            "name": "string"
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "remoteParticipant",
+        "lineNumber": 16,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Information about the other call participant.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 46,
+                      "offset": 45
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 46,
+                  "offset": 45
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 46,
+              "offset": 45
+            }
           }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "properties": [
+          {
+            "title": "property",
+            "name": "remoteParticipant.displayNumber",
+            "lineNumber": 17,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "The username with domain of the callee in the form \"username@domain\"",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 69,
+                          "offset": 68
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 69,
+                      "offset": 68
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 69,
+                  "offset": 68
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          },
+          {
+            "title": "property",
+            "name": "remoteParticipant.displayName",
+            "lineNumber": 18,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "The display name of the callee",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 31,
+                          "offset": 30
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          }
+        ]
+      },
+      {
+        "title": "property",
+        "name": "startTime",
+        "lineNumber": 19,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The start time of the call in milliseconds since the epoch.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 60,
+                      "offset": 59
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 60,
+                  "offset": 59
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 60,
+              "offset": 59
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        }
+      },
+      {
+        "title": "property",
+        "name": "state",
+        "lineNumber": 20,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The current state of the call. See ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "Call.states",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " for possible states.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 70,
+                      "offset": 69
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 70,
+              "offset": 69
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
         }
       }
     ],
@@ -46089,12 +46804,8 @@
     "throws": [],
     "todos": [],
     "access": "public",
-    "kind": "typedef",
-    "name": "MediaConstraint",
-    "type": {
-      "type": "NameExpression",
-      "name": "Object"
-    },
+    "kind": "module",
+    "name": "CallObject",
     "members": {
       "global": [],
       "inner": [],
@@ -46104,11 +46815,11 @@
     },
     "path": [
       {
-        "name": "MediaConstraint",
-        "kind": "typedef"
+        "name": "CallObject",
+        "kind": "module"
       }
     ],
-    "namespace": "MediaConstraint"
+    "namespace": "CallObject"
   },
   {
     "description": {
@@ -48035,7 +48746,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The state representation of a Call.\nCan be retrieved using the Call feature's ",
+              "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
               "position": {
                 "start": {
                   "line": 1,
@@ -48044,8 +48755,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 43,
-                  "offset": 78
+                  "column": 12,
+                  "offset": 86
                 },
                 "indent": [
                   1
@@ -48054,17 +48765,17 @@
             },
             {
               "type": "inlineCode",
-              "value": "getAll",
+              "value": "exact",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 43,
-                  "offset": 78
+                  "column": 12,
+                  "offset": 86
                 },
                 "end": {
                   "line": 2,
-                  "column": 51,
-                  "offset": 86
+                  "column": 19,
+                  "offset": 93
                 },
                 "indent": []
               }
@@ -48075,51 +48786,85 @@
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 51,
-                  "offset": 86
+                  "column": 19,
+                  "offset": 93
                 },
                 "end": {
                   "line": 2,
-                  "column": 55,
-                  "offset": 90
+                  "column": 23,
+                  "offset": 97
                 },
                 "indent": []
               }
             },
             {
               "type": "inlineCode",
-              "value": "getById",
+              "value": "ideal",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 55,
-                  "offset": 90
+                  "column": 23,
+                  "offset": 97
                 },
                 "end": {
                   "line": 2,
-                  "column": 64,
-                  "offset": 99
+                  "column": 30,
+                  "offset": 104
                 },
                 "indent": []
               }
             },
             {
               "type": "text",
-              "value": " APIs.\nA Call can be manipulated by using the Call feature's APIs.",
+              "value": " property should be provided. If both are present, the\n   ",
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 64,
-                  "offset": 99
+                  "column": 30,
+                  "offset": 104
                 },
                 "end": {
                   "line": 3,
-                  "column": 60,
-                  "offset": 165
+                  "column": 4,
+                  "offset": 162
                 },
                 "indent": [
                   1
                 ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "exact",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 4,
+                  "offset": 162
+                },
+                "end": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 169
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value will be used.",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 169
+                },
+                "end": {
+                  "line": 3,
+                  "column": 31,
+                  "offset": 189
+                },
+                "indent": []
               }
             }
           ],
@@ -48131,11 +48876,157 @@
             },
             "end": {
               "line": 3,
-              "column": 60,
-              "offset": 165
+              "column": 31,
+              "offset": 189
             },
             "indent": [
               1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "When the ",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 191
+                },
+                "end": {
+                  "line": 5,
+                  "column": 10,
+                  "offset": 200
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "exact",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 10,
+                  "offset": 200
+                },
+                "end": {
+                  "line": 5,
+                  "column": 17,
+                  "offset": 207
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 17,
+                  "offset": 207
+                },
+                "end": {
+                  "line": 6,
+                  "column": 69,
+                  "offset": 348
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 191
+            },
+            "end": {
+              "line": 6,
+              "column": 69,
+              "offset": 348
+            },
+            "indent": [
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "When the ",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 1,
+                  "offset": 350
+                },
+                "end": {
+                  "line": 8,
+                  "column": 10,
+                  "offset": 359
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "ideal",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 10,
+                  "offset": 359
+                },
+                "end": {
+                  "line": 8,
+                  "column": 17,
+                  "offset": 366
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 17,
+                  "offset": 366
+                },
+                "end": {
+                  "line": 9,
+                  "column": 76,
+                  "offset": 520
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 8,
+              "column": 1,
+              "offset": 350
+            },
+            "end": {
+              "line": 9,
+              "column": 76,
+              "offset": 520
+            },
+            "indent": [
               1
             ]
           }
@@ -48148,9 +49039,9 @@
           "offset": 0
         },
         "end": {
-          "line": 3,
-          "column": 60,
-          "offset": 165
+          "line": 9,
+          "column": 76,
+          "offset": 520
         }
       }
     },
@@ -48158,182 +49049,65 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 5,
+        "lineNumber": 11,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 6,
-        "type": null,
-        "name": "CallObject"
-      },
-      {
-        "title": "property",
-        "description": "The direction in which the call was created (outgoing/incoming).",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "direction"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the call.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "id"
-      },
-      {
-        "title": "property",
-        "description": "Indicates whether this call is currently being held locally.",
-        "lineNumber": 9,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "localHold"
-      },
-      {
-        "title": "property",
-        "description": "A list of Track IDs that the call is sending to the remote participant.",
-        "lineNumber": 10,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        },
-        "name": "localTracks"
-      },
-      {
-        "title": "property",
-        "description": "This indicates the media types that the call was initialized with.",
-        "lineNumber": 11,
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "name": "mediaConstraints"
-      },
-      {
-        "title": "property",
-        "description": "Whether the call was initialized with audio.",
         "lineNumber": 12,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "mediaConstraints.audio"
+        "type": null,
+        "name": "MediaConstraint"
       },
       {
-        "title": "property",
-        "description": "Whether the call was initialized with video.",
+        "title": "typedef",
+        "description": null,
         "lineNumber": 13,
         "type": {
           "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "mediaConstraints.video"
-      },
-      {
-        "title": "property",
-        "description": "Indicates whether this call is currently being held remotely.",
-        "lineNumber": 14,
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        },
-        "name": "remoteHold"
-      },
-      {
-        "title": "property",
-        "description": "A list of Track IDs that the call is receiving from the remote participant.",
-        "lineNumber": 15,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        },
-        "name": "remoteTracks"
-      },
-      {
-        "title": "property",
-        "description": "Information about the other call participant.",
-        "lineNumber": 16,
-        "type": {
-          "type": "NameExpression",
           "name": "Object"
         },
-        "name": "remoteParticipant"
+        "name": "MediaConstraint"
       },
       {
         "title": "property",
-        "description": "The username with domain of the callee in the form \"username@domain\"",
-        "lineNumber": 17,
+        "description": "The required value for the constraint. Other values will not be accepted.",
+        "lineNumber": 14,
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
         },
-        "name": "remoteParticipant.displayNumber"
+        "name": "exact"
       },
       {
         "title": "property",
-        "description": "The display name of the callee",
-        "lineNumber": 18,
+        "description": "The ideal value for the constraint. Other values will be considered if necessary.",
+        "lineNumber": 15,
         "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
         },
-        "name": "remoteParticipant.displayName"
+        "name": "ideal"
       },
       {
-        "title": "property",
-        "description": "The start time of the call in milliseconds since the epoch.",
-        "lineNumber": 19,
-        "type": {
-          "type": "NameExpression",
-          "name": "number"
-        },
-        "name": "startTime"
-      },
-      {
-        "title": "property",
-        "description": "The current state of the call. See `Call.states` for possible states.",
-        "lineNumber": 20,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "state"
+        "title": "example",
+        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
+        "lineNumber": 16
       }
     ],
     "loc": {
       "start": {
-        "line": 14,
+        "line": 47,
         "column": 0
       },
       "end": {
-        "line": 35,
+        "line": 74,
         "column": 3
       }
     },
@@ -48351,13 +49125,17 @@
       "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
-    "examples": [],
+    "examples": [
+      {
+        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
+      }
+    ],
     "params": [],
     "properties": [
       {
         "title": "property",
-        "name": "direction",
-        "lineNumber": 7,
+        "name": "exact",
+        "lineNumber": 14,
         "description": {
           "type": "root",
           "children": [
@@ -48366,7 +49144,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The direction in which the call was created (outgoing/incoming).",
+                  "value": "The required value for the constraint. Other values will not be accepted.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -48375,13 +49153,150 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 65,
-                      "offset": 64
+                      "column": 74,
+                      "offset": 73
                     },
                     "indent": []
                   }
                 }
               ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 74,
+                  "offset": 73
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 74,
+              "offset": 73
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
+        }
+      },
+      {
+        "title": "property",
+        "name": "ideal",
+        "lineNumber": 15,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The ideal value for the constraint. Other values will be considered if necessary.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 82,
+                      "offset": 81
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 82,
+                  "offset": 81
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 82,
+              "offset": 81
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "typedef",
+    "name": "MediaConstraint",
+    "type": {
+      "type": "NameExpression",
+      "name": "Object"
+    },
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "MediaConstraint",
+        "kind": "typedef"
+      }
+    ],
+    "namespace": "MediaConstraint"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A Part is a custom object representing the payload of a message.",
               "position": {
                 "start": {
                   "line": 1,
@@ -48407,456 +49322,125 @@
               "line": 1,
               "column": 65,
               "offset": 64
-            }
+            },
+            "indent": []
           }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
         },
+        "end": {
+          "line": 1,
+          "column": 65,
+          "offset": 64
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "property",
+        "description": "The payload type. Can be \"text\", \"json\", \"file\".",
+        "lineNumber": 3,
         "type": {
           "type": "NameExpression",
           "name": "string"
-        }
+        },
+        "name": "type"
       },
       {
         "title": "property",
-        "name": "id",
+        "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "text"
+      },
+      {
+        "title": "property",
+        "description": "The object corresponding to a json object to attach to a message. A part cannot have both json and a file.",
+        "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        },
+        "name": "json"
+      },
+      {
+        "title": "property",
+        "description": "The file to attach to attach to a message. A part cannot have both json and a file.",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "File"
+          }
+        },
+        "name": "file"
+      },
+      {
+        "title": "public",
+        "description": null,
         "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the call.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 20,
-                      "offset": 19
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 20,
-                  "offset": 19
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 20,
-              "offset": 19
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
+        "type": null
       },
       {
-        "title": "property",
-        "name": "localHold",
+        "title": "module",
+        "description": null,
         "lineNumber": 9,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Indicates whether this call is currently being held locally.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 61,
-                      "offset": 60
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 61,
-                  "offset": 60
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 61,
-              "offset": 60
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
-        }
+        "type": null,
+        "name": "Part"
       },
       {
-        "title": "property",
-        "name": "localTracks",
+        "title": "type",
+        "description": null,
         "lineNumber": 10,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of Track IDs that the call is sending to the remote participant.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 72,
-                      "offset": 71
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 72,
-                  "offset": 71
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 72,
-              "offset": 71
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "mediaConstraints",
-        "lineNumber": 11,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "This indicates the media types that the call was initialized with.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 67,
-                      "offset": 66
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 67,
-                  "offset": 66
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 67,
-              "offset": 66
-            }
-          }
-        },
         "type": {
           "type": "NameExpression",
           "name": "Object"
-        },
-        "properties": [
-          {
-            "title": "property",
-            "name": "mediaConstraints.audio",
-            "lineNumber": 12,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "Whether the call was initialized with audio.",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 45,
-                          "offset": 44
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 45,
-                      "offset": 44
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 45,
-                  "offset": 44
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "boolean"
-            }
-          },
-          {
-            "title": "property",
-            "name": "mediaConstraints.video",
-            "lineNumber": 13,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "Whether the call was initialized with video.",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 45,
-                          "offset": 44
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 45,
-                      "offset": 44
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 45,
-                  "offset": 44
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "boolean"
-            }
-          }
-        ]
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 24,
+        "column": 0
       },
-      {
-        "title": "property",
-        "name": "remoteHold",
-        "lineNumber": 14,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Indicates whether this call is currently being held remotely.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 62,
-                      "offset": 61
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 62,
-                  "offset": 61
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 62,
-              "offset": 61
-            }
-          }
+      "end": {
+        "line": 35,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 79,
+          "column": 0
         },
-        "type": {
-          "type": "NameExpression",
-          "name": "boolean"
+        "end": {
+          "line": 79,
+          "column": 42
         }
       },
+      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
       {
         "title": "property",
-        "name": "remoteTracks",
-        "lineNumber": 15,
+        "name": "type",
+        "lineNumber": 3,
         "description": {
           "type": "root",
           "children": [
@@ -48865,345 +49449,12 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of Track IDs that the call is receiving from the remote participant.",
+                  "value": "The payload type. Can be \"text\", \"json\", \"file\".",
                   "position": {
                     "start": {
                       "line": 1,
                       "column": 1,
                       "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 76,
-                      "offset": 75
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 76,
-                  "offset": 75
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 76,
-              "offset": 75
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "remoteParticipant",
-        "lineNumber": 16,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Information about the other call participant.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 46,
-                      "offset": 45
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 46,
-                  "offset": 45
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 46,
-              "offset": 45
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "properties": [
-          {
-            "title": "property",
-            "name": "remoteParticipant.displayNumber",
-            "lineNumber": 17,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "The username with domain of the callee in the form \"username@domain\"",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 69,
-                          "offset": 68
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 69,
-                      "offset": 68
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 69,
-                  "offset": 68
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          },
-          {
-            "title": "property",
-            "name": "remoteParticipant.displayName",
-            "lineNumber": 18,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "The display name of the callee",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 31,
-                          "offset": 30
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 31,
-                      "offset": 30
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 31,
-                  "offset": 30
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            }
-          }
-        ]
-      },
-      {
-        "title": "property",
-        "name": "startTime",
-        "lineNumber": 19,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The start time of the call in milliseconds since the epoch.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 60,
-                      "offset": 59
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 60,
-                  "offset": 59
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 60,
-              "offset": 59
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "number"
-        }
-      },
-      {
-        "title": "property",
-        "name": "state",
-        "lineNumber": 20,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The current state of the call. See ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 36,
-                      "offset": 35
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "Call.states",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 36,
-                      "offset": 35
                     },
                     "end": {
                       "line": 1,
@@ -49212,23 +49463,6 @@
                     },
                     "indent": []
                   }
-                },
-                {
-                  "type": "text",
-                  "value": " for possible states.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 49,
-                      "offset": 48
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 70,
-                      "offset": 69
-                    },
-                    "indent": []
-                  }
                 }
               ],
               "position": {
@@ -49239,8 +49473,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 70,
-                  "offset": 69
+                  "column": 49,
+                  "offset": 48
                 },
                 "indent": []
               }
@@ -49254,14 +49488,203 @@
             },
             "end": {
               "line": 1,
-              "column": 70,
-              "offset": 69
+              "column": 49,
+              "offset": 48
             }
           }
         },
         "type": {
           "type": "NameExpression",
           "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "text",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 114,
+                      "offset": 113
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 114,
+                  "offset": 113
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 114,
+              "offset": 113
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "json",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The object corresponding to a json object to attach to a message. A part cannot have both json and a file.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 107,
+                      "offset": 106
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 107,
+                  "offset": 106
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 107,
+              "offset": 106
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        }
+      },
+      {
+        "title": "property",
+        "name": "file",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The file to attach to attach to a message. A part cannot have both json and a file.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 84,
+                      "offset": 83
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 84,
+                  "offset": 83
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 84,
+              "offset": 83
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "File"
+          }
         }
       }
     ],
@@ -49271,7 +49694,7 @@
     "todos": [],
     "access": "public",
     "kind": "module",
-    "name": "CallObject",
+    "name": "Part",
     "members": {
       "global": [],
       "inner": [],
@@ -49281,11 +49704,11 @@
     },
     "path": [
       {
-        "name": "CallObject",
+        "name": "Part",
         "kind": "module"
       }
     ],
-    "namespace": "CallObject"
+    "namespace": "Part"
   },
   {
     "description": {
@@ -49937,429 +50360,6 @@
       }
     ],
     "namespace": "MessageSender"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "A Part is a custom object representing the payload of a message.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 65,
-                  "offset": 64
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 65,
-              "offset": 64
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 65,
-          "offset": 64
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "property",
-        "description": "The payload type. Can be \"text\", \"json\", \"file\".",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "type"
-      },
-      {
-        "title": "property",
-        "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "text"
-      },
-      {
-        "title": "property",
-        "description": "The object corresponding to a json object to attach to a message. A part cannot have both json and a file.",
-        "lineNumber": 5,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        },
-        "name": "json"
-      },
-      {
-        "title": "property",
-        "description": "The file to attach to attach to a message. A part cannot have both json and a file.",
-        "lineNumber": 6,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "File"
-          }
-        },
-        "name": "file"
-      },
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 8,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 9,
-        "type": null,
-        "name": "Part"
-      },
-      {
-        "title": "type",
-        "description": null,
-        "lineNumber": 10,
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 24,
-        "column": 0
-      },
-      "end": {
-        "line": 35,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 79,
-          "column": 0
-        },
-        "end": {
-          "line": 79,
-          "column": 42
-        }
-      },
-      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "type",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The payload type. Can be \"text\", \"json\", \"file\".",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 49,
-                      "offset": 48
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 49,
-                  "offset": 48
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 49,
-              "offset": 48
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "text",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 114,
-                      "offset": 113
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 114,
-                  "offset": 113
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 114,
-              "offset": 113
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "json",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The object corresponding to a json object to attach to a message. A part cannot have both json and a file.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 107,
-                      "offset": 106
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 107,
-                  "offset": 106
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 107,
-              "offset": 106
-            }
-          }
-        },
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        }
-      },
-      {
-        "title": "property",
-        "name": "file",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The file to attach to attach to a message. A part cannot have both json and a file.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 84,
-                      "offset": 83
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 84,
-                  "offset": 83
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 84,
-              "offset": 83
-            }
-          }
-        },
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "File"
-          }
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "Part",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "Part",
-        "kind": "module"
-      }
-    ],
-    "namespace": "Part"
   },
   {
     "description": {

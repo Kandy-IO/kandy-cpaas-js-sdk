@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.22
+ * Version: 4.5.0-beta.25
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.22';
+  let version = '4.5.0-beta.25';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33925,6 +33925,10 @@ function api(context) {
      * @method fetch
      */
     fetch: function (options = {}) {
+      // convert chat chatTypes to CPaaS values
+      if (options.type) {
+        options.type = _mappings.chatTypeAliases[options.type];
+      }
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
@@ -33943,6 +33947,8 @@ function api(context) {
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+      // convert chat chatTypes to CPaaS values
+      options.type = _mappings.chatTypeAliases[options.type];
       let destination = Array.isArray(recipient) ? [...recipient] : [recipient];
       let description = 'Conversation';
       let messages;
@@ -33987,6 +33993,9 @@ function api(context) {
      * @returns {Conversation} a Conversation object
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+      // convert chat chatTypes to CPaaS values
+      options.type = _mappings.chatTypeAliases[options.type];
+
       const destination = Array.isArray(recipient) ? recipient : [recipient];
       const prevConv = (0, _selectors.findConversation)(context.getState(), destination, options.type);
 
@@ -36890,6 +36899,15 @@ const DeliveryStatuses = exports.DeliveryStatuses = {
   SMS: 'sms',
   ONETOONE: 'chat-oneToOne',
   GROUP: 'chat-group'
+
+  // Aliases for chatTypes to allow previous chat types such as 'im', and 'group'
+  // to be used as well as 'chat-oneToOne' and 'chat-group'.
+};const chatTypeAliases = exports.chatTypeAliases = {
+  sms: chatTypes.SMS,
+  'chat-oneToOne': chatTypes.ONETOONE,
+  im: chatTypes.ONETOONE,
+  'chat-group': chatTypes.GROUP,
+  group: chatTypes.GROUP
 };
 
 /***/ }),
