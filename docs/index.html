@@ -5467,8 +5467,8 @@ client.on(<span class="hljs-string">'devices:change'</span>, <span class="hljs-f
   </div>
   
 
-  <p>The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
-and its messages, and return conversation objects when requested.</p>
+  <p>The messaging feature revolves around a "conversation" structure. It is responsible for storing the conversations
+and its messages, and returning conversation objects when requested.</p>
 <p>See the "Conversation" and "Message" sections of the documentation for more details.</p>
 <p>Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').</p>
 
@@ -5510,7 +5510,7 @@ and its messages, and return conversation objects when requested.</p>
 
   
 
-  <p>Attempts to retrieve a list of conversations that the current user is a part of.
+  <p>Retrieves a list of chat conversations that the current user is a part of.
 These conversations can then be retrieved from the store using get().</p>
 
 
@@ -5533,7 +5533,7 @@ These conversations can then be retrieved from the store using get().</p>
           <div>
             <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
 	    An optional configuration object to query for more specific results.
-If no object is passed, all threads will be retrieved.
+If no object is passed, or the type is invalid, all conversations will be retrieved.
 
           </div>
           
@@ -5551,29 +5551,9 @@ If no object is passed, all threads will be retrieved.
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>options.touched</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
-  </td>
-  <td class='break-word'><span>The unix timestamp in seconds representing the date from which
-to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
-the back-end making use of the most recent date value provided in a previous request
-</span></td>
-</tr>
-
-
-              
-                <tr>
   <td class='break-word'><span class='code bold'>options.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
   </td>
-  <td class='break-word'><span>Limit results to one of: "chat-oneToOne", "chat-group"or "sms".
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.thread</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)?</code>
-  </td>
-  <td class='break-word'><span>Limit results to one thread specified by its thread handle.
+  <td class='break-word'><span>Type of conversation to fetch. See the conversation.chatTypes API for valid types.
 </span></td>
 </tr>
 
@@ -5617,8 +5597,8 @@ the back-end making use of the most recent date value provided in a previous req
 
   
 
-  <p>Get a conversation object matching the user ID provided.</p>
-<p>If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created</p>
+  <p>Get a conversation object matching the user ID and type provided.
+If a conversation with the given user ID and type exists in the store, it will be returned.</p>
 
 
   <div class='pre p1 fill-light mt0'>get(recipient: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?): <a href="#conversation">Conversation</a></div>
@@ -5639,8 +5619,7 @@ the back-end making use of the most recent date value provided in a previous req
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>recipient</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The destination for messages created in this conversation. This
-will be a user's sip address.
+	    The Id of the remote user with which the current user had a conversation.
 
           </div>
           
@@ -5649,7 +5628,7 @@ will be a user's sip address.
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-	    Options to use when creating the conversation object.
+	    Options to use when getting a conversation object.
 
           </div>
           
@@ -5671,7 +5650,7 @@ will be a user's sip address.
   
     (default <code>&#39;chat-onToOne&#39;</code>)
   </td>
-  <td class='break-word'><span>The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms".
+  <td class='break-word'><span>The type of conversation to get. See the conversation.chatTypes API for valid types.
 </span></td>
 </tr>
 
@@ -5747,7 +5726,8 @@ object will be sent to the destination provided</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>recipient</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    
+	    The Id of the remote user with which the current will have a conversation.
+
           </div>
           
         </div>
@@ -5777,7 +5757,7 @@ object will be sent to the destination provided</p>
   
     (default <code>&#39;chat-oneToOne&#39;</code>)
   </td>
-  <td class='break-word'><span>The type of conversation. Can be one of "chat-oneToOne", "chat-group" or "sms".
+  <td class='break-word'><span>The type of conversation to create. See the conversation.chatTypes API for valid types.
 </span></td>
 </tr>
 
@@ -5940,7 +5920,7 @@ object will be sent to the destination provided</p>
     
       
       <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Use the chat types to fetch group conversations.</span>
-client.messaging.fetch({<span class="hljs-attr">type</span>: client.messaging.chatTypes.GROUP}) {</pre>
+client.conversation.fetch({<span class="hljs-attr">type</span>: client.conversation.chatTypes.GROUP}) {</pre>
     
   
 
@@ -6429,7 +6409,7 @@ as part of the event argument.</p>
   <p>A Conversation object represents a conversation between either two users, or a
 user and a group. A Conversation can create messages via the conversation's
 createMessage() function.</p>
-<p>Once sender sends the initial message (within a conversation) to a recipient, there will be a
+<p>Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender &#x26; recipient's state.</p>
 
 
@@ -6458,6 +6438,13 @@ conversation object saved in both sender &#x26; recipient's state.</p>
         </div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>address</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The Id of the current user who is having a conversation.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>lastReceived</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
           : The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
 This property applies only to conversation object stored in recipient's state.
@@ -6467,7 +6454,14 @@ This property applies only to conversation object stored in recipient's state.
       
         <div class='space-bottom0'>
           <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type associated with all messages within this conversation object (e.g. chat, im, group).
+          : The type associated with all messages within this conversation object. See the conversation.chatTypes API for valid types.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>lastMessage</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The last message received.
 
           
         </div>
@@ -6865,7 +6859,7 @@ This property applies only to conversation object stored in recipient's state.
 
   
 
-  <p>Subscribe to this conversations messages array.</p>
+  <p>Subscribe to this conversation's messages array.</p>
 
 
   <div class='pre p1 fill-light mt0'>subscribe(subscriber: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a></div>
@@ -7134,21 +7128,21 @@ obtained through the getMessage/getMessages API on an existing conversation.</p>
       
         <div class='space-bottom0'>
           <span class='code bold'>timestamp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-          : The Unix timestamp in seconds marking the time when message was created by sender.
+          : The Unix timestamp in seconds marking the time when the message was created by sender.
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>isPending</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Whether message is in pending state or not (delivered by server or not).
+          : Whether the message is in pending state or not (delivered by server or not).
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>read</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : : Whether message was read by recipient user.
+          : : Whether the message was read by recipient user.
 
           
         </div>
@@ -7170,15 +7164,15 @@ obtained through the getMessage/getMessages API on an existing conversation.</p>
         <div class='space-bottom0'>
           <span class='code bold'>messageId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
           : The unique id of the message. The message object (stored in sender's state) has a different id
-than the one associated with message object stored in recipient's state.
+than the one associated with the message object stored in recipient's state.
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of message that was sent (e.g. chat, im, group).
-This property applies only to message object stored in sender's state.
+          : The type of message that was sent. See the conversation.chatTypes API for valid types.
+This property applies only to message objects stored in sender's state.
 
           
         </div>
@@ -7186,7 +7180,7 @@ This property applies only to message object stored in sender's state.
         <div class='space-bottom0'>
           <span class='code bold'>deliveryStatus</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
           : Tracks the status of the outgoing message (i.e. 'Sent', etc).
-This property applies only to message object stored in sender's state.
+This property applies only to the message object stored in sender's state.
 
           
         </div>

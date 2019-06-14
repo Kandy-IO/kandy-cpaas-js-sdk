@@ -545,8 +545,8 @@ Media will resume as normal for the tracks.
 
 ## Messaging
 
-The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
-and its messages, and return conversation objects when requested.
+The messaging feature revolves around a "conversation" structure. It is responsible for storing the conversations
+and its messages, and returning conversation objects when requested.
 
 See the "Conversation" and "Message" sections of the documentation for more details.
 
@@ -554,31 +554,25 @@ Messaging functions are all part of the 'conversation' namespace. Ex: client.con
 
 ### fetch
 
-Attempts to retrieve a list of conversations that the current user is a part of.
+Retrieves a list of chat conversations that the current user is a part of.
 These conversations can then be retrieved from the store using get().
 
 **Parameters**
 
 -   `options` **[Object][5]?** An optional configuration object to query for more specific results.
-    If no object is passed, all threads will be retrieved.
-    -   `options.touched` **[string][2]?** The unix timestamp in seconds representing the date from which
-         to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
-         the back-end making use of the most recent date value provided in a previous request
-    -   `options.type` **[string][2]?** Limit results to one of: "chat-oneToOne", "chat-group"or "sms".
-    -   `options.thread` **([string][2] \| [number][10])?** Limit results to one thread specified by its thread handle.
+    If no object is passed, or the type is invalid, all conversations will be retrieved.
+    -   `options.type` **[string][2]?** Type of conversation to fetch. See the conversation.chatTypes API for valid types.
 
 ### get
 
-Get a conversation object matching the user ID provided.
-
-If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created
+Get a conversation object matching the user ID and type provided.
+If a conversation with the given user ID and type exists in the store, it will be returned.
 
 **Parameters**
 
--   `recipient` **[string][2]** The destination for messages created in this conversation. This
-    will be a user's sip address.
--   `options` **[Object][5]?** Options to use when creating the conversation object.
-    -   `options.type` **[string][2]** The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms". (optional, default `'chat-onToOne'`)
+-   `recipient` **[string][2]** The Id of the remote user with which the current user had a conversation.
+-   `options` **[Object][5]?** Options to use when getting a conversation object.
+    -   `options.type` **[string][2]** The type of conversation to get. See the conversation.chatTypes API for valid types. (optional, default `'chat-onToOne'`)
 
 Returns **[Conversation][12]** A Conversation object.
 
@@ -589,9 +583,9 @@ object will be sent to the destination provided
 
 **Parameters**
 
--   `recipient` **[string][2]** 
+-   `recipient` **[string][2]** The Id of the remote user with which the current will have a conversation.
 -   `options` **[Object][5]?** Options to use when creating the conversation object.
-    -   `options.type` **[string][2]** The type of conversation. Can be one of "chat-oneToOne", "chat-group" or "sms". (optional, default `'chat-oneToOne'`)
+    -   `options.type` **[string][2]** The type of conversation to create. See the conversation.chatTypes API for valid types. (optional, default `'chat-oneToOne'`)
 
 Returns **[Conversation][12]** a Conversation object
 
@@ -615,7 +609,7 @@ Possible types of conversations.
 
 ```javascript
 // Use the chat types to fetch group conversations.
-client.messaging.fetch({type: client.messaging.chatTypes.GROUP}) {
+client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
 ```
 
 ## Conversation
@@ -624,15 +618,17 @@ A Conversation object represents a conversation between either two users, or a
 user and a group. A Conversation can create messages via the conversation's
 createMessage() function.
 
-Once sender sends the initial message (within a conversation) to a recipient, there will be a
+Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender & recipient's state.
 
 **Properties**
 
 -   `destination` **[string][2]** The Id of the remote user with which the current user is having a conversation.
+-   `address` **[string][2]** The Id of the current user who is having a conversation.
 -   `lastReceived` **[number][10]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
     This property applies only to conversation object stored in recipient's state.
--   `type` **[string][2]** The type associated with all messages within this conversation object (e.g. chat, im, group).
+-   `type` **[string][2]** The type associated with all messages within this conversation object. See the conversation.chatTypes API for valid types.
+-   `lastMessage` **[string][2]** The last message received.
 -   `messages` **[Array][8]&lt;[Message][13]>** The array of message objects.
 -   `isTypingList` **[Array][8]&lt;[string][2]>** The array indentifying the User IDs of the users who are currently typing.
 
@@ -686,7 +682,7 @@ Delete this conversation on the server
 
 ### subscribe
 
-Subscribe to this conversations messages array.
+Subscribe to this conversation's messages array.
 
 **Parameters**
 
@@ -731,17 +727,17 @@ Below are the properties pertaining to this saved message object in either sende
 
 **Properties**
 
--   `timestamp` **[number][10]** The Unix timestamp in seconds marking the time when message was created by sender.
--   `isPending` **[boolean][6]** Whether message is in pending state or not (delivered by server or not).
--   `read` **[boolean][6]** : Whether message was read by recipient user.
+-   `timestamp` **[number][10]** The Unix timestamp in seconds marking the time when the message was created by sender.
+-   `isPending` **[boolean][6]** Whether the message is in pending state or not (delivered by server or not).
+-   `read` **[boolean][6]** : Whether the message was read by recipient user.
 -   `parts` **[Array][8]&lt;[Part][14]>** An array of Parts.
 -   `sender` **[string][2]** The primary contact address of the sender.
 -   `messageId` **[string][2]** The unique id of the message. The message object (stored in sender's state) has a different id
-    than the one associated with message object stored in recipient's state.
--   `type` **[string][2]** The type of message that was sent (e.g. chat, im, group).
-    This property applies only to message object stored in sender's state.
+    than the one associated with the message object stored in recipient's state.
+-   `type` **[string][2]** The type of message that was sent. See the conversation.chatTypes API for valid types.
+    This property applies only to message objects stored in sender's state.
 -   `deliveryStatus` **[string][2]** Tracks the status of the outgoing message (i.e. 'Sent', etc).
-    This property applies only to message object stored in sender's state.
+    This property applies only to the message object stored in sender's state.
 
 ## Groups
 

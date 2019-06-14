@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.30
+ * Version: 4.5.0-beta.33
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.30';
+  let version = '4.5.0-beta.33';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33405,7 +33405,7 @@ function createConversation(destination, options) {
 
 /**
  * Creates a fetch conversations action. This is dispatched by the API directly.
- * @param {Object} [options] An optional configuration object to query for more specific results. If no object is passed, all threads will be retrieved
+ * @param {Object} [options] An optional configuration object to query for more specific results. If no object is passed, all conversations will be retrieved
  * @method fetchConversations
  * @returns {Object} A flux standard action representing the fetch conversations action.
  */
@@ -33419,9 +33419,9 @@ function fetchConversations(options) {
 /**
  * Creates a fetch conversations finished action.
  * @method fetchConversationsFinished
- * @param {Object} $0
- * @param {Array} [$0.conversations] An array of conversation objects, if fetch was successful
- * @param {Object} [$0.error] An error object, only included if fetchConversations implementation had an error.
+ * @param {Object} params
+ * @param {Array} [params.conversations] An array of conversation objects, if fetch was successful
+ * @param {Object} [params.error] An error object, only included if fetchConversations implementation had an error.
  * @returns {Object} A flux standard action representing the fetch conversations finished action.
  */
 function fetchConversationsFinished({ conversations, error }) {
@@ -33438,9 +33438,9 @@ function fetchConversationsFinished({ conversations, error }) {
  * @method updateConversation
  * @param {Object} conversation The conversation object
  * @param {Array} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
- * @param {number} [conversation.id] The conversation object's corresponding thread ID
+ * @param {number} [conversation.id] The conversation object's corresponding ID
  * @param {string} [conversation.type] The conversation type, which is expected to be one of: "chat-oneToOne", "chat-group", "sms".
- * @returns {Object} A flux standard action representing the create conversation action.
+ * @returns {Object} A flux standard action representing the update conversation action.
  */
 function updateConversation(conversation) {
   return {
@@ -33454,7 +33454,7 @@ function updateConversation(conversation) {
  * @method deleteConversation
  * @param  {string} destination The destination for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @returns {Object} A flux standard action.
+ * @returns {Object} A flux standard action representing the delete conversation action.
  */
 function deleteConversation(destination, type) {
   return {
@@ -33469,11 +33469,11 @@ function deleteConversation(destination, type) {
 /**
  * Creates a delete conversations finished action.
  * @method deleteConversationFinish
- * @param {Object} $0
- * @param {Array} $0.destination An array of destinations for messages created in this conversation.
- * @param {string} $0.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @param {Object} [$0.error] An error object, only present if an error occurred.
- * @returns {Object} A flux standard action representing the fetch messages finished action.
+ * @param {Object} params
+ * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {Object} [params.error] An error object, only present if an error occurred.
+ * @returns {Object} A flux standard action representing the delete conversation finished action.
  */
 function deleteConversationFinish({ destination, type, error }) {
   return {
@@ -33485,10 +33485,10 @@ function deleteConversationFinish({ destination, type, error }) {
 
 /**
  *
- * @param {Object} $0
- * @param {string} $0.state (active/idle) state of the typing user
- * @param {string} $0.destination the target user to send the notification to
- * @returns {Object}
+ * @param {Object} params
+ * @param {string} params.state (active/idle) state of the typing user
+ * @param {string} params.destination the target user to send the notification to
+ * @returns {Object} A flux standard action representing the setIsTyping action.
  */
 function setIsTyping({ state, destination, type }) {
   return {
@@ -33499,13 +33499,13 @@ function setIsTyping({ state, destination, type }) {
 
 /**
  *
- * @param {Object} $0
- * @param {string} $0.state (active/idle) state of the typing user
- * @param {string} $0.senderAddress the username of the user who sent the notification
- * @param {string} $0.destination the target user to send the notification to
- * @param {string} $0.type a standard error object
- * @param {BasicError} $0.error a standard error object
- * @returns {Object}
+ * @param {Object} params
+ * @param {string} params.state (active/idle) state of the typing user
+ * @param {string} params.senderAddress the username of the user who sent the notification
+ * @param {string} params.destination the target user to send the notification to
+ * @param {string} params.type a standard error object
+ * @param {BasicError} params.error a standard error object
+ * @returns {Object} A flux standard action representing the setIsTyping finished action.
  */
 function setIsTypingFinished({ state, senderAddress, destination, type, error }) {
   return {
@@ -33543,10 +33543,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 // So import everything from each file, then re-export.
 
 /**
- * The messaging plugin's actions are organized into three types:
+ * The messaging plugin's actions are organized into two types:
  *  - message actions: those which act on message object,
  *  - convo actions: those which act on conversation objects,
- *  - group actions: those which manage groups.
  */
 const messageActions = exports.messageActions = messageActionsImport;
 const convoActions = exports.convoActions = convoActionsImport;
@@ -33638,8 +33637,8 @@ const deliveryReceiptReceived = exports.deliveryReceiptReceived = (messageId, de
  * @param {Array} destination An array of destinations for messages created in this conversation.
  * @param {Array} parts The message parts, as a formatted object.
  * @param {number} timestamp A timestamp for the sent message.
- * @param {number} id The ID of the conversation as it exists in the back end.
  * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
+ * @param {number} id The ID of the conversation as it exists in the back end.
  * @returns {Object} A flux standard action representing the send message action.
  */
 const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, id) => sendMessageHelper(actionTypes.SEND_MESSAGE, destination, parts, timestamp, type, id);
@@ -33648,15 +33647,15 @@ const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, 
  * Creates a send message finished action. Trigged when a message send function has received a success response.
  *
  * @method sendMessageFinish
- * @param {Object} $0
- * @param {Array} $0.destination An array of destinations for messages created in this conversation.
- * @param {string} $0.sender The sender of the outgoing message.
- * @param {string} $0.type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
- * @param {Array} $0.parts The message parts.
- * @param {number} $0.timestamp A timestamp for the sent message.
- * @param {string} [$0.messageId] The returned messageId of the message if sent successfully.
- * @param {string} [$0.deliveryStatus] The status of sent message
- * @param {Object} [$0.error] A basic error object
+ * @param {Object} params
+ * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {string} params.sender The sender of the outgoing message.
+ * @param {string} params.type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
+ * @param {Array} params.parts The message parts.
+ * @param {number} params.timestamp A timestamp for the sent message.
+ * @param {string} [params.messageId] The returned messageId of the message if sent successfully.
+ * @param {string} [params.deliveryStatus] The status of sent message
+ * @param {Object} [params.error] A basic error object
  * @returns {Object} A flux standard action representing the send message finished action.
  */
 const sendMessageFinish = exports.sendMessageFinish = ({
@@ -33732,10 +33731,10 @@ const sendMessageRead = exports.sendMessageRead = (messageId, participant) => me
  * Creates a send message read finish action. This triggers on server response when attempting to mark a message read.
  *
  * @method sendMessageReadFinish
- * @param {Object} $0
- * @param {string} $0.messageId The unique id of the message being marked as read.
- * @param {string} $0.participant The other participant of the conversation.
- * @param {Object} $0.error A Basic error object.
+ * @param {Object} params
+ * @param {string} params.messageId The unique id of the message being marked as read.
+ * @param {string} params.participant The other participant of the conversation.
+ * @param {Object} params.error A Basic error object.
  * @returns {Object} A flux standard action representing the send message read finish action.
  */
 function sendMessageReadFinish({ messageId, participant, error }) {
@@ -33781,7 +33780,7 @@ function fetchMessagesFinished(destination, type, messages, error) {
  * Request to clear messages from a conversation's state.
  * @method clearMessages
  * @param  {string} destination The destination for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of "chat-OneToOne", "chat-group" or "sms".
+ * @param {string} type The type of conversation: can be one of chat-OneToOne', 'chat-group' or 'sms'.
  * @returns {Object} A flux standard action.
  */
 function clearMessages(destination, type) {
@@ -33816,11 +33815,11 @@ function deleteMessage(destination, type, messageId) {
 /**
  * Creates a fetch messages finished action.
  * @method deleteMessagesFinish
- * @param {Object} $0
- * @param {Array} $0.destination An array of destinations for messages created in this conversation.
- * @param {string} $0.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @param {string} $0.messageId The ID of the message that was targeted for deletion
- * @param {Object} [$0.error] An error object, only present if an error occurred.
+ * @param {Object} params
+ * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} params.messageId The ID of the message that was targeted for deletion
+ * @param {Object} [params.error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
 function deleteMessageFinish({ destination, type, messageId, error }) {
@@ -33834,11 +33833,11 @@ function deleteMessageFinish({ destination, type, messageId, error }) {
 /**
  * Returns a get image links action
  * @method getImageLinks
- * @param {Object} $0
- * @param {Array} $0.parts the different parts of the message
- * @param {string} $0.destination the destination address(es)
- * @param {string} $0.type the type of message (chat, group, SMS
- * @param {string} $0.messageId id for looking up the message
+ * @param {Object} params
+ * @param {Array} params.parts the different parts of the message
+ * @param {string} params.destination the destination address(es)
+ * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} params.messageId id for looking up the message
  * @returns {Object}
  */
 function getImageLinks({ parts, destination, type, messageId }) {
@@ -33851,13 +33850,13 @@ function getImageLinks({ parts, destination, type, messageId }) {
 /**
  * Returns a get image links finish action
  * @method getImageLinksFinish
- * @param {Object} $0
- * @param {string} $0.url the url that returns an attachment
- * @param {string} $0.rawURL the url returned when we upload an image
- * @param {Array} $0.destination the destination address(es)
- * @param {string} $0.typethe type of message (chat, group, SMS
- * @param {string} $0.messageId id for looking up the message
- * @param {Object} [$0.error] a standard error object
+ * @param {Object} params
+ * @param {string} params.url the url that returns an attachment
+ * @param {string} params.rawURL the url returned when we upload an image
+ * @param {Array} params.destination the destination address(es)
+ * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
+ * @param {string} params.messageId id for looking up the message
+ * @param {Object} [params.error] a standard error object
  * @returns {Object}
  */
 function getImageLinksFinish({ url, rawURL, destination, type, messageId, error }) {
@@ -33891,11 +33890,10 @@ var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 
 // Retrieve logger
 /**
- * The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
- * and its messages, and return conversation objects when requested.
+ * The messaging feature revolves around a "conversation" structure. It is responsible for storing the conversations
+ * and its messages, and returning conversation objects when requested.
  *
  * See the "Conversation" and "Message" sections of the documentation for more details.
- *
  *
  * Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
  *
@@ -33907,21 +33905,15 @@ const log = (0, _logs.getLogManager)().getLogger('Messaging');
 
 function api(context) {
   const messagingApi = {
-    // TODO: Revise this API's argument, since it is using names that are defined by CIM  they are not very descriptive.
     /**
-     * Attempts to retrieve a list of conversations that the current user is a part of.
+     * Retrieves a list of chat conversations that the current user is a part of.
      * These conversations can then be retrieved from the store using get().
      *
      * @public
      * @param {Object} [options] An optional configuration object to query for more specific results.
-     * If no object is passed, all threads will be retrieved.
-     * @param {string} [options.touched] The unix timestamp in seconds representing the date from which
-     *  to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
-     *  the back-end making use of the most recent date value provided in a previous request
-     * @param {string} [options.type] Limit results to one of: "chat-oneToOne", "chat-group"or "sms".
-     * @param {string|number} [options.thread] Limit results to one thread specified by its thread handle.
+     * If no object is passed, or the type is invalid, all conversations will be retrieved.
+     * @param {string} [options.type] Type of conversation to fetch. See the conversation.chatTypes API for valid types.
      * @memberof Messaging
-     * @requires fetchConversations
      * @method fetch
      */
     fetch: function (options = {}) {
@@ -33932,18 +33924,15 @@ function api(context) {
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
-     * Get a conversation object matching the user ID provided.
-     *
-     * If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created
+     * Get a conversation object matching the user ID and type provided.
+     * If a conversation with the given user ID and type exists in the store, it will be returned.
      *
      * @public
      * @memberof Messaging
-     * @requires internalAndSmsMessaging
      * @method get
-     * @param {string} recipient The destination for messages created in this conversation. This
-     * will be a user's sip address.
-     * @param {Object} [options] Options to use when creating the conversation object.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms".
+     * @param {string} recipient The Id of the remote user with which the current user had a conversation.
+     * @param {Object} [options] Options to use when getting a conversation object.
+     * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See the conversation.chatTypes API for valid types.
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -33953,7 +33942,6 @@ function api(context) {
       let description = 'Conversation';
       let messages;
       let id;
-
       const conversation = (0, _selectors.findConversation)(context.getState(), destination, options.type);
       if (conversation) {
         if (options.type === conversation.type) {
@@ -33985,11 +33973,10 @@ function api(context) {
      *
      * @public
      * @memberof Messaging
-     * @requires internalAndSmsMessaging
      * @method create
-     * @param {string} recipient
+     * @param {string} recipient The Id of the remote user with which the current will have a conversation.
      * @param {Object} [options] Options to use when creating the conversation object.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation. Can be one of "chat-oneToOne", "chat-group" or "sms".
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See the conversation.chatTypes API for valid types.
      * @returns {Conversation} a Conversation object
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -34013,7 +34000,6 @@ function api(context) {
      *
      * @public
      * @memberof Messaging
-     * @requires internalAndSmsMessaging
      * @method getAll
      * @returns {Array<Conversation>} An array of conversation objects.
      */
@@ -34031,7 +34017,7 @@ function api(context) {
      * @property {string} SMS A chat using SMS.
      * @example
      * // Use the chat types to fetch group conversations.
-     * client.messaging.fetch({type: client.messaging.chatTypes.GROUP}) {
+     * client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
      */
     chatTypes: _mappings.chatTypes
   };
@@ -34373,7 +34359,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * Base conversation stamp
  * @param {Array} destination The Destination for messages being sent through
  * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} type='chat' The type of the message.
+ * @param {string} [type='chat-oneToOne'] The message type. See the conversation.chatTypes API for valid types.
  * @param {string} id The unique identifier for base conversation.
  * @param {string} description='' The description associated with base conversation.
  * @param {Array} messages=[] An array containing the conversation's messages.
@@ -34386,14 +34372,15 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * user and a group. A Conversation can create messages via the conversation's
  * createMessage() function.
  *
- * Once sender sends the initial message (within a conversation) to a recipient, there will be a
+ * Once a sender sends the initial message (within a conversation) to a recipient, there will be a
  * conversation object saved in both sender & recipient's state.
  *
- * @requires richMessagingWithoutLocation
  * @property {string} destination The Id of the remote user with which the current user is having a conversation.
+ * @property {string} address The Id of the current user who is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
  * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type associated with all messages within this conversation object (e.g. chat, im, group).
+ * @property {string} type The type associated with all messages within this conversation object. See the conversation.chatTypes API for valid types.
+ * @property {string} lastMessage The last message received.
  * @property {Array<Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
  *
@@ -34402,7 +34389,6 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @type {Object}
  */
 // `features` and `lastPull` are not documented because they're intended to be internal
-// `type` is not documented because as of now there are no types other than 'im'
 
 /**
  * A Part is a custom object representing the payload of a message.
@@ -34442,17 +34428,17 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  *
  * Below are the properties pertaining to this saved message object in either sender or recipient's state.
  *
- * @property {number} timestamp The Unix timestamp in seconds marking the time when message was created by sender.
- * @property {boolean} isPending Whether message is in pending state or not (delivered by server or not).
- * @property {boolean} read: Whether message was read by recipient user.
+ * @property {number} timestamp The Unix timestamp in seconds marking the time when the message was created by sender.
+ * @property {boolean} isPending Whether the message is in pending state or not (delivered by server or not).
+ * @property {boolean} read: Whether the message was read by recipient user.
  * @property {Array<Part>} parts An array of Parts.
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
- * than the one associated with message object stored in recipient's state.
- * @property {string} type The type of message that was sent (e.g. chat, im, group).
- * This property applies only to message object stored in sender's state.
+ * than the one associated with the message object stored in recipient's state.
+ * @property {string} type The type of message that was sent. See the conversation.chatTypes API for valid types.
+ * This property applies only to message objects stored in sender's state.
  * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
- * This property applies only to message object stored in sender's state.
+ * This property applies only to the message object stored in sender's state.
  *
  * @public
  * @module Message
@@ -34495,7 +34481,6 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @requires richMessagingWithoutLocation
      * @constructs Message
      * @param {Part} part The part to add to the message.
      * @returns {Message} The newly created Message object.
@@ -34609,7 +34594,6 @@ const conversationBase = {
      * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
      * @public
      * @memberof Conversation
-     * @requires richMessagingWithoutLocation
      * @method deleteMessages
      * @param {Array<string>} messageIds An array of message IDs
      */
@@ -34628,7 +34612,6 @@ const conversationBase = {
      *
      * @public
      * @memberof Conversation
-     * @requires richMessagingWithoutLocation
      * @method delete
      */
     delete: function () {
@@ -34636,7 +34619,7 @@ const conversationBase = {
     },
 
     /**
-     * Subscribe to this conversations messages array.
+     * Subscribe to this conversation's messages array.
      *
      * @public
      * @memberof Conversation
@@ -34711,7 +34694,6 @@ const conversationBase = {
      * See the isTypingList:change event.
      *
      * @public
-     * @requires isTyping
      * @memberof Conversation
      * @method setIsTyping
      * @param {boolean} isTyping Whether the user is typing or not
@@ -34730,12 +34712,13 @@ const conversationBase = {
    * @param  {Object} parts - Initial part to the message.
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
    * @param  {Array} context.features - List of features the conversation supports.
+   * @param  {string} type - The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
    * @param  {Function} context.send - Function for sending the message.
    * @param  {number} timestamp unix timestamp in seconds
    * @param  {boolean} isFetchingLinks
    * @param  {string} sender The author of the message
    * @param  {string} messageId a unique id for looking up the message
-   * @param  {string} [type='chat-oneToOne'] - The type of the message
+   * @param  {string} [type='chat-oneToOne'] - The message type. See the conversation.chatTypes API for valid types.
    */
 };const messageBase = {
   initializers: [function ({
@@ -34792,7 +34775,6 @@ const conversationBase = {
      *
      * @public
      * @memberof MessageSender
-     * @requires richMessagingWithoutLocation
      * @param {Part} part The part to add to the message.
      */
     addPart(part) {
@@ -34825,7 +34807,6 @@ const conversationBase = {
      *
      * @public
      * @memberof MessageSender
-     * @requires richMessagingWithoutLocation
      */
     createImageLinks() {
       const { parts, destination, type, messageId } = this;
@@ -35278,7 +35259,8 @@ var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 /**
  * Retrieves the config options provided by the messaging plugin.
  * @method getMessagingConfig
- * @return {Object}
+ * @param  {Object} state Redux state.
+ * @return {Object} config
  */
 function getMessagingConfig(state) {
   return (0, _fp.cloneDeep)(state.config.messaging);
@@ -35287,7 +35269,8 @@ function getMessagingConfig(state) {
 /**
  * Retrieves conversations from the store pertaining to messaging.
  * @method getConversations
- * @return {Object}
+ * @param  {Object} state Redux state.
+ * @return {Array} A list of conversation objects.
  */
 function getConversations(state) {
   return (0, _fp.cloneDeep)(state.messaging.conversations);
@@ -35297,21 +35280,24 @@ function getConversations(state) {
  * Retrieves the messages from the store pertaining to a specific messaging
  * conversation.
  * @method getMessages
- * @return {Object}
+ * @param  {Object} state Redux state.
+ * @param  {string} conversationId The conversation identifier.
+ * @return {Array}  A list of message objects.
  */
 function getMessages(state, conversationId) {
   return (0, _fp.cloneDeep)(state.messaging.conversations[conversationId].messages);
 }
 
 /**
- * Searches for a conversation by its destination, which represents the destination
- * for all messages being sent to this conversation from this instance of the SDK
+ * Searches for a conversation by its destination and type. The destination represents
+ * the destination for all messages being sent to this conversation from this instance of the SDK
  *
- * @param state
+ * @method findConversation
+ * @param  {Object} state Redux state.
  * @param {Array} destination A subscriber handle or a comma-separated list
  * of subscriber handles
  * @param {string} type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
- * @returns {Object}
+ * @returns {Object} A conversation object.
  */
 function findConversation(state, destination, type = _mappings.chatTypes.ONETOONE) {
   return (0, _fp.cloneDeep)(state.messaging.conversations.find(conversation => {
@@ -35322,14 +35308,15 @@ function findConversation(state, destination, type = _mappings.chatTypes.ONETOON
 /**
  * Searches for a member in a conversation and returns their name
  *
- * @param state
+ * @method findMember
+ * @param  {Object} state Redux state.
  * @param {string} destination A subscriber handle or a comma-separated list
  * of subscriber handles
  * @param id {number} User ID for the specific conversation member for whom we are searching
- * @returns {*}
+ * @returns {Object} A member object.
  */
 function findMember(state, destination, id) {
-  const conv = state.messaging.conversations.find(conversation => conversation.destination === destination);
+  const conv = state.messaging.conversations.find(conversation => conversation.destination[0] === destination);
   if (conv) {
     return (0, _fp.cloneDeep)(conv.members.find(member => member.id === id));
   }
@@ -36208,19 +36195,19 @@ var _errors2 = _interopRequireDefault(_errors);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Logging
-
-
-// Other plugins.
 const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
  * Handles isTypingNotifications and sets isTypingList in redux state
  * @method receiveIsTypingNotification
- * @param {Object} action
+ * @param {Object} action A 'NOTIFICATION_RECEIVED' action.
  */
 
 
 // Libraries.
+
+
+// Other plugins.
 // Messaging plugin.
 function* receiveIsTypingNotification(action) {
   const {
@@ -36253,7 +36240,7 @@ function* receiveIsTypingNotification(action) {
 /**
  * Sets the typing status of the current user in redux state
  * @method setIsTyping
- * @param {Object} action
+ * @param {Object} action A 'SET_IS_TYPING' action.
  */
 function* setIsTyping(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
@@ -36414,7 +36401,7 @@ function* handleChatMessageNotification(action) {
 /**
  * Handles delivery receipts for SMS messages via websocket messages
  * @method handleDeliveryReceipts
- * @param  {Object} action A `RECEIVE_DELIVERY_RECEIPT` action representing a deliveryReceipt.
+ * @param  {Object} action A `NOTIFICATION_RECEIVED` action representing a deliveryReceipt.
  */
 function* handleDeliveryReceipts(action) {
   const deliveryInfo = action.payload.deliveryInfoNotification.deliveryInfo;
@@ -36500,7 +36487,7 @@ function* handleIncomingSMS(action) {
 /**
  * Saga that fetches a list of Chat Conversations
  * @method fetchConversations
- * @param {Object} action
+ * @param {Object} action A 'FETCH_CONVERSATIONS' action.
  */
 function* fetchConversations(action) {
   const type = action.payload.type;
@@ -36539,7 +36526,7 @@ function* fetchConversations(action) {
 /**
  * Saga that fetches all chat messages for a particular conversation
  * @method fetchChatMessages
- * @param {Object} action
+ * @param {Object} action A 'FETCH_MESSAGES' action.
  */
 function* fetchChatMessages(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
@@ -36584,7 +36571,7 @@ function* fetchChatMessages(action) {
 
 /**
  * Creates URLs for multimedia attachments and dispatches an action to update the store with the new url
- * @param {Object} action
+ * @param {Object} action A 'GET_IMAGE_LINKS' action.
  */
 function* getImageLinks(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
