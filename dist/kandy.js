@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.37
+ * Version: 4.5.0-beta.38
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.37';
+  let version = '4.5.0-beta.38';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33911,8 +33911,8 @@ function api(context) {
      *
      * @public
      * @param {Object} [options] An optional configuration object to query for more specific results.
-     * If no object is passed, or the type is invalid, all conversations will be retrieved.
-     * @param {string} [options.type] Type of conversation to fetch. See the conversation.chatTypes API for valid types.
+     * If no object is passed, all conversations will be retrieved.
+     * @param {string} [options.type] Type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @memberof Messaging
      * @method fetch
      */
@@ -33924,15 +33924,15 @@ function api(context) {
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
-     * Get a conversation object matching the user ID and type provided.
-     * If a conversation with the given user ID and type exists in the store, it will be returned.
+     * Get a conversation object matching the User ID and type provided.
+     * If a conversation with the given User ID and type exists in the store, it will be returned.
      *
      * @public
      * @memberof Messaging
      * @method get
-     * @param {string} recipient The Id of the remote user with which the current user had a conversation.
+     * @param {string} recipient The User Id of the remote user with which the current user had a conversation.
      * @param {Object} [options] Options to use when getting a conversation object.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See the conversation.chatTypes API for valid types.
+     * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -33976,7 +33976,7 @@ function api(context) {
      * @method create
      * @param {string} recipient The Id of the remote user with which the current will have a conversation.
      * @param {Object} [options] Options to use when creating the conversation object.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See the conversation.chatTypes API for valid types.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @returns {Conversation} a Conversation object
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -34008,8 +34008,9 @@ function api(context) {
     },
     /**
      * Possible types of conversations.
-     *
      * @public
+     * @static
+     * @typedef {Object} chatTypes
      * @memberof Messaging
      * @type {Object}
      * @property {string} ONETOONE A simple chat between two users.
@@ -34041,6 +34042,9 @@ Object.defineProperty(exports, "__esModule", {
  * @public
  * @memberof Messaging
  * @event conversations:new
+ * @param {Array} params An array of objects containing information about the new conversation
+ * @param {Array} params.destination The destination for messages created in this conversation.
+ * @param {string} params.type The type of conversation created. See {@link Messaging.chatTypes chatTypes} for valid types.
  */
 const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
 
@@ -34050,9 +34054,10 @@ const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
  * @public
  * @memberof Messaging
  * @event conversations:change
- * @param {Array} params An array of objects containing information about the conversations that have changed
+ * @param {Array} params An array of objects containing information about the conversations that have changed.
  * @param {Array} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-OneToOne", "chat-group" or "sms"
+ * @param {string} params.type The type of conversation changed. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} [params.messageId] The ID of the message affected.
  */
 const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:change';
 
@@ -34066,7 +34071,7 @@ const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:chang
  * @event messages:change
  * @param {Object} params
  * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms"
+ * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
  * @param {string} [params.sender] The username of the sender of the message which caused the `messages:change` event to be triggered.
  */
@@ -34092,7 +34097,7 @@ const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
  * @event isTypingList:change
  * @param {Object} params
  * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. Can be one of "chat-oneToOne", "chat-group" or "sms"
+ * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @param {string} [params.sender] The username of the sender that caused the event to trigger
  */
 const IS_TYPING_LIST_CHANGE = exports.IS_TYPING_LIST_CHANGE = 'isTypingList:change';
@@ -34125,7 +34130,11 @@ const eventsMap = {};
 
 eventsMap[actionTypes.CREATE_CONVERSATION] = function (action) {
   return {
-    type: eventTypes.CONVERSATIONS_NEW
+    type: eventTypes.CONVERSATIONS_NEW,
+    args: {
+      destination: action.payload.destination,
+      type: action.payload.type
+    }
   };
 };
 
@@ -34146,10 +34155,11 @@ eventsMap[actionTypes.MESSAGE_RECEIVED] = function (action) {
   if (meta.newConversation) {
     return {
       type: eventTypes.CONVERSATIONS_CHANGE,
-      args: [{
+      args: {
         destination: payload.destination,
-        type: action.meta.type
-      }]
+        type: meta.type,
+        messageId: payload.message.messageId
+      }
     };
   }
   return {
@@ -34157,7 +34167,7 @@ eventsMap[actionTypes.MESSAGE_RECEIVED] = function (action) {
     args: {
       destination: payload.destination,
       messageId: payload.message.messageId,
-      type: action.meta.type
+      type: meta.type
     }
   };
 };
@@ -34260,7 +34270,8 @@ eventsMap[actionTypes.SET_IS_TYPING_FINISHED] = function (action) {
     args: {
       destination: action.payload.destination,
       sender: action.payload.senderAddress,
-      type: action.payload.type
+      type: action.payload.type,
+      state: action.payload.state
     }
   };
 };
@@ -34359,7 +34370,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * Base conversation stamp
  * @param {Array} destination The Destination for messages being sent through
  * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} [type='chat-oneToOne'] The message type. See the conversation.chatTypes API for valid types.
+ * @param {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @param {string} id The unique identifier for base conversation.
  * @param {string} description='' The description associated with base conversation.
  * @param {Array} messages=[] An array containing the conversation's messages.
@@ -34379,7 +34390,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {string} address The Id of the current user who is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
  * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type associated with all messages within this conversation object. See the conversation.chatTypes API for valid types.
+ * @property {string} type The type associated with all messages within this conversation object. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
  * @property {Array<Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
@@ -34435,7 +34446,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
- * @property {string} type The type of message that was sent. See the conversation.chatTypes API for valid types.
+ * @property {string} type The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
  * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
  * This property applies only to the message object stored in sender's state.
@@ -34718,7 +34729,7 @@ const conversationBase = {
    * @param  {boolean} isFetchingLinks
    * @param  {string} sender The author of the message
    * @param  {string} messageId a unique id for looking up the message
-   * @param  {string} [type='chat-oneToOne'] - The message type. See the conversation.chatTypes API for valid types.
+   * @param  {string} [type='chat-oneToOne'] - The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
    */
 };const messageBase = {
   initializers: [function ({

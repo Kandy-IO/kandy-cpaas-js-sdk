@@ -560,21 +560,21 @@ These conversations can then be retrieved from the store using get().
 **Parameters**
 
 -   `options` **[Object][5]?** An optional configuration object to query for more specific results.
-    If no object is passed, or the type is invalid, all conversations will be retrieved.
-    -   `options.type` **[string][2]?** Type of conversation to fetch. See the conversation.chatTypes API for valid types.
+    If no object is passed, all conversations will be retrieved.
+    -   `options.type` **[string][2]?** Type of conversation to fetch. See [chatTypes][12] for valid types.
 
 ### get
 
-Get a conversation object matching the user ID and type provided.
-If a conversation with the given user ID and type exists in the store, it will be returned.
+Get a conversation object matching the User ID and type provided.
+If a conversation with the given User ID and type exists in the store, it will be returned.
 
 **Parameters**
 
--   `recipient` **[string][2]** The Id of the remote user with which the current user had a conversation.
+-   `recipient` **[string][2]** The User Id of the remote user with which the current user had a conversation.
 -   `options` **[Object][5]?** Options to use when getting a conversation object.
-    -   `options.type` **[string][2]** The type of conversation to get. See the conversation.chatTypes API for valid types. (optional, default `'chat-onToOne'`)
+    -   `options.type` **[string][2]** The type of conversation to get. See [chatTypes][12] for valid types. (optional, default `'chat-onToOne'`)
 
-Returns **[Conversation][12]** A Conversation object.
+Returns **[Conversation][13]** A Conversation object.
 
 ### create
 
@@ -585,19 +585,21 @@ object will be sent to the destination provided
 
 -   `recipient` **[string][2]** The Id of the remote user with which the current will have a conversation.
 -   `options` **[Object][5]?** Options to use when creating the conversation object.
-    -   `options.type` **[string][2]** The type of conversation to create. See the conversation.chatTypes API for valid types. (optional, default `'chat-oneToOne'`)
+    -   `options.type` **[string][2]** The type of conversation to create. See [chatTypes][12] for valid types. (optional, default `'chat-oneToOne'`)
 
-Returns **[Conversation][12]** a Conversation object
+Returns **[Conversation][13]** a Conversation object
 
 ### getAll
 
 Returns all conversations currently tracked by the SDK
 
-Returns **[Array][8]&lt;[Conversation][12]>** An array of conversation objects.
+Returns **[Array][8]&lt;[Conversation][13]>** An array of conversation objects.
 
 ### chatTypes
 
 Possible types of conversations.
+
+Type: [Object][5]
 
 **Properties**
 
@@ -627,9 +629,9 @@ conversation object saved in both sender & recipient's state.
 -   `address` **[string][2]** The Id of the current user who is having a conversation.
 -   `lastReceived` **[number][10]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
     This property applies only to conversation object stored in recipient's state.
--   `type` **[string][2]** The type associated with all messages within this conversation object. See the conversation.chatTypes API for valid types.
+-   `type` **[string][2]** The type associated with all messages within this conversation object. See [chatTypes][12] for valid types.
 -   `lastMessage` **[string][2]** The last message received.
--   `messages` **[Array][8]&lt;[Message][13]>** The array of message objects.
+-   `messages` **[Array][8]&lt;[Message][14]>** The array of message objects.
 -   `isTypingList` **[Array][8]&lt;[string][2]>** The array indentifying the User IDs of the users who are currently typing.
 
 ### createMessage
@@ -638,7 +640,7 @@ Create and return a message object. You must specify the part. If this is a simp
 
 **Parameters**
 
--   `part` **[Part][14]** The part to add to the message.
+-   `part` **[Part][15]** The part to add to the message.
 
 **Examples**
 
@@ -646,7 +648,7 @@ Create and return a message object. You must specify the part. If this is a simp
 conversation.createMessage({type: 'text', text: 'This is the message'});
 ```
 
-Returns **[Message][13]** The newly created Message object.
+Returns **[Message][14]** The newly created Message object.
 
 ### clearMessages
 
@@ -656,7 +658,7 @@ Clears all messages in this conversation from local state.
 
 Get the messages associated with this conversation.
 
-Returns **[Array][8]&lt;[Message][13]>** An array of messages.
+Returns **[Array][8]&lt;[Message][14]>** An array of messages.
 
 ### getMessage
 
@@ -730,11 +732,11 @@ Below are the properties pertaining to this saved message object in either sende
 -   `timestamp` **[number][10]** The Unix timestamp in seconds marking the time when the message was created by sender.
 -   `isPending` **[boolean][6]** Whether the message is in pending state or not (delivered by server or not).
 -   `read` **[boolean][6]** : Whether the message was read by recipient user.
--   `parts` **[Array][8]&lt;[Part][14]>** An array of Parts.
+-   `parts` **[Array][8]&lt;[Part][15]>** An array of Parts.
 -   `sender` **[string][2]** The primary contact address of the sender.
 -   `messageId` **[string][2]** The unique id of the message. The message object (stored in sender's state) has a different id
     than the one associated with the message object stored in recipient's state.
--   `type` **[string][2]** The type of message that was sent. See the conversation.chatTypes API for valid types.
+-   `type` **[string][2]** The type of message that was sent. See [chatTypes][12] for valid types.
     This property applies only to message objects stored in sender's state.
 -   `deliveryStatus` **[string][2]** Tracks the status of the outgoing message (i.e. 'Sent', etc).
     This property applies only to the message object stored in sender's state.
@@ -1103,6 +1105,33 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
+## sdpHandlers
+
+A set of handlers for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.
+
+### createCodecRemover
+
+In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+
+To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+
+The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+
+**Examples**
+
+```javascript
+import { create, sdpHandlers } from 'kandy';
+const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+const client = create({
+  call: {
+    sdpHandlers: [codecRemover]
+  }
+})
+```
+
 ## config
 
 The configuration object. This object defines what different configuration
@@ -1189,33 +1218,6 @@ Configuration options for the Subscription feature.
     -   `subscription.channelLifetime` **[number][10]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
     -   `subscription.timeout` **[number][10]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
-## sdpHandlers
-
-A set of handlers for manipulating SDP information.
-These handlers are used to customize low-level call behaviour for very specific
-environments and/or scenarios. They can be provided during SDK instantiation
-to be used for all calls.
-
-### createCodecRemover
-
-In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
-
-To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
-
-The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
-
-**Examples**
-
-```javascript
-import { create, sdpHandlers } from 'kandy';
-const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
-const client = create({
-  call: {
-    sdpHandlers: [codecRemover]
-  }
-})
-```
-
 ## Logger
 
 The internal logger used to provide information about the SDK's behaviour.
@@ -1272,77 +1274,6 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## MediaConstraint
-
-The MediaConstraint type defines the format for configuring media options.
-Either the `exact` or `ideal` property should be provided. If both are present, the
-   `exact` value will be used.
-
-When the `exact` value is provided, it will be the only value considered for the option.
-   If it cannot be used, the constraint will be considered an error.
-
-When the `ideal` value is provided, it will be considered as the optimal value for the option.
-   If it cannot be used, the closest acceptable value will be used instead.
-
-Type: [Object][5]
-
-**Properties**
-
--   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
--   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
-
-**Examples**
-
-```javascript
-// Specify video resolution when making a call.
-client.call.make(destination, {
-   audio: true,
-   video: true,
-   videoOptions: {
-     // Set height and width constraints to ideally be 1280x720.
-     height: { ideal: 720 },
-     width: { ideal: 1280 }
-   }
-})
-```
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][6]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][8]&lt;[TrackObject][15]>** A list of Track objects that are contained in this Media object.
-
-## TrackObject
-
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
-
-**Properties**
-
--   `containers` **[Array][8]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][2]** The ID of the Track.
--   `kind` **[string][2]** The kind of Track this is (audio, video).
--   `label` **[string][2]** The label of the device this Track uses.
--   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
--   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
-
-## DevicesObject
-
-A collection of devices and their information.
-
-**Properties**
-
--   `camera` **[Array][8]&lt;[DeviceInfo][16]>** A list of camera device information.
--   `microphone` **[Array][8]&lt;[DeviceInfo][16]>** A list of microphone device information.
--   `speaker` **[Array][8]&lt;[DeviceInfo][16]>** A list of speaker device information.
-
 ## DeviceInfo
 
 Contains information about a device.
@@ -1377,6 +1308,77 @@ A Call can be manipulated by using the Call feature's APIs.
 -   `startTime` **[number][10]** The start time of the call in milliseconds since the epoch.
 -   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
 
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][6]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][8]&lt;[TrackObject][16]>** A list of Track objects that are contained in this Media object.
+
+## TrackObject
+
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+
+**Properties**
+
+-   `containers` **[Array][8]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][6]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][2]** The ID of the Track.
+-   `kind` **[string][2]** The kind of Track this is (audio, video).
+-   `label` **[string][2]** The label of the device this Track uses.
+-   `muted` **[boolean][6]** Indicator on whether this Track is muted or not.
+-   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][8]&lt;[DeviceInfo][17]>** A list of camera device information.
+-   `microphone` **[Array][8]&lt;[DeviceInfo][17]>** A list of microphone device information.
+-   `speaker` **[Array][8]&lt;[DeviceInfo][17]>** A list of speaker device information.
+
+## MediaConstraint
+
+The MediaConstraint type defines the format for configuring media options.
+Either the `exact` or `ideal` property should be provided. If both are present, the
+   `exact` value will be used.
+
+When the `exact` value is provided, it will be the only value considered for the option.
+   If it cannot be used, the constraint will be considered an error.
+
+When the `ideal` value is provided, it will be considered as the optimal value for the option.
+   If it cannot be used, the closest acceptable value will be used instead.
+
+Type: [Object][5]
+
+**Properties**
+
+-   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
+-   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
+
+**Examples**
+
+```javascript
+// Specify video resolution when making a call.
+client.call.make(destination, {
+   audio: true,
+   video: true,
+   videoOptions: {
+     // Set height and width constraints to ideally be 1280x720.
+     height: { ideal: 720 },
+     width: { ideal: 1280 }
+   }
+})
+```
+
 ## MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1396,7 +1398,7 @@ Add an additional part to a message.
 
 **Parameters**
 
--   `part` **[Part][14]** The part to add to the message.
+-   `part` **[Part][15]** The part to add to the message.
 
 ### createImageLinks
 
@@ -1478,12 +1480,14 @@ The Basic error object. Provides information about an error that occurred in the
 
 [11]: #mediaobject
 
-[12]: #conversation
+[12]: #messagingchattypes
 
-[13]: #message
+[13]: #conversation
 
-[14]: #part
+[14]: #message
 
-[15]: #trackobject
+[15]: #part
 
-[16]: #deviceinfo
+[16]: #trackobject
+
+[17]: #deviceinfo
