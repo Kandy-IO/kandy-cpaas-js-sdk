@@ -1274,29 +1274,6 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## CallObject
-
-The state representation of a Call.
-Can be retrieved using the Call feature's `getAll` or `getById` APIs.
-A Call can be manipulated by using the Call feature's APIs.
-
-**Properties**
-
--   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
--   `id` **[string][2]** The ID of the call.
--   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
--   `localTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
-    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
-    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
--   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
--   `remoteTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
-    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
--   `startTime` **[number][10]** The start time of the call in milliseconds since the epoch.
--   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
-
 ## MediaConstraint
 
 The MediaConstraint type defines the format for configuring media options.
@@ -1358,6 +1335,16 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
+## DevicesObject
+
+A collection of devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][8]&lt;[DeviceInfo][17]>** A list of camera device information.
+-   `microphone` **[Array][8]&lt;[DeviceInfo][17]>** A list of microphone device information.
+-   `speaker` **[Array][8]&lt;[DeviceInfo][17]>** A list of speaker device information.
+
 ## DeviceInfo
 
 Contains information about a device.
@@ -1369,15 +1356,39 @@ Contains information about a device.
 -   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][2]** The name of the device.
 
-## DevicesObject
+## CallObject
 
-A collection of devices and their information.
+The state representation of a Call.
+Can be retrieved using the Call feature's `getAll` or `getById` APIs.
+A Call can be manipulated by using the Call feature's APIs.
 
 **Properties**
 
--   `camera` **[Array][8]&lt;[DeviceInfo][17]>** A list of camera device information.
--   `microphone` **[Array][8]&lt;[DeviceInfo][17]>** A list of microphone device information.
--   `speaker` **[Array][8]&lt;[DeviceInfo][17]>** A list of speaker device information.
+-   `direction` **[string][2]** The direction in which the call was created (outgoing/incoming).
+-   `id` **[string][2]** The ID of the call.
+-   `localHold` **[boolean][6]** Indicates whether this call is currently being held locally.
+-   `localTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `mediaConstraints` **[Object][5]** This indicates the media types that the call was initialized with.
+    -   `mediaConstraints.audio` **[boolean][6]** Whether the call was initialized with audio.
+    -   `mediaConstraints.video` **[boolean][6]** Whether the call was initialized with video.
+-   `remoteHold` **[boolean][6]** Indicates whether this call is currently being held remotely.
+-   `remoteTracks` **[Array][8]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]** The username with domain of the callee in the form "username@domain"
+    -   `remoteParticipant.displayName` **[string][2]** The display name of the callee
+-   `startTime` **[number][10]** The start time of the call in milliseconds since the epoch.
+-   `state` **[string][2]** The current state of the call. See `Call.states` for possible states.
+
+## Part
+
+A Part is a custom object representing the payload of a message.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be "text", "json", "file".
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+-   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
 
 ## MessageSender
 
@@ -1403,17 +1414,6 @@ Add an additional part to a message.
 ### createImageLinks
 
 Creates a usable link for the given message
-
-## Part
-
-A Part is a custom object representing the payload of a message.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be "text", "json", "file".
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
--   `file` **File?** The file to attach to attach to a message. A part cannot have both json and a file.
 
 ## Subscription
 
