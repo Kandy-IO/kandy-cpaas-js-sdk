@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.40
+ * Version: 4.5.0-beta.41
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.40';
+  let version = '4.5.0-beta.41';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -42562,8 +42562,17 @@ function contactsAPI({ dispatch, getState, primitives }) {
      * @param {boolean} [contact.buddy] Indicates whether or not the contact is a friend of the user
      */
     update(contact) {
-      log.debug(_logs.API_LOG_TAG + 'contacts.update: ', contact);
-      dispatch(actions.updateContact(contact));
+      let objectToUse;
+      if (typeof contact === 'string' || contact instanceof String) {
+        log.warn(_logs.API_LOG_TAG + 'contacts.update: Call to update(contactId, contact) has been deprecated and so it will be removed. Consider using: update(contact), instead.');
+        // second argument is supposed to be actual contact obj
+        objectToUse = arguments[1];
+      } else {
+        // Assume first param is the actual contact obj
+        objectToUse = contact;
+      }
+      log.debug(_logs.API_LOG_TAG + 'contacts.update: ', objectToUse);
+      dispatch(actions.updateContact(objectToUse));
     },
 
     /**

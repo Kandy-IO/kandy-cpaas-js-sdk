@@ -7,12 +7,10 @@ Kandy.js change log.
 
 ## 4.5.0 - beta
 
-### Compatibility Warning
-- Removed the first parameter (contactId) from kandy.contacts.update() API. The user will need to remove such parameter from any calls made to this API and ensure that contactId is now being supplied as part of the contact object which is passed to this API. `KAA-1600`
-
 ### Changed
 
 - The valid conversation types have been changed to `chat-oneToOne`, `chat-group` and `sms`. Previous types `im` and `group` can still be used and will be converted to the newer types. `KAA-1744`.
+- Removed the first parameter (contactId) from kandy.contacts.update() API, thus deprecating it. The user should now use the update(contact) API and ensure that contactId is now being supplied as part of the contact object which is passed to this API. `KAA-1783` `KAA-1600`
 
 ## 4.4.0 - 2019-05-24
 
