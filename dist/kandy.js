@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.41
+ * Version: 4.5.0-beta.43
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.41';
+  let version = '4.5.0-beta.43';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33911,8 +33911,7 @@ function api(context) {
      *
      * @public
      * @param {Object} [options] An optional configuration object to query for more specific results.
-     * If no object is passed, all conversations will be retrieved.
-     * @param {string} [options.type] Type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @param {string} [options.type='chat-onToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @memberof Messaging
      * @method fetch
      */
@@ -33931,7 +33930,7 @@ function api(context) {
      * @memberof Messaging
      * @method get
      * @param {string} recipient The User Id of the remote user with which the current user had a conversation.
-     * @param {Object} [options] Options to use when getting a conversation object.
+     * @param {Object} [options] An optional configuration object to query for more specific results.
      * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
@@ -35866,10 +35865,8 @@ function* fetchConversationsRequest(requestInfo, type) {
   let url;
   if (type === _mappings.chatTypes.GROUP) {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/sessions`;
-  } else if (type === _mappings.chatTypes.ONETOONE) {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/sessions`;
   } else {
-    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/sessions`;
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/sessions`;
   }
   const requestOptions = {
     method: 'GET',
