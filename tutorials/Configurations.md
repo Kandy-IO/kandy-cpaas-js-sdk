@@ -2,7 +2,7 @@
 layout: page
 categories: quickstarts-javascript
 title: Configurations
-permalink: /quickstarts/javascript/cpaas2/Configurations
+permalink: /quickstarts/javascript/cpaas/Configurations
 position: 1
 categories:
   - getting_started
@@ -102,6 +102,4 @@ connectivity: {
   reconnectLimit: 3
 }
 ```
-
-
 

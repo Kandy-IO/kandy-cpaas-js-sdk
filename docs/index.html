@@ -211,6 +211,24 @@
                       </a></li>
                     
                       <li><a
+                        href='#callsconsultativetransfer'
+                        class='regular pre-open'>
+                        .consultativeTransfer
+                      </a></li>
+                    
+                      <li><a
+                        href='#callsdirecttransfer'
+                        class='regular pre-open'>
+                        .directTransfer
+                      </a></li>
+                    
+                      <li><a
+                        href='#callsjoin'
+                        class='regular pre-open'>
+                        .join
+                      </a></li>
+                    
+                      <li><a
                         href='#callsstates'
                         class='regular pre-open'>
                         .states
@@ -400,6 +418,12 @@
                         href='#messaginggetall'
                         class='regular pre-open'>
                         .getAll
+                      </a></li>
+                    
+                      <li><a
+                        href='#messagingchattypes'
+                        class='regular pre-open'>
+                        .chatTypes
                       </a></li>
                     
                     </ul>
@@ -644,15 +668,15 @@
                         </a></li>
                       
                         <li><a
-                          href='#groupseventgroupinvitation_received'
+                          href='#groupseventgrouprefresh'
                           class='regular pre-open'>
-                          ⓔ group:invitation_received
+                          ⓔ group:refresh
                         </a></li>
                       
                         <li><a
-                          href='#groupseventgroupinvitation_changed'
+                          href='#groupseventgroupinvitation_received'
                           class='regular pre-open'>
-                          ⓔ group:invitation_changed
+                          ⓔ group:invitation_received
                         </a></li>
                       
                         <li><a
@@ -1127,29 +1151,9 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
+                  href='#callobject'
                   class="">
-                  DeviceInfo
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#devicesobject'
-                  class="">
-                  DevicesObject
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#trackobject'
-                  class="">
-                  TrackObject
+                  CallObject
                   
                 </a>
                 
@@ -1167,9 +1171,9 @@
               
                 
                 <li><a
-                  href='#callobject'
+                  href='#trackobject'
                   class="">
-                  CallObject
+                  TrackObject
                   
                 </a>
                 
@@ -1177,9 +1181,29 @@
               
                 
                 <li><a
-                  href='#part'
+                  href='#devicesobject'
                   class="">
-                  Part
+                  DevicesObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#deviceinfo'
+                  class="">
+                  DeviceInfo
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#mediaconstraint'
+                  class="">
+                  MediaConstraint
                   
                 </a>
                 
@@ -1222,6 +1246,16 @@
                   
                   
                 </div>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#part'
+                  class="">
+                  Part
+                  
+                </a>
                 
                 </li>
               
@@ -2088,6 +2122,26 @@ permissions.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's audio.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the microphone to receive audio from.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>media.video</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
   
     (default <code>false</code>)
@@ -2095,6 +2149,53 @@ permissions.</p>
   <td class='break-word'><span>Whether the call should have video on start.
 </span></td>
 </tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's video.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the camera to receive video from.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.height</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The height of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.width</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The width of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.frameRate</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The frame rate of the video.
+</span></td>
+</tr>
+
+
+  
 
 
               
@@ -2298,6 +2399,26 @@ permissions.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's audio.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the microphone to receive audio from.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>media.video</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
   
     (default <code>false</code>)
@@ -2305,6 +2426,53 @@ permissions.</p>
   <td class='break-word'><span>Whether the call should have video on start.
 </span></td>
 </tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's video.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the camera to receive video from.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.height</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The height of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.width</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The width of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.frameRate</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The frame rate of the video.
+</span></td>
+</tr>
+
+
+  
 
 
               
@@ -2809,6 +2977,26 @@ Will trigger a <code>call:newMedia</code> event.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's audio.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.audioOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the microphone to receive audio from.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>media.video</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
   
     (default <code>false</code>)
@@ -2816,6 +3004,53 @@ Will trigger a <code>call:newMedia</code> event.</p>
   <td class='break-word'><span>Whether to add video to the call.
 </span></td>
 </tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's video.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.deviceId</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>ID of the camera to receive video from.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.height</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The height of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.width</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The width of the video.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.videoOptions.frameRate</span> <code class='quiet'><a href="#mediaconstraint">MediaConstraint</a>?</code>
+  </td>
+  <td class='break-word'><span>The frame rate of the video.
+</span></td>
+</tr>
+
+
+  
 
 
               
@@ -3118,6 +3353,234 @@ A track ID can optionally be provided to get a report for the specific track of 
           <div>
             <span class='code bold'>destination</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The user to forward the call to.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callsconsultativetransfer'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>consultativeTransfer(callId, otherCallId)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Performs a "consultative" transfer between two on-going calls (also known
+as an announced or warm transfer). This allows the current user to
+transfer the remote participant of a call to another user, after
+having spoken to both users.</p>
+<p>Both calls used for the transfer must be locally held. Both remote
+participants will see their call be unheld, and will be connected to
+one another after the operation. Both calls for the current user will
+be ended.</p>
+
+
+  <div class='pre p1 fill-light mt0'>consultativeTransfer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, otherCallId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>callId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    ID of the call being acted on.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>otherCallId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    ID of the other call being acted on.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callsdirecttransfer'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>directTransfer(callId, destination)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Performs a "direct" transfer on a call (also known as an unannounced or
+blind transfer). This allows the current user to transfer the remote
+participant of a call to another user, similar to a "forward"
+operation.</p>
+<p>The specified call must be locally held. The "destination" user will
+receive an incoming call, and when answered, they will be connected
+with the remote participant of the specified call. The current user's
+call will be ended after the operation.</p>
+
+
+  <div class='pre p1 fill-light mt0'>directTransfer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, destination: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>callId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    ID of the call being acted on.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>destination</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The user to transfer the call to.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callsjoin'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>join(callId, otherCallId)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Performs a "join" on two ongoing calls.
+This allows the current user to have a call with audio from the other two users.</p>
+<p>Both specified calls must be locally held. The "joined" call will be
+audio-only, even if either previous call had video. Video cannot be
+added to the "joined" call. Both remote participants will see their
+call be unheld, and will receive additional audio from other
+participants after the operation. Both calls for the current user will
+be ended.</p>
+
+
+  <div class='pre p1 fill-light mt0'>join(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, otherCallId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>callId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    ID of the call being acted on.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>otherCallId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    ID of the other call being acted on.
 
           </div>
           
@@ -3553,6 +4016,34 @@ See <code>Call.states</code> for possible call states.</p>
   <td class='break-word'><span class='code bold'>params.previous.remoteHold</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
   </td>
   <td class='break-word'><span>The previous remote hold state. Present when the state change was a hold/unhold operation.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.transition</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>params.transition.statusCode</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  </td>
+  <td class='break-word'><span>The status code associated with the particular state change's reason.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>params.transition.reasonText</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>The reason for the state change.
 </span></td>
 </tr>
 
@@ -4976,8 +5467,8 @@ client.on(<span class="hljs-string">'devices:change'</span>, <span class="hljs-f
   </div>
   
 
-  <p>The messaging feature revolves around a "conversation" structure. It is responsible to store the conversations
-and its messages, and return conversation objects when requested.</p>
+  <p>The messaging feature revolves around a "conversation" structure. It is responsible for storing the conversations
+and its messages, and returning conversation objects when requested.</p>
 <p>See the "Conversation" and "Message" sections of the documentation for more details.</p>
 <p>Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').</p>
 
@@ -5019,7 +5510,7 @@ and its messages, and return conversation objects when requested.</p>
 
   
 
-  <p>Attempts to retrieve a list of conversations that the current user is a part of.
+  <p>Retrieves a list of chat conversations that the current user is a part of.
 These conversations can then be retrieved from the store using get().</p>
 
 
@@ -5042,7 +5533,6 @@ These conversations can then be retrieved from the store using get().</p>
           <div>
             <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
 	    An optional configuration object to query for more specific results.
-If no object is passed, all threads will be retrieved.
 
           </div>
           
@@ -5060,29 +5550,13 @@ If no object is passed, all threads will be retrieved.
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>options.touched</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  <td class='break-word'><span class='code bold'>options.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  
+    (default <code>&#39;chat-onToOne&#39;</code>)
   </td>
-  <td class='break-word'><span>The unix timestamp in seconds representing the date from which
-to return any threads that have changed. Can also pass the string literal "lastcheck", resulting in
-the back-end making use of the most recent date value provided in a previous request
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
-  </td>
-  <td class='break-word'><span>Limit results to one of: "internal", "sms", "im" or "group".
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.thread</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)?</code>
-  </td>
-  <td class='break-word'><span>Limit results to one thread specified by its thread handle.
+  <td class='break-word'><span>The type of conversation to fetch. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
 </span></td>
 </tr>
 
@@ -5126,8 +5600,8 @@ the back-end making use of the most recent date value provided in a previous req
 
   
 
-  <p>Get a conversation object matching the user ID provided.</p>
-<p>If a conversation with the given user ID already exists in the store, it will be returned; otherwise, a new conversation will be created</p>
+  <p>Get a conversation object matching the User ID and type provided.
+If a conversation with the given User ID and type exists in the store, it will be returned.</p>
 
 
   <div class='pre p1 fill-light mt0'>get(recipient: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?): <a href="#conversation">Conversation</a></div>
@@ -5148,8 +5622,7 @@ the back-end making use of the most recent date value provided in a previous req
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>recipient</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The destination for messages created in this conversation. This
-will be a user's sip address.
+	    The User Id of the remote user with which the current user had a conversation.
 
           </div>
           
@@ -5158,7 +5631,7 @@ will be a user's sip address.
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-	    Options to use when creating the conversation object.
+	    An optional configuration object to query for more specific results.
 
           </div>
           
@@ -5178,9 +5651,11 @@ will be a user's sip address.
                 <tr>
   <td class='break-word'><span class='code bold'>options.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   
-    (default <code>&#39;im&#39;</code>)
+    (default <code>&#39;chat-onToOne&#39;</code>)
   </td>
-  <td class='break-word'><span>The type of conversation to create. Can be one of "im", "sms" or "other"
+  <td class='break-word'><span>The type of conversation to get. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
 </span></td>
 </tr>
 
@@ -5256,7 +5731,8 @@ object will be sent to the destination provided</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>recipient</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    
+	    The Id of the remote user with which the current will have a conversation.
+
           </div>
           
         </div>
@@ -5284,9 +5760,11 @@ object will be sent to the destination provided</p>
                 <tr>
   <td class='break-word'><span class='code bold'>options.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   
-    (default <code>&#39;im&#39;</code>)
+    (default <code>&#39;chat-oneToOne&#39;</code>)
   </td>
-  <td class='break-word'><span>The type of conversation. Can be one of "im", "sms" or "other"
+  <td class='break-word'><span>The type of conversation to create. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
 </span></td>
 </tr>
 
@@ -5384,6 +5862,90 @@ object will be sent to the destination provided</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='messagingchattypes'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>chatTypes</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Possible types of conversations.</p>
+
+
+  <div class='pre p1 fill-light mt0'>chatTypes</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>ONETOONE</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : A simple chat between two users.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>GROUP</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : A chat between groups of users
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>SMS</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : A chat using SMS.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Use the chat types to fetch group conversations.</span>
+client.conversation.fetch({<span class="hljs-attr">type</span>: client.conversation.chatTypes.GROUP}) {</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
 </div>
 
   
@@ -5420,6 +5982,56 @@ object will be sent to the destination provided</p>
   
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
+	    An array of objects containing information about the new conversation
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.destination</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
+  </td>
+  <td class='break-word'><span>The destination for messages created in this conversation.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The type of conversation created. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
   
 
   
@@ -5473,7 +6085,7 @@ object will be sent to the destination provided</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-	    An array of objects containing information about the conversations that have changed
+	    An array of objects containing information about the conversations that have changed.
 
           </div>
           
@@ -5502,7 +6114,18 @@ object will be sent to the destination provided</p>
                 <tr>
   <td class='break-word'><span class='code bold'>params.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The type of conversation to create. Can be one of "chat", "im", "sms" or "group"
+  <td class='break-word'><span>The type of conversation changed. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.messageId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>The ID of the message affected.
 </span></td>
 </tr>
 
@@ -5597,7 +6220,9 @@ as part of the event argument.</p>
                 <tr>
   <td class='break-word'><span class='code bold'>params.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The type of conversation to create. Can be one of "chat", "im", "sms" or "group"
+  <td class='break-word'><span>The type of conversation to create. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
 </span></td>
 </tr>
 
@@ -5794,7 +6419,9 @@ as part of the event argument.</p>
                 <tr>
   <td class='break-word'><span class='code bold'>params.type</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The type of conversation to create. Can be one of "chat", "im", "sms" or "group"
+  <td class='break-word'><span>The type of conversation to create. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
 </span></td>
 </tr>
 
@@ -5859,7 +6486,7 @@ as part of the event argument.</p>
   <p>A Conversation object represents a conversation between either two users, or a
 user and a group. A Conversation can create messages via the conversation's
 createMessage() function.</p>
-<p>Once sender sends the initial message (within a conversation) to a recipient, there will be a
+<p>Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender &#x26; recipient's state.</p>
 
 
@@ -5888,6 +6515,13 @@ conversation object saved in both sender &#x26; recipient's state.</p>
         </div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>address</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The Id of the current user who is having a conversation.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>lastReceived</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
           : The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
 This property applies only to conversation object stored in recipient's state.
@@ -5897,7 +6531,16 @@ This property applies only to conversation object stored in recipient's state.
       
         <div class='space-bottom0'>
           <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type associated with all messages within this conversation object (e.g. chat, im, group).
+          : The type associated with all messages within this conversation object. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>lastMessage</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The last message received.
 
           
         </div>
@@ -6295,7 +6938,7 @@ This property applies only to conversation object stored in recipient's state.
 
   
 
-  <p>Subscribe to this conversations messages array.</p>
+  <p>Subscribe to this conversation's messages array.</p>
 
 
   <div class='pre p1 fill-light mt0'>subscribe(subscriber: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a></div>
@@ -6564,21 +7207,21 @@ obtained through the getMessage/getMessages API on an existing conversation.</p>
       
         <div class='space-bottom0'>
           <span class='code bold'>timestamp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-          : The Unix timestamp in seconds marking the time when message was created by sender.
+          : The Unix timestamp in seconds marking the time when the message was created by sender.
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>isPending</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Whether message is in pending state or not (delivered by server or not).
+          : Whether the message is in pending state or not (delivered by server or not).
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>read</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : : Whether message was read by recipient user.
+          : : Whether the message was read by recipient user.
 
           
         </div>
@@ -6600,15 +7243,17 @@ obtained through the getMessage/getMessages API on an existing conversation.</p>
         <div class='space-bottom0'>
           <span class='code bold'>messageId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
           : The unique id of the message. The message object (stored in sender's state) has a different id
-than the one associated with message object stored in recipient's state.
+than the one associated with the message object stored in recipient's state.
 
           
         </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of message that was sent (e.g. chat, im, group).
-This property applies only to message object stored in sender's state.
+          : The type of message that was sent. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
+This property applies only to message objects stored in sender's state.
 
           
         </div>
@@ -6616,7 +7261,7 @@ This property applies only to message object stored in sender's state.
         <div class='space-bottom0'>
           <span class='code bold'>deliveryStatus</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
           : Tracks the status of the outgoing message (i.e. 'Sent', etc).
-This property applies only to message object stored in sender's state.
+This property applies only to the message object stored in sender's state.
 
           
         </div>
@@ -7062,7 +7707,7 @@ known locally. They can then be accessed using <code>get</code> or 'getAll'.</p>
   <p>Retrieve list of invitations known locally.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getInvitations(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Invitaions></div>
+  <div class='pre p1 fill-light mt0'>getInvitations(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Invitations></div>
   
   
 
@@ -7081,7 +7726,7 @@ known locally. They can then be accessed using <code>get</code> or 'getAll'.</p>
     <div class='py1 quiet mt1 prose-big'>Returns</div>
     
       <div>
-        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Invitaions></code>:
+        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Invitations></code>:
           A list of invitations.
 
         
@@ -7504,7 +8149,7 @@ The group is deleted and all participants will receive a 'group:delete' notifica
 
   
 
-  <p>An new group has been created.</p>
+  <p>A new group has been created.</p>
 
 
   <div class='pre p1 fill-light mt0'>group:new</div>
@@ -7544,16 +8189,7 @@ The group is deleted and all participants will receive a 'group:delete' notifica
                 <tr>
   <td class='break-word'><span class='code bold'>params.groupId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The group that was created.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.participants</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of participants added to the new group.
+  <td class='break-word'><span>The group Id of the group that was changed.
 </span></td>
 </tr>
 
@@ -7597,7 +8233,7 @@ The group is deleted and all participants will receive a 'group:delete' notifica
 
   
 
-  <p>A group has been modified.</p>
+  <p>An existing group has been modified. Ex: a new participant has been added/removed from the group or their status has been updated.</p>
 
 
   <div class='pre p1 fill-light mt0'>group:change</div>
@@ -7637,16 +8273,7 @@ The group is deleted and all participants will receive a 'group:delete' notifica
                 <tr>
   <td class='break-word'><span class='code bold'>params.groupId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The group that changed.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.participants</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of participants in the group.
+  <td class='break-word'><span>The group Id of the group that was changed.
 </span></td>
 </tr>
 
@@ -7728,7 +8355,7 @@ The group is deleted and all participants will receive a 'group:delete' notifica
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.groupId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>params.group</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
   <td class='break-word'><span>The group that was deleted.
 </span></td>
@@ -7742,6 +8369,52 @@ The group is deleted and all participants will receive a 'group:delete' notifica
         </div>
       
     </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='groupseventgrouprefresh'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>group:refresh</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The list of groups has been refreshed.</p>
+
+
+  <div class='pre p1 fill-light mt0'>group:refresh</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
   
 
   
@@ -7812,131 +8485,9 @@ The group is deleted and all participants will receive a 'group:delete' notifica
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.groupId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>params.invitation</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
   </td>
-  <td class='break-word'><span>The group that invitation is for.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.participant</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The name of the participant.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.status</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The status of the participant.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='groupseventgroupinvitation_changed'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>group:invitation_changed</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>An invitation to a group has been accepted or rejected.
-A status of 'Connected' means the participant has accpeted the invitaion.
-A status of 'Disconnected' means the participant has declined the invitaion.</p>
-
-
-  <div class='pre p1 fill-light mt0'>group:invitation_changed</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.groupId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The group that invitation is for.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.participant</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The name of the participant.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.status</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The status of the participant.
+  <td class='break-word'><span>the Invitation object
 </span></td>
 </tr>
 
@@ -10317,7 +10868,7 @@ Will trigger the <code>contacts:change</code> event.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>update(contactId, contact)</span>
+            <span class='code strong strong truncate'>update(contact)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -10329,7 +10880,7 @@ Will trigger the <code>contacts:change</code> event.</p>
 Will trigger the <code>contacts:change</code> event.</p>
 
 
-  <div class='pre p1 fill-light mt0'>update(contactId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, contact: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  <div class='pre p1 fill-light mt0'>update(contact: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
 
@@ -10343,15 +10894,6 @@ Will trigger the <code>contacts:change</code> event.</p>
   
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>contactId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The unique contact ID.
-
-          </div>
-          
-        </div>
       
         <div class='space-bottom0'>
           <div>
@@ -12151,344 +12693,6 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Contains information about a device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A collection of devices and their information.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='trackobject'>
-      TrackObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
-
-
-  <div class='pre p1 fill-light mt0'>TrackObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
-          : The list of CSS selectors that were used to render this Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Track.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The kind of Track this is (audio, video).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The label of the device this Track uses.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this Track is muted or not.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The state of this Track. Can be 'live' or 'ended'.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media Stream that includes this Track.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
-
-
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='callobject'>
       CallObject
     </h3>
@@ -12643,18 +12847,19 @@ A Call can be manipulated by using the Call feature's APIs.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='part'>
-      Part
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
     </h3>
     
     
   </div>
   
 
-  <p>A Part is a custom object representing the payload of a message.</p>
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
 
 
-  <div class='pre p1 fill-light mt0'>Part</div>
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
   
   
 
@@ -12672,29 +12877,22 @@ A Call can be manipulated by using the Call feature's APIs.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The payload type. Can be "text", "json", "file".
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>text</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>json</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>file</span> <code class='quiet'>(File?)</code>
-          : The file to attach to attach to a message. A part cannot have both json and a file.
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
 
           
         </div>
@@ -12706,6 +12904,362 @@ A Call can be manipulated by using the Call feature's APIs.</p>
 
   
 
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='trackobject'>
+      TrackObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's <code>getTrackById</code> API and manipulated with other functions of the Media module.</p>
+
+
+  <div class='pre p1 fill-light mt0'>TrackObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>containers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : The list of CSS selectors that were used to render this Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>disabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Track.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The kind of Track this is (audio, video).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The label of the device this Track uses.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>muted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this Track is muted or not.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The state of this Track. Can be 'live' or 'ended'.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>streamId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media Stream that includes this Track.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A collection of devices and their information.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Contains information about a device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='mediaconstraint'>
+      MediaConstraint
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The MediaConstraint type defines the format for configuring media options.
+Either the <code>exact</code> or <code>ideal</code> property should be provided. If both are present, the
+<code>exact</code> value will be used.</p>
+<p>When the <code>exact</code> value is provided, it will be the only value considered for the option.
+If it cannot be used, the constraint will be considered an error.</p>
+<p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
+If it cannot be used, the closest acceptable value will be used instead.</p>
+
+
+  <div class='pre p1 fill-light mt0'>MediaConstraint</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>exact</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+          : The required value for the constraint. Other values will not be accepted.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>ideal</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+          : The ideal value for the constraint. Other values will be considered if necessary.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify video resolution when making a call.</span>
+client.call.make(destination, {
+   <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">videoOptions</span>: {
+     <span class="hljs-comment">// Set height and width constraints to ideally be 1280x720.</span>
+     height: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">720</span> },
+     <span class="hljs-attr">width</span>: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">1280</span> }
+   }
+})</pre>
+    
   
 
   
@@ -12915,6 +13469,86 @@ can be sent using the send function.</p>
     </div>
   
 </div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='part'>
+      Part
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A Part is a custom object representing the payload of a message.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Part</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The payload type. Can be "text", "json", "file".
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>text</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>json</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
+          : The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>file</span> <code class='quiet'>(File?)</code>
+          : The file to attach to attach to a message. A part cannot have both json and a file.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
 
   
 

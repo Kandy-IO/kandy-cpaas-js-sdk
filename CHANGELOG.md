@@ -5,6 +5,29 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.5.0 - 2019-06-28
+
+### Fixed
+- Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
+
+### Added
+- a new event `group:refresh` has been added. `KAA-1797`
+- `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
+- Added "join" functionality for calls. See the `kandy.call.join` API. `KAA-1508`
+- Added "consultative transfer" functionality for calls. See the `kandy.call.consultativeTransfer` API. `KAA-1510`
+- Added "direct transfer" functionality for calls. See the `kandy.call.directTransfer` API. `KAA-1509`
+- Added `transition.reasonText` to `call:stateChange` event. `KAA-1725`
+- Added functionality that emits `call:stateChange` event when complex operation failure notification is received.
+
+### Changed
+- `group:change` event is now emitted after the user has left a group and when a participant has joined the group. `KAA-1797`
+- `group:change` event payload no longer contains `participant`. `KAA-1797`
+- `group:new` event is now emitted when a new `group` is created instead of `group:change`. `KAA-1797`
+- `group:delete` event is now emitted when a `group` is deleted instead of `group:change`. `KAA-1797`
+- `group:delete` event now contains a payload with the deleted group. `KAA-1797`
+- The valid conversation types have been changed to `chat-oneToOne`, `chat-group` and `sms`. Previous types `im` and `group` can still be used and will be converted to the newer types. `KAA-1744`.
+- Removed the first parameter (contactId) from kandy.contacts.update() API, thus deprecating it. The user should now use the update(contact) API and ensure that contactId is now being supplied as part of the contact object which is passed to this API. `KAA-1783` `KAA-1600`
+
 ## 4.4.0 - 2019-05-24
 
 ### Added
@@ -12,6 +35,8 @@ Kandy.js change log.
 
 ### Fixed
 - Fixed call states not having `startTime` and/or `endTime` properties in certain scenarios when the call does not establish. `KAA-1620`
+- Fixed the `contacts.remove` API from reporting a success during failure scenarios.
+- The `contacts:error` event should now be emitted instead of `contacts:change`.
 
 ## 4.3.1 - 2019-04-26
 
@@ -21,8 +46,17 @@ Kandy.js change log.
 ## 4.3.0 - 2019-04-26
 
 ### Added
-
+- Added group chat functionality with support for sending and receiving messages `KAA-1594`
+- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality.  See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
 - Added a DEBUG log at the start of every public API invocation, which will better help with future investigations `KAA-1353`
+- Added reject call functionality. `KAA-1511`
+- Added an API to retrieve basic browser information. See `getBrowserDetails`. `KAA-1470`
+
+### Fixed
+- Fixed a "remove media" call issue where the error event provided an incorrect message if the track ID was invalid. `KAA-1436`
+- Fixed reject call behaviour to make call state `Ended` on callee side instead of `Cancelled`. `KAA-1584`
+- Fixed a call issue where a media mismatch error on answer would leave the call in `Ringing` state instead of ending the call. `KAA-1432`
+- Fixed an issue where errors prevented renegotiation from completing. `KAA-1497`
 
 ## 4.2.1 - 2019-04-16
 
@@ -121,7 +155,7 @@ The function to instantiate the SDK has been renamed from `createKandy()` to `Ka
 
 ### Added
 
-- [CPaaS 2.0] Added chat functionality with support for sending and receiving messages `KAA-617`
+- [CPaaS] Added chat functionality with support for sending and receiving messages `KAA-617`
 - Added user's locale to data returned in fetchSelfInfo(). `KAA-787`
 - Added new Authorization name (authname) to the Kandy connect method. `KAA-606`
 - Implemented originalRemoteParticipant field to call and callHistory for keeping track of the initial call "to" `feat/KAA-959`

@@ -2,7 +2,7 @@
 layout: page
 categories: quickstarts-javascript
 title: Get Started
-permalink: /quickstarts/javascript/cpaas2/Get%20Started
+permalink: /quickstarts/javascript/cpaas/Get%20Started
 position: 0
 categories:
   - getting_started
@@ -91,6 +91,4 @@ The best way to learn is usually by example. Our quickstarts will provided you w
 | Chrome  | Latest 3 Major Versions |
 | Firefox | Latest 3 Major Versions |
 | Safari  |  Latest Major Version   |
-
-
 

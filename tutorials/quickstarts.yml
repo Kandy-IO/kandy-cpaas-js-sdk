@@ -3,41 +3,45 @@
 
 - name: Get Started
   description: # Get Started
-  link: /quickstarts/javascript/cpaas2/Get%20Started
+  link: /quickstarts/javascript/cpaas/Get%20Started
 
 - name: Configurations
   description: # Configurations
-  link: /quickstarts/javascript/cpaas2/Configurations
+  link: /quickstarts/javascript/cpaas/Configurations
 
 - name: Authentication
   description: # Authentication
-  link: /quickstarts/javascript/cpaas2/Authentication
+  link: /quickstarts/javascript/cpaas/Authentication
 
 - name: Voice and Video Calls
   description: # Voice and Video Calls
-  link: /quickstarts/javascript/cpaas2/Voice%20and%20Video%20Calls
+  link: /quickstarts/javascript/cpaas/Voice%20and%20Video%20Calls
 
 - name: Anonymous Calls
   description: # Anonymous Calls
-  link: /quickstarts/javascript/cpaas2/Anonymous%20Calls
+  link: /quickstarts/javascript/cpaas/Anonymous%20Calls
 
 - name: Chat
   description: # Chat
-  link: /quickstarts/javascript/cpaas2/Chat
+  link: /quickstarts/javascript/cpaas/Chat
 
 - name: SMS Messaging
   description: # SMS Messaging
-  link: /quickstarts/javascript/cpaas2/SMS%20Messaging
+  link: /quickstarts/javascript/cpaas/SMS%20Messaging
+
+- name: Multimedia Chat
+  description: # Multimedia Chat
+  link: /quickstarts/javascript/cpaas/Multimedia%20Chat
 
 - name: Address Book and Directory
   description: # Address Book and Directory
-  link: /quickstarts/javascript/cpaas2/Address%20Book%20and%20Directory
+  link: /quickstarts/javascript/cpaas/Address%20Book%20and%20Directory
 
 - name: Presence
   description: # Presence
-  link: /quickstarts/javascript/cpaas2/Presence
+  link: /quickstarts/javascript/cpaas/Presence
 
 - name: Troubleshooting and Logs
   description: # Capturing Logs and Troubleshooting Problems
-  link: /quickstarts/javascript/cpaas2/Troubleshooting%20and%20Logs
+  link: /quickstarts/javascript/cpaas/Troubleshooting%20and%20Logs
 
