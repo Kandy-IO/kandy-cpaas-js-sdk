@@ -13,11 +13,6 @@ Kandy.js change log.
 ### Added
 - a new event `group:refresh` has been added. `KAA-1797`
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
-- Added "join" functionality for calls. See the `kandy.call.join` API. `KAA-1508`
-- Added "consultative transfer" functionality for calls. See the `kandy.call.consultativeTransfer` API. `KAA-1510`
-- Added "direct transfer" functionality for calls. See the `kandy.call.directTransfer` API. `KAA-1509`
-- Added `transition.reasonText` to `call:stateChange` event. `KAA-1725`
-- Added functionality that emits `call:stateChange` event when complex operation failure notification is received.
 
 ### Changed
 - `group:change` event is now emitted after the user has left a group and when a participant has joined the group. `KAA-1797`
