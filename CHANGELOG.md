@@ -5,10 +5,26 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.5.0 - beta
+## 4.6.0 - beta
+
+### Added
+- Added `chat-group` and `chat-oneToOne` conversation and message delete functionality. See `conversation.delete` and `conversation.deleteMessages`. `KAA-1777`
+
+## 4.5.0 - 2019-06-28
+
+### Fixed
+- Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
+
+### Added
+- a new event `group:refresh` has been added. `KAA-1797`
+- `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
 
 ### Changed
-
+- `group:change` event is now emitted after the user has left a group and when a participant has joined the group. `KAA-1797`
+- `group:change` event payload no longer contains `participant`. `KAA-1797`
+- `group:new` event is now emitted when a new `group` is created instead of `group:change`. `KAA-1797`
+- `group:delete` event is now emitted when a `group` is deleted instead of `group:change`. `KAA-1797`
+- `group:delete` event now contains a payload with the deleted group. `KAA-1797`
 - The valid conversation types have been changed to `chat-oneToOne`, `chat-group` and `sms`. Previous types `im` and `group` can still be used and will be converted to the newer types. `KAA-1744`.
 - Removed the first parameter (contactId) from kandy.contacts.update() API, thus deprecating it. The user should now use the update(contact) API and ensure that contactId is now being supplied as part of the contact object which is passed to this API. `KAA-1783` `KAA-1600`
 
@@ -20,7 +36,7 @@ Kandy.js change log.
 ### Fixed
 - Fixed call states not having `startTime` and/or `endTime` properties in certain scenarios when the call does not establish. `KAA-1620`
 - Fixed the `contacts.remove` API from reporting a success during failure scenarios.
-  - The `contacts:error` event should now be emitted instead of `contacts:change`.
+- The `contacts:error` event should now be emitted instead of `contacts:change`.
 
 ## 4.3.1 - 2019-04-26
 

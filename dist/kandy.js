@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0-beta.44
+ * Version: 4.5.0-beta.51
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30068,7 +30068,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0-beta.44';
+  let version = '4.5.0-beta.51';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -30375,13 +30375,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param  {Object} requestInfo - Info needed to perform the request.
  * @return {group}
  */
-// Groups plugin.
-
 // Helpers.
 function* createRequest(params, requestInfo) {
   // Add the group owner (current user) to list of group participants
   const groupOwner = {
-    address: requestInfo.username,
+    address: params.currentUser.identity,
     'x-isAdmin': true
   };
   const participants = [groupOwner, ...params.participants];
@@ -30713,8 +30711,8 @@ function* createGroup({ payload }) {
       return { address: participant.address, 'x-isAdmin': false };
     });
   }
-
-  const requestParams = (0, _extends3.default)({}, params, { participants: participantInvites });
+  const currentUser = yield (0, _effects.select)(_selectors.getUserInfo);
+  const requestParams = (0, _extends3.default)({}, params, { participants: participantInvites, currentUser });
 
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
   const response = yield (0, _effects.call)(_groups.createRequest, requestParams, requestInfo);
@@ -31198,13 +31196,10 @@ const ADD_PARTICIPANT = exports.ADD_PARTICIPANT = prefix + 'ADD_PARTICIPANT';
 const ADD_PARTICIPANT_FINISH = exports.ADD_PARTICIPANT_FINISH = prefix + 'ADD_PARTICIPANT_FINISH';
 const REMOVE_PARTICIPANT = exports.REMOVE_PARTICIPANT = prefix + 'REMOVE_PARTICIPANT';
 const REMOVE_PARTICIPANT_FINISH = exports.REMOVE_PARTICIPANT_FINISH = prefix + 'REMOVE_PARTICIPANT_FINISH';
-const GET_PARTICIPANTS = exports.GET_PARTICIPANTS = prefix + 'GET_PARTICIPANTS';
 const DELETE_GROUP = exports.DELETE_GROUP = prefix + 'DELETE_GROUP';
 const DELETE_GROUP_FINISH = exports.DELETE_GROUP_FINISH = prefix + 'DELETE_GROUP_FINISH';
 
 // User actions
-const GET_ALL_GROUPS = exports.GET_ALL_GROUPS = prefix + 'GET_ALL_GROUPS';
-const GET_GROUP = exports.GET_GROUP = prefix + 'GET_GROUP';
 const FETCH_GROUPS = exports.FETCH_GROUPS = prefix + 'FETCH_GROUPS';
 const FETCH_GROUPS_FINISH = exports.FETCH_GROUPS_FINISH = prefix + 'FETCH_GROUPS_FINISH';
 const CREATE_GROUP = exports.CREATE_GROUP = prefix + 'CREATE_GROUP';
@@ -31239,8 +31234,6 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-exports.getAll = getAll;
-exports.get = get;
 exports.fetchGroups = fetchGroups;
 exports.fetchGroupsFinish = fetchGroupsFinish;
 exports.create = create;
@@ -31255,7 +31248,6 @@ exports.addParticipant = addParticipant;
 exports.addParticipantFinish = addParticipantFinish;
 exports.removeParticipant = removeParticipant;
 exports.removeParticipantFinish = removeParticipantFinish;
-exports.getParticipants = getParticipants;
 exports.deleteGroup = deleteGroup;
 exports.deleteGroupFinish = deleteGroupFinish;
 exports.invitationReceived = invitationReceived;
@@ -31274,7 +31266,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Helper function for formatting actions.
  * Ensures that actions follow an expectable format.
  * @method actionFormatter
- * @param  {string}  actionType   [description]
+ * @param  {string}  actionType  The type of action
  * @param  {Object} [payload={}] The action payload.
  * @param  {BasicError} [payload.error] For an error action, the error should be provided.
  * @param  {Object} [meta={}] The action meta data.
@@ -31290,37 +31282,11 @@ function actionFormatter(actionType, payload = {}, meta = {}) {
 }
 
 /**
- * Retrieves existing groups from state
- * @method getAll
- * @return {Object}          A Flux Standard Action for GET_ALL
- */
-// Groups plugin.
-function getAll() {
-  return {
-    type: actionTypes.GET_ALL
-  };
-}
-
-/**
- * Retrieve a group from state
- * @method get
- * @param {string} groupId - The ID of the group to retrieve.
- * @return {Object}          A Flux Standard Action for GET_GROUP
- */
-function get(groupId) {
-  return {
-    type: actionTypes.GET_GROUP,
-    payload: {
-      groupId
-    }
-  };
-}
-
-/**
  * Fetches existing groups from the server
  * @method fetchGroups
  * @return {Object} A Flux Standard Action for FETCH_GROUPS
  */
+// Groups plugin.
 function fetchGroups() {
   return {
     type: actionTypes.FETCH_GROUPS
@@ -31347,7 +31313,7 @@ function fetchGroupsFinish({ groups, error }) {
  * @param {string[]} params.users - Array of users to add to group upon creation.
  * @param {string} params.image - The image for the group.
  * @param {string} params.type - Type of group: ie 'Open', 'Closed'. //ToDo Verify this
- * @return {Object}          A Flux Standard Action for CREATE_GROUP
+ * @return {Object} A Flux Standard Action for CREATE_GROUP
  */
 function create(params = {}) {
   return actionFormatter(actionTypes.CREATE_GROUP, { params });
@@ -31367,7 +31333,7 @@ function createFinish(group, error) {
  * Leave a group
  * @method leave
  * @param {string} groupId - The ID of the group to leave.
- * @return {Object}          A Flux Standard Action for LEAVE_GROUP
+ * @return {Object} A Flux Standard Action for LEAVE_GROUP
  */
 function leave(groupId) {
   return actionFormatter(actionTypes.LEAVE_GROUP, { groupId });
@@ -31380,7 +31346,7 @@ function leave(groupId) {
  * @param {string} $0.groupId The ID of the group that id being left.
  * @param {string} $0.participant The participant that is leaving.
  * @param {Object} [$0.error] An error object.
- * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
+ * @return {Object} A Flux Standard Action for ADD_PARTICIPANT
  */
 function leaveGroupFinish({ groupId, participant, error }) {
   return actionFormatter(actionTypes.LEAVE_GROUP_FINISH, { groupId, participant, error });
@@ -31390,7 +31356,7 @@ function leaveGroupFinish({ groupId, participant, error }) {
  * Accept a group invitation
  * @method acceptInvitation
  * @param {string} groupId - The ID of the group to retrieve.
- * @return {Object}          A Flux Standard Action for ACCEPT_INVITATION
+ * @return {Object} A Flux Standard Action for ACCEPT_INVITATION
  */
 function acceptInvitation(groupId) {
   return actionFormatter(actionTypes.ACCEPT_INVITATION, { groupId });
@@ -31404,7 +31370,7 @@ function acceptInvitation(groupId) {
  * @param {Object} $0.group - Information about the group.
  * @param {string} $0.status - 'Connected' status to indicate that invitation is accepted.
  * @param {string} [$0.error] - An error object.
- * @return {Object}          A Flux Standard Action      A Flux Standard Action
+ * @return {Object} A Flux Standard Action
  */
 function acceptInvitationFinish({ groupId, participant, group, status, error }) {
   return actionFormatter(actionTypes.ACCEPT_INVITATION_FINISH, { groupId, participant, group, status, error });
@@ -31414,7 +31380,7 @@ function acceptInvitationFinish({ groupId, participant, group, status, error }) 
  * Reject a group invitation
  * @method rejectInvitation
  * @param {string} groupId - The ID of the group to reject.
- * @return {Object}          A Flux Standard Action for REJECT_INVITATION
+ * @return {Object} A Flux Standard Action for REJECT_INVITATION
  */
 function rejectInvitation(groupId) {
   return actionFormatter(actionTypes.REJECT_INVITATION, { groupId });
@@ -31427,7 +31393,7 @@ function rejectInvitation(groupId) {
  * @param {Object} $0.participant - Participant that the invitation is for.
  * @param {Object} $0.status - 'Disconnected' status to indicate that invitation is rejected.
  * @param {string} [$0.error] - An error object.
- * @return {Object}          A Flux Standard Action
+ * @return {Object} A Flux Standard Action
  */
 function rejectInvitationFinish({ groupId, participant, status, error }) {
   return actionFormatter(actionTypes.REJECT_INVITATION_FINISH, { groupId, participant, status, error });
@@ -31438,7 +31404,7 @@ function rejectInvitationFinish({ groupId, participant, status, error }) {
  * @method addParticipant
  * @param {string} groupId - The ID of the group to add a participant to.
  * @param {string} participant - Participant to add to the group.
- * @return {Object}          A Flux Standard Action for ADD_PARTICIPANT
+ * @return {Object} A Flux Standard Action for ADD_PARTICIPANT
  */
 function addParticipant(groupId, participant) {
   return actionFormatter(actionTypes.ADD_PARTICIPANT, { groupId, participant });
@@ -31482,25 +31448,10 @@ function removeParticipantFinish({ groupId, participant, error }) {
 }
 
 /**
- * Get participants
- * @method getParticipants
- * @param {string} groupId - The ID of the group to request participants from.
- * @return {Object}          A Flux Standard Action for GET_PARTICIPANTS
- */
-function getParticipants(groupId) {
-  return {
-    type: actionTypes.GET_PARTICIPANTS,
-    payload: {
-      groupId
-    }
-  };
-}
-
-/**
  * A request to delete a group.
  * @method deleteGroup
  * @param {string} groupId - The ID of the the group to delete.
- * @return {Object}          A Flux Standard Action for DELETE_GROUP
+ * @return {Object} A Flux Standard Action for DELETE_GROUP
  */
 function deleteGroup(groupId) {
   return actionFormatter(actionTypes.DELETE_GROUP, { groupId });
@@ -31769,27 +31720,6 @@ const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
 
 /***/ }),
 
-/***/ "../kandy/src/groups/interface/constants.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * The valid status values for inivtation accept / reject
- * @name INVITATION_STATUS
- * @type {Object}
- */
-const INVITATION_STATUS = exports.INVITATION_STATUS = {
-  CONNECTED: 'Connected',
-  DISCONNECTED: 'Disconnected'
-};
-
-/***/ }),
-
 /***/ "../kandy/src/groups/interface/eventTypes.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -31800,26 +31730,24 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * An new group has been created.
+ * A new group has been created.
  *
  * @public
  * @memberof Groups
  * @event group:new
  * @param {Object} params
- * @param {string} params.groupId The group that was created.
- * @param {Array}  params.participants List of participants added to the new group.
+ * @param {string} params.groupId The group Id of the group that was changed.
  */
 const GROUP_NEW = exports.GROUP_NEW = 'group:new';
 
 /**
- * A group has been modified.
+ * An existing group has been modified. Ex: a new participant has been added/removed from the group or their status has been updated.
  *
  * @public
  * @memberof Groups
  * @event group:change
  * @param {Object} params
- * @param {string} params.groupId The group that changed.
- * @param {Array}  params.participants List of participants in the group.
+ * @param {string} params.groupId The group Id of the group that was changed.
  */
 const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
 
@@ -31830,9 +31758,18 @@ const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
  * @memberof Groups
  * @event group:delete
  * @param {Object} params
- * @param {string} params.groupId The group that was deleted.
+ * @param {string} params.group The group that was deleted.
  */
 const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
+
+/**
+ * The list of groups has been refreshed.
+ *
+ * @public
+ * @memberof Groups
+ * @event group:refresh
+ */
+const GROUP_REFRESH = exports.GROUP_REFRESH = 'group:refresh';
 
 /**
  * An invitation to a group has been received.
@@ -31841,26 +31778,9 @@ const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
  * @memberof Groups
  * @event group:invitation_received
  * @param {Object} params
- * @param {string} params.groupId The group that invitation is for.
- * @param {string} params.participant The name of the participant.
- * @param {string} params.status The status of the participant.
+ * @param {Object} params.invitation the Invitation object
  */
 const GROUP_INVITATION_RECEIVED = exports.GROUP_INVITATION_RECEIVED = 'group:invitation_received';
-
-/**
- * An invitation to a group has been accepted or rejected.
- * A status of 'Connected' means the participant has accpeted the invitation.
- * A status of 'Disconnected' means the participant has declined the invitation.
- *
- * @public
- * @memberof Groups
- * @event group:invitation_changed
- * @param {Object} params
- * @param {string} params.groupId The group that invitation is for.
- * @param {string} params.participant The name of the participant.
- * @param {string} params.status The status of the participant.
- */
-const GROUP_INVITATION = exports.GROUP_INVITATION = 'group:invitation';
 
 /**
  * An error occured with groups.
@@ -31893,21 +31813,25 @@ var _eventTypes = __webpack_require__("../kandy/src/groups/interface/eventTypes.
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _constants = __webpack_require__("../kandy/src/groups/interface/constants.js");
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// Helper function for error events.
-function groupsError(action) {
+let events = {};
+
+const groupChangedEvent = function (action) {
   if (action.error) {
     return {
-      type: eventTypes.ERROR,
+      type: eventTypes.GROUP_CHANGE,
       args: { error: action.payload }
     };
+  } else {
+    return {
+      type: eventTypes.GROUP_CHANGE,
+      args: {
+        groupId: action.payload.groupId
+      }
+    };
   }
-}
-
-let events = {};
+};
 
 events[actionTypes.CREATE_GROUP_FINISH] = function (action) {
   if (action.error) {
@@ -31919,13 +31843,13 @@ events[actionTypes.CREATE_GROUP_FINISH] = function (action) {
     return {
       type: eventTypes.GROUP_NEW,
       args: {
-        group: action.payload.group.groupChatSessionInformation
+        groupId: action.payload.group.groupChatSessionInformation.groupId
       }
     };
   }
 };
 
-events[actionTypes.DELETE_GROUP_FINISH] = function (action) {
+events[actionTypes.DELETE_GROUP_FINISH] = function (action, { prevState }) {
   if (action.error) {
     return {
       type: eventTypes.GROUP_DELETE,
@@ -31934,99 +31858,17 @@ events[actionTypes.DELETE_GROUP_FINISH] = function (action) {
   } else {
     return {
       type: eventTypes.GROUP_DELETE,
-      args: {
-        groupId: action.payload.groupId
-      }
+      args: { group: prevState.groups.groups.find(group => group.groupId === action.payload.groupId) }
     };
   }
 };
 
-events[actionTypes.ADD_PARTICIPANT_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant
-      }
-    };
-  }
-};
-
-events[actionTypes.REMOVE_PARTICIPANT_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant
-      }
-    };
-  }
-};
-
-events[actionTypes.LEAVE_GROUP] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId
-      }
-    };
-  }
-};
-
-events[actionTypes.ACCEPT_INVITATION_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: {
-        groupId: action.payload.groupId,
-        group: action.payload.group,
-        participant: action.payload.participant,
-        status: _constants.INVITATION_STATUS.CONNECTED
-      }
-    };
-  }
-};
-
-events[actionTypes.REJECT_INVITATION_FINISH] = function (action) {
-  if (action.error) {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: { error: action.payload }
-    };
-  } else {
-    return {
-      type: eventTypes.GROUP_INVITATION,
-      args: {
-        groupId: action.payload.groupId,
-        participant: action.payload.participant,
-        status: _constants.INVITATION_STATUS.DISCONNECTED
-      }
-    };
-  }
-};
+events[actionTypes.ADD_PARTICIPANT_FINISH] = groupChangedEvent;
+events[actionTypes.REMOVE_PARTICIPANT_FINISH] = groupChangedEvent;
+events[actionTypes.LEAVE_GROUP_FINISH] = groupChangedEvent;
+events[actionTypes.ACCEPT_INVITATION_FINISH] = groupChangedEvent;
+events[actionTypes.REJECT_INVITATION_FINISH] = groupChangedEvent;
+events[actionTypes.STATUS_NOTIFICATION_RECEIVED] = groupChangedEvent;
 
 events[actionTypes.INVITATION_RECEIVED] = function (action) {
   if (action.error) {
@@ -32044,11 +31886,19 @@ events[actionTypes.INVITATION_RECEIVED] = function (action) {
   }
 };
 
-// TODO: Should have events to notifiy of successful operations for these actions.
-events[actionTypes.GET_ALL_GROUPS] = groupsError;
-events[actionTypes.GET_GROUP] = groupsError;
-events[actionTypes.FETCH_GROUPS] = groupsError;
-events[actionTypes.GET_PARTICIPANTS] = groupsError;
+events[actionTypes.FETCH_GROUPS_FINISH] = function (action) {
+  if (action.error) {
+    return {
+      type: eventTypes.GROUP_REFRESH,
+      args: { error: action.payload }
+    };
+  } else {
+    return {
+      type: eventTypes.GROUP_REFRESH,
+      args: {}
+    };
+  }
+};
 
 exports.default = events;
 
@@ -33388,7 +33238,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Creates a create conversation action. Triggered when the user creates a new conversation object.
  *
  * @method createConversation
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {Object} options The options object can contain any keys an app may want passed along into the conversation object in the store.
  * @returns {Object} A flux standard action representing the create conversation action.
  */
@@ -33420,7 +33270,7 @@ function fetchConversations(options) {
  * Creates a fetch conversations finished action.
  * @method fetchConversationsFinished
  * @param {Object} params
- * @param {Array} [params.conversations] An array of conversation objects, if fetch was successful
+ * @param {Array<conversation>} [params.conversations] An array of conversation objects, if fetch was successful
  * @param {Object} [params.error] An error object, only included if fetchConversations implementation had an error.
  * @returns {Object} A flux standard action representing the fetch conversations finished action.
  */
@@ -33437,7 +33287,7 @@ function fetchConversationsFinished({ conversations, error }) {
  *
  * @method updateConversation
  * @param {Object} conversation The conversation object
- * @param {Array} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
+ * @param {Array<string>} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
  * @param {number} [conversation.id] The conversation object's corresponding ID
  * @param {string} [conversation.type] The conversation type, which is expected to be one of: "chat-oneToOne", "chat-group", "sms".
  * @returns {Object} A flux standard action representing the update conversation action.
@@ -33450,9 +33300,9 @@ function updateConversation(conversation) {
 }
 
 /**
- * Request to delete all the messages from a conversation.
+ * Deletes all the messages from a conversation.
  * @method deleteConversation
- * @param  {string} destination The destination for messages created in this conversation.
+ * @param  {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the delete conversation action.
  */
@@ -33470,7 +33320,7 @@ function deleteConversation(destination, type) {
  * Creates a delete conversations finished action.
  * @method deleteConversationFinish
  * @param {Object} params
- * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @param {Object} [params.error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the delete conversation finished action.
@@ -33619,7 +33469,7 @@ function messageReadHelper(actionType, messageId, participant) {
  * @method deliveryReceiptReceived
  * @param {string} messageId the id of the sent message
  * @param {string} deliveryStatus the status of sent message
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
  * @returns {Object} A flux standard action representing the send message action.
  */
@@ -33634,8 +33484,8 @@ const deliveryReceiptReceived = exports.deliveryReceiptReceived = (messageId, de
  * Creates a send message action. Triggered when the user initiates the send message process.
  *
  * @method sendMessage
- * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {Array} parts The message parts, as a formatted object.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
+ * @param {Array<part>} parts The message parts, as a formatted object.
  * @param {number} timestamp A timestamp for the sent message.
  * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
  * @param {number} id The ID of the conversation as it exists in the back end.
@@ -33648,10 +33498,10 @@ const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, 
  *
  * @method sendMessageFinish
  * @param {Object} params
- * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.sender The sender of the outgoing message.
  * @param {string} params.type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
- * @param {Array} params.parts The message parts.
+ * @param {Array<part>} params.parts The message parts.
  * @param {number} params.timestamp A timestamp for the sent message.
  * @param {string} [params.messageId] The returned messageId of the message if sent successfully.
  * @param {string} [params.deliveryStatus] The status of sent message
@@ -33679,8 +33529,8 @@ const sendMessageFinish = exports.sendMessageFinish = ({
  * Creates a message received action. Triggered when the websocket receives a chat message.
  *
  * @method messageReceived
- * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {Array} parts The message parts.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
+ * @param {Array<part>} parts The message parts.
  * @param {string} messageId The messageId of the message that has been received.
  * @param {string} sender The user who sent the message. This is the user who the conversation is with.
  * @param {number} timestamp A timestamp for the sent message.
@@ -33748,7 +33598,7 @@ function sendMessageReadFinish({ messageId, participant, error }) {
 /**
  * Creates a fetch messages action. This is dispatched by the API directly.
  * @method fetchMessages
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {number} amount A number representing the amount of messages to fetch.
  * @returns {Object} A flux standard action representing the fetch messages action.
  */
@@ -33762,9 +33612,9 @@ function fetchMessages(destination, amount, type) {
 /**
  * Creates a fetch messages finished action.
  * @method fetchMessagesFinished
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @param {Array} messages An array of formatted messages to put into the store.
+ * @param {Array<message>} messages An array of formatted messages to put into the store.
  * @param {Object} [error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
@@ -33814,7 +33664,7 @@ function deleteMessage(destination, type, messageId) {
 
 /**
  * Creates a fetch messages finished action.
- * @method deleteMessagesFinish
+ * @method deleteMessageFinish
  * @param {Object} params
  * @param {Array} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
@@ -33916,6 +33766,7 @@ function api(context) {
      * @method fetch
      */
     fetch: function (options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.fetch: ', options);
       // convert chat chatTypes to CPaaS values
       if (options.type) {
         options.type = _mappings.chatTypeAliases[options.type];
@@ -33935,6 +33786,7 @@ function api(context) {
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.get: ', recipient, options);
       // convert chat chatTypes to CPaaS values
       options.type = _mappings.chatTypeAliases[options.type];
       let destination = Array.isArray(recipient) ? [...recipient] : [recipient];
@@ -33979,6 +33831,7 @@ function api(context) {
      * @returns {Conversation} a Conversation object
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.create');
       // convert chat chatTypes to CPaaS values
       options.type = _mappings.chatTypeAliases[options.type];
 
@@ -34003,8 +33856,13 @@ function api(context) {
      * @returns {Array<Conversation>} An array of conversation objects.
      */
     getAll: function () {
-      return (0, _selectors.getConversations)(context.getState());
+      log.debug(_logs.API_LOG_TAG + 'conversation.getAll');
+      const conversations = (0, _selectors.getConversations)(context.getState());
+
+      // Map conversation Objects to Conversation-Mixin Objects
+      return conversations.map(conversation => context.primitives.Conversation(conversation));
     },
+
     /**
      * Possible types of conversations.
      * @public
@@ -34246,6 +34104,7 @@ eventsMap[actionTypes.DELETE_MESSAGE_FINISH] = function (action) {
       type: eventTypes.MESSAGES_CHANGE,
       args: {
         destination: action.payload.destination,
+        mesasgeId: action.payload.messageId,
         type: action.payload.type
       }
     };
@@ -34601,17 +34460,13 @@ const conversationBase = {
     },
 
     /**
-     * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
+     * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched.
      * @public
      * @memberof Conversation
      * @method deleteMessages
      * @param {Array<string>} messageIds An array of message IDs
      */
     deleteMessages: function (messageIds = []) {
-      if (messageIds.length === 0) {
-        // If this method was called without providing any specific message IDs, we will assume that all messages should be deleted
-        this.messages.forEach(message => messageIds.push(message.messageId));
-      }
       messageIds.forEach(messageId => {
         this.context.dispatch(_actions.messageActions.deleteMessage(this.destination, this.type, messageId));
       });
@@ -35356,6 +35211,8 @@ exports.setIsTypingRequest = setIsTypingRequest;
 exports.uploadFile = uploadFile;
 exports.sendChatMessageRequest = sendChatMessageRequest;
 exports.sendGroupChatMessageRequest = sendGroupChatMessageRequest;
+exports.deleteChatConversationRequest = deleteChatConversationRequest;
+exports.deleteChatMessageRequest = deleteChatMessageRequest;
 exports.chatSubscribe = chatSubscribe;
 exports.chatUnsubscribe = chatUnsubscribe;
 exports.sendSMSRequest = sendSMSRequest;
@@ -35364,7 +35221,7 @@ exports.smsInboundUnsubscribe = smsInboundUnsubscribe;
 exports.smsOutboundSubscribe = smsOutboundSubscribe;
 exports.smsOutboundUnsubscribe = smsOutboundUnsubscribe;
 exports.fetchConversationsRequest = fetchConversationsRequest;
-exports.chatFetchMessages = chatFetchMessages;
+exports.fetchMessagesRequest = fetchMessagesRequest;
 exports.fetchImageLinks = fetchImageLinks;
 
 var _effects = __webpack_require__("../kandy/src/request/effects.js");
@@ -35374,6 +35231,8 @@ var _effects2 = _interopRequireDefault(_effects);
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
+
+var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
 
 var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 
@@ -35395,6 +35254,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
+// Helpers.
 function _marshalData(attributes) {
   return attributes.reduce((accum, current, index) => {
     accum[current.name] = attributes[index].value;
@@ -35408,11 +35268,10 @@ function _marshalData(attributes) {
  * @param {Object} requestInfo
  * @param {string} destination to send the notification to
  * @param {string} state (idle/active) the state of the user typing
- * @param {string} type The type of conversation. Can be one of "chat", "sms" or "group"
+ * @param {string} type The type of conversation. Can be one of "chat-oneToOne" or "chat-group"
  * @param {string} [refresh='60'] a string integer representing in seconds how long before the server refreshes the state
  * @returns {Object}
  */
-// Helpers.
 function* setIsTypingRequest(requestInfo, destination, state, type, refresh = '60') {
   let url;
   if (type === _mappings.chatTypes.ONETOONE) {
@@ -35521,22 +35380,8 @@ function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts)
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
   if (response.error) {
-    // Request error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.error);
     return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
+      error: (0, _helpers.handleRequestError)(response, 'Send chat message')
     };
   } else {
     // Success scenario.
@@ -35574,28 +35419,85 @@ function* sendGroupChatMessageRequest(requestInfo, destination, textParts, fileP
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
   if (response.error) {
-    // Request error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.error);
     return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
+      error: (0, _helpers.handleRequestError)(response, 'Send group chat message')
     };
   } else {
     // Success scenario.
     return (0, _extends3.default)({}, response.payload.body.chatMessage, {
       error: false
     });
+  }
+}
+
+/**
+ * Used to delete chat conversation
+ * @method deleteChatConversationRequest
+ * @param {Object} requestInfo
+ * @param {string} destination Destination associated with the conversation to delete
+ * @param {string} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group"
+ * @returns {Object}
+ */
+function* deleteChatConversationRequest(requestInfo, destination, type) {
+  let url;
+  if (type === _mappings.chatTypes.ONETOONE) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+  } else if (type === _mappings.chatTypes.GROUP) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}`;
+  }
+
+  const requestOptions = {
+    method: 'DELETE',
+    url: url
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Delete conversation')
+    };
+  } else {
+    // Success scenario.
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Used to delete chat message
+ * @method deleteChatMessageRequest
+ * @param {Object} requestInfo
+ * @param {Object} destination Destination associated with the conversation
+ * @param {Object} messageId MessageId of message to delete
+ * @param {Object} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group"
+ * @returns {Object}
+ */
+function* deleteChatMessageRequest(requestInfo, destination, messageId, type) {
+  let url;
+  if (type === _mappings.chatTypes.ONETOONE) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages/${messageId}`;
+  } else if (type === _mappings.chatTypes.GROUP) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}/messages/${messageId}`;
+  }
+
+  const requestOptions = {
+    method: 'DELETE',
+    url: url
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Delete message')
+    };
+  } else {
+    // Success scenario.
+    return {
+      error: false
+    };
   }
 }
 
@@ -35868,6 +35770,7 @@ function* fetchConversationsRequest(requestInfo, type) {
   } else {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/sessions`;
   }
+
   const requestOptions = {
     method: 'GET',
     url: url
@@ -35890,17 +35793,30 @@ function* fetchConversationsRequest(requestInfo, type) {
 }
 
 /**
- * Performs a REST request to fetch a list of messages for a particular conversation
- * @method chatFetchMessages
+ * Performs a REST request to fetch a list of messages for a particular chat conversation
+ * @method fetchMessagesRequest
  * @param {Object} requestInfo
- * @param {Object} destination a target to send the message to
+ * @param {Object} params
+ * @param {string} params.destination a target email or groupId to send the message to
+ * @param {string} [params.type='chat-onToOne'] The type of messages to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @return {Object}
  */
-function* chatFetchMessages(requestInfo, destination) {
-  const requestOptions = {
-    method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`
-  };
+function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE } = {}) {
+  let url;
+  if (type === _mappings.chatTypes.GROUP) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}/messages`;
+  } else if (type === _mappings.chatTypes.ONETOONE) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+  } else {
+    return {
+      error: new _errors2.default({
+        message: 'Unrecognized chat type, ensure the chat type is either "chat-group" or "chat-oneToOne"',
+        code: _errors.subscriptionCodes.FETCH_MESSAGES_FAIL
+      })
+    };
+  }
+
+  const requestOptions = { method: 'GET', url };
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
   if (response.error) {
@@ -35959,6 +35875,8 @@ exports.registerChat = registerChat;
 exports.registerInboundSMS = registerInboundSMS;
 exports.registerOutboundSMS = registerOutboundSMS;
 exports.sendChatMessage = sendChatMessage;
+exports.deleteConversation = deleteConversation;
+exports.deleteMessage = deleteMessage;
 exports.receiveChatMessageNotification = receiveChatMessageNotification;
 exports.sendSMS = sendSMS;
 exports.receiveSMS = receiveSMS;
@@ -36043,6 +35961,22 @@ function* sendChatMessage() {
   }
 
   yield (0, _effects2.takeEvery)(sendChatPattern, messagingSagas.sendChatMessage);
+}
+
+/**
+ * Delete a Conversation
+ * @method deleteConversation
+ */
+function* deleteConversation() {
+  yield (0, _effects2.takeEvery)(actionTypes.DELETE_CONVERSATION, messagingSagas.deleteConversation);
+}
+
+/**
+ * Delete a Message
+ * @method deleteMessage
+ */
+function* deleteMessage() {
+  yield (0, _effects2.takeEvery)(actionTypes.DELETE_MESSAGE, messagingSagas.deleteMessage);
 }
 
 /**
@@ -36172,6 +36106,8 @@ var _extends3 = _interopRequireDefault(_extends2);
 exports.receiveIsTypingNotification = receiveIsTypingNotification;
 exports.setIsTyping = setIsTyping;
 exports.sendChatMessage = sendChatMessage;
+exports.deleteConversation = deleteConversation;
+exports.deleteMessage = deleteMessage;
 exports.handleChatMessageNotification = handleChatMessageNotification;
 exports.handleDeliveryReceipts = handleDeliveryReceipts;
 exports.sendSMS = sendSMS;
@@ -36348,6 +36284,61 @@ function* sendChatMessage(action) {
     yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
       messageId
     })));
+  }
+}
+
+/**
+ * Deletes a conversation via DELETE request
+ * @method deleteConversation
+ * @param  {Object} action A `DELETE_CONVERSATION` action
+ */
+function* deleteConversation(action) {
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+
+  let deleteResponse;
+  const chatType = action.payload.type;
+
+  deleteResponse = yield (0, _effects.call)(_requests.deleteChatConversationRequest, requestInfo, action.payload.destination[0], chatType);
+
+  if (deleteResponse.error) {
+    yield (0, _effects.put)(_actions.convoActions.deleteConversationFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      error: deleteResponse.error
+    }));
+  } else {
+    yield (0, _effects.put)(_actions.convoActions.deleteConversationFinish({
+      type: chatType,
+      destination: action.payload.destination
+    }));
+  }
+}
+
+/**
+ * Deletes a message via DELETE request
+ * @method deleteMessage
+ * @param  {Object} action A `DELETE_MESSAGE` action
+ */
+function* deleteMessage(action) {
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+
+  let deleteResponse;
+  const chatType = action.payload.type;
+  deleteResponse = yield (0, _effects.call)(_requests.deleteChatMessageRequest, requestInfo, action.payload.destination[0], action.payload.messageId, chatType);
+
+  if (deleteResponse.error) {
+    yield (0, _effects.put)(_actions.messageActions.deleteMessageFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      messageId: action.payload.messageId,
+      error: deleteResponse.error
+    }));
+  } else {
+    yield (0, _effects.put)(_actions.messageActions.deleteMessageFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      messageId: action.payload.messageId
+    }));
   }
 }
 
@@ -36538,14 +36529,12 @@ function* fetchConversations(action) {
  */
 function* fetchChatMessages(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_requests.chatFetchMessages, requestInfo, action.payload.destination[0]);
+  const response = yield (0, _effects.call)(_requests.fetchMessagesRequest, requestInfo, {
+    destination: action.payload.destination[0],
+    type: action.payload.type
+  });
 
-  const sessionType = getResourceType(response.resourceURL);
-
-  let destination;
   const messageList = response.chatMessage.map(message => {
-    destination = message['x-destinationAddress']; // FIXME: make this less ugly
-
     let parts = [];
     if (message.text) {
       parts = parts.concat({ type: 'text', text: message.text });
@@ -36566,14 +36555,14 @@ function* fetchChatMessages(action) {
       sender: message.senderAddress,
       destination: message['x-destinationAddress'],
       timestamp: message.dateTime,
-      messageId: message.resourceURL.split('/messages/')[1] // messageID is affter /messages/
+      messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
     };
   });
 
   if (response.error) {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished([destination], sessionType, null, response.error));
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, response.error));
   } else {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished([destination], sessionType, messageList, null));
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, null));
   }
 }
 
@@ -36887,7 +36876,7 @@ const DeliveryStatuses = exports.DeliveryStatuses = {
 
   /**
    * Chat types
-   * Chat types used in the cpaas2 messaging plugin
+   * Chat types used in the cpaas messaging plugin
    * @name chatTypes
    */
 };const chatTypes = exports.chatTypes = {
