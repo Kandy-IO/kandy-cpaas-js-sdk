@@ -8,11 +8,16 @@ Kandy.js change log.
 ## 4.6.0 - beta
 
 ### Added
-- Added `chat-group` and `chat-oneToOne` conversation and message delete functionality. See `conversation.delete` and `conversation.deleteMessages`. `KAA-1777`
+
+- Added "replaceTrack" functionality for calls. See the `kandy.call.replaceTrack` API. `KAA-1727`
+- Added bandwidth control functionality for calls. See `kandy.call.makeCall`, `kandy.call.answerCall`, `kandy.call.removeMedia` & `kandy.call.addMedia`. `KAA-1740`
+- User now automatically disconnects gracefully when internet connection is lost for too long. `KAA-1591`
+- Added the ability to delete messages and conversations of types `chat-oneToOne`, `chat-group` and `sms`. See `Conversation#delete` and `Conversation#deleteMessages`. `KAA-1777` `KAA-1826`
 
 ## 4.5.0 - 2019-06-28
 
 ### Fixed
+
 - Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
 
 ### Added
@@ -20,6 +25,7 @@ Kandy.js change log.
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
 
 ### Changed
+
 - `group:change` event is now emitted after the user has left a group and when a participant has joined the group. `KAA-1797`
 - `group:change` event payload no longer contains `participant`. `KAA-1797`
 - `group:new` event is now emitted when a new `group` is created instead of `group:change`. `KAA-1797`
@@ -31,9 +37,11 @@ Kandy.js change log.
 ## 4.4.0 - 2019-05-24
 
 ### Added
+
 - Added Ignore Call functionality. `KAA-1512`
 
 ### Fixed
+
 - Fixed call states not having `startTime` and/or `endTime` properties in certain scenarios when the call does not establish. `KAA-1620`
 - Fixed the `contacts.remove` API from reporting a success during failure scenarios.
 - The `contacts:error` event should now be emitted instead of `contacts:change`.
@@ -41,18 +49,21 @@ Kandy.js change log.
 ## 4.3.1 - 2019-04-26
 
 ### Fixed
+
 - Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
 
 ## 4.3.0 - 2019-04-26
 
 ### Added
+
 - Added group chat functionality with support for sending and receiving messages `KAA-1594`
-- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality.  See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
+- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality. See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
 - Added a DEBUG log at the start of every public API invocation, which will better help with future investigations `KAA-1353`
 - Added reject call functionality. `KAA-1511`
 - Added an API to retrieve basic browser information. See `getBrowserDetails`. `KAA-1470`
 
 ### Fixed
+
 - Fixed a "remove media" call issue where the error event provided an incorrect message if the track ID was invalid. `KAA-1436`
 - Fixed reject call behaviour to make call state `Ended` on callee side instead of `Cancelled`. `KAA-1584`
 - Fixed a call issue where a media mismatch error on answer would leave the call in `Ringing` state instead of ending the call. `KAA-1432`
