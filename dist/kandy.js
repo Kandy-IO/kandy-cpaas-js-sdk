@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.60
+ * Version: 4.6.0-beta.64
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21058,6 +21058,8 @@ var midcallSagas = _interopRequireWildcard(_midcall);
 
 var _notifications2 = __webpack_require__("../kandy/src/callstack/call/notifications.js");
 
+var _dtmf = __webpack_require__("../kandy/src/callstack/call/dtmf.js");
+
 var _support2 = __webpack_require__("../kandy/src/callstack/call/support.js");
 
 var _effects = __webpack_require__("../kandy/src/subscription/interface/effects.js");
@@ -21079,9 +21081,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Other plugins.
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
 
-
-// Callstack plugin.
+// Call plugin.
 function* registerCall() {
   yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
 }
@@ -21100,12 +21105,9 @@ function* registerCall() {
 
 
 // Libraries.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
 
-// Call plugin.
+
+// Callstack plugin.
 function* createCall(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, (0, _extends3.default)({}, deps, { requests }));
 }
@@ -21179,7 +21181,7 @@ function* removeMediaEntry(deps) {
  * @param {Array}  deps.sdpHandlers SDP handlers.
  */
 function* sendDTMFEntry(deps) {
-  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, deps);
+  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, _dtmf.sendDtmf, deps);
 }
 
 /**
@@ -24481,6 +24483,428 @@ function isRemoteHold(callState) {
  */
 function isDualHold(callState) {
   return callState.state === _constants.CALL_STATES.ON_HOLD && callState.localHold && callState.remoteHold;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/callstack/call/dtmf.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sendDtmf = sendDtmf;
+exports.playOutBand = playOutBand;
+exports.playInBand = playInBand;
+exports.hasTelephoneEvent = hasTelephoneEvent;
+exports.convertTone = convertTone;
+exports.splitTones = splitTones;
+
+var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Entry saga for sending DTMF tones on a call.
+ *
+ * Determines if the DTMF tones need to be out-of-band (preferred) or in-band.
+ *    Referes to helper functions to send the tones.
+ *
+ * Assumptions:
+ *    1. None; everything is checked.
+ * Responsibilities:
+ *    1. Validate the operation is currently possible.
+ *    2. Determine if out-of-band tones are possible for the call.
+ *    3. Send the tones, depending on method available.
+ * @method sendDtmf
+ * @param {Object} deps        Dependencies that the saga uses.
+ * @param {Object} deps.webRTC The WebRTC stack.
+ * @param {Object} action      A "send dtmf" action.
+ */
+/**
+ * dtmf.js contains one call operation:
+ *    - sendDtmf: Send DTMF tone(s) over a call.
+ *
+ * and several "helper" functions for it:
+ *    - playInBand: Functionality for in-band DTMF.
+ *    - playOutBand: Functionality for out-of-band DTMF.
+ *      - addTones: Generates DTMF tones and adds them to the audio.
+ *    - hasTelephoneEvent: Helper to determine out-of-band DTMF support.
+ *    - convertTone, splitTones: Helpers for parsing input.
+ */
+
+// Call plugin.
+function* sendDtmf(deps, action) {
+  const { webRTC } = deps;
+
+  // Get the call.
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  let error;
+  /**
+   * Operation requirements:
+   *    1. The call exists.
+   *    2. The call is either Connected or Ringing.
+   *    3. A valid tone was provided.
+   */
+  if (!targetCall) {
+    log.info(`Failed to send DTMF tones on unknown call ${action.payload.id}`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_PARAM,
+      message: 'Call state not found; invalid call ID.'
+    });
+  } else if (![_constants.CALL_STATES.CONNECTED, _constants.CALL_STATES.RINGING].includes(targetCall.state)) {
+    log.info(`Failed to send DTMF tones on call ${targetCall.id}: Bad call state.`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_STATE,
+      message: `Call is in an invalid state (${targetCall.state}).`
+    });
+  } else if (!action.payload.tone) {
+    log.info(`Failed to send DTMF tones on call ${targetCall.id}: Invalid tone.`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_PARAM,
+      message: 'No DTMF tone specified.'
+    });
+  }
+
+  if (error) {
+    // Stop the operation if it cannot be performed right now.
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, { error }));
+    return;
+  }
+
+  // Get the webrtc Session for the call.
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], targetCall.webrtcSessionId);
+
+  // TODO: Is this the correct SDP to use?
+  let canSendOutBand = yield (0, _effects.call)(hasTelephoneEvent, session.peer.remoteDescription.sdp);
+
+  let result;
+  if (canSendOutBand) {
+    log.debug(`Sending DTMF tones out-of-band for call ${targetCall.id}.`);
+    result = yield (0, _effects.call)(playOutBand, session, action.payload);
+  } else {
+    log.debug(`Sending DTMF tones in-band for call ${targetCall.id}.`);
+    result = yield (0, _effects.call)(playInBand, session, action.payload);
+  }
+
+  if (result) {
+    log.info(`Successfully sent DTMF tones for call ${targetCall.id}.`);
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id));
+  } else {
+    log.debug(`Failed to send DTMF tones for call ${targetCall.id}.`);
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: `Unable to send DTMF tones for call ${targetCall.id}.`
+      })
+    }));
+  }
+}
+
+/**
+ * Sends DTMF tones out-of-band over a Session.
+ * This saga defines how out-of-band tones are sent over a call.
+ *
+ * The Callstack implementation uses the WebRTC stack's implementation for this.
+ *    There is no signaling involved.
+ *
+ * @method playOutBand
+ * @param  {Session} session A Webrtc Session object.
+ * @param  {Object}  options
+ * @param  {string}  options.tone           The tone sequence.
+ * @param  {number}  [options.duration]     The length of each DTMF tone.
+ * @param  {number}  [options.intertoneGap] The gap between each DTMF tone.
+ * @return {boolean} Whether the operation was succesful or not.
+ */
+function* playOutBand(session, options) {
+  const result = yield (0, _effects.call)([session, 'sendDTMF'], options);
+  return result;
+}
+
+/**
+ * Sends DTMF tones in-band over a Session.
+ * This saga defines how in-band tones are sent over a call.
+ *
+ * DTMF tones are added to the audio track by using AudioContext nodes. A
+ *    MediaStream is converted into an audio node, which allows us to add more
+ *    audio inputs into the node. The original audio and DTMF tones are mixed
+ *    into a single node this way, and the track from this node temporarily
+ *    replaces the original track in the Session.
+ *
+ *                       +-------------------------+
+ *    Original           | Additional Audio Source |
+ *   MediaStream         +---------+---------------+
+ *       |                         |
+ *       |                         |
+ *       v                         v
+ * +-----+-------+         +-------+----------+
+ * | Source Node +-------->| Destination Node |
+ * +-------------+         +-------+----------+
+ *                                 |
+ *                                 |
+ *                                 v
+ *                         MediaStream w/ DTMF
+ *
+ * @method playInBand
+ * @param  {Session} session A Webrtc Session object.
+ * @param  {Object}  options
+ * @param  {string}  options.tone           The tone sequence.
+ * @param  {number}  [options.duration=100]     The length of each DTMF tone.
+ * @param  {number}  [options.intertoneGap=70]  The gap between each DTMF tone.
+ * @return {boolean} Whether the operation was succesful or not.
+ */
+function* playInBand(session, options) {
+  let { tone, duration, intertoneGap: gap } = options;
+
+  // Ensure optional options are numbers (not strings). If not numbers, or
+  //    undefined, use default values.
+  duration = Number(duration) > 0 ? Number(duration) : 100;
+  gap = Number(gap) > -1 ? Number(gap) : 70;
+
+  // Get the (native) track the tones will be inserted into.
+  const track = session.localTracks.filter(track => track.getState().kind === 'audio')[0];
+
+  const stream = track.getStream();
+  const context = new AudioContext();
+
+  // Create a source node that has the stream media.
+  const source = context.createMediaStreamSource(stream);
+
+  /**
+   * Create the "destination node". All audio sources will be connected to This
+   *    node, and it will be used as the "final output".
+   */
+  const dest = context.createMediaStreamDestination();
+  // Connect the source node to it, so that it has the original audio.
+  source.connect(dest);
+
+  // Get the track from the destination node and replace the original track
+  //    on the PeerConnection with it. The remote endpoint will now receive
+  //    any/all audio that is connected to the destination node.
+  const newTrack = dest.stream.getAudioTracks()[0];
+  yield (0, _effects.call)([session.peer, 'replaceTrack'], newTrack, { trackId: track.id });
+
+  // Add the DTMF tones to the destination node.
+  yield (0, _effects.call)(addTones, context, dest, tone, { duration, gap });
+
+  // Un-replace track on the PeerConnection. This resets the tracks back to
+  //    "normal".
+  yield (0, _effects.call)([session.peer, 'replaceTrack'], track.track, { trackId: newTrack.id });
+
+  // Clean-up the AudioContext nodes.
+  context.close();
+
+  return true;
+}
+
+/**
+ * Generates DTMF tones based on input, and connects the audio to the provided
+ *    target node.
+ * @method addTones
+ * @param  {AudioContext} context      The AudioContext being used.
+ * @param  {AudioNode} targetNode      The AudioNode to add DTMF tones to.
+ * @param  {string} tones              The input tones.
+ * @param  {Object} [options]
+ * @param  {number} [options.duration] The length of each DTMF tone.
+ * @param  {number} [options.gap]      The gap between each DTMF tone.
+ */
+function* addTones(context, targetNode, tones, options) {
+  /**
+   * Node Diagram:
+   * +--------------+
+   * | Oscillator 1 +--+
+   * +--------------+  |    +--------------+
+   *                   +--->|   Osc Node   |
+   * +--------------+  |    +------+-------+
+   * | Oscillator 2 +--+           |
+   * +--------------+              | Connect generated audio
+   *                               v to the provided node.
+   *                        +------+--------+
+   *                        |  Target Node  |
+   *                        +---------------+
+   */
+
+  /**
+   * Step 1: Setup the audio nodes.
+   */
+  // Create the Oscillator nodes that will generate the frequencies.
+  const oscillators = [context.createOscillator(), context.createOscillator()];
+  oscillators[0].type = 'sine';
+  oscillators[1].type = 'sine';
+
+  /**
+   * Create an intermediary Gain node to control the volume of the oscillator
+   *   frequencies before connecting them to anything else.
+   */
+  const oscNode = context.createGain();
+  oscillators[0].connect(oscNode);
+  oscillators[1].connect(oscNode);
+  oscNode.gain.value = 0.1;
+
+  // Connect the combined oscillators to the target node. Any tones created
+  //    by the oscillators will be heard in the target node.
+  oscNode.connect(targetNode);
+
+  // Connect the oscillators to the "destination" as well, which works magically.
+  // `context.destination` connects to the "default destination" (or something
+  //    like that), which will be the machine's speakers. This will play the
+  //    audio locally.
+  oscNode.connect(context.destination);
+
+  /**
+   * Step 2: Use the oscillators to generate DTMF tones.
+   */
+
+  /**
+   * Schedule a frequency to be played for a period of time.
+   * @method scheduleTone
+   * @param  {number} tone  A frequency.
+   * @param  {number} start When the tone should start.
+   * @param  {number} dur   The duration of the tone, in seconds.
+   */
+  function scheduleTone(tone, start, dur) {
+    oscillators[0].frequency.setValueAtTime(tone[0], start);
+    oscillators[0].frequency.setValueAtTime(0, start + dur);
+
+    oscillators[1].frequency.setValueAtTime(tone[1], start);
+    oscillators[1].frequency.setValueAtTime(0, start + dur);
+  }
+
+  const toneSequence = splitTones(tones).map(convertTone);
+
+  // Convert the time units to seconds.
+  const dur = options.duration / 1000;
+  const gap = options.gap / 1000;
+
+  let toneStart = context.currentTime;
+  for (let i = 0; i < toneSequence.length; i++) {
+    scheduleTone(toneSequence[i], toneStart, dur);
+
+    toneStart = toneStart + dur + gap;
+  }
+
+  // Start playing the scheduled tones.
+  oscillators[0].start();
+  oscillators[1].start();
+
+  /**
+   * Step 3: Clean-up the audio nodes.
+   */
+
+  // Wait until all tones have finished playing.
+  const numTones = toneSequence.length;
+  const delayTime = numTones * (options.duration + options.gap);
+  yield (0, _effects.delay)(delayTime);
+
+  // Disconnect all nodes from each other.
+  oscNode.disconnect();
+  oscillators[0].stop();
+  oscillators[0].disconnect();
+  oscillators[1].stop();
+  oscillators[1].disconnect();
+}
+
+/**
+ * Checks whether an SDP has at least one telephone-event codec.
+ *
+ * TODO: If there isn't a telephone-event, then the PeerConnection won't have
+ *    a "dtmf sender" (RTCRtpSender.dtmf). Should preferrably check for that
+ *    rather than looking through the SDP.
+ * This isn't being done because the Session/Peer models wrap "send dtmf" in a
+ *    way that makes it inconvenient to use.
+ *
+ * @method hasTelephoneEvent
+ * @param  {string}  stringSdp An SDP.
+ * @return {boolean}
+ */
+function hasTelephoneEvent(stringSdp) {
+  const sdp = _sdpTransform2.default.parse(stringSdp);
+
+  const hasCodec = sdp.media.filter(media => media.type === 'audio').some(media => {
+    return media.rtp.some(rtp => rtp.codec === 'telephone-event');
+  });
+
+  return hasCodec;
+}
+
+/**
+ * Converts a single tone input to its dual-frequencies.
+ * @method convertTone
+ * @param  {string} tone A DTMF tone input character.
+ * @return {Array} The set of frequencies for the DTMF tone.
+ */
+function convertTone(tone) {
+  if (typeof tone !== 'string' || tone.length > 1) {
+    throw new Error('Invalid input for DTMF tone.');
+  }
+
+  switch (tone) {
+    case '1':
+      return ['697', '1209'];
+    case '2':
+      return ['697', '1336'];
+    case '3':
+      return ['697', '1477'];
+    case '4':
+      return ['770', '1209'];
+    case '5':
+      return ['770', '1336'];
+    case '6':
+      return ['770', '1477'];
+    case '7':
+      return ['852', '1209'];
+    case '8':
+      return ['852', '1336'];
+    case '9':
+      return ['852', '1477'];
+    case '0':
+      return ['941', '1209'];
+    case '*':
+      return ['941', '1336'];
+    case '#':
+      return ['941', '1477'];
+  }
+}
+
+/**
+ * Splits a DTMF tone sequence into individual tones.
+ * @method splitTones
+ * @param  {string} tone A DTMF tone string.
+ * @return {Array} List of single-character tones.
+ */
+function splitTones(tone) {
+  const matches = tone.match(/[\d*#]+/);
+  if (!matches || matches[0] !== tone) {
+    throw new Error('Invalid characters in tone.');
+  }
+
+  return tone.split('');
 }
 
 /***/ }),
@@ -30709,7 +31133,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.60';
+  let version = '4.6.0-beta.64';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
