@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.65
+ * Version: 4.6.0-beta.68
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22428,14 +22428,14 @@ function callAPI({ dispatch, getState }) {
      *    application will use this ID to identify and control the call after it
      *    has been initiated.
      *
-     * The `getCallById` API can be used to retrieve the current state of the
+     * The {@link Calls.getById getById} API can be used to retrieve the current state of the
      *    call.
      *
-     * The SDK will emit a `call:start` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:start call:start} event locally when the operation
      *    completes. When the remote participant receives the call, a
-     *    `call:receive` event will be emitted remotely for them.
+     *    {@link Calls.event:call:receive call:receive} event will be emitted remotely for them.
      *
-     * The SDK requires access to the machine's media devices (eg. microphone)
+     * The SDK requires access to the machine's media devices (e.g. microphone)
      *    in order to make a call. If it does not already have permissions to
      *    use the devices, the user may be prompted by the browser to give
      *    permissions.
@@ -22446,15 +22446,15 @@ function callAPI({ dispatch, getState }) {
      * @param {string} destination The address of the desired remote participant. The format is either
      * 'sip:sipuser@sip.domain.example.com' for SIP calls or 'tel:18881239876' for PSTN calls.
      * @param {Object} [media] The media options the call should be initialized with.
-     * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
-     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video stream.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @returns {string} The generated ID of the newly created call.
@@ -22503,9 +22503,9 @@ function callAPI({ dispatch, getState }) {
      * The specified call to reject must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
      *    completes. The remote participant will be notified, through their own
-     *    `call:stateChange` event, that the call was rejected.
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the call was rejected.
      * @public
      * @memberof Calls
      * @requires call
@@ -22523,12 +22523,12 @@ function callAPI({ dispatch, getState }) {
      * The specified call to answer must be in a ringing state with an incoming
      *    direction. The call will become connected as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
      *    completes. This indicates that the call has connected with the remote
-     *    participant. The `getCallById` API can be used to retrieve the latest
+     *    participant. The {@link Calls.getById getById} API can be used to retrieve the latest
      *    call state after the change. Further events will be emitted to
      *    indicate that the call has received media from the remote participant.
-     *     See the `call:newTrack` event for more information about this.
+     *     See the {@link Calls.event:call:newTrack call:newTrack} event for more information about this.
      *
      * The SDK requires access to the machine's media devices (eg. microphone)
      *    in order to answer a call. If it does not already have permissions to
@@ -22540,14 +22540,14 @@ function callAPI({ dispatch, getState }) {
      * @method answer
      * @param {string} callId The ID of the call to answer.
      * @param {Object} [media] The media options the call should be initialized with.
-     * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
@@ -22570,7 +22570,7 @@ function callAPI({ dispatch, getState }) {
      * The specified call to ignore must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
      *    completes. The remote participant will not be notified that the call
      *    was ignored.
      * @public
@@ -22593,11 +22593,11 @@ function callAPI({ dispatch, getState }) {
      *    being sent.
      *
      * Some call operations cannot be performed while the call is on hold. The
-     *    call can be taken off hold with the `unhold` API.
+     *    call can be taken off hold with the {@link Calls.unhold unhold} API.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally, when the operation
      *    completes. The remote participant will be notified of the operation
-     *    through a `call:stateChange` as well.
+     *    through a {@link Calls.event:call:stateChange call:stateChange} event as well.
      * @public
      * @memberof Calls
      * @requires call
@@ -22617,10 +22617,11 @@ function callAPI({ dispatch, getState }) {
      *    also remotely held, call media will be reconnected as it was before
      *    the call was held.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
      *    completes. The remote participant will be notified of the operation
-     *    through a `call:stateChange` as well.
+     *    through a {@link Calls.event:call:stateChange call:stateChange} as well.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22641,10 +22642,10 @@ function callAPI({ dispatch, getState }) {
      * @method getAll
      * @return {Array<CallObject>} Call objects.
      * @example
-     * let calls = client.call.getAll();
+     * let calls = client.call.getAll()
      * let currentCalls = calls.filter(call => {
-     *     return call.state === client.call.states.CONNECTED;
-     * });
+     *     return call.state === client.call.states.CONNECTED
+     * })
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'call.getAll');
@@ -22657,6 +22658,7 @@ function callAPI({ dispatch, getState }) {
      * @memberof Calls
      * @requires call
      * @requires callMe
+     * @static
      * @method getById
      * @param {string} callId The ID of the call to retrieve.
      * @return {CallObject} A call object.
@@ -22671,11 +22673,11 @@ function callAPI({ dispatch, getState }) {
      *
      * The SDK will stop any/all local media associated with the call. Events
      *    will be emitted to indicate which media tracks were stopped. See the
-     *    `call:trackEnded` event for more information.
+     *    {@link Calls.event:call:trackEnded call:trackEnded} event for more information.
      *
      * The SDK will emit a `call:stateChange` event locally when the operation
      *    completes. The remote participant will be notified, through their own
-     *    `call:stateChange` event, that the call was ended.
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the call was ended.
      * @public
      * @memberof Calls
      * @requires call
@@ -22691,21 +22693,21 @@ function callAPI({ dispatch, getState }) {
     /**
      * Add new media tracks to an ongoing call.
      * Will get new media tracks from the specific sources to add to the call.
-     * Will trigger a `call:newMedia` event.
+     * Will trigger a {@link Calls.event:call:newMedia call:newMedia} event.
      * @public
      * @memberof Calls
      * @requires call
      * @requires callMe
      * @param {string} callId The ID of the call to add media to.
      * @param {Object} [media={}] The media options to add to the call.
-     * @param {Boolean} [media.audio=false] Whether to add audio to the call.
+     * @param {boolean} [media.audio=false] Whether to add audio to the call.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether to add video to the call.
+     * @param {boolean} [media.video=false] Whether to add video to the call.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
@@ -22743,7 +22745,8 @@ function callAPI({ dispatch, getState }) {
      *    sequence of DTMF tones (eg. '123') which will be played one after the
      *    other.
      *
-     * The specified call must be either in Connected or Ringing state.
+     * The specified call must be either in Connected or Ringing state, otherwise invoking
+     * this API will have no effect.
      *
      * The tones will be sent as out-of-band tones if supported by the call,
      *    otherwise they will be added in-band to the call's audio.
@@ -22784,8 +22787,8 @@ function callAPI({ dispatch, getState }) {
      * @memberof Calls
      * @requires call
      * @method forward
-     * @param {string} callId      ID of the call being acted on.
-     * @param {string} destination The user to forward the call to.
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} destination The user to forward the call to. This destination should be in the form of: user@domain
      */
     forward(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22799,7 +22802,7 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Performs a "consultative" transfer between two on-going calls (also known
+     * Performs a "consultative" transfer between two ongoing calls (also known
      *    as an announced or warm transfer). This allows the current user to
      *    transfer the remote participant of a call to another user, after
      *    having spoken to both users.
@@ -22812,7 +22815,7 @@ function callAPI({ dispatch, getState }) {
      * @memberof Calls
      * @requires call
      * @method consultativeTransfer
-     * @param {string} callId      ID of the call being acted on.
+     * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
      */
     consultativeTransfer(callId, otherCallId) {
@@ -22833,8 +22836,8 @@ function callAPI({ dispatch, getState }) {
      * @memberof Calls
      * @requires call
      * @method directTransfer
-     * @param {string} callId      ID of the call being acted on.
-     * @param {string} destination The user to transfer the call to.
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} destination The user to transfer the call to. This destination should be in the form of: user@domain
      */
     directTransfer(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22849,19 +22852,19 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Performs a "join" on two ongoing calls.
-     * This allows the current user to have a call with audio from the other two users.
+     * This allows the current user to establish a call with audio between two remote users.
      *
-     * Both specified calls must be locally held. The "joined" call will be
-     *    audio-only, even if either previous call had video. Video cannot be
+     * Both specified calls (between curent user and each of the remote users) must first be placed on hold locally.
+     *    The "joined" call will be audio-only, even if either previous call had video. Video cannot be
      *    added to the "joined" call. Both remote participants will see their
-     *    call be unheld, and will receive additional audio from other
+     *    call taken off hold, and will receive additional audio from other
      *    participants after the operation. Both calls for the current user will
-     *    be ended.
+     *    be ended after the operation.
      * @public
      * @memberof Calls
      * @requires call
      * @method join
-     * @param {string} callId      ID of the call being acted on.
+     * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
      */
     join(callId, otherCallId) {
@@ -22877,7 +22880,7 @@ function callAPI({ dispatch, getState }) {
      * new track to the call. This effectively allows for changing the
      * track constraints (eg. device used) for an on-going call.
      *
-     * The SDK will emit a `call:trackReplaced` event locally when the operation
+     * The SDK will emit a {@link Calls.event:call:trackReplaced call:trackReplaced} event locally when the operation
      * completes. The newly added track will need to be handled by the local
      * application. The track will be replaced seamlessly for the remote
      * application, which will not receive an event.
@@ -22888,15 +22891,15 @@ function callAPI({ dispatch, getState }) {
      * @requires callMe
      * @param {string} callId The ID of the call to replace the track of.
      * @param {string} trackId The ID of the track to replace.
-     * @param {Object} [media={}] The media options.
-     * @param {Boolean} [media.audio=false] Whether to create an audio track.
+     * @param {Object} [media] The media options.
+     * @param {boolean} [media.audio=false] Whether to create an audio track.
      * @param {Object} [media.audioOptions] Options for configuring the audio track.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether to create a video track.
+     * @param {boolean} [media.video=false] Whether to create a video track.
      * @param {Object} [media.videoOptions] Options for configuring the video track.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @example
      * const callId = ...
@@ -24688,9 +24691,19 @@ function* playInBand(session, options) {
   gap = Number(gap) > -1 ? Number(gap) : 70;
 
   // Get the (native) track the tones will be inserted into.
-  const track = session.localTracks.filter(track => track.getState().kind === 'audio')[0];
+  let track;
+  for (let localTrack of session.localTracks) {
+    // Matching the track is done this way because we need to yield to getState,
+    //    but we can't yield inside of a `.find(func)` or similar. So iterate
+    //    over the new tracks "manually".
+    const state = yield (0, _effects.call)([localTrack, 'getState']);
+    if (state.kind === 'audio') {
+      track = localTrack;
+      break;
+    }
+  }
 
-  const stream = track.getStream();
+  const stream = yield (0, _effects.call)([track, 'getStream']);
   const context = new AudioContext();
 
   // Create a source node that has the stream media.
@@ -27644,7 +27657,8 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
   }
 
   // Add the tracks to the session.
-  yield (0, _effects.call)([session, 'addTracks'], media.getTracks());
+  const tracks = yield (0, _effects.call)([media, 'getTracks']);
+  yield (0, _effects.call)([session, 'addTracks'], tracks);
 
   /*
    * Create the local SDP answer, run it through any provided SDP handlers,
@@ -27938,7 +27952,8 @@ function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
   }
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
-  yield (0, _effects.call)([session, 'addTracks'], media.getTracks());
+  const tracks = yield (0, _effects.call)([media, 'getTracks']);
+  yield (0, _effects.call)([session, 'addTracks'], tracks);
 
   /*
    * Create the local SDP offer, run it through any provided SDP handlers,
@@ -27954,7 +27969,8 @@ function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
-  return { error: false, media: media.getState(), sdp: offer.sdp };
+  const mediaState = yield (0, _effects.call)([media, 'getState']);
+  return { error: false, media: mediaState, sdp: offer.sdp };
 }
 
 /**
@@ -28054,7 +28070,7 @@ function* webRtcReplaceTrack(webRTC, params) {
     };
   }
 
-  const oldTrackState = oldTrack.getState();
+  const oldTrackState = yield (0, _effects.call)([oldTrack, 'getState']);
   const oldTrackKind = oldTrackState.kind;
 
   // Verify that there are constraints for the old track's kind.
@@ -28076,7 +28092,20 @@ function* webRtcReplaceTrack(webRTC, params) {
   if (createLocalError) {
     return { error: createLocalError, newTrackId: undefined };
   }
-  const newTrack = newMedia.getTracks().find(track => track.getState().kind === oldTrackKind);
+
+  // Find the new track that matches the old track we want to replace.
+  const newTracks = yield (0, _effects.call)([newMedia, 'getTracks']);
+  let newTrack;
+  for (let track of newTracks) {
+    // Matching the track is done this way because we need to yield to getState,
+    //    but we can't yield inside of a `.find(func)` or similar. So iterate
+    //    over the new tracks "manually".
+    const state = yield (0, _effects.call)([track, 'getState']);
+    if (state.kind === oldTrackKind) {
+      newTrack = track;
+      break;
+    }
+  }
 
   if (!newTrack) {
     return {
@@ -31133,7 +31162,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.65';
+  let version = '4.6.0-beta.68';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33538,12 +33567,13 @@ const logMgr = getLogManager(defaultOptions);
 /**
  * Configuration options for the Logs feature.
  * @public
+ * @static
  * @name config.logs
  * @memberof config
  * @requires logs
  * @instance
  * @param {Object} logs Logs configs.
- * @param  {string} [logs.logLevel=debug] Log level to be set. See `logger.levels`.
+ * @param  {string} [logs.logLevel=debug] Log level to be set. See {@link Logger.levels levels}.
  * @param  {boolean} [logs.flatten=false] Whether all logs should be output in a string-only format.
  * @param  {Object} [logs.logActions] Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
  * @param  {boolean} [logs.logActions.actionOnly=true] Only output information about the action itself. Omits the SDK context for when it occurred.
@@ -33666,13 +33696,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 /**
- * The internal logger used to provide information about the SDK's behaviour.
+ * The internal logger is used to provide information about the SDK's behaviour.
  * The logger can provide two types of logs: basic logs and action logs. Basic
  * logs are simple lines of information about what the SDK is doing during operations.
  * Action logs are complete information about a specific action that occurred
- * within the SDK, prodiving debug information describing it.
- * The amount of information logged can be configured as part of the SDK
- * (see `configs.logs`) configuration.
+ * within the SDK, providing debug information describing it.
+ * The amount of information logged can be configured as part of the SDK configuration.
+ * See {@link #configconfiglogs config.logs} .
  *
  * @public
  * @module Logger
@@ -33684,9 +33714,10 @@ function api() {
     /**
      * Possible levels for the SDK logger.
      * @public
+     * @static
      * @memberof Logger
-     * @property {string} SILENT Logs nothing.
-     * @property {string} ERROR Only log unhandled errors.
+     * @property {string} SILENT Log nothing.
+     * @property {string} ERROR Log only unhandled errors.
      * @property {string} WARN Log issues that may cause problems or unexpected behaviour.
      * @property {string} INFO Log useful information and messages to indicate the SDK's internal operations.
      * @property {string} DEBUG Log information to help diagnose problematic behaviour.
