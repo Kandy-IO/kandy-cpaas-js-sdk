@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.68
+ * Version: 4.6.0-beta.69
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23094,7 +23094,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
- * A collection of devices and their information.
+ * A collection of media devices and their information.
  *
  * @public
  * @module DevicesObject
@@ -31162,7 +31162,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.68';
+  let version = '4.6.0-beta.69';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
