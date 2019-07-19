@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.69
+ * Version: 4.6.0-beta.91
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20495,9 +20495,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @memberof config
  * @instance
  * @param {Object} call The call configuration object.
- * @param {Object} [call.iceServers] ICE servers to be used for calls.
+ * @param {string} [call.sdpSemantics='unified-plan'] The sdpSemantics to use (`'unified-plan'` or `'plan-b'`).
+ * @param {Array<IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
- * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ * @param {Array<SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  */
 
@@ -20581,7 +20582,7 @@ function cpaasCalls(options = {}) {
     api: _interfaceNew2.default.api,
     reducer: _interfaceNew2.default.reducer,
     init,
-    capabilities: ['call']
+    capabilities: ['call', 'cpaas_call', 'cpaas_user_id', 'cpaas_pstn']
   };
 }
 
@@ -22422,39 +22423,40 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 function callAPI({ dispatch, getState }) {
   return {
     /**
-     * Starts an outgoing call to a SIP user or a PSTN phone number.
+     * Starts an outgoing call to a {@link UserID UserID} or a {@link PhoneNumber PhoneNumber}.
      *
      * The call will be tracked by a unique ID that is returned by the API. The
      *    application will use this ID to identify and control the call after it
      *    has been initiated.
      *
-     * The {@link Calls.getById getById} API can be used to retrieve the current state of the
-     *    call.
+     * The {@link Calls.getById call.getById} API can be used to retrieve the
+     *    current information about the call.
      *
-     * The SDK will emit a {@link Calls.event:call:start call:start} event locally when the operation
-     *    completes. When the remote participant receives the call, a
-     *    {@link Calls.event:call:receive call:receive} event will be emitted remotely for them.
+     * The SDK will emit a {@link Calls.event:call:start call:start} event
+     *    locally when the operation completes. When the remote participant
+     *    receives the call, a {@link Calls.event:call:receive call:receive}
+     *    event will be emitted remotely for them.
      *
      * The SDK requires access to the machine's media devices (e.g. microphone)
      *    in order to make a call. If it does not already have permissions to
      *    use the devices, the user may be prompted by the browser to give
      *    permissions.
      * @public
+     * @static
      * @memberof Calls
-     * @requires call
+     * @requires cpaas_call
      * @method make
-     * @param {string} destination The address of the desired remote participant. The format is either
-     * 'sip:sipuser@sip.domain.example.com' for SIP calls or 'tel:18881239876' for PSTN calls.
-     * @param {Object} [media] The media options the call should be initialized with.
-     * @param {boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {UserID|PhoneNumber} destination The desired destination.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
-     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video stream.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @returns {string} The generated ID of the newly created call.
@@ -22469,9 +22471,62 @@ function callAPI({ dispatch, getState }) {
      *   }
      * })
      * // Make an audio-only call.
-     * const newCallId = client.call.make(callee, { audio: true })
+     * const newCallId = client.call.make(destination, { audio: true })
      */
-    make(destination, media = {}, options = {}) {
+
+    /**
+     * Starts an outgoing call to a {@link SIP_URI SIP URI} or a
+     *    {@link TEL_URI TEL URI}.
+     *
+     * The call will be tracked by a unique ID that is returned by the API. The
+     *    application will use this ID to identify and control the call after it
+     *    has been initiated.
+     *
+     * The {@link Calls.getCallById call.getById} API can be used to retrieve
+     *    the current information about the call.
+     *
+     * The SDK will emit a {@link Calls.event:call:start call:start} event
+     *    locally when the operation completes. When the remote participant
+     *    receives the call, a {@link Calls.event:call:receive call:receive}
+     *    event will be emitted remotely for them.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to make a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires link_call
+     * @method make
+     * @param {SIP_URI|TEL_URI} destination The desired destination.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {Object} [media.audioOptions] Options for configuring the call's audio.
+     * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
+     * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     * @returns {string} The generated ID of the newly created call.
+     * @example
+     * // Listen for the event emitted after making a call.
+     * client.on('call:start', function (params) {
+     *   const { callId, error } = params
+     *   if (error) {
+     *     // Call failed to initialize.
+     *   } else {
+     *     // Call was initialized, and the recipient user will be notified.
+     *   }
+     * })
+     * // Make an audio-only call.
+     * const newCallId = client.call.make(destination, { audio: true })
+     */
+    make(destination, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.make: ', destination, media, options);
       const callId = (0, _v2.default)();
       const from = (0, _selectors2.getUserInfo)(getState()).username;
@@ -22503,10 +22558,13 @@ function callAPI({ dispatch, getState }) {
      * The specified call to reject must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
-     *    completes. The remote participant will be notified, through their own
-     *    {@link Calls.event:call:stateChange call:stateChange} event, that the call was rejected.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified, through their own
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the
+     *    call was rejected.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @method reject
@@ -22523,36 +22581,39 @@ function callAPI({ dispatch, getState }) {
      * The specified call to answer must be in a ringing state with an incoming
      *    direction. The call will become connected as a result of the operation.
      *
-     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
-     *    completes. This indicates that the call has connected with the remote
-     *    participant. The {@link Calls.getById getById} API can be used to retrieve the latest
-     *    call state after the change. Further events will be emitted to
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. This indicates that the
+     *    call has connected with the remote participant. The
+     *    {@link Calls.getById call.getById} API can be used to retrieve the
+     *    latest call state after the change. Further events will be emitted to
      *    indicate that the call has received media from the remote participant.
-     *     See the {@link Calls.event:call:newTrack call:newTrack} event for more information about this.
+     *    See the {@link Calls.event:call:newTrack call:newTrack} event for
+     *    more information about this.
      *
-     * The SDK requires access to the machine's media devices (eg. microphone)
+     * The SDK requires access to the system's media devices (eg. microphone)
      *    in order to answer a call. If it does not already have permissions to
      *    use the devices, the user may be prompted by the browser to give
      *    permissions.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @method answer
      * @param {string} callId The ID of the call to answer.
-     * @param {Object} [media] The media options the call should be initialized with.
-     * @param {boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
-    answer(callId, media = {}, options = {}) {
+    answer(callId, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
@@ -22570,10 +22631,11 @@ function callAPI({ dispatch, getState }) {
      * The specified call to ignore must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
-     *    completes. The remote participant will not be notified that the call
-     *    was ignored.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will not be notified that the call was ignored.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @method ignore
@@ -22593,12 +22655,14 @@ function callAPI({ dispatch, getState }) {
      *    being sent.
      *
      * Some call operations cannot be performed while the call is on hold. The
-     *    call can be taken off hold with the {@link Calls.unhold unhold} API.
+     *    call can be taken off hold with the {@link Calls.unhold call.unhold} API.
      *
-     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally, when the operation
-     *    completes. The remote participant will be notified of the operation
-     *    through a {@link Calls.event:call:stateChange call:stateChange} event as well.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified of the operation through a
+     *    {@link Calls.event:call:stateChange call:stateChange} event as well.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22617,9 +22681,10 @@ function callAPI({ dispatch, getState }) {
      *    also remotely held, call media will be reconnected as it was before
      *    the call was held.
      *
-     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange} event locally when the operation
-     *    completes. The remote participant will be notified of the operation
-     *    through a {@link Calls.event:call:stateChange call:stateChange} as well.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified of the operation through a
+     *    {@link Calls.event:call:stateChange call:stateChange} event as well.
      * @public
      * @static
      * @memberof Calls
@@ -22634,8 +22699,9 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieves the state of calls made during the current session.
+     * Retrieves the information of all calls made during the current session.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22653,8 +22719,9 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieves a single call from state with a specific call ID.
+     * Retrieves the information of a single call with a specific call ID.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22673,12 +22740,16 @@ function callAPI({ dispatch, getState }) {
      *
      * The SDK will stop any/all local media associated with the call. Events
      *    will be emitted to indicate which media tracks were stopped. See the
-     *    {@link Calls.event:call:trackEnded call:trackEnded} event for more information.
+     *    {@link Calls.event:call:trackEnded call:trackEnded} event for more
+     *    information.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will be notified, through their own
-     *    {@link Calls.event:call:stateChange call:stateChange} event, that the call was ended.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified, through their own
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the
+     *    call was ended.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22693,8 +22764,13 @@ function callAPI({ dispatch, getState }) {
     /**
      * Add new media tracks to an ongoing call.
      * Will get new media tracks from the specific sources to add to the call.
-     * Will trigger a {@link Calls.event:call:newMedia call:newMedia} event.
+     *
+     * The SDK will emit a {@link Calls.event:call:newTrack call:newTrack} event
+     *    both for the local and remote users to indicate a track has been
+     *    added to the Call.
+     *
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22706,8 +22782,8 @@ function callAPI({ dispatch, getState }) {
      * @param {boolean} [media.video=false] Whether to add video to the call.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
@@ -22723,8 +22799,14 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Remove tracks from an ongoing call
+     * Remove tracks from an ongoing call.
+     *
+     * The SDK will emit a {@link Calls.event:call:trackEnded call:trackEnded}
+     *    event for both the local and remote users to indicate that a track
+     *    has been removed.
+     *
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
@@ -22745,18 +22827,19 @@ function callAPI({ dispatch, getState }) {
      *    sequence of DTMF tones (eg. '123') which will be played one after the
      *    other.
      *
-     * The specified call must be either in Connected or Ringing state, otherwise invoking
-     * this API will have no effect.
+     * The specified call must be either in Connected or Ringing state,
+     *    otherwise invoking this API will have no effect.
      *
      * The tones will be sent as out-of-band tones if supported by the call,
      *    otherwise they will be added in-band to the call's audio.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
      * @method sendDTMF
-     * @param {string} callId Id of the call being acted on.
-     * @param {string} tone DTMF tone to send. Valid values are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} tone DTMF tone(s) to send. Valid chracters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
      * @param {number} [duration=100] The amount of time, in milliseconds, that each DTMF tone should last.
      * @param {number} [intertoneGap=70] The length of time, in milliseconds, to wait between tones.
      *
@@ -22767,14 +22850,22 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Get a report about low-level call stats / information.
-     * A track ID can optionally be provided to get a report for the specific track of the call.
+     * Get a report about low-level call statistical information.
+     *
+     * A Track ID can optionally be provided to get a report for a specific
+     *    Track of the Call.
+     *
+     * The SDK will emit a
+     *    {@link Calls.event:call:statsReceived call:statsReceived} event, after
+     *    the operation completes, that has the report.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
-     * @param {string} callId The ID of the call to retrieve stats report.
-     * @param {string} [trackId] TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
+     * @param {string} callId The ID of the Call to retrieve the report.
+     * @param {string} [trackId] ID of a Track being used by the Call. If not
+     *    provided, RTCStatsReport is generated for the Call itself.
      */
     getStats(callId, trackId) {
       log.debug(_logs.API_LOG_TAG + 'call.getStats: ', callId, trackId);
@@ -22782,13 +22873,38 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Forward an incoming call to another user.
+     * Forwards an incoming call to another user.
+     *
+     * The specified destination will receive the Call instead of the current
+     *    user.
+     *
+     * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
+     *    event after the operation completes.
+     *
      * @public
+     * @static
      * @memberof Calls
-     * @requires call
+     * @requires call_link
      * @method forward
      * @param {string} callId ID of the call being acted on.
-     * @param {string} destination The user to forward the call to. This destination should be in the form of: user@domain
+     * @param {SIP_URI|TEL_URI} destination The destination to forward the call to.
+     */
+
+    /**
+     * Forwards an incoming call to another user.
+     *
+     * The specified destination will receive the Call instead of the current
+     *    user.
+     *
+     * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
+     *    event after the operation completes.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call_cpaas
+     * @method forward
+     * @param {string} callId ID of the call being acted on.
+     * @param {UserID|PhoneNumber} destination The destination to forward the call to.
      */
     forward(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22812,6 +22928,7 @@ function callAPI({ dispatch, getState }) {
      *    one another after the operation. Both calls for the current user will
      *    be ended.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @method consultativeTransfer
@@ -22833,11 +22950,31 @@ function callAPI({ dispatch, getState }) {
      *    with the remote participant of the specified call. The current user's
      *    call will be ended after the operation.
      * @public
+     * @static
      * @memberof Calls
-     * @requires call
+     * @requires call_link
      * @method directTransfer
      * @param {string} callId ID of the call being acted on.
-     * @param {string} destination The user to transfer the call to. This destination should be in the form of: user@domain
+     * @param {SIP_URI|TEL_URI} destination The destination to transfer the call to.
+     */
+
+    /**
+     * Performs a "direct" transfer on a call (also known as an unannounced or
+     *    blind transfer). This allows the current user to transfer the remote
+     *    participant of a call to another user, similar to a "forward"
+     *    operation.
+     *
+     * The specified call must be locally held. The "destination" user will
+     *    receive an incoming call, and when answered, they will be connected
+     *    with the remote participant of the specified call. The current user's
+     *    call will be ended after the operation.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call_cpaas
+     * @method directTransfer
+     * @param {string} callId ID of the call being acted on.
+     * @param {UserID|PhoneNumber} destination The destination to transfer the call to.
      */
     directTransfer(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22852,15 +22989,17 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Performs a "join" on two ongoing calls.
-     * This allows the current user to establish a call with audio between two remote users.
+     * This allows the current user to establish a call with audio with two
+     *    remote users.
      *
-     * Both specified calls (between curent user and each of the remote users) must first be placed on hold locally.
-     *    The "joined" call will be audio-only, even if either previous call had video. Video cannot be
+     * Both specified calls must be locally held. The "joined" call will be
+     *    audio-only, even if either previous call had video. Video cannot be
      *    added to the "joined" call. Both remote participants will see their
      *    call taken off hold, and will receive additional audio from other
      *    participants after the operation. Both calls for the current user will
      *    be ended after the operation.
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @method join
@@ -22877,29 +23016,31 @@ function callAPI({ dispatch, getState }) {
      * Replace a call's track with a new track of the same media type.
      *
      * The operation will remove the old track from the call and add a
-     * new track to the call. This effectively allows for changing the
-     * track constraints (eg. device used) for an on-going call.
+     *    new track to the call. This effectively allows for changing the
+     *    track constraints (eg. device used) for an ongoing call.
      *
-     * The SDK will emit a {@link Calls.event:call:trackReplaced call:trackReplaced} event locally when the operation
-     * completes. The newly added track will need to be handled by the local
-     * application. The track will be replaced seamlessly for the remote
-     * application, which will not receive an event.
+     * The SDK will emit a
+     *    {@link Calls.event:call:trackReplaced call:trackReplaced} event
+     *    locally when the operation completes. The newly added track will need
+     *    to be handled by the local application. The track will be replaced
+     *    seamlessly for the remote application, which will not receive an event.
      *
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @requires callMe
      * @param {string} callId The ID of the call to replace the track of.
      * @param {string} trackId The ID of the track to replace.
-     * @param {Object} [media] The media options.
+     * @param {Object} [media={}] The media options.
      * @param {boolean} [media.audio=false] Whether to create an audio track.
      * @param {Object} [media.audioOptions] Options for configuring the audio track.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether to create a video track.
      * @param {Object} [media.videoOptions] Options for configuring the video track.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video capture frame.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video capture frame.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
      * @example
      * const callId = ...
@@ -22911,7 +23052,7 @@ function callAPI({ dispatch, getState }) {
      * client.call.replaceTrack(callId, videoTrack.id, {
      *   // The track should be replaced with a video track using
      *   //    a specific device. This effectively changes the input
-     *   //    device for an on-going call.
+     *   //    device for an ongoing call.
      *   video: true,
      *   videoOptions: {
      *     deviceId: cameraId
@@ -22927,9 +23068,24 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Possible states for a call.
+     * Possible states that a Call can be in.
+     *
+     * A Call's state describes the current status of the Call. An application
+     *    should use the state to understand how the Call, and any media
+     *    associated with the Call, should be handled. Which state the Call is
+     *    in defines how it can be interacted with, as certain operations can
+     *    only be performed while in specific states, and tells an application
+     *    whether the Call currently has media flowing between users.
+     *
+     * The Call's state is a property of the {@link CallObject}, which can be
+     *    retrieved using the {@link Calls.getById call.getById} or
+     *    {@link Calls.getAll call.getAll} APIs.
+     *
+     * The SDK emits a {@link Calls.event:call:stateChange call:stateChange}
+     *    event when a Call's state changes from one state to another.
      *
      * @public
+     * @static
      * @memberof Calls
      * @requires call
      * @type {Object}
@@ -22974,7 +23130,7 @@ var _call2 = _interopRequireDefault(_call);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * The call feature is used to make audio and video calls to and from
+ * The Calls feature is used to make audio and video calls to and from
  * SIP users and PSTN phones.
  *
  * Call functions are all part of the 'call' namespace.
@@ -22983,33 +23139,44 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @module Calls
  */
 
-// TODO: Does the following apply to the new call stack?
 /**
- * The state representation of a Call.
- * Can be retrieved using the Call feature's `getAll` or `getById` APIs.
- * A Call can be manipulated by using the Call feature's APIs.
+ * Information about a Call.
+ *
+ * Can be retrieved using the {@link Calls.getAll call.getAll} or
+ *    {@link Calls.getById call.getById} APIs.
  *
  * @public
+ * @static
  * @module CallObject
- * @property {string} direction The direction in which the call was created (outgoing/incoming).
  * @property {string} id The ID of the call.
+ * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+ * @property {string} state The current state of the call. See {@link Calls.states call.states} for possible states.
  * @property {boolean} localHold Indicates whether this call is currently being held locally.
- * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
- * @property {Object} mediaConstraints This indicates the media types that the call was initialized with.
- * @property {boolean} mediaConstraints.audio Whether the call was initialized with audio.
- * @property {boolean} mediaConstraints.video Whether the call was initialized with video.
  * @property {boolean} remoteHold Indicates whether this call is currently being held remotely.
+ * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
  * @property {Array<string>} remoteTracks A list of Track IDs that the call is receiving from the remote participant.
  * @property {Object} remoteParticipant Information about the other call participant.
- * @property {string} remoteParticipant.displayNumber The username with domain of the callee in the form "username@domain"
- * @property {string} remoteParticipant.displayName The display name of the callee
+ * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
+ * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
+ * @property {BandwidthControls} bandwidth The bandwidth limitations set for the call.
  * @property {number} startTime The start time of the call in milliseconds since the epoch.
- * @property {string} state The current state of the call. See `Call.states` for possible states.
+ * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
  */
 
 /**
- * The media features are used to interact with media that the SDK is
- * currently using.
+ * The Media feature provides an interface for interacting with Media that the
+ *    SDK has access to. Media is used conjunction with the {@link Calls}
+ *    feature to manipulate and render the Tracks sent and received from a Call.
+ *
+ * Media and Track objects are not created directly, but are created as part of
+ *    Call operations. Media and Tracks will either be marked as "local" or
+ *    "remote" depending on whether their source is the local user's machine
+ *    or a remote user's machine.
+ *
+ * The Media feature also keeps track of media devices that the user's machine
+ *    can access. Any media device (eg. USB headset) connected to the machine
+ *    can be used as a source for media. Available devices can be found using
+ *    the {@link Media.getDevices media.getDevices} API.
  *
  * Media functions are all part of the 'media' namespace.
  *
@@ -23067,11 +23234,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
+ * @public
+ * @module IceServer
+ * @typedef {Object} IceServer
+ * @property {string} url The URL of the ICE server.
+ * @property {string} [credential] The credential needed by the ICE server.
+ */
+
+/**
+ * @public
+ * @module SdpHandlerInfo
+ * @typedef {Object} SdpHandlerInfo
+ * @property {RTCSdpType} type The session description's type.
+ * @property {string} endpoint Which end of the connection created the SDP.
+ */
+
+/**
+ * The form of an SDP handler function and the expected arguments that it receives.
+ * @public
+ * @module SdpHandlerFunction
+ * @typedef {Function} SdpHandlerFunction
+ * @param {Object} newSdp The SDP so far (could have been modified by previous handlers).
+ * @param {SdpHandlerInfo} info Additional information that might be useful when making SDP modifications.
+ * @param {Object} originalSdp The SDP in its initial state.
+ * @returns {Object} The resulting modified SDP based on the changes made by this function.
+ */
+
+/**
  * The state representation of a Media object.
  * Media is a collection of Track objects.
  *
  * @public
  * @module MediaObject
+ * @typedef {Object} MediaObject
  * @property {string} id The ID of the Media object.
  * @property {boolean} local Indicator on whether this media is local or remote.
  * @property {Array<TrackObject>} tracks A list of Track objects that are contained in this Media object.
@@ -23142,26 +23337,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * An outgoing call has been started.
- * The call state can be retrieved using the `getById(callId)` API.
+ *
+ * Information about the Call can be retrieved using the
+ *    {@link Calls.getById call.getById} API.
  *
  * @public
  * @memberof Calls
  * @event call:start
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  */
 const CALL_STARTED = exports.CALL_STARTED = 'call:start';
 
 /**
  * A new incoming call has been received.
- * The call state can be retrieved using the `getById(callId)` API.
+ *
+ * Information about the Call can be retrieved using the
+ *    {@link Calls.getById call.getById} API.
  *
  * @public
  * @memberof Calls
  * @event call:receive
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  * @example
  * client.on('call:receive', function(params) {
@@ -23173,8 +23372,9 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
 
 // TODO: Add a property in event params that indicates the operation that caused the state change.
 /**
- * A call's state has changed.
- * See `Call.states` for possible call states.
+ * A Call's state has changed.
+ *
+ * See {@link Calls.states call.states} for information about call states.
  * @public
  * @memberof Calls
  * @event call:stateChange
@@ -23214,27 +23414,34 @@ const CALL_STATE_CHANGE = exports.CALL_STATE_CHANGE = 'call:stateChange';
  * @memberof Calls
  * @event call:newMedia
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {boolean} params.local Whether the new media is local or not.
  * @param {Array} params.tracks The list of new Tracks.
- * @param {string} params.mediaId The Id of the Media object the Tracks belong to.
+ * @param {string} params.mediaId The ID of the Media object the Tracks belong to.
  */
 const CALL_ADDED_MEDIA = exports.CALL_ADDED_MEDIA = 'call:newMedia';
 
 /**
- * Media has been removed from the call
+ * Media has been removed from the call.
  * @public
  * @memberof Calls
  * @event call:removedMedia
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {boolean} params.local Whether the new media is local or not.
  * @param {Array} params.tracks The list of new Tracks.
  */
 const CALL_REMOVED_MEDIA = exports.CALL_REMOVED_MEDIA = 'call:removedMedia';
 
 /**
- * The call has received a new Track.
+ * A new Track has been added to the Call.
+ *
+ * The Track may have been added by either the local user or remote user using
+ *    the {@link Calls.addMedia call.addMedia} API.
+ *
+ * Information about the Track can be retrieved using the
+ *    {@link Media.getTrackById media.getTrackById} API.
+ *
  * @public
  * @memberof Calls
  * @event call:newTrack
@@ -23247,7 +23454,12 @@ const CALL_REMOVED_MEDIA = exports.CALL_REMOVED_MEDIA = 'call:removedMedia';
 const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
 
 /**
- * The call has received a new Track.
+ * A Track has been removed from a Call.
+ *
+ * The Track may have been removed by either the local user or remote user using
+ *    the {@link Calls.removeMedia call.removeMedia} API. Tracks are also
+ *    removed from Calls automatically while the Call is on hold.
+ *
  * @public
  * @memberof Calls
  * @event call:trackEnded
@@ -23260,27 +23472,31 @@ const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
 const CALL_TRACK_ENDED = exports.CALL_TRACK_ENDED = 'call:trackEnded';
 
 /**
- * Stats have been retrieved for a call or specific track.
+ * Stats have been retrieved for a Call or specific Track of a Call.
+ *
+ * See the {@link Calls.getStats call.getStats} API for more information.
+ *
  * @public
  * @memberof Calls
  * @event call:statsReceived
  * @param {Object} params
- * @param {string} params.callId The ID of the call to retrieve stats for.
- * @param {string} [params.trackId] The ID of the track to retrieve stats for.
+ * @param {string} params.callId The ID of the Call to retrieve stats for.
+ * @param {string} [params.trackId] The ID of the Track to retrieve stats for.
  * @param {string} params.result The RTCStatsReport.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  */
 const STATS_RECEIVED = exports.STATS_RECEIVED = 'call:statsReceived';
 
 /**
- * A track has been replaced on the call.
+ * A Track has been replaced on the Call.
  *
- * This event signifies the completion of the "replace track" operation (see
- *    the `call.replaceTrack` API).
+ * A Track is replaced by the local user using the
+ *    {@link Calls.replaceTrack call.replaceTrack} API.
  *
- * This event is similar to the `call:newTrack` event, where the call has a new
- *    media track. It also includes context about the track that was replaced
- *    in the form of its state at time of replacement.
+ * This event is similar to the {@link Calls.event:call:newTrack call:newTrack}
+ *    event, where the call has a new Track, except that an existing Track has
+ *    been removed at the same time. The event includes information about the
+ *    Track that was replaced to help an application replace it seamlessly.
  *
  * @public
  * @memberof Calls
@@ -27347,12 +27563,12 @@ const log = (0, _logs.getLogManager)().getLogger('SDPHANDLER');
  * However, if only SDES is available, don't disable it.
  *
  * @method sanitizeSdesFromSdp
- * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
+ * @param {Object} newSdp The SDP so far (could have been modified by previous handlers).
  * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
  * @param {string} info.endpoint Which end of the connection created the SDP.
- * @param {Object} originalSdp The sdp in its initial state.
- * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
+ * @param {Object} originalSdp The SDP in its initial state.
+ * @return {Object} The sanitized SDP with crypto removed (if fingerprint exists)
  */
 // Other plugins.
 function sanitizeSdesFromSdp(newSdp, info, originalSdp) {
@@ -28759,6 +28975,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 const log = (0, _logs.getLogManager)().getLogger('CONFIG'); /**
                                                              * An interface for getting and updating the configuration Object.
                                                              *
+                                                             * Config functions are available directly on the SDK Object
+                                                             *
                                                              * @public
                                                              * @module Config
                                                              * @requires config
@@ -28772,7 +28990,7 @@ function api(context) {
      * @memberof Config
      * @requires config
      * @method getConfig
-     * @returns {Object} A configuration Object
+     * @returns {Object} A configuration Object.
      */
     getConfig: function () {
       log.debug(_logs.API_LOG_TAG + 'getConfig');
@@ -28783,10 +29001,11 @@ function api(context) {
      * Update values in the global Config section of the store.
      *
      * @public
+     * @static
      * @memberof Config
      * @requires config
      * @method updateConfig
-     * @param {Object} newConfigValues Key Value pairs that will be placed into the store.
+     * @param {Object} newConfigValues Key-value pairs that will be placed into the store. See {@link config} for details on what key-value pairs are available for use.
      */
     updateConfig: function (newConfigValues) {
       log.debug(_logs.API_LOG_TAG + 'updateConfig: ', newConfigValues);
@@ -29158,7 +29377,7 @@ function api({ dispatch, getState }) {
      * @public
      * @memberof Connectivity
      * @method getSocketState
-     * @param  {string} [platform='link'] Backend platform for which websocket's state to request.
+     * @param {string} [platform='link'] Backend platform for which to request the websocket's state.
      */
     getSocketState(platform = _constants.platforms.LINK) {
       log.debug(_logs.API_LOG_TAG + 'connection.getSocketState: ', platform);
@@ -29170,14 +29389,13 @@ function api({ dispatch, getState }) {
      * @public
      * @memberof Connectivity
      * @method enableConnectivityChecking
-     * @param {boolean} enable Whether to enable or disable connectivity checking.
+     * @param {boolean} enable Enable connectivity checking.
      */
     enableConnectivityChecking(enable) {
       log.debug(_logs.API_LOG_TAG + 'connection.enableConnectivityChecking: ', enable);
       dispatch((0, _actions.changeConnectivityChecking)(enable));
     }
   };
-
   return { connection: connectivityApi };
 }
 
@@ -30157,6 +30375,45 @@ const connCheckMethods = exports.connCheckMethods = {
   KEEP_ALIVE: 'keepAlive',
   PING_PONG: 'pingPong'
 };
+
+/***/ }),
+
+/***/ "../kandy/src/docs/docs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * The User ID ie: joe@test.3s5j.att.com
+ *
+ * @public
+ * @module UserID
+ * @requires cpaas_user_id
+ */
+
+/**
+ * The SIP URI ie: sip:joe@domain.com
+ *
+ * @public
+ * @module SIP_URI
+ * @requires link_user_id
+ */
+
+/**
+ * The Phone Numer ie: +18885559876
+ *
+ * @public
+ * @module PhoneNumber
+ * @requires cpaas_pstn
+ */
+
+/**
+ * The TEL URI ie: tel:+18885559876
+ *
+ * @public
+ * @module TEL_URI
+ * @requires link_pstn
+ */
+
 
 /***/ }),
 
@@ -31162,7 +31419,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.69';
+  let version = '4.6.0-beta.91';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -32620,18 +32877,36 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = function (context) {
   const groupsApi = {
     /**
-     * Create a group.
-     * User creating group will become the admin of that group.
+     * Creates a Group.
+     *
+     * The SDK will emit a {@link Group.event:group:new group:new} event locally
+     *    when the operation completes. This event will include a Group ID that
+     *    is used to uniquely identify the group.
+     *
+     * Remote users added to the Group during creation will receive a
+     *    `group:invitation_received` event, which will include information
+     *    about the Group. Group participants can be managed after creation
+     *    using the {@link Groups.addParticipant group.addParticipant} and
+     *    {@link Groups.removeParticipant group.removeParticipant} APIs.
+     *
+     * Group information will become available after the operation completes
+     *    using the {@link Groups.get group.get} and
+     *    {@link Group.getAll group.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method create
      * @param {Object} params
-     * @param {string[]} [params.participants] - List of participants to add to group when created.
-     * @param {string} [params.subject] - Subject of the grour chat session.
-     * @param {string} params.name - Name of the grour chat session.
-     * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
-     * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
+     * @param {Array<string>} [params.participants] List of participants to
+     *    invite to the group as part of creation. A participant's address
+     *    should be in the form of their User ID.
+     * @param {string} [params.subject] Subject of the Group.
+     * @param {string} params.name Name of the Group.
+     * @param {string} [params.image] HTTP URL of the image to be used as the
+     *    Group's avatar.
+     * @param {string} params.type Closed group indicates this is an
+     *    invitation-based closed chat group. Only Closed supported.
      */
     create(params) {
       log.debug(_logs.API_LOG_TAG + 'groups.create: ', params);
@@ -32639,14 +32914,20 @@ exports.default = function (context) {
     },
 
     /**
-     * Fetches existing groups from the server.
-     * This will update the store with the retrieved groups, making them
-     * known locally. They can then be accessed using `get` or 'getAll'.
+     * Fetches information about all Groups that the current user is a member
+     *    of. This will refresh the available Groups with any new information
+     *    from the server.
+     *
+     * The SDK will emit a {@link Group.event:group:refresh group:refresh} event
+     *    when the operation completes.
+     *
+     * Information about an available Group can be retrieved using the
+     *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get}
+     *    APIs.
      *
      * @public
      * @memberof Groups
      * @method fetch
-     *
      */
     fetch() {
       log.debug(_logs.API_LOG_TAG + 'groups.fetch');
@@ -32654,12 +32935,13 @@ exports.default = function (context) {
     },
 
     /**
-     * Get information for all groups known locally.
+     * Retrieves information about all available Groups.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method getAll
-     * @return {Group[]} - An array of Groups.
+     * @return {Array<Group>} The list of all available Groups.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'groups.getAll');
@@ -32667,13 +32949,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve information about a paticular group known locally.
+     * Retrieves information about a single Group, if available.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method get
-     * @param {string} groupId - The Id of the group to retrieve information for.
-     * @return {Group} - Group information.
+     * @param {string} groupId The ID uniquely identifying the Group.
+     * @return {Group} The specified Group.
      */
     get(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.get: ', groupId);
@@ -32681,13 +32964,13 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve list of particpants from a group known locally.
+     * Retrieves the list of particpants from an available Group.
      *
      * @public
      * @memberof Groups
      * @method getParticipants
-     * @param {string} groupId - The Id of the group to get participants list.
-     * @return {Participant[]} - A list of participants.
+     * @param {string} groupId The ID of the Group to get participants.
+     * @return {Array<string>} The list of Group participants.
      */
     getParticipants(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.getParticipants: ', groupId);
@@ -32695,24 +32978,30 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve list of invitations known locally.
+     * Retrieves information about all Group invitations available.
+     *
+     * The {@link Groups.event:group:invitation_received group:invitation_received}
+     *    event indicates that a new Group invitation is available.
      *
      * @public
      * @memberof Groups
      * @method getInvitations
-     * @return {Invitations[]} - A list of invitations.
+     * @return {Array<Invitations>} The list of Group invitations.
      */
-    getInvitations(groupId) {
+    getInvitations() {
       return selectors.getInvitations(context.getState());
     },
 
     /**
-     * Leave a group.
+     * Leaves a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method leave
-     * @param {string} groupId - The Id of the group to leave.
+     * @param {string} groupId The ID of the Group to leave.
      */
     leave(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.leave: ', groupId);
@@ -32720,12 +33009,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Accept invitation to a group.
+     * Accepts an invitation to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method acceptInvitation
-     * @param {string} groupId - The Id of the group to accept an invitation to.
+     * @param {string} groupId The ID of the Group to accept an invitation to.
      */
     acceptInvitation(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.acceptInvitation: ', groupId);
@@ -32733,12 +33025,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Reject invitation to a group.
+     * Rejects an invitation to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method rejectInvitation
-     * @param {string} groupId - The Id of the group to reject an invitation to.
+     * @param {string} groupId The ID of the Group to reject an invitation to.
      */
     rejectInvitation(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.rejectInvitation: ', groupId);
@@ -32746,13 +33041,19 @@ exports.default = function (context) {
     },
 
     /**
-     * Add participant to a group.
+     * Adds participant to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes. The participant being added will receive
+     *    a {@link Groups.event:group:invitation_received group:invitation_received}
+     *    event.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method addParticipant
-     * @param {string} groupId - The Id of the group to add participant to.
-     * @param {string} participant - The userId of participant to add.
+     * @param {string} groupId The ID of the Group to add participant to.
+     * @param {string} participant The User ID of the participant to add.
      */
     addParticipant(groupId, participant) {
       log.debug(_logs.API_LOG_TAG + 'groups.addParticipant: ', groupId, participant);
@@ -32760,13 +33061,17 @@ exports.default = function (context) {
     },
 
     /**
-     * Remove participant from a group.
+     * Removes a participant from a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method removeParticipant
-     * @param {string} groupId - The Id of the group to remove participant from.
-     * @param {string} participant - The userId of participant to remove.
+     * @param {string} groupId The ID of the Group to remove participant from.
+     * @param {string} participant The User ID of the participant to remove.
      */
     removeParticipant(groupId, participant) {
       log.debug(_logs.API_LOG_TAG + 'groups.removeParticipant: ', groupId, participant);
@@ -32774,13 +33079,18 @@ exports.default = function (context) {
     },
 
     /**
-     * Delete a group.
-     * The group is deleted and all participants will receive a 'group:delete' notification.
+     * Deletes a Group.
+     *
+     * The Group will no longer be available using the {@link Groups.get group.get}
+     *    and {@link Group.getAll group.getAll} APIs.
+     *
+     * The SDK will emit a {@link Groups.event:group:delete group:delete} event
+     *    for all participants in the Group.
      *
      * @public
      * @memberof Groups
      * @method delete
-     * @param {string} groupId - The Id of the group to delete.
+     * @param {string} groupId The ID of the Group to delete.
      */
     delete(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.delete: ', groupId);
@@ -32803,7 +33113,16 @@ var _logs = __webpack_require__("../kandy/src/logs/index.js");
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
-                                                             * The Groups feature is used to manage groups.
+                                                             * The Groups feature provides an interface for an application to create and
+                                                             *    manage Groups for a User. Groups are used in conjuction with the
+                                                             *    {@link Messaging Messaging} feature to allow for group conversations.
+                                                             *
+                                                             * Groups are persisted by the server. When the SDK is initialized, there will
+                                                             *    be no Group information available, but the {@link Groups.fetch fetch}
+                                                             *    Group API is used to make available any Groups that were created
+                                                             *    previously.
+                                                             *
+                                                             * The creator of a Group is the Group's administrator.
                                                              *
                                                              * Group functions are all part of the 'groups' namespace.
                                                              *
@@ -32824,40 +33143,58 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A new group has been created.
+ * A new Group has been created and its information is now available.
+ *
+ * Information about an available Group can be retrieved using the
+ *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
  *
  * @public
+ * @static
  * @memberof Groups
  * @event group:new
  * @param {Object} params
- * @param {string} params.groupId The group Id of the group that was changed.
+ * @param {string} params.groupId The ID of the newly available Group.
+ * @example
+ * // Set an event listener for new Groups being created.
+ * client.on('group:new', params => {
+ *    const group = client.groups.get(params.groupId)
+ *    // Use the new group.
+ * })
  */
 const GROUP_NEW = exports.GROUP_NEW = 'group:new';
 
 /**
- * An existing group has been modified. Ex: a new participant has been added/removed from the group or their status has been updated.
+ * An existing Group has been modified and the new information is available.
  *
  * @public
  * @memberof Groups
  * @event group:change
  * @param {Object} params
- * @param {string} params.groupId The group Id of the group that was changed.
+ * @param {string} params.groupId The ID of the Group that has changed.
  */
 const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
 
 /**
- * A group has been deleted.
+ * A Group has been deleted and is no longer available.
+ *
+ * The latest information about the Group is provided as part of the event.
  *
  * @public
  * @memberof Groups
  * @event group:delete
  * @param {Object} params
- * @param {string} params.group The group that was deleted.
+ * @param {string} params.group The information about the Group that was deleted.
  */
 const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
 
 /**
- * The list of groups has been refreshed.
+ * The list of Groups has been refreshed.
+ *
+ * Any previously available Groups may have had their information updated, and
+ *    any otherwise unknown Groups may now be available.
+ *
+ * Information about an available Group can be retrieved using the
+ *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
  *
  * @public
  * @memberof Groups
@@ -32866,9 +33203,13 @@ const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
 const GROUP_REFRESH = exports.GROUP_REFRESH = 'group:refresh';
 
 /**
- * An invitation to a group has been received.
+ * An invitation to a Group has been received.
+ *
+ * Information about a Group invitation can be retrieved using the
+ *    {@link Groups.getInvitations group.getInvitations} API.
  *
  * @public
+ * @static
  * @memberof Groups
  * @event group:invitation_received
  * @param {Object} params
@@ -32877,7 +33218,7 @@ const GROUP_REFRESH = exports.GROUP_REFRESH = 'group:refresh';
 const GROUP_INVITATION_RECEIVED = exports.GROUP_INVITATION_RECEIVED = 'group:invitation_received';
 
 /**
- * An error occured with groups.
+ * An error occured with a Group operation.
  *
  * @public
  * @memberof Groups
@@ -33356,27 +33697,41 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * @module config
  */
 
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
 /**
- * A set of handlers for manipulating SDP information.
+ * A set of {@link #sdphandlerfunction SdpHandlerFunction}s for manipulating SDP information.
  * These handlers are used to customize low-level call behaviour for very specific
  * environments and/or scenarios. They can be provided during SDK instantiation
  * to be used for all calls.
+ *
  * @public
  * @module sdpHandlers
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
+ *   }
+ * })
  */
 
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+ * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
  *
- * To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+ * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
  *
  * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
  *
  * @public
  * @memberof sdpHandlers
  * @method createCodecRemover
+ * @param {Array<string>} codecs A list of codec names to remove from the SDP.
+ * @returns {SdpHandlerFunction} The resulting SDP handler that will remove the codec.
  * @example
  * import { create, sdpHandlers } from 'kandy';
  * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
@@ -33461,10 +33816,14 @@ var _cpaas15 = __webpack_require__("../kandy/src/users/cpaas/index.js");
 
 var _cpaas16 = _interopRequireDefault(_cpaas15);
 
+__webpack_require__("../kandy/src/docs/docs.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Plugins
 const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'groups', fn: _cpaas12.default }, { name: 'subscription', fn: _cpaas14.default }, { name: 'users', fn: _cpaas16.default }];
+
+// Plugins
+
 
 function root(options = {}, plugins = []) {
   return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
@@ -33573,7 +33932,7 @@ const logMgr = getLogManager(defaultOptions);
  * @requires logs
  * @instance
  * @param {Object} logs Logs configs.
- * @param  {string} [logs.logLevel=debug] Log level to be set. See {@link Logger.levels levels}.
+ * @param  {string} [logs.logLevel='debug'] Log level to be set. See {@link Logger.levels levels}.
  * @param  {boolean} [logs.flatten=false] Whether all logs should be output in a string-only format.
  * @param  {Object} [logs.logActions] Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
  * @param  {boolean} [logs.logActions.actionOnly=true] Only output information about the action itself. Omits the SDK context for when it occurred.
@@ -34841,7 +35200,10 @@ var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
  *
  * See the "Conversation" and "Message" sections of the documentation for more details.
  *
- * Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
+ * Available conversations can be retrieved using the
+ *    {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging APIs.
+ *
+ * Messaging functions are all part of the 'messaging' namespace. Ex: {@link Messaging.getAll client.conversation.getAll}
  *
  * @public
  * @module Messaging
@@ -34852,14 +35214,21 @@ const log = (0, _logs.getLogManager)().getLogger('Messaging');
 function api(context) {
   const messagingApi = {
     /**
-     * Retrieves a list of chat conversations that the current user is a part of.
-     * These conversations can then be retrieved from the store using get().
+     * Fetches chat conversations that the current user is part of. This will refresh
+     * the available information with any new information from the server.
+     *
+     * If successful, the event {@link Messaging.event:conversations:change conversations:change} will be emitted.
+     *
+     * Available conversation information can be retrieved using the
+     * {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging
+     * APIs.
      *
      * @public
-     * @param {Object} [options] An optional configuration object to query for more specific results.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
-     * @memberof Messaging
+     * @static
      * @method fetch
+     * @memberof Messaging
+     * @param {Object} [options] A configuration object to query for more specific results.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
      */
     fetch: function (options = {}) {
       log.debug(_logs.API_LOG_TAG + 'conversation.fetch: ', options);
@@ -34870,15 +35239,18 @@ function api(context) {
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
-     * Get a conversation object matching the User ID and type provided.
-     * If a conversation with the given User ID and type exists in the store, it will be returned.
+     * Retrieves a conversation object matching the User ID and Type provided if available.
+     *
+     * Conversations are made availble using the {@link Messaging.fetch fetch}
+     * or {@link Messaging.create create} Messaging APIs.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method get
-     * @param {string} recipient The User Id of the remote user with which the current user had a conversation.
-     * @param {Object} [options] An optional configuration object to query for more specific results.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @memberof Messaging
+     * @param {string} recipient The User ID of the remote user with which the current user had a conversation.
+     * @param {Object} [options] Options used to query for more specific results.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -34915,16 +35287,19 @@ function api(context) {
       return undefined;
     },
     /**
-     * Create and return a new conversation object. Any messages being sent through this conversation
-     * object will be sent to the destination provided
+     * Creates and return a new conversation object. Any messages being sent through this Conversation
+     * object will be sent to the destination provided.
+     *
+     * If successful, the event {@link Messaging.event:conversations:new conversations:new} will be emitted.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method create
-     * @param {string} recipient The Id of the remote user with which the current will have a conversation.
-     * @param {Object} [options] Options to use when creating the conversation object.
+     * @memberof Messaging
+     * @param {string} recipient The ID of the remote user to create a conversaton with.
+     * @param {Object} [options] Options to use when creating a new conversation object.
      * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
-     * @returns {Conversation} a Conversation object
+     * @returns {Conversation} A Conversation object.
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
       log.debug(_logs.API_LOG_TAG + 'conversation.create');
@@ -34944,12 +35319,16 @@ function api(context) {
       });
     },
     /**
-     * Returns all conversations currently tracked by the SDK
+     * Retrieves all available conversations for the current user.
+     *
+     * Conversations are made availble using the {@link Messaging.fetch fetch}
+     * or {@link Messaging.create create} Messaging APIs.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method getAll
-     * @returns {Array<Conversation>} An array of conversation objects.
+     * @memberof Messaging
+     * @returns {Array<Conversation>} An array of Conversation objects.
      */
     getAll: function () {
       log.debug(_logs.API_LOG_TAG + 'conversation.getAll');
@@ -34990,48 +35369,46 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A new conversation has been created and added to the state.
+ * A new conversation has been created.
  *
  * @public
  * @memberof Messaging
  * @event conversations:new
- * @param {Array} params An array of objects containing information about the new conversation
- * @param {Array} params.destination The destination for messages created in this conversation.
+ * @param {Array<Object>} params An array containing one object with information about the newly created conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation created. See {@link Messaging.chatTypes chatTypes} for valid types.
  */
 const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
 
 /**
- * A change has occured in the conversation list.
+ * A change has occurred in the conversation list.
  *
  * @public
  * @memberof Messaging
  * @event conversations:change
- * @param {Array} params An array of objects containing information about the conversations that have changed.
- * @param {Array} params.destination The destination for messages created in this conversation.
+ * @param {Array<Object>} params An array of objects containing information about the conversations that have changed.
+ * @param {Array<string>} params.destination An array of destinations for messages in this conversation.
  * @param {string} params.type The type of conversation changed. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} [params.messageId] The ID of the message affected.
  */
 const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:change';
 
 /**
- * A change has occured in a specific conversations message list.
- * If a single message was affected/created, `messageId` will be present
- * as part of the event argument.
+ * A change has occurred in a specific conversation's message list.
+ * If a single message was created/edited, `messageId` will be present.
  *
  * @public
  * @memberof Messaging
  * @event messages:change
  * @param {Object} params
- * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {Array<string>} params.destination An array of destinations for the message affected.
+ * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
- * @param {string} [params.sender] The username of the sender of the message which caused the `messages:change` event to be triggered.
+ * @param {string} [params.sender] The username of the sender.
  */
 const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 
 /**
- * An error occured with messaging.
+ * An error occurred with messaging.
  *
  * @public
  * @memberof Messaging
@@ -35042,16 +35419,17 @@ const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
 
 /**
- * The List of users that are currently typing has changed.
+ * The list of users that are currently typing has changed.
  *
  * @public
  * @requires isTyping
  * @memberof Messaging
  * @event isTypingList:change
  * @param {Object} params
- * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} [params.sender] The username of the sender that caused the event to trigger
+ * @param {Array<string>} params.destination An array of destinations in this conversation.
+ * @param {string} params.sender The username of the sender that caused the event to fire.
+ * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.state (active/idle) The current state of the sender that caused the event to fire.
  */
 const IS_TYPING_LIST_CHANGE = exports.IS_TYPING_LIST_CHANGE = 'isTypingList:change';
 
@@ -35200,7 +35578,7 @@ eventsMap[actionTypes.DELETE_MESSAGE_FINISH] = function (action) {
       type: eventTypes.MESSAGES_CHANGE,
       args: {
         destination: action.payload.destination,
-        mesasgeId: action.payload.messageId,
+        messageId: action.payload.messageId,
         type: action.payload.type
       }
     };
@@ -35322,29 +35700,32 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
  * Base conversation stamp
- * @param {Array} destination The Destination for messages being sent through
+ * @param {Array<string>} destination The destination(s) for messages being sent through
  * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
  * @param {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} id The unique identifier for base conversation.
- * @param {string} description='' The description associated with base conversation.
- * @param {Array} messages=[] An array containing the conversation's messages.
+ * @param {string} [id=undefined] id The unique identifier for the conversation.
+ * @param {string} [description=''] The description associated with the conversation.
+ * @param {Array<Message>} [messages=[]] An array containing the conversation's messages.
+ * @param {Array<string>} [isTypingList=[]] A array that represents the list of usings who are currently typing.
  * @param {number} lastReceived The timestamp associated with the last received message.
  */
 
 // Events
 /**
- * A Conversation object represents a conversation between either two users, or a
- * user and a group. A Conversation can create messages via the conversation's
- * createMessage() function.
+ * A Conversation object represents a conversation either between two users, or between a
+ * user and a group. A user can create a Conversation using {@link Messaging.create client.conversation.create} Messaging API.
+ * A Conversation can be used to create messages to send using the Conversation and Messaging APIs
+ * {@link #conversationcreatemessage Conversation.createMessage} and {@link #messagesendersend Message.send} functions.
+ *
  *
  * Once a sender sends the initial message (within a conversation) to a recipient, there will be a
- * conversation object saved in both sender & recipient's state.
+ * conversation object saved in both sender and recipient's state.
  *
- * @property {string} destination The Id of the remote user with which the current user is having a conversation.
- * @property {string} address The Id of the current user who is having a conversation.
+ * @property {string} destination The ID/group ID of the remote user with which the current user is having a conversation.
+ * @property {string} address The ID of the current user who is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
  * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type associated with all messages within this conversation object. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @property {string} type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
  * @property {Array<Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
@@ -35356,12 +35737,12 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 // `features` and `lastPull` are not documented because they're intended to be internal
 
 /**
- * A Part is a custom object representing the payload of a message.
+ * A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
  *
- * @property {string} type The payload type. Can be "text", "json", "file".
+ * @property {string} type The payload type. Can be `text`, `json`, or `file`.
  * @property {string} text The text of the message. Messages with file or json attachments are still required to have text associated to it.
- * @property {Object} [json] The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
- * @property {File} [file] The file to attach to attach to a message. A part cannot have both json and a file.
+ * @property {Object} [json] The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+ * @property {File} [file] The file to attach to a message. A `Part` cannot have both json and a file.
  *
  * @public
  * @module Part
@@ -35371,10 +35752,10 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 /**
  * A Message sender object is a means by which a sender can deliver information to a recipient.
  *
- * This sender object can obtained through the createMessage API on an existing conversation.
+ * This sender object can be obtained through the {@link #conversationcreatemessage conversation.createMessage} API on an existing conversation.
  *
- * Once all the desired parts have been added to it (using appPart function), the message
- * can be sent using the send function.
+ * Once all the desired parts have been added to it using the {@link #messagesenderaddpart MessageSender.addPart},
+ * the message can then be sent using the send function.
  *
  * @public
  * @module MessageSender
@@ -35383,28 +35764,27 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
  * A Message object represents an individual message that was delivered to a recipient and it is
- * obtained through the getMessage/getMessages API on an existing conversation.
+ * obtained through the {@link #conversationgetmessages Conversation.getMessages} or {@link #conversationgetmessage Conversation.getMessage} API on an existing conversation.
  *
- * Messages have parts which represent pieces of a message, such as a text part, a json object part or a file part.
+ * Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
  *
- * Once sender sends a message, this message is saved in sender's state as an object.
+ * Once the sender sends a message, this message is saved in sender's state as an object.
  *
- * Similarly, once recipient gets a message, this message is saved in recipient's state.
+ * Similarly, once the recipient gets a message, this message is saved in recipient's state.
  *
  * Below are the properties pertaining to this saved message object in either sender or recipient's state.
  *
- * @property {number} timestamp The Unix timestamp in seconds marking the time when the message was created by sender.
+ * @property {number} timestamp A Unix timestamp in seconds marking the time when the message was created by sender.
  * @property {boolean} isPending Whether the message is in pending state or not (delivered by server or not).
- * @property {boolean} read: Whether the message was read by recipient user.
- * @property {Array<Part>} parts An array of Parts.
+ * @property {boolean} read Whether the message was read by recipient user or not.
+ * @property {Array<Part>} parts An array of Part Objects.
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
  * @property {string} type The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
- * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
+ * @property {string} deliveryStatus Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
  * This property applies only to the message object stored in sender's state.
- *
  * @public
  * @module Message
  * @type {Object}
@@ -35442,12 +35822,16 @@ const conversationBase = {
 
   methods: {
     /**
-     * Create and return a message object. You must specify the part. If this is a simple text message, provide a `text` part as demonstrated in the example.
+     * Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      *
      * @public
      * @memberof Conversation
+     * @method createMessage
      * @constructs Message
-     * @param {Part} part The part to add to the message.
+     * @param {Part} part The Part to add to the message.
      * @returns {Message} The newly created Message object.
      *
      * @example
@@ -35476,6 +35860,8 @@ const conversationBase = {
     /**
      * Clears all messages in this conversation from local state.
      *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      * @public
      * @memberof Conversation
      * @method clearMessages
@@ -35485,7 +35871,7 @@ const conversationBase = {
     },
 
     /**
-     * Get the messages associated with this conversation.
+     * Gets all messages from this conversation.
      *
      * @public
      * @memberof Conversation
@@ -35505,13 +35891,13 @@ const conversationBase = {
     },
 
     /**
-     * Get a specific message from this conversation.
+     * Gets a specific message from this conversation.
      *
      * @public
      * @method getMessage
      * @memberof Conversation
-     * @param {string} messageId ID of the message to retrieve.
-     * @return {Object} A message object.
+     * @param {string} messageId The ID of the message to retrieve.
+     * @return {Message} A message object.
      */
     getMessage(messageId) {
       const convo = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
@@ -35556,11 +35942,15 @@ const conversationBase = {
     },
 
     /**
-     * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched.
+     * Deletes specified messages from this conversation.
+     * Provide an array of message IDs for the messages to be deleted.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      * @public
      * @memberof Conversation
      * @method deleteMessages
-     * @param {Array<string>} messageIds An array of message IDs
+     * @param {Array<string>} [messageIds=[]] An array of message IDs for the messages to be deleted
      */
     deleteMessages: function (messageIds = []) {
       messageIds.forEach(messageId => {
@@ -35569,7 +35959,9 @@ const conversationBase = {
     },
 
     /**
-     * Delete this conversation on the server
+     * Delete the conversation.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -35580,7 +35972,7 @@ const conversationBase = {
     },
 
     /**
-     * Subscribe to this conversation's messages array.
+     * Subscribe to this conversation's messages list to receive notification of changes.
      *
      * @public
      * @memberof Conversation
@@ -35623,9 +36015,11 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Allows the user to fetch messages associated with a specific conversation from the server.
-     * When the operation is complete, a NEW_MESSAGE event will be emitted.
-     * Messages can then be retrieved using getMessages.
+     * Allows the user to fetch messages associated with a specific conversation to make them available.
+     * When the operation is complete, a `messages:change` event will be emitted.
+     * Messages can then be retrieved using {@link #conversationgetmessages Conversation.getMessages}.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -35637,7 +36031,7 @@ const conversationBase = {
     }
   }
   /*
-   * Conversation is Typing. Responsible for updating the state of who is idling or actively typing
+   * Conversation is Typing. Responsible for updating the state of who is idling or actively typing.
    */
 };const conversationIsTyping = {
   initializers: [function () {
@@ -35652,7 +36046,8 @@ const conversationBase = {
     /**
      * Sets the typing status of the conversation for the current user.
      * Other participants will be notified of changes to the conversation's typing status.
-     * See the isTypingList:change event.
+     *
+     * If successful, the event {@link Messaging.event:isTypingList:change isTypingList:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -35670,16 +36065,16 @@ const conversationBase = {
    * @param {string} destination The Destination for messages being sent through
    * this conversation in this instance of the SDK. This can be one or many users,
    * separated by commas `,`
-   * @param  {Object} parts - Initial part to the message.
-   * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
-   * @param  {string} type - The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
-   * @param  {Function} context.send - Function for sending the message.
+   * @param  {Object} parts Initial part to the message.
+   * @param  {Object} context Information and capabilities for how the message will act with regard to the conversation.
+   * @param  {Array} context.features Array of features the conversation supports.
+   * @param  {string} type The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
+   * @param  {Function} context.send Function for sending the message.
    * @param  {number} timestamp unix timestamp in seconds
    * @param  {boolean} isFetchingLinks
    * @param  {string} sender The author of the message
-   * @param  {string} messageId a unique id for looking up the message
-   * @param  {string} [type='chat-oneToOne'] - The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
+   * @param  {string} messageId a unique ID for looking up the message
+   * @param  {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
    */
 };const messageBase = {
   initializers: [function ({
@@ -35720,7 +36115,7 @@ const conversationBase = {
    * stamp to add message parts capabilities to a Message primitive
    * @name withParts
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
+   * @param  {Array<string>} context.features - Array of features the conversation supports.
    */
 };const withParts = {
   initializers: [function ({ context: { features = [] } }) {
@@ -35732,11 +36127,11 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Add an additional part to a message.
+     * Add an additional `Part` to a message.
      *
      * @public
      * @memberof MessageSender
-     * @param {Part} part The part to add to the message.
+     * @param {Part} part The `Part` to add to the message.
      */
     addPart(part) {
       // Validate the part. If not valid, returns an error.
@@ -35752,7 +36147,7 @@ const conversationBase = {
    * stamp to allow creation of multimedia links
    * @name multimediaLinks
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
+   * @param  {Array<string>} context.features - Array of features the conversation supports.
    */
 };const multimediaLinks = {
   initializers: [function ({ context: { features = [] } }) {
@@ -35764,7 +36159,7 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Creates a usable link for the given message
+     * Creates a usable image link for the message in this `MessageSender`.
      *
      * @public
      * @memberof MessageSender
@@ -38828,8 +39223,9 @@ exports.default = () => {
   function augmentedApi(context) {
     const newApi = (0, _interface.api)(context);
     /**
-     * Possible status values.
+     * Possible presence status values.
      * @public
+     * @static
      * @memberof Presence
      * @type {Object}
      * @property {string} OPEN
@@ -38841,8 +39237,9 @@ exports.default = () => {
      */
     newApi.presence.statuses = _constants.STATUS;
     /**
-     * Possible activity values.
+     * Possible presence activity values.
      * @public
+     * @static
      * @memberof Presence
      * @type {Object}
      * @property {string} AVAILABLE
@@ -38852,6 +39249,10 @@ exports.default = () => {
      * @property {string} ON_THE_PHONE
      * @property {string} ACTIVITIES_UNKNOWN
      * @property {string} ACTIVITIES_OTHER
+     * @example
+     * const { statuses, activities } = client.presence
+     * // Use the values when updating presence.
+     * client.presence.update(statuses.OPEN, activities.AVAILABLE)
      */
     newApi.presence.activities = _constants.ACTIVITY;
     return newApi;
@@ -39933,16 +40334,28 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = function (context) {
   const presenceApi = {
     /**
-     * Update the presence for the current user.
-     * Other users subscribed for this user's presence will receive the update.
+     * Updates the presence information for the current user.
+     *
+     * See {@link Presence.statuses presence.statuses} and
+     *    {@link Presence.activities presence.activities} for valid values.
+     *
+     * The SDK will emit a
+     *    {@link Presence.event:presence:selfChange presence:selfChange} event
+     *    when the operation completes. The updated presence information is
+     *    available and can be retrieved with
+     *    {@link Presence.getSelf presence.getSelf}.
+     *
+     * Other users subscribed for this user's presence will receive a
+     *    {@link Presence.event:presence:change presence:change} event.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method update
      * @param  {string} status The status of the presence state.
      * @param  {string} activity The activity to be shown as presence state
-     * @param  {string} [note] An additional note to be provided when the activity is "other".
+     * @param  {string} [note] An additional note to be provided when the activity is `presence.activities.ACTIVITIES_OTHER`.
      */
     update(status, activity, note) {
       log.debug(_logs.API_LOG_TAG + 'presence.update: ', status, activity, note);
@@ -39950,14 +40363,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve the presence information for specified users.
+     * Retrieves the presence information for specified users, if available.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method get
-     * @param  {Array<string>|string} users  A user id or an array of user ids.
-     * @return {Array} List of user presence information.
+     * @param  {Array<string>|string} user A User ID or an array of User IDs.
+     * @return {Array<Object>|Object} List of user presence information.
      */
     get(user) {
       log.debug(_logs.API_LOG_TAG + 'presence.get: ', user);
@@ -39974,13 +40388,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve the presence information for all users.
+     * Retrieves the presence information for all available users.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method getAll
-     * @return {Array} List of user presence information.
+     * @return {Array<Object>} List of user presence information.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'presence.getAll');
@@ -39990,11 +40405,15 @@ exports.default = function (context) {
     /**
      * Retrieves the presence information for the current user.
      *
+     * This information is set using the {@link Presence.update presnece.update}
+     *    API.
+     *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method getSelf
-     * @return {Object}
+     * @return {Object} Presence information for the current user.
      */
     getSelf() {
       log.debug(_logs.API_LOG_TAG + 'presence.getSelf');
@@ -40002,15 +40421,19 @@ exports.default = function (context) {
     },
 
     /**
-     * Fetch (from the server) the presence for the given users.
-     * This will update the store with the retrieved values, which can then
-     * be accessed using `get`.
+     * Fetches presence information for the given users. This will refresh the
+     *    available information with any new information from the server.
+     *
+     * Available presence information an be retrieved using the
+     *    {@link Presence.get presence.get} or
+     *    {@link Presence.getAll presence.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method fetch
-     * @param  {Array<string>|string} users  A user id or an array of user ids.
+     * @param {Array<string>|string} user A User ID or an array of User IDs.
      */
     fetch(user) {
       log.debug(_logs.API_LOG_TAG + 'presence.fetch: ', user);
@@ -40019,13 +40442,17 @@ exports.default = function (context) {
     },
 
     /**
-     * Subscribe to retrieve presence updates about specified user.
+     * Subscribe to another User's presence updates.
+     *
+     * When the User updates their presence information, the SDK will emit a
+     *    {@link Presence.event:presence:change presence:change} event.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method subscribe
-     * @param  {string} user  The ID of the user to subscribe to.
+     * @param {Array<string>|string} users A User ID or an array of User IDs.
      */
     subscribe(users) {
       log.debug(_logs.API_LOG_TAG + 'presence.subscribe: ', users);
@@ -40033,13 +40460,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Unsubscribe from presence updates about specified user.
+     * Unsubscribe from another User's presence updates.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method unsubscribe
-     * @param  {string} user  The ID of the user to unsubscribe from.
+     * @param {Array<string>|string} users A User ID or an array of User IDs.
      */
     unsubscribe(users) {
       log.debug(_logs.API_LOG_TAG + 'presence.unsubscribe: ', users);
@@ -40062,10 +40490,20 @@ var _logs = __webpack_require__("../kandy/src/logs/index.js");
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const log = (0, _logs.getLogManager)().getLogger('PRESENCE'); /**
-                                                               * The presence features are used to update the authenticated users presence
-                                                               * on the server, as well as retrieve other users presence information.
+                                                               * The Presence feature provides an interface for an application to set the
+                                                               *    User's presence information and to track other Users' presence
+                                                               *    information.
                                                                *
-                                                               * Presence functions are all part of the 'presence' namespace.
+                                                               * Presence information is persisted by the server. When the SDK is initialized,
+                                                               *    there will be no information available. Presence information will become
+                                                               *    available either by using {@link Presence.fetch presence.fetch} or
+                                                               *    by subscribing for updates about other Users, using
+                                                               *    {@link Presence.subscribe presence.subscribe}.
+                                                               *
+                                                               * Available presence information can be retrieved using
+                                                               *    {@link Presence.get presence.get} or {@link Presence.getAll presence.getAll}.
+                                                               *
+                                                               * Presence APIs are part of the 'presence' namespace.
                                                                *
                                                                * @public
                                                                * @requires presence
@@ -40084,7 +40522,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A presence update has been received from a subscribed user.
+ * A presence update about a subscribed user has been received.
  *
  * @public
  * @memberof Presence
@@ -40099,7 +40537,10 @@ Object.defineProperty(exports, "__esModule", {
 const RECEIVED = exports.RECEIVED = 'presence:change';
 
 /**
- * The user's self presence information has changed.
+ * The current user's presence information has changed.
+ *
+ * The changed information can be retrieved using the
+ *    {@link Presence.getSelf presence.getSelf} API.
  *
  * @public
  * @memberof Presence
@@ -40109,7 +40550,7 @@ const RECEIVED = exports.RECEIVED = 'presence:change';
 const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
 
 /**
- * An error occured with presence.
+ * An error occurred with presence.
  *
  * @public
  * @memberof Presence
@@ -41841,9 +42282,9 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 /**
  * Service API. All functions in this plugin are part of the 'services' namespace.
  * @method api
- * @param  {Function} $0
- * @param  {Function} $0.dispatch - The redux store's dispatch function.
- * @param  {Function} $0.getState - The redux store's getState function.
+ * @param  {Function} params
+ * @param  {Function} params.dispatch - The redux store's dispatch function.
+ * @param  {Function} params.getState - The redux store's getState function.
  * @return {Object} api - The subscription API object.
  */
 
@@ -41853,10 +42294,22 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
 // Auth plugin.
 /**
- * The Service feature allows applications to subscribe for receiving
- * communications from the platform's services. It allows an application to manage the
- * features that they will receive notifications for, and on which type of
- * channel they wish to receive them on.
+ * The Services feature allows an application to manage how they wish the SDK to
+ *    receive communications from the platform. An application can subscribe to
+ *    services in order to receive updates about that service for the current
+ *    user. A feature generally requires a subscription for its service to be
+ *    fully functional.
+ *
+ * The services an application can subscribe to are based on the features
+ *    included in the SDK. The list of available services can be retrieved
+ *    using the {@link Subscription.getSubscriptions services.getSubscriptions}
+ *    API. These values can be used with the
+ *    {@link Subscription.subscribe services.subscribe} API.
+ *
+ * The channel used for subscriptions is the method for receiving the service
+ *    updates. The recommended channel is `websocket`, where the SDK is able to
+ *    handle receiving the updates internally. Alternate channel methods, if a
+ *    websocket cannot be used, will be available in the future.
  *
  * Service functions are all part of the 'services' namespace.
  *
@@ -41868,13 +42321,21 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 function api({ dispatch, getState }) {
   const subscriptionApi = {
     /**
-     * Perform a backend subscription. This will subscribe to the requested
-     * services, as well as connect to the request notification channel.
+     * Subscribes to platform notifications for an SDK service.
+     *
+     * Subscriptions can only be made for services available to the SDK. See
+     *    {@link Subscription.getSubscriptions services.getSubscriptions} for
+     *    information about services.
+     *
+     * The SDK currently only supports the `websocket` channel as a subscription
+     *    type.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method subscribe
-     * @param {Array} services The services that you would like to subscribe for.
-     * @param {String} [type='websocket'] The type of subscription you would like to subscribe for.
+     * @param {Array<string>} services A list of available services.
+     * @param {string} [type='websocket'] The method of how to receive service updates.
      */
     subscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.subscribe: ', services, type);
@@ -41888,12 +42349,19 @@ function api({ dispatch, getState }) {
     },
 
     /**
-     * Unsubscribe from notification subscriptions.
+     * Cancels existing subscriptions for platform notifications.
+     *
+     * Existing subscriptions can be retrieved using the
+     *    {@link Subscriptions.getSubscriptions services.getSubscriptions} API.
+     *    The `subscribed` values are the services that can be unsubscribed from.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method unsubscribe
-     * @param {Array} services The subscribed services that should be unsubscribed.
-     * @param {String} [type='websocket'] The type of channelto be used for the notifications.
+     * @param {Array<string>} services A list of subscribed services.
+     * @param {string} [type='websocket'] The method of how the service updates
+     *    are being received.
      */
     unsubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.unsubscribe: ', services, type);
@@ -41906,17 +42374,45 @@ function api({ dispatch, getState }) {
       }
     },
 
+    /**
+     * Resubscribe for notification subscriptions. ***NOT YET SUPPORTED***
+     * @memberof Subscription
+     * @method resubscribe
+     * @param {Array<string>} services The subscribed services that should be unsubscribed.
+     * @param {string} [type='websocket'] The type of channel to be used for the notifications.
+     */
     resubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.resubscribe: ', services, type);
       log.info(`THIS FUNCTIONALITY IS NOT YET SUPPORTED. Services: ${services}. Type: ${type}`);
     },
 
     /**
-     * Retrieve information about currently subscribed services and available services.
+     * Retrieves information about currently subscribed services and available services.
+     *
+     * The `available` values are the SDK's services that an application can
+     *    subscribe to receive notifications about. A feature generally
+     *    requires a subscription to its service in order to be fully functional.
+     *
+     * The `subscribed` values are the SDK's services that the application has
+     *    an active subscription for. Services are subscribed to using the
+     *    {@link Subscription.subcribe services.subscribe} API.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method getSubscriptions
      * @return {Object} Lists of subscribed and available services.
+     * @example
+     * // Get the lists of services.
+     * const services = client.services.getSubscriptions()
+     *
+     * // Figure out which available services don't have a subscription.
+     * const notSubscribed = services.available.filter(service => {
+     *    return !services.subscribed.includes(service)
+     * })
+     *
+     * // Subscribe for all not-yet-subscribed services.
+     * client.services.subscribe(notSubscribed)
      */
     getSubscriptions() {
       log.debug(_logs.API_LOG_TAG + 'services.getSubscriptions');
@@ -42011,8 +42507,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
+ * Subscription information has changed.
+ *
+ * The updated subscription information can be retrieved using the
+ *    {@link Subscription.getSubscriptions services.getSubscriptions} API.
  * @public
  * @memberof Subscription
  * @event subscription:change
@@ -42020,11 +42518,15 @@ Object.defineProperty(exports, "__esModule", {
 const SUB_CHANGE = exports.SUB_CHANGE = 'subscription:change';
 
 /**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
+ * An error occurred during a subscription operation.
+ *
+ * The subscription information can be retrieved using the
+ *    {@link Subscription.getSubscriptions services.getSubscriptions} API.
  * @public
  * @memberof Subscription
  * @event subscription:error
+ * @param {Object} params
+ * @param {Object} params.error A Basic error object, representing the error that occurred.
  */
 const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
 
@@ -43758,21 +44260,40 @@ function usersAPI({ dispatch, getState, primitives }) {
   /**
    * The Users feature allows access to user information for users within the same domain.
    *
-   * These functions are namespaced beneath 'user' on the API.
+   * The functions in this module are namespaced under 'user'.
    * @public
    * @module Users
    */
 
+  /**
+   * The User data object.
+   *
+   * @public
+   * @module User
+   * @property {string} userId The User ID of the user.
+   * @property {string} emailAddress The email address of the user.
+   * @property {string} firstName The first name of the user.
+   * @property {string} lastName The last name of the user.
+   * @property {string} photoURL The URL to get the photo of the user.
+   * @property {string} buddy Whether the user is a "buddy". Values can be "true" or "false".
+   */
+
   return {
     /**
-     * Fetches information about a specified user from the platform.
-     * Will trigger a `directory:change` event.
+     * Fetches information about a User.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The User's information will then
+     *    be available.
+     *
+     * Information about an available User can be retrieved using the
+     *    {@link Users.get user.get} API.
      *
      * @public
+     * @static
      * @memberof Users
      * @method fetch
-     *
-     * @param {string} userId The URI uniquely identifying the user.
+     * @param {string} userId The User ID of the user.
      */
     fetch(userId) {
       log.debug(_logs.API_LOG_TAG + 'user.fetch: ', userId);
@@ -43780,10 +44301,17 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Fetches information about the current user's profile data from the platform.
-     * Will trigger a `directory:change` event.
+     * Fetches information about the current User.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The User's information will then
+     *    be available.
+     *
+     * Information about an available User can be retrieved using the
+     *    {@link Users.get user.get} API.
      *
      * @public
+     * @static
      * @memberof Users
      * @method fetchSelfInfo
      */
@@ -43793,11 +44321,17 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Retrieves local information about a previously fetched user.
+     * Retrieves information about a User, if available.
+     *
+     * See the {@link Users.fetch user.fetch} and
+     *    {@link Users.search user.search} APIs for details about making Users'
+     *    information available.
+     *
      * @public
      * @memberof Users
      * @method get
-     * @param {string} userId The URI uniquely identifying the user.
+     * @param {string} userId The User ID of the user.
+     * @returns {User} The User object for the specified user.
      */
     get(userId) {
       log.debug(_logs.API_LOG_TAG + 'user.get: ', userId);
@@ -43805,10 +44339,16 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Retrieves local information about previously fetched users.
+     * Retrieves information about all available Users.
+     *
+     * See the {@link Users.fetch user.fetch} and
+     *    {@link Users.search user.search} APIs for details about making Users'
+     *    information available.
+     *
      * @public
      * @memberof Users
      * @method getAll
+     * @returns {Array<User>} An array of all the User objects.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'user.getAll');
@@ -43816,24 +44356,29 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Search the users in the directory.
-     * Will trigger a `directory:change` event.
+     * Searches the domain's directory for Users.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The search results will be
+     *    provided as part of the event, and will also be available using the
+     *    {@link Users.get user.get} and {@link Users.getAll user.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Users
      * @method search
-     * @param {Object} filters Query filter options.
-     * @param {string} [filters.userId] Matches the unique URI identifying the user.
-     * @param {string} [filters.name] Matches firstName or lastName.
-     * @param {string} [filters.firstName] Matches firstName.
-     * @param {string} [filters.lastName] Matches lastName.
-     * @param {string} [filters.userName] Matches userName.
-     * @param {string} [filters.phoneNumber] Matches phoneNumber.
-     * @param {Object} [options] Sorting options
-     * @param {string} [options.sortBy] The attribute upon which to sort results. This can be any of the above listed filters which describe a user attribute.
-     * @param {string} [options.order] Order by which to return results. Can be one of "asc" or "desc".
-     * @param {number} [options.max] The maximmum number of results to return.
-     * @param {string} [options.next] The pointer for a chunk of results, which may be returned from other a previous query.
+     * @param {Object} filters The filter options for the search.
+     * @param {string} [filters.userId] Matches the User ID of the user.
+     * @param {string} [filters.name] Matches the firstName or lastName.
+     * @param {string} [filters.firstName] Matches the firstName.
+     * @param {string} [filters.lastName] Matches the lastName.
+     * @param {string} [filters.userName] Matches the userName.
+     * @param {string} [filters.phoneNumber] Matches the phoneNumber.
+     * @param {Object} [options] Sorting options.
+     * @param {string} [options.sortBy] The User property to sort the results by. This can be any of the above listed filters.
+     * @param {string} [options.order] Order in which results are returned. Can be either "asc" or "desc".
+     * @param {number} [options.max] The maximum number of results to return.
+     * @param {string} [options.next] The pointer for a chunk of results, which may be returned from a previous query.
      */
     search(filters = {}, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'user.search: ', filters, options);
@@ -43950,10 +44495,12 @@ const CONTACTS_CHANGE = exports.CONTACTS_CHANGE = 'contacts:change';
 /**
  * The directory has changed.
  * @public
+ * @static
  * @memberof Users
  * @event directory:change
  * @param {Object} params
- * @param {Array} params.results The results of the directory search.
+ * @param {Array<User>} params.results The Users' information returned by the
+ *    operation.
  */
 const DIRECTORY_CHANGE = exports.DIRECTORY_CHANGE = 'directory:change';
 
@@ -45692,6 +46239,7 @@ function api(context) {
 
     /**
      * Retrieve information about the browser being used.
+     *
      * Browser information being defined indicates that the browser supports
      *    basic webRTC scenarios.
      * @public
@@ -45749,7 +46297,12 @@ function mediaAPI({ dispatch, getState }) {
   return {
     /**
      * Retrieves the available media devices for use.
+     *
+     * The {@link Media.event:devices:change devices:change} event will be
+     *    emitted when the available media devices have changed.
+     *
      * @public
+     * @static
      * @memberof Media
      * @method getDevices
      * @return {Object} The lists of camera, microphone, and speaker devices.
@@ -45760,12 +46313,13 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieve a media object from state with a specific media ID.
+     * Retrieves an available Media object with a specific Media ID.
      * @public
+     * @static
      * @memberof Media
      * @method getById
-     * @param  {string} mediaId The ID of the media to retrieve.
-     * @return {MediaObject} A media object.
+     * @param  {string} mediaId The ID of the Media to retrieve.
+     * @return {MediaObject} A Media object.
      */
     getById(mediaId) {
       log.debug(_logs.API_LOG_TAG + 'media.getById: ', mediaId);
@@ -45773,12 +46327,13 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieve a Track object from state with a specific ID.
+     * Retrieve an available Track object with a specific Track ID.
      * @public
+     * @static
      * @memberof Media
      * @method getTrackById
-     * @param  {string} trackId The ID of the track to retrieve.
-     * @return {Object} A track object.
+     * @param  {string} trackId The ID of the Track to retrieve.
+     * @return {TrackObject} A Track object.
      */
     getTrackById(trackId) {
       log.debug(_logs.API_LOG_TAG + 'media.getByTrackId: ', trackId);
@@ -45786,17 +46341,22 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Render media Tracks in a container.
-     * The container is specified by providing a CSS selector string that corresponds to the HTMLElement to act as the container.
+     * Render Media Tracks in a container.
+     *
+     * The container is specified by providing a CSS selector string that
+     *    corresponds to the HTMLElement to act as the container.
      * @public
+     * @static
      * @memberof Media
      * @method renderTracks
-     * @param  {Array}  tracks List of Track IDs to be rendered.
-     * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Array<string>} trackIds List of Track IDs to be rendered.
+     * @param  {string} cssSelector A CSS selector string that uniquely
+     *    identifies an element. Ensure that special characters are properly
+     *    escaped.
      * @param  {Object} [options] Additional options for rendering the tracks.
-     * @param  {string} [options.speakerId] The device ID of the speaker to use for audio tracks.
+     * @param  {string} [options.speakerId] The speaker's Device ID to use for audio tracks.
      * @example
-     * // When an outgoing call is accepted, render the media used for the call.
+     * // When an outgoing call is accepted, render the Media used for the call.
      * client.on('call:accepted', function (params) {
      *     // Get the information about the call.
      *     const call = client.call.getById(params.callId)
@@ -45806,51 +46366,71 @@ function mediaAPI({ dispatch, getState }) {
      *     client.media.render(call.remoteMedia[0], remoteContainer)
      * })
      */
-    renderTracks(tracks, cssSelector, options = {}) {
-      log.debug(_logs.API_LOG_TAG + 'media.renderTracks: ', tracks, cssSelector, options);
-      dispatch(_actions.trackActions.renderTracks(tracks, (0, _extends3.default)({
+    renderTracks(trackIds, cssSelector, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'media.renderTracks: ', trackIds, cssSelector, options);
+      dispatch(_actions.trackActions.renderTracks(trackIds, (0, _extends3.default)({
         selector: cssSelector
       }, options)));
     },
 
     /**
-     * Remove media Tracks from a container.
-     * The container is specified by providing a CSS selector string that corresponds to the HTMLElement to act as the container.
+     * Remove Media Tracks from a container.
+     *
+     * The container is specified by providing a CSS selector string that
+     *    corresponds to the HTMLElement to act as the container.
      * @public
+     * @static
      * @memberof Media
      * @method removeTracks
-     * @param  {Array}  tracks List of Track IDs to stop being rendered.
-     * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Array<string>} trackIds List of Track IDs to stop being rendered.
+     * @param  {string} cssSelector A CSS selector string that uniquely
+     *    identifies an element. Ensure that special characters are properly
+     *    escaped.
      */
-    removeTracks(tracks, cssSelector) {
-      log.debug(_logs.API_LOG_TAG + 'media.removeTracks: ', tracks, cssSelector);
-      dispatch(_actions.trackActions.removeTracks(tracks, { selector: cssSelector }));
+    removeTracks(trackIds, cssSelector) {
+      log.debug(_logs.API_LOG_TAG + 'media.removeTracks: ', trackIds, cssSelector);
+      dispatch(_actions.trackActions.removeTracks(trackIds, { selector: cssSelector }));
     },
 
     /**
-     * Mutes the specified tracks.
-     * Prevents media from being received for the tracks. Audio tracks will become silent and video tracks will be a black frame.
+     * Mutes the specified Tracks at their media source.
+     *
+     * Prevents media from being received for the Tracks. Audio Tracks will
+     *    become silent and video Tracks will be a black frame.
+     *
+     * If a local Track being sent in a Call is muted, the Track will be
+     *    noticeably muted for the remote user. If a remote Track received in a
+     *    call is muted, the result will only be noticeable locally.
+     *
+     * The SDK will emit a {@link Media.event:media:muted media:muted} event
+     *    when a Track has been muted.
      * @public
+     * @static
      * @memberof Media
      * @method muteTracks
-     * @param  {Array} tracks List of Track IDs.
+     * @param  {Array<string>} trackIds List of Track IDs.
      */
-    muteTracks(tracks) {
-      log.debug(_logs.API_LOG_TAG + 'media.muteTracks: ', tracks);
-      dispatch(_actions.trackActions.muteTracks(tracks));
+    muteTracks(trackIds) {
+      log.debug(_logs.API_LOG_TAG + 'media.muteTracks: ', trackIds);
+      dispatch(_actions.trackActions.muteTracks(trackIds));
     },
 
     /**
-     * Unmutes the specified tracks.
-     * Media will resume as normal for the tracks.
+     * Unmutes the specified Tracks.
+     *
+     * Media will resume as normal for the Tracks.
+     *
+     * The SDK will emit a {@link Media.event:media:unmuted media:unmuted} event
+     *    when a Track has been unmuted.
      * @public
+     * @static
      * @memberof Media
      * @method unmuteTracks
-     * @param  {Array} tracks List of Track IDs.
+     * @param  {Array<string>} trackIds List of Track IDs.
      */
-    unmuteTracks(tracks) {
-      log.debug(_logs.API_LOG_TAG + 'media.unmuteTracks: ', tracks);
-      dispatch(_actions.trackActions.unmuteTracks(tracks));
+    unmuteTracks(trackIds) {
+      log.debug(_logs.API_LOG_TAG + 'media.unmuteTracks: ', trackIds);
+      dispatch(_actions.trackActions.unmuteTracks(trackIds));
     }
   };
 }
@@ -45867,8 +46447,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * Media devices available for use have changed.
- * Use the `getDevices` media API to retrieve the lists of devices.
+ * The media devices available for use have changed.
+ *
+ * Information about the available media devices can be retrieved using the
+ *    {@link Media.getDevices media.getDevices} API.
+ *
  * @public
  * @memberof Media
  * @event devices:change
@@ -45883,6 +46466,8 @@ const DEVICES_CHANGED = exports.DEVICES_CHANGED = 'devices:change';
 
 /**
  * The specified Tracks have been muted.
+ *
+ * A Track can be muted using the {@link Media.muteTracks media.muteTracks} API.
  * @public
  * @memberof Media
  * @event media:muted
@@ -45893,6 +46478,9 @@ const TRACKS_MUTED = exports.TRACKS_MUTED = 'media:muted';
 
 /**
  * The specified Tracks have been unmuted.
+ *
+ * A Track can be unmuted using the {@link Media.unmuteTracks media.unmuteTracks}
+ *    API.
  * @public
  * @memberof Media
  * @event media:unmuted
