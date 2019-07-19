@@ -82,7 +82,7 @@
           {
             name: 'Hide Front Matter',
             extend(api) {
-              api.processMarkdown(md => md.replace(/---([^]*?)---/gm, ''))
+              api.processMarkdown(md => md.replace(/---([^]*?)---/m, ''))
             }
           },
           {
