@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.96
+ * Version: 4.6.0-beta.97
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31419,7 +31419,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.96';
+  let version = '4.6.0-beta.97';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -39459,12 +39459,10 @@ function* getPresenceLists(requestInfo) {
  * REST request to retrieve presence states of requested presentities.
  * @method retrievePresence
  * @param  {Array} users Array of userId's
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {string} subscriptionId Resource ID of the subscription
  * @param  {Object} requestInfo
  * @return {Object}
  */
-function* retrievePresence(users, presenceListId, subscriptionId, requestInfo) {
+function* retrievePresence(users, requestInfo) {
   let adhocPresenceList = {
     adhocPresenceList: {
       presentityUserId: users
@@ -39874,16 +39872,7 @@ function* fetchPresence({ payload }) {
   const users = payload;
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
 
-  // get current presenceListId
-  const subscriptions = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
-    return sub.service === 'presence';
-  });
-  const presenceListId = presenceSubscription[0].presenceListId;
-  const resourceURL = presenceSubscription[0].resourceURL;
-  const subscriptionId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-
-  const response = yield (0, _effects.call)(_presence.retrievePresence, users, presenceListId, subscriptionId, requestInfo);
+  const response = yield (0, _effects.call)(_presence.retrievePresence, users, requestInfo);
   log.debug('Received response from retrievePresence request:', response);
 
   if (!response.error) {
