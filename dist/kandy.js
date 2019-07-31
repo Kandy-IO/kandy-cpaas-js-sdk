@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.6.0-beta.108
+ * Version: 4.6.0-beta.109
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31421,7 +31421,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.6.0-beta.108';
+  let version = '4.6.0-beta.109';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -37554,9 +37554,14 @@ function* registerInboundSMS() {
  * Runs immediately.
  * @method registerOutboundSMS
  */
-function* registerOutboundSMS() {
-  yield (0, _effects.registerService)('smsoutbound', subsSagas.smsOutboundSubscription, subsSagas.smsOutboundUnsubscription);
-}
+function* registerOutboundSMS() {}
+/*
+ * smsoutbound subscriptions are disabled because they are not supported by
+ *    the backend yet.
+ * See: KAA-1925
+ */
+// yield registerService('smsoutbound', subsSagas.smsOutboundSubscription, subsSagas.smsOutboundUnsubscription)
+
 
 /**
  * Chat Operations
