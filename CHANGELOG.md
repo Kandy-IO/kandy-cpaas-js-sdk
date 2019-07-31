@@ -14,6 +14,10 @@ Kandy.js change log.
 - User now automatically disconnects gracefully when internet connection is lost for too long. `KAA-1591`
 - Added the ability to delete messages and conversations of types `chat-oneToOne`, `chat-group` and `sms`. See `Conversation#delete` and `Conversation#deleteMessages`. `KAA-1777` `KAA-1826`
 
+### Fixed
+
+- Fixed a Messaging issue where messages could not be received on a Conversation that was created with a mixed-case recipient ID. `KAA-1889`
+
 ## 4.5.0 - 2019-06-28
 
 ### Fixed
@@ -23,6 +27,7 @@ Kandy.js change log.
 ### Added
 - a new event `group:refresh` has been added. `KAA-1797`
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
+
 
 ### Changed
 
