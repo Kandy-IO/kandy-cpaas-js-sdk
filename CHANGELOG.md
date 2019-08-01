@@ -5,16 +5,45 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.6.0 - 2019-08-01
+
+### Added
+
+- Added "replaceTrack" functionality for calls. See the `kandy.call.replaceTrack` API. `KAA-1727`
+- Added bandwidth control functionality for calls. See `kandy.call.makeCall`, `kandy.call.answerCall`, `kandy.call.removeMedia` & `kandy.call.addMedia`. `KAA-1740`
+- User now automatically disconnects gracefully when internet connection is lost for too long. `KAA-1591`
+- Added the ability to delete messages and conversations of types `chat-oneToOne`, `chat-group` and `sms`. See `Conversation#delete` and `Conversation#deleteMessages`. `KAA-1777` `KAA-1826`
+- Added information about token expiry time when user logs in, using CodePen example application.
+- Added partial support for Group management to the Kandy example application. This includes: group creation, fetching groups and render basic group info.
+- Added ability to delete messages & conversations in the CPaaS example application. `KAA-1842`
+- Added a tutorial page for Group management. It includes group creation (and deletion) by admin user, invites to a group of participants, ability to accept or reject invites by non-admin users as well as adding (and removing) participants by admin user. `KAA-1767`
+
+### Fixed
+
+- Fixed a Messaging issue where messages could not be received on a Conversation that was created with a mixed-case recipient ID. `KAA-1889`
+- Fixed a Messaging issue where SMS messages were either duplicated or missing in CodePen example application. `KAA-1752`
+- Fixed presence fetching for a given user. `KAA-1874`
+- Fixed browser support table in Tutorial page and specify more explicitly that SDK supports Safari Desktop.
+- Fixed many API documentation issues across all SDK's plugins.
+- Fixed version numbering associated with public documentation. `KAA-1823`
+
+### Changed
+
+- Refactored the Groups and Invitation state content in SDK Redux store. `KAA-1845`
+
 ## 4.5.0 - 2019-06-28
 
 ### Fixed
+
 - Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
 
 ### Added
 - a new event `group:refresh` has been added. `KAA-1797`
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
 
+
 ### Changed
+
 - `group:change` event is now emitted after the user has left a group and when a participant has joined the group. `KAA-1797`
 - `group:change` event payload no longer contains `participant`. `KAA-1797`
 - `group:new` event is now emitted when a new `group` is created instead of `group:change`. `KAA-1797`
@@ -26,9 +55,11 @@ Kandy.js change log.
 ## 4.4.0 - 2019-05-24
 
 ### Added
+
 - Added Ignore Call functionality. `KAA-1512`
 
 ### Fixed
+
 - Fixed call states not having `startTime` and/or `endTime` properties in certain scenarios when the call does not establish. `KAA-1620`
 - Fixed the `contacts.remove` API from reporting a success during failure scenarios.
 - The `contacts:error` event should now be emitted instead of `contacts:change`.
@@ -36,18 +67,21 @@ Kandy.js change log.
 ## 4.3.1 - 2019-04-26
 
 ### Fixed
+
 - Made a hotfix release just to update the version because something went wrong with NPM and it requires a new version.
 
 ## 4.3.0 - 2019-04-26
 
 ### Added
+
 - Added group chat functionality with support for sending and receiving messages `KAA-1594`
-- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality.  See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
+- Added an API to create, retrieve, update and delete groups. These groups are used for the group chat functionality. See `kandy.groups` namespace. `KAA-1516` `KAA-1517` `KAA-1518` `KAA-1519` `KAA-1520`
 - Added a DEBUG log at the start of every public API invocation, which will better help with future investigations `KAA-1353`
 - Added reject call functionality. `KAA-1511`
 - Added an API to retrieve basic browser information. See `getBrowserDetails`. `KAA-1470`
 
 ### Fixed
+
 - Fixed a "remove media" call issue where the error event provided an incorrect message if the track ID was invalid. `KAA-1436`
 - Fixed reject call behaviour to make call state `Ended` on callee side instead of `Cancelled`. `KAA-1584`
 - Fixed a call issue where a media mismatch error on answer would leave the call in `Ringing` state instead of ending the call. `KAA-1432`

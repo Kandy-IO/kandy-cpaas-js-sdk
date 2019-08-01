@@ -25,6 +25,10 @@
   description: # Chat
   link: /quickstarts/javascript/cpaas/Chat
 
+- name: Group Chat
+  description: # Group Chat
+  link: /quickstarts/javascript/cpaas/Group%20Chat
+
 - name: SMS Messaging
   description: # SMS Messaging
   link: /quickstarts/javascript/cpaas/SMS%20Messaging

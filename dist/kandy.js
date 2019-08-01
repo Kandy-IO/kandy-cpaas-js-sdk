@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.5.0
+ * Version: 4.6.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18836,12 +18836,22 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * Possible subscription states.
+ * @name SUBSCRIPTION_STATE
  * @type {Object}
  */
 const SUBSCRIPTION_STATE = exports.SUBSCRIPTION_STATE = {
   FULL: 'FULL',
   PARTIAL: 'PARTIAL',
   NONE: 'NONE'
+
+  /**
+   * Possible disconnect reasons.
+   * @name DISCONNECT_REASONS
+   * @type {Object}
+   */
+};const DISCONNECT_REASONS = exports.DISCONNECT_REASONS = {
+  GONE: 'GONE',
+  LOST_CONNECTION: 'LOST_CONNECTION'
 };
 
 /***/ }),
@@ -19142,13 +19152,13 @@ function disconnect() {
  * Create a disconnectFinished action that possibly takes an error object on failure.
  *
  * @method disconnectFinished
- * @param {Object} $0
- * @param {string} [$0.error] An error message. Only present if an error occurred.
- * @param {Boolean} [$0.forced] Whether the disconnect was forcefully disconnected.
+ * @param {Object} params
+ * @param {string} [params.error] An error message. Only present if an error occurred.
+ * @param {string} [params.reason] Why the disconnectFinished action is being dispatched.
  * @return {Object} A flux standard action.
  */
-function disconnectFinished({ error, forced } = {}) {
-  var action = {
+function disconnectFinished({ error, reason } = {}) {
+  let action = {
     type: actionTypes.DISCONNECT_FINISHED,
     payload: {}
   };
@@ -19157,7 +19167,10 @@ function disconnectFinished({ error, forced } = {}) {
     action.error = true;
     action.payload = error;
   }
-  action.payload.forced = forced;
+
+  if (reason) {
+    action.payload.reason = reason;
+  }
 
   return action;
 }
@@ -19576,6 +19589,17 @@ function api({ dispatch, getState }) {
     subscriptionStates: _constants.SUBSCRIPTION_STATE,
 
     /**
+     * Possible reasons for disconnecting.
+     *
+     * @public
+     * @memberof Authentication
+     * @requires connect
+     * @property {string} GONE Connection was terminated by the server
+     * @property {string} LOST_CONNECTION Internet connection was lost
+     */
+    disconnectReasons: _constants.DISCONNECT_REASONS,
+
+    /**
      * Sets the authentication tokens necessary to make requests to the platform. The access token
      * provided establishes what can be accessed by the SDK. The identity token represents who is authenticated.
      *
@@ -19619,7 +19643,7 @@ Object.defineProperty(exports, "__esModule", {
  * @requires connect
  * @event auth:change
  * @param {Object} params
- * @param {boolean} params.forced For a disconnection, whether the change was forced by the system.
+ * @param {string} params.reason The cause of the authentication change, provided in the event of an unsolicited disconnection. See the `disconnectReasons` API for possible values.
  */
 const AUTH_CHANGE = exports.AUTH_CHANGE = 'auth:change';
 
@@ -19693,7 +19717,10 @@ eventsMap[actionTypes.UPDATE_SUBSCRIPTION_FINISH] = authChangedEvent;
 
 eventsMap[actionTypes.DISCONNECT_FINISHED] = function (action) {
   let discEvent = authChangedEvent(action);
-  discEvent.args.forced = action.payload.forced;
+  if (action.payload.reason === 'GONE') {
+    discEvent.args.forced = true;
+  }
+  discEvent.args.reason = action.payload.reason;
   return discEvent;
 };
 
@@ -19864,7 +19891,7 @@ reducers[actionTypes.DISCONNECT] = {
 };
 
 reducers[actionTypes.DISCONNECT_FINISHED] = {
-  next() {
+  next(state, action) {
     return {
       isConnected: false,
       isPending: false,
@@ -20223,7 +20250,7 @@ exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ICE_MEDIA_STATES = exports.FCS_ICE_MEDIA_STATES = exports.WEBRTC_DEVICE_KINDS = exports.CALL_DIRECTION = exports.STATUS_CODES = exports.COMPLEX_OPERATION_MESSAGES = exports.COMPLEX_OPERATIONS = exports.OPERATIONS = exports.CALL_MEDIA_STATES = exports.CALL_STATES = exports.CALL_STATES_FCS = exports.FCS_CALL_STATES = undefined;
+exports.ICE_MEDIA_STATES = exports.FCS_ICE_MEDIA_STATES = exports.WEBRTC_DEVICE_KINDS = exports.BANDWIDTH_DEFAULTS = exports.CALL_DIRECTION = exports.STATUS_CODES = exports.COMPLEX_OPERATION_MESSAGES = exports.COMPLEX_OPERATIONS = exports.OPERATIONS = exports.CALL_MEDIA_STATES = exports.CALL_STATES = exports.CALL_STATES_FCS = exports.FCS_CALL_STATES = undefined;
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
@@ -20376,6 +20403,14 @@ const CALL_STATES = exports.CALL_STATES = {
   INCOMING: 'incoming',
   OUTGOING: 'outgoing'
 
+  /**
+   * The default bandwidth limits to use for a track type.
+   * @name BANDWIDTH_DEFAULTS
+   */
+};const BANDWIDTH_DEFAULTS = exports.BANDWIDTH_DEFAULTS = {
+  AUDIO: 5000,
+  VIDEO: 5000
+
   /*
    * A conversion from MediaDeviceInfo.kind values to their more common terms.
    * See: https://developer.mozilla.org/en-US/docs/Web/API/MediaDeviceInfo/kind
@@ -20460,9 +20495,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @memberof config
  * @instance
  * @param {Object} call The call configuration object.
- * @param {Object} [call.iceServers] ICE servers to be used for calls.
+ * @param {string} [call.sdpSemantics='unified-plan'] The sdpSemantics to use (`'unified-plan'` or `'plan-b'`).
+ * @param {Array<IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
- * @param {Array} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ * @param {Array<SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  */
 
@@ -20516,17 +20552,23 @@ function cpaasCalls(options = {}) {
      *
      * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
      *
+     * 4. Modify sdp and add bandwidth limits on it if bandwidth controls are provided.
      */
     let sdpHandlers = options.sdpHandlers;
     if (options.removeH264Codecs) {
       sdpHandlers.push((0, _codecRemover2.default)(['H264']));
     }
     sdpHandlers.push(_utils.sanitizeSdesFromSdp);
-    webRTC.sdp.pipeline.setHandlers(sdpHandlers);
+    sdpHandlers.push(_utils.modifySdpBandwidth);
 
-    // Wrap the call sagas in a function that provides them with the webRTC stack.
-    const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
-      return (0, _utils2.autoRestart)(() => saga(webRTC.managers));
+    // Dependencies to be provided to every call saga.
+    const deps = {
+      webRTC: webRTC.managers,
+      sdpHandlers
+
+      // Wrap the call sagas in a function that provides them with the webRTC stack.
+    };const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
+      return (0, _utils2.autoRestart)(() => saga(deps));
     });
 
     // Run all of the sagas.
@@ -20539,7 +20581,8 @@ function cpaasCalls(options = {}) {
     name: _interfaceNew2.default.name,
     api: _interfaceNew2.default.api,
     reducer: _interfaceNew2.default.reducer,
-    init
+    init,
+    capabilities: ['call', 'cpaas_call', 'cpaas_user_id', 'cpaas_pstn']
   };
 }
 
@@ -20960,6 +21003,11 @@ function* callUnsubscribe(requestInfo, subInfo) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.registerCall = registerCall;
 exports.createCall = createCall;
 exports.answerCallEntry = answerCallEntry;
@@ -20979,6 +21027,7 @@ exports.ignoreCallEntry = ignoreCallEntry;
 exports.rejectCallEntry = rejectCallEntry;
 exports.getStatsEntry = getStatsEntry;
 exports.setTurnCredentials = setTurnCredentials;
+exports.replaceTrackEntry = replaceTrackEntry;
 
 var _subscriptions = __webpack_require__("../kandy/src/call/cpaas/sagas/subscriptions.js");
 
@@ -21010,6 +21059,8 @@ var midcallSagas = _interopRequireWildcard(_midcall);
 
 var _notifications2 = __webpack_require__("../kandy/src/callstack/call/notifications.js");
 
+var _dtmf = __webpack_require__("../kandy/src/callstack/call/dtmf.js");
+
 var _support2 = __webpack_require__("../kandy/src/callstack/call/support.js");
 
 var _effects = __webpack_require__("../kandy/src/subscription/interface/effects.js");
@@ -21022,6 +21073,8 @@ var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /**
  * Register the call service for subscriptions.
  * @method registerCall
@@ -21029,9 +21082,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 
 // Other plugins.
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
 
-
-// Callstack plugin.
+// Call plugin.
 function* registerCall() {
   yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
 }
@@ -21043,27 +21099,29 @@ function* registerCall() {
 /**
  * Start an outgoing call.
  * @method createCall
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
 
 
 // Libraries.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
 
-// Call plugin.
-function* createCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, { webRTC, requests });
+
+// Callstack plugin.
+function* createCall(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Answer a ringing call.
  * @method answerCall
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* answerCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, { webRTC, requests });
+function* answerCallEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
@@ -21072,9 +21130,12 @@ function* answerCallEntry(webRTC) {
  * TODO: There will be different "hold" scenarios. Need to determine how to
  *    differentiate between them to know which saga to trigger.
  * @method holdCall
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* holdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, { webRTC, requests });
+function* holdCall(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.CALL_HOLD, midcallSagas.offerInactiveMedia, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
@@ -21083,33 +21144,45 @@ function* holdCall(webRTC) {
  * TODO: There will be different "unhold" scenarios. Need to determine how to
  *    differentiate between them to know which saga to trigger.
  * @method unholdCall
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* unholdCall(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, { webRTC, requests });
+function* unholdCall(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.CALL_UNHOLD, midcallSagas.offerFullMedia, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Add media to a call.
  * @method addMedia
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* addMediaEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, { webRTC, requests });
+function* addMediaEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.ADD_MEDIA, midcallSagas.addMedia, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Remove media from a call.
  * @method removeMedia
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* removeMediaEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, { webRTC, requests });
+function* removeMediaEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Send DTMF tones for a call.
  * @method sendDTMF
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* sendDTMFEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, midcallSagas.sendDTMF, { webRTC });
+function* sendDTMFEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.SEND_DTMF, _dtmf.sendDtmf, deps);
 }
 
 /**
@@ -21119,17 +21192,18 @@ function* sendDTMFEntry(webRTC) {
 /**
  * Handle a "call incoming" notification.
  * @method incomingCallNotification
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* incomingCallNotification(webRTC) {
+function* incomingCallNotification(deps) {
   // Curry the signaling function to specify the status.
   function* updateSessionRinging(...args) {
     return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Ringing');
   }
 
   // Dependencies provided to the Callstack saga.
-  const deps = {
-    webRTC,
+  const callDeps = (0, _extends3.default)({}, deps, {
     requests: {
       // Add the wrapped request to CPaaS's set of requests.
       updateCallRinging: updateSessionRinging
@@ -21141,7 +21215,7 @@ function* incomingCallNotification(webRTC) {
      * @method cpaasIncomingCall
      * @param {Object} action An "incoming call notification" action.
      */
-  };function* cpaasIncomingCall(action) {
+  });function* cpaasIncomingCall(action) {
     const notification = action.payload.wrtcsSessionInvitationNotification;
 
     // Massage data into a generic format, instead of CPaaS-specific.
@@ -21153,7 +21227,7 @@ function* incomingCallNotification(webRTC) {
       remoteNumber: notification.originatorAddress
 
       // Pass the incoming call parameters to the Callstack for handling.
-    };yield (0, _effects2.call)(_notifications2.incomingCall, deps, params);
+    };yield (0, _effects2.call)(_notifications2.incomingCall, callDeps, params);
   }
 
   // Redux-saga take() pattern.
@@ -21166,9 +21240,11 @@ function* incomingCallNotification(webRTC) {
 /**
  * Handle a "call accepted" notification.
  * @method callAcceptedNotification
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* callAcceptedNotification(webRTC) {
+function* callAcceptedNotification(deps) {
   /**
    * Intercept the CPaaS-specific notification, ensuring parameters are given
    *    to the Callstack sagas into a generic format.
@@ -21184,7 +21260,7 @@ function* callAcceptedNotification(webRTC) {
       wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
     };
 
-    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
+    yield (0, _effects2.call)(_notifications2.parseCallResponse, deps, params);
   }
 
   // Redux-saga take() pattern.
@@ -21200,7 +21276,7 @@ function* callAcceptedNotification(webRTC) {
  * @method callStatusNotification
  * @param  {Object} webRTC The webRTC stack.
  */
-function* callStatusNotification(webRTC) {
+function* callStatusNotification(deps) {
   function statusUpdatePattern(status) {
     return function statusPattern(action) {
       return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
@@ -21209,7 +21285,6 @@ function* callStatusNotification(webRTC) {
 
   function* parseStatusNotification(action) {
     const eventType = action.payload.wrtcsEventNotification.eventType;
-    const deps = { webRTC };
     const params = {
       wrtcsSessionId: action.payload.wrtcsEventNotification.link[0].href.split('sessions/')[1]
     };
@@ -21223,16 +21298,15 @@ function* callStatusNotification(webRTC) {
   // Handle specific call statuses
   yield (0, _effects2.takeEvery)(statusUpdatePattern('Ringing'), parseStatusNotification);
   yield (0, _effects2.takeEvery)(statusUpdatePattern('SessionEnded'), parseStatusNotification);
-  yield (0, _effects2.takeEvery)(statusUpdatePattern('Cancelled'), notificationSagas.callStatusUpdateCancelled, webRTC);
+  yield (0, _effects2.takeEvery)(statusUpdatePattern('Cancelled'), notificationSagas.callStatusUpdateCancelled, deps.webRTC);
 }
 
 /**
  * Handle sending a call audit request
  * TODO: Move the common "setup" logic into the Callstack?
  * @method callAudit
- * @param  {Object} webRTC The webRTC stack.
  */
-function* callAudit(webRTC) {
+function* callAudit() {
   const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED];
 
   // Curry the signaling function to specify the status.
@@ -21257,12 +21331,13 @@ function* callAudit(webRTC) {
  * Uses properties in the notification to create a standardized data object to
  *    be used by the Callstack.
  * @method callOfferNotification
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* callOfferNotification(webRTC) {
+function* callOfferNotification(deps) {
   // Dependencies provided to the Callstack saga.
-  const deps = {
-    webRTC,
+  const callDeps = (0, _extends3.default)({}, deps, {
     requests: {
       /*
        * CPaaS uses the same REST endpoint for both answering a call and
@@ -21278,7 +21353,7 @@ function* callOfferNotification(webRTC) {
      * @method parseOfferNotification
      * @param {Object} action
      */
-  };function* parseOfferNotification(action) {
+  });function* parseOfferNotification(action) {
     const notification = action.payload.wrtcsOfferNotification;
 
     // Pull-out the parameters into a standard format for the Callstack.
@@ -21287,7 +21362,7 @@ function* callOfferNotification(webRTC) {
       wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
     };
 
-    yield (0, _effects2.call)(_notifications2.parseCallRequest, deps, params);
+    yield (0, _effects2.call)(_notifications2.parseCallRequest, callDeps, params);
   }
 
   // Redux-saga take() pattern.
@@ -21301,9 +21376,11 @@ function* callOfferNotification(webRTC) {
 /**
  * Handle a "call answer" notification.
  * @method callAnswerNotification
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* callAnswerNotification(webRTC) {
+function* callAnswerNotification(deps) {
   /**
    * Intercept the CPaaS-specific notification, ensuring parameters are given
    *    to the Callstack sagas into a generic format.
@@ -21319,7 +21396,7 @@ function* callAnswerNotification(webRTC) {
       wrtcsSessionId: notification.link[0].href.split('sessions/')[1]
     };
 
-    yield (0, _effects2.call)(_notifications2.parseCallResponse, { webRTC }, params);
+    yield (0, _effects2.call)(_notifications2.parseCallResponse, deps, params);
   }
 
   // Redux-saga take() pattern.
@@ -21333,37 +21410,45 @@ function* callAnswerNotification(webRTC) {
 /**
  * End an ongoing call.
  * @method endCall
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* endCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, { webRTC, requests });
+function* endCallEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.END_CALL, midcallSagas.endCall, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Ignore an incoming call.
  * @method ignoreCall
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* ignoreCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.IGNORE_CALL, establishSagas.ignoreCall, { webRTC });
+function* ignoreCallEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.IGNORE_CALL, establishSagas.ignoreCall, deps);
 }
 
 /**
  * Reject an incoming call.
  * @method rejectCall
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* rejectCallEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.REJECT_CALL, establishSagas.rejectCall, { webRTC, requests });
+function* rejectCallEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.REJECT_CALL, establishSagas.rejectCall, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
  * Get RTCStatsReport.
  * @method getStats
- * @param  {Object} webRTC The webRTC stack.
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  */
-function* getStatsEntry(webRTC) {
-  yield (0, _effects2.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, { webRTC });
+function* getStatsEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.GET_STATS, midcallSagas.getStats, deps);
 }
 
 /**
@@ -21380,6 +21465,16 @@ function* setTurnCredentials() {
   }
 
   yield (0, _effects2.takeEvery)(callSubscribePattern, supportSagas.setTurnCredentials);
+}
+
+/**
+ * Replaces a track with a new track with specified constraints.
+ * @method replaceTrackEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ */
+function* replaceTrackEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.REPLACE_TRACK, midcallSagas.replaceTrack, deps);
 }
 
 /***/ }),
@@ -21855,6 +21950,8 @@ const callPrefix = '@@KANDY/CALL/';
 const MAKE_CALL = exports.MAKE_CALL = callPrefix + 'MAKE';
 const MAKE_CALL_FINISH = exports.MAKE_CALL_FINISH = callPrefix + 'MAKE_FINISH';
 
+const MAKE_ANONYMOUS_CALL = exports.MAKE_ANONYMOUS_CALL = callPrefix + 'MAKE_ANONYMOUS_CALL';
+
 const CALL_INCOMING = exports.CALL_INCOMING = callPrefix + 'INCOMING';
 
 const CALL_RINGING = exports.CALL_RINGING = callPrefix + 'RINGING';
@@ -21918,6 +22015,9 @@ const DIRECT_TRANSFER_FINISH = exports.DIRECT_TRANSFER_FINISH = callPrefix + 'DI
 const JOIN = exports.JOIN = callPrefix + 'JOIN';
 const JOIN_FINISH = exports.JOIN_FINISH = callPrefix + 'JOIN_FINISH';
 
+const REPLACE_TRACK = exports.REPLACE_TRACK = callPrefix + 'REPLACE_TRACK';
+const REPLACE_TRACK_FINISH = exports.REPLACE_TRACK_FINISH = callPrefix + 'REPLACE_TRACK_FINISH';
+
 /**
  * Turn action types.
  */
@@ -21951,6 +22051,7 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.makeCall = makeCall;
 exports.makeCallFinish = makeCallFinish;
+exports.makeAnonymousCall = makeAnonymousCall;
 exports.callIncoming = callIncoming;
 exports.callRinging = callRinging;
 exports.callCancelled = callCancelled;
@@ -21988,6 +22089,8 @@ exports.directTransfer = directTransfer;
 exports.directTransferFinish = directTransferFinish;
 exports.join = join;
 exports.joinFinish = joinFinish;
+exports.replaceTrack = replaceTrack;
+exports.replaceTrackFinish = replaceTrackFinish;
 
 var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTypes.js");
 
@@ -22049,6 +22152,10 @@ function makeCall(id, options) {
 
 function makeCallFinish(id, params) {
   return callActionHelper(actionTypes.MAKE_CALL_FINISH, id, params);
+}
+
+function makeAnonymousCall(id, params) {
+  return callActionHelper(actionTypes.MAKE_ANONYMOUS_CALL, id, params);
 }
 
 function callIncoming(id, params) {
@@ -22199,6 +22306,14 @@ function joinFinish(id, params) {
   return callActionHelper(actionTypes.JOIN_FINISH, id, params);
 }
 
+function replaceTrack(id, params) {
+  return callActionHelper(actionTypes.REPLACE_TRACK, id, params);
+}
+
+function replaceTrackFinish(id, params) {
+  return callActionHelper(actionTypes.REPLACE_TRACK_FINISH, id, params);
+}
+
 /***/ }),
 
 /***/ "../kandy/src/call/interfaceNew/actions/index.js":
@@ -22308,38 +22423,42 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 function callAPI({ dispatch, getState }) {
   return {
     /**
-     * Starts an outgoing call to a SIP user or a PSTN phone number.
+     * Starts an outgoing call to a {@link UserID UserID} or a {@link PhoneNumber PhoneNumber}.
      *
      * The call will be tracked by a unique ID that is returned by the API. The
      *    application will use this ID to identify and control the call after it
      *    has been initiated.
      *
-     * The `getCallById` API can be used to retrieve the current state of the
-     *    call.
+     * The {@link Calls.getById call.getById} API can be used to retrieve the
+     *    current information about the call.
      *
-     * The SDK will emit a `call:start` event locally when the operation
-     *    completes. When the remote participant receives the call, a
-     *    `call:receive` event will be emitted remotely for them.
+     * The SDK will emit a {@link Calls.event:call:start call:start} event
+     *    locally when the operation completes. When the remote participant
+     *    receives the call, a {@link Calls.event:call:receive call:receive}
+     *    event will be emitted remotely for them.
      *
-     * The SDK requires access to the machine's media devices (eg. microphone)
+     * The SDK requires access to the machine's media devices (e.g. microphone)
      *    in order to make a call. If it does not already have permissions to
      *    use the devices, the user may be prompted by the browser to give
      *    permissions.
      * @public
+     * @static
      * @memberof Calls
+     * @requires cpaas_call
      * @method make
-     * @param {string} destination The address of the desired remote participant. The format is either
-     * 'sip:sipuser@sip.domain.example.com' for SIP calls or 'tel:18881239876' for PSTN calls.
-     * @param {Object} [media] The media options the call should be initialized with.
-     * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {UserID|PhoneNumber} destination The desired destination.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @returns {string} The generated ID of the newly created call.
      * @example
      * // Listen for the event emitted after making a call.
@@ -22352,9 +22471,62 @@ function callAPI({ dispatch, getState }) {
      *   }
      * })
      * // Make an audio-only call.
-     * const newCallId = client.call.make(callee, { audio: true })
+     * const newCallId = client.call.make(destination, { audio: true })
      */
-    make(destination, media = {}, options = {}) {
+
+    /**
+     * Starts an outgoing call to a {@link SIP_URI SIP URI} or a
+     *    {@link TEL_URI TEL URI}.
+     *
+     * The call will be tracked by a unique ID that is returned by the API. The
+     *    application will use this ID to identify and control the call after it
+     *    has been initiated.
+     *
+     * The {@link Calls.getCallById call.getById} API can be used to retrieve
+     *    the current information about the call.
+     *
+     * The SDK will emit a {@link Calls.event:call:start call:start} event
+     *    locally when the operation completes. When the remote participant
+     *    receives the call, a {@link Calls.event:call:receive call:receive}
+     *    event will be emitted remotely for them.
+     *
+     * The SDK requires access to the machine's media devices (eg. microphone)
+     *    in order to make a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires link_call
+     * @method make
+     * @param {SIP_URI|TEL_URI} destination The desired destination.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {Object} [media.audioOptions] Options for configuring the call's audio.
+     * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
+     * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     * @returns {string} The generated ID of the newly created call.
+     * @example
+     * // Listen for the event emitted after making a call.
+     * client.on('call:start', function (params) {
+     *   const { callId, error } = params
+     *   if (error) {
+     *     // Call failed to initialize.
+     *   } else {
+     *     // Call was initialized, and the recipient user will be notified.
+     *   }
+     * })
+     * // Make an audio-only call.
+     * const newCallId = client.call.make(destination, { audio: true })
+     */
+    make(destination, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.make: ', destination, media, options);
       const callId = (0, _v2.default)();
       const from = (0, _selectors2.getUserInfo)(getState()).username;
@@ -22386,11 +22558,15 @@ function callAPI({ dispatch, getState }) {
      * The specified call to reject must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will be notified, through their own
-     *    `call:stateChange` event, that the call was rejected.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified, through their own
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the
+     *    call was rejected.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
      * @method reject
      * @param {string} callId The ID of the call to reject.
      */
@@ -22405,33 +22581,39 @@ function callAPI({ dispatch, getState }) {
      * The specified call to answer must be in a ringing state with an incoming
      *    direction. The call will become connected as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. This indicates that the call has connected with the remote
-     *    participant. The `getCallById` API can be used to retrieve the latest
-     *    call state after the change. Further events will be emitted to
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. This indicates that the
+     *    call has connected with the remote participant. The
+     *    {@link Calls.getById call.getById} API can be used to retrieve the
+     *    latest call state after the change. Further events will be emitted to
      *    indicate that the call has received media from the remote participant.
-     *     See the `call:newTrack` event for more information about this.
+     *    See the {@link Calls.event:call:newTrack call:newTrack} event for
+     *    more information about this.
      *
-     * The SDK requires access to the machine's media devices (eg. microphone)
+     * The SDK requires access to the system's media devices (eg. microphone)
      *    in order to answer a call. If it does not already have permissions to
      *    use the devices, the user may be prompted by the browser to give
      *    permissions.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
      * @method answer
      * @param {string} callId The ID of the call to answer.
-     * @param {Object} [media] The media options the call should be initialized with.
-     * @param {Boolean} [media.audio=true] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
-    answer(callId, media = {}, options = {}) {
+    answer(callId, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
@@ -22449,11 +22631,13 @@ function callAPI({ dispatch, getState }) {
      * The specified call to ignore must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will not be notified that the call
-     *    was ignored.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will not be notified that the call was ignored.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
      * @method ignore
      * @param {string} callId The ID of the call to ignore.
      */
@@ -22471,13 +22655,17 @@ function callAPI({ dispatch, getState }) {
      *    being sent.
      *
      * Some call operations cannot be performed while the call is on hold. The
-     *    call can be taken off hold with the `unhold` API.
+     *    call can be taken off hold with the {@link Calls.unhold call.unhold} API.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will be notified of the operation
-     *    through a `call:stateChange` as well.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified of the operation through a
+     *    {@link Calls.event:call:stateChange call:stateChange} event as well.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @method hold
      * @param {string} callId The ID of the call to hold.
      */
@@ -22493,11 +22681,15 @@ function callAPI({ dispatch, getState }) {
      *    also remotely held, call media will be reconnected as it was before
      *    the call was held.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will be notified of the operation
-     *    through a `call:stateChange` as well.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified of the operation through a
+     *    {@link Calls.event:call:stateChange call:stateChange} event as well.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @method unhold
      * @param {string} callId The ID of the call to unhold.
      */
@@ -22507,16 +22699,19 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieves the state of calls made during the current session.
+     * Retrieves the information of all calls made during the current session.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @method getAll
      * @return {Array<CallObject>} Call objects.
      * @example
-     * let calls = client.call.getAll();
+     * let calls = client.call.getAll()
      * let currentCalls = calls.filter(call => {
-     *     return call.state === client.call.states.CONNECTED;
-     * });
+     *     return call.state === client.call.states.CONNECTED
+     * })
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'call.getAll');
@@ -22524,9 +22719,13 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieves a single call from state with a specific call ID.
+     * Retrieves the information of a single call with a specific call ID.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
+     * @static
      * @method getById
      * @param {string} callId The ID of the call to retrieve.
      * @return {CallObject} A call object.
@@ -22541,13 +22740,19 @@ function callAPI({ dispatch, getState }) {
      *
      * The SDK will stop any/all local media associated with the call. Events
      *    will be emitted to indicate which media tracks were stopped. See the
-     *    `call:trackEnded` event for more information.
+     *    {@link Calls.event:call:trackEnded call:trackEnded} event for more
+     *    information.
      *
-     * The SDK will emit a `call:stateChange` event locally when the operation
-     *    completes. The remote participant will be notified, through their own
-     *    `call:stateChange` event, that the call was ended.
+     * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant
+     *    will be notified, through their own
+     *    {@link Calls.event:call:stateChange call:stateChange} event, that the
+     *    call was ended.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @method end
      * @param {string} callId The ID of the call to end.
      */
@@ -22559,51 +22764,82 @@ function callAPI({ dispatch, getState }) {
     /**
      * Add new media tracks to an ongoing call.
      * Will get new media tracks from the specific sources to add to the call.
-     * Will trigger a `call:newMedia` event.
+     *
+     * The SDK will emit a {@link Calls.event:call:newTrack call:newTrack} event
+     *    both for the local and remote users to indicate a track has been
+     *    added to the Call.
+     *
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @param {string} callId The ID of the call to add media to.
      * @param {Object} [media={}] The media options to add to the call.
-     * @param {Boolean} [media.audio=false] Whether to add audio to the call.
+     * @param {boolean} [media.audio=false] Whether to add audio to the call.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
-     * @param {Boolean} [media.video=false] Whether to add video to the call.
+     * @param {boolean} [media.video=false] Whether to add video to the call.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
-    addMedia(callId, media = {}) {
+    addMedia(callId, media = {}, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.addMedia: ', callId, media);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
         video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
       };
 
-      dispatch(_actions.callActions.addMedia(callId, { mediaConstraints }));
+      dispatch(_actions.callActions.addMedia(callId, (0, _extends3.default)({ mediaConstraints }, options)));
     },
 
     /**
-     * Remove tracks from an ongoing call
-     * @public
-     * @memberof Calls
-     * @param {string} callId The ID of the call to remove media from.
-     * @param {Array} tracks A list of track IDs to remove.
-     */
-    removeMedia(callId, tracks) {
-      log.debug(_logs.API_LOG_TAG + 'call.removeMedia: ', callId, tracks);
-      dispatch(_actions.callActions.removeMedia(callId, { tracks }));
-    },
-
-    /**
-     * Send DTMF tones on an ongoing call.
+     * Remove tracks from an ongoing call.
+     *
+     * The SDK will emit a {@link Calls.event:call:trackEnded call:trackEnded}
+     *    event for both the local and remote users to indicate that a track
+     *    has been removed.
      *
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
+     * @param {string} callId The ID of the call to remove media from.
+     * @param {Array} tracks A list of track IDs to remove.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     */
+    removeMedia(callId, tracks, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'call.removeMedia: ', callId, tracks);
+      dispatch(_actions.callActions.removeMedia(callId, (0, _extends3.default)({ tracks }, options)));
+    },
+
+    /**
+     * Send DTMF tones to a call's audio.
+     *
+     * The provided tone can either be a single DTMF tone (eg. '1') or a
+     *    sequence of DTMF tones (eg. '123') which will be played one after the
+     *    other.
+     *
+     * The specified call must be either in Connected or Ringing state,
+     *    otherwise invoking this API will have no effect.
+     *
+     * The tones will be sent as out-of-band tones if supported by the call,
+     *    otherwise they will be added in-band to the call's audio.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call
+     * @requires callMe
      * @method sendDTMF
-     * @param {string} callId Id of the call being acted on.
-     * @param {string} tone DTMF tone to send. Valid values are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} tone DTMF tone(s) to send. Valid chracters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
      * @param {number} [duration=100] The amount of time, in milliseconds, that each DTMF tone should last.
      * @param {number} [intertoneGap=70] The length of time, in milliseconds, to wait between tones.
      *
@@ -22614,12 +22850,22 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Get a report about low-level call stats / information.
-     * A track ID can optionally be provided to get a report for the specific track of the call.
+     * Get a report about low-level call statistical information.
+     *
+     * A Track ID can optionally be provided to get a report for a specific
+     *    Track of the Call.
+     *
+     * The SDK will emit a
+     *    {@link Calls.event:call:statsReceived call:statsReceived} event, after
+     *    the operation completes, that has the report.
      * @public
+     * @static
      * @memberof Calls
-     * @param {string} callId The ID of the call to retrieve stats report.
-     * @param {string} [trackId] TrackId. If trackId is not provided, RTCStatsReport is gererated from the peerConnection.
+     * @requires call
+     * @requires callMe
+     * @param {string} callId The ID of the Call to retrieve the report.
+     * @param {string} [trackId] ID of a Track being used by the Call. If not
+     *    provided, RTCStatsReport is generated for the Call itself.
      */
     getStats(callId, trackId) {
       log.debug(_logs.API_LOG_TAG + 'call.getStats: ', callId, trackId);
@@ -22627,12 +22873,38 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Forward an incoming call to another user.
+     * Forwards an incoming call to another user.
+     *
+     * The specified destination will receive the Call instead of the current
+     *    user.
+     *
+     * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
+     *    event after the operation completes.
+     *
      * @public
+     * @static
      * @memberof Calls
+     * @requires call_link
      * @method forward
-     * @param {string} callId      ID of the call being acted on.
-     * @param {string} destination The user to forward the call to.
+     * @param {string} callId ID of the call being acted on.
+     * @param {SIP_URI|TEL_URI} destination The destination to forward the call to.
+     */
+
+    /**
+     * Forwards an incoming call to another user.
+     *
+     * The specified destination will receive the Call instead of the current
+     *    user.
+     *
+     * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
+     *    event after the operation completes.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call_cpaas
+     * @method forward
+     * @param {string} callId ID of the call being acted on.
+     * @param {UserID|PhoneNumber} destination The destination to forward the call to.
      */
     forward(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22646,7 +22918,7 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Performs a "consultative" transfer between two on-going calls (also known
+     * Performs a "consultative" transfer between two ongoing calls (also known
      *    as an announced or warm transfer). This allows the current user to
      *    transfer the remote participant of a call to another user, after
      *    having spoken to both users.
@@ -22656,9 +22928,11 @@ function callAPI({ dispatch, getState }) {
      *    one another after the operation. Both calls for the current user will
      *    be ended.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
      * @method consultativeTransfer
-     * @param {string} callId      ID of the call being acted on.
+     * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
      */
     consultativeTransfer(callId, otherCallId) {
@@ -22676,10 +22950,31 @@ function callAPI({ dispatch, getState }) {
      *    with the remote participant of the specified call. The current user's
      *    call will be ended after the operation.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call_link
      * @method directTransfer
-     * @param {string} callId      ID of the call being acted on.
-     * @param {string} destination The user to transfer the call to.
+     * @param {string} callId ID of the call being acted on.
+     * @param {SIP_URI|TEL_URI} destination The destination to transfer the call to.
+     */
+
+    /**
+     * Performs a "direct" transfer on a call (also known as an unannounced or
+     *    blind transfer). This allows the current user to transfer the remote
+     *    participant of a call to another user, similar to a "forward"
+     *    operation.
+     *
+     * The specified call must be locally held. The "destination" user will
+     *    receive an incoming call, and when answered, they will be connected
+     *    with the remote participant of the specified call. The current user's
+     *    call will be ended after the operation.
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call_cpaas
+     * @method directTransfer
+     * @param {string} callId ID of the call being acted on.
+     * @param {UserID|PhoneNumber} destination The destination to transfer the call to.
      */
     directTransfer(callId, destination) {
       const config = (0, _selectors.getOptions)(getState());
@@ -22694,18 +22989,21 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Performs a "join" on two ongoing calls.
-     * This allows the current user to have a call with audio from the other two users.
+     * This allows the current user to establish a call with audio with two
+     *    remote users.
      *
      * Both specified calls must be locally held. The "joined" call will be
      *    audio-only, even if either previous call had video. Video cannot be
      *    added to the "joined" call. Both remote participants will see their
-     *    call be unheld, and will receive additional audio from other
+     *    call taken off hold, and will receive additional audio from other
      *    participants after the operation. Both calls for the current user will
-     *    be ended.
+     *    be ended after the operation.
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
      * @method join
-     * @param {string} callId      ID of the call being acted on.
+     * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
      */
     join(callId, otherCallId) {
@@ -22715,10 +23013,81 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Possible states for a call.
+     * Replace a call's track with a new track of the same media type.
+     *
+     * The operation will remove the old track from the call and add a
+     *    new track to the call. This effectively allows for changing the
+     *    track constraints (eg. device used) for an ongoing call.
+     *
+     * The SDK will emit a
+     *    {@link Calls.event:call:trackReplaced call:trackReplaced} event
+     *    locally when the operation completes. The newly added track will need
+     *    to be handled by the local application. The track will be replaced
+     *    seamlessly for the remote application, which will not receive an event.
      *
      * @public
+     * @static
      * @memberof Calls
+     * @requires call
+     * @requires callMe
+     * @param {string} callId The ID of the call to replace the track of.
+     * @param {string} trackId The ID of the track to replace.
+     * @param {Object} [media={}] The media options.
+     * @param {boolean} [media.audio=false] Whether to create an audio track.
+     * @param {Object} [media.audioOptions] Options for configuring the audio track.
+     * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
+     * @param {boolean} [media.video=false] Whether to create a video track.
+     * @param {Object} [media.videoOptions] Options for configuring the video track.
+     * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @example
+     * const callId = ...
+     * // Get the video track used by the call.
+     * const videoTrack = ...
+     *
+     * // Replace the specified video track of the call with a new
+     * //    video track.
+     * client.call.replaceTrack(callId, videoTrack.id, {
+     *   // The track should be replaced with a video track using
+     *   //    a specific device. This effectively changes the input
+     *   //    device for an ongoing call.
+     *   video: true,
+     *   videoOptions: {
+     *     deviceId: cameraId
+     *   }
+     * })
+     */
+    replaceTrack(callId, trackId, media) {
+      const mediaConstraints = {
+        audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
+        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
+      };
+      dispatch(_actions.callActions.replaceTrack(callId, { trackId, mediaConstraints }));
+    },
+
+    /**
+     * Possible states that a Call can be in.
+     *
+     * A Call's state describes the current status of the Call. An application
+     *    should use the state to understand how the Call, and any media
+     *    associated with the Call, should be handled. Which state the Call is
+     *    in defines how it can be interacted with, as certain operations can
+     *    only be performed while in specific states, and tells an application
+     *    whether the Call currently has media flowing between users.
+     *
+     * The Call's state is a property of the {@link CallObject}, which can be
+     *    retrieved using the {@link Calls.getById call.getById} or
+     *    {@link Calls.getAll call.getAll} APIs.
+     *
+     * The SDK emits a {@link Calls.event:call:stateChange call:stateChange}
+     *    event when a Call's state changes from one state to another.
+     *
+     * @public
+     * @static
+     * @memberof Calls
+     * @requires call
      * @type {Object}
      * @property {string} INITIATING The (outgoing) call is being started.
      * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received.
@@ -22761,7 +23130,7 @@ var _call2 = _interopRequireDefault(_call);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * The call feature is used to make audio and video calls to and from
+ * The Calls feature is used to make audio and video calls to and from
  * SIP users and PSTN phones.
  *
  * Call functions are all part of the 'call' namespace.
@@ -22770,33 +23139,44 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @module Calls
  */
 
-// TODO: Does the following apply to the new call stack?
 /**
- * The state representation of a Call.
- * Can be retrieved using the Call feature's `getAll` or `getById` APIs.
- * A Call can be manipulated by using the Call feature's APIs.
+ * Information about a Call.
+ *
+ * Can be retrieved using the {@link Calls.getAll call.getAll} or
+ *    {@link Calls.getById call.getById} APIs.
  *
  * @public
+ * @static
  * @module CallObject
- * @property {string} direction The direction in which the call was created (outgoing/incoming).
  * @property {string} id The ID of the call.
+ * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+ * @property {string} state The current state of the call. See {@link Calls.states call.states} for possible states.
  * @property {boolean} localHold Indicates whether this call is currently being held locally.
- * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
- * @property {Object} mediaConstraints This indicates the media types that the call was initialized with.
- * @property {boolean} mediaConstraints.audio Whether the call was initialized with audio.
- * @property {boolean} mediaConstraints.video Whether the call was initialized with video.
  * @property {boolean} remoteHold Indicates whether this call is currently being held remotely.
+ * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
  * @property {Array<string>} remoteTracks A list of Track IDs that the call is receiving from the remote participant.
  * @property {Object} remoteParticipant Information about the other call participant.
- * @property {string} remoteParticipant.displayNumber The username with domain of the callee in the form "username@domain"
- * @property {string} remoteParticipant.displayName The display name of the callee
+ * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
+ * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
+ * @property {BandwidthControls} bandwidth The bandwidth limitations set for the call.
  * @property {number} startTime The start time of the call in milliseconds since the epoch.
- * @property {string} state The current state of the call. See `Call.states` for possible states.
+ * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
  */
 
 /**
- * The media features are used to interact with media that the SDK is
- * currently using.
+ * The Media feature provides an interface for interacting with Media that the
+ *    SDK has access to. Media is used conjunction with the {@link Calls}
+ *    feature to manipulate and render the Tracks sent and received from a Call.
+ *
+ * Media and Track objects are not created directly, but are created as part of
+ *    Call operations. Media and Tracks will either be marked as "local" or
+ *    "remote" depending on whether their source is the local user's machine
+ *    or a remote user's machine.
+ *
+ * The Media feature also keeps track of media devices that the user's machine
+ *    can access. Any media device (eg. USB headset) connected to the machine
+ *    can be used as a source for media. Available devices can be found using
+ *    the {@link Media.getDevices media.getDevices} API.
  *
  * Media functions are all part of the 'media' namespace.
  *
@@ -22834,11 +23214,59 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
+ * The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
+ * BandwidthControls only affect received remote tracks of the specified type.
+ *
+ * @public
+ * @module BandwidthControls
+ * @typedef {Object} BandwidthControls
+ * @property {number} [audio] The desired bandwidth bitrate in kilobits per second for received remote audio.
+ * @property {number} [video] The desired bandwidth bitrate in kilobits per second for received remote video.
+ * @example
+ * // Specify received remote video bandwidth limits when making a call.
+ * client.call.make(destination, mediaConstraints,
+ *  {
+ *    bandwidth: {
+ *      video: 5
+ *    }
+ *  }
+ * )
+ */
+
+/**
+ * @public
+ * @module IceServer
+ * @typedef {Object} IceServer
+ * @property {string} url The URL of the ICE server.
+ * @property {string} [credential] The credential needed by the ICE server.
+ */
+
+/**
+ * @public
+ * @module SdpHandlerInfo
+ * @typedef {Object} SdpHandlerInfo
+ * @property {RTCSdpType} type The session description's type.
+ * @property {string} endpoint Which end of the connection created the SDP.
+ */
+
+/**
+ * The form of an SDP handler function and the expected arguments that it receives.
+ * @public
+ * @module SdpHandlerFunction
+ * @typedef {Function} SdpHandlerFunction
+ * @param {Object} newSdp The SDP so far (could have been modified by previous handlers).
+ * @param {SdpHandlerInfo} info Additional information that might be useful when making SDP modifications.
+ * @param {Object} originalSdp The SDP in its initial state.
+ * @returns {Object} The resulting modified SDP based on the changes made by this function.
+ */
+
+/**
  * The state representation of a Media object.
  * Media is a collection of Track objects.
  *
  * @public
  * @module MediaObject
+ * @typedef {Object} MediaObject
  * @property {string} id The ID of the Media object.
  * @property {boolean} local Indicator on whether this media is local or remote.
  * @property {Array<TrackObject>} tracks A list of Track objects that are contained in this Media object.
@@ -22861,7 +23289,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
- * A collection of devices and their information.
+ * A collection of media devices and their information.
  *
  * @public
  * @module DevicesObject
@@ -22909,26 +23337,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * An outgoing call has been started.
- * The call state can be retrieved using the `getById(callId)` API.
+ *
+ * Information about the Call can be retrieved using the
+ *    {@link Calls.getById call.getById} API.
  *
  * @public
  * @memberof Calls
  * @event call:start
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  */
 const CALL_STARTED = exports.CALL_STARTED = 'call:start';
 
 /**
  * A new incoming call has been received.
- * The call state can be retrieved using the `getById(callId)` API.
+ *
+ * Information about the Call can be retrieved using the
+ *    {@link Calls.getById call.getById} API.
  *
  * @public
  * @memberof Calls
  * @event call:receive
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  * @example
  * client.on('call:receive', function(params) {
@@ -22940,8 +23372,9 @@ const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
 
 // TODO: Add a property in event params that indicates the operation that caused the state change.
 /**
- * A call's state has changed.
- * See `Call.states` for possible call states.
+ * A Call's state has changed.
+ *
+ * See {@link Calls.states call.states} for information about call states.
  * @public
  * @memberof Calls
  * @event call:stateChange
@@ -22981,27 +23414,34 @@ const CALL_STATE_CHANGE = exports.CALL_STATE_CHANGE = 'call:stateChange';
  * @memberof Calls
  * @event call:newMedia
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {boolean} params.local Whether the new media is local or not.
  * @param {Array} params.tracks The list of new Tracks.
- * @param {string} params.mediaId The Id of the Media object the Tracks belong to.
+ * @param {string} params.mediaId The ID of the Media object the Tracks belong to.
  */
 const CALL_ADDED_MEDIA = exports.CALL_ADDED_MEDIA = 'call:newMedia';
 
 /**
- * Media has been removed from the call
+ * Media has been removed from the call.
  * @public
  * @memberof Calls
  * @event call:removedMedia
  * @param {Object} params
- * @param {string} params.callId The Id of the call.
+ * @param {string} params.callId The ID of the call.
  * @param {boolean} params.local Whether the new media is local or not.
  * @param {Array} params.tracks The list of new Tracks.
  */
 const CALL_REMOVED_MEDIA = exports.CALL_REMOVED_MEDIA = 'call:removedMedia';
 
 /**
- * The call has received a new Track.
+ * A new Track has been added to the Call.
+ *
+ * The Track may have been added by either the local user or remote user using
+ *    the {@link Calls.addMedia call.addMedia} API.
+ *
+ * Information about the Track can be retrieved using the
+ *    {@link Media.getTrackById media.getTrackById} API.
+ *
  * @public
  * @memberof Calls
  * @event call:newTrack
@@ -23014,7 +23454,12 @@ const CALL_REMOVED_MEDIA = exports.CALL_REMOVED_MEDIA = 'call:removedMedia';
 const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
 
 /**
- * The call has received a new Track.
+ * A Track has been removed from a Call.
+ *
+ * The Track may have been removed by either the local user or remote user using
+ *    the {@link Calls.removeMedia call.removeMedia} API. Tracks are also
+ *    removed from Calls automatically while the Call is on hold.
+ *
  * @public
  * @memberof Calls
  * @event call:trackEnded
@@ -23027,17 +23472,42 @@ const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
 const CALL_TRACK_ENDED = exports.CALL_TRACK_ENDED = 'call:trackEnded';
 
 /**
- * Stats have been retrieved for a call or specific track.
+ * Stats have been retrieved for a Call or specific Track of a Call.
+ *
+ * See the {@link Calls.getStats call.getStats} API for more information.
+ *
  * @public
  * @memberof Calls
  * @event call:statsReceived
  * @param {Object} params
- * @param {string} params.callId The ID of the call to retrieve stats for.
- * @param {string} [params.trackId] The ID of the track to retrieve stats for.
+ * @param {string} params.callId The ID of the Call to retrieve stats for.
+ * @param {string} [params.trackId] The ID of the Track to retrieve stats for.
  * @param {string} params.result The RTCStatsReport.
  * @param {BasicError} [params.error] An error object, if the operation was not successful.
  */
 const STATS_RECEIVED = exports.STATS_RECEIVED = 'call:statsReceived';
+
+/**
+ * A Track has been replaced on the Call.
+ *
+ * A Track is replaced by the local user using the
+ *    {@link Calls.replaceTrack call.replaceTrack} API.
+ *
+ * This event is similar to the {@link Calls.event:call:newTrack call:newTrack}
+ *    event, where the call has a new Track, except that an existing Track has
+ *    been removed at the same time. The event includes information about the
+ *    Track that was replaced to help an application replace it seamlessly.
+ *
+ * @public
+ * @memberof Calls
+ * @event call:trackReplaced
+ * @param {Object} params
+ * @param {string} params.callId The ID of the call where a track was replaced.
+ * @param {string} [params.newTrackId] The ID of the new track that replaced the old track.
+ * @param {TrackObject} [params.oldTrack] State of the replaced track.
+ * @param {BasicError} [params.error] An error object, if the operation was not successful.
+ */
+const CALL_TRACK_REPLACED = exports.CALL_TRACK_REPLACED = 'call:trackReplaced';
 
 /***/ }),
 
@@ -23209,6 +23679,14 @@ callEvents[webrtcActionTypes.SESSION_NEW_TRACK] = (action, context) => {
   return null;
 };
 
+callEvents[actionTypes.REPLACE_TRACK_FINISH] = (action, context) => {
+  return callEventHandler(eventTypes.CALL_TRACK_REPLACED, action, {
+    error: action.payload.error,
+    newTrackId: action.payload.newTrackId,
+    oldTrack: action.payload.oldTrackState
+  });
+};
+
 callEvents[webrtcActionTypes.SESSION_TRACK_ENDED] = (action, context) => {
   const state = context.state;
   const call = (0, _selectors.getCallByWebrtcSessionId)(state, action.payload.id);
@@ -23326,7 +23804,11 @@ reducers[actionTypes.MAKE_CALL] = {
       // Hold status.
       localHold: false,
       remoteHold: false,
-      isCaller: true
+      isCaller: true,
+      // Flag indicating whether the call is anonymous or not
+      isAnonymous: action.payload.isAnonymous,
+      // The account token used to make the anonymous call
+      account: action.payload.account
     };
 
     return (0, _fp.concat)(state, newCall);
@@ -23405,7 +23887,8 @@ callReducers[actionTypes.MAKE_CALL_FINISH] = {
     return (0, _extends3.default)({}, state, {
       state: action.payload.state,
       wrtcsSessionId: action.payload.wrtcsSessionId,
-      webrtcSessionId: action.payload.webrtcSessionId
+      webrtcSessionId: action.payload.webrtcSessionId,
+      bandwidth: action.payload.bandwidth
     });
   },
   throw(state, action) {
@@ -23426,7 +23909,8 @@ callReducers[actionTypes.ANSWER_CALL_FINISH] = {
       mediaConstraints: action.payload.mediaConstraints,
       webrtcSessionId: webrtcId,
       localHold: false,
-      remoteHold: false
+      remoteHold: false,
+      bandwidth: action.payload.bandwidth
     });
   },
   throw(state, action) {
@@ -23585,6 +24069,22 @@ reducers[actionTypes.JOIN_FINISH] = {
   }
 };
 
+callReducers[actionTypes.ADD_MEDIA_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      bandwidth: action.payload.bandwidth
+    });
+  }
+};
+
+callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      bandwidth: action.payload.bandwidth
+    });
+  }
+};
+
 /*
  * Combine all of the call-tier reducers into a single reducer,
  *      each with a default state of empty object.
@@ -23592,7 +24092,7 @@ reducers[actionTypes.JOIN_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER_FINISH);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.MUSIC_ON_HOLD, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER_FINISH);
 
 /*
  * Reducer to handle specific call actions.
@@ -24206,6 +24706,440 @@ function isDualHold(callState) {
 
 /***/ }),
 
+/***/ "../kandy/src/callstack/call/dtmf.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sendDtmf = sendDtmf;
+exports.playOutBand = playOutBand;
+exports.playInBand = playInBand;
+exports.hasTelephoneEvent = hasTelephoneEvent;
+exports.convertTone = convertTone;
+exports.splitTones = splitTones;
+
+var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
+
+var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _errors = __webpack_require__("../kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
+/**
+ * Entry saga for sending DTMF tones on a call.
+ *
+ * Determines if the DTMF tones need to be out-of-band (preferred) or in-band.
+ *    Referes to helper functions to send the tones.
+ *
+ * Assumptions:
+ *    1. None; everything is checked.
+ * Responsibilities:
+ *    1. Validate the operation is currently possible.
+ *    2. Determine if out-of-band tones are possible for the call.
+ *    3. Send the tones, depending on method available.
+ * @method sendDtmf
+ * @param {Object} deps        Dependencies that the saga uses.
+ * @param {Object} deps.webRTC The WebRTC stack.
+ * @param {Object} action      A "send dtmf" action.
+ */
+/**
+ * dtmf.js contains one call operation:
+ *    - sendDtmf: Send DTMF tone(s) over a call.
+ *
+ * and several "helper" functions for it:
+ *    - playInBand: Functionality for in-band DTMF.
+ *    - playOutBand: Functionality for out-of-band DTMF.
+ *      - addTones: Generates DTMF tones and adds them to the audio.
+ *    - hasTelephoneEvent: Helper to determine out-of-band DTMF support.
+ *    - convertTone, splitTones: Helpers for parsing input.
+ */
+
+// Call plugin.
+function* sendDtmf(deps, action) {
+  const { webRTC } = deps;
+
+  // Get the call.
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  let error;
+  /**
+   * Operation requirements:
+   *    1. The call exists.
+   *    2. The call is either Connected or Ringing.
+   *    3. A valid tone was provided.
+   */
+  if (!targetCall) {
+    log.info(`Failed to send DTMF tones on unknown call ${action.payload.id}`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_PARAM,
+      message: 'Call state not found; invalid call ID.'
+    });
+  } else if (![_constants.CALL_STATES.CONNECTED, _constants.CALL_STATES.RINGING].includes(targetCall.state)) {
+    log.info(`Failed to send DTMF tones on call ${targetCall.id}: Bad call state.`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_STATE,
+      message: `Call is in an invalid state (${targetCall.state}).`
+    });
+  } else if (!action.payload.tone) {
+    log.info(`Failed to send DTMF tones on call ${targetCall.id}: Invalid tone.`);
+    error = new _errors2.default({
+      code: _errors.callCodes.INVALID_PARAM,
+      message: 'No DTMF tone specified.'
+    });
+  }
+
+  if (error) {
+    // Stop the operation if it cannot be performed right now.
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, { error }));
+    return;
+  }
+
+  // Get the webrtc Session for the call.
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], targetCall.webrtcSessionId);
+  // Get the remote description for the Session.
+  const remoteDesc = yield (0, _effects.call)([session, 'getRemoteDescription']);
+
+  // TODO: Is this the correct SDP to use?
+  let canSendOutBand = yield (0, _effects.call)(hasTelephoneEvent, remoteDesc.sdp);
+
+  let result;
+  if (canSendOutBand) {
+    log.debug(`Sending DTMF tones out-of-band for call ${targetCall.id}.`);
+    result = yield (0, _effects.call)(playOutBand, session, action.payload);
+  } else {
+    log.debug(`Sending DTMF tones in-band for call ${targetCall.id}.`);
+    result = yield (0, _effects.call)(playInBand, session, action.payload);
+  }
+
+  if (result) {
+    log.info(`Successfully sent DTMF tones for call ${targetCall.id}.`);
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id));
+  } else {
+    log.debug(`Failed to send DTMF tones for call ${targetCall.id}.`);
+    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: `Unable to send DTMF tones for call ${targetCall.id}.`
+      })
+    }));
+  }
+}
+
+/**
+ * Sends DTMF tones out-of-band over a Session.
+ * This saga defines how out-of-band tones are sent over a call.
+ *
+ * The Callstack implementation uses the WebRTC stack's implementation for this.
+ *    There is no signaling involved.
+ *
+ * @method playOutBand
+ * @param  {Session} session A Webrtc Session object.
+ * @param  {Object}  options
+ * @param  {string}  options.tone           The tone sequence.
+ * @param  {number}  [options.duration]     The length of each DTMF tone.
+ * @param  {number}  [options.intertoneGap] The gap between each DTMF tone.
+ * @return {boolean} Whether the operation was succesful or not.
+ */
+function* playOutBand(session, options) {
+  const result = yield (0, _effects.call)([session, 'sendDTMF'], options);
+  return result;
+}
+
+/**
+ * Sends DTMF tones in-band over a Session.
+ * This saga defines how in-band tones are sent over a call.
+ *
+ * DTMF tones are added to the audio track by using AudioContext nodes. A
+ *    MediaStream is converted into an audio node, which allows us to add more
+ *    audio inputs into the node. The original audio and DTMF tones are mixed
+ *    into a single node this way, and the track from this node temporarily
+ *    replaces the original track in the Session.
+ *
+ *                       +-------------------------+
+ *    Original           | Additional Audio Source |
+ *   MediaStream         +---------+---------------+
+ *       |                         |
+ *       |                         |
+ *       v                         v
+ * +-----+-------+         +-------+----------+
+ * | Source Node +-------->| Destination Node |
+ * +-------------+         +-------+----------+
+ *                                 |
+ *                                 |
+ *                                 v
+ *                         MediaStream w/ DTMF
+ *
+ * @method playInBand
+ * @param  {Session} session A Webrtc Session object.
+ * @param  {Object}  options
+ * @param  {string}  options.tone           The tone sequence.
+ * @param  {number}  [options.duration=100]     The length of each DTMF tone.
+ * @param  {number}  [options.intertoneGap=70]  The gap between each DTMF tone.
+ * @return {boolean} Whether the operation was succesful or not.
+ */
+function* playInBand(session, options) {
+  let { tone, duration, intertoneGap: gap } = options;
+
+  // Ensure optional options are numbers (not strings). If not numbers, or
+  //    undefined, use default values.
+  duration = Number(duration) > 0 ? Number(duration) : 100;
+  gap = Number(gap) > -1 ? Number(gap) : 70;
+
+  // Get the (native) track the tones will be inserted into.
+  let track;
+  for (let localTrack of session.localTracks) {
+    // Matching the track is done this way because we need to yield to getState,
+    //    but we can't yield inside of a `.find(func)` or similar. So iterate
+    //    over the new tracks "manually".
+    const state = yield (0, _effects.call)([localTrack, 'getState']);
+    if (state.kind === 'audio') {
+      track = localTrack;
+      break;
+    }
+  }
+
+  const stream = yield (0, _effects.call)([track, 'getStream']);
+  const context = new AudioContext();
+
+  // Create a source node that has the stream media.
+  const source = context.createMediaStreamSource(stream);
+
+  /**
+   * Create the "destination node". All audio sources will be connected to This
+   *    node, and it will be used as the "final output".
+   */
+  const dest = context.createMediaStreamDestination();
+  // Connect the source node to it, so that it has the original audio.
+  source.connect(dest);
+
+  // Get the track from the destination node and replace the original track
+  //    on the PeerConnection with it. The remote endpoint will now receive
+  //    any/all audio that is connected to the destination node.
+  const newTrack = dest.stream.getAudioTracks()[0];
+  yield (0, _effects.call)([session.peer, 'replaceTrack'], newTrack, { trackId: track.id });
+
+  // Add the DTMF tones to the destination node.
+  yield (0, _effects.call)(addTones, context, dest, tone, { duration, gap });
+
+  // Un-replace track on the PeerConnection. This resets the tracks back to
+  //    "normal".
+  yield (0, _effects.call)([session.peer, 'replaceTrack'], track.track, { trackId: newTrack.id });
+
+  // Clean-up the AudioContext nodes.
+  context.close();
+
+  return true;
+}
+
+/**
+ * Generates DTMF tones based on input, and connects the audio to the provided
+ *    target node.
+ * @method addTones
+ * @param  {AudioContext} context      The AudioContext being used.
+ * @param  {AudioNode} targetNode      The AudioNode to add DTMF tones to.
+ * @param  {string} tones              The input tones.
+ * @param  {Object} [options]
+ * @param  {number} [options.duration] The length of each DTMF tone.
+ * @param  {number} [options.gap]      The gap between each DTMF tone.
+ */
+function* addTones(context, targetNode, tones, options) {
+  /**
+   * Node Diagram:
+   * +--------------+
+   * | Oscillator 1 +--+
+   * +--------------+  |    +--------------+
+   *                   +--->|   Osc Node   |
+   * +--------------+  |    +------+-------+
+   * | Oscillator 2 +--+           |
+   * +--------------+              | Connect generated audio
+   *                               v to the provided node.
+   *                        +------+--------+
+   *                        |  Target Node  |
+   *                        +---------------+
+   */
+
+  /**
+   * Step 1: Setup the audio nodes.
+   */
+  // Create the Oscillator nodes that will generate the frequencies.
+  const oscillators = [context.createOscillator(), context.createOscillator()];
+  oscillators[0].type = 'sine';
+  oscillators[1].type = 'sine';
+
+  /**
+   * Create an intermediary Gain node to control the volume of the oscillator
+   *   frequencies before connecting them to anything else.
+   */
+  const oscNode = context.createGain();
+  oscillators[0].connect(oscNode);
+  oscillators[1].connect(oscNode);
+  oscNode.gain.value = 0.1;
+
+  // Connect the combined oscillators to the target node. Any tones created
+  //    by the oscillators will be heard in the target node.
+  oscNode.connect(targetNode);
+
+  // Connect the oscillators to the "destination" as well, which works magically.
+  // `context.destination` connects to the "default destination" (or something
+  //    like that), which will be the machine's speakers. This will play the
+  //    audio locally.
+  oscNode.connect(context.destination);
+
+  /**
+   * Step 2: Use the oscillators to generate DTMF tones.
+   */
+
+  /**
+   * Schedule a frequency to be played for a period of time.
+   * @method scheduleTone
+   * @param  {number} tone  A frequency.
+   * @param  {number} start When the tone should start.
+   * @param  {number} dur   The duration of the tone, in seconds.
+   */
+  function scheduleTone(tone, start, dur) {
+    oscillators[0].frequency.setValueAtTime(tone[0], start);
+    oscillators[0].frequency.setValueAtTime(0, start + dur);
+
+    oscillators[1].frequency.setValueAtTime(tone[1], start);
+    oscillators[1].frequency.setValueAtTime(0, start + dur);
+  }
+
+  const toneSequence = splitTones(tones).map(convertTone);
+
+  // Convert the time units to seconds.
+  const dur = options.duration / 1000;
+  const gap = options.gap / 1000;
+
+  let toneStart = context.currentTime;
+  for (let i = 0; i < toneSequence.length; i++) {
+    scheduleTone(toneSequence[i], toneStart, dur);
+
+    toneStart = toneStart + dur + gap;
+  }
+
+  // Start playing the scheduled tones.
+  oscillators[0].start();
+  oscillators[1].start();
+
+  /**
+   * Step 3: Clean-up the audio nodes.
+   */
+
+  // Wait until all tones have finished playing.
+  const numTones = toneSequence.length;
+  const delayTime = numTones * (options.duration + options.gap);
+  yield (0, _effects.delay)(delayTime);
+
+  // Disconnect all nodes from each other.
+  oscNode.disconnect();
+  oscillators[0].stop();
+  oscillators[0].disconnect();
+  oscillators[1].stop();
+  oscillators[1].disconnect();
+}
+
+/**
+ * Checks whether an SDP has at least one telephone-event codec.
+ *
+ * TODO: If there isn't a telephone-event, then the PeerConnection won't have
+ *    a "dtmf sender" (RTCRtpSender.dtmf). Should preferrably check for that
+ *    rather than looking through the SDP.
+ * This isn't being done because the Session/Peer models wrap "send dtmf" in a
+ *    way that makes it inconvenient to use.
+ *
+ * @method hasTelephoneEvent
+ * @param  {string}  stringSdp An SDP.
+ * @return {boolean}
+ */
+function hasTelephoneEvent(stringSdp) {
+  const sdp = _sdpTransform2.default.parse(stringSdp);
+
+  const hasCodec = sdp.media.filter(media => media.type === 'audio').some(media => {
+    return media.rtp.some(rtp => rtp.codec === 'telephone-event');
+  });
+
+  return hasCodec;
+}
+
+/**
+ * Converts a single tone input to its dual-frequencies.
+ * @method convertTone
+ * @param  {string} tone A DTMF tone input character.
+ * @return {Array} The set of frequencies for the DTMF tone.
+ */
+function convertTone(tone) {
+  if (typeof tone !== 'string' || tone.length > 1) {
+    throw new Error('Invalid input for DTMF tone.');
+  }
+
+  switch (tone) {
+    case '1':
+      return ['697', '1209'];
+    case '2':
+      return ['697', '1336'];
+    case '3':
+      return ['697', '1477'];
+    case '4':
+      return ['770', '1209'];
+    case '5':
+      return ['770', '1336'];
+    case '6':
+      return ['770', '1477'];
+    case '7':
+      return ['852', '1209'];
+    case '8':
+      return ['852', '1336'];
+    case '9':
+      return ['852', '1477'];
+    case '0':
+      return ['941', '1209'];
+    case '*':
+      return ['941', '1336'];
+    case '#':
+      return ['941', '1477'];
+  }
+}
+
+/**
+ * Splits a DTMF tone sequence into individual tones.
+ * @method splitTones
+ * @param  {string} tone A DTMF tone string.
+ * @return {Array} List of single-character tones.
+ */
+function splitTones(tone) {
+  const matches = tone.match(/[\d*#]+/);
+  if (!matches || matches[0] !== tone) {
+    throw new Error('Invalid characters in tone.');
+  }
+
+  return tone.split('');
+}
+
+/***/ }),
+
 /***/ "../kandy/src/callstack/call/establish.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24227,6 +25161,8 @@ var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.j
 
 var _constants = __webpack_require__("../kandy/src/call/constants.js");
 
+var _bandwidth = __webpack_require__("../kandy/src/callstack/utils/bandwidth.js");
+
 var _utils = __webpack_require__("../kandy/src/call/cpaas/utils/index.js");
 
 var _establish = __webpack_require__("../kandy/src/callstack/webrtc/establish.js");
@@ -24241,15 +25177,6 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 
 // Callstack plugin.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
-
-// Call plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -24268,13 +25195,23 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.createSession "Make call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action        An action of type `MAKE_CALL`.
  */
 
 
 // Libraries.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
+
+// Call plugin.
 function* makeCall(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
 
   // Create a new local media object for this call.
   const mediaConstraints = {
@@ -24285,10 +25222,12 @@ function* makeCall(deps, action) {
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
   const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
-  const { error, offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
+  const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
+  const { error, offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
     sdpSemantics,
     turnInfo,
-    trickleIceMode
+    trickleIceMode,
+    bandwidth
   });
 
   // An error occured while trying to setup the WebRTC portion of the call.
@@ -24303,6 +25242,9 @@ function* makeCall(deps, action) {
 
   const callInfo = {
     participantAddress: action.payload.participantAddress,
+    isAnonymous: action.payload.isAnonymous,
+    from: action.payload.from,
+    account: action.payload.account,
     offer: offerSdp
   };
 
@@ -24317,14 +25259,16 @@ function* makeCall(deps, action) {
       // The ID that the webRTC stack uses to track this webRTC session.
       webrtcSessionId: sessionId,
       // The local Media object associated with this call.
-      mediaId: mediaId
+      mediaId: mediaId,
+      // The bandwidth of the call.
+      bandwidth
     }));
   } else {
     // The call failed, so stop the Media object created for the call.
     // TODO: Update redux state that the Media object is stopped.
     //    Need an event from Media model to notify about the stop, and listener
     //    set on Media when it is created (in `createLocalMedia` saga).
-    yield (0, _effects.call)(_midcall.closeCall, webRTC, mediaId);
+    yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, mediaId);
 
     yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
       state: _constants.CALL_STATES.ENDED,
@@ -24363,12 +25307,14 @@ function* makeCall(deps, action) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.answerSession "Answer call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action        An "answer call" action.
  */
 function* answerCall(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
+  const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
   if (!incomingCall) {
     // TODO: Should report an error.
     log.error(`Error: Call ${action.payload.id} not found.`);
@@ -24406,10 +25352,11 @@ function* answerCall(deps, action) {
     const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
     // Setup a webRTC session.
-    webrtcInfo = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
+    webrtcInfo = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
       sdpSemantics,
       turnInfo,
-      trickleIceMode
+      trickleIceMode,
+      bandwidth
     });
 
     if (webrtcInfo.error) {
@@ -24435,8 +25382,8 @@ function* answerCall(deps, action) {
     log.debug('Answering call.', action.payload.id);
 
     // Update the existing webRTC session with an answer.
-    const sessionOptions = { sessionId: incomingCall.webrtcSessionId };
-    webrtcInfo = yield (0, _effects.call)(_establish.answerWebrtcSession, webRTC, mediaConstraints, sessionOptions);
+    const sessionOptions = { sessionId: incomingCall.webrtcSessionId, bandwidth };
+    webrtcInfo = yield (0, _effects.call)(_establish.answerWebrtcSession, deps, mediaConstraints, sessionOptions);
 
     if (webrtcInfo.error) {
       yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
@@ -24468,7 +25415,9 @@ function* answerCall(deps, action) {
       // For slow start calls, there isn't a webRTC session yet.
       webrtcSessionId: webrtcInfo.sessionId,
       // TODO: Properly track the media that the call has.
-      mediaConstraints
+      mediaConstraints,
+      // The bandwidth of the call
+      bandwidth
     }, {
       isSlowStart: incomingCall.isSlowStart
     }));
@@ -24642,13 +25591,13 @@ Object.defineProperty(exports, "__esModule", {
 exports.endCall = endCall;
 exports.offerInactiveMedia = offerInactiveMedia;
 exports.offerFullMedia = offerFullMedia;
-exports.sendDTMF = sendDTMF;
 exports.getStats = getStats;
 exports.addMedia = addMedia;
 exports.removeMedia = removeMedia;
 exports.directTransfer = directTransfer;
 exports.consultativeTransfer = consultativeTransfer;
 exports.join = join;
+exports.replaceTrack = replaceTrack;
 
 var _establish = __webpack_require__("../kandy/src/callstack/webrtc/establish.js");
 
@@ -24723,13 +25672,13 @@ function* endCall(deps, action) {
     return;
   }
 
-  const { wrtcsSessionId, webrtcSessionId } = yield (0, _effects.select)(_selectors.getCallById, id);
+  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account } = yield (0, _effects.select)(_selectors.getCallById, id);
 
   // Perform webRTC functions
   yield (0, _effects.call)(_midcall.closeCall, webRTC, webrtcSessionId);
 
   // Perform signalling to end the session
-  const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId });
+  const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
 
   if (!response.error) {
     yield (0, _effects.put)(_actions.callActions.endCallFinish(id));
@@ -24760,10 +25709,11 @@ function* endCall(deps, action) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action An action of type `CALL_HOLD`.
  */
 function* offerInactiveMedia(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: false });
@@ -24777,14 +25727,14 @@ function* offerInactiveMedia(deps, action) {
   }
 
   const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-  const { wrtcsSessionId, webrtcSessionId } = targetCall;
+  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account } = targetCall;
 
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
-  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, webrtcSessionId, {
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, deps, webrtcSessionId, {
     audio: 'inactive',
     video: 'inactive'
-  });
+  }, targetCall.bandwidth);
 
   if (!offer) {
     log.debug('Failed to generate SDP offer');
@@ -24800,7 +25750,9 @@ function* offerInactiveMedia(deps, action) {
 
   const callInfo = {
     wrtcsSessionId,
-    offer: offer.sdp
+    offer: offer.sdp,
+    isAnonymous,
+    account
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -24839,10 +25791,11 @@ function* offerInactiveMedia(deps, action) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action        A "unhold call" action.
  */
 function* offerFullMedia(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: true });
@@ -24856,14 +25809,14 @@ function* offerFullMedia(deps, action) {
   }
 
   const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-  const { wrtcsSessionId, webrtcSessionId } = targetCall;
+  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account } = targetCall;
 
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
-  const offer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, webrtcSessionId, {
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, deps, webrtcSessionId, {
     audio: 'sendrecv',
     video: 'sendrecv'
-  });
+  }, targetCall.bandwidth);
 
   if (!offer) {
     log.debug('Invalid SDP offer or SDP offer not received.');
@@ -24879,7 +25832,9 @@ function* offerFullMedia(deps, action) {
 
   const callInfo = {
     wrtcsSessionId,
-    offer: offer.sdp
+    offer: offer.sdp,
+    isAnonymous,
+    account
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -24894,72 +25849,6 @@ function* offerFullMedia(deps, action) {
     log.debug('Successfully sent unhold offer.');
     yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
       local: true
-    }));
-  }
-}
-
-/**
- * Sends DTMF tones out-of-band.
- *
- * This saga defines how DTMF tones are sent over a call. It performs
- *    the webRTC operations on the local session of a call. There is no
- *    signaling involved.
- * Assumptions:
- *    1. The call is in the correct state.
- *        - The call is connected.
- * Responsibilities:
- *    1. Validate that tones can be sent on the call's session.
- *    2. Send the tones.
- * @method sendDTMF
- * @param {Object} deps        Dependencies that the saga uses.
- * @param {Object} deps.webRTC The WebRTC stack.
- * @param {Object} action      A "send dtmf" action.
- */
-function* sendDTMF(deps, action) {
-  const { webRTC } = deps;
-
-  // Handle scenario where no tone is provided.
-  if ((0, _fp.isUndefined)(action.payload.tone)) {
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.INVALID_PARAM,
-        message: 'No tone specifed.'
-      })
-    }));
-    return;
-  }
-
-  // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
-  if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
-      local: true,
-      error: stateError
-    }));
-    return;
-  }
-
-  // Get the call.
-  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-
-  // Get the local Session for the call.
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], targetCall.webrtcSessionId);
-
-  const { tone, duration, intertoneGap } = action.payload;
-
-  // Send DTMF tones.
-  const result = yield (0, _effects.call)([session, 'sendDTMF'], { tone, duration, intertoneGap });
-  if (result) {
-    log.debug('Successfully sent DTMF tones.');
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id));
-  } else {
-    log.debug('Failed to send DTMF tones.');
-    yield (0, _effects.put)(_actions.callActions.sendDTMFFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.GENERIC_ERROR,
-        message: 'Unable to send DTMF tones.'
-      })
     }));
   }
 }
@@ -25041,10 +25930,12 @@ function* getStats(deps, action) {
  * @param {Object}  deps.webRTC   The WebRTC stack.
  * @param {Object}  deps.requests requests that addMedia relies on
  * @param {Function}  deps.requests.updateSession request to update the session on the backend
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param  {Object} action        An "add media" action.
  */
 function* addMedia(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
+  const { bandwidth } = action.payload;
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
@@ -25058,11 +25949,15 @@ function* addMedia(deps, action) {
   }
 
   // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const { webrtcSessionId, wrtcsSessionId, bandwidth: callBandwidth, isAnonymous, account } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
-  // Create media and add tracks using webRTC
-  const { error, sdp, media } = yield (0, _effects.call)(_midcall.webRtcAddMedia, webRTC, action.payload.mediaConstraints, {
-    sessionId: webrtcSessionId
+  const finalBandwidth = {
+    audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
+    video: bandwidth && bandwidth.video ? bandwidth.video : callBandwidth.video
+    // Create media and add tracks using webRTC
+  };const { error, sdp, media } = yield (0, _effects.call)(_midcall.webRtcAddMedia, deps, action.payload.mediaConstraints, {
+    sessionId: webrtcSessionId,
+    bandwidth: finalBandwidth
   });
 
   if (error) {
@@ -25075,7 +25970,9 @@ function* addMedia(deps, action) {
 
   const callInfo = {
     wrtcsSessionId,
-    offer: sdp
+    offer: sdp,
+    isAnonymous,
+    account
 
     // Perform signalling to add media
   };const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -25091,7 +25988,8 @@ function* addMedia(deps, action) {
     yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
       local: true,
       mediaId: media.id,
-      tracks: media.tracks.map(track => track.id)
+      tracks: media.tracks.map(track => track.id),
+      bandwidth: finalBandwidth
     }));
   }
 }
@@ -25112,15 +26010,17 @@ function* addMedia(deps, action) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action An action of type `REMOVE_MEDIA`.
  */
 function* removeMedia(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
+  const { id, tracks, bandwidth } = action.payload;
 
   // Handle scenario where no track ids are provided or not in an array.
-  if (!(0, _fp.isArray)(action.payload.tracks) || (0, _fp.isEmpty)(action.payload.tracks)) {
+  if (!(0, _fp.isArray)(tracks) || (0, _fp.isEmpty)(tracks)) {
     log.debug(`No track ids specified to remove.`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       error: new _errors2.default({
         code: _errors.callCodes.INVALID_PARAM,
@@ -25131,26 +26031,30 @@ function* removeMedia(deps, action) {
   }
 
   // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, id, { state: _constants.CALL_STATES.CONNECTED });
   if (stateError) {
     log.debug(`Invalid call state:  ${stateError.message}`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       stateError
     }));
     return;
   }
   // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const { webrtcSessionId, wrtcsSessionId, bandwidth: callBandwidth, isAnonymous, account } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
-  // Remove media and tracks using webRTC
-  const { sdp, error } = yield (0, _effects.call)(_midcall.webRtcRemoveMedia, webRTC, {
+  const finalBandwidth = {
+    audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
+    video: bandwidth && bandwidth.video ? bandwidth.video : callBandwidth.video
+    // Remove media and tracks using webRTC
+  };const { sdp, error } = yield (0, _effects.call)(_midcall.webRtcRemoveMedia, deps, {
     sessionId: webrtcSessionId,
-    tracks: action.payload.tracks
+    tracks: tracks,
+    bandwidth: finalBandwidth
   });
   if (error) {
     log.debug(`Failed to remove media: ${error.message}`);
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       error
     }));
@@ -25159,22 +26063,25 @@ function* removeMedia(deps, action) {
 
   const callInfo = {
     wrtcsSessionId,
-    offer: sdp
+    offer: sdp,
+    isAnonymous,
+    account
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
     log.debug('Failed to send remove media offer.');
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       error: response.error
     }));
   } else {
     log.debug('Successfully sent remove media offer.');
-    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
-      tracks: action.payload.tracks
+      tracks: tracks,
+      bandwidth: finalBandwidth
     }));
   }
 }
@@ -25312,7 +26219,7 @@ function* consultativeTransfer(deps, action) {
  * @param {Object}   action An action of type `JOIN`.
  */
 function* join(deps, action) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
 
   const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
   const otherCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.otherCallId);
@@ -25347,7 +26254,7 @@ function* join(deps, action) {
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
   const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
-  const { offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, webRTC, mediaConstraints, {
+  const { offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
     sdpSemantics,
     turnInfo,
     trickleIceMode
@@ -25406,6 +26313,50 @@ function* join(deps, action) {
     // The ids of the calls that were used for joining.
     usedCallIds: [currentCall.id, otherCall.id]
   }));
+}
+
+/**
+ *
+ * Replaces an existing track with a new track.
+ *
+ * This saga handles the WebRTC portion of replacing a track.
+ * Assumptions:
+ *    1. The action contains call id, trackId, and mediaConstraints
+ * Responsibilities:
+ *    1. Creates a new track.
+ *    2. Replaces an an existing track with the newly created track.
+ *    3. Update call state (via redux actions).
+ * @method replaceTrack
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   action An action of type `REPLACE_TRACK`.
+ */
+function* replaceTrack(deps, action) {
+  const { webRTC } = deps;
+  const { trackId, mediaConstraints } = action.payload;
+
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state: ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.replaceTrackFinish(action.payload.id, {
+      error: stateError
+    }));
+    return;
+  }
+
+  const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  const { error, newTrackId, oldTrackState } = yield (0, _effects.call)(_midcall.webRtcReplaceTrack, webRTC, {
+    sessionId: currentCall.webrtcSessionId,
+    trackId,
+    mediaConstraints
+  });
+
+  if (error) {
+    yield (0, _effects.put)(_actions.callActions.replaceTrackFinish(action.payload.id, { error }));
+  } else {
+    yield (0, _effects.put)(_actions.callActions.replaceTrackFinish(action.payload.id, { newTrackId, oldTrackState }));
+  }
 }
 
 /***/ }),
@@ -25475,6 +26426,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateSessionResponse "Respond to offer" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   targetCall    The call being acted on.
  * @param {Object}   params        Parameters of the update request.
  * @param {string}   params.sdp          A remote offer SDP.
@@ -25545,7 +26497,7 @@ function* handleUpdateRequest(deps, targetCall, params) {
 
   // Handle the offer SDP to receive an answer SDP.
   // TODO: Handle the offer differently depending on remote operation.
-  const { error, answerSDP } = yield (0, _effects.call)(_midcall.handleOffer, webRTC, sdp, targetCall.webrtcSessionId);
+  const { error, answerSDP } = yield (0, _effects.call)(_midcall.handleOffer, deps, sdp, targetCall.webrtcSessionId, targetCall.bandwidth);
 
   if (error) {
     log.debug('Failed to receive offer SDP.', error);
@@ -25557,7 +26509,9 @@ function* handleUpdateRequest(deps, targetCall, params) {
   // Send answer sdp back to remote side
   const callInfo = {
     wrtcsSessionId: targetCall.wrtcsSessionId,
-    answer: answerSDP
+    answer: answerSDP,
+    isAnonymous: targetCall.isAnonymous,
+    account: targetCall.account
   };
 
   const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
@@ -25608,6 +26562,7 @@ function* handleUpdateRequest(deps, targetCall, params) {
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateSessionResponse "Respond to offer" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param  {Object} targetCall The call being acted on.
  * @param {Object}   params       Parameters of the update request.
  * @param {string}   params.remoteNumber Number of the remote participant.
@@ -25658,11 +26613,13 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
     video: targetCall.localHold ? 'inactive' : 'sendrecv'
 
     // Create an offer to use for responding to the slow start notification.
-  };const slowOffer = yield (0, _effects.call)(_midcall.generateOffer, webRTC, targetCall.webrtcSessionId, mediaDirections);
+  };const slowOffer = yield (0, _effects.call)(_midcall.generateOffer, deps, targetCall.webrtcSessionId, mediaDirections);
 
   const callInfo = {
     wrtcsSessionId: targetCall.wrtcsSessionId,
-    answer: slowOffer.sdp
+    answer: slowOffer.sdp,
+    isAnonymous: targetCall.isAnonymous,
+    account: targetCall.account
 
     // Respond with our "offer".
   };const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
@@ -25709,7 +26666,10 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  *    2. TODO: Determine what the original operation was.
  *    3. Update call state (via redux action).
  * @method handleUpdateResponse
- * @param  {Object} webRTC     The webRTC stack.
+ * @param {Object}  deps          Dependencies that the saga uses.
+ * @param {Object}  deps.webRTC   The WebRTC stack.
+ * @param {Object}  deps.requests The set of platform-specific signalling functions.
+ * @param {Array}   deps.sdpHandlers The list of SDP handlers to run.
  * @param  {Object} targetCall The call being acted on.
  * @param  {Object} params
  * @param  {string} params.sdp A remote answer SDP.
@@ -25717,7 +26677,6 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  * @param  {string} params.remoteNumber Number of the remote participant.
  */
 function* handleUpdateResponse(deps, targetCall, params) {
-  const { webRTC } = deps;
   const { sdp } = params;
   log.info(`Handling regular update response for call ${targetCall.id}.`);
 
@@ -25726,7 +26685,7 @@ function* handleUpdateResponse(deps, targetCall, params) {
 
   // Handle the remote answer SDP.
   const sessionInfo = { sessionId: targetCall.webrtcSessionId, answerSdp: sdp };
-  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionInfo, targetCall);
+  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, deps, sessionInfo, targetCall);
 
   if (error) {
     log.debug('Failed to receive answer SDP', error);
@@ -25797,7 +26756,10 @@ function* handleUpdateResponse(deps, targetCall, params) {
  *    2. Have the callstack process the answer SDP.
  *    3. Update call state (via redux action) based on original operation.
  * @method handleSlowUpdateResponse
- * @param  {Object} webRTC     The webRTC stack.
+ * @param {Object}  deps          Dependencies that the saga uses.
+ * @param {Object}  deps.webRTC   The WebRTC stack.
+ * @param {Object}  deps.requests The set of platform-specific signalling functions.
+ * @param {Array}   deps.sdpHandlers The list of SDP handlers to run.
  * @param  {Object} targetCall The call being acted on.
  * @param  {Object} params
  * @param  {string} params.sdp A remote answer SDP.
@@ -25805,7 +26767,6 @@ function* handleUpdateResponse(deps, targetCall, params) {
  * @param  {string} params.remoteNumber Number of the remote participant.
  */
 function* handleSlowUpdateResponse(deps, targetCall, params) {
-  const { webRTC } = deps;
   let { sdp } = params;
   log.info(`Handling slow start update response for call ${targetCall.id}.`);
 
@@ -25842,7 +26803,7 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
 
   // Handle the remote answer SDP.
   const sessionInfo = { sessionId: targetCall.webrtcSessionId, answerSdp: sdp };
-  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, webRTC, sessionInfo, targetCall);
+  const error = yield (0, _effects.call)(_negotiation.receivedAnswer, deps, sessionInfo, targetCall);
 
   if (error) {
     log.debug('Failed to receive answer SDP', error);
@@ -25963,6 +26924,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * @param {Object}   deps.webRTC   The WebRTC stack.
  * @param {Object}   deps.requests The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateCallRinging "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   params        Parameters describing the incoming call.
  * @param {string}   [params.sdp]  The remote SDP offer included with the notification (if any).
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
@@ -25993,7 +26955,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 // Call plugin.
 function* incomingCall(deps, params) {
-  const { webRTC, requests } = deps;
+  const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName } = params;
 
   let sessionId, isSlowStart;
@@ -26012,7 +26974,7 @@ function* incomingCall(deps, params) {
     const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
     // Since we have the remote offer SDP, we can setup a webRTC session.
-    sessionId = yield (0, _effects.call)(_establish.setupIncomingCall, webRTC, {
+    sessionId = yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
       offer: {
         sdp
       },
@@ -26461,7 +27423,9 @@ function* sendCallAudit(deps, action) {
   }
 
   const updateStatusResponse = yield (0, _effects.call)(requests.auditCall, {
-    wrtcsSessionId: currentCall.wrtcsSessionId
+    wrtcsSessionId: currentCall.wrtcsSessionId,
+    isAnonymous: currentCall.isAnonymous,
+    account: currentCall.account
   });
 
   if (updateStatusResponse.error) {
@@ -26478,6 +27442,106 @@ function* sendCallAudit(deps, action) {
 
 /***/ }),
 
+/***/ "../kandy/src/callstack/sdp/pipeline.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _freeze = __webpack_require__("../../node_modules/babel-runtime/core-js/object/freeze.js");
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+exports.default = runPipeline;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Basic SDP pipeline runner.
+ * @method sdpPipeline
+ * @param  {Array}      handlers       List of functions that transform the SDP.
+ * @param  {string}     sdp            The session description.
+ * @param  {RTCSdpType} info           Information about the session description.
+ * @param  {RTCSdpType} info.type      The session description's type.
+ * @param  {string}     info.endpoint  Which end of the connection created the SDP.
+ * @param  {boolean}    info.isInitiator Whether this session initiated the connection or not.
+ * @param  {BandwidthControls} [info.bandwidth] Information about bandwidth controls.
+ * @return {string}     The modified session description.
+ */
+function runPipeline(handlers, sdp, info) {
+  let objectSdp = _sdpTransform2.default.parse(sdp);
+
+  const originalSdp = (0, _freeze2.default)(objectSdp);
+  let newSdp = (0, _fp.cloneDeep)(originalSdp);
+
+  if ((0, _fp.isArray)(handlers)) {
+    handlers.forEach(handler => {
+      if ((0, _fp.isFunction)(handler)) {
+        newSdp = handler(newSdp, info, originalSdp);
+      } else {
+        _loglevel2.default.error(`SDP handler not a function; skipping.`);
+      }
+    });
+  }
+
+  return _sdpTransform2.default.write(newSdp);
+} // Libraries.
+
+/***/ }),
+
+/***/ "../kandy/src/callstack/utils/bandwidth.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.checkBandwidthControls = checkBandwidthControls;
+
+var _constants = __webpack_require__("../kandy/src/call/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Checks whether the bandwidth controls provided exist and are numbers.
+ * If not, then a default limit is used.
+ * @param {BandwidthControls} bandwidthControls The bandwidth controls to check.
+ */
+function checkBandwidthControls(bandwidthControls) {
+  const finalBandwidthControls = (0, _extends3.default)({}, bandwidthControls);
+
+  if (!bandwidthControls || !(bandwidthControls.audio && typeof bandwidthControls.audio === 'number')) {
+    finalBandwidthControls.audio = _constants.BANDWIDTH_DEFAULTS.AUDIO;
+  }
+  if (!bandwidthControls || !(bandwidthControls.video && typeof bandwidthControls.video === 'number')) {
+    finalBandwidthControls.video = _constants.BANDWIDTH_DEFAULTS.VIDEO;
+  }
+  return finalBandwidthControls;
+}
+
+/***/ }),
+
 /***/ "../kandy/src/callstack/utils/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26489,6 +27553,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.sanitizeSdesFromSdp = sanitizeSdesFromSdp;
 exports.changeDtlsRoleTo = changeDtlsRoleTo;
+exports.modifySdpBandwidth = modifySdpBandwidth;
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
@@ -26500,12 +27565,12 @@ const log = (0, _logs.getLogManager)().getLogger('SDPHANDLER');
  * However, if only SDES is available, don't disable it.
  *
  * @method sanitizeSdesFromSdp
- * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
+ * @param {Object} newSdp The SDP so far (could have been modified by previous handlers).
  * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
  * @param {string} info.endpoint Which end of the connection created the SDP.
- * @param {Object} originalSdp The sdp in its initial state.
- * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
+ * @param {Object} originalSdp The SDP in its initial state.
+ * @return {Object} The sanitized SDP with crypto removed (if fingerprint exists)
  */
 // Other plugins.
 function sanitizeSdesFromSdp(newSdp, info, originalSdp) {
@@ -26539,6 +27604,46 @@ function changeDtlsRoleTo(role) {
 
     return newSdp;
   };
+}
+
+/**
+ * An SDP handler that adds bandwidth options to the SDP.
+ * Supports Chrome & Firefox by generating 2 types of configs:
+ *  - 'AS' for Chrome in kilobits per second
+ *  - 'TIAS' for Firefox in bits per second
+ * @method modifySdpBandwidth
+ * @param {BandwidthControls} bandwidthControls
+ * @return {Function} SDP handler.
+ */
+function modifySdpBandwidth(newSdp, info, originalSdp) {
+  /**
+   * Generates bandwidth configs that Chrome & Firefox can recognize.
+   * @param {number} limit The bandwidth limit in kilobits per second.
+   */
+  function generateBandwidthConfigs(limit) {
+    return [{
+      type: 'AS', // Chrome supports this (in kilobits per second)
+      limit
+    }, {
+      type: 'TIAS', // Firefox supports this (in bits per second)
+      limit: limit * 1000
+    }];
+  }
+
+  if (info.bandwidth) {
+    // For more details on bandwidth controls, see here https://webrtchacks.com/limit-webrtc-bandwidth-sdp/.
+    if (info.bandwidth.audio) {
+      newSdp.media.filter(media => media.type === 'audio').forEach(media => {
+        media.bandwidth = generateBandwidthConfigs(info.bandwidth.audio);
+      });
+    }
+    if (info.bandwidth.video) {
+      newSdp.media.filter(media => media.type === 'video').forEach(media => {
+        media.bandwidth = generateBandwidthConfigs(info.bandwidth.video);
+      });
+    }
+  }
+  return newSdp;
 }
 
 /***/ }),
@@ -26602,6 +27707,10 @@ exports.answerWebrtcSession = answerWebrtcSession;
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
+var _pipeline = __webpack_require__("../kandy/src/callstack/sdp/pipeline.js");
+
+var _pipeline2 = _interopRequireDefault(_pipeline);
+
 var _media = __webpack_require__("../kandy/src/callstack/webrtc/media.js");
 
 var mediaOps = _interopRequireWildcard(_media);
@@ -26610,14 +27719,19 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // WebRTC operations.
+// Helpers
 const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 /**
  * Performs the WebRTC portion necessary for establishing outgoing calls
  *
  * @method setupCall
- * @param  {Object} webRTC A WebRTC instance
+ * @param  {Object} deps
+ * @param  {Object} deps.webRTC      The WebRTC stack.
+ * @param  {Array}  deps.sdpHandlers SDP handlers.
  * @param  {Object} mediaConstraints Video and audio media constraints
  * @param  {boolean} mediaConstraints.audio Whether to enable audio or not
  * @param  {boolean} mediaConstraints.video Whether to enable video or not
@@ -26625,6 +27739,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
  * @param  {Object} sessionOptions.sdpSemantics Semantics for Real Time Communication configurations
  * @param  {Object} sessionOptions.turnInfo Contains information required for setting up ICE servers
  * @param  {string} sessionOptions.trickleIceMode What mode to be used for trickle ICE
+ * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.offerSdp Session Description Protocol for a call offer
  * @return {string} Object.sessionId session identifier
@@ -26633,9 +27748,9 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 
 // Libraries.
-// Helpers
-function* setupCall(webRTC, mediaConstraints, sessionOptions) {
-  const { sdpSemantics, turnInfo, trickleIceMode } = sessionOptions;
+function* setupCall(deps, mediaConstraints, sessionOptions) {
+  const { webRTC, sdpHandlers } = deps;
+  const { sdpSemantics, turnInfo, trickleIceMode, bandwidth } = sessionOptions;
 
   const { media, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
@@ -26658,7 +27773,16 @@ function* setupCall(webRTC, mediaConstraints, sessionOptions) {
   const tracks = yield (0, _effects.call)([media, 'getTracks']);
   yield (0, _effects.call)([session, 'addTracks'], tracks);
 
+  /*
+   * Create the local SDP offer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   let offer = yield (0, _effects.call)([session, 'createOffer']);
+  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
+    type: offer.type,
+    endpoint: 'local',
+    bandwidth
+  });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
   return {
@@ -26673,7 +27797,9 @@ function* setupCall(webRTC, mediaConstraints, sessionOptions) {
  * Prepares the WebRTC portions of setting up an incoming call
  *
  * @method setupIncomingCall
- * @param  {Object} webRTC An instance of webRTC
+ * @param  {Object} deps
+ * @param  {Object} deps.webRTC      The WebRTC stack.
+ * @param  {Array}  deps.sdpHandlers SDP handlers.
  * @param  {Object} sessionOptions
  * @param  {Object} sessionOptions.sdpSemantics semantics for the SDP, contains video and audio constraints
  * @param  {Object} sessionOptions.turnInfo TURN information, contains server info
@@ -26681,8 +27807,10 @@ function* setupCall(webRTC, mediaConstraints, sessionOptions) {
  * @param  {Object} sessionOptions.offer an offer containing an SDP
  * @return {string} sessionId an identifier for the session
  */
-function* setupIncomingCall(webRTC, sessionOptions) {
-  const { offer, sdpSemantics, turnInfo, trickleIceMode } = sessionOptions;
+function* setupIncomingCall(deps, sessionOptions) {
+  const { webRTC, sdpHandlers } = deps;
+  const { sdpSemantics, turnInfo, trickleIceMode } = sessionOptions;
+  let offer = sessionOptions.offer;
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
     peer: {
@@ -26693,6 +27821,16 @@ function* setupIncomingCall(webRTC, sessionOptions) {
       trickleIceMode
     }
   });
+
+  /*
+   * Run the remote SDP offer through any SDP handlers provided, then set it
+   *    as the Session's remote description.
+   */
+  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
+    type: offer.type,
+    endpoint: 'remote'
+  });
+
   yield (0, _effects.call)([session, 'processOffer'], {
     type: 'offer',
     sdp: offer.sdp
@@ -26705,22 +27843,28 @@ function* setupIncomingCall(webRTC, sessionOptions) {
  * Prepares the WebRTC portions of answering a call
  *
  * @method answerWebrtcSession
- * @param  {Object} webRTC An instance of webRTC
+ * @param  {Object} deps
+ * @param  {Object} deps.webRTC      The WebRTC stack.
+ * @param  {Array}  deps.sdpHandlers SDP handlers.
  * @param  {Object} mediaConstraints Video and audio media constraints
  * @param  {boolean} mediaConstraints.audio Whether to enable audio or not
  * @param  {boolean} mediaConstraints.video Whether to enable video or not
  * @param  {Object} sessionOptions
  * @param  {string} sessionOptions.sessionId the local webrtc session id
+ * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.answerSDP Session Description Protocol for answer
  * @return {string} Object.mediaId an identifier for media
  */
-function* answerWebrtcSession(webRTC, mediaConstraints, sessionOptions) {
+function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
+  const { webRTC, sdpHandlers } = deps;
+  const { sessionId, bandwidth } = sessionOptions;
+
   // Get the webRTC session that represents this call.
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionOptions.sessionId);
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   if (!session) {
-    log.error(`Error: webRTC session ${sessionOptions.sessionId} not found.`);
+    log.error(`Error: webRTC session ${sessionId} not found.`);
     return;
   }
 
@@ -26731,9 +27875,19 @@ function* answerWebrtcSession(webRTC, mediaConstraints, sessionOptions) {
   }
 
   // Add the tracks to the session.
-  yield (0, _effects.call)([session, 'addTracks'], media.getTracks());
+  const tracks = yield (0, _effects.call)([media, 'getTracks']);
+  yield (0, _effects.call)([session, 'addTracks'], tracks);
 
+  /*
+   * Create the local SDP answer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   let answer = yield (0, _effects.call)([session, 'createAnswer']);
+  answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
+    type: answer.type,
+    endpoint: 'local',
+    bandwidth
+  });
   answer = yield (0, _effects.call)([session, 'setLocalDescription'], answer);
 
   return {
@@ -26819,10 +27973,14 @@ Object.defineProperty(exports, "__esModule", {
 exports.recreatePeer = recreatePeer;
 exports.closeCall = closeCall;
 exports.handleOffer = handleOffer;
-exports.handleAnswer = handleAnswer;
 exports.generateOffer = generateOffer;
 exports.webRtcAddMedia = webRtcAddMedia;
 exports.webRtcRemoveMedia = webRtcRemoveMedia;
+exports.webRtcReplaceTrack = webRtcReplaceTrack;
+
+var _pipeline = __webpack_require__("../kandy/src/callstack/sdp/pipeline.js");
+
+var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
@@ -26843,6 +28001,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Libraries
+// Callstack plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 /**
@@ -26854,6 +28013,8 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 
 // WebRTC operations.
+
+
 // Other Plugins
 function* recreatePeer(webRTC, sessionId) {
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
@@ -26888,12 +28049,16 @@ function* closeCall(webRTC, sessionId) {
  * Performs webRTC portions of receiving an "offer" Session Description Protocol
  *
  * @method handleOffer
- * @param {Object} webRTC A WebRTC instance
- * @param {string} sdp Session Description protocol offer
- * @param {string} webrtcSessionId local webrtc session id
+ * @param  {Object} deps
+ * @param  {Object} deps.webRTC      The WebRTC stack.
+ * @param  {Array}  deps.sdpHandlers SDP handlers.
+ * @param  {string} offer Session Description protocol offer
+ * @param  {string} webrtcSessionId local webrtc session id
+ * @param {BandwidthControls} bandwidth bandwidth configurations to use
  * @returns {Object}
  */
-function* handleOffer(webRTC, sdp, webrtcSessionId) {
+function* handleOffer(deps, offer, webrtcSessionId, bandwidth) {
+  const { webRTC, sdpHandlers } = deps;
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], webrtcSessionId);
 
   if (!session) {
@@ -26901,17 +28066,35 @@ function* handleOffer(webRTC, sdp, webrtcSessionId) {
     return;
   }
 
+  /*
+   * Run the remote SDP offer through any SDP handlers provided, then set it
+   *    as the Session's remote description.
+   */
+  offer = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer, {
+    type: 'offer',
+    endpoint: 'remote'
+  });
+
   // TODO: Make sure the session is in the correct signaling state to process an offer.
   const error = yield (0, _effects.call)([session, 'processOffer'], {
     type: 'offer',
-    sdp
+    sdp: offer
   });
 
   if (error) {
     return { error };
   }
 
+  /*
+   * Create the local SDP answer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   let answer = yield (0, _effects.call)([session, 'createAnswer']);
+  answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
+    type: answer.type,
+    endpoint: 'local',
+    bandwidth
+  });
   answer = yield (0, _effects.call)([session, 'setLocalDescription'], answer);
 
   return {
@@ -26920,44 +28103,21 @@ function* handleOffer(webRTC, sdp, webrtcSessionId) {
 }
 
 /**
- * Performs webRTC portions of receiving an "answer" Session Description Protocol
- *
- * @method handleAnswer
- * @param {Object} webRTC A WebRTC instance
- * @param {string} sdp Session Description protocol answer
- * @param {string} webrtcSessionId local webrtc session id
- * @return {Object} Object
- * @return {Object} Object.error
- */
-function* handleAnswer(webRTC, sdp, webrtcSessionId) {
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], webrtcSessionId);
-
-  if (!session) {
-    log.debug(`webRTC session ${webrtcSessionId} not found.`);
-    return;
-  }
-
-  // TODO: Make sure the session is in the correct signaling state to process an answer.
-  const error = yield (0, _effects.call)([session, 'processAnswer'], {
-    type: 'answer',
-    sdp
-  });
-
-  return { error };
-}
-
-/**
  * Performs the webRTC session functions associated with creating an SDP offer
  *
  * @method generateOffer
- * @param {Object} webRTC A WebRTC instance
+ * @param {Object} deps
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  * @param {string} sessionId the local webRTC session id, used to lookup the session object
  * @param {Object} mediaDirections
  * @param {string} mediaDirections.audio mode of audio add to the sdp offer
  * @param {string} mediaDirections.video mode of video add to the sdp offer
+ * @param {BandwidthControls} bandwidth bandwidth configurations to use
  * @return {Object} offer object containing a Session Description Protocol
  */
-function* generateOffer(webRTC, sessionId, mediaDirections) {
+function* generateOffer(deps, sessionId, mediaDirections, bandwidth) {
+  const { webRTC, sdpHandlers } = deps;
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   if (!session) {
@@ -26965,10 +28125,19 @@ function* generateOffer(webRTC, sessionId, mediaDirections) {
     return;
   }
 
+  /*
+   * Create the local SDP offer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
   let offer = yield (0, _effects.call)([session, 'createOffer'], {
     mediaDirections
+  });
+  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
+    type: offer.type,
+    endpoint: 'local',
+    bandwidth
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
@@ -26978,49 +28147,72 @@ function* generateOffer(webRTC, sessionId, mediaDirections) {
 /**
  * Performs the webRTC responsibilities for adding media
  *
- * @param {Object} webRTC A WebRTC instance
+ * @param {Object} deps
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  * @param  {Object} mediaConstraints Video and audio media constraints
  * @param  {boolean} mediaConstraints.audio Whether to enable audio or not
  * @param  {boolean} mediaConstraints.video Whether to enable video or not
  * @param  {Object} sessionOptions
  * @param  {string} sessionOptions.sessionId the local webrtc session id
+ * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.sdp An offer in the form of a Session Description Protocol
  * @return {Object} Object.media media object containing tracks
  */
-function* webRtcAddMedia(webRTC, mediaConstraints, sessionOptions) {
+function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
+  const { webRTC, sdpHandlers } = deps;
   const { media, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
+  const { sessionId, bandwidth } = sessionOptions;
 
   if (error) {
     return { error };
   }
 
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionOptions.sessionId);
-  yield (0, _effects.call)([session, 'addTracks'], media.getTracks());
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
+  const tracks = yield (0, _effects.call)([media, 'getTracks']);
+  yield (0, _effects.call)([session, 'addTracks'], tracks);
 
+  /*
+   * Create the local SDP offer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
   let offer = yield (0, _effects.call)([session, 'createOffer']);
+  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
+    type: offer.type,
+    endpoint: 'local',
+    bandwidth
+  });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
-  return { error: false, media: media.getState(), sdp: offer.sdp };
+  const mediaState = yield (0, _effects.call)([media, 'getState']);
+  return { error: false, media: mediaState, sdp: offer.sdp };
 }
 
 /**
  * Performs the webRTC responsibilities for removing media
  *
- * @param {Object} webRTC A WebRTC instance
+ * @param {Object} deps
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
  * @param {Object} sessionOptions
+ * @param  {string} sessionOptions.sessionId The local webrtc session id
+ * @param {Array} sessionOptions.tracks A list of track IDs to remove
+ * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.sdp An offer in the form of a Session Description Protocol
  */
-function* webRtcRemoveMedia(webRTC, sessionOptions) {
-  // Get the tracks
-  const localTracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], sessionOptions.tracks);
+function* webRtcRemoveMedia(deps, sessionOptions) {
+  const { webRTC, sdpHandlers } = deps;
+  const { sessionId, tracks, bandwidth } = sessionOptions;
+  // Get the tracks that we want to remove
+  const localTracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], tracks);
   const invalidTrackIds = [];
-  for (var i = 0; i < localTracks.length; i++) {
-    if ((0, _fp.isUndefined)(localTracks[i])) {
-      invalidTrackIds.push(sessionOptions.tracks[i]);
+  for (var i = 0; i < localTracksToRemove.length; i++) {
+    if ((0, _fp.isUndefined)(localTracksToRemove[i])) {
+      invalidTrackIds.push(tracks[i]);
     }
   }
 
@@ -27035,23 +28227,134 @@ function* webRtcRemoveMedia(webRTC, sessionOptions) {
     };
   }
 
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionOptions.sessionId);
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   // Removes tracks from peer (Will stop tracks from being sent to remote participant).
   // Does NOT end the tracks.
-  yield (0, _effects.call)([session, 'removeTracks'], sessionOptions.tracks);
+  yield (0, _effects.call)([session, 'removeTracks'], tracks);
 
+  // TODO: This should only cleanup the removed tracks, shouldn't it?
   // Ends the tracks.
   // Clean-up the local tracks.
-  yield (0, _effects.all)(localTracks.map(track => (0, _effects.call)([track, 'cleanup'])));
+  yield (0, _effects.all)(localTracksToRemove.map(track => (0, _effects.call)([track, 'cleanup'])));
 
+  /*
+   * Create the local SDP offer, run it through any provided SDP handlers,
+   *    then set it as the Session's local description.
+   */
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
   let offer = yield (0, _effects.call)([session, 'createOffer']);
+  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
+    type: offer.type,
+    endpoint: 'local',
+    bandwidth
+  });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
   return {
     sdp: offer.sdp
+  };
+}
+
+/**
+ * Performs the webRTC responsibilities for replacing a track
+ *
+ * @param {Object} webRTC A WebRTC instance
+ * @param {Object} params
+ * @param {string} params.sessionId The id of the session to replace the track of
+ * @param {string} params.trackId The id of the track to replace
+ * @param  {Object} params.mediaConstraints Video or audio media constraints
+ * @param  {Object|boolean} params.mediaConstraints.audio Audio configs
+ * @param  {Object|boolean} params.mediaConstraints.video Video configs
+ * @returns {Object} replaceTrackResult The result of the track replace operation
+ * @returns {BasicError} [replaceTrackResult.error] Error object
+ * @returns {string} newTrackId The ID of the new track that we used to replace the old one.
+ * @returns {Object} replaceTrackResult.oldTrackState The state of the old track before it was replaced.
+ */
+function* webRtcReplaceTrack(webRTC, params) {
+  const { sessionId, trackId, mediaConstraints } = params;
+
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
+  const oldTrack = session.localTracks.find(track => track.id === trackId);
+
+  if (!oldTrack) {
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: `Old track ${trackId} not found.`
+      }),
+      newTrackId: undefined
+    };
+  }
+
+  const oldTrackState = yield (0, _effects.call)([oldTrack, 'getState']);
+  const oldTrackKind = oldTrackState.kind;
+
+  // Verify that there are constraints for the old track's kind.
+  if (!mediaConstraints[oldTrackKind]) {
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: `Media constraints missing data for ${oldTrackKind}.`
+      }),
+      newTrackId: undefined
+    };
+  }
+
+  const finalMediaConstraints = {
+    [oldTrackKind]: mediaConstraints[oldTrackKind]
+
+    // Create Media
+  };const { media: newMedia, error: createLocalError } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, finalMediaConstraints);
+  if (createLocalError) {
+    return { error: createLocalError, newTrackId: undefined };
+  }
+
+  // Find the new track that matches the old track we want to replace.
+  const newTracks = yield (0, _effects.call)([newMedia, 'getTracks']);
+  let newTrack;
+  for (let track of newTracks) {
+    // Matching the track is done this way because we need to yield to getState,
+    //    but we can't yield inside of a `.find(func)` or similar. So iterate
+    //    over the new tracks "manually".
+    const state = yield (0, _effects.call)([track, 'getState']);
+    if (state.kind === oldTrackKind) {
+      newTrack = track;
+      break;
+    }
+  }
+
+  if (!newTrack) {
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.USER_MEDIA_ERROR,
+        message: `${oldTrackKind} track not found`
+      }),
+      newTrackId: undefined
+    };
+  }
+
+  // Replaces the track
+  const replaceTrackError = yield (0, _effects.call)([session, 'replaceTrack'], newTrack.track, { trackId });
+  if (replaceTrackError) {
+    // If cannot replace old track, cleanup the newly created track
+    yield (0, _effects.call)([newTrack, 'cleanup']);
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.GENERIC_ERROR,
+        message: replaceTrackError.message
+      }),
+      newTrackId: undefined
+    };
+  }
+
+  // cleanup old track
+  yield (0, _effects.call)([oldTrack, 'cleanup']);
+
+  return {
+    newTrackId: newTrack.id,
+    oldTrackState
   };
 }
 
@@ -27079,10 +28382,16 @@ var _utils = __webpack_require__("../kandy/src/callstack/utils/index.js");
 
 var _sdp = __webpack_require__("../kandy/src/callstack/utils/sdp.js");
 
+var _pipeline = __webpack_require__("../kandy/src/callstack/sdp/pipeline.js");
+
+var _pipeline2 = _interopRequireDefault(_pipeline);
+
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Helpers.
+// Other Plugins
 const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 /**
@@ -27097,10 +28406,6 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 
 // Libraries.
-
-
-// Helpers.
-// Other Plugins
 function* isSameSdpSessionId(webRTC, sessionId, sdp) {
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
   const currentDesc = session.peer.remoteDescription;
@@ -27138,10 +28443,12 @@ function* isSameSdpSessionId(webRTC, sessionId, sdp) {
  * @param {Object} targetCall Information about the call that this Session is associated with.
  * @returns {Object} Error object if any have occured. Undefined otherwise.
  */
-function* receivedAnswer(webRTC, sessionInfo, targetCall) {
+function* receivedAnswer(deps, sessionInfo, targetCall) {
+  const { webRTC, sdpHandlers } = deps;
   log.debug(`Processing SDP answer for session ${sessionInfo.sessionId}.`);
 
-  const { sessionId, answerSdp } = sessionInfo;
+  const sessionId = sessionInfo.sessionId;
+  let answerSdp = sessionInfo.answerSdp;
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   if (!session) {
@@ -27150,9 +28457,6 @@ function* receivedAnswer(webRTC, sessionInfo, targetCall) {
     return;
   }
   // TODO: Ensure Session is in the correct signaling state for an answer SDP.
-
-  // SDP handlers to be used during SDP "processing".
-  const sdpHandlers = [];
 
   /*
    * If the answer we received has DTLS role of 'actpass', then this is not a
@@ -27176,10 +28480,18 @@ function* receivedAnswer(webRTC, sessionInfo, targetCall) {
    */
   let error;
   try {
+    /*
+     * Run the remote SDP answer through any SDP handlers provided, then set it
+     *    as the Session's remote description.
+     */
+    answerSdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answerSdp, {
+      type: 'answer',
+      endpoint: 'remote'
+    });
     yield (0, _effects.call)([session, 'processAnswer'], {
       type: 'answer',
       sdp: answerSdp
-    }, { sdpHandlers });
+    });
   } catch (err) {
     // TODO: Better error handling.
     log.debug(`Failed to process answer: ${err.message}`);
@@ -27665,6 +28977,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 const log = (0, _logs.getLogManager)().getLogger('CONFIG'); /**
                                                              * An interface for getting and updating the configuration Object.
                                                              *
+                                                             * Config functions are available directly on the SDK Object
+                                                             *
                                                              * @public
                                                              * @module Config
                                                              * @requires config
@@ -27678,7 +28992,7 @@ function api(context) {
      * @memberof Config
      * @requires config
      * @method getConfig
-     * @returns {Object} A configuration Object
+     * @returns {Object} A configuration Object.
      */
     getConfig: function () {
       log.debug(_logs.API_LOG_TAG + 'getConfig');
@@ -27689,10 +29003,11 @@ function api(context) {
      * Update values in the global Config section of the store.
      *
      * @public
+     * @static
      * @memberof Config
      * @requires config
      * @method updateConfig
-     * @param {Object} newConfigValues Key Value pairs that will be placed into the store.
+     * @param {Object} newConfigValues Key-value pairs that will be placed into the store. See {@link config} for details on what key-value pairs are available for use.
      */
     updateConfig: function (newConfigValues) {
       log.debug(_logs.API_LOG_TAG + 'updateConfig: ', newConfigValues);
@@ -28064,7 +29379,7 @@ function api({ dispatch, getState }) {
      * @public
      * @memberof Connectivity
      * @method getSocketState
-     * @param  {string} [platform='link'] Backend platform for which websocket's state to request.
+     * @param {string} [platform='link'] Backend platform for which to request the websocket's state.
      */
     getSocketState(platform = _constants.platforms.LINK) {
       log.debug(_logs.API_LOG_TAG + 'connection.getSocketState: ', platform);
@@ -28076,14 +29391,13 @@ function api({ dispatch, getState }) {
      * @public
      * @memberof Connectivity
      * @method enableConnectivityChecking
-     * @param {boolean} enable Whether to enable or disable connectivity checking.
+     * @param {boolean} enable Enable connectivity checking.
      */
     enableConnectivityChecking(enable) {
       log.debug(_logs.API_LOG_TAG + 'connection.enableConnectivityChecking: ', enable);
       dispatch((0, _actions.changeConnectivityChecking)(enable));
     }
   };
-
   return { connection: connectivityApi };
 }
 
@@ -29063,6 +30377,45 @@ const connCheckMethods = exports.connCheckMethods = {
   KEEP_ALIVE: 'keepAlive',
   PING_PONG: 'pingPong'
 };
+
+/***/ }),
+
+/***/ "../kandy/src/docs/docs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * The User ID ie: joe@test.3s5j.att.com
+ *
+ * @public
+ * @module UserID
+ * @requires cpaas_user_id
+ */
+
+/**
+ * The SIP URI ie: sip:joe@domain.com
+ *
+ * @public
+ * @module SIP_URI
+ * @requires link_user_id
+ */
+
+/**
+ * The Phone Numer ie: +18885559876
+ *
+ * @public
+ * @module PhoneNumber
+ * @requires cpaas_pstn
+ */
+
+/**
+ * The TEL URI ie: tel:+18885559876
+ *
+ * @public
+ * @module TEL_URI
+ * @requires link_pstn
+ */
+
 
 /***/ }),
 
@@ -30068,7 +31421,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.5.0';
+  let version = '4.6.0';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -30361,21 +31714,22 @@ var _effects2 = _interopRequireDefault(_effects);
 
 var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
 
+var _utils = __webpack_require__("../kandy/src/groups/utils.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * REST request to create a new group.
  * @method create
- * @param {Object} params
- * @param {string[]} [params.participants] - List of participants to add to group when created.
- * @param {string} [params.subject] - Subject of the group chat session.
- * @param {string} params.name - Name of the group chat session.
- * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
- * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
- * @param  {Object} requestInfo - Info needed to perform the request.
+ * @param  {Object} params
+ * @param  {Array} [params.participants] List of participants to add to group when created.
+ * @param  {string} params.name Name of the group chat session.
+ * @param  {string} params.type Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @param  {string} [params.subject] Subject of the group chat session.
+ * @param  {string} [params.image]  HTTP URL of the image that is assigned to the grpup chat session avatar
  * @return {group}
  */
-// Helpers.
 function* createRequest(params, requestInfo) {
   // Add the group owner (current user) to list of group participants
   const groupOwner = {
@@ -30394,9 +31748,10 @@ function* createRequest(params, requestInfo) {
     }
   };
 
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group`;
   const requestOptions = {
     method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`,
+    url,
     body: (0, _stringify2.default)(requestBody)
   };
 
@@ -30407,34 +31762,39 @@ function* createRequest(params, requestInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Create group')
     };
   } else {
-    return response.payload;
+    // re-map group objects to a more workable structure
+    const group = (0, _utils.marshallGroup)(response.payload.body.groupChatSessionInformation);
+    return group;
   }
 }
 
 /**
  * Request to delete a specified group.
  * @method deleteRequest
- * @param  {string} groupId - The ID of the group to delete.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Object}
+ * @param  {string} groupId The ID of the group to delete.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @return {Object} obj
+ * @return {Object} [obj.error] The error message if the group delete was unsuccessful
  */
+// Helpers.
 function* deleteRequest(groupId, requestInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}`;
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}`,
+    url,
     responseType: 'text'
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
+  // handle errors if they occur, otherwise response will be No Content.
   if (response.error) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Delete Group')
     };
   } else {
-    // response does not contain the groupId of the group deleted so it is
-    // appended to the response for the reducer to access.
-    response.payload.groupId = groupId;
-    return response.payload;
+    return {
+      error: false
+    };
   }
 }
 
@@ -30442,9 +31802,9 @@ function* deleteRequest(groupId, requestInfo) {
  * REST request to add a participant to a specified group.
  * @method addParticipantRequest
  * @param  {Object} payload
- * @param  {string} payload.groupId - The ID of the group to remove the participant from.
- * @param  {string} payload.participant - The participant address.
- * @param  {Object} requestInfo - Info needed to perform the request.
+ * @param  {string} payload.groupId The ID of the group to remove the participant from.
+ * @param  {string} payload.participant The participant address.
+ * @param  {Object} requestInfo Info needed to perform the request.
  */
 function* addParticipantRequest({ groupId, participant }, requestInfo) {
   const requestBody = {
@@ -30454,9 +31814,10 @@ function* addParticipantRequest({ groupId, participant }, requestInfo) {
     }
   };
 
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}/participants`;
   const requestOptions = {
     method: 'POST',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants`,
+    url,
     body: (0, _stringify2.default)(requestBody)
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -30466,7 +31827,9 @@ function* addParticipantRequest({ groupId, participant }, requestInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Add Participant')
     };
   } else {
-    return response.payload.body.participantInformation;
+    const { 'x-isAdmin': isAdmin, status, address } = response.payload.body.participantInformation;
+
+    return { address, status, isAdmin };
   }
 }
 
@@ -30474,15 +31837,16 @@ function* addParticipantRequest({ groupId, participant }, requestInfo) {
  * REST request to remove a participant from a specified group.
  * @method removeParticipantRequest
  * @param  {Object} payload
- * @param  {string} payload.groupId - The ID of the group.
- * @param  {string} payload.participant - The participant to remove from the group.
- * @param  {Object} requestInfo - Info needed to perform the request.
+ * @param  {string} payload.groupId The ID of the group.
+ * @param  {string} payload.participant The participant to remove from the group.
+ * @param  {Object} requestInfo Info needed to perform the request.
  * @return {Object}
  */
 function* removeParticipantRequest({ groupId, participant }, requestInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}/participants/${participant}`;
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${participant}`
+    url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
@@ -30500,37 +31864,43 @@ function* removeParticipantRequest({ groupId, participant }, requestInfo) {
 /**
  * REST request to leave a specified group.
  * @method leaveGroupRequest
- * @param  {string} groupId - The ID of the group to leave.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
+ * @param  {string} groupId The ID of the group to leave.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @param  {Object} userInfo Info needed about the current user.
  * @return {Object}
  */
 function* leaveGroupRequest(groupId, requestInfo, userInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}` + `/${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}`;
+
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}`
+    url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
+  // handle errors if they occur, otherwise response will be No Content.
   if (response.error) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Leave group')
     };
   } else {
-    return response.payload;
+    return {
+      error: false
+    };
   }
 }
 
 /**
  * REST request to fetch groups from server.
  * @method fetchRequest
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @return {Group[]} - An array of Groups.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @return {Array} An array of Groups.
  */
 function* fetchRequest(requestInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group`;
   const requestOptions = {
     method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group`
+    url
   };
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -30540,21 +31910,26 @@ function* fetchRequest(requestInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Fetch groups')
     };
   } else {
-    return response.payload.body.groupChatSessionInformationList.groupChatSessionInformation;
+    const groupSessions = response.payload.body.groupChatSessionInformationList.groupChatSessionInformation;
+
+    // re-map group objects to a more workable structure
+    const groups = groupSessions.map(group => (0, _utils.marshallGroup)(group));
+    return groups;
   }
 }
 
 /**
  * REST request to fetch a group with a specific groupId from server.
  * @method fetchRequestByGroupId
- * @param  {string} groupId - The ID of the group to fetch.
- * @param  {Object} requestInfo - Info needed to perform the request.
+ * @param  {string} groupId The ID of the group to fetch.
+ * @param  {Object} requestInfo Info needed to perform the request.
  * @return {Object}
  */
 function* fetchRequestByGroupId(groupId, requestInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}`;
   const requestOptions = {
     method: 'GET',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}`
+    url
   };
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -30564,16 +31939,18 @@ function* fetchRequestByGroupId(groupId, requestInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Fetch group by groupId')
     };
   } else {
-    return response.payload.body.groupChatSessionInformation;
+    // re-map group objects to a more workable structure
+    const group = (0, _utils.marshallGroup)(response.payload.body.groupChatSessionInformation);
+    return group;
   }
 }
 
 /**
  * Request to accept an invitation to a specified group.
  * @method acceptInvitationRequest
- * @param  {string} groupId - The ID of the group to accept invitation to.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
+ * @param  {string} groupId The ID of the group to accept invitation to.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @param  {Object} userInfo Info needed about the current user.
  * @return {Object}
  */
 function* acceptInvitationRequest(groupId, requestInfo, userInfo) {
@@ -30582,9 +31959,10 @@ function* acceptInvitationRequest(groupId, requestInfo, userInfo) {
       status: 'Connected'
     }
   };
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}/status`;
   const requestOptions = {
     method: 'PUT',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/` + `${userInfo.identity}/status`,
+    url,
     body: (0, _stringify2.default)(requestBody)
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -30594,22 +31972,25 @@ function* acceptInvitationRequest(groupId, requestInfo, userInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Accept Invitation')
     };
   } else {
-    return response.payload;
+    return {
+      error: false
+    };
   }
 }
 
 /**
  * Request to reject an invitation to a specified group.
  * @method rejectInvitationRequest
- * @param  {string} groupId - The ID of the group to reject invitation to.
- * @param  {Object} requestInfo - Info needed to perform the request.
- * @param  {Object} userInfo - Info needed about the current user.
+ * @param  {string} groupId The ID of the group to reject invitation to.
+ * @param  {Object} requestInfo Info needed to perform the request.
+ * @param  {Object} userInfo Info needed about the current user.
  * @return {Object}
  */
 function* rejectInvitationRequest(groupId, requestInfo, userInfo) {
+  const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}`;
   const requestOptions = {
     method: 'DELETE',
-    url: `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/` + `${userInfo.identity}`
+    url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
@@ -30618,7 +31999,9 @@ function* rejectInvitationRequest(groupId, requestInfo, userInfo) {
       error: (0, _helpers.handleRequestError)(response, 'Reject Invitation')
     };
   } else {
-    return response.payload;
+    return {
+      error: false
+    };
   }
 }
 
@@ -30668,19 +32051,11 @@ var _constants = __webpack_require__("../kandy/src/constants.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
+var _utils = __webpack_require__("../kandy/src/groups/utils.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Constants
-const log = (0, _logs.getLogManager)().getLogger('GROUPS');
-
-/**
- * Create a group.
- * @method create
- * @param  {Object} action An action of type `CREATE`.
- */
-
 
 // Libraries.
 
@@ -30690,8 +32065,18 @@ const log = (0, _logs.getLogManager)().getLogger('GROUPS');
 
 // Other plugins.
 // groups plugin.
+const log = (0, _logs.getLogManager)().getLogger('GROUPS');
+
+/**
+ * Create a group.
+ * @method create
+ * @param  {Object} action An action of type `CREATE`.
+ */
+
+
+// Constants
 function* createGroup({ payload }) {
-  const params = payload.params;
+  const { params } = payload;
   log.info(`Creating group ${params.name}.`);
 
   // Verify that name has been supplied
@@ -30708,6 +32093,8 @@ function* createGroup({ payload }) {
   let participantInvites = [];
   if (params.participants) {
     participantInvites = params.participants.map(participant => {
+      // TODO: Why is participant an object and not a string? The docs say it
+      //    should be a string.
       return { address: participant.address, 'x-isAdmin': false };
     });
   }
@@ -30715,20 +32102,14 @@ function* createGroup({ payload }) {
   const requestParams = (0, _extends3.default)({}, params, { participants: participantInvites, currentUser });
 
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.createRequest, requestParams, requestInfo);
-  log.debug('Received response from create group request:', response);
+  const newGroup = yield (0, _effects.call)(_groups.createRequest, requestParams, requestInfo);
+  log.debug('Received response from create group request:', newGroup);
 
-  if (!response.error) {
-    // parse the resourceURL to get the groupID to save in state.
-    const resourceURL = response.body.groupChatSessionInformation.resourceURL;
-    const groupId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-    response.body.groupChatSessionInformation.groupId = groupId;
-
-    yield (0, _effects.put)(actions.createFinish(response.body));
+  if (!newGroup.error) {
+    yield (0, _effects.put)(actions.createFinish(newGroup));
   } else {
-    yield (0, _effects.put)(actions.createFinish({}, response.error));
+    yield (0, _effects.put)(actions.createFinish({}, newGroup.error));
   }
-  return true;
 }
 
 /**
@@ -30738,7 +32119,7 @@ function* createGroup({ payload }) {
  * @return {Object}
  */
 function* deleteGroup({ payload }) {
-  const groupId = payload.groupId;
+  const { groupId } = payload;
   log.info(`Deleting group ${groupId}.`);
 
   // verify that a groupId was supplied
@@ -30753,13 +32134,13 @@ function* deleteGroup({ payload }) {
     return;
   }
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.deleteRequest, groupId, requestInfo);
-  log.debug('Received response from deleteGroup request:', response);
+  const deletedGroup = yield (0, _effects.call)(_groups.deleteRequest, groupId, requestInfo);
+  log.debug('Received response from deleteGroup request:', deletedGroup);
 
-  if (!response.error) {
-    yield (0, _effects.put)(actions.deleteGroupFinish({ groupId: response.groupId }));
+  if (!deletedGroup.error) {
+    yield (0, _effects.put)(actions.deleteGroupFinish({ groupId }));
   } else {
-    yield (0, _effects.put)(actions.deleteGroupFinish({ error: response.error }));
+    yield (0, _effects.put)(actions.deleteGroupFinish({ error: deletedGroup.error }));
   }
 }
 
@@ -30770,8 +32151,7 @@ function* deleteGroup({ payload }) {
  * @return {Object}
  */
 function* addParticipant({ payload }) {
-  const groupId = payload.groupId;
-  const participant = payload.participant;
+  const { groupId, participant } = payload;
   log.info(`Adding participant ${participant} to group ${groupId}.`);
 
   // verify that a groupId was supplied
@@ -30798,16 +32178,16 @@ function* addParticipant({ payload }) {
     return;
   }
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.addParticipantRequest, payload, requestInfo);
-  log.debug('Received response from addParticipant request:', response);
+  const newParticipant = yield (0, _effects.call)(_groups.addParticipantRequest, payload, requestInfo);
+  log.debug('Received response from addParticipant request:', newParticipant);
 
-  if (!response.error) {
+  if (!newParticipant.error) {
     yield (0, _effects.put)(actions.addParticipantFinish({
       groupId,
-      participant: response
+      participant: newParticipant
     }));
   } else {
-    yield (0, _effects.put)(actions.addParticipantFinish({ error: response.error }));
+    yield (0, _effects.put)(actions.addParticipantFinish({ error: newParticipant.error }));
   }
 }
 
@@ -30818,8 +32198,7 @@ function* addParticipant({ payload }) {
  * @return {Object}
  */
 function* removeParticipant({ payload }) {
-  const groupId = payload.groupId;
-  const participant = payload.participant;
+  const { groupId, participant } = payload;
   log.info(`Removing participant ${participant} from group ${groupId}.`);
   // verify that a groupId was supplied
   if (!groupId) {
@@ -30864,8 +32243,8 @@ function* removeParticipant({ payload }) {
  * @return {Object}
  */
 function* leaveGroup({ payload }) {
-  log.info('leaveGroup saga called: ', payload.groupId);
-  const groupId = payload.groupId;
+  const { groupId } = payload;
+  log.info('leaveGroup saga called: ', groupId);
 
   // verify that a groupId was supplied
   if (!groupId) {
@@ -30885,11 +32264,7 @@ function* leaveGroup({ payload }) {
   log.debug('Received response from leave group request:', response);
 
   if (!response.error) {
-    const userIdentifier = userInfo.identity;
-    yield (0, _effects.put)(actions.leaveGroupFinish({
-      groupId,
-      participant: userIdentifier
-    }));
+    yield (0, _effects.put)(actions.leaveGroupFinish({ groupId, participant: userInfo.identity }));
   } else {
     yield (0, _effects.put)(actions.leaveGroupFinish({ error: response.error }));
   }
@@ -30898,19 +32273,19 @@ function* leaveGroup({ payload }) {
 /**
  * Fetches all existing groups from the server.
  * @method fetch
- * @return {Group[]} - An array of Groups.
  */
 function* fetch() {
   log.info(`Fetching groups.`);
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
-  const response = yield (0, _effects.call)(_groups.fetchRequest, requestInfo);
-  if (!response.error) {
-    yield (0, _effects.put)(actions.fetchGroupsFinish({ groups: response }));
+  const groups = yield (0, _effects.call)(_groups.fetchRequest, requestInfo);
+
+  if (!groups.error) {
+    yield (0, _effects.put)(actions.fetchGroupsFinish({ groups }));
   } else {
-    yield (0, _effects.put)(actions.fetchGroupsFinish({ error: response.error }));
+    yield (0, _effects.put)(actions.fetchGroupsFinish({ error: groups.error }));
   }
 
-  log.debug('Received response from fetch request:', response);
+  log.debug('Received response from fetch request:', groups);
 }
 
 /**
@@ -30921,7 +32296,7 @@ function* fetch() {
  */
 function* acceptInvitation({ payload }) {
   log.info('accept invitation saga called: ', payload);
-  const groupId = payload.groupId;
+  const { groupId } = payload;
 
   // verify that a groupId was supplied
   if (!groupId) {
@@ -30948,19 +32323,15 @@ function* acceptInvitation({ payload }) {
 
   // Before accepting an invitation, we need to have the current state of
   // the group in state.
-  const groupResponse = yield (0, _effects.call)(_groups.fetchRequestByGroupId, groupId, requestInfo);
+  const group = yield (0, _effects.call)(_groups.fetchRequestByGroupId, groupId, requestInfo);
 
-  if (groupResponse.error) {
-    yield (0, _effects.put)(actions.acceptInvitationFinish({ error: groupResponse.error }));
+  if (group.error) {
+    yield (0, _effects.put)(actions.acceptInvitationFinish({ error: group.error }));
     return;
   }
 
-  if (!response.error && !groupResponse.error) {
-    yield (0, _effects.put)(actions.acceptInvitationFinish({
-      groupId,
-      participant: userInfo.identity,
-      group: groupResponse
-    }));
+  if (!response.error && !group.error) {
+    yield (0, _effects.put)(actions.acceptInvitationFinish({ groupId, group }));
   }
 }
 
@@ -30968,11 +32339,12 @@ function* acceptInvitation({ payload }) {
  * Reject invitation to a group.
  * @method rejectInvitation
  * @param  {Object} payload Information about the group to reject an invitation to.
+ * @param  {Object} payload.groupId the Group ID for referencing this group
  * @return {Object}
  */
 function* rejectInvitation({ payload }) {
   log.info('reject invitation saga called: ', payload);
-  const groupId = payload.groupId;
+  const { groupId } = payload;
 
   // verify that a groupId was supplied
   if (!groupId) {
@@ -30990,48 +32362,65 @@ function* rejectInvitation({ payload }) {
   const userInfo = yield (0, _effects.select)(_selectors.getUserInfo, _constants.platforms.CPAAS);
   const response = yield (0, _effects.call)(_groups.rejectInvitationRequest, groupId, requestInfo, userInfo);
   if (!response.error) {
-    yield (0, _effects.put)(actions.rejectInvitationFinish({
-      groupId,
-      participant: userInfo.identity
-    }));
+    yield (0, _effects.put)(actions.rejectInvitationFinish({ groupId }));
   } else {
     yield (0, _effects.put)(actions.rejectInvitationFinish({ error: response.error }));
   }
 }
 
 /**
- * Handle incoming 'groupChatSessionInvitationNotification'.
+ * Handle incoming 'groupChatSessionInvitationNotification' websocket messages.
  * @method handleInvitationNotification
- * @param  {string} groupId groupId
+ * @param {Object} wsAction An Object received on the websocket
  */
 function* handleInvitationNotification(wsAction) {
+  const { 'x-name': name, link, participant } = wsAction.payload.groupChatSessionInvitationNotification;
+
   // parse the href to get the groupId and add to invitation
-  const invite = wsAction.payload.groupChatSessionInvitationNotification;
-  const link = invite.link.find(link => link.rel === 'groupChatSessionInformation');
-  const groupId = link.href.substring(link.href.lastIndexOf('/') + 1);
-  const invitation = (0, _extends3.default)({}, invite, {
-    groupId: groupId
-  });
+  const linkInfo = link.find(link => link.rel === 'groupChatSessionInformation');
+  const groupId = linkInfo.href.substring(linkInfo.href.lastIndexOf('/') + 1);
+
+  // map out resourceURL and rename x-isAdmin
+  const participants = (0, _utils.remapParticipants)(participant);
+
+  const invitation = {
+    groupId,
+    participants,
+    name
+  };
   yield (0, _effects.put)(actions.invitationReceived({ invitation }));
 }
 
 /**
- * Handle incoming 'chatParticipantStatusNotification'.
+ * Handle incoming 'chatParticipantStatusNotification' websocket messages.
  * @method handleParticipantStatusNotification
- * @param  {string} groupId groupId
+ * @param {Object} wsAction An Object received on the websocket
+ * @param {Array}  wsAction.link A list of session information objects
+ * @param {Array}  wsAction.participant a list of participants for the group
+ * @param {number} wsAction.dateTime the time the notification was sent
+ * @param {string} wsAction.id an ID (NOT the same as groupId) for the group
+ * @param {string} wsAction['x-name'] the name of the group
  */
 function* handleParticipantStatusNotification(wsAction) {
   const notification = wsAction.payload.chatParticipantStatusNotification;
   const link = notification.link.find(link => link.rel === 'groupChatSessionInformation');
   const groupId = link.href.substring(link.href.lastIndexOf('/') + 1);
 
+  // map out resourceURL and rename x-isAdmin
+  notification.participants = (0, _utils.remapParticipants)(notification.participant);
+  delete notification.participant;
+
   yield (0, _effects.put)(actions.statusNotificationReceived({ groupId, notification }));
 }
 
 /**
- * Handle incoming 'chatEventNotification'.
+ * Handle incoming 'chatEventNotification' websocket messages.
  * @method handleEventNotification
- * @param  {string} userId userId
+ * @param {Object} wsAction An Object received on the websocket
+ * @param {Array}  wsAction.link A list of session information objects
+ * @param {number} wsAction.dateTime the time the notification was sent
+ * @param {string} wsAction.id an ID (NOT the same as groupId) for the group
+ * @param {string} wsAction['x-name'] the name of the group
  */
 function* handleEventNotification(wsAction) {
   const notification = wsAction.payload.chatEventNotification;
@@ -31284,7 +32673,7 @@ function actionFormatter(actionType, payload = {}, meta = {}) {
 /**
  * Fetches existing groups from the server
  * @method fetchGroups
- * @return {Object} A Flux Standard Action for FETCH_GROUPS
+ * @return {Object} A Flux Standard Action.
  */
 // Groups plugin.
 function fetchGroups() {
@@ -31297,7 +32686,7 @@ function fetchGroups() {
  * A notice that fetchGroups has finished.
  * @method fetchGroupsFinish
  * @param {Object} params
- * @param {[Object]} params.groups - Array of groups.
+ * @param {[Object]} params.groups Array of groups.
  * @param {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
@@ -31309,11 +32698,11 @@ function fetchGroupsFinish({ groups, error }) {
  * Create a new group
  * @method create
  * @param {Object} params
- * @param {string} params.userId - The Id of the current user.
- * @param {string[]} params.users - Array of users to add to group upon creation.
- * @param {string} params.image - The image for the group.
- * @param {string} params.type - Type of group: ie 'Open', 'Closed'. //ToDo Verify this
- * @return {Object} A Flux Standard Action for CREATE_GROUP
+ * @param {string} params.userId The Id of the current user.
+ * @param {string[]} params.users Array of users to add to group upon creation.
+ * @param {string} params.image The image for the group.
+ * @param {string} params.type Type of group: ie 'Open', 'Closed'. //ToDo Verify this
+ * @return {Object} A Flux Standard Action.
  */
 function create(params = {}) {
   return actionFormatter(actionTypes.CREATE_GROUP, { params });
@@ -31321,7 +32710,7 @@ function create(params = {}) {
 
 /**
  * @method createFinish
- * @param {Object} group - The group that was created.
+ * @param {Object} group The group that was created.
  * @param {Object} [error] An error object.
  * @return {Object} A flux standard action.
  */
@@ -31332,8 +32721,8 @@ function createFinish(group, error) {
 /**
  * Leave a group
  * @method leave
- * @param {string} groupId - The ID of the group to leave.
- * @return {Object} A Flux Standard Action for LEAVE_GROUP
+ * @param {string} groupId The ID of the group to leave.
+ * @return {Object} A Flux Standard Action.
  */
 function leave(groupId) {
   return actionFormatter(actionTypes.LEAVE_GROUP, { groupId });
@@ -31342,11 +32731,11 @@ function leave(groupId) {
 /**
  * Leave a specified group
  /**
- * @param {Object} $0
- * @param {string} $0.groupId The ID of the group that id being left.
- * @param {string} $0.participant The participant that is leaving.
- * @param {Object} [$0.error] An error object.
- * @return {Object} A Flux Standard Action for ADD_PARTICIPANT
+ * @param {Object} params
+ * @param {string} params.groupId The ID of the group that id being left.
+ * @param {string} params.participant The participant that is leaving.
+ * @param {Object} [params.error] An error object.
+ * @return {Object} A Flux Standard Action.
  */
 function leaveGroupFinish({ groupId, participant, error }) {
   return actionFormatter(actionTypes.LEAVE_GROUP_FINISH, { groupId, participant, error });
@@ -31355,8 +32744,8 @@ function leaveGroupFinish({ groupId, participant, error }) {
 /**
  * Accept a group invitation
  * @method acceptInvitation
- * @param {string} groupId - The ID of the group to retrieve.
- * @return {Object} A Flux Standard Action for ACCEPT_INVITATION
+ * @param {string} groupId The ID of the group to retrieve.
+ * @return {Object} A Flux Standard Action.
  */
 function acceptInvitation(groupId) {
   return actionFormatter(actionTypes.ACCEPT_INVITATION, { groupId });
@@ -31364,23 +32753,21 @@ function acceptInvitation(groupId) {
 
 /**
  * Accept a group invitation
- * @param {Object} $0
- * @param {string} $0.groupId - GroupId to accept invitation to.
- * @param {Object} $0.participant - Participant that the invitation is for.
- * @param {Object} $0.group - Information about the group.
- * @param {string} $0.status - 'Connected' status to indicate that invitation is accepted.
- * @param {string} [$0.error] - An error object.
+ * @param {Object} params
+ * @param {Object} params.group Information about the group.
+ * @param {string} params.status status of the invitation
+ * @param {string} [params.error] An error object.
  * @return {Object} A Flux Standard Action
  */
-function acceptInvitationFinish({ groupId, participant, group, status, error }) {
-  return actionFormatter(actionTypes.ACCEPT_INVITATION_FINISH, { groupId, participant, group, status, error });
+function acceptInvitationFinish({ groupId, group, status, error }) {
+  return actionFormatter(actionTypes.ACCEPT_INVITATION_FINISH, { groupId, group, status, error });
 }
 
 /**
  * Reject a group invitation
  * @method rejectInvitation
- * @param {string} groupId - The ID of the group to reject.
- * @return {Object} A Flux Standard Action for REJECT_INVITATION
+ * @param {string} groupId The ID of the group to reject.
+ * @return {Object} A Flux Standard Action.
  */
 function rejectInvitation(groupId) {
   return actionFormatter(actionTypes.REJECT_INVITATION, { groupId });
@@ -31388,23 +32775,22 @@ function rejectInvitation(groupId) {
 
 /**
  * Reject a group invitation
- * @param {Object} $0
- * @param {string} $0.groupId - GroupId to reject invitation from.
- * @param {Object} $0.participant - Participant that the invitation is for.
- * @param {Object} $0.status - 'Disconnected' status to indicate that invitation is rejected.
- * @param {string} [$0.error] - An error object.
+ * @param {Object} params
+ * @param {string} params.groupId GroupId to reject invitation from.
+ * @param {Object} params.status status of the invitation
+ * @param {string} [params.error] An error object.
  * @return {Object} A Flux Standard Action
  */
-function rejectInvitationFinish({ groupId, participant, status, error }) {
-  return actionFormatter(actionTypes.REJECT_INVITATION_FINISH, { groupId, participant, status, error });
+function rejectInvitationFinish({ groupId, status, error }) {
+  return actionFormatter(actionTypes.REJECT_INVITATION_FINISH, { groupId, status, error });
 }
 
 /**
  * Add a participant to a group
  * @method addParticipant
- * @param {string} groupId - The ID of the group to add a participant to.
- * @param {string} participant - Participant to add to the group.
- * @return {Object} A Flux Standard Action for ADD_PARTICIPANT
+ * @param {string} groupId The ID of the group to add a participant to.
+ * @param {string} participant Participant to add to the group.
+ * @return {Object} A Flux Standard Action.
  */
 function addParticipant(groupId, participant) {
   return actionFormatter(actionTypes.ADD_PARTICIPANT, { groupId, participant });
@@ -31413,10 +32799,10 @@ function addParticipant(groupId, participant) {
 /**
  * A notice that addParticipant has finished.
  * @method addParticipantFinish
- * @param {Object} $0
- * @param  {string} $0.groupId The ID of the group to be modified.
- * @param  {Object} $0.participant Participant to add to the group.
- * @param  {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param  {string} params.groupId The ID of the group to be modified.
+ * @param  {Object} params.participant Participant to add to the group.
+ * @param  {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function addParticipantFinish({ groupId, participant, error }) {
@@ -31426,9 +32812,9 @@ function addParticipantFinish({ groupId, participant, error }) {
 /**
  * Remove a participant from a group
  * @method removeParticipant
- * @param {string} groupId - The ID of the group to remove a participant from.
- * @param {Object} participant - Participant to remove from the group.
- * @return {Object} A Flux Standard Action for REMOVE_PARTICIPANT
+ * @param {string} groupId The ID of the group to remove a participant from.
+ * @param {Object} participant Participant to remove from the group.
+ * @return {Object} A Flux Standard Action.
  */
 function removeParticipant(groupId, participant) {
   return actionFormatter(actionTypes.REMOVE_PARTICIPANT, { groupId, participant });
@@ -31437,10 +32823,10 @@ function removeParticipant(groupId, participant) {
 /**
  * A notice that removeParticipant has finished.
  * @method removeParticipantFinish
- * @param {Object} $0
- * @param  {string} $0.groupId The ID of the group to be modified.
- * @param  {Object} $0.participant Participant to remove from the group.
- * @param  {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param  {string} params.groupId The ID of the group to be modified.
+ * @param  {Object} params.participant Participant to remove from the group.
+ * @param  {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function removeParticipantFinish({ groupId, participant, error }) {
@@ -31450,8 +32836,8 @@ function removeParticipantFinish({ groupId, participant, error }) {
 /**
  * A request to delete a group.
  * @method deleteGroup
- * @param {string} groupId - The ID of the the group to delete.
- * @return {Object} A Flux Standard Action for DELETE_GROUP
+ * @param {string} groupId The ID of the the group to delete.
+ * @return {Object} A Flux Standard Action.
  */
 function deleteGroup(groupId) {
   return actionFormatter(actionTypes.DELETE_GROUP, { groupId });
@@ -31460,9 +32846,9 @@ function deleteGroup(groupId) {
 /**
  * A notice that deleteGroup has finished.
  * @method deleteGroupFinish
- * @param {Object} $0
- * @param {string} $0.groupId The ID of the group that was deleted.
- * @param {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param {string} params.groupId The ID of the group that was deleted.
+ * @param {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function deleteGroupFinish({ groupId, error }) {
@@ -31476,9 +32862,9 @@ function deleteGroupFinish({ groupId, error }) {
 /**
  * A notice that a 'groupChatSessionInvitationNotification' has been recieved.
  * @method invitationReceived
- * @param {Object} $0
- * @param  {Object} $0.invitation Invitation (groupChatSessionInvitationNotification).
- * @param  {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param  {Object} params.invitation Invitation.
+ * @param  {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function invitationReceived({ invitation, error }) {
@@ -31488,10 +32874,10 @@ function invitationReceived({ invitation, error }) {
 /**
  * A notice that a 'chatParticipantStatusNotification' has been recieved.
  * @method statusNotificationReceived
- * @param {Object} $0
- * @param  {Object} $0.groupId Id of the group that the notification is for.
- * @param  {Object} $0.notification Notification (chatParticipantStatusNotification).
- * @param  {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param  {Object} params.groupId Id of the group that the notification is for.
+ * @param  {Object} params.notification Notification.
+ * @param  {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function statusNotificationReceived({ groupId, notification, error }) {
@@ -31501,10 +32887,10 @@ function statusNotificationReceived({ groupId, notification, error }) {
 /**
  * A notice that a 'chatEventNotification' has been received.
  * @method eventNotificationReceived
- * @param {Object} $0
- * @param  {Object} $0.groupId Id of the group that the notification is for.
- * @param  {Object} $0.notification Information (chatEventNotification).
- * @param  {Object} [$0.error] An error object.
+ * @param {Object} params
+ * @param  {Object} params.groupId Id of the group that the notification is for.
+ * @param  {Object} params.notification Information.
+ * @param  {Object} [params.error] An error object.
  * @return {Object} A flux standard action.
  */
 function eventNotificationReceived({ groupId, notification, error }) {
@@ -31526,18 +32912,36 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = function (context) {
   const groupsApi = {
     /**
-     * Create a group.
-     * User creating group will become the admin of that group.
+     * Creates a Group.
+     *
+     * The SDK will emit a {@link Group.event:group:new group:new} event locally
+     *    when the operation completes. This event will include a Group ID that
+     *    is used to uniquely identify the group.
+     *
+     * Remote users added to the Group during creation will receive a
+     *    `group:invitation_received` event, which will include information
+     *    about the Group. Group participants can be managed after creation
+     *    using the {@link Groups.addParticipant group.addParticipant} and
+     *    {@link Groups.removeParticipant group.removeParticipant} APIs.
+     *
+     * Group information will become available after the operation completes
+     *    using the {@link Groups.get group.get} and
+     *    {@link Group.getAll group.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method create
      * @param {Object} params
-     * @param {string[]} [params.participants] - List of participants to add to group when created.
-     * @param {string} [params.subject] - Subject of the grour chat session.
-     * @param {string} params.name - Name of the grour chat session.
-     * @param {string} [params.image]  - HTTP URL of the image that is assigned to the grpup chat session avatar
-     * @param {string} params.type - Closed group indicates this is an invitation-based closed chat group. Only Closed supported.
+     * @param {Array<string>} [params.participants] List of participants to
+     *    invite to the group as part of creation. A participant's address
+     *    should be in the form of their User ID.
+     * @param {string} [params.subject] Subject of the Group.
+     * @param {string} params.name Name of the Group.
+     * @param {string} [params.image] HTTP URL of the image to be used as the
+     *    Group's avatar.
+     * @param {string} params.type Closed group indicates this is an
+     *    invitation-based closed chat group. Only Closed supported.
      */
     create(params) {
       log.debug(_logs.API_LOG_TAG + 'groups.create: ', params);
@@ -31545,14 +32949,20 @@ exports.default = function (context) {
     },
 
     /**
-     * Fetches existing groups from the server.
-     * This will update the store with the retrieved groups, making them
-     * known locally. They can then be accessed using `get` or 'getAll'.
+     * Fetches information about all Groups that the current user is a member
+     *    of. This will refresh the available Groups with any new information
+     *    from the server.
+     *
+     * The SDK will emit a {@link Group.event:group:refresh group:refresh} event
+     *    when the operation completes.
+     *
+     * Information about an available Group can be retrieved using the
+     *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get}
+     *    APIs.
      *
      * @public
      * @memberof Groups
      * @method fetch
-     *
      */
     fetch() {
       log.debug(_logs.API_LOG_TAG + 'groups.fetch');
@@ -31560,12 +32970,13 @@ exports.default = function (context) {
     },
 
     /**
-     * Get information for all groups known locally.
+     * Retrieves information about all available Groups.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method getAll
-     * @return {Group[]} - An array of Groups.
+     * @return {Array<Group>} The list of all available Groups.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'groups.getAll');
@@ -31573,13 +32984,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve information about a paticular group known locally.
+     * Retrieves information about a single Group, if available.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method get
-     * @param {string} groupId - The Id of the group to retrieve information for.
-     * @return {Group} - Group information.
+     * @param {string} groupId The ID uniquely identifying the Group.
+     * @return {Group} The specified Group.
      */
     get(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.get: ', groupId);
@@ -31587,13 +32999,13 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve list of particpants from a group known locally.
+     * Retrieves the list of particpants from an available Group.
      *
      * @public
      * @memberof Groups
      * @method getParticipants
-     * @param {string} groupId - The Id of the group to get participants list.
-     * @return {Participant[]} - A list of participants.
+     * @param {string} groupId The ID of the Group to get participants.
+     * @return {Array<string>} The list of Group participants.
      */
     getParticipants(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.getParticipants: ', groupId);
@@ -31601,24 +33013,30 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve list of invitations known locally.
+     * Retrieves information about all Group invitations available.
+     *
+     * The {@link Groups.event:group:invitation_received group:invitation_received}
+     *    event indicates that a new Group invitation is available.
      *
      * @public
      * @memberof Groups
      * @method getInvitations
-     * @return {Invitations[]} - A list of invitations.
+     * @return {Array<Invitations>} The list of Group invitations.
      */
-    getInvitations(groupId) {
+    getInvitations() {
       return selectors.getInvitations(context.getState());
     },
 
     /**
-     * Leave a group.
+     * Leaves a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method leave
-     * @param {string} groupId - The Id of the group to leave.
+     * @param {string} groupId The ID of the Group to leave.
      */
     leave(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.leave: ', groupId);
@@ -31626,12 +33044,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Accept invitation to a group.
+     * Accepts an invitation to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method acceptInvitation
-     * @param {string} groupId - The Id of the group to accept an invitation to.
+     * @param {string} groupId The ID of the Group to accept an invitation to.
      */
     acceptInvitation(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.acceptInvitation: ', groupId);
@@ -31639,12 +33060,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Reject invitation to a group.
+     * Rejects an invitation to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
      * @memberof Groups
      * @method rejectInvitation
-     * @param {string} groupId - The Id of the group to reject an invitation to.
+     * @param {string} groupId The ID of the Group to reject an invitation to.
      */
     rejectInvitation(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.rejectInvitation: ', groupId);
@@ -31652,13 +33076,19 @@ exports.default = function (context) {
     },
 
     /**
-     * Add participant to a group.
+     * Adds participant to a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes. The participant being added will receive
+     *    a {@link Groups.event:group:invitation_received group:invitation_received}
+     *    event.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method addParticipant
-     * @param {string} groupId - The Id of the group to add participant to.
-     * @param {string} participant - The userId of participant to add.
+     * @param {string} groupId The ID of the Group to add participant to.
+     * @param {string} participant The User ID of the participant to add.
      */
     addParticipant(groupId, participant) {
       log.debug(_logs.API_LOG_TAG + 'groups.addParticipant: ', groupId, participant);
@@ -31666,13 +33096,17 @@ exports.default = function (context) {
     },
 
     /**
-     * Remove participant from a group.
+     * Removes a participant from a Group.
+     *
+     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     *    when the operation completes.
      *
      * @public
+     * @static
      * @memberof Groups
      * @method removeParticipant
-     * @param {string} groupId - The Id of the group to remove participant from.
-     * @param {string} participant - The userId of participant to remove.
+     * @param {string} groupId The ID of the Group to remove participant from.
+     * @param {string} participant The User ID of the participant to remove.
      */
     removeParticipant(groupId, participant) {
       log.debug(_logs.API_LOG_TAG + 'groups.removeParticipant: ', groupId, participant);
@@ -31680,13 +33114,18 @@ exports.default = function (context) {
     },
 
     /**
-     * Delete a group.
-     * The group is deleted and all participants will receive a 'group:delete' notification.
+     * Deletes a Group.
+     *
+     * The Group will no longer be available using the {@link Groups.get group.get}
+     *    and {@link Group.getAll group.getAll} APIs.
+     *
+     * The SDK will emit a {@link Groups.event:group:delete group:delete} event
+     *    for all participants in the Group.
      *
      * @public
      * @memberof Groups
      * @method delete
-     * @param {string} groupId - The Id of the group to delete.
+     * @param {string} groupId The ID of the Group to delete.
      */
     delete(groupId) {
       log.debug(_logs.API_LOG_TAG + 'groups.delete: ', groupId);
@@ -31709,7 +33148,16 @@ var _logs = __webpack_require__("../kandy/src/logs/index.js");
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
-                                                             * The Groups feature is used to manage groups.
+                                                             * The Groups feature provides an interface for an application to create and
+                                                             *    manage Groups for a User. Groups are used in conjuction with the
+                                                             *    {@link Messaging Messaging} feature to allow for group conversations.
+                                                             *
+                                                             * Groups are persisted by the server. When the SDK is initialized, there will
+                                                             *    be no Group information available, but the {@link Groups.fetch fetch}
+                                                             *    Group API is used to make available any Groups that were created
+                                                             *    previously.
+                                                             *
+                                                             * The creator of a Group is the Group's administrator.
                                                              *
                                                              * Group functions are all part of the 'groups' namespace.
                                                              *
@@ -31730,40 +33178,63 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A new group has been created.
+ * A new Group has been created and its information is now available.
+ *
+ * Information about an available Group can be retrieved using the
+ *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
  *
  * @public
+ * @static
  * @memberof Groups
  * @event group:new
  * @param {Object} params
- * @param {string} params.groupId The group Id of the group that was changed.
+ * @param {string} params.id The ID of the newly available Group.
+ * @example
+ * // Set an event listener for new Groups being created.
+ * client.on('group:new', params => {
+ *    const group = client.groups.get(params.groupId)
+ *    // Use the new group.
+ * })
  */
 const GROUP_NEW = exports.GROUP_NEW = 'group:new';
 
 /**
- * An existing group has been modified. Ex: a new participant has been added/removed from the group or their status has been updated.
+ * An existing Group has been modified and the new information is available.
  *
  * @public
  * @memberof Groups
  * @event group:change
  * @param {Object} params
- * @param {string} params.groupId The group Id of the group that was changed.
+ * @param {string} params.id The ID of the Group that has changed.
  */
 const GROUP_CHANGE = exports.GROUP_CHANGE = 'group:change';
 
 /**
- * A group has been deleted.
+ * A Group has been deleted and is no longer available.
+ *
+ * The latest information about the Group is provided as part of the event.
  *
  * @public
  * @memberof Groups
  * @event group:delete
  * @param {Object} params
- * @param {string} params.group The group that was deleted.
+ * @param {Object} params.group The information about the Group that was deleted.
+ * @param {string} params.group.id the Group ID of the deleted group
+ * @param {string} params.group.image the group image of the deleted group
+ * @param {string} params.group.name the group name of the deleted group
+ * @param {Array} params.group.participants the participants of the group of the deleted group
+ * @param {string} params.group.subject the subject for the group of the deleted group
  */
 const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
 
 /**
- * The list of groups has been refreshed.
+ * The list of Groups has been refreshed.
+ *
+ * Any previously available Groups may have had their information updated, and
+ *    any otherwise unknown Groups may now be available.
+ *
+ * Information about an available Group can be retrieved using the
+ *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
  *
  * @public
  * @memberof Groups
@@ -31772,18 +33243,25 @@ const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
 const GROUP_REFRESH = exports.GROUP_REFRESH = 'group:refresh';
 
 /**
- * An invitation to a group has been received.
+ * An invitation to a Group has been received.
+ *
+ * Information about a Group invitation can be retrieved using the
+ *    {@link Groups.getInvitations group.getInvitations} API.
  *
  * @public
+ * @static
  * @memberof Groups
  * @event group:invitation_received
  * @param {Object} params
- * @param {Object} params.invitation the Invitation object
+ * @param {Object} params.invitation contains information about the group invitation
+ * @param {string} params.invitation.id Group ID used to locate and join the group
+ * @param {Array} params.invitation.participants a list of participants in the group
+ * @param {string} params.invitation.name the group name
  */
 const GROUP_INVITATION_RECEIVED = exports.GROUP_INVITATION_RECEIVED = 'group:invitation_received';
 
 /**
- * An error occured with groups.
+ * An error occured with a Group operation.
  *
  * @public
  * @memberof Groups
@@ -31805,6 +33283,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _actionTypes = __webpack_require__("../kandy/src/groups/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
@@ -31815,6 +33297,8 @@ var eventTypes = _interopRequireWildcard(_eventTypes);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 let events = {};
 
 const groupChangedEvent = function (action) {
@@ -31824,11 +33308,10 @@ const groupChangedEvent = function (action) {
       args: { error: action.payload }
     };
   } else {
+    const { groupId } = action.payload;
     return {
       type: eventTypes.GROUP_CHANGE,
-      args: {
-        groupId: action.payload.groupId
-      }
+      args: { id: groupId }
     };
   }
 };
@@ -31840,11 +33323,10 @@ events[actionTypes.CREATE_GROUP_FINISH] = function (action) {
       args: { error: action.payload }
     };
   } else {
+    const { groupId } = action.payload.group;
     return {
       type: eventTypes.GROUP_NEW,
-      args: {
-        groupId: action.payload.group.groupChatSessionInformation.groupId
-      }
+      args: { id: groupId }
     };
   }
 };
@@ -31856,9 +33338,10 @@ events[actionTypes.DELETE_GROUP_FINISH] = function (action, { prevState }) {
       args: { error: action.payload }
     };
   } else {
+    const group = prevState.groups.groups.find(group => group.id === action.payload.groupId);
     return {
       type: eventTypes.GROUP_DELETE,
-      args: { group: prevState.groups.groups.find(group => group.groupId === action.payload.groupId) }
+      args: { group }
     };
   }
 };
@@ -31869,6 +33352,7 @@ events[actionTypes.LEAVE_GROUP_FINISH] = groupChangedEvent;
 events[actionTypes.ACCEPT_INVITATION_FINISH] = groupChangedEvent;
 events[actionTypes.REJECT_INVITATION_FINISH] = groupChangedEvent;
 events[actionTypes.STATUS_NOTIFICATION_RECEIVED] = groupChangedEvent;
+events[actionTypes.EVENT_NOTIFICATION_RECEIVED] = groupChangedEvent;
 
 events[actionTypes.INVITATION_RECEIVED] = function (action) {
   if (action.error) {
@@ -31877,11 +33361,13 @@ events[actionTypes.INVITATION_RECEIVED] = function (action) {
       args: { error: action.payload }
     };
   } else {
+    // replace groupId with id
+    const invitation = (0, _extends3.default)({}, action.payload.invitation, { id: action.payload.invitation.groupId });
+    delete invitation.groupId;
+
     return {
       type: eventTypes.GROUP_INVITATION_RECEIVED,
-      args: {
-        invitation: action.payload.invitation
-      }
+      args: { invitation }
     };
   }
 };
@@ -31967,7 +33453,10 @@ const reducers = {};
 
 reducers[actionTypes.CREATE_GROUP_FINISH] = {
   next(state, action) {
-    const newGroup = action.payload.group.groupChatSessionInformation;
+    // rename groupId to id
+    const newGroup = (0, _extends3.default)({}, action.payload.group, { id: action.payload.group.groupId });
+    delete newGroup.groupId;
+
     return (0, _extends3.default)({}, state, { groups: [...state.groups, newGroup] });
   }
 };
@@ -31980,7 +33469,7 @@ reducers[actionTypes.DELETE_GROUP_FINISH] = {
     const { groupId } = action.payload;
 
     return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId)
+      groups: state.groups.filter(group => group.id !== groupId)
     });
   }
 };
@@ -31994,9 +33483,9 @@ reducers[actionTypes.ADD_PARTICIPANT_FINISH] = {
 
     return (0, _extends3.default)({}, state, {
       groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
+        if (group.id === groupId) {
           return (0, _extends3.default)({}, group, {
-            participant: [...group.participant, participant]
+            participants: [...group.participants, participant]
           });
         }
         return group;
@@ -32013,9 +33502,9 @@ reducers[actionTypes.REMOVE_PARTICIPANT_FINISH] = {
     const { groupId, participant } = action.payload;
     return (0, _extends3.default)({}, state, {
       groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
+        if (group.id === groupId) {
           return (0, _extends3.default)({}, group, {
-            participant: group.participant.filter(member => member.address !== participant)
+            participants: group.participants.filter(member => member.address !== participant)
           });
         }
         return group;
@@ -32032,8 +33521,8 @@ reducers[actionTypes.LEAVE_GROUP_FINISH] = {
     const { groupId } = action.payload;
 
     return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId),
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
+      groups: state.groups.filter(group => group.id !== groupId),
+      invitations: state.invitations.filter(invite => invite.id !== groupId)
     });
   }
 };
@@ -32043,15 +33532,15 @@ reducers[actionTypes.LEAVE_GROUP_FINISH] = {
  */
 reducers[actionTypes.FETCH_GROUPS_FINISH] = {
   next(state, action) {
-    const { groups } = action.payload;
+    // rename groupId to id
+    const groups = action.payload.groups.map(group => {
+      const groupWithId = (0, _extends3.default)({}, group, { id: group.groupId });
+      delete groupWithId.groupId;
+      return groupWithId;
+    });
 
-    // add groupId as a new property to each group. The groupId is
-    // parsed from the group's resourceURL.
     return (0, _extends3.default)({}, state, {
-      groups: groups.map(function (group) {
-        group.groupId = group.resourceURL.substring(group.resourceURL.lastIndexOf('/') + 1);
-        return group;
-      })
+      groups
     });
   }
 };
@@ -32061,14 +33550,14 @@ reducers[actionTypes.FETCH_GROUPS_FINISH] = {
  */
 reducers[actionTypes.ACCEPT_INVITATION_FINISH] = {
   next(state, action) {
-    const { groupId, group } = action.payload;
-    const newGroup = (0, _extends3.default)({}, group, {
-      groupId
+    const { group } = action.payload;
+    const newGroup = (0, _extends3.default)({}, group, { id: group.groupId });
+    delete newGroup.groupId;
 
-      // remove the invitation and replace the group in state.
-    });return (0, _extends3.default)({}, state, {
-      groups: [...state.groups.filter(group => group.groupId !== groupId), newGroup],
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
+    // remove the invitation and replace the group in state.
+    return (0, _extends3.default)({}, state, {
+      groups: [...state.groups.filter(group => group.id !== newGroup.id), newGroup],
+      invitations: state.invitations.filter(invite => invite.id !== newGroup.id)
     });
   }
 };
@@ -32082,8 +33571,8 @@ reducers[actionTypes.REJECT_INVITATION_FINISH] = {
 
     // remove the invitation and the group from state.
     return (0, _extends3.default)({}, state, {
-      groups: state.groups.filter(group => group.groupId !== groupId),
-      invitations: state.invitations.filter(invite => invite.groupId !== groupId)
+      groups: state.groups.filter(group => group.id !== groupId),
+      invitations: state.invitations.filter(invite => invite.id !== groupId)
     });
   }
 };
@@ -32093,9 +33582,9 @@ reducers[actionTypes.REJECT_INVITATION_FINISH] = {
  */
 reducers[actionTypes.INVITATION_RECEIVED] = {
   next(state, action) {
-    const { invitation } = action.payload;
+    const invitation = (0, _extends3.default)({}, action.payload.invitation, { id: action.payload.invitation.groupId });
+    delete invitation.groupId;
 
-    // add the new invitation to the state.
     return (0, _extends3.default)({}, state, {
       invitations: [...state.invitations, invitation]
     });
@@ -32113,13 +33602,13 @@ reducers[actionTypes.EVENT_NOTIFICATION_RECEIVED] = {
     // remove the group and invitation from state.
     if (notification.eventType === 'SessionCancelled') {
       return (0, _extends3.default)({}, state, {
-        groups: state.groups.filter(group => group.groupId !== groupId),
-        invitations: state.invitations.filter(invite => invite.groupId !== groupId)
+        groups: state.groups.filter(group => group.id !== groupId),
+        invitations: state.invitations.filter(invite => invite.id !== groupId)
         // otherwise, just remove the group
       });
     } else if (notification.eventType === 'SessionEnded') {
       return (0, _extends3.default)({}, state, {
-        groups: state.groups.filter(group => group.groupId !== groupId)
+        groups: state.groups.filter(group => group.id !== groupId)
       });
     }
   }
@@ -32131,14 +33620,14 @@ reducers[actionTypes.STATUS_NOTIFICATION_RECEIVED] = {
   next(state, action) {
     // need to update the state.... if the group exists in state, update this participants
     const { groupId, notification } = action.payload;
-    const changedParticipant = notification.participant[0];
+    const changedParticipant = notification.participants[0];
     const newState = (0, _extends3.default)({}, state, {
       groups: state.groups.map(group => {
-        if (group.groupId === groupId) {
+        if (group.id === groupId) {
           let newGroup = (0, _extends3.default)({}, group, {
-            participant: group.participant.filter(participant => participant.address !== changedParticipant.address)
+            participants: group.participants.filter(participant => participant.address !== changedParticipant.address)
           });
-          newGroup.participant.push(changedParticipant);
+          newGroup.participants.push(changedParticipant);
           return (0, _extends3.default)({}, newGroup);
         }
         return group;
@@ -32186,7 +33675,7 @@ function getAllGroups(state) {
  * @return {Object}  Group information of specified group.
  */
 function getGroup(state, groupId) {
-  const group = state.groups.groups.find(groups => groups.groupId === groupId);
+  const group = state.groups.groups.find(group => group.id === groupId);
   if (group) {
     return (0, _fp.cloneDeep)(group);
   }
@@ -32199,9 +33688,9 @@ function getGroup(state, groupId) {
  * @return {[Object]}  List of participants in specified group.
  */
 function getParticipants(state, groupId) {
-  const group = state.groups.groups.find(groups => groups.groupId === groupId);
+  const group = state.groups.groups.find(group => group.id === groupId);
   if (group) {
-    return (0, _fp.cloneDeep)(group.participant);
+    return (0, _fp.cloneDeep)(group.participants);
   }
 }
 
@@ -32213,6 +33702,65 @@ function getParticipants(state, groupId) {
  */
 function getInvitations(state, groupId) {
   return (0, _fp.cloneDeep)(state.groups.invitations);
+}
+
+/***/ }),
+
+/***/ "../kandy/src/groups/utils.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.remapParticipants = remapParticipants;
+exports.marshallGroup = marshallGroup;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Remaps/renames some properties on the participants array passed in
+ *
+ * @param {Array} participants a list of participant objects
+ * @return {Array}
+ */
+function remapParticipants(participants) {
+  return participants.map(participant => {
+    const remappedParticipant = (0, _extends3.default)({}, participant, { isAdmin: participant['x-isAdmin'] });
+    delete remappedParticipant.resourceURL;
+    delete remappedParticipant['x-isAdmin'];
+    return remappedParticipant;
+  });
+}
+
+/**
+ * Normalizes server group notifications into a more usable object structure for front end development.
+ *
+ * @param {Object} groupNotification
+ * @returns {Object} group
+ * @returns {string} group.name The group name
+ * @returns {Array} group.participants A list of participant objects
+ * @returns {string} group.subject The group subject
+ * @returns {string} group.groupId An ID for looking up the group
+ * @returns {string} group.image The image for the group
+ */
+function marshallGroup(groupNotification) {
+  // pull out and rename properties
+  const { 'x-name': name, 'x-image': image, subject, resourceURL, participant } = groupNotification;
+
+  // re-map all participants on each group
+  const participants = remapParticipants(participant);
+
+  // parse the Group ID out of resourceURL
+  const groupId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
+  return { name, participants, subject, groupId, image };
 }
 
 /***/ }),
@@ -32262,27 +33810,41 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * @module config
  */
 
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
 /**
- * A set of handlers for manipulating SDP information.
+ * A set of {@link #sdphandlerfunction SdpHandlerFunction}s for manipulating SDP information.
  * These handlers are used to customize low-level call behaviour for very specific
  * environments and/or scenarios. They can be provided during SDK instantiation
  * to be used for all calls.
+ *
  * @public
  * @module sdpHandlers
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
+ *   }
+ * })
  */
 
 // Disabling eslint for the next comment as we want to be able to use a disallowed word
 // eslint-disable-next-line no-warning-comments
 /**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party. While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+ * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
  *
- * To facilitate this common task, the SDK provides a codec removal handler that can be used for this purpose.
+ * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
  *
  * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
  *
  * @public
  * @memberof sdpHandlers
  * @method createCodecRemover
+ * @param {Array<string>} codecs A list of codec names to remove from the SDP.
+ * @returns {SdpHandlerFunction} The resulting SDP handler that will remove the codec.
  * @example
  * import { create, sdpHandlers } from 'kandy';
  * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
@@ -32367,10 +33929,14 @@ var _cpaas15 = __webpack_require__("../kandy/src/users/cpaas/index.js");
 
 var _cpaas16 = _interopRequireDefault(_cpaas15);
 
+__webpack_require__("../kandy/src/docs/docs.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Plugins
 const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'groups', fn: _cpaas12.default }, { name: 'subscription', fn: _cpaas14.default }, { name: 'users', fn: _cpaas16.default }];
+
+// Plugins
+
 
 function root(options = {}, plugins = []) {
   return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
@@ -32473,12 +34039,13 @@ const logMgr = getLogManager(defaultOptions);
 /**
  * Configuration options for the Logs feature.
  * @public
+ * @static
  * @name config.logs
  * @memberof config
  * @requires logs
  * @instance
  * @param {Object} logs Logs configs.
- * @param  {string} [logs.logLevel=debug] Log level to be set. See `logger.levels`.
+ * @param  {string} [logs.logLevel='debug'] Log level to be set. See {@link Logger.levels levels}.
  * @param  {boolean} [logs.flatten=false] Whether all logs should be output in a string-only format.
  * @param  {Object} [logs.logActions] Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
  * @param  {boolean} [logs.logActions.actionOnly=true] Only output information about the action itself. Omits the SDK context for when it occurred.
@@ -32601,13 +34168,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 /**
- * The internal logger used to provide information about the SDK's behaviour.
+ * The internal logger is used to provide information about the SDK's behaviour.
  * The logger can provide two types of logs: basic logs and action logs. Basic
  * logs are simple lines of information about what the SDK is doing during operations.
  * Action logs are complete information about a specific action that occurred
- * within the SDK, prodiving debug information describing it.
- * The amount of information logged can be configured as part of the SDK
- * (see `configs.logs`) configuration.
+ * within the SDK, providing debug information describing it.
+ * The amount of information logged can be configured as part of the SDK configuration.
+ * See {@link #configconfiglogs config.logs} .
  *
  * @public
  * @module Logger
@@ -32619,9 +34186,10 @@ function api() {
     /**
      * Possible levels for the SDK logger.
      * @public
+     * @static
      * @memberof Logger
-     * @property {string} SILENT Logs nothing.
-     * @property {string} ERROR Only log unhandled errors.
+     * @property {string} SILENT Log nothing.
+     * @property {string} ERROR Log only unhandled errors.
      * @property {string} WARN Log issues that may cause problems or unexpected behaviour.
      * @property {string} INFO Log useful information and messages to indicate the SDK's internal operations.
      * @property {string} DEBUG Log information to help diagnose problematic behaviour.
@@ -33238,7 +34806,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Creates a create conversation action. Triggered when the user creates a new conversation object.
  *
  * @method createConversation
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {Object} options The options object can contain any keys an app may want passed along into the conversation object in the store.
  * @returns {Object} A flux standard action representing the create conversation action.
  */
@@ -33270,7 +34838,7 @@ function fetchConversations(options) {
  * Creates a fetch conversations finished action.
  * @method fetchConversationsFinished
  * @param {Object} params
- * @param {Array} [params.conversations] An array of conversation objects, if fetch was successful
+ * @param {Array<conversation>} [params.conversations] An array of conversation objects, if fetch was successful
  * @param {Object} [params.error] An error object, only included if fetchConversations implementation had an error.
  * @returns {Object} A flux standard action representing the fetch conversations finished action.
  */
@@ -33287,7 +34855,7 @@ function fetchConversationsFinished({ conversations, error }) {
  *
  * @method updateConversation
  * @param {Object} conversation The conversation object
- * @param {Array} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
+ * @param {Array<string>} conversation.destination An array of strings representing the destinations for messages that are sent from this conversation object. This property is always required, as it is the primary property by which conversations are organized in messaging plugin
  * @param {number} [conversation.id] The conversation object's corresponding ID
  * @param {string} [conversation.type] The conversation type, which is expected to be one of: "chat-oneToOne", "chat-group", "sms".
  * @returns {Object} A flux standard action representing the update conversation action.
@@ -33300,9 +34868,9 @@ function updateConversation(conversation) {
 }
 
 /**
- * Request to delete all the messages from a conversation.
+ * Deletes all the messages from a conversation.
  * @method deleteConversation
- * @param  {string} destination The destination for messages created in this conversation.
+ * @param  {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the delete conversation action.
  */
@@ -33320,7 +34888,7 @@ function deleteConversation(destination, type) {
  * Creates a delete conversations finished action.
  * @method deleteConversationFinish
  * @param {Object} params
- * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @param {Object} [params.error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the delete conversation finished action.
@@ -33469,7 +35037,7 @@ function messageReadHelper(actionType, messageId, participant) {
  * @method deliveryReceiptReceived
  * @param {string} messageId the id of the sent message
  * @param {string} deliveryStatus the status of sent message
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
  * @returns {Object} A flux standard action representing the send message action.
  */
@@ -33484,8 +35052,8 @@ const deliveryReceiptReceived = exports.deliveryReceiptReceived = (messageId, de
  * Creates a send message action. Triggered when the user initiates the send message process.
  *
  * @method sendMessage
- * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {Array} parts The message parts, as a formatted object.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
+ * @param {Array<part>} parts The message parts, as a formatted object.
  * @param {number} timestamp A timestamp for the sent message.
  * @param {string} type Type of message. 'chat-oneToOne', 'chat-group' or 'sms'.
  * @param {number} id The ID of the conversation as it exists in the back end.
@@ -33498,10 +35066,10 @@ const sendMessage = exports.sendMessage = (destination, parts, timestamp, type, 
  *
  * @method sendMessageFinish
  * @param {Object} params
- * @param {Array} params.destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.sender The sender of the outgoing message.
  * @param {string} params.type The type of conversation: can be one of 'chat-oneToOne', 'chat-group' or 'sms'
- * @param {Array} params.parts The message parts.
+ * @param {Array<part>} params.parts The message parts.
  * @param {number} params.timestamp A timestamp for the sent message.
  * @param {string} [params.messageId] The returned messageId of the message if sent successfully.
  * @param {string} [params.deliveryStatus] The status of sent message
@@ -33529,8 +35097,8 @@ const sendMessageFinish = exports.sendMessageFinish = ({
  * Creates a message received action. Triggered when the websocket receives a chat message.
  *
  * @method messageReceived
- * @param {Array} destination An array of destinations for messages created in this conversation.
- * @param {Array} parts The message parts.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
+ * @param {Array<part>} parts The message parts.
  * @param {string} messageId The messageId of the message that has been received.
  * @param {string} sender The user who sent the message. This is the user who the conversation is with.
  * @param {number} timestamp A timestamp for the sent message.
@@ -33598,7 +35166,7 @@ function sendMessageReadFinish({ messageId, participant, error }) {
 /**
  * Creates a fetch messages action. This is dispatched by the API directly.
  * @method fetchMessages
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {number} amount A number representing the amount of messages to fetch.
  * @returns {Object} A flux standard action representing the fetch messages action.
  */
@@ -33612,9 +35180,9 @@ function fetchMessages(destination, amount, type) {
 /**
  * Creates a fetch messages finished action.
  * @method fetchMessagesFinished
- * @param {Array} destination An array of destinations for messages created in this conversation.
+ * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @param {Array} messages An array of formatted messages to put into the store.
+ * @param {Array<message>} messages An array of formatted messages to put into the store.
  * @param {Object} [error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
@@ -33630,7 +35198,7 @@ function fetchMessagesFinished(destination, type, messages, error) {
  * Request to clear messages from a conversation's state.
  * @method clearMessages
  * @param  {string} destination The destination for messages created in this conversation.
- * @param {string} type The type of conversation: can be one of chat-OneToOne', 'chat-group' or 'sms'.
+ * @param {string} type The type of conversation: can be one of 'chat-OneToOne', 'chat-group' or 'sms'.
  * @returns {Object} A flux standard action.
  */
 function clearMessages(destination, type) {
@@ -33664,7 +35232,7 @@ function deleteMessage(destination, type, messageId) {
 
 /**
  * Creates a fetch messages finished action.
- * @method deleteMessagesFinish
+ * @method deleteMessageFinish
  * @param {Object} params
  * @param {Array} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
@@ -33745,7 +35313,10 @@ var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
  *
  * See the "Conversation" and "Message" sections of the documentation for more details.
  *
- * Messaging functions are all part of the 'conversation' namespace. Ex: client.conversation.get('id').
+ * Available conversations can be retrieved using the
+ *    {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging APIs.
+ *
+ * Messaging functions are all part of the 'messaging' namespace. Ex: {@link Messaging.getAll client.conversation.getAll}
  *
  * @public
  * @module Messaging
@@ -33756,14 +35327,21 @@ const log = (0, _logs.getLogManager)().getLogger('Messaging');
 function api(context) {
   const messagingApi = {
     /**
-     * Retrieves a list of chat conversations that the current user is a part of.
-     * These conversations can then be retrieved from the store using get().
+     * Fetches chat conversations that the current user is part of. This will refresh
+     * the available information with any new information from the server.
+     *
+     * If successful, the event {@link Messaging.event:conversations:change conversations:change} will be emitted.
+     *
+     * Available conversation information can be retrieved using the
+     * {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging
+     * APIs.
      *
      * @public
-     * @param {Object} [options] An optional configuration object to query for more specific results.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
-     * @memberof Messaging
+     * @static
      * @method fetch
+     * @memberof Messaging
+     * @param {Object} [options] A configuration object to query for more specific results.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
      */
     fetch: function (options = {}) {
       log.debug(_logs.API_LOG_TAG + 'conversation.fetch: ', options);
@@ -33774,15 +35352,18 @@ function api(context) {
       context.dispatch(_actions.convoActions.fetchConversations(options));
     },
     /**
-     * Get a conversation object matching the User ID and type provided.
-     * If a conversation with the given User ID and type exists in the store, it will be returned.
+     * Retrieves a conversation object matching the User ID and Type provided if available.
+     *
+     * Conversations are made availble using the {@link Messaging.fetch fetch}
+     * or {@link Messaging.create create} Messaging APIs.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method get
-     * @param {string} recipient The User Id of the remote user with which the current user had a conversation.
-     * @param {Object} [options] An optional configuration object to query for more specific results.
-     * @param {string} [options.type='chat-onToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @memberof Messaging
+     * @param {string} recipient The User ID of the remote user with which the current user had a conversation.
+     * @param {Object} [options] Options used to query for more specific results.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -33819,23 +35400,29 @@ function api(context) {
       return undefined;
     },
     /**
-     * Create and return a new conversation object. Any messages being sent through this conversation
-     * object will be sent to the destination provided
+     * Creates and return a new conversation object. Any messages being sent through this Conversation
+     * object will be sent to the destination provided.
+     *
+     * If successful, the event {@link Messaging.event:conversations:new conversations:new} will be emitted.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method create
-     * @param {string} recipient The Id of the remote user with which the current will have a conversation.
-     * @param {Object} [options] Options to use when creating the conversation object.
+     * @memberof Messaging
+     * @param {string} recipient The ID of the remote user to create a conversation with. The ID will be changed to lowercase.
+     * @param {Object} [options] Options to use when creating a new conversation object.
      * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
-     * @returns {Conversation} a Conversation object
+     * @returns {Conversation} A Conversation object.
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
       log.debug(_logs.API_LOG_TAG + 'conversation.create');
       // convert chat chatTypes to CPaaS values
       options.type = _mappings.chatTypeAliases[options.type];
 
-      const destination = Array.isArray(recipient) ? recipient : [recipient];
+      const recipients = Array.isArray(recipient) ? recipient : [recipient];
+
+      const destination = recipients.map(recipient => recipient.toLowerCase());
+
       const prevConv = (0, _selectors.findConversation)(context.getState(), destination, options.type);
 
       if (!prevConv) {
@@ -33848,12 +35435,16 @@ function api(context) {
       });
     },
     /**
-     * Returns all conversations currently tracked by the SDK
+     * Retrieves all available conversations for the current user.
+     *
+     * Conversations are made availble using the {@link Messaging.fetch fetch}
+     * or {@link Messaging.create create} Messaging APIs.
      *
      * @public
-     * @memberof Messaging
+     * @static
      * @method getAll
-     * @returns {Array<Conversation>} An array of conversation objects.
+     * @memberof Messaging
+     * @returns {Array<Conversation>} An array of Conversation objects.
      */
     getAll: function () {
       log.debug(_logs.API_LOG_TAG + 'conversation.getAll');
@@ -33894,48 +35485,46 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A new conversation has been created and added to the state.
+ * A new conversation has been created.
  *
  * @public
  * @memberof Messaging
  * @event conversations:new
- * @param {Array} params An array of objects containing information about the new conversation
- * @param {Array} params.destination The destination for messages created in this conversation.
+ * @param {Array<Object>} params An array containing one object with information about the newly created conversation.
+ * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
  * @param {string} params.type The type of conversation created. See {@link Messaging.chatTypes chatTypes} for valid types.
  */
 const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
 
 /**
- * A change has occured in the conversation list.
+ * A change has occurred in the conversation list.
  *
  * @public
  * @memberof Messaging
  * @event conversations:change
- * @param {Array} params An array of objects containing information about the conversations that have changed.
- * @param {Array} params.destination The destination for messages created in this conversation.
+ * @param {Array<Object>} params An array of objects containing information about the conversations that have changed.
+ * @param {Array<string>} params.destination An array of destinations for messages in this conversation.
  * @param {string} params.type The type of conversation changed. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} [params.messageId] The ID of the message affected.
  */
 const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:change';
 
 /**
- * A change has occured in a specific conversations message list.
- * If a single message was affected/created, `messageId` will be present
- * as part of the event argument.
+ * A change has occurred in a specific conversation's message list.
+ * If a single message was created/edited, `messageId` will be present.
  *
  * @public
  * @memberof Messaging
  * @event messages:change
  * @param {Object} params
- * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {Array<string>} params.destination An array of destinations for the message affected.
+ * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
- * @param {string} [params.sender] The username of the sender of the message which caused the `messages:change` event to be triggered.
+ * @param {string} [params.sender] The username of the sender.
  */
 const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 
 /**
- * An error occured with messaging.
+ * An error occurred with messaging.
  *
  * @public
  * @memberof Messaging
@@ -33946,16 +35535,17 @@ const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
 
 /**
- * The List of users that are currently typing has changed.
+ * The list of users that are currently typing has changed.
  *
  * @public
  * @requires isTyping
  * @memberof Messaging
  * @event isTypingList:change
  * @param {Object} params
- * @param {string} params.destination The destination for messages created in this conversation.
- * @param {string} params.type The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} [params.sender] The username of the sender that caused the event to trigger
+ * @param {Array<string>} params.destination An array of destinations in this conversation.
+ * @param {string} params.sender The username of the sender that caused the event to fire.
+ * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.state (active/idle) The current state of the sender that caused the event to fire.
  */
 const IS_TYPING_LIST_CHANGE = exports.IS_TYPING_LIST_CHANGE = 'isTypingList:change';
 
@@ -34104,6 +35694,7 @@ eventsMap[actionTypes.DELETE_MESSAGE_FINISH] = function (action) {
       type: eventTypes.MESSAGES_CHANGE,
       args: {
         destination: action.payload.destination,
+        messageId: action.payload.messageId,
         type: action.payload.type
       }
     };
@@ -34225,29 +35816,32 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
  * Base conversation stamp
- * @param {Array} destination The Destination for messages being sent through
+ * @param {Array<string>} destination The destination(s) for messages being sent through
  * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
  * @param {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
- * @param {string} id The unique identifier for base conversation.
- * @param {string} description='' The description associated with base conversation.
- * @param {Array} messages=[] An array containing the conversation's messages.
+ * @param {string} [id=undefined] id The unique identifier for the conversation.
+ * @param {string} [description=''] The description associated with the conversation.
+ * @param {Array<Message>} [messages=[]] An array containing the conversation's messages.
+ * @param {Array<string>} [isTypingList=[]] A array that represents the list of usings who are currently typing.
  * @param {number} lastReceived The timestamp associated with the last received message.
  */
 
 // Events
 /**
- * A Conversation object represents a conversation between either two users, or a
- * user and a group. A Conversation can create messages via the conversation's
- * createMessage() function.
+ * A Conversation object represents a conversation either between two users, or between a
+ * user and a group. A user can create a Conversation using {@link Messaging.create client.conversation.create} Messaging API.
+ * A Conversation can be used to create messages to send using the Conversation and Messaging APIs
+ * {@link #conversationcreatemessage Conversation.createMessage} and {@link #messagesendersend Message.send} functions.
+ *
  *
  * Once a sender sends the initial message (within a conversation) to a recipient, there will be a
- * conversation object saved in both sender & recipient's state.
+ * conversation object saved in both sender and recipient's state.
  *
- * @property {string} destination The Id of the remote user with which the current user is having a conversation.
- * @property {string} address The Id of the current user who is having a conversation.
+ * @property {string} destination The ID/group ID of the remote user with which the current user is having a conversation.
+ * @property {string} address The ID of the current user who is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
  * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type associated with all messages within this conversation object. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @property {string} type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
  * @property {Array<Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
@@ -34259,12 +35853,12 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 // `features` and `lastPull` are not documented because they're intended to be internal
 
 /**
- * A Part is a custom object representing the payload of a message.
+ * A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
  *
- * @property {string} type The payload type. Can be "text", "json", "file".
+ * @property {string} type The payload type. Can be `text`, `json`, or `file`.
  * @property {string} text The text of the message. Messages with file or json attachments are still required to have text associated to it.
- * @property {Object} [json] The object corresponding to a json object to attach to a message. A part cannot have both json and a file.
- * @property {File} [file] The file to attach to attach to a message. A part cannot have both json and a file.
+ * @property {Object} [json] The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+ * @property {File} [file] The file to attach to a message. A `Part` cannot have both json and a file.
  *
  * @public
  * @module Part
@@ -34274,10 +35868,10 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 /**
  * A Message sender object is a means by which a sender can deliver information to a recipient.
  *
- * This sender object can obtained through the createMessage API on an existing conversation.
+ * This sender object can be obtained through the {@link #conversationcreatemessage conversation.createMessage} API on an existing conversation.
  *
- * Once all the desired parts have been added to it (using appPart function), the message
- * can be sent using the send function.
+ * Once all the desired parts have been added to it using the {@link #messagesenderaddpart MessageSender.addPart},
+ * the message can then be sent using the send function.
  *
  * @public
  * @module MessageSender
@@ -34286,28 +35880,27 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 
 /**
  * A Message object represents an individual message that was delivered to a recipient and it is
- * obtained through the getMessage/getMessages API on an existing conversation.
+ * obtained through the {@link #conversationgetmessages Conversation.getMessages} or {@link #conversationgetmessage Conversation.getMessage} API on an existing conversation.
  *
- * Messages have parts which represent pieces of a message, such as a text part, a json object part or a file part.
+ * Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
  *
- * Once sender sends a message, this message is saved in sender's state as an object.
+ * Once the sender sends a message, this message is saved in sender's state as an object.
  *
- * Similarly, once recipient gets a message, this message is saved in recipient's state.
+ * Similarly, once the recipient gets a message, this message is saved in recipient's state.
  *
  * Below are the properties pertaining to this saved message object in either sender or recipient's state.
  *
- * @property {number} timestamp The Unix timestamp in seconds marking the time when the message was created by sender.
+ * @property {number} timestamp A Unix timestamp in seconds marking the time when the message was created by sender.
  * @property {boolean} isPending Whether the message is in pending state or not (delivered by server or not).
- * @property {boolean} read: Whether the message was read by recipient user.
- * @property {Array<Part>} parts An array of Parts.
+ * @property {boolean} read Whether the message was read by recipient user or not.
+ * @property {Array<Part>} parts An array of Part Objects.
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
  * @property {string} type The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
- * @property {string} deliveryStatus Tracks the status of the outgoing message (i.e. 'Sent', etc).
+ * @property {string} deliveryStatus Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
  * This property applies only to the message object stored in sender's state.
- *
  * @public
  * @module Message
  * @type {Object}
@@ -34345,12 +35938,16 @@ const conversationBase = {
 
   methods: {
     /**
-     * Create and return a message object. You must specify the part. If this is a simple text message, provide a `text` part as demonstrated in the example.
+     * Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      *
      * @public
      * @memberof Conversation
+     * @method createMessage
      * @constructs Message
-     * @param {Part} part The part to add to the message.
+     * @param {Part} part The Part to add to the message.
      * @returns {Message} The newly created Message object.
      *
      * @example
@@ -34379,6 +35976,8 @@ const conversationBase = {
     /**
      * Clears all messages in this conversation from local state.
      *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      * @public
      * @memberof Conversation
      * @method clearMessages
@@ -34388,7 +35987,7 @@ const conversationBase = {
     },
 
     /**
-     * Get the messages associated with this conversation.
+     * Gets all messages from this conversation.
      *
      * @public
      * @memberof Conversation
@@ -34408,13 +36007,13 @@ const conversationBase = {
     },
 
     /**
-     * Get a specific message from this conversation.
+     * Gets a specific message from this conversation.
      *
      * @public
      * @method getMessage
      * @memberof Conversation
-     * @param {string} messageId ID of the message to retrieve.
-     * @return {Object} A message object.
+     * @param {string} messageId The ID of the message to retrieve.
+     * @return {Message} A message object.
      */
     getMessage(messageId) {
       const convo = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
@@ -34459,24 +36058,26 @@ const conversationBase = {
     },
 
     /**
-     * Delete messages from this conversation. Provide an array of message IDs representing the messages for which the DELETE_MESSAGE action will be dispatched. If no message IDs are provided, all of the messages will be deleted.
+     * Deletes specified messages from this conversation.
+     * Provide an array of message IDs for the messages to be deleted.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     *
      * @public
      * @memberof Conversation
      * @method deleteMessages
-     * @param {Array<string>} messageIds An array of message IDs
+     * @param {Array<string>} [messageIds=[]] An array of message IDs for the messages to be deleted
      */
     deleteMessages: function (messageIds = []) {
-      if (messageIds.length === 0) {
-        // If this method was called without providing any specific message IDs, we will assume that all messages should be deleted
-        this.messages.forEach(message => messageIds.push(message.messageId));
-      }
       messageIds.forEach(messageId => {
         this.context.dispatch(_actions.messageActions.deleteMessage(this.destination, this.type, messageId));
       });
     },
 
     /**
-     * Delete this conversation on the server
+     * Delete the conversation.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -34487,7 +36088,7 @@ const conversationBase = {
     },
 
     /**
-     * Subscribe to this conversation's messages array.
+     * Subscribe to this conversation's messages list to receive notification of changes.
      *
      * @public
      * @memberof Conversation
@@ -34530,9 +36131,11 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Allows the user to fetch messages associated with a specific conversation from the server.
-     * When the operation is complete, a NEW_MESSAGE event will be emitted.
-     * Messages can then be retrieved using getMessages.
+     * Allows the user to fetch messages associated with a specific conversation to make them available.
+     * When the operation is complete, a `messages:change` event will be emitted.
+     * Messages can then be retrieved using {@link #conversationgetmessages Conversation.getMessages}.
+     *
+     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -34544,7 +36147,7 @@ const conversationBase = {
     }
   }
   /*
-   * Conversation is Typing. Responsible for updating the state of who is idling or actively typing
+   * Conversation is Typing. Responsible for updating the state of who is idling or actively typing.
    */
 };const conversationIsTyping = {
   initializers: [function () {
@@ -34559,7 +36162,8 @@ const conversationBase = {
     /**
      * Sets the typing status of the conversation for the current user.
      * Other participants will be notified of changes to the conversation's typing status.
-     * See the isTypingList:change event.
+     *
+     * If successful, the event {@link Messaging.event:isTypingList:change isTypingList:change} will be emitted.
      *
      * @public
      * @memberof Conversation
@@ -34577,16 +36181,16 @@ const conversationBase = {
    * @param {string} destination The Destination for messages being sent through
    * this conversation in this instance of the SDK. This can be one or many users,
    * separated by commas `,`
-   * @param  {Object} parts - Initial part to the message.
-   * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
-   * @param  {string} type - The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
-   * @param  {Function} context.send - Function for sending the message.
+   * @param  {Object} parts Initial part to the message.
+   * @param  {Object} context Information and capabilities for how the message will act with regard to the conversation.
+   * @param  {Array} context.features Array of features the conversation supports.
+   * @param  {string} type The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
+   * @param  {Function} context.send Function for sending the message.
    * @param  {number} timestamp unix timestamp in seconds
    * @param  {boolean} isFetchingLinks
    * @param  {string} sender The author of the message
-   * @param  {string} messageId a unique id for looking up the message
-   * @param  {string} [type='chat-oneToOne'] - The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
+   * @param  {string} messageId a unique ID for looking up the message
+   * @param  {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
    */
 };const messageBase = {
   initializers: [function ({
@@ -34627,7 +36231,7 @@ const conversationBase = {
    * stamp to add message parts capabilities to a Message primitive
    * @name withParts
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
+   * @param  {Array<string>} context.features - Array of features the conversation supports.
    */
 };const withParts = {
   initializers: [function ({ context: { features = [] } }) {
@@ -34639,11 +36243,11 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Add an additional part to a message.
+     * Add an additional `Part` to a message.
      *
      * @public
      * @memberof MessageSender
-     * @param {Part} part The part to add to the message.
+     * @param {Part} part The `Part` to add to the message.
      */
     addPart(part) {
       // Validate the part. If not valid, returns an error.
@@ -34659,7 +36263,7 @@ const conversationBase = {
    * stamp to allow creation of multimedia links
    * @name multimediaLinks
    * @param  {Object} context - Information and capabilities for how the message will act with regard to the conversation.
-   * @param  {Array} context.features - List of features the conversation supports.
+   * @param  {Array<string>} context.features - Array of features the conversation supports.
    */
 };const multimediaLinks = {
   initializers: [function ({ context: { features = [] } }) {
@@ -34671,7 +36275,7 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Creates a usable link for the given message
+     * Creates a usable image link for the message in this `MessageSender`.
      *
      * @public
      * @memberof MessageSender
@@ -35214,6 +36818,8 @@ exports.setIsTypingRequest = setIsTypingRequest;
 exports.uploadFile = uploadFile;
 exports.sendChatMessageRequest = sendChatMessageRequest;
 exports.sendGroupChatMessageRequest = sendGroupChatMessageRequest;
+exports.deleteChatConversationRequest = deleteChatConversationRequest;
+exports.deleteChatMessageRequest = deleteChatMessageRequest;
 exports.chatSubscribe = chatSubscribe;
 exports.chatUnsubscribe = chatUnsubscribe;
 exports.sendSMSRequest = sendSMSRequest;
@@ -35232,6 +36838,8 @@ var _effects2 = _interopRequireDefault(_effects);
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
+
+var _helpers = __webpack_require__("../kandy/src/common/helpers/index.js");
 
 var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
 
@@ -35253,6 +36861,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
+// Helpers.
 function _marshalData(attributes) {
   return attributes.reduce((accum, current, index) => {
     accum[current.name] = attributes[index].value;
@@ -35266,11 +36875,10 @@ function _marshalData(attributes) {
  * @param {Object} requestInfo
  * @param {string} destination to send the notification to
  * @param {string} state (idle/active) the state of the user typing
- * @param {string} type The type of conversation. Can be one of "chat", "sms" or "group"
+ * @param {string} type The type of conversation. Can be one of "chat-oneToOne" or "chat-group"
  * @param {string} [refresh='60'] a string integer representing in seconds how long before the server refreshes the state
  * @returns {Object}
  */
-// Helpers.
 function* setIsTypingRequest(requestInfo, destination, state, type, refresh = '60') {
   let url;
   if (type === _mappings.chatTypes.ONETOONE) {
@@ -35379,22 +36987,8 @@ function* sendChatMessageRequest(requestInfo, destination, textParts, fileParts)
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
   if (response.error) {
-    // Request error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.error);
     return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.debug('Failed to send Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Chat Message.'
-      })
+      error: (0, _helpers.handleRequestError)(response, 'Send chat message')
     };
   } else {
     // Success scenario.
@@ -35432,28 +37026,89 @@ function* sendGroupChatMessageRequest(requestInfo, destination, textParts, fileP
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
   if (response.error) {
-    // Request error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.error);
     return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
-    };
-  } else if (response.payload.requestError) {
-    // Server error.
-    _loglevel2.default.error('Failed to send Group Chat Message.', response.payload.requestError);
-    return {
-      error: new _errors2.default({
-        code: _errors.messagingCodes.SEND_MESSAGE_FAIL,
-        message: 'Failed to send Group Chat Message.'
-      })
+      error: (0, _helpers.handleRequestError)(response, 'Send group chat message')
     };
   } else {
     // Success scenario.
     return (0, _extends3.default)({}, response.payload.body.chatMessage, {
       error: false
     });
+  }
+}
+
+/**
+ * Used to delete chat conversation
+ * @method deleteChatConversationRequest
+ * @param {Object} requestInfo
+ * @param {string} destination Destination associated with the conversation to delete
+ * @param {string} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group"
+ * @returns {Object}
+ */
+function* deleteChatConversationRequest(requestInfo, destination, type) {
+  let url;
+  if (type === _mappings.chatTypes.ONETOONE) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+  } else if (type === _mappings.chatTypes.GROUP) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}`;
+  } else if (type === _mappings.chatTypes.SMS) {
+    url = `${requestInfo.baseURL}/cpaas/smsmessaging/v1/${requestInfo.username}/remoteAddresses/${destination}/localAddresses/${requestInfo.senderAddress}`;
+  }
+
+  const requestOptions = {
+    method: 'DELETE',
+    url: url
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Delete conversation')
+    };
+  } else {
+    // Success scenario.
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Used to delete chat message
+ * @method deleteChatMessageRequest
+ * @param {Object} requestInfo
+ * @param {Object} destination Destination associated with the conversation
+ * @param {Object} messageId MessageId of message to delete
+ * @param {Object} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group"
+ * @returns {Object}
+ */
+function* deleteChatMessageRequest(requestInfo, destination, messageId, type) {
+  let url;
+  if (type === _mappings.chatTypes.ONETOONE) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages/${messageId}`;
+  } else if (type === _mappings.chatTypes.GROUP) {
+    url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}/messages/${messageId}`;
+  } else if (type === _mappings.chatTypes.SMS) {
+    url = `${requestInfo.baseURL}/cpaas/smsmessaging/v1/${requestInfo.username}/remoteAddresses/${destination}/localAddresses/${requestInfo.senderAddress}/messages/${messageId}`;
+  }
+
+  const requestOptions = {
+    method: 'DELETE',
+    url: url
+  };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Delete message')
+    };
+  } else {
+    // Success scenario.
+    return {
+      error: false
+    };
   }
 }
 
@@ -35831,6 +37486,8 @@ exports.registerChat = registerChat;
 exports.registerInboundSMS = registerInboundSMS;
 exports.registerOutboundSMS = registerOutboundSMS;
 exports.sendChatMessage = sendChatMessage;
+exports.deleteConversation = deleteConversation;
+exports.deleteMessage = deleteMessage;
 exports.receiveChatMessageNotification = receiveChatMessageNotification;
 exports.sendSMS = sendSMS;
 exports.receiveSMS = receiveSMS;
@@ -35897,9 +37554,14 @@ function* registerInboundSMS() {
  * Runs immediately.
  * @method registerOutboundSMS
  */
-function* registerOutboundSMS() {
-  yield (0, _effects.registerService)('smsoutbound', subsSagas.smsOutboundSubscription, subsSagas.smsOutboundUnsubscription);
-}
+function* registerOutboundSMS() {}
+/*
+ * smsoutbound subscriptions are disabled because they are not supported by
+ *    the backend yet.
+ * See: KAA-1925
+ */
+// yield registerService('smsoutbound', subsSagas.smsOutboundSubscription, subsSagas.smsOutboundUnsubscription)
+
 
 /**
  * Chat Operations
@@ -35915,6 +37577,22 @@ function* sendChatMessage() {
   }
 
   yield (0, _effects2.takeEvery)(sendChatPattern, messagingSagas.sendChatMessage);
+}
+
+/**
+ * Delete a Conversation
+ * @method deleteConversation
+ */
+function* deleteConversation() {
+  yield (0, _effects2.takeEvery)(actionTypes.DELETE_CONVERSATION, messagingSagas.deleteConversation);
+}
+
+/**
+ * Delete a Message
+ * @method deleteMessage
+ */
+function* deleteMessage() {
+  yield (0, _effects2.takeEvery)(actionTypes.DELETE_MESSAGE, messagingSagas.deleteMessage);
 }
 
 /**
@@ -36044,6 +37722,8 @@ var _extends3 = _interopRequireDefault(_extends2);
 exports.receiveIsTypingNotification = receiveIsTypingNotification;
 exports.setIsTyping = setIsTyping;
 exports.sendChatMessage = sendChatMessage;
+exports.deleteConversation = deleteConversation;
+exports.deleteMessage = deleteMessage;
 exports.handleChatMessageNotification = handleChatMessageNotification;
 exports.handleDeliveryReceipts = handleDeliveryReceipts;
 exports.sendSMS = sendSMS;
@@ -36220,6 +37900,71 @@ function* sendChatMessage(action) {
     yield (0, _effects.put)(_actions.messageActions.sendMessageFinish((0, _extends3.default)({}, finishInfo, {
       messageId
     })));
+  }
+}
+
+/**
+ * Deletes a conversation via DELETE request
+ * @method deleteConversation
+ * @param  {Object} action A `DELETE_CONVERSATION` action
+ */
+function* deleteConversation(action) {
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+
+  let deleteResponse;
+  const chatType = action.payload.type;
+
+  if (chatType === _mappings.chatTypes.SMS) {
+    // sms delete requires originators phone number
+    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+    requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+  }
+  deleteResponse = yield (0, _effects.call)(_requests.deleteChatConversationRequest, requestInfo, action.payload.destination[0], chatType);
+
+  if (deleteResponse.error) {
+    yield (0, _effects.put)(_actions.convoActions.deleteConversationFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      error: deleteResponse.error
+    }));
+  } else {
+    yield (0, _effects.put)(_actions.convoActions.deleteConversationFinish({
+      type: chatType,
+      destination: action.payload.destination
+    }));
+  }
+}
+
+/**
+ * Deletes a message via DELETE request
+ * @method deleteMessage
+ * @param  {Object} action A `DELETE_MESSAGE` action
+ */
+function* deleteMessage(action) {
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+
+  let deleteResponse;
+  const chatType = action.payload.type;
+  if (chatType === _mappings.chatTypes.SMS) {
+    // sms delete requires originators phone number
+    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+    requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+  }
+  deleteResponse = yield (0, _effects.call)(_requests.deleteChatMessageRequest, requestInfo, action.payload.destination[0], action.payload.messageId, chatType);
+
+  if (deleteResponse.error) {
+    yield (0, _effects.put)(_actions.messageActions.deleteMessageFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      messageId: action.payload.messageId,
+      error: deleteResponse.error
+    }));
+  } else {
+    yield (0, _effects.put)(_actions.messageActions.deleteMessageFinish({
+      type: chatType,
+      destination: action.payload.destination,
+      messageId: action.payload.messageId
+    }));
   }
 }
 
@@ -37599,8 +39344,9 @@ exports.default = () => {
   function augmentedApi(context) {
     const newApi = (0, _interface.api)(context);
     /**
-     * Possible status values.
+     * Possible presence status values.
      * @public
+     * @static
      * @memberof Presence
      * @type {Object}
      * @property {string} OPEN
@@ -37612,8 +39358,9 @@ exports.default = () => {
      */
     newApi.presence.statuses = _constants.STATUS;
     /**
-     * Possible activity values.
+     * Possible presence activity values.
      * @public
+     * @static
      * @memberof Presence
      * @type {Object}
      * @property {string} AVAILABLE
@@ -37623,6 +39370,10 @@ exports.default = () => {
      * @property {string} ON_THE_PHONE
      * @property {string} ACTIVITIES_UNKNOWN
      * @property {string} ACTIVITIES_OTHER
+     * @example
+     * const { statuses, activities } = client.presence
+     * // Use the values when updating presence.
+     * client.presence.update(statuses.OPEN, activities.AVAILABLE)
      */
     newApi.presence.activities = _constants.ACTIVITY;
     return newApi;
@@ -37829,12 +39580,10 @@ function* getPresenceLists(requestInfo) {
  * REST request to retrieve presence states of requested presentities.
  * @method retrievePresence
  * @param  {Array} users Array of userId's
- * @param  {string} presenceListId Resource ID of the presenceList
- * @param  {string} subscriptionId Resource ID of the subscription
  * @param  {Object} requestInfo
  * @return {Object}
  */
-function* retrievePresence(users, presenceListId, subscriptionId, requestInfo) {
+function* retrievePresence(users, requestInfo) {
   let adhocPresenceList = {
     adhocPresenceList: {
       presentityUserId: users
@@ -38244,16 +39993,7 @@ function* fetchPresence({ payload }) {
   const users = payload;
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
 
-  // get current presenceListId
-  const subscriptions = yield (0, _effects.select)(_selectors2.getNotificationChannels);
-  var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
-    return sub.service === 'presence';
-  });
-  const presenceListId = presenceSubscription[0].presenceListId;
-  const resourceURL = presenceSubscription[0].resourceURL;
-  const subscriptionId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
-
-  const response = yield (0, _effects.call)(_presence.retrievePresence, users, presenceListId, subscriptionId, requestInfo);
+  const response = yield (0, _effects.call)(_presence.retrievePresence, users, requestInfo);
   log.debug('Received response from retrievePresence request:', response);
 
   if (!response.error) {
@@ -38704,16 +40444,28 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = function (context) {
   const presenceApi = {
     /**
-     * Update the presence for the current user.
-     * Other users subscribed for this user's presence will receive the update.
+     * Updates the presence information for the current user.
+     *
+     * See {@link Presence.statuses presence.statuses} and
+     *    {@link Presence.activities presence.activities} for valid values.
+     *
+     * The SDK will emit a
+     *    {@link Presence.event:presence:selfChange presence:selfChange} event
+     *    when the operation completes. The updated presence information is
+     *    available and can be retrieved with
+     *    {@link Presence.getSelf presence.getSelf}.
+     *
+     * Other users subscribed for this user's presence will receive a
+     *    {@link Presence.event:presence:change presence:change} event.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method update
      * @param  {string} status The status of the presence state.
      * @param  {string} activity The activity to be shown as presence state
-     * @param  {string} [note] An additional note to be provided when the activity is "other".
+     * @param  {string} [note] An additional note to be provided when the activity is `presence.activities.ACTIVITIES_OTHER`.
      */
     update(status, activity, note) {
       log.debug(_logs.API_LOG_TAG + 'presence.update: ', status, activity, note);
@@ -38721,14 +40473,15 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve the presence information for specified users.
+     * Retrieves the presence information for specified users, if available.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method get
-     * @param  {Array<string>|string} users  A user id or an array of user ids.
-     * @return {Array} List of user presence information.
+     * @param  {Array<string>|string} user A User ID or an array of User IDs.
+     * @return {Array<Object>|Object} List of user presence information.
      */
     get(user) {
       log.debug(_logs.API_LOG_TAG + 'presence.get: ', user);
@@ -38745,13 +40498,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieve the presence information for all users.
+     * Retrieves the presence information for all available users.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method getAll
-     * @return {Array} List of user presence information.
+     * @return {Array<Object>} List of user presence information.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'presence.getAll');
@@ -38761,11 +40515,15 @@ exports.default = function (context) {
     /**
      * Retrieves the presence information for the current user.
      *
+     * This information is set using the {@link Presence.update presnece.update}
+     *    API.
+     *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method getSelf
-     * @return {Object}
+     * @return {Object} Presence information for the current user.
      */
     getSelf() {
       log.debug(_logs.API_LOG_TAG + 'presence.getSelf');
@@ -38773,15 +40531,19 @@ exports.default = function (context) {
     },
 
     /**
-     * Fetch (from the server) the presence for the given users.
-     * This will update the store with the retrieved values, which can then
-     * be accessed using `get`.
+     * Fetches presence information for the given users. This will refresh the
+     *    available information with any new information from the server.
+     *
+     * Available presence information an be retrieved using the
+     *    {@link Presence.get presence.get} or
+     *    {@link Presence.getAll presence.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method fetch
-     * @param  {Array<string>|string} users  A user id or an array of user ids.
+     * @param {Array<string>|string} user A User ID or an array of User IDs.
      */
     fetch(user) {
       log.debug(_logs.API_LOG_TAG + 'presence.fetch: ', user);
@@ -38790,13 +40552,17 @@ exports.default = function (context) {
     },
 
     /**
-     * Subscribe to retrieve presence updates about specified user.
+     * Subscribe to another User's presence updates.
+     *
+     * When the User updates their presence information, the SDK will emit a
+     *    {@link Presence.event:presence:change presence:change} event.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method subscribe
-     * @param  {string} user  The ID of the user to subscribe to.
+     * @param {Array<string>|string} users A User ID or an array of User IDs.
      */
     subscribe(users) {
       log.debug(_logs.API_LOG_TAG + 'presence.subscribe: ', users);
@@ -38804,13 +40570,14 @@ exports.default = function (context) {
     },
 
     /**
-     * Unsubscribe from presence updates about specified user.
+     * Unsubscribe from another User's presence updates.
      *
      * @public
+     * @static
      * @memberof Presence
      * @requires presence
      * @method unsubscribe
-     * @param  {string} user  The ID of the user to unsubscribe from.
+     * @param {Array<string>|string} users A User ID or an array of User IDs.
      */
     unsubscribe(users) {
       log.debug(_logs.API_LOG_TAG + 'presence.unsubscribe: ', users);
@@ -38833,10 +40600,20 @@ var _logs = __webpack_require__("../kandy/src/logs/index.js");
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const log = (0, _logs.getLogManager)().getLogger('PRESENCE'); /**
-                                                               * The presence features are used to update the authenticated users presence
-                                                               * on the server, as well as retrieve other users presence information.
+                                                               * The Presence feature provides an interface for an application to set the
+                                                               *    User's presence information and to track other Users' presence
+                                                               *    information.
                                                                *
-                                                               * Presence functions are all part of the 'presence' namespace.
+                                                               * Presence information is persisted by the server. When the SDK is initialized,
+                                                               *    there will be no information available. Presence information will become
+                                                               *    available either by using {@link Presence.fetch presence.fetch} or
+                                                               *    by subscribing for updates about other Users, using
+                                                               *    {@link Presence.subscribe presence.subscribe}.
+                                                               *
+                                                               * Available presence information can be retrieved using
+                                                               *    {@link Presence.get presence.get} or {@link Presence.getAll presence.getAll}.
+                                                               *
+                                                               * Presence APIs are part of the 'presence' namespace.
                                                                *
                                                                * @public
                                                                * @requires presence
@@ -38855,7 +40632,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * A presence update has been received from a subscribed user.
+ * A presence update about a subscribed user has been received.
  *
  * @public
  * @memberof Presence
@@ -38870,7 +40647,10 @@ Object.defineProperty(exports, "__esModule", {
 const RECEIVED = exports.RECEIVED = 'presence:change';
 
 /**
- * The user's self presence information has changed.
+ * The current user's presence information has changed.
+ *
+ * The changed information can be retrieved using the
+ *    {@link Presence.getSelf presence.getSelf} API.
  *
  * @public
  * @memberof Presence
@@ -38880,7 +40660,7 @@ const RECEIVED = exports.RECEIVED = 'presence:change';
 const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
 
 /**
- * An error occured with presence.
+ * An error occurred with presence.
  *
  * @public
  * @memberof Presence
@@ -40354,7 +42134,9 @@ function* onConnectionLostEntry() {
  */
 function* onConnectionLost() {
   const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices);
-  yield (0, _effects2.put)(actions.unsubscribe(subscribedServices));
+  yield (0, _effects2.put)(actions.unsubscribeFinished({
+    unsubscriptions: subscribedServices
+  }));
 }
 
 /***/ }),
@@ -40552,7 +42334,8 @@ function doPluginUnsubscriptions(services, type) {
 function reportUnsubscriptionFinished({ service, type, error }) {
   return actionFormatter(actionTypes.PLUGIN_UNSUBSCRIPTION_FINISHED, {
     service,
-    channelType: type
+    channelType: type,
+    error
   });
 }
 
@@ -40609,9 +42392,9 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 /**
  * Service API. All functions in this plugin are part of the 'services' namespace.
  * @method api
- * @param  {Function} $0
- * @param  {Function} $0.dispatch - The redux store's dispatch function.
- * @param  {Function} $0.getState - The redux store's getState function.
+ * @param  {Function} params
+ * @param  {Function} params.dispatch - The redux store's dispatch function.
+ * @param  {Function} params.getState - The redux store's getState function.
  * @return {Object} api - The subscription API object.
  */
 
@@ -40621,10 +42404,22 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
 // Auth plugin.
 /**
- * The Service feature allows applications to subscribe for receiving
- * communications from the platform's services. It allows an application to manage the
- * features that they will receive notifications for, and on which type of
- * channel they wish to receive them on.
+ * The Services feature allows an application to manage how they wish the SDK to
+ *    receive communications from the platform. An application can subscribe to
+ *    services in order to receive updates about that service for the current
+ *    user. A feature generally requires a subscription for its service to be
+ *    fully functional.
+ *
+ * The services an application can subscribe to are based on the features
+ *    included in the SDK. The list of available services can be retrieved
+ *    using the {@link Subscription.getSubscriptions services.getSubscriptions}
+ *    API. These values can be used with the
+ *    {@link Subscription.subscribe services.subscribe} API.
+ *
+ * The channel used for subscriptions is the method for receiving the service
+ *    updates. The recommended channel is `websocket`, where the SDK is able to
+ *    handle receiving the updates internally. Alternate channel methods, if a
+ *    websocket cannot be used, will be available in the future.
  *
  * Service functions are all part of the 'services' namespace.
  *
@@ -40636,13 +42431,21 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 function api({ dispatch, getState }) {
   const subscriptionApi = {
     /**
-     * Perform a backend subscription. This will subscribe to the requested
-     * services, as well as connect to the request notification channel.
+     * Subscribes to platform notifications for an SDK service.
+     *
+     * Subscriptions can only be made for services available to the SDK. See
+     *    {@link Subscription.getSubscriptions services.getSubscriptions} for
+     *    information about services.
+     *
+     * The SDK currently only supports the `websocket` channel as a subscription
+     *    type.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method subscribe
-     * @param {Array} services The services that you would like to subscribe for.
-     * @param {String} [type='websocket'] The type of subscription you would like to subscribe for.
+     * @param {Array<string>} services A list of available services.
+     * @param {string} [type='websocket'] The method of how to receive service updates.
      */
     subscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.subscribe: ', services, type);
@@ -40656,12 +42459,19 @@ function api({ dispatch, getState }) {
     },
 
     /**
-     * Unsubscribe from notification subscriptions.
+     * Cancels existing subscriptions for platform notifications.
+     *
+     * Existing subscriptions can be retrieved using the
+     *    {@link Subscriptions.getSubscriptions services.getSubscriptions} API.
+     *    The `subscribed` values are the services that can be unsubscribed from.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method unsubscribe
-     * @param {Array} services The subscribed services that should be unsubscribed.
-     * @param {String} [type='websocket'] The type of channelto be used for the notifications.
+     * @param {Array<string>} services A list of subscribed services.
+     * @param {string} [type='websocket'] The method of how the service updates
+     *    are being received.
      */
     unsubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.unsubscribe: ', services, type);
@@ -40674,17 +42484,45 @@ function api({ dispatch, getState }) {
       }
     },
 
+    /**
+     * Resubscribe for notification subscriptions. ***NOT YET SUPPORTED***
+     * @memberof Subscription
+     * @method resubscribe
+     * @param {Array<string>} services The subscribed services that should be unsubscribed.
+     * @param {string} [type='websocket'] The type of channel to be used for the notifications.
+     */
     resubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.resubscribe: ', services, type);
       log.info(`THIS FUNCTIONALITY IS NOT YET SUPPORTED. Services: ${services}. Type: ${type}`);
     },
 
     /**
-     * Retrieve information about currently subscribed services and available services.
+     * Retrieves information about currently subscribed services and available services.
+     *
+     * The `available` values are the SDK's services that an application can
+     *    subscribe to receive notifications about. A feature generally
+     *    requires a subscription to its service in order to be fully functional.
+     *
+     * The `subscribed` values are the SDK's services that the application has
+     *    an active subscription for. Services are subscribed to using the
+     *    {@link Subscription.subcribe services.subscribe} API.
+     *
      * @public
+     * @static
      * @memberof Subscription
      * @method getSubscriptions
      * @return {Object} Lists of subscribed and available services.
+     * @example
+     * // Get the lists of services.
+     * const services = client.services.getSubscriptions()
+     *
+     * // Figure out which available services don't have a subscription.
+     * const notSubscribed = services.available.filter(service => {
+     *    return !services.subscribed.includes(service)
+     * })
+     *
+     * // Subscribe for all not-yet-subscribed services.
+     * client.services.subscribe(notSubscribed)
      */
     getSubscriptions() {
       log.debug(_logs.API_LOG_TAG + 'services.getSubscriptions');
@@ -40779,8 +42617,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
+ * Subscription information has changed.
+ *
+ * The updated subscription information can be retrieved using the
+ *    {@link Subscription.getSubscriptions services.getSubscriptions} API.
  * @public
  * @memberof Subscription
  * @event subscription:change
@@ -40788,11 +42628,15 @@ Object.defineProperty(exports, "__esModule", {
 const SUB_CHANGE = exports.SUB_CHANGE = 'subscription:change';
 
 /**
- * Subscription state has changed.
- * The new state can be retrieved by calling the `getSubscribedServices` API.
+ * An error occurred during a subscription operation.
+ *
+ * The subscription information can be retrieved using the
+ *    {@link Subscription.getSubscriptions services.getSubscriptions} API.
  * @public
  * @memberof Subscription
  * @event subscription:error
+ * @param {Object} params
+ * @param {Object} params.error A Basic error object, representing the error that occurred.
  */
 const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
 
@@ -42526,21 +44370,40 @@ function usersAPI({ dispatch, getState, primitives }) {
   /**
    * The Users feature allows access to user information for users within the same domain.
    *
-   * These functions are namespaced beneath 'user' on the API.
+   * The functions in this module are namespaced under 'user'.
    * @public
    * @module Users
    */
 
+  /**
+   * The User data object.
+   *
+   * @public
+   * @module User
+   * @property {string} userId The User ID of the user.
+   * @property {string} emailAddress The email address of the user.
+   * @property {string} firstName The first name of the user.
+   * @property {string} lastName The last name of the user.
+   * @property {string} photoURL The URL to get the photo of the user.
+   * @property {string} buddy Whether the user is a "buddy". Values can be "true" or "false".
+   */
+
   return {
     /**
-     * Fetches information about a specified user from the platform.
-     * Will trigger a `directory:change` event.
+     * Fetches information about a User.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The User's information will then
+     *    be available.
+     *
+     * Information about an available User can be retrieved using the
+     *    {@link Users.get user.get} API.
      *
      * @public
+     * @static
      * @memberof Users
      * @method fetch
-     *
-     * @param {string} userId The URI uniquely identifying the user.
+     * @param {string} userId The User ID of the user.
      */
     fetch(userId) {
       log.debug(_logs.API_LOG_TAG + 'user.fetch: ', userId);
@@ -42548,10 +44411,17 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Fetches information about the current user's profile data from the platform.
-     * Will trigger a `directory:change` event.
+     * Fetches information about the current User.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The User's information will then
+     *    be available.
+     *
+     * Information about an available User can be retrieved using the
+     *    {@link Users.get user.get} API.
      *
      * @public
+     * @static
      * @memberof Users
      * @method fetchSelfInfo
      */
@@ -42561,11 +44431,17 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Retrieves local information about a previously fetched user.
+     * Retrieves information about a User, if available.
+     *
+     * See the {@link Users.fetch user.fetch} and
+     *    {@link Users.search user.search} APIs for details about making Users'
+     *    information available.
+     *
      * @public
      * @memberof Users
      * @method get
-     * @param {string} userId The URI uniquely identifying the user.
+     * @param {string} userId The User ID of the user.
+     * @returns {User} The User object for the specified user.
      */
     get(userId) {
       log.debug(_logs.API_LOG_TAG + 'user.get: ', userId);
@@ -42573,10 +44449,16 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Retrieves local information about previously fetched users.
+     * Retrieves information about all available Users.
+     *
+     * See the {@link Users.fetch user.fetch} and
+     *    {@link Users.search user.search} APIs for details about making Users'
+     *    information available.
+     *
      * @public
      * @memberof Users
      * @method getAll
+     * @returns {Array<User>} An array of all the User objects.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'user.getAll');
@@ -42584,24 +44466,29 @@ function usersAPI({ dispatch, getState, primitives }) {
     },
 
     /**
-     * Search the users in the directory.
-     * Will trigger a `directory:change` event.
+     * Searches the domain's directory for Users.
+     *
+     * The SDK will emit a {@link Users.event:directory:change directory:change}
+     *    event after the operation completes. The search results will be
+     *    provided as part of the event, and will also be available using the
+     *    {@link Users.get user.get} and {@link Users.getAll user.getAll} APIs.
      *
      * @public
+     * @static
      * @memberof Users
      * @method search
-     * @param {Object} filters Query filter options.
-     * @param {string} [filters.userId] Matches the unique URI identifying the user.
-     * @param {string} [filters.name] Matches firstName or lastName.
-     * @param {string} [filters.firstName] Matches firstName.
-     * @param {string} [filters.lastName] Matches lastName.
-     * @param {string} [filters.userName] Matches userName.
-     * @param {string} [filters.phoneNumber] Matches phoneNumber.
-     * @param {Object} [options] Sorting options
-     * @param {string} [options.sortBy] The attribute upon which to sort results. This can be any of the above listed filters which describe a user attribute.
-     * @param {string} [options.order] Order by which to return results. Can be one of "asc" or "desc".
-     * @param {number} [options.max] The maximmum number of results to return.
-     * @param {string} [options.next] The pointer for a chunk of results, which may be returned from other a previous query.
+     * @param {Object} filters The filter options for the search.
+     * @param {string} [filters.userId] Matches the User ID of the user.
+     * @param {string} [filters.name] Matches the firstName or lastName.
+     * @param {string} [filters.firstName] Matches the firstName.
+     * @param {string} [filters.lastName] Matches the lastName.
+     * @param {string} [filters.userName] Matches the userName.
+     * @param {string} [filters.phoneNumber] Matches the phoneNumber.
+     * @param {Object} [options] Sorting options.
+     * @param {string} [options.sortBy] The User property to sort the results by. This can be any of the above listed filters.
+     * @param {string} [options.order] Order in which results are returned. Can be either "asc" or "desc".
+     * @param {number} [options.max] The maximum number of results to return.
+     * @param {string} [options.next] The pointer for a chunk of results, which may be returned from a previous query.
      */
     search(filters = {}, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'user.search: ', filters, options);
@@ -42718,10 +44605,12 @@ const CONTACTS_CHANGE = exports.CONTACTS_CHANGE = 'contacts:change';
 /**
  * The directory has changed.
  * @public
+ * @static
  * @memberof Users
  * @event directory:change
  * @param {Object} params
- * @param {Array} params.results The results of the directory search.
+ * @param {Array<User>} params.results The Users' information returned by the
+ *    operation.
  */
 const DIRECTORY_CHANGE = exports.DIRECTORY_CHANGE = 'directory:change';
 
@@ -43572,6 +45461,13 @@ function setListeners(session, emit, END = 'END') {
     }));
   };
 
+  const trackReplaced = ({ oldTrackId, trackId }) => {
+    emit(_actions.sessionActions.sessionTrackReplaced(session.id, {
+      oldTrackId,
+      trackId
+    }));
+  };
+
   // Generic "something changed" handler.
   // TODO: Either use this for other events or remove it.
   // eslint-disable-next-line no-unused-vars
@@ -43588,11 +45484,13 @@ function setListeners(session, emit, END = 'END') {
   session.on('new:track', newTrack);
   session.on('track:removed', trackRemoved);
   session.on('track:ended', trackEnded);
+  session.on('track:replaced', trackReplaced);
 
   const unsubscribe = () => {
     session.off('new:track', newTrack);
     session.off('track:removed', trackRemoved);
     session.off('track:ended', trackEnded);
+    session.off('track:replaced', trackReplaced);
   };
   return unsubscribe;
 }
@@ -44037,6 +45935,7 @@ const SESSION_NEW_TRACK = exports.SESSION_NEW_TRACK = sessionPrefix + 'NEW_TRACK
 const SESSION_TRACK_REMOVED = exports.SESSION_TRACK_REMOVED = sessionPrefix + 'TRACK_REMOVED';
 const SESSION_TRACK_ENDED = exports.SESSION_TRACK_ENDED = sessionPrefix + 'TRACK_ENDED';
 const SESSION_CHANGE = exports.SESSION_CHANGE = sessionPrefix + 'CHANGE';
+const SESSION_TRACK_REPLACED = exports.SESSION_TRACK_REPLACED = sessionPrefix + 'TRACK_REPLACED';
 
 /**
  * Media action types.
@@ -44253,6 +46152,7 @@ exports.sessionNewTrack = sessionNewTrack;
 exports.sessionTrackRemoved = sessionTrackRemoved;
 exports.sessionTrackEnded = sessionTrackEnded;
 exports.sessionChange = sessionChange;
+exports.sessionTrackReplaced = sessionTrackReplaced;
 
 var _actionTypes = __webpack_require__("../kandy/src/webrtc/interface/actionTypes.js");
 
@@ -44305,6 +46205,10 @@ function sessionTrackEnded(id, params) {
 
 function sessionChange(id, params) {
   return sessionActionHelper(actionTypes.SESSION_CHANGE, id, params);
+}
+
+function sessionTrackReplaced(id, params) {
+  return sessionActionHelper(actionTypes.SESSION_TRACK_REPLACED, id, params);
 }
 
 /***/ }),
@@ -44445,6 +46349,7 @@ function api(context) {
 
     /**
      * Retrieve information about the browser being used.
+     *
      * Browser information being defined indicates that the browser supports
      *    basic webRTC scenarios.
      * @public
@@ -44502,7 +46407,12 @@ function mediaAPI({ dispatch, getState }) {
   return {
     /**
      * Retrieves the available media devices for use.
+     *
+     * The {@link Media.event:devices:change devices:change} event will be
+     *    emitted when the available media devices have changed.
+     *
      * @public
+     * @static
      * @memberof Media
      * @method getDevices
      * @return {Object} The lists of camera, microphone, and speaker devices.
@@ -44513,12 +46423,13 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieve a media object from state with a specific media ID.
+     * Retrieves an available Media object with a specific Media ID.
      * @public
+     * @static
      * @memberof Media
      * @method getById
-     * @param  {string} mediaId The ID of the media to retrieve.
-     * @return {MediaObject} A media object.
+     * @param  {string} mediaId The ID of the Media to retrieve.
+     * @return {MediaObject} A Media object.
      */
     getById(mediaId) {
       log.debug(_logs.API_LOG_TAG + 'media.getById: ', mediaId);
@@ -44526,12 +46437,13 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Retrieve a Track object from state with a specific ID.
+     * Retrieve an available Track object with a specific Track ID.
      * @public
+     * @static
      * @memberof Media
      * @method getTrackById
-     * @param  {string} trackId The ID of the track to retrieve.
-     * @return {Object} A track object.
+     * @param  {string} trackId The ID of the Track to retrieve.
+     * @return {TrackObject} A Track object.
      */
     getTrackById(trackId) {
       log.debug(_logs.API_LOG_TAG + 'media.getByTrackId: ', trackId);
@@ -44539,17 +46451,22 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Render media Tracks in a container.
-     * The container is specified by providing a CSS selector string that corresponds to the HTMLElement to act as the container.
+     * Render Media Tracks in a container.
+     *
+     * The container is specified by providing a CSS selector string that
+     *    corresponds to the HTMLElement to act as the container.
      * @public
+     * @static
      * @memberof Media
      * @method renderTracks
-     * @param  {Array}  tracks List of Track IDs to be rendered.
-     * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Array<string>} trackIds List of Track IDs to be rendered.
+     * @param  {string} cssSelector A CSS selector string that uniquely
+     *    identifies an element. Ensure that special characters are properly
+     *    escaped.
      * @param  {Object} [options] Additional options for rendering the tracks.
-     * @param  {string} [options.speakerId] The device ID of the speaker to use for audio tracks.
+     * @param  {string} [options.speakerId] The speaker's Device ID to use for audio tracks.
      * @example
-     * // When an outgoing call is accepted, render the media used for the call.
+     * // When an outgoing call is accepted, render the Media used for the call.
      * client.on('call:accepted', function (params) {
      *     // Get the information about the call.
      *     const call = client.call.getById(params.callId)
@@ -44559,51 +46476,71 @@ function mediaAPI({ dispatch, getState }) {
      *     client.media.render(call.remoteMedia[0], remoteContainer)
      * })
      */
-    renderTracks(tracks, cssSelector, options = {}) {
-      log.debug(_logs.API_LOG_TAG + 'media.renderTracks: ', tracks, cssSelector, options);
-      dispatch(_actions.trackActions.renderTracks(tracks, (0, _extends3.default)({
+    renderTracks(trackIds, cssSelector, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'media.renderTracks: ', trackIds, cssSelector, options);
+      dispatch(_actions.trackActions.renderTracks(trackIds, (0, _extends3.default)({
         selector: cssSelector
       }, options)));
     },
 
     /**
-     * Remove media Tracks from a container.
-     * The container is specified by providing a CSS selector string that corresponds to the HTMLElement to act as the container.
+     * Remove Media Tracks from a container.
+     *
+     * The container is specified by providing a CSS selector string that
+     *    corresponds to the HTMLElement to act as the container.
      * @public
+     * @static
      * @memberof Media
      * @method removeTracks
-     * @param  {Array}  tracks List of Track IDs to stop being rendered.
-     * @param  {string} cssSelector A CSS selector string that uniquely identifies an element. Ensure that special characters are properly escaped.
+     * @param  {Array<string>} trackIds List of Track IDs to stop being rendered.
+     * @param  {string} cssSelector A CSS selector string that uniquely
+     *    identifies an element. Ensure that special characters are properly
+     *    escaped.
      */
-    removeTracks(tracks, cssSelector) {
-      log.debug(_logs.API_LOG_TAG + 'media.removeTracks: ', tracks, cssSelector);
-      dispatch(_actions.trackActions.removeTracks(tracks, { selector: cssSelector }));
+    removeTracks(trackIds, cssSelector) {
+      log.debug(_logs.API_LOG_TAG + 'media.removeTracks: ', trackIds, cssSelector);
+      dispatch(_actions.trackActions.removeTracks(trackIds, { selector: cssSelector }));
     },
 
     /**
-     * Mutes the specified tracks.
-     * Prevents media from being received for the tracks. Audio tracks will become silent and video tracks will be a black frame.
+     * Mutes the specified Tracks at their media source.
+     *
+     * Prevents media from being received for the Tracks. Audio Tracks will
+     *    become silent and video Tracks will be a black frame.
+     *
+     * If a local Track being sent in a Call is muted, the Track will be
+     *    noticeably muted for the remote user. If a remote Track received in a
+     *    call is muted, the result will only be noticeable locally.
+     *
+     * The SDK will emit a {@link Media.event:media:muted media:muted} event
+     *    when a Track has been muted.
      * @public
+     * @static
      * @memberof Media
      * @method muteTracks
-     * @param  {Array} tracks List of Track IDs.
+     * @param  {Array<string>} trackIds List of Track IDs.
      */
-    muteTracks(tracks) {
-      log.debug(_logs.API_LOG_TAG + 'media.muteTracks: ', tracks);
-      dispatch(_actions.trackActions.muteTracks(tracks));
+    muteTracks(trackIds) {
+      log.debug(_logs.API_LOG_TAG + 'media.muteTracks: ', trackIds);
+      dispatch(_actions.trackActions.muteTracks(trackIds));
     },
 
     /**
-     * Unmutes the specified tracks.
-     * Media will resume as normal for the tracks.
+     * Unmutes the specified Tracks.
+     *
+     * Media will resume as normal for the Tracks.
+     *
+     * The SDK will emit a {@link Media.event:media:unmuted media:unmuted} event
+     *    when a Track has been unmuted.
      * @public
+     * @static
      * @memberof Media
      * @method unmuteTracks
-     * @param  {Array} tracks List of Track IDs.
+     * @param  {Array<string>} trackIds List of Track IDs.
      */
-    unmuteTracks(tracks) {
-      log.debug(_logs.API_LOG_TAG + 'media.unmuteTracks: ', tracks);
-      dispatch(_actions.trackActions.unmuteTracks(tracks));
+    unmuteTracks(trackIds) {
+      log.debug(_logs.API_LOG_TAG + 'media.unmuteTracks: ', trackIds);
+      dispatch(_actions.trackActions.unmuteTracks(trackIds));
     }
   };
 }
@@ -44620,8 +46557,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
- * Media devices available for use have changed.
- * Use the `getDevices` media API to retrieve the lists of devices.
+ * The media devices available for use have changed.
+ *
+ * Information about the available media devices can be retrieved using the
+ *    {@link Media.getDevices media.getDevices} API.
+ *
  * @public
  * @memberof Media
  * @event devices:change
@@ -44636,6 +46576,8 @@ const DEVICES_CHANGED = exports.DEVICES_CHANGED = 'devices:change';
 
 /**
  * The specified Tracks have been muted.
+ *
+ * A Track can be muted using the {@link Media.muteTracks media.muteTracks} API.
  * @public
  * @memberof Media
  * @event media:muted
@@ -44646,6 +46588,9 @@ const TRACKS_MUTED = exports.TRACKS_MUTED = 'media:muted';
 
 /**
  * The specified Tracks have been unmuted.
+ *
+ * A Track can be unmuted using the {@link Media.unmuteTracks media.unmuteTracks}
+ *    API.
  * @public
  * @memberof Media
  * @event media:unmuted
@@ -45104,9 +47049,24 @@ sessionReducers[actionTypes.SESSION_TRACK_ENDED] = {
   }
 };
 
+sessionReducers[actionTypes.SESSION_TRACK_REPLACED] = {
+  next(state, action) {
+    // Remove old track id if it still exists
+    const removeTrack = trackId => trackId === action.payload.oldTrackId;
+    const newLocalTracks = (0, _fp.remove)(removeTrack, state.localTracks);
+    // Add new track id if it doesn't exist
+    if (newLocalTracks.indexOf(action.payload.trackId) === -1) {
+      newLocalTracks.push(action.payload.trackId);
+    }
+    return (0, _extends3.default)({}, state, {
+      localTracks: newLocalTracks
+    });
+  }
+};
+
 const sessionReducer = (0, _reduxActions.handleActions)(sessionReducers, {});
 
-const specificSessionActions = (0, _reduxActions.combineActions)(actionTypes.SESSION_NEW_TRACK, actionTypes.SESSION_TRACK_REMOVED, actionTypes.SESSION_TRACK_ENDED);
+const specificSessionActions = (0, _reduxActions.combineActions)(actionTypes.SESSION_NEW_TRACK, actionTypes.SESSION_TRACK_REMOVED, actionTypes.SESSION_TRACK_ENDED, actionTypes.SESSION_TRACK_REPLACED);
 
 reducers[specificSessionActions] = (state, action) => {
   return state.map(session => {
@@ -45443,33 +47403,27 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
-var _documentTools = __webpack_require__("../kandy/src/webrtc/utils/documentTools.js");
-
 /**
  * Render Tracks in a specified container.
  * @method renderTracks
  * @param  {Object} action A "render tracks" action.
  */
-// Call plugin.
+
+
+// Libraries.
 function* renderTracks(webRTC, action) {
+  const { trackIds, selector, speakerId } = action.payload;
+
   // Get the tracks that are to be rendered.
-  const tracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], action.payload.trackIds);
+  const tracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIds);
   const filteredTracks = tracks.filter(track => !(0, _fp.isUndefined)(track));
 
-  // Get the container the tracks are to be rendered in.
-  const container = yield (0, _effects.call)(_documentTools.findContainer, action.payload.selector);
-  if (!container) {
-    return;
-  }
-
-  const speakerId = action.payload.speakerId;
-
   // Render the tracks.
-  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], container, speakerId)));
+  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
-    selector: action.payload.selector
+    selector
   }));
 }
 
@@ -45478,26 +47432,20 @@ function* renderTracks(webRTC, action) {
  * @method removeTracks
  * @param  {Object} action A "remove tracks" action.
  */
-
-
-// Libraries.
+// Call plugin.
 function* removeTracks(webRTC, action) {
+  const { trackIds, selector } = action.payload;
+
   // Get the tracks that are to be removed.
   const allTracks = yield (0, _effects.call)([webRTC.track, 'getTracks']);
-  const tracks = allTracks.filter(track => action.payload.trackIds.includes(track.id));
-
-  // Get the container the tracks are to be rendered in.
-  const container = yield (0, _effects.call)(_documentTools.findContainer, action.payload.selector);
-  if (!container) {
-    return;
-  }
+  const tracks = allTracks.filter(track => trackIds.includes(track.id));
 
   // Remove the tracks.
-  yield (0, _effects.all)(tracks.map(track => (0, _effects.call)([track, 'removeFrom'], container)));
+  yield (0, _effects.all)(tracks.map(track => (0, _effects.call)([track, 'removeFrom'], selector)));
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.removeTracksFinish(tracks.map(track => track.id), {
-    selector: action.payload.selector
+    selector
   }));
 }
 
@@ -45535,42 +47483,6 @@ function* unmuteTracks(webRTC, action) {
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.unmuteTracksFinish(tracks.map(track => track.id)));
-}
-
-/***/ }),
-
-/***/ "../kandy/src/webrtc/utils/documentTools.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.findContainer = findContainer;
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-const log = (0, _logs.getLogManager)().getLogger('MEDIA');
-
-/**
- * Find an html container based on the given selector.
- * @method findContainer
- * @param {string} selector The selector to use when querying the document.
- * @return {Object} The container object (undefined if not found).
- */
-function findContainer(selector) {
-  let container;
-  try {
-    container = document.querySelector(selector);
-    if (!container) {
-      throw new Error('Element not found.');
-    }
-  } catch (e) {
-    log.error(`Unable to get container with selector: "${selector}". Error: ${e}`);
-  }
-  return container;
 }
 
 /***/ }),
@@ -45792,7 +47704,7 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
 
   // Check devices whenever they change.
   let recentDeviceChange = false;
-  navigator.mediaDevices.ondevicechange = () => {
+  navigator.mediaDevices.addEventListener('devicechange', () => {
     _loglevel2.default.info('Media device change detected.');
     // A physical device change results in one event per
     // device "kind". Group the events together.
@@ -45806,7 +47718,7 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
         });
       }, 50);
     }
-  };
+  });
 
   /**
    * Updates the stored device lists with the latest devices.
@@ -45948,6 +47860,58 @@ function MediaManager(managers) {
    * @return {Promise}
    */
   function createLocal(constraints) {
+    /**
+     * Firefox workaround.
+     *
+     * Issue Summary: Browser behaviour for prompting the user for device
+     *    permissions is not consistent for consecutive gUM calls. The following
+     *    workaround makes it consistent if the less-specific constraint is
+     *    provided.
+     *
+     * Context: The `deviceId` constraint format can be either a string or an
+     *    object. The object format allows precise control over how the browser
+     *    should try to get the track. It can be specified to fail if it can't
+     *    fulfill the constraint (exact), or whether the constraint is "best
+     *    effort" (ideal). When the string format is given, it follows the
+     *    "ideal" behaviour.
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/ConstrainDOMString
+     *
+     *  - When the "ideal" behaviour is followed and the user has not given
+     *      permission (and not disallowed), the browswer will prompt the user
+     *      for permission.
+     *  - [Issue] When the "ideal" behaviour is followed and the user has given
+     *      permission previously, the browser will not prompt the user for
+     *      permission.
+     *
+     * Problem: When gUM is called for a different device (ideal behaviour) than
+     *    permission was granted for previously, the browser will not prompt the
+     *    user to give permission for the (new) device. This results in gUM
+     *    using the original device for the new track.
+     *
+     * This happens on Firefox because the prompt for media permissions is
+     *    specific to a single device. For Chrome, the prompt is generic to any
+     *    device.
+     * If permissions are always allowed ("remember my decision" on Firefox or
+     *    default on Chrome), this issue wouldn't be seen.
+     *
+     * Workaround: When the behaviour (idea / exact) isn't specified, default
+     *    to exact (instead of letting the browser default to ideal; as per the
+     *    specification).
+     *
+     * This ensures that the browser always prompts the user to give permissions
+     *    for the device (if not already granted). It is also more in-line with
+     *    what might be expected when you ask for a certain device (ie. don't
+     *    return a different device unless it was specified that it's okay).
+     */
+    for (const kind in constraints) {
+      if (constraints[kind] && typeof constraints[kind] === 'object' && typeof constraints[kind].deviceId === 'string') {
+        // Don't allow a "bare" value be provided for deviceId. Change it to use
+        //    "exact".
+        const id = constraints[kind].deviceId;
+        constraints[kind].deviceId = { exact: id };
+      }
+    }
+
     // Get user media, ...
     return new _promise2.default((resolve, reject) => {
       // TODO: Proper error checking.
@@ -47250,18 +49214,25 @@ function Peer(id, config = {}, trackManager) {
   /**
    * Replaces a specified transceiver's sender.track.
    * @method replaceTrack
-   * @param {Object} [options] Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
+   * @param {Object} newTrack The MediaStreamTrack we want to place into the sender.
+   * @param {Object} options Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
    * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
-   * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
-  function replaceTrack(options, track) {
-    const targetTransceiver = findTransceiver(options);
+  function replaceTrack(newTrack, options) {
     return new _promise2.default((resolve, reject) => {
-      if (targetTransceiver) {
-        targetTransceiver.sender.replaceTrack(track).then(resolve).catch(reject);
+      let sender;
+      if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+        const targetTransceiver = findTransceiver(options);
+        sender = targetTransceiver ? targetTransceiver.sender : undefined;
       } else {
-        reject(new Error(`Transceiver ${options} not found.`));
+        sender = peerConnection.getSenders().find(sender => sender.track.id === options.trackId);
+      }
+
+      if (sender) {
+        sender.replaceTrack(newTrack).then(resolve).catch(reject);
+      } else {
+        reject(new Error(`Sender for track ${options.trackId} not found.`));
       }
     });
   }
@@ -47850,15 +49821,20 @@ function Session(id, managers, config = {}) {
   /**
    * Replaces a specified transceiver's sender.track.
    * @method replaceTrack
-   * @param {Object} [options]
+   * @param {Object} newTrack The MediaStreamTrack we want to place into the sender.
+   * @param {Object} options Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
    * @param {String} [options.trackId] The transceiver with the specific sender.track.id.
    * @param {String} [options.mid] The transceiver with the specific media id.
-   * @param {Object} track The MediaStreamTrack we want to place into the sender.
    * @return {Object} A Promise object which is fulfilled once the track has been replaced
    */
-  function replaceTrack(options, track) {
+  function replaceTrack(newTrack, options) {
     const peer = peerManager.get(peerId);
-    return peer.replaceTrack(options, track);
+    return peer.replaceTrack(newTrack, options).then(() => {
+      emitter.emit('track:replaced', {
+        oldTrackId: options.trackId,
+        trackId: newTrack.id
+      });
+    }).catch(err => err);
   }
 
   /**
@@ -48183,6 +50159,10 @@ function Session(id, managers, config = {}) {
     return peer;
   }
 
+  function getRemoteDescription() {
+    return peer.remoteDescription;
+  }
+
   /**
    * The exposed API.
    */
@@ -48209,6 +50189,7 @@ function Session(id, managers, config = {}) {
     createOffer,
     createAnswer,
     setLocalDescription,
+    getRemoteDescription,
     generateOffer,
     processOffer,
     generateAnswer,
@@ -48302,10 +50283,29 @@ function Track(mediaTrack, mediaStream) {
   /**
    * Renders this Track as a subelement of the specified element.
    * @method renderIn
-   * @param  {HTMLElement} element The DOM element to be rendered in.
+   * @param  {HTMLElement|String} container The DOM element to be rendered in,
+   *    or a unique CSS selector for the DOM element.
    * @param  {String} [speakerId] The device ID to be used for audio output.
    */
-  function renderIn(element, speakerId) {
+  function renderIn(container, speakerId) {
+    let element;
+    // If a string was provided, use it as a CSS selector to find the element.
+    if (typeof container === 'string') {
+      _loglevel2.default.debug(`Track ${id} rendering in element using selector: ${container}`);
+
+      element = document.querySelector(container);
+      if (!element) {
+        _loglevel2.default.error(`Unable to get container with selector: ${container}.`);
+        return false;
+      }
+    } else {
+      _loglevel2.default.debug(`Track ${id} rendering in provided HTMLElement.`);
+
+      element = container;
+    }
+
+    // TODO: Proper error checking.
+
     if (containers.indexOf(element) > -1) {
       // Already rendered in element.
       _loglevel2.default.debug(`Track ${id} already rendered in element.`, element);
@@ -48359,9 +50359,26 @@ function Track(mediaTrack, mediaStream) {
   /**
    * Stop rendering this Track from the specified element.
    * @method removeFrom
-   * @param  {HTMLElement} element The DOM element to be removed from.
+   * @param  {HTMLElement} container The DOM element to be removed from, or
+   *     a unique CSS selector for the DOM element.
    */
-  function removeFrom(element) {
+  function removeFrom(container) {
+    let element;
+    // If a string was provided, use it as a CSS selector to find the element.
+    if (typeof container === 'string') {
+      _loglevel2.default.debug(`Track ${id} removing from element using selector: ${container}`);
+
+      element = document.querySelector(container);
+      if (!element) {
+        _loglevel2.default.error(`Unable to get container with selector: ${container}.`);
+        return false;
+      }
+    } else {
+      _loglevel2.default.debug(`Track ${id} removing from provided HTMLElement.`);
+
+      element = container;
+    }
+
     let index = containers.indexOf(element);
     if (index === -1) {
       // Not rendered in element.
