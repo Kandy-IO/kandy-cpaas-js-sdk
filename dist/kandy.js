@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.7.0-beta.111
+ * Version: 4.7.0-beta.120
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21307,7 +21307,7 @@ function* callStatusNotification(deps) {
  * @method callAudit
  */
 function* callAudit() {
-  const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED];
+  const actionTypesToDoAuditOn = [actionTypes.ANSWER_CALL, actionTypes.CALL_ACCEPTED, actionTypes.MAKE_CALL_FINISH];
 
   // Curry the signaling function to specify the status.
   function* auditCall(...args) {
@@ -23440,6 +23440,21 @@ Object.defineProperty(exports, "__esModule", {
 const CALL_STARTED = exports.CALL_STARTED = 'call:start';
 
 /**
+ * A new joined call has been started.
+ *
+ * Information about the Call can be retrieved using the
+ *    {@link Calls.getById call.getById} API.
+ *
+ * @public
+ * @memberof Calls
+ * @event call:join
+ * @param {Object} params
+ * @param {string} params.callId The ID of the call.
+ * @param {BasicError} [params.error] An error object, if the operation was not successful.
+ */
+const CALL_JOIN = exports.CALL_JOIN = 'call:join';
+
+/**
  * A new incoming call has been received.
  *
  * Information about the Call can be retrieved using the
@@ -23694,6 +23709,10 @@ callEvents[actionTypes.PENDING_MAKE_CALL] = action => {
   return callEventHandler(eventTypes.CALL_STARTED, action, {
     error: action.payload.error
   });
+};
+
+callEvents[actionTypes.PENDING_JOIN] = action => {
+  return callEventHandler(eventTypes.CALL_JOIN, action);
 };
 
 callEvents[actionTypes.CALL_INCOMING] = action => {
@@ -31909,7 +31928,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.7.0-beta.111';
+  let version = '4.7.0-beta.120';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -42175,6 +42194,8 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
  * If already open, does nothing. If not open, requests/opens it.
  * @method ensureChannel
  * @param {string} type The type of notification channel.
+ * @return {Object} The result containing a boolean property: success.
+ *                  If success property is false, an extra error property will also be present.
  */
 function* ensureChannelOpen(type) {
   /**
@@ -42198,17 +42219,17 @@ function* ensureChannelOpen(type) {
 
     if (channelResponse.error) {
       // Error scenario: Could not open websocket channel.
-      return false;
+      return { success: false, error: channelResponse.error };
     }
 
     // Save newly opened channel info in state.
     yield (0, _effects2.put)(actions.channelOpened((0, _extends3.default)({}, channelResponse.notificationChannel, {
       channelId: channelResponse.notificationChannel.resourceURL.split('/channels/')[1]
     }), type));
-    return true;
+    return { success: true };
   } else {
     // If there is already a channel, use it.
-    return true;
+    return { success: true };
   }
 }
 
@@ -42388,11 +42409,10 @@ function* subscriptionFlow() {
       }
 
       // Open the notification channel if it isn't already.
-      const hasChannel = yield (0, _effects2.call)(_channels.ensureChannelOpen, action.payload.type);
-      if (!hasChannel) {
+      const result = yield (0, _effects2.call)(_channels.ensureChannelOpen, action.payload.type);
+      if (!result.success) {
         // Error scenario: Could not open channel.
-        // TODO: Better error.
-        yield (0, _effects2.put)(actions.subscribeFinished({ error: true }));
+        yield (0, _effects2.put)(actions.subscribeFinished({ error: result.error }));
         continue;
       }
 
@@ -42492,7 +42512,7 @@ function* subscribeForServices(action) {
     // TODO: Proper error / return.
     return {
       error: new _errors2.default({
-        message: 'No valid services to subscribe provided.',
+        message: 'Failed to subscribe: No valid services provided.',
         // TODO: Proper error code.
         code: 'BAD_INPUT'
       })
@@ -42543,7 +42563,7 @@ function* unsubscribeServices(action) {
     // TODO: Proper error / return.
     return {
       error: new _errors2.default({
-        message: 'No valid services to subscribe provided.',
+        message: 'Failed to unsubscribe: No valid services provided.',
         // TODO: Proper error code.
         code: 'BAD_INPUT'
       })
@@ -43153,7 +43173,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function subChangeEvent(action) {
   return {
     type: action.error ? eventTypes.SUB_ERROR : eventTypes.SUB_CHANGE,
-    args: action.error ? { error: action.payload } : {}
+    args: action.error ? { error: action.payload.error } : {}
   };
 }
 
@@ -45458,12 +45478,19 @@ exports.default = reducers;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
 exports.getContacts = getContacts;
 exports.getContact = getContact;
 exports.getUsers = getUsers;
 exports.getUser = getUser;
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
  * Redux-saga selector functions.
@@ -45492,10 +45519,11 @@ function getContact(state, id) {
 /**
  * Gets the users from state.
  * @method getUsers
- * @return {Object}
+ * @return {Array<User>} An array of all the User objects.
  */
 function getUsers(state) {
-  return (0, _fp.cloneDeep)(state.users.users);
+  let allUsers = (0, _fp.cloneDeep)(state.users.users);
+  return (0, _values2.default)(allUsers);
 }
 
 /**
