@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.7.0-beta.120
+ * Version: 4.7.0-beta.121
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31928,7 +31928,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.7.0-beta.120';
+  let version = '4.7.0-beta.121';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -41667,6 +41667,21 @@ async function makeRequest(options, requestId) {
     let error = !response.ok;
 
     if (error) {
+      /*
+       * Handle a special-case error where the response body is a HTML page...
+       * Throw away the body and to its simply reported as 'Forbidden'.
+       * TODO: Handle responses based on their type rather than checking for
+       *    individual special cases...
+       */
+      const cType = response.headers.map['content-type'];
+      if (response.status === 403 && cType.includes('html')) {
+        return {
+          body: false,
+          error: 'REQUEST',
+          result
+        };
+      }
+
       // If the response indicates an error, resolve the body as JSON and return a `REQUEST` error
       log.debug(`Response indicates that request ${requestId} failed`);
       responseBody = await response.json();
