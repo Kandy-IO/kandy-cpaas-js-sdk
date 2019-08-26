@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.7.0-beta.122
+ * Version: 4.7.0-beta.123
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -24050,7 +24050,8 @@ callReducers[actionTypes.PENDING_MAKE_CALL] = {
       state: action.payload.state,
       wrtcsSessionId: action.payload.wrtcsSessionId,
       webrtcSessionId: action.payload.webrtcSessionId,
-      bandwidth: action.payload.bandwidth
+      bandwidth: action.payload.bandwidth,
+      displayName: action.payload.displayName
     });
   }
 };
@@ -25669,7 +25670,9 @@ function* makeCall(deps, action) {
       // The local Media object associated with this call.
       mediaId: mediaId,
       // The bandwidth of the call.
-      bandwidth
+      bandwidth,
+      // The custom display name to use. Not supported on all environments.
+      displayName: action.payload.displayName
     }));
   } else {
     // The call failed, so stop the Media object created for the call.
@@ -27677,8 +27680,17 @@ function* callStatusUpdateEnded(deps, params) {
     remoteParticipant: {
       displayNumber: params.remoteNumber,
       displayName: params.remoteName
+    },
+    transition: {
+      prevState: currentCall.state
     }
   };
+  if (statusCode) {
+    endParams.transition.statusCode = statusCode;
+  }
+  if (reasonText) {
+    endParams.transition.reasonText = reasonText;
+  }
 
   if (reasonText) {
     let customStatusCode = statusCode;
@@ -31928,7 +31940,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.7.0-beta.122';
+  let version = '4.7.0-beta.123';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
