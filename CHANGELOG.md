@@ -15,7 +15,7 @@ Kandy.js change log.
 - Fixed an issue causing some BasicError objects to have a misleading message rather than a message about the operation that failed. `KAA-1947`
 - Fixed an issue where call audits weren't being sent.`KAA-1944`
 
-## 4.6.0 - 2018-08-01
+## 4.6.0 - 2019-08-01
 
 ### Added
 
@@ -23,10 +23,23 @@ Kandy.js change log.
 - Added bandwidth control functionality for calls. See `kandy.call.makeCall`, `kandy.call.answerCall`, `kandy.call.removeMedia` & `kandy.call.addMedia`. `KAA-1740`
 - User now automatically disconnects gracefully when internet connection is lost for too long. `KAA-1591`
 - Added the ability to delete messages and conversations of types `chat-oneToOne`, `chat-group` and `sms`. See `Conversation#delete` and `Conversation#deleteMessages`. `KAA-1777` `KAA-1826`
+- Added information about token expiry time when user logs in, using CodePen example application.
+- Added partial support for Group management to the Kandy example application. This includes: group creation, fetching groups and render basic group info.
+- Added ability to delete messages & conversations in the CPaaS example application. `KAA-1842`
+- Added a tutorial page for Group management. It includes group creation (and deletion) by admin user, invites to a group of participants, ability to accept or reject invites by non-admin users as well as adding (and removing) participants by admin user. `KAA-1767`
 
 ### Fixed
 
 - Fixed a Messaging issue where messages could not be received on a Conversation that was created with a mixed-case recipient ID. `KAA-1889`
+- Fixed a Messaging issue where SMS messages were either duplicated or missing in CodePen example application. `KAA-1752`
+- Fixed presence fetching for a given user. `KAA-1874`
+- Fixed browser support table in Tutorial page and specify more explicitly that SDK supports Safari Desktop.
+- Fixed many API documentation issues across all SDK's plugins.
+- Fixed version numbering associated with public documentation. `KAA-1823`
+
+### Changed
+
+- Refactored the Groups and Invitation state content in SDK Redux store. `KAA-1845`
 
 ## 4.5.0 - 2019-06-28
 
@@ -35,9 +48,9 @@ Kandy.js change log.
 - Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
 
 ### Added
+
 - a new event `group:refresh` has been added. `KAA-1797`
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
-
 
 ### Changed
 

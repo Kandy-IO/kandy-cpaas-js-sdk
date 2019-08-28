@@ -1167,9 +1167,9 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
+                  href='#sdphandlerinfo'
                   class="">
-                  DeviceInfo
+                  SdpHandlerInfo
                   
                 </a>
                 
@@ -1217,9 +1217,9 @@
               
                 
                 <li><a
-                  href='#sdphandlerinfo'
+                  href='#iceserver'
                   class="">
-                  SdpHandlerInfo
+                  IceServer
                   
                 </a>
                 
@@ -1227,9 +1227,9 @@
               
                 
                 <li><a
-                  href='#iceserver'
+                  href='#deviceinfo'
                   class="">
-                  IceServer
+                  DeviceInfo
                   
                 </a>
                 
@@ -13686,18 +13686,22 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
+    <h3 class='fl m0' id='sdphandlerinfo'>
+      SdpHandlerInfo
     </h3>
     
     
   </div>
   
 
-  <p>Contains information about a device.</p>
+  
 
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
   
   
 
@@ -13715,31 +13719,15 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
+          <span class='code bold'>type</span> <code class='quiet'>(RTCSdpType)</code>
+          : The session description's type.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
+          <span class='code bold'>endpoint</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : Which end of the connection created the SDP.
 
           
         </div>
@@ -14123,76 +14111,6 @@ Media is a collection of Track objects.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='sdphandlerinfo'>
-      SdpHandlerInfo
-    </h3>
-    
-    
-  </div>
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> <code class='quiet'>(RTCSdpType)</code>
-          : The session description's type.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>endpoint</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Which end of the connection created the SDP.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='iceserver'>
       IceServer
     </h3>
@@ -14235,6 +14153,88 @@ Media is a collection of Track objects.</p>
         <div class='space-bottom0'>
           <span class='code bold'>credential</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
           : The credential needed by the ICE server.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Contains information about a device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
 
           
         </div>

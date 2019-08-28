@@ -1586,16 +1586,14 @@ Can be retrieved using the [call.getAll][25] or
 -   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
 
-## DeviceInfo
+## SdpHandlerInfo
 
-Contains information about a device.
+Type: [Object][5]
 
 **Properties**
 
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][2]** Which end of the connection created the SDP.
 
 ## DevicesObject
 
@@ -1650,15 +1648,6 @@ Type: [Function][3]
 
 Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
 
-## SdpHandlerInfo
-
-Type: [Object][5]
-
-**Properties**
-
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][2]** Which end of the connection created the SDP.
-
 ## IceServer
 
 Type: [Object][5]
@@ -1667,6 +1656,17 @@ Type: [Object][5]
 
 -   `url` **[string][2]** The URL of the ICE server.
 -   `credential` **[string][2]?** The credential needed by the ICE server.
+
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## BandwidthControls
 
