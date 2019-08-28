@@ -1167,29 +1167,9 @@
               
                 
                 <li><a
-                  href='#sdphandlerfunction'
+                  href='#deviceinfo'
                   class="">
-                  SdpHandlerFunction
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#mediaobject'
-                  class="">
-                  MediaObject
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#trackobject'
-                  class="">
-                  TrackObject
+                  DeviceInfo
                   
                 </a>
                 
@@ -1207,9 +1187,29 @@
               
                 
                 <li><a
-                  href='#deviceinfo'
+                  href='#trackobject'
                   class="">
-                  DeviceInfo
+                  TrackObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#mediaobject'
+                  class="">
+                  MediaObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#sdphandlerfunction'
+                  class="">
+                  SdpHandlerFunction
                   
                 </a>
                 
@@ -1257,16 +1257,6 @@
               
                 
                 <li><a
-                  href='#part'
-                  class="">
-                  Part
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#messagesender'
                   class=" toggle-sibling">
                   MessageSender
@@ -1302,6 +1292,16 @@
                   
                   
                 </div>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#part'
+                  class="">
+                  Part
+                  
+                </a>
                 
                 </li>
               
@@ -13686,23 +13686,18 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='sdphandlerfunction'>
-      SdpHandlerFunction
+    <h3 class='fl m0' id='deviceinfo'>
+      DeviceInfo
     </h3>
     
     
   </div>
   
 
-  <p>The form of an SDP handler function and the expected arguments that it receives.</p>
+  <p>Contains information about a device.</p>
 
 
-  <div class='pre p1 fill-light mt0'>SdpHandlerFunction(newSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, info: <a href="#sdphandlerinfo">SdpHandlerInfo</a>, originalSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>
-    </p>
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
   
   
 
@@ -13714,51 +13709,44 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
   
 
   
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
       
         <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>newSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    The SDP so far (could have been modified by previous handlers).
+          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the device.
 
-          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>info</span> <code class='quiet'>(<a href="#sdphandlerinfo">SdpHandlerInfo</a>)</code>
-	    Additional information that might be useful when making SDP modifications.
+          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
 
-          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>originalSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    The SDP in its initial state.
+          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The type of the device (audioinput, audiooutput, videoinput).
 
-          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The name of the device.
+
           
         </div>
       
     </div>
   
 
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Returns</div>
-    
-      <div>
-        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-          The resulting modified SDP based on the changes made by this function.
-
-        
-      </div>
-    
   
 
   
@@ -13780,24 +13768,18 @@ log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${detail
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='mediaobject'>
-      MediaObject
+    <h3 class='fl m0' id='devicesobject'>
+      DevicesObject
     </h3>
     
     
   </div>
   
 
-  <p>The state representation of a Media object.
-Media is a collection of Track objects.</p>
+  <p>A collection of media devices and their information.</p>
 
 
-  <div class='pre p1 fill-light mt0'>MediaObject</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
   
   
 
@@ -13815,22 +13797,22 @@ Media is a collection of Track objects.</p>
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the Media object.
+          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of camera device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : Indicator on whether this media is local or remote.
+          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of microphone device information.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
-          : A list of Track objects that are contained in this Media object.
+          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
+          : A list of speaker device information.
 
           
         </div>
@@ -13968,18 +13950,24 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='devicesobject'>
-      DevicesObject
+    <h3 class='fl m0' id='mediaobject'>
+      MediaObject
     </h3>
     
     
   </div>
   
 
-  <p>A collection of media devices and their information.</p>
+  <p>The state representation of a Media object.
+Media is a collection of Track objects.</p>
 
 
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  <div class='pre p1 fill-light mt0'>MediaObject</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
   
   
 
@@ -13997,22 +13985,22 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>camera</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of camera device information.
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The ID of the Media object.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of microphone device information.
+          <span class='code bold'>local</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Indicator on whether this media is local or remote.
 
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#deviceinfo">DeviceInfo</a>>)</code>
-          : A list of speaker device information.
+          <span class='code bold'>tracks</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#trackobject">TrackObject</a>>)</code>
+          : A list of Track objects that are contained in this Media object.
 
           
         </div>
@@ -14041,67 +14029,79 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deviceinfo'>
-      DeviceInfo
+    <h3 class='fl m0' id='sdphandlerfunction'>
+      SdpHandlerFunction
     </h3>
     
     
   </div>
   
 
-  <p>Contains information about a device.</p>
+  <p>The form of an SDP handler function and the expected arguments that it receives.</p>
 
 
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  <div class='pre p1 fill-light mt0'>SdpHandlerFunction(newSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, info: <a href="#sdphandlerinfo">SdpHandlerInfo</a>, originalSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
-  
-
-  
-  
-  
-  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>
+    </p>
   
   
 
   
+  
+  
+  
+  
+  
 
   
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
       
         <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The ID of the device.
+          <div>
+            <span class='code bold'>newSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The SDP so far (could have been modified by previous handlers).
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
+          <div>
+            <span class='code bold'>info</span> <code class='quiet'>(<a href="#sdphandlerinfo">SdpHandlerInfo</a>)</code>
+	    Additional information that might be useful when making SDP modifications.
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>kind</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The type of the device (audioinput, audiooutput, videoinput).
+          <div>
+            <span class='code bold'>originalSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The SDP in its initial state.
 
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The name of the device.
-
+          </div>
           
         </div>
       
     </div>
   
 
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+          The resulting modified SDP based on the changes made by this function.
+
+        
+      </div>
+    
   
 
   
@@ -14440,96 +14440,6 @@ client.call.make(destination, {
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='part'>
-      Part
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Part</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The payload type. Can be 
-<code>text</code>
-, 
-<code>json</code>
-, or 
-<code>file</code>
-.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>text</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The text of the message. Messages with file or json attachments are still required to have text associated to it.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>json</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : The object corresponding to a json object to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>file</span> <code class='quiet'>(File?)</code>
-          : The file to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='messagesender'>
       MessageSender
     </h3>
@@ -14724,6 +14634,96 @@ the message can then be sent using the send function.</p>
     </div>
   
 </div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='part'>
+      Part
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Part</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The payload type. Can be 
+<code>text</code>
+, 
+<code>json</code>
+, or 
+<code>file</code>
+.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>text</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>json</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
+          : The object corresponding to a json object to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>file</span> <code class='quiet'>(File?)</code>
+          : The file to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
 
   
 

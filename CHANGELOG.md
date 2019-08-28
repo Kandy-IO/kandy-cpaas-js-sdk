@@ -12,6 +12,7 @@ Kandy.js change log.
 - Fixed the logging issue for the Authentication tutorial regarding subscribing/unsubscribing for/from services. `KAA_1916`
 - Fixed an issue where the `kandy.call.history.clear()` is not clearing history data and returning an empty array. `KAA-1873`
 - Fixed implementation of public API 'getAll' (for 'users' plugin) to return an array of all users instead of an object of all users, so that it aligns with current API documentation. `KAA-1923`
+- Fixed an issue causing some BasicError objects to have a misleading message rather than a message about the operation that failed. `KAA-1947`
 - Fixed an issue where call audits weren't being sent.`KAA-1944`
 
 ## 4.6.0 - 2018-08-01

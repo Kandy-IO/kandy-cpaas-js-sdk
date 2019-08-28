@@ -1586,32 +1586,26 @@ Can be retrieved using the [call.getAll][25] or
 -   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
 
-## SdpHandlerFunction
+## DeviceInfo
 
-The form of an SDP handler function and the expected arguments that it receives.
-
-Type: [Function][3]
-
-**Parameters**
-
--   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
--   `info` **[SdpHandlerInfo][84]** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][5]** The SDP in its initial state.
-
-Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][5]
+Contains information about a device.
 
 **Properties**
 
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][13]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
+
+## DevicesObject
+
+A collection of media devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][19]&lt;[DeviceInfo][84]>** A list of camera device information.
+-   `microphone` **[Array][19]&lt;[DeviceInfo][84]>** A list of microphone device information.
+-   `speaker` **[Array][19]&lt;[DeviceInfo][84]>** A list of speaker device information.
 
 ## TrackObject
 
@@ -1629,26 +1623,32 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## DevicesObject
+## MediaObject
 
-A collection of media devices and their information.
+The state representation of a Media object.
+Media is a collection of Track objects.
 
-**Properties**
-
--   `camera` **[Array][19]&lt;[DeviceInfo][85]>** A list of camera device information.
--   `microphone` **[Array][19]&lt;[DeviceInfo][85]>** A list of microphone device information.
--   `speaker` **[Array][19]&lt;[DeviceInfo][85]>** A list of speaker device information.
-
-## DeviceInfo
-
-Contains information about a device.
+Type: [Object][5]
 
 **Properties**
 
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][13]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
+
+## SdpHandlerFunction
+
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][3]
+
+**Parameters**
+
+-   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
+-   `info` **[SdpHandlerInfo][85]** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][5]** The SDP in its initial state.
+
+Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
 
 ## SdpHandlerInfo
 
@@ -1727,17 +1727,6 @@ client.call.make(destination, {
 })
 ```
 
-## Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
-
 ## MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1762,6 +1751,17 @@ Add an additional `Part` to a message.
 ### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
+
+## Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## Subscription
 
@@ -2039,9 +2039,9 @@ The Phone Numer ie: +18885559876
 
 [83]: #callsstates
 
-[84]: #sdphandlerinfo
+[84]: #deviceinfo
 
-[85]: #deviceinfo
+[85]: #sdphandlerinfo
 
 [86]: #messagesenderaddpart
 
