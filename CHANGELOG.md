@@ -5,6 +5,17 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.7.0 - 2019-08-30
+
+### Fixed
+
+- Fixed the logging issue for the Authentication tutorial regarding subscribing/unsubscribing for/from services. `KAA_1916`
+- Fixed an issue where the `kandy.call.history.clear()` is not clearing history data and returning an empty array. `KAA-1873`
+- Fixed implementation of public API 'getAll' (for 'users' plugin) to return an array of all users instead of an object of all users, so that it aligns with current API documentation. `KAA-1923`
+- Fixed a Users issue where the 'fetchSelfInfo' API would not return any information for the current user. `KAA-1924`
+- Fixed an issue causing some BasicError objects to have a misleading message rather than a message about the operation that failed. `KAA-1947`
+- Fixed an issue where call audits weren't being sent.`KAA-1944`
+
 ## 4.6.0 - 2019-08-01
 
 ### Added
@@ -38,9 +49,9 @@ Kandy.js change log.
 - Fixed an issue where the `fetchMessages` function was not available on `Conversations` returned by `kandy.conversation.getAll()`. `KAA-1795`
 
 ### Added
+
 - a new event `group:refresh` has been added. `KAA-1797`
 - `group:refresh` event is now emitted when a new list of groups is fetched instead of `group:change`. `KAA-1797`
-
 
 ### Changed
 
