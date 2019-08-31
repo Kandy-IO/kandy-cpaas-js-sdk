@@ -1231,7 +1231,8 @@ Information about an available User can be retrieved using the
 
 ### fetchSelfInfo
 
-Fetches information about the current User.
+Fetches information about the current User from directory.
+This API is simply a shortcut for the [user.fetch(getUserInfo().identity)][73] API.
 
 The SDK will emit a [directory:change][71]
    event after the operation completes. The User's information will then
@@ -1563,6 +1564,15 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
+## SdpHandlerInfo
+
+Type: [Object][5]
+
+**Properties**
+
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][2]** Which end of the connection created the SDP.
+
 ## CallObject
 
 Information about a Call.
@@ -1586,53 +1596,14 @@ Can be retrieved using the [call.getAll][25] or
 -   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
 
-## SdpHandlerInfo
+## IceServer
 
 Type: [Object][5]
 
 **Properties**
 
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][2]** Which end of the connection created the SDP.
-
-## DevicesObject
-
-A collection of media devices and their information.
-
-**Properties**
-
--   `camera` **[Array][19]&lt;[DeviceInfo][84]>** A list of camera device information.
--   `microphone` **[Array][19]&lt;[DeviceInfo][84]>** A list of microphone device information.
--   `speaker` **[Array][19]&lt;[DeviceInfo][84]>** A list of speaker device information.
-
-## TrackObject
-
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
-
-**Properties**
-
--   `containers` **[Array][19]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][13]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][2]** The ID of the Track.
--   `kind` **[string][2]** The kind of Track this is (audio, video).
--   `label` **[string][2]** The label of the device this Track uses.
--   `muted` **[boolean][13]** Indicator on whether this Track is muted or not.
--   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
-
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][5]
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][13]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
+-   `urls` **([Array][19]&lt;[string][2]> | [string][2])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+-   `credential` **[string][2]?** The credential needed by the ICE server.
 
 ## SdpHandlerFunction
 
@@ -1643,19 +1614,10 @@ Type: [Function][3]
 **Parameters**
 
 -   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
--   `info` **[SdpHandlerInfo][85]** Additional information that might be useful when making SDP modifications.
+-   `info` **[SdpHandlerInfo][84]** Additional information that might be useful when making SDP modifications.
 -   `originalSdp` **[Object][5]** The SDP in its initial state.
 
 Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
-
-## IceServer
-
-Type: [Object][5]
-
-**Properties**
-
--   `url` **[string][2]** The URL of the ICE server.
--   `credential` **[string][2]?** The credential needed by the ICE server.
 
 ## DeviceInfo
 
@@ -1693,6 +1655,29 @@ client.call.make(destination, mediaConstraints,
 )
 ```
 
+## MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+Type: [Object][5]
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][13]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
+
+## DevicesObject
+
+A collection of media devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][19]&lt;[DeviceInfo][85]>** A list of camera device information.
+-   `microphone` **[Array][19]&lt;[DeviceInfo][85]>** A list of microphone device information.
+-   `speaker` **[Array][19]&lt;[DeviceInfo][85]>** A list of speaker device information.
+
 ## MediaConstraint
 
 The MediaConstraint type defines the format for configuring media options.
@@ -1727,6 +1712,33 @@ client.call.make(destination, {
 })
 ```
 
+## TrackObject
+
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+
+**Properties**
+
+-   `containers` **[Array][19]&lt;[string][2]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][13]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][2]** The ID of the Track.
+-   `kind` **[string][2]** The kind of Track this is (audio, video).
+-   `label` **[string][2]** The label of the device this Track uses.
+-   `muted` **[boolean][13]** Indicator on whether this Track is muted or not.
+-   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
+
+## Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
 ## MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1751,17 +1763,6 @@ Add an additional `Part` to a message.
 ### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
-
-## Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## Subscription
 
@@ -2039,9 +2040,9 @@ The Phone Numer ie: +18885559876
 
 [83]: #callsstates
 
-[84]: #deviceinfo
+[84]: #sdphandlerinfo
 
-[85]: #sdphandlerinfo
+[85]: #deviceinfo
 
 [86]: #messagesenderaddpart
 
