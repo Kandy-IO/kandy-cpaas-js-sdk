@@ -1564,72 +1564,6 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## MediaConstraint
-
-The MediaConstraint type defines the format for configuring media options.
-Either the `exact` or `ideal` property should be provided. If both are present, the
-   `exact` value will be used.
-
-When the `exact` value is provided, it will be the only value considered for the option.
-   If it cannot be used, the constraint will be considered an error.
-
-When the `ideal` value is provided, it will be considered as the optimal value for the option.
-   If it cannot be used, the closest acceptable value will be used instead.
-
-Type: [Object][5]
-
-**Properties**
-
--   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
--   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
-
-**Examples**
-
-```javascript
-// Specify video resolution when making a call.
-client.call.make(destination, {
-   audio: true,
-   video: true,
-   videoOptions: {
-     // Set height and width constraints to ideally be 1280x720.
-     height: { ideal: 720 },
-     width: { ideal: 1280 }
-   }
-})
-```
-
-## SdpHandlerInfo
-
-Type: [Object][5]
-
-**Properties**
-
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][2]** Which end of the connection created the SDP.
-
-## CallObject
-
-Information about a Call.
-
-Can be retrieved using the [call.getAll][25] or
-   [call.getById][8] APIs.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the call.
--   `direction` **[string][2]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
--   `state` **[string][2]** The current state of the call. See [call.states][83] for possible states.
--   `localHold` **[boolean][13]** Indicates whether this call is currently being held locally.
--   `remoteHold` **[boolean][13]** Indicates whether this call is currently being held remotely.
--   `localTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `remoteTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]?** The User ID of the remote participant in the form "username@domain".
-    -   `remoteParticipant.displayName` **[string][2]?** The display name of the remote participant.
--   `bandwidth` **[BandwidthControls][15]** The bandwidth limitations set for the call.
--   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
--   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
-
 ## DeviceInfo
 
 Contains information about a device.
@@ -1666,43 +1600,6 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
 
-## MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][5]
-
-**Properties**
-
--   `id` **[string][2]** The ID of the Media object.
--   `local` **[boolean][13]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
-
-## SdpHandlerFunction
-
-The form of an SDP handler function and the expected arguments that it receives.
-
-Type: [Function][3]
-
-**Parameters**
-
--   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
--   `info` **[SdpHandlerInfo][84]** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][5]** The SDP in its initial state.
-
-Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
-
-## DevicesObject
-
-A collection of media devices and their information.
-
-**Properties**
-
--   `camera` **[Array][19]&lt;[DeviceInfo][85]>** A list of camera device information.
--   `microphone` **[Array][19]&lt;[DeviceInfo][85]>** A list of microphone device information.
--   `speaker` **[Array][19]&lt;[DeviceInfo][85]>** A list of speaker device information.
-
 ## BandwidthControls
 
 The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
@@ -1728,16 +1625,108 @@ client.call.make(destination, mediaConstraints,
 )
 ```
 
-## Part
+## MediaObject
 
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+Type: [Object][5]
 
 **Properties**
 
--   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+-   `id` **[string][2]** The ID of the Media object.
+-   `local` **[boolean][13]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][19]&lt;[TrackObject][30]>** A list of Track objects that are contained in this Media object.
+
+## SdpHandlerFunction
+
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][3]
+
+**Parameters**
+
+-   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
+-   `info` **[SdpHandlerInfo][83]** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][5]** The SDP in its initial state.
+
+Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
+
+## SdpHandlerInfo
+
+Type: [Object][5]
+
+**Properties**
+
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][2]** Which end of the connection created the SDP.
+
+## DevicesObject
+
+A collection of media devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][19]&lt;[DeviceInfo][84]>** A list of camera device information.
+-   `microphone` **[Array][19]&lt;[DeviceInfo][84]>** A list of microphone device information.
+-   `speaker` **[Array][19]&lt;[DeviceInfo][84]>** A list of speaker device information.
+
+## MediaConstraint
+
+The MediaConstraint type defines the format for configuring media options.
+Either the `exact` or `ideal` property should be provided. If both are present, the
+   `exact` value will be used.
+
+When the `exact` value is provided, it will be the only value considered for the option.
+   If it cannot be used, the constraint will be considered an error.
+
+When the `ideal` value is provided, it will be considered as the optimal value for the option.
+   If it cannot be used, the closest acceptable value will be used instead.
+
+Type: [Object][5]
+
+**Properties**
+
+-   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
+-   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
+
+**Examples**
+
+```javascript
+// Specify video resolution when making a call.
+client.call.make(destination, {
+   audio: true,
+   video: true,
+   videoOptions: {
+     // Set height and width constraints to ideally be 1280x720.
+     height: { ideal: 720 },
+     width: { ideal: 1280 }
+   }
+})
+```
+
+## CallObject
+
+Information about a Call.
+
+Can be retrieved using the [call.getAll][25] or
+   [call.getById][8] APIs.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the call.
+-   `direction` **[string][2]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+-   `state` **[string][2]** The current state of the call. See [call.states][85] for possible states.
+-   `localHold` **[boolean][13]** Indicates whether this call is currently being held locally.
+-   `remoteHold` **[boolean][13]** Indicates whether this call is currently being held remotely.
+-   `localTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `remoteTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]?** The User ID of the remote participant in the form "username@domain".
+    -   `remoteParticipant.displayName` **[string][2]?** The display name of the remote participant.
+-   `bandwidth` **[BandwidthControls][15]** The bandwidth limitations set for the call.
+-   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
+-   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
 
 ## MessageSender
 
@@ -1763,6 +1752,17 @@ Add an additional `Part` to a message.
 ### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
+
+## Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## Subscription
 
@@ -1866,13 +1866,13 @@ The User data object.
 -   `photoURL` **[string][2]** The URL to get the photo of the user.
 -   `buddy` **[string][2]** Whether the user is a "buddy". Values can be "true" or "false".
 
-## UserID
-
-The User ID ie: joe@test.3s5j.att.com
-
 ## PhoneNumber
 
 The Phone Numer ie: +18885559876
+
+## UserID
+
+The User ID ie: joe@test.3s5j.att.com
 
 [1]: #config
 
@@ -2038,11 +2038,11 @@ The Phone Numer ie: +18885559876
 
 [82]: #config
 
-[83]: #callsstates
+[83]: #sdphandlerinfo
 
-[84]: #sdphandlerinfo
+[84]: #deviceinfo
 
-[85]: #deviceinfo
+[85]: #callsstates
 
 [86]: #messagesenderaddpart
 
