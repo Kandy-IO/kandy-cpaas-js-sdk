@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.8.0-beta.134
+ * Version: 4.8.0-beta.135
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32856,7 +32856,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.8.0-beta.134';
+  let version = '4.8.0-beta.135';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -51091,6 +51091,7 @@ function Session(id, managers, config = {}) {
   let peerId;
   const peerManager = managers.peerManager;
   const mediaManager = managers.mediaManager;
+  const trackManager = managers.trackManager;
   const emitter = new _eventemitter2.default();
 
   // The latest remote description successfully set, even if the Peer has
@@ -51617,6 +51618,22 @@ function Session(id, managers, config = {}) {
       }
 
       media.on('track:removed', trackId => {
+        // This is used as a workaround for an issue that was noticed on Chrome 76 plan-b
+        //  (it may have already been happening in previous versions):
+        //  - the remote audio track's `ended` event does not fire when remote sdp comes in with `inactive` media (hold).
+        //  - the remote audio track's `ended` event fires when sdp comes in with `sendrecv` media (unhold).
+        // Only do manual remote track cleanup when plan-b.
+        // Doing so for unified-plan will make the new track in `ontrack` event come in an `ended` state.
+        if (!(0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
+          const trackToCleanup = trackManager.get(trackId);
+          if (trackToCleanup) {
+            trackToCleanup.cleanup();
+            _loglevel2.default.info(`Cleaning up track ${trackId}.`);
+          } else {
+            _loglevel2.default.info(`Track ${trackId} not found.`);
+          }
+        }
+
         emitter.emit('track:removed', {
           local: false,
           trackId: trackId

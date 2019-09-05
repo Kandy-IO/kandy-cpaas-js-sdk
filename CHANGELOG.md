@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.8.0 - beta
 
+### Fixed
+
+- Fixed an issue in Chrome plan-b where hold operation will not fire a `call:trackEnded` event and will fire it during the unhold operation. `KAA-1942`
+
 ## 4.7.0 - 2019-08-30
 
 ### Fixed
