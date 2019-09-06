@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.8.0-beta.135
+ * Version: 4.8.0-beta.136
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29093,6 +29093,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.hasSameSessionId = hasSameSessionId;
+
+var _extractors = __webpack_require__("../webrtc/src/sdpUtils/extractors.js");
+
 /**
  * Checks whether two SDPs have the same session ID.
  * @method hasSameSessionId
@@ -29101,27 +29104,11 @@ exports.hasSameSessionId = hasSameSessionId;
  * @return {boolean} Whether the two SDPs have the same session ID.
  */
 function hasSameSessionId(sdp, newSdp) {
-  /**
-   * Extracts the session ID from the SDP.
-   * Session ID is located in the o= line.
-   * Ref: https://tools.ietf.org/html/rfc4566#section-5.2
-   * @method getSessionId
-   * @param  {string} sdp A valid SDP string.
-   * @return {string} The SDP's session ID.
-   */
-  function getSessionId(sdp) {
-    const oLine = sdp.match(/o=.*/gm);
+  const firstSdpSessionId = (0, _extractors.getSdpSessionId)(sdp);
+  const secondSdpSessionId = (0, _extractors.getSdpSessionId)(newSdp);
 
-    if (oLine && oLine[0]) {
-      return oLine[0].split(' ')[1];
-    }
-  }
-
-  const firstSession = getSessionId(sdp);
-  const secondSession = getSessionId(newSdp);
-
-  if (firstSession && secondSession) {
-    return firstSession === secondSession;
+  if (firstSdpSessionId && secondSdpSessionId) {
+    return firstSdpSessionId === secondSdpSessionId;
   }
 }
 
@@ -32856,7 +32843,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.8.0-beta.135';
+  let version = '4.8.0-beta.136';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -50977,6 +50964,22 @@ function Peer(id, config = {}, trackManager) {
     }
   }
 
+  /**
+   * Gets the current dtls role of the peer.
+   * @returns {string} The dtls role of this peer.
+   */
+  function getDtlsRole() {
+    return dtlsRole;
+  }
+
+  /**
+   * Sets the current dtls role of the peer.
+   * @param {string} targetRole The dtls role we want to use.
+   */
+  function setDtlsRole(targetRole) {
+    dtlsRole = targetRole;
+  }
+
   function on(...args) {
     return emitter.on(...args);
   }
@@ -51016,6 +51019,8 @@ function Peer(id, config = {}, trackManager) {
     setLocalDescription,
     setRemoteDescription,
     setTransceiversDirection,
+    getDtlsRole,
+    setDtlsRole,
     // Media APIs.
     addTrack,
     removeTrack,
@@ -51052,6 +51057,10 @@ var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/pro
 
 var _promise2 = _interopRequireDefault(_promise);
 
+var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js");
+
+var _map2 = _interopRequireDefault(_map);
+
 exports.default = Session;
 
 var _constants = __webpack_require__("../webrtc/src/constants.js");
@@ -51061,6 +51070,8 @@ var _pipeline = __webpack_require__("../webrtc/src/sdpUtils/pipeline.js");
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _sdpSemantics = __webpack_require__("../webrtc/src/sdpUtils/sdpSemantics.js");
+
+var _extractors = __webpack_require__("../webrtc/src/sdpUtils/extractors.js");
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -51082,9 +51093,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-
-
-// SDP Helpers.
+// Helpers.
 function Session(id, managers, config = {}) {
   // Internal variables.
   const sessionId = id;
@@ -51093,6 +51102,13 @@ function Session(id, managers, config = {}) {
   const mediaManager = managers.mediaManager;
   const trackManager = managers.trackManager;
   const emitter = new _eventemitter2.default();
+
+  // This structure is used to remember the dtls role of a peer relative to some remote sdp.
+  // key: the remote sdp's session id (o= line).
+  // value: the dtls role that the current peer's local sdp has.
+  // This is needed because a remote SDP with the same sessionId as a previous one may reappear later on
+  //  (music-unhold scenario) and the roles will be expected to be the same.
+  const dtlsRoleRecord = new _map2.default();
 
   // The latest remote description successfully set, even if the Peer has
   //    been recreated since it was set.
@@ -51106,6 +51122,17 @@ function Session(id, managers, config = {}) {
     setupPeerEventHandlers(peer);
   } else {
     throw new Error(`Peer creation error in Session ${sessionId}.`);
+  }
+
+  /**
+   * Records the peer's dtlsRole if it hasn't been recorded yet and associates it with a remote sdp's sessionId.
+   * @method recordNewDtlsRole
+   */
+  function recordNewDtlsRole() {
+    const remoteSdpSessionId = (0, _extractors.getSdpSessionId)(peer.remoteDescription.sdp);
+    if (!dtlsRoleRecord.get(remoteSdpSessionId)) {
+      dtlsRoleRecord.set(remoteSdpSessionId, peer.getDtlsRole());
+    }
   }
 
   /**
@@ -51289,21 +51316,26 @@ function Session(id, managers, config = {}) {
   }
 
   /**
-   * Sets a local SDP offer.
+   * Sets a local SDP.
    * @method setLocalDescription
-   * @param  {Object} offer The SDP to set as local description.
-   * @return {Promise} Resolves with the offer.
+   * @param  {Object} description The description containing the SDP to set as the local description.
+   * @return {Promise} Resolves with the description.
    */
-  function setLocalDescription(offer) {
+  function setLocalDescription(description) {
     return new _promise2.default((resolve, reject) => {
       const peer = peerManager.get(peerId);
       if (!peer) {
         reject(new Error(`Peer not found in Session ${sessionId}.`));
       }
 
-      peer.setLocalDescription(offer).then(() => {
+      peer.setLocalDescription(description).then(() => {
+        // Record the peer's dtls role if setting a local answer.
+        if (description.type === 'answer') {
+          recordNewDtlsRole();
+        }
+
         // Resolve with the _current_ local description, which may be
-        //    different than the provided offer due trickle ICE config.
+        //    different than the provided description due trickle ICE config.
         resolve(peer.localDescription);
       }).catch(reject);
     });
@@ -51435,6 +51467,15 @@ function Session(id, managers, config = {}) {
         }
       }
 
+      // Set the dtlsRole here if the following are true:
+      // - It previously existed for this specific remote sdp.
+      // - It hasn't been set on a recreated peer yet.
+      const remoteSdpSessionId = (0, _extractors.getSdpSessionId)(peer.remoteDescription.sdp);
+      const previousDtlsRole = dtlsRoleRecord.get(remoteSdpSessionId);
+      if (!peer.getDtlsRole() && previousDtlsRole) {
+        peer.setDtlsRole(previousDtlsRole);
+      }
+
       peer.createAnswer(options).then(answer => {
         if (options.sdpHandlers || _pipeline2.default.getHandlers().length) {
           _loglevel2.default.debug('Modifying local answer with SDP pipeline.');
@@ -51487,8 +51528,12 @@ function Session(id, managers, config = {}) {
       }
 
       peer.setRemoteDescription(answer).then(() => {
+        // Record the peer's dtls role.
+        recordNewDtlsRole();
+
         // Set the answer as the latest remote description.
         latestRemoteDescription = answer;
+
         resolve();
       }).catch(reject);
     });
@@ -51738,7 +51783,9 @@ function Session(id, managers, config = {}) {
     once,
     off
   };
-} // Helpers.
+}
+
+// SDP Helpers.
 
 /***/ }),
 
@@ -52067,6 +52114,34 @@ function Track(mediaTrack, mediaStream) {
     getStream
   };
 } // Libraries.
+
+/***/ }),
+
+/***/ "../webrtc/src/sdpUtils/extractors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSdpSessionId = getSdpSessionId;
+/**
+ * Extracts the session ID from the SDP.
+ * Session ID is located in the o= line.
+ * Ref: https://tools.ietf.org/html/rfc4566#section-5.2
+ * @method getSdpSessionId
+ * @param  {string} sdp A valid SDP string.
+ * @return {string} The SDP's session ID.
+ */
+function getSdpSessionId(sdp) {
+  const oLine = sdp.match(/o=.*/gm);
+
+  if (oLine && oLine[0]) {
+    return oLine[0].split(' ')[1];
+  }
+}
 
 /***/ }),
 
