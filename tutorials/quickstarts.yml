@@ -25,6 +25,10 @@
   description: # Chat
   link: /quickstarts/javascript/cpaas/Chat
 
+- name: Chat History
+  description: # Chat History
+  link: /quickstarts/javascript/cpaas/Chat%20History
+
 - name: Group Chat
   description: # Group Chat
   link: /quickstarts/javascript/cpaas/Group%20Chat
