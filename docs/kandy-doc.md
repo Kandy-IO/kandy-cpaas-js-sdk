@@ -1564,25 +1564,39 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
-## SdpHandlerInfo
+## MediaConstraint
+
+The MediaConstraint type defines the format for configuring media options.
+Either the `exact` or `ideal` property should be provided. If both are present, the
+   `exact` value will be used.
+
+When the `exact` value is provided, it will be the only value considered for the option.
+   If it cannot be used, the constraint will be considered an error.
+
+When the `ideal` value is provided, it will be considered as the optimal value for the option.
+   If it cannot be used, the closest acceptable value will be used instead.
 
 Type: [Object][5]
 
 **Properties**
 
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][2]** Which end of the connection created the SDP.
+-   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
+-   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
 
-## DeviceInfo
+**Examples**
 
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
+```javascript
+// Specify video resolution when making a call.
+client.call.make(destination, {
+   audio: true,
+   video: true,
+   videoOptions: {
+     // Set height and width constraints to ideally be 1280x720.
+     height: { ideal: 720 },
+     width: { ideal: 1280 }
+   }
+})
+```
 
 ## DevicesObject
 
@@ -1637,6 +1651,15 @@ Type: [Function][3]
 
 Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
 
+## SdpHandlerInfo
+
+Type: [Object][5]
+
+**Properties**
+
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][2]** Which end of the connection created the SDP.
+
 ## IceServer
 
 Type: [Object][5]
@@ -1671,39 +1694,16 @@ client.call.make(destination, mediaConstraints,
 )
 ```
 
-## MediaConstraint
+## DeviceInfo
 
-The MediaConstraint type defines the format for configuring media options.
-Either the `exact` or `ideal` property should be provided. If both are present, the
-   `exact` value will be used.
-
-When the `exact` value is provided, it will be the only value considered for the option.
-   If it cannot be used, the constraint will be considered an error.
-
-When the `ideal` value is provided, it will be considered as the optimal value for the option.
-   If it cannot be used, the closest acceptable value will be used instead.
-
-Type: [Object][5]
+Contains information about a device.
 
 **Properties**
 
--   `exact` **[string][2]?** The required value for the constraint. Other values will not be accepted.
--   `ideal` **[string][2]?** The ideal value for the constraint. Other values will be considered if necessary.
-
-**Examples**
-
-```javascript
-// Specify video resolution when making a call.
-client.call.make(destination, {
-   audio: true,
-   video: true,
-   videoOptions: {
-     // Set height and width constraints to ideally be 1280x720.
-     height: { ideal: 720 },
-     width: { ideal: 1280 }
-   }
-})
-```
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
 
 ## CallObject
 
@@ -1727,17 +1727,6 @@ Can be retrieved using the [call.getAll][25] or
 -   `bandwidth` **[BandwidthControls][15]** The bandwidth limitations set for the call.
 -   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
-
-## Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## MessageSender
 
@@ -1763,6 +1752,17 @@ Add an additional `Part` to a message.
 ### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
+
+## Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## Subscription
 
