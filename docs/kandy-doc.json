@@ -50490,6 +50490,551 @@
           "children": [
             {
               "type": "text",
+              "value": "A set of ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "link",
+              "url": "#sdphandlerfunction",
+              "title": null,
+              "jsdoc": true,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "SdpHandlerFunction"
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "end": {
+                  "line": 1,
+                  "column": 56,
+                  "offset": 55
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": "s for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 56,
+                  "offset": 55
+                },
+                "end": {
+                  "line": 4,
+                  "column": 26,
+                  "offset": 273
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 26,
+              "offset": 273
+            },
+            "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 26,
+          "offset": 273
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 6,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 7,
+        "type": null,
+        "name": "sdpHandlers"
+      },
+      {
+        "title": "example",
+        "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [ <Your-SDP-Handler-Function>, ...]\n  }\n})",
+        "lineNumber": 8
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 29,
+        "column": 0
+      },
+      "end": {
+        "line": 45,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 76,
+          "column": 0
+        },
+        "end": {
+          "line": 76,
+          "column": 35
+        }
+      },
+      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/index.common.js"
+    },
+    "augments": [],
+    "examples": [
+      {
+        "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [ <Your-SDP-Handler-Function>, ...]\n  }\n})"
+      }
+    ],
+    "params": [],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "sdpHandlers",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.\nWhile creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 160,
+                        "offset": 263
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 160,
+                    "offset": 263
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 265
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 116,
+                        "offset": 380
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 265
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 116,
+                    "offset": 380
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 382
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 167,
+                        "offset": 548
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 382
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 167,
+                    "offset": 548
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 167,
+                "offset": 548
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 8,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "sdpHandlers",
+              "lineNumber": 9
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 10,
+              "name": "createCodecRemover"
+            },
+            {
+              "title": "param",
+              "description": "A list of codec names to remove from the SDP.",
+              "lineNumber": 11,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "codecs"
+            },
+            {
+              "title": "returns",
+              "description": "The resulting SDP handler that will remove the codec.",
+              "lineNumber": 12,
+              "type": {
+                "type": "NameExpression",
+                "name": "SdpHandlerFunction"
+              }
+            },
+            {
+              "title": "example",
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
+              "lineNumber": 13
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 49,
+              "column": 0
+            },
+            "end": {
+              "line": 71,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 76,
+                "column": 0
+              },
+              "end": {
+                "line": 76,
+                "column": 35
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/index.common.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
+            }
+          ],
+          "params": [
+            {
+              "title": "param",
+              "name": "codecs",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of codec names to remove from the SDP.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 46,
+                            "offset": 45
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 46,
+                        "offset": 45
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 46,
+                    "offset": 45
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The resulting SDP handler that will remove the codec.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 54,
+                            "offset": 53
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 54,
+                        "offset": 53
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 54,
+                    "offset": 53
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "SdpHandlerFunction"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "sdpHandlers",
+          "kind": "function",
+          "name": "createCodecRemover",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "sdpHandlers",
+              "kind": "module"
+            },
+            {
+              "name": "createCodecRemover",
+              "kind": "function"
+            }
+          ],
+          "namespace": "sdpHandlerscreateCodecRemover"
+        }
+      ]
+    },
+    "path": [
+      {
+        "name": "sdpHandlers",
+        "kind": "module"
+      }
+    ],
+    "namespace": "sdpHandlers"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "The configuration object. This object defines what different configuration\nvalues you can use when instantiating the SDK.",
               "position": {
                 "start": {
@@ -54742,551 +55287,6 @@
           "children": [
             {
               "type": "text",
-              "value": "A set of ",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 10,
-                  "offset": 9
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "link",
-              "url": "#sdphandlerfunction",
-              "title": null,
-              "jsdoc": true,
-              "children": [
-                {
-                  "type": "text",
-                  "value": "SdpHandlerFunction"
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 10,
-                  "offset": 9
-                },
-                "end": {
-                  "line": 1,
-                  "column": 56,
-                  "offset": 55
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": "s for manipulating SDP information.\nThese handlers are used to customize low-level call behaviour for very specific\nenvironments and/or scenarios. They can be provided during SDK instantiation\nto be used for all calls.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 56,
-                  "offset": 55
-                },
-                "end": {
-                  "line": 4,
-                  "column": 26,
-                  "offset": 273
-                },
-                "indent": [
-                  1,
-                  1,
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 4,
-              "column": 26,
-              "offset": 273
-            },
-            "indent": [
-              1,
-              1,
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 4,
-          "column": 26,
-          "offset": 273
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 6,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 7,
-        "type": null,
-        "name": "sdpHandlers"
-      },
-      {
-        "title": "example",
-        "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [ <Your-SDP-Handler-Function>, ...]\n  }\n})",
-        "lineNumber": 8
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 29,
-        "column": 0
-      },
-      "end": {
-        "line": 45,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 76,
-          "column": 0
-        },
-        "end": {
-          "line": 76,
-          "column": 35
-        }
-      },
-      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/index.common.js"
-    },
-    "augments": [],
-    "examples": [
-      {
-        "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [ <Your-SDP-Handler-Function>, ...]\n  }\n})"
-      }
-    ],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "sdpHandlers",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": [
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.\nWhile creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 160,
-                        "offset": 263
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 160,
-                    "offset": 263
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.",
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 1,
-                        "offset": 265
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 116,
-                        "offset": 380
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 4,
-                    "column": 1,
-                    "offset": 265
-                  },
-                  "end": {
-                    "line": 4,
-                    "column": 116,
-                    "offset": 380
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.",
-                    "position": {
-                      "start": {
-                        "line": 6,
-                        "column": 1,
-                        "offset": 382
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 167,
-                        "offset": 548
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 6,
-                    "column": 1,
-                    "offset": 382
-                  },
-                  "end": {
-                    "line": 6,
-                    "column": 167,
-                    "offset": 548
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 6,
-                "column": 167,
-                "offset": 548
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 8,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "sdpHandlers",
-              "lineNumber": 9
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 10,
-              "name": "createCodecRemover"
-            },
-            {
-              "title": "param",
-              "description": "A list of codec names to remove from the SDP.",
-              "lineNumber": 11,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              },
-              "name": "codecs"
-            },
-            {
-              "title": "returns",
-              "description": "The resulting SDP handler that will remove the codec.",
-              "lineNumber": 12,
-              "type": {
-                "type": "NameExpression",
-                "name": "SdpHandlerFunction"
-              }
-            },
-            {
-              "title": "example",
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})",
-              "lineNumber": 13
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 49,
-              "column": 0
-            },
-            "end": {
-              "line": 71,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 76,
-                "column": 0
-              },
-              "end": {
-                "line": 76,
-                "column": 35
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/index.common.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "import { create, sdpHandlers } from 'kandy';\nconst codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])\nconst client = create({\n  call: {\n    sdpHandlers: [codecRemover]\n  }\n})"
-            }
-          ],
-          "params": [
-            {
-              "title": "param",
-              "name": "codecs",
-              "lineNumber": 11,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of codec names to remove from the SDP.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 46,
-                            "offset": 45
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 46,
-                        "offset": 45
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 46,
-                    "offset": 45
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [
-            {
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The resulting SDP handler that will remove the codec.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 54,
-                            "offset": 53
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 54,
-                        "offset": 53
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 54,
-                    "offset": 53
-                  }
-                }
-              },
-              "title": "returns",
-              "type": {
-                "type": "NameExpression",
-                "name": "SdpHandlerFunction"
-              }
-            }
-          ],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "sdpHandlers",
-          "kind": "function",
-          "name": "createCodecRemover",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "sdpHandlers",
-              "kind": "module"
-            },
-            {
-              "name": "createCodecRemover",
-              "kind": "function"
-            }
-          ],
-          "namespace": "sdpHandlerscreateCodecRemover"
-        }
-      ]
-    },
-    "path": [
-      {
-        "name": "sdpHandlers",
-        "kind": "module"
-      }
-    ],
-    "namespace": "sdpHandlers"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "The internal logger is used to provide information about the SDK's behaviour.\nThe logger can provide two types of logs: basic logs and action logs. Basic\nlogs are simple lines of information about what the SDK is doing during operations.\nAction logs are complete information about a specific action that occurred\nwithin the SDK, providing debug information describing it.\nThe amount of information logged can be configured as part of the SDK configuration.\nSee ",
               "position": {
                 "start": {
@@ -56862,6 +56862,391 @@
           "children": [
             {
               "type": "text",
+              "value": "A collection of media devices and their information.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 53,
+          "offset": 52
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 3,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 4,
+        "type": null,
+        "name": "DevicesObject"
+      },
+      {
+        "title": "property",
+        "description": "A list of camera device information.",
+        "lineNumber": 5,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "camera"
+      },
+      {
+        "title": "property",
+        "description": "A list of microphone device information.",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "microphone"
+      },
+      {
+        "title": "property",
+        "description": "A list of speaker device information.",
+        "lineNumber": 7,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        },
+        "name": "speaker"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 162,
+        "column": 0
+      },
+      "end": {
+        "line": 170,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 192,
+          "column": 0
+        },
+        "end": {
+          "line": 196,
+          "column": 1
+        }
+      },
+      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "camera",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of camera device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "microphone",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of microphone device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      },
+      {
+        "title": "property",
+        "name": "speaker",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "A list of speaker device information.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 38,
+                      "offset": 37
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 38,
+              "offset": 37
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "DeviceInfo"
+            }
+          ]
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "DevicesObject",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "DevicesObject",
+        "kind": "module"
+      }
+    ],
+    "namespace": "DevicesObject"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
               "position": {
                 "start": {
@@ -57594,442 +57979,6 @@
       }
     ],
     "namespace": "TrackObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Contains information about a device.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 37,
-          "offset": 36
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 3,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 4,
-        "type": null,
-        "name": "DeviceInfo"
-      },
-      {
-        "title": "property",
-        "description": "The ID of the device.",
-        "lineNumber": 5,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "deviceId"
-      },
-      {
-        "title": "property",
-        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "groupId"
-      },
-      {
-        "title": "property",
-        "description": "The type of the device (audioinput, audiooutput, videoinput).",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "kind"
-      },
-      {
-        "title": "property",
-        "description": "The name of the device.",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "label"
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 172,
-        "column": 0
-      },
-      "end": {
-        "line": 181,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 192,
-          "column": 0
-        },
-        "end": {
-          "line": 196,
-          "column": 1
-        }
-      },
-      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "deviceId",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The ID of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 22,
-                      "offset": 21
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 22,
-                  "offset": 21
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 22,
-              "offset": 21
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "groupId",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The group ID of the device. Devices that share a ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "groupId",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " belong to the same physical device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 59,
-                      "offset": 58
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 95,
-                      "offset": 94
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 95,
-                  "offset": 94
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 95,
-              "offset": 94
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "kind",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 62,
-                      "offset": 61
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 62,
-                  "offset": 61
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 62,
-              "offset": 61
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "label",
-        "lineNumber": 8,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The name of the device.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 24,
-                      "offset": 23
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 24,
-                  "offset": 23
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 24,
-              "offset": 23
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "DeviceInfo",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "DeviceInfo",
-        "kind": "module"
-      }
-    ],
-    "namespace": "DeviceInfo"
   },
   {
     "description": {
@@ -59608,7 +59557,7 @@
           "children": [
             {
               "type": "text",
-              "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
+              "value": "Contains information about a device.",
               "position": {
                 "start": {
                   "line": 1,
@@ -59616,115 +59565,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 12,
-                  "offset": 86
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "exact",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 12,
-                  "offset": 86
-                },
-                "end": {
-                  "line": 2,
-                  "column": 19,
-                  "offset": 93
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " or ",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 19,
-                  "offset": 93
-                },
-                "end": {
-                  "line": 2,
-                  "column": 23,
-                  "offset": 97
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "ideal",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 23,
-                  "offset": 97
-                },
-                "end": {
-                  "line": 2,
-                  "column": 30,
-                  "offset": 104
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " property should be provided. If both are present, the\n   ",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 30,
-                  "offset": 104
-                },
-                "end": {
-                  "line": 3,
-                  "column": 4,
-                  "offset": 162
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "exact",
-              "position": {
-                "start": {
-                  "line": 3,
-                  "column": 4,
-                  "offset": 162
-                },
-                "end": {
-                  "line": 3,
-                  "column": 11,
-                  "offset": 169
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value will be used.",
-              "position": {
-                "start": {
-                  "line": 3,
-                  "column": 11,
-                  "offset": 169
-                },
-                "end": {
-                  "line": 3,
-                  "column": 31,
-                  "offset": 189
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
                 },
                 "indent": []
               }
@@ -59737,160 +59580,11 @@
               "offset": 0
             },
             "end": {
-              "line": 3,
-              "column": 31,
-              "offset": 189
+              "line": 1,
+              "column": 37,
+              "offset": 36
             },
-            "indent": [
-              1,
-              1
-            ]
-          }
-        },
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "When the ",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 1,
-                  "offset": 191
-                },
-                "end": {
-                  "line": 5,
-                  "column": 10,
-                  "offset": 200
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "exact",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 10,
-                  "offset": 200
-                },
-                "end": {
-                  "line": 5,
-                  "column": 17,
-                  "offset": 207
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
-              "position": {
-                "start": {
-                  "line": 5,
-                  "column": 17,
-                  "offset": 207
-                },
-                "end": {
-                  "line": 6,
-                  "column": 69,
-                  "offset": 348
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 5,
-              "column": 1,
-              "offset": 191
-            },
-            "end": {
-              "line": 6,
-              "column": 69,
-              "offset": 348
-            },
-            "indent": [
-              1
-            ]
-          }
-        },
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "When the ",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 1,
-                  "offset": 350
-                },
-                "end": {
-                  "line": 8,
-                  "column": 10,
-                  "offset": 359
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "ideal",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 10,
-                  "offset": 359
-                },
-                "end": {
-                  "line": 8,
-                  "column": 17,
-                  "offset": 366
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
-              "position": {
-                "start": {
-                  "line": 8,
-                  "column": 17,
-                  "offset": 366
-                },
-                "end": {
-                  "line": 9,
-                  "column": 76,
-                  "offset": 520
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 8,
-              "column": 1,
-              "offset": 350
-            },
-            "end": {
-              "line": 9,
-              "column": 76,
-              "offset": 520
-            },
-            "indent": [
-              1
-            ]
+            "indent": []
           }
         }
       ],
@@ -59901,9 +59595,9 @@
           "offset": 0
         },
         "end": {
-          "line": 9,
-          "column": 76,
-          "offset": 520
+          "line": 1,
+          "column": 37,
+          "offset": 36
         }
       }
     },
@@ -59911,65 +59605,64 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 11,
+        "lineNumber": 3,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 12,
+        "lineNumber": 4,
         "type": null,
-        "name": "MediaConstraint"
+        "name": "DeviceInfo"
       },
       {
-        "title": "typedef",
-        "description": null,
-        "lineNumber": 13,
+        "title": "property",
+        "description": "The ID of the device.",
+        "lineNumber": 5,
         "type": {
           "type": "NameExpression",
-          "name": "Object"
+          "name": "string"
         },
-        "name": "MediaConstraint"
+        "name": "deviceId"
       },
       {
         "title": "property",
-        "description": "The required value for the constraint. Other values will not be accepted.",
-        "lineNumber": 14,
+        "description": "The group ID of the device. Devices that share a `groupId` belong to the same physical device.",
+        "lineNumber": 6,
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
+          "type": "NameExpression",
+          "name": "string"
         },
-        "name": "exact"
+        "name": "groupId"
       },
       {
         "title": "property",
-        "description": "The ideal value for the constraint. Other values will be considered if necessary.",
-        "lineNumber": 15,
+        "description": "The type of the device (audioinput, audiooutput, videoinput).",
+        "lineNumber": 7,
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
+          "type": "NameExpression",
+          "name": "string"
         },
-        "name": "ideal"
+        "name": "kind"
       },
       {
-        "title": "example",
-        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
-        "lineNumber": 16
+        "title": "property",
+        "description": "The name of the device.",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "label"
       }
     ],
     "loc": {
       "start": {
-        "line": 58,
+        "line": 172,
         "column": 0
       },
       "end": {
-        "line": 85,
+        "line": 181,
         "column": 3
       }
     },
@@ -59987,17 +59680,13 @@
       "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
-    "examples": [
-      {
-        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
-      }
-    ],
+    "examples": [],
     "params": [],
     "properties": [
       {
         "title": "property",
-        "name": "exact",
-        "lineNumber": 14,
+        "name": "deviceId",
+        "lineNumber": 5,
         "description": {
           "type": "root",
           "children": [
@@ -60006,7 +59695,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The required value for the constraint. Other values will not be accepted.",
+                  "value": "The ID of the device.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -60015,8 +59704,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 74,
-                      "offset": 73
+                      "column": 22,
+                      "offset": 21
                     },
                     "indent": []
                   }
@@ -60030,8 +59719,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 74,
-                  "offset": 73
+                  "column": 22,
+                  "offset": 21
                 },
                 "indent": []
               }
@@ -60045,23 +59734,20 @@
             },
             "end": {
               "line": 1,
-              "column": 74,
-              "offset": 73
+              "column": 22,
+              "offset": 21
             }
           }
         },
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
+          "type": "NameExpression",
+          "name": "string"
         }
       },
       {
         "title": "property",
-        "name": "ideal",
-        "lineNumber": 15,
+        "name": "groupId",
+        "lineNumber": 6,
         "description": {
           "type": "root",
           "children": [
@@ -60070,7 +59756,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The ideal value for the constraint. Other values will be considered if necessary.",
+                  "value": "The group ID of the device. Devices that share a ",
                   "position": {
                     "start": {
                       "line": 1,
@@ -60079,8 +59765,42 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 82,
-                      "offset": 81
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "groupId",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " belong to the same physical device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 95,
+                      "offset": 94
                     },
                     "indent": []
                   }
@@ -60094,8 +59814,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 82,
-                  "offset": 81
+                  "column": 95,
+                  "offset": 94
                 },
                 "indent": []
               }
@@ -60109,17 +59829,136 @@
             },
             "end": {
               "line": 1,
-              "column": 82,
-              "offset": 81
+              "column": 95,
+              "offset": 94
             }
           }
         },
         "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "kind",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The type of the device (audioinput, audiooutput, videoinput).",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 62,
+                      "offset": 61
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 62,
+                  "offset": 61
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 62,
+              "offset": 61
+            }
           }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "label",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The name of the device.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
         }
       }
     ],
@@ -60128,12 +59967,8 @@
     "throws": [],
     "todos": [],
     "access": "public",
-    "kind": "typedef",
-    "name": "MediaConstraint",
-    "type": {
-      "type": "NameExpression",
-      "name": "Object"
-    },
+    "kind": "module",
+    "name": "DeviceInfo",
     "members": {
       "global": [],
       "inner": [],
@@ -60143,11 +59978,11 @@
     },
     "path": [
       {
-        "name": "MediaConstraint",
-        "kind": "typedef"
+        "name": "DeviceInfo",
+        "kind": "module"
       }
     ],
-    "namespace": "MediaConstraint"
+    "namespace": "DeviceInfo"
   },
   {
     "description": {
@@ -61427,7 +61262,7 @@
           "children": [
             {
               "type": "text",
-              "value": "A collection of media devices and their information.",
+              "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
               "position": {
                 "start": {
                   "line": 1,
@@ -61435,9 +61270,115 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
+                  "line": 2,
+                  "column": 12,
+                  "offset": 86
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "exact",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 12,
+                  "offset": 86
+                },
+                "end": {
+                  "line": 2,
+                  "column": 19,
+                  "offset": 93
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " or ",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 19,
+                  "offset": 93
+                },
+                "end": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 97
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "ideal",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 97
+                },
+                "end": {
+                  "line": 2,
+                  "column": 30,
+                  "offset": 104
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " property should be provided. If both are present, the\n   ",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 30,
+                  "offset": 104
+                },
+                "end": {
+                  "line": 3,
+                  "column": 4,
+                  "offset": 162
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "exact",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 4,
+                  "offset": 162
+                },
+                "end": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 169
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value will be used.",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 169
+                },
+                "end": {
+                  "line": 3,
+                  "column": 31,
+                  "offset": 189
                 },
                 "indent": []
               }
@@ -61450,11 +61391,160 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 53,
-              "offset": 52
+              "line": 3,
+              "column": 31,
+              "offset": 189
             },
-            "indent": []
+            "indent": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "When the ",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 191
+                },
+                "end": {
+                  "line": 5,
+                  "column": 10,
+                  "offset": 200
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "exact",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 10,
+                  "offset": 200
+                },
+                "end": {
+                  "line": 5,
+                  "column": 17,
+                  "offset": 207
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 17,
+                  "offset": 207
+                },
+                "end": {
+                  "line": 6,
+                  "column": 69,
+                  "offset": 348
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 191
+            },
+            "end": {
+              "line": 6,
+              "column": 69,
+              "offset": 348
+            },
+            "indent": [
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "When the ",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 1,
+                  "offset": 350
+                },
+                "end": {
+                  "line": 8,
+                  "column": 10,
+                  "offset": 359
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "ideal",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 10,
+                  "offset": 359
+                },
+                "end": {
+                  "line": 8,
+                  "column": 17,
+                  "offset": 366
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 17,
+                  "offset": 366
+                },
+                "end": {
+                  "line": 9,
+                  "column": 76,
+                  "offset": 520
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 8,
+              "column": 1,
+              "offset": 350
+            },
+            "end": {
+              "line": 9,
+              "column": 76,
+              "offset": 520
+            },
+            "indent": [
+              1
+            ]
           }
         }
       ],
@@ -61465,9 +61555,9 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 53,
-          "offset": 52
+          "line": 9,
+          "column": 76,
+          "offset": 520
         }
       }
     },
@@ -61475,81 +61565,65 @@
       {
         "title": "public",
         "description": null,
-        "lineNumber": 3,
+        "lineNumber": 11,
         "type": null
       },
       {
         "title": "module",
         "description": null,
-        "lineNumber": 4,
+        "lineNumber": 12,
         "type": null,
-        "name": "DevicesObject"
+        "name": "MediaConstraint"
+      },
+      {
+        "title": "typedef",
+        "description": null,
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "MediaConstraint"
       },
       {
         "title": "property",
-        "description": "A list of camera device information.",
-        "lineNumber": 5,
+        "description": "The required value for the constraint. Other values will not be accepted.",
+        "lineNumber": 14,
         "type": {
-          "type": "TypeApplication",
+          "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+            "name": "string"
+          }
         },
-        "name": "camera"
+        "name": "exact"
       },
       {
         "title": "property",
-        "description": "A list of microphone device information.",
-        "lineNumber": 6,
+        "description": "The ideal value for the constraint. Other values will be considered if necessary.",
+        "lineNumber": 15,
         "type": {
-          "type": "TypeApplication",
+          "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
+            "name": "string"
+          }
         },
-        "name": "microphone"
+        "name": "ideal"
       },
       {
-        "title": "property",
-        "description": "A list of speaker device information.",
-        "lineNumber": 7,
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        },
-        "name": "speaker"
+        "title": "example",
+        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
+        "lineNumber": 16
       }
     ],
     "loc": {
       "start": {
-        "line": 162,
+        "line": 58,
         "column": 0
       },
       "end": {
-        "line": 170,
+        "line": 85,
         "column": 3
       }
     },
@@ -61567,13 +61641,17 @@
       "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
-    "examples": [],
+    "examples": [
+      {
+        "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
+      }
+    ],
     "params": [],
     "properties": [
       {
         "title": "property",
-        "name": "camera",
-        "lineNumber": 5,
+        "name": "exact",
+        "lineNumber": 14,
         "description": {
           "type": "root",
           "children": [
@@ -61582,7 +61660,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "A list of camera device information.",
+                  "value": "The required value for the constraint. Other values will not be accepted.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -61591,8 +61669,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 37,
-                      "offset": 36
+                      "column": 74,
+                      "offset": 73
                     },
                     "indent": []
                   }
@@ -61606,8 +61684,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 37,
-                  "offset": 36
+                  "column": 74,
+                  "offset": 73
                 },
                 "indent": []
               }
@@ -61621,649 +61699,8 @@
             },
             "end": {
               "line": 1,
-              "column": 37,
-              "offset": 36
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "microphone",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of microphone device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      },
-      {
-        "title": "property",
-        "name": "speaker",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "A list of speaker device information.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 38,
-                      "offset": 37
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 38,
-                  "offset": 37
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 38,
-              "offset": 37
-            }
-          }
-        },
-        "type": {
-          "type": "TypeApplication",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Array"
-          },
-          "applications": [
-            {
-              "type": "NameExpression",
-              "name": "DeviceInfo"
-            }
-          ]
-        }
-      }
-    ],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "access": "public",
-    "kind": "module",
-    "name": "DevicesObject",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "DevicesObject",
-        "kind": "module"
-      }
-    ],
-    "namespace": "DevicesObject"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 115,
-                  "offset": 114
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 115,
-              "offset": 114
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 115,
-          "offset": 114
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "property",
-        "description": "The payload type. Can be `text`, `json`, or `file`.",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "type"
-      },
-      {
-        "title": "property",
-        "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "text"
-      },
-      {
-        "title": "property",
-        "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
-        "lineNumber": 5,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        },
-        "name": "json"
-      },
-      {
-        "title": "property",
-        "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
-        "lineNumber": 6,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "File"
-          }
-        },
-        "name": "file"
-      },
-      {
-        "title": "public",
-        "description": null,
-        "lineNumber": 8,
-        "type": null
-      },
-      {
-        "title": "module",
-        "description": null,
-        "lineNumber": 9,
-        "type": null,
-        "name": "Part"
-      },
-      {
-        "title": "type",
-        "description": null,
-        "lineNumber": 10,
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 26,
-        "column": 0
-      },
-      "end": {
-        "line": 37,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 80,
-          "column": 0
-        },
-        "end": {
-          "line": 80,
-          "column": 42
-        }
-      },
-      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [
-      {
-        "title": "property",
-        "name": "type",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The payload type. Can be ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 26,
-                      "offset": 25
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "text",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 26,
-                      "offset": 25
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 32,
-                      "offset": 31
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": ", ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 32,
-                      "offset": 31
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "json",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 40,
-                      "offset": 39
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": ", or ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 40,
-                      "offset": 39
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 45,
-                      "offset": 44
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 45,
-                      "offset": 44
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 51,
-                      "offset": 50
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": ".",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 51,
-                      "offset": 50
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 52,
-                      "offset": 51
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 52,
-                  "offset": 51
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 52,
-              "offset": 51
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "text",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 114,
-                      "offset": 113
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 114,
-                  "offset": 113
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 114,
-              "offset": 113
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "property",
-        "name": "json",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The object corresponding to a json object to attach to a message. A ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 69,
-                      "offset": 68
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "Part",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 69,
-                      "offset": 68
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 75,
-                      "offset": 74
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " cannot have both json and a file.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 75,
-                      "offset": 74
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 109,
-                      "offset": 108
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 109,
-                  "offset": 108
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 109,
-              "offset": 108
+              "column": 74,
+              "offset": 73
             }
           }
         },
@@ -62271,14 +61708,14 @@
           "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "Object"
+            "name": "string"
           }
         }
       },
       {
         "title": "property",
-        "name": "file",
-        "lineNumber": 6,
+        "name": "ideal",
+        "lineNumber": 15,
         "description": {
           "type": "root",
           "children": [
@@ -62287,7 +61724,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The file to attach to a message. A ",
+                  "value": "The ideal value for the constraint. Other values will be considered if necessary.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -62296,42 +61733,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 36,
-                      "offset": 35
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "Part",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 36,
-                      "offset": 35
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " cannot have both json and a file.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 76,
-                      "offset": 75
+                      "column": 82,
+                      "offset": 81
                     },
                     "indent": []
                   }
@@ -62345,8 +61748,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 76,
-                  "offset": 75
+                  "column": 82,
+                  "offset": 81
                 },
                 "indent": []
               }
@@ -62360,8 +61763,8 @@
             },
             "end": {
               "line": 1,
-              "column": 76,
-              "offset": 75
+              "column": 82,
+              "offset": 81
             }
           }
         },
@@ -62369,7 +61772,7 @@
           "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "File"
+            "name": "string"
           }
         }
       }
@@ -62379,8 +61782,12 @@
     "throws": [],
     "todos": [],
     "access": "public",
-    "kind": "module",
-    "name": "Part",
+    "kind": "typedef",
+    "name": "MediaConstraint",
+    "type": {
+      "type": "NameExpression",
+      "name": "Object"
+    },
     "members": {
       "global": [],
       "inner": [],
@@ -62390,11 +61797,11 @@
     },
     "path": [
       {
-        "name": "Part",
-        "kind": "module"
+        "name": "MediaConstraint",
+        "kind": "typedef"
       }
     ],
-    "namespace": "Part"
+    "namespace": "MediaConstraint"
   },
   {
     "description": {
@@ -63220,6 +62627,599 @@
       }
     ],
     "namespace": "MessageSender"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 115,
+                  "offset": 114
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 115,
+              "offset": 114
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 115,
+          "offset": 114
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "property",
+        "description": "The payload type. Can be `text`, `json`, or `file`.",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "type"
+      },
+      {
+        "title": "property",
+        "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "text"
+      },
+      {
+        "title": "property",
+        "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
+        "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        },
+        "name": "json"
+      },
+      {
+        "title": "property",
+        "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "File"
+          }
+        },
+        "name": "file"
+      },
+      {
+        "title": "public",
+        "description": null,
+        "lineNumber": 8,
+        "type": null
+      },
+      {
+        "title": "module",
+        "description": null,
+        "lineNumber": 9,
+        "type": null,
+        "name": "Part"
+      },
+      {
+        "title": "type",
+        "description": null,
+        "lineNumber": 10,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 26,
+        "column": 0
+      },
+      "end": {
+        "line": 37,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 80,
+          "column": 0
+        },
+        "end": {
+          "line": 80,
+          "column": 42
+        }
+      },
+      "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [
+      {
+        "title": "property",
+        "name": "type",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The payload type. Can be ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "text",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 32,
+                      "offset": 31
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ", ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 32,
+                      "offset": 31
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "json",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ", or ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ".",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 52,
+                      "offset": 51
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 52,
+                  "offset": 51
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "text",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 114,
+                      "offset": 113
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 114,
+                  "offset": 113
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 114,
+              "offset": 113
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "property",
+        "name": "json",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The object corresponding to a json object to attach to a message. A ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 69,
+                      "offset": 68
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "Part",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 69,
+                      "offset": 68
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 75,
+                      "offset": 74
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " cannot have both json and a file.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 75,
+                      "offset": 74
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 109,
+                      "offset": 108
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 109,
+                  "offset": 108
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 109,
+              "offset": 108
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        }
+      },
+      {
+        "title": "property",
+        "name": "file",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The file to attach to a message. A ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "Part",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " cannot have both json and a file.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 76,
+                      "offset": 75
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 76,
+                  "offset": 75
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 76,
+              "offset": 75
+            }
+          }
+        },
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "File"
+          }
+        }
+      }
+    ],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "access": "public",
+    "kind": "module",
+    "name": "Part",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "Part",
+        "kind": "module"
+      }
+    ],
+    "namespace": "Part"
   },
   {
     "description": {

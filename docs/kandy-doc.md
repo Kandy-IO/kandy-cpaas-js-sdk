@@ -1372,96 +1372,9 @@ Will trigger the `contacts:change` event.
 
 -   `contactId` **[string][2]** The unique contact ID of the contact.
 
-## config
-
-The configuration object. This object defines what different configuration
-values you can use when instantiating the SDK.
-
-### config.logs
-
-Configuration options for the Logs feature.
-
-**Parameters**
-
--   `logs` **[Object][5]** Logs configs.
-    -   `logs.logLevel` **[string][2]** Log level to be set. See [levels][77]. (optional, default `'debug'`)
-    -   `logs.flatten` **[boolean][13]** Whether all logs should be output in a string-only format. (optional, default `false`)
-    -   `logs.logActions` **[Object][5]?** Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
-        -   `logs.logActions.actionOnly` **[boolean][13]** Only output information about the action itself. Omits the SDK context for when it occurred. (optional, default `true`)
-        -   `logs.logActions.collapsed` **[boolean][13]** Whether logs should be minimized when initially output. The full log is still output and can be inspected on the console. (optional, default `false`)
-        -   `logs.logActions.diff` **[boolean][13]** Include a diff of what SDK context was changed by the action. (optional, default `false`)
-        -   `logs.logActions.exposePayloads` **[boolean][13]** Allow action payloads to be exposed in the logs, potentially displaying sensitive information (optional, default `false`)
-    -   `logs.enableFcsLogs` **[boolean][13]** Enable the detailed call logger. (optional, default `true`)
-    -   `logs.enableGrouping` **[boolean][13]** Whether to group information about an action log together in the console. (optional, default `true`)
-
-### config.authentication
-
-Configuration options for the Authentication feature.
-
-**Parameters**
-
--   `authentication` **[Object][5]** Authentication configs.
-    -   `authentication.server` **[Object][5]** Information for how to reach the platform.
-        -   `authentication.server.base` **[string][2]** Server to be used for requests.
-        -   `authentication.server.protocol` **[string][2]** Protocol to be used for requests. (optional, default `https`)
-        -   `authentication.server.port` **[Number][21]** Port to be used for requests. (optional, default `443`)
-        -   `authentication.server.version` **[string][2]** Version of the REST API to be used. (optional, default `v1`)
-    -   `authentication.clientCorrelator` **[string][2]** Unique ID for the client. This is required by the platform to identify an instance of the application used by the specific device.
-
-### config.call
-
-Configuration options for the call feature.
-
-**Parameters**
-
--   `call` **[Object][5]** The call configuration object.
-    -   `call.sdpSemantics` **[string][2]** The sdpSemantics to use (`'unified-plan'` or `'plan-b'`). (optional, default `'unified-plan'`)
-    -   `call.iceServers` **[Array][19]&lt;[IceServer][78]>?** The list of ICE servers to be used for calls.
-    -   `call.serverTurnCredentials` **[boolean][13]** Whether server-provided TURN credentials should be used. (optional, default `true`)
-    -   `call.sdpHandlers` **[Array][19]&lt;[SdpHandlerFunction][79]>?** List of SDP handler functions to modify SDP. Advanced usage.
-    -   `call.removeH264Codecs` **[boolean][13]** Whether to remove "H264" codec lines from incoming and outgoing SDP messages. (optional, default `true`)
-
-### config.connectivity
-
-Configuration options for the Connectivity feature.
-
-**Parameters**
-
--   `connectivity` **[Object][5]** Connectivity configs.
-    -   `connectivity.method` **[Object][5]** Configuration for how connectivity checks should be made.
-        -   `connectivity.method.type` **[String][2]** The method of connectivity checking to use: `keepAlive` or `pingPong`. (optional, default `'keepAlive'`)
-        -   `connectivity.method.responsibleParty` **[String][2]** Configures who is responsible for initiating the connectivity check: `client` or `server`. (optional, default `'client'`)
-    -   `connectivity.pingInterval` **[Number][21]** Time in between websocket ping attempts (milliseconds). Only used for when the client is responsible for ping/connCheck. (optional, default `30000`)
-    -   `connectivity.reconnectLimit` **[Number][21]** Number of failed reconnect attempts before reporting an error. Can be set to 0 to not limit reconnection attempts. (optional, default `5`)
-    -   `connectivity.reconnectDelay` **[Number][21]** Base time between websocket reconnect attempts (milliseconds). (optional, default `5000`)
-    -   `connectivity.reconnectTimeMultiplier` **[Number][21]** Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this factor after each failed reconnect attempt to increase the delay between attempts. (optional, default `1`)
-    -   `connectivity.reconnectTimeLimit` **[Number][21]** Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts. (optional, default `640000`)
-    -   `connectivity.autoReconnect` **[Boolean][13]** Flag to determine whether reconnection will be attempted automatically after connectivity disruptions. (optional, default `true`)
-    -   `connectivity.maxMissedPings` **[Number][21]** Maximum pings sent (without receiving a response) before reporting an error. (optional, default `3`)
-    -   `connectivity.checkConnectivity` **[Boolean][13]** Flag to determine whether to enable connectivity checking or not. (optional, default `false`)
-
-### config.notifications
-
-Configuration options for the notification feature.
-
-**Parameters**
-
--   `notifications` **[Object][5]** The notifications configuration object.
-    -   `notifications.idCacheLength` **[number][21]** Default amount of event ids to remember for de-duplication purposes. (optional, default `100`)
-
-### config.subscription
-
-Configuration options for the Subscription feature.
-
-**Parameters**
-
--   `subscription` **[Object][5]** Subscription configs.
-    -   `subscription.channelLifetime` **[number][21]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
-    -   `subscription.timeout` **[number][21]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
-
 ## sdpHandlers
 
-A set of [SdpHandlerFunction][80]s for manipulating SDP information.
+A set of [SdpHandlerFunction][77]s for manipulating SDP information.
 These handlers are used to customize low-level call behaviour for very specific
 environments and/or scenarios. They can be provided during SDK instantiation
 to be used for all calls.
@@ -1503,7 +1416,94 @@ const client = create({
 })
 ```
 
-Returns **[SdpHandlerFunction][79]** The resulting SDP handler that will remove the codec.
+Returns **[SdpHandlerFunction][78]** The resulting SDP handler that will remove the codec.
+
+## config
+
+The configuration object. This object defines what different configuration
+values you can use when instantiating the SDK.
+
+### config.logs
+
+Configuration options for the Logs feature.
+
+**Parameters**
+
+-   `logs` **[Object][5]** Logs configs.
+    -   `logs.logLevel` **[string][2]** Log level to be set. See [levels][79]. (optional, default `'debug'`)
+    -   `logs.flatten` **[boolean][13]** Whether all logs should be output in a string-only format. (optional, default `false`)
+    -   `logs.logActions` **[Object][5]?** Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
+        -   `logs.logActions.actionOnly` **[boolean][13]** Only output information about the action itself. Omits the SDK context for when it occurred. (optional, default `true`)
+        -   `logs.logActions.collapsed` **[boolean][13]** Whether logs should be minimized when initially output. The full log is still output and can be inspected on the console. (optional, default `false`)
+        -   `logs.logActions.diff` **[boolean][13]** Include a diff of what SDK context was changed by the action. (optional, default `false`)
+        -   `logs.logActions.exposePayloads` **[boolean][13]** Allow action payloads to be exposed in the logs, potentially displaying sensitive information (optional, default `false`)
+    -   `logs.enableFcsLogs` **[boolean][13]** Enable the detailed call logger. (optional, default `true`)
+    -   `logs.enableGrouping` **[boolean][13]** Whether to group information about an action log together in the console. (optional, default `true`)
+
+### config.authentication
+
+Configuration options for the Authentication feature.
+
+**Parameters**
+
+-   `authentication` **[Object][5]** Authentication configs.
+    -   `authentication.server` **[Object][5]** Information for how to reach the platform.
+        -   `authentication.server.base` **[string][2]** Server to be used for requests.
+        -   `authentication.server.protocol` **[string][2]** Protocol to be used for requests. (optional, default `https`)
+        -   `authentication.server.port` **[Number][21]** Port to be used for requests. (optional, default `443`)
+        -   `authentication.server.version` **[string][2]** Version of the REST API to be used. (optional, default `v1`)
+    -   `authentication.clientCorrelator` **[string][2]** Unique ID for the client. This is required by the platform to identify an instance of the application used by the specific device.
+
+### config.call
+
+Configuration options for the call feature.
+
+**Parameters**
+
+-   `call` **[Object][5]** The call configuration object.
+    -   `call.sdpSemantics` **[string][2]** The sdpSemantics to use (`'unified-plan'` or `'plan-b'`). (optional, default `'unified-plan'`)
+    -   `call.iceServers` **[Array][19]&lt;[IceServer][80]>?** The list of ICE servers to be used for calls.
+    -   `call.serverTurnCredentials` **[boolean][13]** Whether server-provided TURN credentials should be used. (optional, default `true`)
+    -   `call.sdpHandlers` **[Array][19]&lt;[SdpHandlerFunction][78]>?** List of SDP handler functions to modify SDP. Advanced usage.
+    -   `call.removeH264Codecs` **[boolean][13]** Whether to remove "H264" codec lines from incoming and outgoing SDP messages. (optional, default `true`)
+
+### config.connectivity
+
+Configuration options for the Connectivity feature.
+
+**Parameters**
+
+-   `connectivity` **[Object][5]** Connectivity configs.
+    -   `connectivity.method` **[Object][5]** Configuration for how connectivity checks should be made.
+        -   `connectivity.method.type` **[String][2]** The method of connectivity checking to use: `keepAlive` or `pingPong`. (optional, default `'keepAlive'`)
+        -   `connectivity.method.responsibleParty` **[String][2]** Configures who is responsible for initiating the connectivity check: `client` or `server`. (optional, default `'client'`)
+    -   `connectivity.pingInterval` **[Number][21]** Time in between websocket ping attempts (milliseconds). Only used for when the client is responsible for ping/connCheck. (optional, default `30000`)
+    -   `connectivity.reconnectLimit` **[Number][21]** Number of failed reconnect attempts before reporting an error. Can be set to 0 to not limit reconnection attempts. (optional, default `5`)
+    -   `connectivity.reconnectDelay` **[Number][21]** Base time between websocket reconnect attempts (milliseconds). (optional, default `5000`)
+    -   `connectivity.reconnectTimeMultiplier` **[Number][21]** Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this factor after each failed reconnect attempt to increase the delay between attempts. (optional, default `1`)
+    -   `connectivity.reconnectTimeLimit` **[Number][21]** Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts. (optional, default `640000`)
+    -   `connectivity.autoReconnect` **[Boolean][13]** Flag to determine whether reconnection will be attempted automatically after connectivity disruptions. (optional, default `true`)
+    -   `connectivity.maxMissedPings` **[Number][21]** Maximum pings sent (without receiving a response) before reporting an error. (optional, default `3`)
+    -   `connectivity.checkConnectivity` **[Boolean][13]** Flag to determine whether to enable connectivity checking or not. (optional, default `false`)
+
+### config.notifications
+
+Configuration options for the notification feature.
+
+**Parameters**
+
+-   `notifications` **[Object][5]** The notifications configuration object.
+    -   `notifications.idCacheLength` **[number][21]** Default amount of event ids to remember for de-duplication purposes. (optional, default `100`)
+
+### config.subscription
+
+Configuration options for the Subscription feature.
+
+**Parameters**
+
+-   `subscription` **[Object][5]** Subscription configs.
+    -   `subscription.channelLifetime` **[number][21]** The amount of time (in seconds) for which to keep subscription channels up and alive. (optional, default `3600`)
+    -   `subscription.timeout` **[number][21]** The amount of time (in seconds) allowed for the subscription/unsubscription process to take place before timing out. (optional, default `20`)
 
 ## Logger
 
@@ -1564,6 +1564,16 @@ log(`Browser in use: ${details.browser}, version ${details.version}.`)
 
 Returns **[Object][5]** Object containing `browser` and `version` information.
 
+## DevicesObject
+
+A collection of media devices and their information.
+
+**Properties**
+
+-   `camera` **[Array][19]&lt;[DeviceInfo][83]>** A list of camera device information.
+-   `microphone` **[Array][19]&lt;[DeviceInfo][83]>** A list of microphone device information.
+-   `speaker` **[Array][19]&lt;[DeviceInfo][83]>** A list of speaker device information.
+
 ## TrackObject
 
 A Track is a stream of audio or video media from a single source.
@@ -1579,17 +1589,6 @@ Tracks can be retrieved using the Media module's `getTrackById` API and manipula
 -   `muted` **[boolean][13]** Indicator on whether this Track is muted or not.
 -   `state` **[string][2]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][2]** The ID of the Media Stream that includes this Track.
-
-## DeviceInfo
-
-Contains information about a device.
-
-**Properties**
-
--   `deviceId` **[string][2]** The ID of the device.
--   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][2]** The name of the device.
 
 ## MediaObject
 
@@ -1613,7 +1612,7 @@ Type: [Function][3]
 **Parameters**
 
 -   `newSdp` **[Object][5]** The SDP so far (could have been modified by previous handlers).
--   `info` **[SdpHandlerInfo][83]** Additional information that might be useful when making SDP modifications.
+-   `info` **[SdpHandlerInfo][84]** Additional information that might be useful when making SDP modifications.
 -   `originalSdp` **[Object][5]** The SDP in its initial state.
 
 Returns **[Object][5]** The resulting modified SDP based on the changes made by this function.
@@ -1661,6 +1660,40 @@ client.call.make(destination, mediaConstraints,
 )
 ```
 
+## DeviceInfo
+
+Contains information about a device.
+
+**Properties**
+
+-   `deviceId` **[string][2]** The ID of the device.
+-   `groupId` **[string][2]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][2]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][2]** The name of the device.
+
+## CallObject
+
+Information about a Call.
+
+Can be retrieved using the [call.getAll][25] or
+   [call.getById][8] APIs.
+
+**Properties**
+
+-   `id` **[string][2]** The ID of the call.
+-   `direction` **[string][2]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+-   `state` **[string][2]** The current state of the call. See [call.states][85] for possible states.
+-   `localHold` **[boolean][13]** Indicates whether this call is currently being held locally.
+-   `remoteHold` **[boolean][13]** Indicates whether this call is currently being held remotely.
+-   `localTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
+-   `remoteTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][5]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][2]?** The User ID of the remote participant in the form "username@domain".
+    -   `remoteParticipant.displayName` **[string][2]?** The display name of the remote participant.
+-   `bandwidth` **[BandwidthControls][15]** The bandwidth limitations set for the call.
+-   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
+-   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
+
 ## MediaConstraint
 
 The MediaConstraint type defines the format for configuring media options.
@@ -1695,50 +1728,6 @@ client.call.make(destination, {
 })
 ```
 
-## CallObject
-
-Information about a Call.
-
-Can be retrieved using the [call.getAll][25] or
-   [call.getById][8] APIs.
-
-**Properties**
-
--   `id` **[string][2]** The ID of the call.
--   `direction` **[string][2]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
--   `state` **[string][2]** The current state of the call. See [call.states][84] for possible states.
--   `localHold` **[boolean][13]** Indicates whether this call is currently being held locally.
--   `remoteHold` **[boolean][13]** Indicates whether this call is currently being held remotely.
--   `localTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is sending to the remote participant.
--   `remoteTracks` **[Array][19]&lt;[string][2]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][5]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][2]?** The User ID of the remote participant in the form "username@domain".
-    -   `remoteParticipant.displayName` **[string][2]?** The display name of the remote participant.
--   `bandwidth` **[BandwidthControls][15]** The bandwidth limitations set for the call.
--   `startTime` **[number][21]** The start time of the call in milliseconds since the epoch.
--   `endTime` **[number][21]?** The end time of the call in milliseconds since the epoch.
-
-## DevicesObject
-
-A collection of media devices and their information.
-
-**Properties**
-
--   `camera` **[Array][19]&lt;[DeviceInfo][85]>** A list of camera device information.
--   `microphone` **[Array][19]&lt;[DeviceInfo][85]>** A list of microphone device information.
--   `speaker` **[Array][19]&lt;[DeviceInfo][85]>** A list of speaker device information.
-
-## Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-**Properties**
-
--   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
-
 ## MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1763,6 +1752,17 @@ Add an additional `Part` to a message.
 ### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
+
+## Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+**Properties**
+
+-   `type` **[string][2]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][2]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][5]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## Subscription
 
@@ -2026,23 +2026,23 @@ The Phone Numer ie: +18885559876
 
 [76]: Users.getAll
 
-[77]: #loggerlevels
+[77]: #sdphandlerfunction
 
-[78]: #iceserver
+[78]: #sdphandlerfunction
 
-[79]: #sdphandlerfunction
+[79]: #loggerlevels
 
-[80]: #sdphandlerfunction
+[80]: #iceserver
 
 [81]: #configconfiglogs
 
 [82]: #config
 
-[83]: #sdphandlerinfo
+[83]: #deviceinfo
 
-[84]: #callsstates
+[84]: #sdphandlerinfo
 
-[85]: #deviceinfo
+[85]: #callsstates
 
 [86]: #messagesenderaddpart
 
