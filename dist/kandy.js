@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.8.0-beta.142
+ * Version: 4.8.0-beta.143
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -24174,14 +24174,20 @@ callReducers[actionTypes.ANSWER_CALL_FINISH] = {
     //    at the answer step.
     const webrtcId = action.payload.webrtcSessionId || state.webrtcSessionId;
 
-    return (0, _extends3.default)({}, state, {
+    const newState = (0, _extends3.default)({}, state, {
       state: action.payload.state,
       mediaConstraints: action.payload.mediaConstraints,
       webrtcSessionId: webrtcId,
       localHold: false,
       remoteHold: false,
       bandwidth: action.payload.bandwidth
-    });
+
+      // Add start time to the call's state here if the call is not a slowstart call
+    });if (action.meta && !action.meta.isSlowStart) {
+      newState.startTime = action.payload.startTime;
+    }
+
+    return newState;
   },
   throw(state, action) {
     return (0, _extends3.default)({}, state, action.payload);
@@ -32873,7 +32879,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.8.0-beta.142';
+  let version = '4.8.0-beta.143';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
