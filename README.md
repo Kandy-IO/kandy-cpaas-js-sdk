@@ -14,8 +14,8 @@ To install a particular build branch or beta branch with the Github URL, run:
 
 ### In the browser :
 ```html
-<script src="https://unpkg.com/@kandy-io/cpaas-sdk@4.7.0/dist/kandy.js"
-  integrity="sha384-9TVtD3tUCPheObO8TLJ0ToLkSgW8ThQqMztBNqqBm8hE3vd9StOz8nL0q2wK0Vx3"
+<script src="https://unpkg.com/@kandy-io/cpaas-sdk@4.8.0/dist/kandy.js"
+  integrity="sha384-XBJrSkn3rozlAAFGhwcb9jcGdXg1/bEZttRuxtjoUUVvSujvo6hB374H4LILWpTv"
   crossorigin="anonymous">
 </script>
 ```
@@ -25,4 +25,4 @@ The information about tutorials and documents can be found in the links below
 
 * `Documents`: [docs](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs)
 
-* `Tutorials`:  [Get Started](https://Kandy-IO.github.io/kandy-cpaas-js-sdk/tutorials/?KANDY=Kandy&KANDYFQDN=oauth-cpaas.att.com#/Get%20Started)
+* `Tutorials`: [Get Started](https://Kandy-IO.github.io/kandy-cpaas-js-sdk/tutorials/?KANDY=Kandy&KANDYFQDN=oauth-cpaas.att.com#/Get%20Started)

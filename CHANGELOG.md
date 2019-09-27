@@ -5,6 +5,14 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.8.0 - 2019-09-27
+
+### Fixed
+
+- Fixed an issue in Chrome plan-b where hold operation will not fire a `call:trackEnded` event and will fire it during the unhold operation. `KAA-1942`
+- Fixed the ordering and nesting of types & namespaces in public documentation. `KAA-1880`
+- Fixed an issue where local call logs were reporting a duration of 0 for all incoming calls. `KAA-1794`
+
 ## 4.7.0 - 2019-08-30
 
 ### Fixed
