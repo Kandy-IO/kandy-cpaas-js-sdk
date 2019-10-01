@@ -224,21 +224,15 @@
                       </a></li>
                     
                       <li><a
-                        href='#callsmediaconstraint'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> MediaConstraint
-                      </a></li>
-                    
-                      <li><a
                         href='#callsmediaobject'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> MediaObject
                       </a></li>
                     
                       <li><a
-                        href='#callsbandwidthcontrols'
+                        href='#callssdphandlerinfo'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> BandwidthControls
+                        <span style="color:blue">ⓣ</span> SdpHandlerInfo
                       </a></li>
                     
                       <li><a
@@ -248,15 +242,21 @@
                       </a></li>
                     
                       <li><a
-                        href='#callscallobject'
+                        href='#callsbandwidthcontrols'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> CallObject
+                        <span style="color:blue">ⓣ</span> BandwidthControls
                       </a></li>
                     
                       <li><a
-                        href='#callssdphandlerinfo'
+                        href='#callsmediaconstraint'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> SdpHandlerInfo
+                        <span style="color:blue">ⓣ</span> MediaConstraint
+                      </a></li>
+                    
+                      <li><a
+                        href='#callscallobject'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> CallObject
                       </a></li>
                     
                       <li><a
@@ -921,15 +921,9 @@
                       </a></li>
                     
                       <li><a
-                        href='#messagingmessage'
+                        href='#messagingconversation'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> Message
-                      </a></li>
-                    
-                      <li><a
-                        href='#messagingmessagesender'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> MessageSender
+                        <span style="color:blue">ⓣ</span> Conversation
                       </a></li>
                     
                       <li><a
@@ -939,9 +933,15 @@
                       </a></li>
                     
                       <li><a
-                        href='#messagingconversation'
+                        href='#messagingmessagesender'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> Conversation
+                        <span style="color:blue">ⓣ</span> MessageSender
+                      </a></li>
+                    
+                      <li><a
+                        href='#messagingmessage'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> Message
                       </a></li>
                     
                     </ul>
@@ -3371,113 +3371,6 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
       </div>
     </div>
   
-    <div class='border-bottom' id='callsmediaconstraint'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>MediaConstraint</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>The MediaConstraint type defines the format for configuring media options.
-Either the <code>exact</code> or <code>ideal</code> property should be provided. If both are present, the
-<code>exact</code> value will be used.</p>
-<p>When the <code>exact</code> value is provided, it will be the only value considered for the option.
-If it cannot be used, the constraint will be considered an error.</p>
-<p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
-If it cannot be used, the closest acceptable value will be used instead.</p>
-
-
-  <div class='pre p1 fill-light mt0'>MediaConstraint</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>exact</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
-          </code>
-
-          
-
-          
-             : The required value for the constraint. Other values will not be accepted.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>ideal</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
-          </code>
-
-          
-
-          
-             : The ideal value for the constraint. Other values will be considered if necessary.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify video resolution when making a call.</span>
-client.call.make(destination, {
-   <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">videoOptions</span>: {
-     <span class="hljs-comment">// Set height and width constraints to ideally be 1280x720.</span>
-     height: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">720</span> },
-     <span class="hljs-attr">width</span>: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">1280</span> }
-   }
-})</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='callsmediaobject'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -3556,6 +3449,176 @@ Media is a collection of Track objects.</p>
 
           
              : A list of Track objects that are contained in this Media object.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callssdphandlerinfo'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>SdpHandlerInfo</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (RTCSdpType)
+          </code>
+
+          
+
+          
+             : The session description's type.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>endpoint</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : Which end of the connection created the SDP.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callsiceserver'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>IceServer</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>IceServer</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>urls</span> 
+          <code class='quiet'>
+            ((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))
+          </code>
+
+          
+
+          
+             : Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>credential</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
+          </code>
+
+          
+
+          
+             : The credential needed by the ICE server.
 
           
           
@@ -3680,11 +3743,11 @@ client.call.make(destination, mediaConstraints,
       </div>
     </div>
   
-    <div class='border-bottom' id='callsiceserver'>
+    <div class='border-bottom' id='callsmediaconstraint'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>IceServer</span>
+            <span class='code strong strong truncate'>MediaConstraint</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3692,9 +3755,16 @@ client.call.make(destination, mediaConstraints,
 
   
 
-  
+  <p>The MediaConstraint type defines the format for configuring media options.
+Either the <code>exact</code> or <code>ideal</code> property should be provided. If both are present, the
+<code>exact</code> value will be used.</p>
+<p>When the <code>exact</code> value is provided, it will be the only value considered for the option.
+If it cannot be used, the constraint will be considered an error.</p>
+<p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
+If it cannot be used, the closest acceptable value will be used instead.</p>
 
-  <div class='pre p1 fill-light mt0'>IceServer</div>
+
+  <div class='pre p1 fill-light mt0'>MediaConstraint</div>
   
     <p>
       Type:
@@ -3717,22 +3787,7 @@ client.call.make(destination, mediaConstraints,
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>urls</span> 
-          <code class='quiet'>
-            ((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))
-          </code>
-
-          
-
-          
-             : Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>credential</span> 
+          <span class='code bold'>exact</span> 
           <code class='quiet'>
             (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
           </code>
@@ -3740,7 +3795,22 @@ client.call.make(destination, mediaConstraints,
           
 
           
-             : The credential needed by the ICE server.
+             : The required value for the constraint. Other values will not be accepted.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>ideal</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
+          </code>
+
+          
+
+          
+             : The ideal value for the constraint. Other values will be considered if necessary.
 
           
           
@@ -3753,6 +3823,21 @@ client.call.make(destination, mediaConstraints,
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify video resolution when making a call.</span>
+client.call.make(destination, {
+   <span class="hljs-attr">audio</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">videoOptions</span>: {
+     <span class="hljs-comment">// Set height and width constraints to ideally be 1280x720.</span>
+     height: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">720</span> },
+     <span class="hljs-attr">width</span>: { <span class="hljs-attr">ideal</span>: <span class="hljs-number">1280</span> }
+   }
+})</pre>
+    
   
 
   
@@ -3980,91 +4065,6 @@ client.call.make(destination, mediaConstraints,
 
           
              : The end time of the call in milliseconds since the epoch.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='callssdphandlerinfo'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>SdpHandlerInfo</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (RTCSdpType)
-          </code>
-
-          
-
-          
-             : The session description's type.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>endpoint</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : Which end of the connection created the SDP.
 
           
           
@@ -11492,535 +11492,6 @@ client.conversation.fetch({<span class="hljs-attr">type</span>: client.conversat
       </div>
     </div>
   
-    <div class='border-bottom' id='messagingmessage'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>Message</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the <a href="#conversationgetmessages">Conversation.getMessages</a> or <a href="#conversationgetmessage">Conversation.getMessage</a> API on an existing conversation.</p>
-<p>Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.</p>
-<p>Once the sender sends a message, this message is saved in sender's state as an object.</p>
-<p>Similarly, once the recipient gets a message, this message is saved in recipient's state.</p>
-<p>Below are the properties pertaining to this saved message object in either sender or recipient's state.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Message</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>timestamp</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
-          </code>
-
-          
-
-          
-             : A Unix timestamp in seconds marking the time when the message was created by sender.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>isPending</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Whether the message is in pending state or not (delivered by server or not).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>read</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Whether the message was read by recipient user or not.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>parts</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Part>)
-          </code>
-
-          
-
-          
-             : An array of Part Objects.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>sender</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The primary contact address of the sender.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>messageId</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The unique id of the message. The message object (stored in sender's state) has a different id
-than the one associated with the message object stored in recipient's state.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The type of message that was sent. See 
-<a href="#messagingchattypes">chatTypes</a>
- for valid types.
-This property applies only to message objects stored in sender's state.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deliveryStatus</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
-This property applies only to the message object stored in sender's state.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='messagingmessagesender'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>MessageSender</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Message sender object is a means by which a sender can deliver information to a recipient.</p>
-<p>This sender object can be obtained through the <a href="#conversationcreatemessage">conversation.createMessage</a> API on an existing conversation.</p>
-<p>Once all the desired parts have been added to it using the <a href="#messagesenderaddpart">MessageSender.addPart</a>,
-the message can then be sent using the send function.</p>
-
-
-  <div class='pre p1 fill-light mt0'>MessageSender</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-    
-      <div class='py1 quiet mt1 prose-big'>Functions</div>
-      <div class="clearfix">
-  
-    <div class='border-bottom' id='messagingmessagesendersend'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>send()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Sends the message.</p>
-
-
-  <div class='pre p1 fill-light mt0'>send()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='messagingmessagesenderaddpart'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>addPart(part)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Add an additional <code>Part</code> to a message.</p>
-
-
-  <div class='pre p1 fill-light mt0'>addPart(part: Part)</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>part</span> <code class='quiet'>(Part)</code>
-	    The 
-<code>Part</code>
- to add to the message.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='messagingmessagesendercreateimagelinks'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createImageLinks()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Creates a usable image link for the message in this <code>MessageSender</code>.</p>
-
-
-  <div class='pre p1 fill-light mt0'>createImageLinks()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-</div>
-
-    
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='messagingpart'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>Part</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Part</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The payload type. Can be 
-<code>text</code>
-, 
-<code>json</code>
-, or 
-<code>file</code>
-.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>text</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>json</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
-          </code>
-
-          
-
-          
-             : The object corresponding to a json object to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>file</span> 
-          <code class='quiet'>
-            (File?)
-          </code>
-
-          
-
-          
-             : The file to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='messagingconversation'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -12779,6 +12250,535 @@ Other participants will be notified of changes to the conversation's typing stat
 </div>
 
     
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='messagingpart'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Part</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Part</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The payload type. Can be 
+<code>text</code>
+, 
+<code>json</code>
+, or 
+<code>file</code>
+.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>text</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>json</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
+          </code>
+
+          
+
+          
+             : The object corresponding to a json object to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>file</span> 
+          <code class='quiet'>
+            (File?)
+          </code>
+
+          
+
+          
+             : The file to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='messagingmessagesender'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>MessageSender</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Message sender object is a means by which a sender can deliver information to a recipient.</p>
+<p>This sender object can be obtained through the <a href="#conversationcreatemessage">conversation.createMessage</a> API on an existing conversation.</p>
+<p>Once all the desired parts have been added to it using the <a href="#messagesenderaddpart">MessageSender.addPart</a>,
+the message can then be sent using the send function.</p>
+
+
+  <div class='pre p1 fill-light mt0'>MessageSender</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+    
+      <div class='py1 quiet mt1 prose-big'>Functions</div>
+      <div class="clearfix">
+  
+    <div class='border-bottom' id='messagingmessagesendersend'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>send()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Sends the message.</p>
+
+
+  <div class='pre p1 fill-light mt0'>send()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='messagingmessagesenderaddpart'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>addPart(part)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Add an additional <code>Part</code> to a message.</p>
+
+
+  <div class='pre p1 fill-light mt0'>addPart(part: Part)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>part</span> <code class='quiet'>(Part)</code>
+	    The 
+<code>Part</code>
+ to add to the message.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='messagingmessagesendercreateimagelinks'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>createImageLinks()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Creates a usable image link for the message in this <code>MessageSender</code>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>createImageLinks()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+    
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='messagingmessage'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Message</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Message object represents an individual message that was delivered to a recipient and it is
+obtained through the <a href="#conversationgetmessages">Conversation.getMessages</a> or <a href="#conversationgetmessage">Conversation.getMessage</a> API on an existing conversation.</p>
+<p>Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.</p>
+<p>Once the sender sends a message, this message is saved in sender's state as an object.</p>
+<p>Similarly, once the recipient gets a message, this message is saved in recipient's state.</p>
+<p>Below are the properties pertaining to this saved message object in either sender or recipient's state.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Message</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>timestamp</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : A Unix timestamp in seconds marking the time when the message was created by sender.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>isPending</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Whether the message is in pending state or not (delivered by server or not).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>read</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Whether the message was read by recipient user or not.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>parts</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Part>)
+          </code>
+
+          
+
+          
+             : An array of Part Objects.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>sender</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The primary contact address of the sender.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>messageId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The unique id of the message. The message object (stored in sender's state) has a different id
+than the one associated with the message object stored in recipient's state.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The type of message that was sent. See 
+<a href="#messagingchattypes">chatTypes</a>
+ for valid types.
+This property applies only to message objects stored in sender's state.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deliveryStatus</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
+This property applies only to the message object stored in sender's state.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
   
 
   
