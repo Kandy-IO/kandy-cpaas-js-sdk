@@ -199,44 +199,14 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### SdpHandlerFunction
-
-The form of an SDP handler function and the expected arguments that it receives.
-
-Type: [Function][10]
-
-**Parameters**
-
--   `newSdp` **[Object][3]** The SDP so far (could have been modified by previous handlers).
--   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][3]** The SDP in its initial state.
-
-Returns **[Object][3]** The resulting modified SDP based on the changes made by this function.
-
-### DeviceInfo
-
-Contains information about a device.
+### IceServer
 
 Type: [Object][3]
 
 **Properties**
 
--   `deviceId` **[string][4]** The ID of the device.
--   `groupId` **[string][4]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][4]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][4]** The name of the device.
-
-### DevicesObject
-
-A collection of media devices and their information.
-
-Type: [Object][3]
-
-**Properties**
-
--   `camera` **[Array][8]&lt;DeviceInfo>** A list of camera device information.
--   `microphone` **[Array][8]&lt;DeviceInfo>** A list of microphone device information.
--   `speaker` **[Array][8]&lt;DeviceInfo>** A list of speaker device information.
+-   `urls` **([Array][8]&lt;[string][4]> | [string][4])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+-   `credential` **[string][4]?** The credential needed by the ICE server.
 
 ### TrackObject
 
@@ -269,24 +239,6 @@ Type: [Object][3]
 -   `local` **[boolean][6]** Indicator on whether this media is local or remote.
 -   `tracks` **[Array][8]&lt;TrackObject>** A list of Track objects that are contained in this Media object.
 
-### SdpHandlerInfo
-
-Type: [Object][3]
-
-**Properties**
-
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][4]** Which end of the connection created the SDP.
-
-### IceServer
-
-Type: [Object][3]
-
-**Properties**
-
--   `urls` **([Array][8]&lt;[string][4]> | [string][4])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
--   `credential` **[string][4]?** The credential needed by the ICE server.
-
 ### BandwidthControls
 
 The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
@@ -311,6 +263,54 @@ client.call.make(destination, mediaConstraints,
  }
 )
 ```
+
+### SdpHandlerFunction
+
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][10]
+
+**Parameters**
+
+-   `newSdp` **[Object][3]** The SDP so far (could have been modified by previous handlers).
+-   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][3]** The SDP in its initial state.
+
+Returns **[Object][3]** The resulting modified SDP based on the changes made by this function.
+
+### SdpHandlerInfo
+
+Type: [Object][3]
+
+**Properties**
+
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][4]** Which end of the connection created the SDP.
+
+### DevicesObject
+
+A collection of media devices and their information.
+
+Type: [Object][3]
+
+**Properties**
+
+-   `camera` **[Array][8]&lt;DeviceInfo>** A list of camera device information.
+-   `microphone` **[Array][8]&lt;DeviceInfo>** A list of microphone device information.
+-   `speaker` **[Array][8]&lt;DeviceInfo>** A list of speaker device information.
+
+### DeviceInfo
+
+Contains information about a device.
+
+Type: [Object][3]
+
+**Properties**
+
+-   `deviceId` **[string][4]** The ID of the device.
+-   `groupId` **[string][4]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][4]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][4]** The name of the device.
 
 ### MediaConstraint
 
@@ -1355,6 +1355,19 @@ Type: [Object][3]
 client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
 ```
 
+### Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+Type: [Object][3]
+
+**Properties**
+
+-   `type` **[string][4]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][4]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][3]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
 ### Conversation
 
 A Conversation object represents a conversation either between two users, or between a
@@ -1470,50 +1483,10 @@ If successful, the event [isTypingList:change][55] will be emitted.
 
 -   `isTyping` **[boolean][6]** Whether the user is typing or not
 
-### Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-Type: [Object][3]
-
-**Properties**
-
--   `type` **[string][4]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][4]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][3]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
-
-### MessageSender
-
-A Message sender object is a means by which a sender can deliver information to a recipient.
-
-This sender object can be obtained through the [conversation.createMessage][51] API on an existing conversation.
-
-Once all the desired parts have been added to it using the [MessageSender.addPart][56],
-the message can then be sent using the send function.
-
-Type: [Object][3]
-
-#### send
-
-Sends the message.
-
-#### addPart
-
-Add an additional `Part` to a message.
-
-**Parameters**
-
--   `part` **Part** The `Part` to add to the message.
-
-#### createImageLinks
-
-Creates a usable image link for the message in this `MessageSender`.
-
 ### Message
 
 A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the [Conversation.getMessages][54] or [Conversation.getMessage][57] API on an existing conversation.
+obtained through the [Conversation.getMessages][54] or [Conversation.getMessage][56] API on an existing conversation.
 
 Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
 
@@ -1538,6 +1511,33 @@ Type: [Object][3]
     This property applies only to message objects stored in sender's state.
 -   `deliveryStatus` **[string][4]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
     This property applies only to the message object stored in sender's state.
+
+### MessageSender
+
+A Message sender object is a means by which a sender can deliver information to a recipient.
+
+This sender object can be obtained through the [conversation.createMessage][51] API on an existing conversation.
+
+Once all the desired parts have been added to it using the [MessageSender.addPart][57],
+the message can then be sent using the send function.
+
+Type: [Object][3]
+
+#### send
+
+Sends the message.
+
+#### addPart
+
+Add an additional `Part` to a message.
+
+**Parameters**
+
+-   `part` **Part** The `Part` to add to the message.
+
+#### createImageLinks
+
+Creates a usable image link for the message in this `MessageSender`.
 
 ## Presence
 
@@ -2012,9 +2012,9 @@ Type: [string][4]
 
 [55]: #messagingeventistypinglistchange
 
-[56]: #messagesenderaddpart
+[56]: #conversationgetmessage
 
-[57]: #conversationgetmessage
+[57]: #messagesenderaddpart
 
 [58]: #presencefetch
 
