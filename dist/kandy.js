@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.8.0-beta.150
+ * Version: 4.9.0-beta.151
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20327,6 +20327,7 @@ const FCS_CALL_STATES = exports.FCS_CALL_STATES = {
 const CALL_STATES = exports.CALL_STATES = {
   INITIATING: 'Initiating',
   INITIATED: 'Initiated',
+  EARLY_MEDIA: 'Early Media',
   RINGING: 'Ringing',
   CANCELLED: 'Cancelled',
   CONNECTED: 'Connected',
@@ -21983,6 +21984,7 @@ const MAKE_ANONYMOUS_CALL = exports.MAKE_ANONYMOUS_CALL = callPrefix + 'MAKE_ANO
 const CALL_INCOMING = exports.CALL_INCOMING = callPrefix + 'INCOMING';
 
 const CALL_RINGING = exports.CALL_RINGING = callPrefix + 'RINGING';
+const SESSION_PROGRESS = exports.SESSION_PROGRESS = callPrefix + 'SESSION_PROGRESS';
 const CALL_CANCELLED = exports.CALL_CANCELLED = callPrefix + 'CANCELLED';
 
 const CALL_AUDIT = exports.CALL_AUDIT = callPrefix + 'AUDIT';
@@ -22094,6 +22096,7 @@ exports.makeCallFinish = makeCallFinish;
 exports.makeAnonymousCall = makeAnonymousCall;
 exports.callIncoming = callIncoming;
 exports.callRinging = callRinging;
+exports.sessionProgress = sessionProgress;
 exports.callCancelled = callCancelled;
 exports.sendCallAudit = sendCallAudit;
 exports.answerCall = answerCall;
@@ -22215,6 +22218,10 @@ function callIncoming(id, params) {
 
 function callRinging(id, params) {
   return callActionHelper(actionTypes.CALL_RINGING, id, params);
+}
+
+function sessionProgress(id, params) {
+  return callActionHelper(actionTypes.SESSION_PROGRESS, id, params);
 }
 
 function callCancelled(id, params) {
@@ -22516,6 +22523,8 @@ function callAPI({ dispatch, getState }) {
      * The {@link Calls.getById call.getById} API can be used to retrieve the
      *    current information about the call.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:start call:start} event
      *    locally when the operation completes. When the remote participant
      *    receives the call, a {@link Calls.event:call:receive call:receive}
@@ -22569,6 +22578,8 @@ function callAPI({ dispatch, getState }) {
      * The {@link Calls.getCallById call.getById} API can be used to retrieve
      *    the current information about the call.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:start call:start} event
      *    locally when the operation completes. When the remote participant
      *    receives the call, a {@link Calls.event:call:receive call:receive}
@@ -22589,11 +22600,16 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.screen=false] Whether the call should have screenshare on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {MediaConstraint} [media.screenOptions.height] The height of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.width] The width of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @param {string} [options.displayName] Custom display name to be provided to the destination. Not supported in all environments and may use default display name.
@@ -22613,12 +22629,14 @@ function callAPI({ dispatch, getState }) {
      */
     make(destination, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.make: ', destination, media, options);
+
       const callId = (0, _v2.default)();
       const from = (0, _selectors2.getUserInfo)(getState()).username;
 
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
-        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
+        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video,
+        screenShare: media.screen && !(0, _fp.isEmpty)(media.screenOptions) ? media.screenOptions : media.screen
       };
 
       const config = (0, _selectors.getOptions)(getState());
@@ -22643,6 +22661,8 @@ function callAPI({ dispatch, getState }) {
      * The specified call to reject must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. The remote participant
      *    will be notified, through their own
@@ -22665,6 +22685,8 @@ function callAPI({ dispatch, getState }) {
      *
      * The specified call to answer must be in a ringing state with an incoming
      *    direction. The call will become connected as a result of the operation.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. This indicates that the
@@ -22690,19 +22712,26 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.screen=false] Whether the call should have screenshare on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {MediaConstraint} [media.screenOptions.height] The height of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.width] The width of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
     answer(callId, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
+
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
-        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
+        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video,
+        screenShare: media.screen && !(0, _fp.isEmpty)(media.screenOptions) ? media.screenOptions : media.screen
       };
 
       dispatch(_actions.callActions.answerCall(callId, (0, _extends3.default)({
@@ -22715,6 +22744,8 @@ function callAPI({ dispatch, getState }) {
      *
      * The specified call to ignore must be in a ringing state with an incoming
      *    direction. The call will be ended as a result of the operation.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. The remote participant
@@ -22742,6 +22773,8 @@ function callAPI({ dispatch, getState }) {
      * Some call operations cannot be performed while the call is on hold. The
      *    call can be taken off hold with the {@link Calls.unhold call.unhold} API.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. The remote participant
      *    will be notified of the operation through a
@@ -22765,6 +22798,8 @@ function callAPI({ dispatch, getState }) {
      * The specified call to unhold must be locally held. If the call is not
      *    also remotely held, call media will be reconnected as it was before
      *    the call was held.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. The remote participant
@@ -22828,6 +22863,8 @@ function callAPI({ dispatch, getState }) {
      *    {@link Calls.event:call:trackEnded call:trackEnded} event for more
      *    information.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:stateChange call:stateChange}
      *    event locally when the operation completes. The remote participant
      *    will be notified, through their own
@@ -22850,6 +22887,8 @@ function callAPI({ dispatch, getState }) {
      * Add new media tracks to an ongoing call.
      * Will get new media tracks from the specific sources to add to the call.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Calls.event:call:newTrack call:newTrack} event
      *    both for the local and remote users to indicate a track has been
      *    added to the Call.
@@ -22865,11 +22904,16 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
      * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether to add video to the call.
+     * @param {boolean} [media.screen=false] Whether to add the screenshare to the call.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
      * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
      * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {MediaConstraint} [media.screenOptions.height] The height of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.width] The width of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
      * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
@@ -22877,7 +22921,8 @@ function callAPI({ dispatch, getState }) {
       log.debug(_logs.API_LOG_TAG + 'call.addMedia: ', callId, media);
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
-        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
+        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video,
+        screenShare: media.screen && !(0, _fp.isEmpty)(media.screenOptions) ? media.screenOptions : media.screen
       };
 
       dispatch(_actions.callActions.addMedia(callId, (0, _extends3.default)({ mediaConstraints }, options)));
@@ -22885,6 +22930,8 @@ function callAPI({ dispatch, getState }) {
 
     /**
      * Remove tracks from an ongoing call.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a {@link Calls.event:call:trackEnded call:trackEnded}
      *    event for both the local and remote users to indicate that a track
@@ -22912,11 +22959,14 @@ function callAPI({ dispatch, getState }) {
      *    sequence of DTMF tones (eg. '123') which will be played one after the
      *    other.
      *
-     * The specified call must be either in Connected or Ringing state,
-     *    otherwise invoking this API will have no effect.
+     * The specified call must be either in Connected, Ringing, or Early Media
+     *    state, otherwise invoking this API will have no effect.
      *
      * The tones will be sent as out-of-band tones if supported by the call,
      *    otherwise they will be added in-band to the call's audio.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * @public
      * @static
      * @memberof call
@@ -22939,6 +22989,8 @@ function callAPI({ dispatch, getState }) {
      *
      * A Track ID can optionally be provided to get a report for a specific
      *    Track of the Call.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a
      *    {@link Calls.event:call:statsReceived call:statsReceived} event, after
@@ -22963,6 +23015,8 @@ function callAPI({ dispatch, getState }) {
      * The specified destination will receive the Call instead of the current
      *    user.
      *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
+     *
      * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
      *    event after the operation completes.
      *
@@ -22980,6 +23034,8 @@ function callAPI({ dispatch, getState }) {
      *
      * The specified destination will receive the Call instead of the current
      *    user.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a {@link Call.event:call:stateChange call:stateChange}
      *    event after the operation completes.
@@ -23008,10 +23064,20 @@ function callAPI({ dispatch, getState }) {
      *    transfer the remote participant of a call to another user, after
      *    having spoken to both users.
      *
-     * Both calls used for the transfer must be locally held. Both remote
-     *    participants will see their call be unheld, and will be connected to
-     *    one another after the operation. Both calls for the current user will
-     *    be ended.
+     * Both calls used for the transfer must be locally held. After the
+     *    operation, these calls will be ended, as indicated by a
+     *    {@link Calls.event:call:stateChange call:stateChange} event.
+     *
+     * Both remote participants will see their call be unheld by the operation,
+     *    as indicated by a
+     *    {@link Calls.event:call:stateChange call:stateChange} event, and will
+     *    be connected to one another afterwards.
+     *
+     * The progression of the operation will be tracked via the
+     *    {@link Calls.event:call:operation call:operation} event. Both local
+     *    calls will receive this event, since it is an operation on both calls,
+     *    and the remote calls will receive it as if it were a "remote unhold"
+     *    operation.
      * @public
      * @static
      * @memberof call
@@ -23030,10 +23096,18 @@ function callAPI({ dispatch, getState }) {
      *    participant of a call to another user, similar to a "forward"
      *    operation.
      *
-     * The specified call must be locally held. The "destination" user will
-     *    receive an incoming call, and when answered, they will be connected
-     *    with the remote participant of the specified call. The current user's
-     *    call will be ended after the operation.
+     * The specified call must be locally held. After the operation, this call
+     *    will be ended, as indicated by a
+     *    {@link Calls.event:call:stateChange call:stateChange} event.
+     *
+     * The "destination" user will receive an incoming call, and when answered,
+     *    they will be connected with the remote participant of the specified
+     *    call.
+     *
+     * The progression of the operation will be tracked via the
+     *    {@link Calls.event:call:operation call:operation} event. The remote
+     *    participant being transferred will receive it as if it were a "remote
+     *    unhold" operation.
      * @public
      * @static
      * @memberof call
@@ -23049,10 +23123,18 @@ function callAPI({ dispatch, getState }) {
      *    participant of a call to another user, similar to a "forward"
      *    operation.
      *
-     * The specified call must be locally held. The "destination" user will
-     *    receive an incoming call, and when answered, they will be connected
-     *    with the remote participant of the specified call. The current user's
-     *    call will be ended after the operation.
+     * The specified call must be locally held. After the operation, this call
+     *    will be ended, as indicated by a
+     *    {@link Calls.event:call:stateChange call:stateChange} event.
+     *
+     * The "destination" user will receive an incoming call, and when answered,
+     *    they will be connected with the remote participant of the specified
+     *    call.
+     *
+     * The progression of the operation will be tracked via the
+     *    {@link Calls.event:call:operation call:operation} event. The remote
+     *    participant being transferred will receive it as if it were a "remote
+     *    unhold" operation.
      * @public
      * @static
      * @memberof call
@@ -23077,12 +23159,18 @@ function callAPI({ dispatch, getState }) {
      * This allows the current user to establish a call with audio with two
      *    remote users.
      *
-     * Both specified calls must be locally held. The "joined" call will be
+     * Both specified calls must be locally held. The new, "joined" call will be
      *    audio-only, even if either previous call had video. Video cannot be
      *    added to the "joined" call. Both remote participants will see their
      *    call taken off hold, and will receive additional audio from other
-     *    participants after the operation. Both calls for the current user will
-     *    be ended after the operation.
+     *    participants after the operation. Both previous calls for the current
+     *    user will be ended after the operation, as indicated by a
+     *    {@link Calls.event:call:stateChange call:stateChange} event.
+     *
+     * The progress of the operation will be tracked via the
+     *    {@link Calls.event:call:operation call:operation} event. Both remote
+     *    participants will also receive this event as if it were a "remote
+     *    unhold" operation.
      * @public
      * @static
      * @memberof call
@@ -23103,6 +23191,8 @@ function callAPI({ dispatch, getState }) {
      * The operation will remove the old track from the call and add a
      *    new track to the call. This effectively allows for changing the
      *    track constraints (eg. device used) for an ongoing call.
+     *
+     * The progress of the operation will be tracked via the {@link Calls.event:call:operation call:operation} event.
      *
      * The SDK will emit a
      *    {@link Calls.event:call:trackReplaced call:trackReplaced} event
@@ -23177,6 +23267,10 @@ function callAPI({ dispatch, getState }) {
      * @property {string} INITIATING The (outgoing) call is being started.
      * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received.
      * @property {string} RINGING The call has been received by both parties, and is waiting to be answered.
+     * @property {string} EARLY_MEDIA The call has not been answered, but media
+     *    is already being received. This may be network-ringing media, IVR
+     *    system media, or other pre-answer medias. When early media is
+     *    supported, this state may replace the Ringing state.
      * @property {string} CANCELLED The call was disconnected before it could be answered.
      * @property {string} CONNECTED Both parties are connected and media is flowing.
      * @property {string} ON_HOLD Both parties are connected but no media is flowing.
@@ -23453,6 +23547,7 @@ const OPERATIONS = exports.OPERATIONS = {
   UNHOLD: 'UNHOLD',
   ADD_MEDIA: 'ADD_MEDIA',
   REMOVE_MEDIA: 'REMOVE_MEDIA',
+  GET_STATS: 'GET_STATS',
   SEND_DTMF: 'SEND_DTMF',
   CONSULTATIVE_TRANSFER: 'CONSULTATIVE_TRANSFER',
   DIRECT_TRANSFER: 'DIRECT_TRANSFER',
@@ -23500,6 +23595,35 @@ const OPERATIONS = exports.OPERATIONS = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+/**
+ * A call operation has either started, been updated, or finished.
+ *
+ * Information about ongoing call operations are stored with the call
+ *    information (see the {@link Calls.getById call.getById} API). This event
+ *    indicates that an operation's information has been changed.
+ *
+ * Local call operations will be tracked from start to finish. An operation may
+ *    be updated as it progresses, based on the status of the operation. The
+ *    operation status may be ongoing or pending, depending if the operation is
+ *    waiting on activity on the local or remote end of the call, respectively.
+ *
+ * Except in the case of slow-start operations, remote operations will only be
+ *    tracked as a "finish", to indicate that it occurred.
+ * @public
+ * @memberof Calls
+ * @event call:operation
+ * @param {Object} params
+ * @param {string} params.operation The call operation causing this event.
+ * @param {string} params.transition The transition reason for the operation change.
+ * @param {boolean} params.isLocal Flag indicating whether the operation was local or not.
+ * @param {Object} [params.previous] The operation information before this change.
+ *    If the transition is to "start" the operation, there will be no previous information.
+ * @param {string} [params.previous.operation] The operation that was ongoing.
+ * @param {string} [params.previous.status] The operation status before this change.
+ * @param {BasicError} [params.error] An error object, if the operation was not successful.
+ */
+const CALL_OPERATION = exports.CALL_OPERATION = 'call:operation';
+
 /**
  * An outgoing call has been started.
  *
@@ -23550,7 +23674,6 @@ const CALL_JOIN = exports.CALL_JOIN = 'call:join';
  */
 const CALL_INCOMING = exports.CALL_INCOMING = 'call:receive';
 
-// TODO: Add a property in event params that indicates the operation that caused the state change.
 /**
  * A Call's state has changed.
  *
@@ -23714,11 +23837,15 @@ var _actionTypes = __webpack_require__("../kandy/src/call/interfaceNew/actionTyp
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
+var _constants = __webpack_require__("../kandy/src/call/interfaceNew/constants.js");
+
 var _actionTypes2 = __webpack_require__("../kandy/src/webrtc/interface/actionTypes.js");
 
 var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
 
 var _selectors = __webpack_require__("../kandy/src/call/interfaceNew/selectors.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -23734,7 +23861,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// Webrtc plugin.
+// Helpers
 // Call plugin.
 function callEventHandler(type, action, params = {}) {
   /**
@@ -23763,7 +23890,7 @@ function callEventHandler(type, action, params = {}) {
  */
 
 
-// Helpers
+// Webrtc plugin.
 function stateChangeHandler(action, params) {
   // Get the call state before this action updated state.
   const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
@@ -23779,18 +23906,199 @@ function stateChangeHandler(action, params) {
   });
 }
 
-const callEvents = exports.callEvents = {};
+/**
+ * Helper function for converting an action to a "call operation" event.
+ * Ensures that all such events have consistent parameters.
+ * @method callOperationHandler
+ * @param {Object} action
+ * @param {Object} params
+ * @param {Object} params.prevState The SDK state before this action updated state.
+ * @param {string} params.operation The currently occurring operation.
+ * @param {string} params.transition The transition reason for the operation change.
+ * @param {string} params.isLocal Flag indicating whether the operation is local or not.
+ * @param {Object} [any] Additional data provided depending on the operation.
+ * @return {Object} An event object.
+ */
+function callOperationHandler(action, params) {
+  // Get the call state before this action updated state.
+  const prevCall = (0, _selectors.getCallById)(params.prevState, action.payload.id);
+  let previous;
 
-callEvents[actionTypes.PENDING_MAKE_CALL] = action => {
-  return callEventHandler(eventTypes.CALL_STARTED, action, {
+  if (prevCall) {
+    previous = params.isLocal ? prevCall.localOp : prevCall.remoteOp;
+  }
+
+  return callEventHandler(eventTypes.CALL_OPERATION, action, {
+    // operation params
+    operation: params.operation,
+    transition: params.transition,
+    isLocal: params.isLocal,
+    // previous operation state data
+    previous,
+    // error
     error: action.payload.error
   });
+}
+
+const callEvents = exports.callEvents = {};
+
+// START actions
+const startActionTypesAndOperations = [{ type: actionTypes.MAKE_CALL, operation: _constants.OPERATIONS.MAKE }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
+  callEvents[startActionTypeAndOperation.type] = (action, params) => {
+    return callOperationHandler(action, (0, _extends3.default)({}, params, {
+      operation: startActionTypeAndOperation.operation,
+      transition: _constants.OP_TRANSITIONS.START,
+      isLocal: true
+    }));
+  };
+});
+
+// PENDING acitons
+callEvents[actionTypes.PENDING_MAKE_CALL] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.MAKE,
+    transition: _constants.OP_TRANSITIONS.UPDATE,
+    isLocal: true
+  })), callEventHandler(eventTypes.CALL_STARTED, action, {
+    error: action.payload.error
+  })];
 };
 
-callEvents[actionTypes.PENDING_JOIN] = action => {
-  return callEventHandler(eventTypes.CALL_JOIN, action);
+callEvents[actionTypes.PENDING_OPERATION] = (action, params) => {
+  return callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: action.payload.operation,
+    transition: _constants.OP_TRANSITIONS.UPDATE,
+    isLocal: true
+  }));
 };
 
+callEvents[actionTypes.PENDING_CONSULTATIVE_TRANSFER] = (action, params) => {
+  const otherCallAction = (0, _fp.cloneDeep)(action);
+  otherCallAction.payload.id = action.payload.otherCallId;
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER,
+    transition: _constants.OP_TRANSITIONS.UPDATE,
+    isLocal: true
+  })), callOperationHandler(otherCallAction, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER,
+    transition: _constants.OP_TRANSITIONS.UPDATE,
+    isLocal: true
+  }))];
+};
+
+callEvents[actionTypes.PENDING_JOIN] = (action, params) => {
+  const operationEvents = action.payload.usedCallIds.map(callId => {
+    const newAction = (0, _fp.cloneDeep)(action);
+    newAction.payload.id = callId;
+    return callOperationHandler(newAction, (0, _extends3.default)({}, params, {
+      operation: _constants.OPERATIONS.JOIN,
+      transition: _constants.OP_TRANSITIONS.UPDATE,
+      isLocal: true
+    }));
+  });
+  operationEvents.push(callEventHandler(eventTypes.CALL_JOIN, action));
+  return operationEvents;
+};
+
+// FINISH actions
+const finishActionTypesAndData = [{ type: actionTypes.MAKE_CALL_FINISH, operation: _constants.OPERATIONS.MAKE, isLocal: true }, { type: actionTypes.CALL_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: true }, { type: actionTypes.CALL_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: true }, { type: actionTypes.CALL_REMOTE_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: false }, { type: actionTypes.CALL_REMOTE_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: false }, { type: actionTypes.REJECT_CALL_FINISH, operation: _constants.OPERATIONS.REJECT, isLocal: true }, { type: actionTypes.IGNORE_CALL_FINISH, operation: _constants.OPERATIONS.IGNORE, isLocal: true }, { type: actionTypes.DIRECT_TRANSFER_FINISH, operation: _constants.OPERATIONS.DIRECT_TRANSFER, isLocal: true }, { type: actionTypes.CONSULTATIVE_TRANSFER_FINISH, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER, isLocal: true }, { type: actionTypes.JOIN_FINISH, operation: _constants.OPERATIONS.JOIN, isLocal: true }, { type: actionTypes.FORWARD_CALL_FINISH, operation: _constants.OPERATIONS.FORWARD_CALL, isLocal: true }];
+finishActionTypesAndData.forEach(finichActionTypeAndData => {
+  callEvents[finichActionTypeAndData.type] = (action, params) => {
+    return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+      operation: finichActionTypeAndData.operation,
+      isLocal: finichActionTypeAndData.isLocal,
+      transition: _constants.OP_TRANSITIONS.FINISH
+    })), stateChangeHandler(action, params)];
+  };
+});
+
+callEvents[actionTypes.END_CALL_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.END,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: action.payload.isLocal
+  })), stateChangeHandler(action, params)];
+};
+
+callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
+  const events = [];
+  // Emit Call Operation Event
+  events.push(callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.ANSWER,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  })));
+
+  // Don't emit a stateChange event if it was a slow start answer. The call isn't actually
+  //    answered yet, so state hasn't changed.
+  // TODO: Don't have this in meta?
+  if (action.meta && action.meta.isSlowStart) {
+    return events;
+  }
+
+  events.push(stateChangeHandler(action, params));
+  return events;
+};
+
+callEvents[actionTypes.ADD_MEDIA_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.ADD_MEDIA,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: action.payload.local
+  })), callEventHandler(eventTypes.CALL_ADDED_MEDIA, action, {
+    local: action.payload.local,
+    tracks: action.payload.tracks,
+    mediaId: action.payload.mediaId,
+    error: action.payload.error
+  })];
+};
+
+callEvents[actionTypes.REMOVE_MEDIA_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.REMOVE_MEDIA,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: action.payload.local
+  })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
+    local: action.payload.local,
+    tracks: action.payload.tracks,
+    error: action.payload.error
+  })];
+};
+
+callEvents[actionTypes.GET_STATS_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.GET_STATS,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  })), callEventHandler(eventTypes.STATS_RECEIVED, action, {
+    result: action.payload.result,
+    error: action.payload.error,
+    trackId: action.payload.trackId
+  })];
+};
+
+callEvents[actionTypes.REPLACE_TRACK_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.REPLACE_TRACK,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  })), callEventHandler(eventTypes.CALL_TRACK_REPLACED, action, {
+    error: action.payload.error,
+    newTrackId: action.payload.newTrackId,
+    oldTrack: action.payload.oldTrackState
+  })];
+};
+
+callEvents[actionTypes.SEND_DTMF_FINISH] = (action, params) => {
+  return callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.SEND_DTMF,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  }));
+};
+
+// other actions
 callEvents[actionTypes.CALL_INCOMING] = action => {
   return callEventHandler(eventTypes.CALL_INCOMING, action, {
     error: action.payload.error
@@ -23798,59 +24106,11 @@ callEvents[actionTypes.CALL_INCOMING] = action => {
 };
 
 callEvents[actionTypes.CALL_RINGING] = stateChangeHandler;
+callEvents[actionTypes.SESSION_PROGRESS] = stateChangeHandler;
 callEvents[actionTypes.CALL_CANCELLED] = stateChangeHandler;
-
-callEvents[actionTypes.ANSWER_CALL_FINISH] = (action, params) => {
-  // Don't emit an event if it was a slow start answer. The call isn't actually
-  //    answered yet, so state hasn't changed.
-  // TODO: Don't have this in meta?
-  if (action.meta && action.meta.isSlowStart) {
-    return;
-  }
-
-  return stateChangeHandler(action, params);
-};
-
 callEvents[actionTypes.CALL_ACCEPTED] = stateChangeHandler;
-callEvents[actionTypes.MAKE_CALL_FINISH] = stateChangeHandler;
-callEvents[actionTypes.IGNORE_CALL_FINISH] = stateChangeHandler;
-callEvents[actionTypes.END_CALL_FINISH] = stateChangeHandler;
-callEvents[actionTypes.DIRECT_TRANSFER_FINISH] = stateChangeHandler;
-callEvents[actionTypes.CONSULTATIVE_TRANSFER_FINISH] = stateChangeHandler;
-callEvents[actionTypes.REJECT_CALL_FINISH] = stateChangeHandler;
-callEvents[actionTypes.CALL_HOLD_FINISH] = stateChangeHandler;
-callEvents[actionTypes.CALL_UNHOLD_FINISH] = stateChangeHandler;
-callEvents[actionTypes.CALL_REMOTE_HOLD_FINISH] = stateChangeHandler;
-callEvents[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = stateChangeHandler;
-callEvents[actionTypes.FORWARD_CALL_FINISH] = stateChangeHandler;
-
 // TODO: Have a proper event for this since UPDATE_CALL does not change the call's state property.
 callEvents[actionTypes.UPDATE_CALL] = stateChangeHandler;
-
-callEvents[actionTypes.ADD_MEDIA_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_ADDED_MEDIA, action, {
-    local: action.payload.local,
-    tracks: action.payload.tracks,
-    mediaId: action.payload.mediaId,
-    error: action.payload.error
-  });
-};
-
-callEvents[actionTypes.REMOVE_MEDIA_FINISH] = action => {
-  return callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
-    local: action.payload.local,
-    tracks: action.payload.tracks,
-    error: action.payload.error
-  });
-};
-
-callEvents[actionTypes.GET_STATS_FINISH] = action => {
-  return callEventHandler(eventTypes.STATS_RECEIVED, action, {
-    result: action.payload.result,
-    error: action.payload.error,
-    trackId: action.payload.trackId
-  });
-};
 
 callEvents[webrtcActionTypes.SESSION_NEW_TRACK] = (action, context) => {
   const state = context.state;
@@ -23864,14 +24124,6 @@ callEvents[webrtcActionTypes.SESSION_NEW_TRACK] = (action, context) => {
     }));
   }
   return null;
-};
-
-callEvents[actionTypes.REPLACE_TRACK_FINISH] = (action, context) => {
-  return callEventHandler(eventTypes.CALL_TRACK_REPLACED, action, {
-    error: action.payload.error,
-    newTrackId: action.payload.newTrackId,
-    oldTrack: action.payload.oldTrackState
-  });
 };
 
 callEvents[webrtcActionTypes.SESSION_TRACK_ENDED] = (action, context) => {
@@ -24056,6 +24308,16 @@ callReducers[actionTypes.CALL_RINGING] = {
   }
 };
 
+// Handle Early Media the same as Ringing, just with a different state.
+callReducers[actionTypes.SESSION_PROGRESS] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      state: _constants.CALL_STATES.EARLY_MEDIA,
+      remoteParticipant: action.payload.remoteParticipant
+    });
+  }
+};
+
 /*
  * Call-tier reducers.
  * Receive a single call's state as state.
@@ -24084,6 +24346,8 @@ callReducers[actionTypes.REPLACE_TRACK_FINISH] = noop;
 callReducers[actionTypes.REMOTE_SLOW_START] = noop;
 callReducers[actionTypes.REMOTE_START_MOH_FINISH] = noop;
 callReducers[actionTypes.REMOTE_STOP_MOH_FINISH] = noop;
+callReducers[actionTypes.GET_STATS] = noop;
+callReducers[actionTypes.GET_STATS_FINISH] = noop;
 
 callReducers[actionTypes.CALL_CANCELLED] = {
   next(state, action) {
@@ -24396,7 +24660,7 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH);
 
 /*
  * Reducer to handle specific call actions.
@@ -25218,7 +25482,7 @@ function* sendDtmf(deps, action) {
   /**
    * Operation requirements:
    *    1. The call exists.
-   *    2. The call is either Connected or Ringing.
+   *    2. The call is either Connected, Ringing, or Early Media.
    *    3. A valid tone was provided.
    */
   if (!targetCall) {
@@ -25227,7 +25491,7 @@ function* sendDtmf(deps, action) {
       code: _errors.callCodes.INVALID_PARAM,
       message: 'Call state not found; invalid call ID.'
     });
-  } else if (![_constants.CALL_STATES.CONNECTED, _constants.CALL_STATES.RINGING].includes(targetCall.state)) {
+  } else if (![_constants.CALL_STATES.CONNECTED, _constants.CALL_STATES.RINGING, _constants.CALL_STATES.EARLY_MEDIA].includes(targetCall.state)) {
     log.info(`Failed to send DTMF tones on call ${targetCall.id}: Bad call state.`);
     error = new _errors2.default({
       code: _errors.callCodes.INVALID_STATE,
@@ -25599,14 +25863,22 @@ var _establish = __webpack_require__("../kandy/src/callstack/webrtc/establish.js
 
 var _midcall = __webpack_require__("../kandy/src/callstack/webrtc/midcall.js");
 
+var _negotiation = __webpack_require__("../kandy/src/callstack/webrtc/negotiation.js");
+
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 // Other plugins.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
 
-
-// Callstack plugin.
+// Call plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -25631,29 +25903,25 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 
 // Libraries.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
 
-// Call plugin.
+
+// Callstack plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
 
   // Create a new local media object for this call.
   const mediaConstraints = {
+    audio: action.payload.mediaConstraints.audio,
     video: action.payload.mediaConstraints.video,
-    audio: action.payload.mediaConstraints.audio
+    screenShare: action.payload.mediaConstraints.screenShare
   };
 
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
   const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
   const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
-  const { error, offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
+
+  const { error, offerSdp, sessionId, mediaIds } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
     sdpSemantics,
     turnInfo,
     trickleIceMode,
@@ -25690,7 +25958,7 @@ function* makeCall(deps, action) {
       // The ID that the webRTC stack uses to track this webRTC session.
       webrtcSessionId: sessionId,
       // The local Media object associated with this call.
-      mediaId: mediaId,
+      mediaIds: mediaIds,
       // The bandwidth of the call.
       bandwidth,
       // The custom display name to use. Not supported on all environments.
@@ -25701,7 +25969,7 @@ function* makeCall(deps, action) {
     // TODO: Update redux state that the Media object is stopped.
     //    Need an event from Media model to notify about the stop, and listener
     //    set on Media when it is created (in `createLocalMedia` saga).
-    yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, mediaId);
+    yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, sessionId);
 
     yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
       state: _constants.CALL_STATES.ENDED,
@@ -25730,8 +25998,9 @@ function* makeCall(deps, action) {
  * Responsibilities:
  *    1. Determine whether Regular or Slow Start negotiation is to be used.
  *    2. Regular: Create an answer for the call, using the webRTC helpers.
- *    3. Regular: Update the call on the server with the answer.
- *    4. Regular: Update call state (via redux actions).
+ *    3. Regular: Remove local tracks that aren't being used for the call.
+ *    4. Regular: Update the call on the server with the answer.
+ *    5. Regular: Update call state (via redux actions).
  *    2. Slow Start: Setup the call locally, using the webRTC helper saga.
  *    3. Slow Start: Update the call on the server with an offer.
  *    4. Slow Start: Update state (via redux actions).
@@ -25768,8 +26037,9 @@ function* answerCall(deps, action) {
   }
 
   const mediaConstraints = {
+    audio: action.payload.mediaConstraints.audio,
     video: action.payload.mediaConstraints.video,
-    audio: action.payload.mediaConstraints.audio
+    screenShare: action.payload.mediaConstraints.screenShare
   };
 
   let webrtcInfo, callInfo, nextState;
@@ -25827,6 +26097,9 @@ function* answerCall(deps, action) {
       return;
     }
 
+    // This removes local tracks that aren't being sent to the other side.
+    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, incomingCall.webrtcSessionId);
+
     callInfo = {
       answer: webrtcInfo.answerSDP,
       wrtcsSessionId: incomingCall.wrtcsSessionId
@@ -25844,7 +26117,7 @@ function* answerCall(deps, action) {
       // TODO: Proper start time for slow-start calls.
       startTime: Date.now(),
       // The local Media object associated with this call.
-      mediaId: webrtcInfo.mediaId,
+      mediaIds: webrtcInfo.mediaIds,
       // For slow start calls, there isn't a webRTC session yet.
       webrtcSessionId: webrtcInfo.sessionId,
       // TODO: Properly track the media that the call has.
@@ -26100,6 +26373,7 @@ function* endCall(deps, action) {
   if (stateError) {
     log.debug(`Call not found: ${stateError.message}`);
     yield (0, _effects.put)(_actions.callActions.endCallFinish(id, {
+      isLocal: true,
       error: stateError
     }));
     return;
@@ -26114,9 +26388,10 @@ function* endCall(deps, action) {
   const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
 
   if (!response.error) {
-    yield (0, _effects.put)(_actions.callActions.endCallFinish(id));
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(id, { isLocal: true }));
   } else {
     yield (0, _effects.put)(_actions.callActions.endCallFinish(id, {
+      isLocal: true,
       error: response.error
     }));
   }
@@ -26388,7 +26663,7 @@ function* addMedia(deps, action) {
     audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
     video: bandwidth && bandwidth.video ? bandwidth.video : callBandwidth.video
     // Create media and add tracks using webRTC
-  };const { error, sdp, media } = yield (0, _effects.call)(_midcall.webRtcAddMedia, deps, action.payload.mediaConstraints, {
+  };const { error, sdp, medias } = yield (0, _effects.call)(_midcall.webRtcAddMedia, deps, action.payload.mediaConstraints, {
     sessionId: webrtcSessionId,
     bandwidth: finalBandwidth
   });
@@ -26417,13 +26692,17 @@ function* addMedia(deps, action) {
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent add media offer.');
+    let tracks = [];
+    medias.forEach(media => {
+      tracks = tracks.concat(media.tracks.map(track => track.id));
+    });
+    log.debug('Successfully sent add media offer.', tracks);
     yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
       operation: localOp.operation,
       operationData: {
         local: true,
-        mediaId: media.id,
-        tracks: media.tracks.map(track => track.id),
+        mediaIds: medias.map(media => media.id),
+        tracks,
         bandwidth: finalBandwidth
       }
     }));
@@ -26572,7 +26851,9 @@ function* directTransfer(deps, action) {
     return;
   }
 
-  yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id));
+  yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
+    operation: currentCall.localOp.operation
+  }));
 }
 
 /**
@@ -26706,7 +26987,7 @@ function* join(deps, action) {
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
   const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
-  const { offerSdp, sessionId, mediaId } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
+  const { offerSdp, sessionId, mediaIds } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
     sdpSemantics,
     turnInfo,
     trickleIceMode
@@ -26754,7 +27035,7 @@ function* join(deps, action) {
     // The ID that the webRTC stack uses to track this webRTC session.
     webrtcSessionId: sessionId,
     // The local Media object associated with this call.
-    mediaId,
+    mediaIds,
     // The media constraints this call has.
     mediaConstraints,
     // The combined addresses of the 2 other participants in the joined call.
@@ -26882,8 +27163,9 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * Responsibilities:
  *    1. Determine what the remote operation was (ie. what is being offered).
  *    2. Process the offer based on remote oepration and current local state.
- *    3. Respond to the request.
- *    4. Update call state (via redux action).
+ *    3. Remove local tracks that aren't being used for the call.
+ *    4. Respond to the request.
+ *    5. Update call state (via redux action).
  * @method handleUpdateRequest
  * @param {Object}   deps          Dependencies that the saga uses.
  * @param {Object}   deps.webRTC   The WebRTC stack.
@@ -26966,8 +27248,18 @@ function* handleUpdateRequest(deps, targetCall, params) {
      *    may have been for a different purpose, such as changing the remote
      *    endpoint during a transfer.
      *
-     * Let this remoteOp default to the generic "update call" operation.
+     * Let this remoteOp default to the generic "update call" operation except when we're on locally hold.
      */
+
+    /*
+     * When our media state is Local Hold, this means that our sdp has media as inactive.
+     * Therefore, when we receive remote sdp with media as also inactive, this means the remote side is doing a hold operation.
+     * Because of this, we get a remoteOp of `NO_CHANGE` when we actually want to handle it as a remote operation
+     *  inorder to get into a dual hold state.
+     */
+    if (mediaState === _constants.CALL_MEDIA_STATES.LOCAL_HOLD) {
+      remoteOp = _constants2.OPERATIONS.HOLD;
+    }
   }
 
   log.info(`Processing update request as remote ${remoteOp} operation in ${mediaState} scenario.`);
@@ -27019,6 +27311,22 @@ function* handleUpdateRequest(deps, targetCall, params) {
     // TODO: Dispatch an error action to notify of the error scenario.
     // The call may now be in a bad state and needs to be fixed.
     return;
+  }
+
+  /**
+   * This removes local tracks that aren't being sent to the other side. These are being
+   *    removed to prevent any unintended side-effects in subsequent negotiations.
+   * We will not be doing this for the following scenarios:
+   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
+   *     remove local tracks in this scenario.
+   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
+   *     remove local tracks in this scenario.
+   *  - No Change - There are no changes so we don't need to remove local tracks.
+   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
+   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
+   */
+  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
+    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, webRTC, targetCall.webrtcSessionId);
   }
 
   // Send answer sdp back to remote side
@@ -27175,8 +27483,9 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  *        - Indicates that it was a regular negotiation process.
  * Responsibilities:
  *    1. Have the callstack process the answer SDP.
- *    2. TODO: Determine what the original operation was.
- *    3. Update call state (via redux action).
+ *    2. Remove local tracks that aren't being used for the call.
+ *    3. TODO: Determine what the original operation was.
+ *    4. Update call state (via redux action).
  * @method handleUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -27210,8 +27519,25 @@ function* handleUpdateResponse(deps, targetCall, params) {
   }
 
   const localOp = targetCall.localOp;
+
+  /**
+   * This removes local tracks that aren't being sent to the other side.
+   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
+   * We will not be doing this for the following scenarios:
+   *  - localOp does not exist - Means that
+   *    - the call was created as part of a Join operation and so it isn't doing any operations of its own right now.
+   *    - the call was Direct Transferred to and so it isn't doing any operations of its own right now.
+   *  - Local Hold - Our senders will have direction as `inactive` and we don't want to
+   *     remove local tracks in this scenario.
+   *  - Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
+   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
+   */
+  if (localOp && localOp.operation !== _constants2.OPERATIONS.HOLD && !(localOp.operation === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
+    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
+  }
+
   // Update call state depending on what the current call state is.
-  if (targetCall.state === _constants.CALL_STATES.RINGING || targetCall.state === _constants.CALL_STATES.INITIATED) {
+  if ([_constants.CALL_STATES.RINGING, _constants.CALL_STATES.INITIATED, _constants.CALL_STATES.EARLY_MEDIA].includes(targetCall.state)) {
     log.info(`Handling state change as remote answer operation.`);
     // Scenario: The call was previously ringing, so this response is a "call
     //    accepted" notification. The call should now be established.
@@ -27303,7 +27629,8 @@ function* handleUpdateResponse(deps, targetCall, params) {
  * Responsibilities:
  *    1. Determine what the original operation was.
  *    2. Have the callstack process the answer SDP.
- *    3. Update call state (via redux action) based on original operation.
+ *    3. Remove local tracks that aren't being used for the call.
+ *    4. Update call state (via redux action) based on original operation.
  * @method handleSlowUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -27374,6 +27701,22 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
     return;
   }
 
+  /*
+   * This removes local tracks that aren't being sent to the other side.
+   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
+   * We will not be doing this for the following scenarios:
+   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
+   *     remove local tracks in this scenario.
+   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
+   *     remove local tracks in this scenario.
+   *  - No Change - There are no changes so we don't need to remove local tracks.
+   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
+   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
+   */
+  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
+    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
+  }
+
   if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
     let callAction = yield (0, _effects.call)(getCallAction, remoteOp);
 
@@ -27441,6 +27784,7 @@ exports.parseCallResponse = parseCallResponse;
 exports.callStatusUpdateEnded = callStatusUpdateEnded;
 exports.callStatusUpdateRinging = callStatusUpdateRinging;
 exports.callStatusUpdateFailed = callStatusUpdateFailed;
+exports.receiveEarlyMedia = receiveEarlyMedia;
 
 var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
 
@@ -27453,6 +27797,10 @@ var _constants2 = __webpack_require__("../kandy/src/call/interfaceNew/constants.
 var _negotiation = __webpack_require__("../kandy/src/callstack/call/negotiation.js");
 
 var negotiation = _interopRequireWildcard(_negotiation);
+
+var _pipeline = __webpack_require__("../kandy/src/callstack/sdp/pipeline.js");
+
+var _pipeline2 = _interopRequireDefault(_pipeline);
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
@@ -27479,6 +27827,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Other plugins
+
+
+// Callstack plugin.
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -27513,22 +27877,6 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 
 // Libraries.
-
-
-// Callstack plugin.
-/**
- * "Notification sagas" handle received notifications.
- * Each saga handles a single websocket notification that may be received from
- *    the backend.
- *
- * There may not be an established webRTC session for these sagas. This may be
- *    because (1) the notification is a new incoming call, or (2) there is a
- *    de-sync between SDK state and server state. This may or may not be
- *    considered as an error scenario (eg. a "call ended" notification for a
- *    call the SDK doesn't know about may be safely ignored).
- */
-
-// Call plugin.
 function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName } = params;
@@ -27775,6 +28123,7 @@ function* callStatusUpdateEnded(deps, params) {
   }
 
   const endParams = {
+    isLocal: false, // end operation was caused by remote side.
     // Remote participant's information.
     remoteParticipant: {
       displayNumber: params.remoteNumber,
@@ -27956,6 +28305,71 @@ function* callStatusUpdateFailed(deps, params) {
   }
 
   yield (0, _effects.put)(_actions.callActions.updateCall(currentCall.id));
+}
+
+/**
+ * A "session progress" notification has been received. It contains an "early
+ *    media" SDP (pranswer) that needs to be processed.
+ *
+ * Processing a pranswer is done by:
+ *    1. Validating the Call / Session.
+ *    2. Running the SDP through the SDP pipeline.
+ *    3. Setting the SDP as the Session's remote description (as pranswer).
+ *    4. Updating the Call state.
+ *
+ * @method receiveEarlyMedia
+ * @param {Object} deps         Dependencies that the saga uses.
+ * @param {Object} deps.webRTC  The WebRTC stack.
+ * @param {Object} params       Parameters describing the notification.
+ */
+function* receiveEarlyMedia(deps, params) {
+  const { wrtcsSessionId } = params;
+  const { webRTC, sdpHandlers } = deps;
+
+  /**
+   * Get the call from state.
+   */
+  const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+  if (!currentCall) {
+    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    return;
+  }
+
+  /**
+   * Get the Webrtc Session.
+   */
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], currentCall.webrtcSessionId);
+  if (!session) {
+    log.debug(`webRTC session ${currentCall.webrtcSessionId} not found.`);
+    // TODO: Better error.
+    return;
+  }
+
+  try {
+    /*
+     * Run the remote SDP pranswer through any SDP handlers provided, then set it
+     *    as the Session's remote description.
+     */
+    const sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, params.sdp, {
+      type: 'pranswer',
+      endpoint: 'remote'
+    });
+    yield (0, _effects.call)([session, 'processAnswer'], {
+      type: 'pranswer',
+      sdp: sdp
+    });
+  } catch (err) {
+    log.debug(`Failed to process pranswer for Call ${currentCall.id}; ignoring.`);
+    return;
+  }
+
+  yield (0, _effects.put)(_actions.callActions.sessionProgress(currentCall.id, {
+    // Remote participant's information.
+    remoteParticipant: {
+      displayNumber: params.remoteNumber,
+      displayName: params.remoteName
+    }
+  }));
 }
 
 /***/ }),
@@ -29164,7 +29578,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
  * @return {Object} Object
  * @return {string} Object.offerSdp Session Description Protocol for a call offer
  * @return {string} Object.sessionId session identifier
- * @return {string} Object.mediaId call identifier
+ * @return {Array}  Object.mediaIds call identifiers
  */
 
 
@@ -29173,7 +29587,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
   const { sdpSemantics, turnInfo, trickleIceMode, bandwidth } = sessionOptions;
 
-  const { media, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
+  const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
   if (error) {
     return { error };
@@ -29191,14 +29605,20 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
   });
 
   // Add the tracks to the session.
-  const tracks = yield (0, _effects.call)([media, 'getTracks']);
-  yield (0, _effects.call)([session, 'addTracks'], tracks);
+  let allTracks = [];
+
+  for (let eachMedia of medias) {
+    let tracks = yield (0, _effects.call)([eachMedia, 'getTracks']);
+    allTracks = [...allTracks, ...tracks];
+  }
+  yield (0, _effects.call)([session, 'addTracks'], allTracks);
 
   /*
    * Create the local SDP offer, run it through any provided SDP handlers,
    *    then set it as the Session's local description.
    */
   let offer = yield (0, _effects.call)([session, 'createOffer']);
+
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
     endpoint: 'local',
@@ -29210,7 +29630,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
     error: false,
     offerSdp: offer.sdp,
     sessionId: session.id,
-    mediaId: media.id
+    mediaIds: medias.map(media => media.id)
   };
 }
 
@@ -29289,15 +29709,20 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
     return;
   }
 
-  const { media, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
+  const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
   if (error) {
     return { error };
   }
 
+  let allTracks = [];
+
   // Add the tracks to the session.
-  const tracks = yield (0, _effects.call)([media, 'getTracks']);
-  yield (0, _effects.call)([session, 'addTracks'], tracks);
+  for (let eachMedia of medias) {
+    let tracks = yield (0, _effects.call)([eachMedia, 'getTracks']);
+    allTracks = [...allTracks, ...tracks];
+  }
+  yield (0, _effects.call)([session, 'addTracks'], allTracks);
 
   /*
    * Create the local SDP answer, run it through any provided SDP handlers,
@@ -29314,7 +29739,7 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
   return {
     error: false,
     answerSDP: answer.sdp,
-    mediaId: media.id
+    mediaIds: medias.map(media => media.id)
   };
 }
 
@@ -29357,20 +29782,37 @@ function* createLocal(webRTC, mediaConstraints) {
   log.debug('Getting media with constraints: ', mediaConstraints);
 
   // Default return values.
-  const result = { media: undefined, error: false };
+  const result = { medias: [], error: false };
+
   try {
-    const media = yield (0, _effects.call)([webRTC.media, 'createLocal'], mediaConstraints);
-    log.debug(`Successfully created local media.`);
-    result.media = media;
+    if (mediaConstraints.screenShare) {
+      let screenShareContraints = {
+        video: mediaConstraints.screenShare
+      };
+
+      let screenShareMedia = yield (0, _effects.call)([webRTC.media, 'createLocalScreen'], screenShareContraints);
+      result.medias.push(screenShareMedia);
+    }
+
+    if (mediaConstraints.audio || mediaConstraints.video) {
+      let media = yield (0, _effects.call)([webRTC.media, 'createLocal'], mediaConstraints);
+      result.medias.push(media);
+    }
   } catch (err) {
     let errMessage;
     if (err.name === 'OverconstrainedError') {
       errMessage = `Failed to get media due to constraint: ${err.constraint}.`;
     } else {
-      errMessage = `Failed to get media: ${err.name}.`;
+      errMessage = `Failed to get media => Name: ${err.name}; Error Message :${err.message}.`;
     }
 
     log.info(errMessage);
+
+    // Clean up successfull media object when there is partial media failure.
+    for (let eachMedia of result.medias) {
+      yield (0, _effects.call)([eachMedia, 'stop']);
+    }
+
     result.error = new _errors2.default({
       message: errMessage,
       code: _errors.callCodes.USER_MEDIA_ERROR
@@ -29583,16 +30025,23 @@ function* generateOffer(deps, sessionId, mediaDirections, bandwidth) {
  */
 function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
-  const { media, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
+  const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
   const { sessionId, bandwidth } = sessionOptions;
 
   if (error) {
     return { error };
   }
-
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
-  const tracks = yield (0, _effects.call)([media, 'getTracks']);
-  yield (0, _effects.call)([session, 'addTracks'], tracks);
+
+  let allTracks = [];
+
+  for (let eachMedia of medias) {
+    let tracks = yield (0, _effects.call)([eachMedia, 'getTracks']);
+
+    allTracks = [...allTracks, ...tracks];
+  }
+
+  yield (0, _effects.call)([session, 'addTracks'], allTracks);
 
   /*
    * Create the local SDP offer, run it through any provided SDP handlers,
@@ -29608,8 +30057,15 @@ function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
-  const mediaState = yield (0, _effects.call)([media, 'getState']);
-  return { error: false, media: mediaState, sdp: offer.sdp };
+  let mediaStates = [];
+
+  for (let eachMediaState of medias) {
+    let mediaState = yield (0, _effects.call)([eachMediaState, 'getState']);
+
+    mediaStates = [...mediaStates, mediaState];
+  }
+
+  return { error: false, medias: mediaStates, sdp: offer.sdp };
 }
 
 /**
@@ -29727,15 +30183,22 @@ function* webRtcReplaceTrack(webRTC, params) {
     [oldTrackKind]: mediaConstraints[oldTrackKind]
 
     // Create Media
-  };const { media: newMedia, error: createLocalError } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, finalMediaConstraints);
+  };const { medias: newMedias, error: createLocalError } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, finalMediaConstraints);
   if (createLocalError) {
     return { error: createLocalError, newTrackId: undefined };
   }
 
+  let allNewTracks = [];
+
   // Find the new track that matches the old track we want to replace.
-  const newTracks = yield (0, _effects.call)([newMedia, 'getTracks']);
+
+  for (let eachMedia of newMedias) {
+    let newTracks = yield (0, _effects.call)([eachMedia, 'getTracks']);
+    allNewTracks = [...allNewTracks, ...newTracks];
+  }
+
   let newTrack;
-  for (let track of newTracks) {
+  for (let track of allNewTracks) {
     // Matching the track is done this way because we need to yield to getState,
     //    but we can't yield inside of a `.find(func)` or similar. So iterate
     //    over the new tracks "manually".
@@ -29790,7 +30253,13 @@ function* webRtcReplaceTrack(webRTC, params) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
 exports.isSameSdpSessionId = isSameSdpSessionId;
+exports.removeUnusedLocalTracks = removeUnusedLocalTracks;
 exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
@@ -29838,6 +30307,31 @@ function* isSameSdpSessionId(webRTC, sessionId, sdp) {
     const sameId = yield (0, _effects.call)(_sdp.hasSameSessionId, currentDesc.sdp, sdp);
     return sameId;
   }
+}
+
+/**
+ * Removes local tracks that are not being sent to the other side.
+ * This is meant to be called when a remote sdp has been processed.
+ * @method removeUnusedLocalTracks
+ * @param  {Object}  webRTC    The webRTC stack.
+ * @param  {string}  sessionId ID of the Session under question.
+ */
+function* removeUnusedLocalTracks(webRTC, sessionId) {
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
+  const localTracksIsSending = yield (0, _effects.call)([session, 'getLocalTracksIsSendingStatus']);
+
+  // Only get the track ids where the track is not sending.
+  const trackIdsToRemove = (0, _keys2.default)(localTracksIsSending).filter(localTrackId => !localTracksIsSending[localTrackId]);
+  const tracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIdsToRemove);
+  log.debug(`Tracks to be removed due to not being actively used for the call: ${trackIdsToRemove}`);
+
+  // Removes tracks from peer (Will stop tracks from being sent to remote participant).
+  // Does NOT end the tracks.
+  yield (0, _effects.call)([session, 'removeTracks'], trackIdsToRemove);
+
+  // Ends the tracks.
+  // Clean-up the local tracks.
+  yield (0, _effects.all)(tracksToRemove.map(track => (0, _effects.call)([track, 'cleanup'])));
 }
 
 /**
@@ -32842,7 +33336,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.8.0-beta.150';
+  let version = '4.9.0-beta.151';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -49365,13 +49859,13 @@ function MediaManager(managers) {
   }
 
   /**
-   * Create a new local Media object.
-   * Use the provided constraints to get user media as the base MediaStream.
-   * @method createLocal
+   * Workaround to get Firefox to behave similarly to Chrome regarding device permission prompts.
+   * @method browserContraintsWorkaround
    * @param  {MediaStreamConstraints}  constraints
-   * @return {Promise}
+   * @return {Object}  media contraints
    */
-  function createLocal(constraints) {
+
+  function browserContraintsWorkaround(constraints) {
     /**
      * Firefox workaround.
      *
@@ -49423,37 +49917,85 @@ function MediaManager(managers) {
         constraints[kind].deviceId = { exact: id };
       }
     }
+    return constraints;
+  }
+
+  /**
+   * Wraps native mediaStream, adds tracks to trackManager and Media, and sets up event handlers on a given media.
+   * @method setupMedia
+   * @param {MediaStream} mediaStream Creating a Media object with it.
+   * @return {Media}
+   */
+
+  function setupMedia(mediaStream) {
+    const media = new _media2.default(mediaStream, true);
+    _loglevel2.default.debug(`Creating Media with ID: ${media.id}.`);
+
+    // Only add tracks to a Media objects using the `addTrack` method.
+    mediaStream.getTracks().forEach(nativeTrack => {
+      const wrappedTrack = trackManager.add(nativeTrack, mediaStream);
+      media.addTrack(wrappedTrack);
+    });
+
+    media.once('media:stopped', mediaId => {
+      remove(mediaId);
+    });
+
+    media.on('track:removed', trackId => {
+      if (media.tracks.size === 0) {
+        remove(media.id);
+      }
+    });
+
+    media.on('track:ended', ({ mediaId, trackId }) => {
+      if (media.getTracks().length === 0) {
+        remove(mediaId);
+      }
+    });
+
+    return media;
+  }
+
+  /**
+   * Create a new local Media object.
+   * Use the provided constraints to get user media as the base MediaStream.
+   * @method createLocal
+   * @param  {MediaStreamConstraints}  constraints
+   * @return {Promise}
+   */
+  function createLocal(constraints) {
+    const constraintsWorkaround = browserContraintsWorkaround(constraints);
 
     // Get user media, ...
     return new _promise2.default((resolve, reject) => {
       // TODO: Proper error checking.
       // TODO: Use the WebAPI directly here? Probably not.
-      navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-        // ... then create a Media object with it.
-        const media = new _media2.default(mediaStream, true);
-        _loglevel2.default.debug(`Creating Media with ID: ${media.id}.`);
+      navigator.mediaDevices.getUserMedia(constraintsWorkaround).then(mediaStream => {
+        const media = setupMedia(mediaStream);
 
-        // Only add tracks to a Media objects using the `addTrack` method.
-        mediaStream.getTracks().forEach(nativeTrack => {
-          const wrappedTrack = trackManager.add(nativeTrack, mediaStream);
-          media.addTrack(wrappedTrack);
-        });
+        medias.set(media.id, media);
+        // TODO: Better event. Include metadata?
+        emitter.emit('media:new', media.id);
 
-        media.once('media:stopped', mediaId => {
-          remove(mediaId);
-        });
+        resolve(media);
+      }).catch(reject);
+    });
+  }
 
-        media.on('track:removed', trackId => {
-          if (media.tracks.size === 0) {
-            remove(media.id);
-          }
-        });
+  /**
+   * Creates a new local Screen Media object.
+   * Use the provided constraints to get user media as the base MediaStream.
+   * @method createLocalScreen
+   * @param {MediaStreamConstraints} constraints
+   * @return {promise}
+   */
 
-        media.on('track:ended', ({ mediaId, trackId }) => {
-          if (media.getTracks().length === 0) {
-            remove(mediaId);
-          }
-        });
+  function createLocalScreen(constraints) {
+    const constraintsWorkaround = browserContraintsWorkaround(constraints);
+
+    return new _promise2.default((resolve, reject) => {
+      navigator.mediaDevices.getDisplayMedia(constraintsWorkaround).then(mediaStream => {
+        const media = setupMedia(mediaStream);
 
         medias.set(media.id, media);
         // TODO: Better event. Include metadata?
@@ -49579,6 +50121,7 @@ function MediaManager(managers) {
     findTrack,
     // Create APIs.
     createLocal,
+    createLocalScreen,
     createRemote,
     // Event APIs.
     on,
@@ -51106,6 +51649,10 @@ var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
+var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -51117,8 +51664,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// Libraries.
-// Helpers.
+// SDP Helpers.
 function Session(id, managers, config = {}) {
   // Internal variables.
   const sessionId = id;
@@ -51419,6 +51965,62 @@ function Session(id, managers, config = {}) {
     }
   }
 
+  /**
+   * This function is used to figure out if our local tracks are being sent to the other side.
+   * This is meant to be called after a remote sdp is processed so that:
+   *  a. Transceivers are up-to-date.
+   *  b. The latestRemoteDescription is really the latest one.
+   * @method getLocalTracksIsSendingStatus
+   * @return {TracksIsSendingStatuses}
+   */
+  function getLocalTracksIsSendingStatus() {
+    /**
+     * An object with flags indicating whether a track is sending data or not where:
+     *  key: <string> track ID
+     *  value: <boolean> isSending.
+     * @typedef {Object} TracksIsSendingStatuses
+     */
+    const tracksIsSending = {};
+
+    /**
+     * For Unified-plan, we consider a track to being sent if
+     *  currentDirection is NOT `inactive` and NOT `recvonly`.
+     * IE: Tracks are being sent if
+     *  currentDirection is `sendrecv` or `sendonly` (both contain `send`).
+     */
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
+      const transceivers = peer.peerConnection.getTransceivers();
+      transceivers.forEach(transceiver => {
+        if (transceiver.sender.track) {
+          tracksIsSending[transceiver.sender.track.id] = transceiver.currentDirection.includes('send');
+        }
+      });
+    } else {
+      /**
+       * For Plan-B, we check the remote sdp and consider a track be sent if
+       *  direction is NOT `inactive` and NOT `sendonly`.
+       * IE: Tracks are being sent if
+       *  direction is `sendrecv` or `recvonly` (both contain `recv`).
+       */
+      const sdpObj = _sdpTransform2.default.parse(latestRemoteDescription.sdp);
+
+      /**
+       * Get the direction of each kind of media.
+       * For plan-b, there are is only 1 m-line for audio and 1 m-line for video.
+       * This means that tracks of the same kind will share the same direction.
+       */
+      const directions = {};
+      sdpObj.media.forEach(media => {
+        const { type, direction } = media;
+        directions[type] = direction;
+      });
+      peer.localTracks.forEach(track => {
+        const nativeTrack = track.track;
+        tracksIsSending[nativeTrack.id] = directions[nativeTrack.kind].includes('recv');
+      });
+    }
+    return tracksIsSending;
+  }
   /**
    * Processes (and sets) a remote SDP offer.
    * @method processOffer
@@ -51797,6 +52399,7 @@ function Session(id, managers, config = {}) {
     processOffer,
     generateAnswer,
     processAnswer,
+    getLocalTracksIsSendingStatus,
     // Other APIs.
     recreatePeer,
     addIceCandidate,
@@ -51810,7 +52413,8 @@ function Session(id, managers, config = {}) {
   };
 }
 
-// SDP Helpers.
+// Libraries.
+// Helpers.
 
 /***/ }),
 

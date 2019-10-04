@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy 4.8.0 | Documentation</title>
+  <title>kandy 4.9.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy</h3>
-          <div class='mb1'><code>4.8.0</code></div>
+          <div class='mb1'><code>4.9.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -115,6 +115,25 @@
                     </ul>
                   
                 </div>
+                
+                </li>
+              
+
+                <li>
+
+                  
+                <a
+                  href='#eventcalloperation'
+                  class="
+                     
+                     
+                  ">
+                  
+                  
+                    call:operation
+                  
+                  
+                </a>
                 
                 </li>
               
@@ -252,18 +271,6 @@
                       </a></li>
                     
                       <li><a
-                        href='#callcallobject'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> CallObject
-                      </a></li>
-                    
-                      <li><a
-                        href='#calliceserver'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> IceServer
-                      </a></li>
-                    
-                      <li><a
                         href='#callsdphandlerfunction'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> SdpHandlerFunction
@@ -282,9 +289,21 @@
                       </a></li>
                     
                       <li><a
+                        href='#calldeviceinfo'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> DeviceInfo
+                      </a></li>
+                    
+                      <li><a
                         href='#calldevicesobject'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> DevicesObject
+                      </a></li>
+                    
+                      <li><a
+                        href='#callcallobject'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> CallObject
                       </a></li>
                     
                       <li><a
@@ -300,9 +319,9 @@
                       </a></li>
                     
                       <li><a
-                        href='#calldeviceinfo'
+                        href='#calliceserver'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> DeviceInfo
+                        <span style="color:blue">ⓣ</span> IceServer
                       </a></li>
                     
                       <li><a
@@ -698,15 +717,15 @@
                       </a></li>
                     
                       <li><a
-                        href='#conversationmessagesender'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> MessageSender
-                      </a></li>
-                    
-                      <li><a
                         href='#conversationmessage'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> Message
+                      </a></li>
+                    
+                      <li><a
+                        href='#conversationmessagesender'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> MessageSender
                       </a></li>
                     
                       <li><a
@@ -2386,6 +2405,157 @@ values you can use when instantiating the SDK using the <a href="#create">create
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='eventcalloperation'>
+      call:operation
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A call operation has either started, been updated, or finished.</p>
+<p>Information about ongoing call operations are stored with the call
+information (see the <a href="Calls.getById">call.getById</a> API). This event
+indicates that an operation's information has been changed.</p>
+<p>Local call operations will be tracked from start to finish. An operation may
+be updated as it progresses, based on the status of the operation. The
+operation status may be ongoing or pending, depending if the operation is
+waiting on activity on the local or remote end of the call, respectively.</p>
+<p>Except in the case of slow-start operations, remote operations will only be
+tracked as a "finish", to indicate that it occurred.</p>
+
+
+  <div class='pre p1 fill-light mt0'>call:operation</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.operation</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The call operation causing this event.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.transition</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The transition reason for the operation change.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.isLocal</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
+  </td>
+  <td class='break-word'><span>Flag indicating whether the operation was local or not.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.previous</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>The operation information before this change.
+If the transition is to "start" the operation, there will be no previous information.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>params.previous.operation</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>The operation that was ongoing.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>params.previous.status</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>The operation status before this change.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'>BasicError?</code>
+  </td>
+  <td class='break-word'><span>An error object, if the operation was not successful.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='api'>
       api
     </h3>
@@ -3321,330 +3491,6 @@ SIP users and PSTN phones.</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='callcallobject'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>CallObject</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Information about a Call.</p>
-<p>Can be retrieved using the <a href="Calls.getAll">call.getAll</a> or
-<a href="Calls.getById">call.getById</a> APIs.</p>
-
-
-  <div class='pre p1 fill-light mt0'>CallObject</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The ID of the call.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>direction</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The direction in which the call was created. Can be 'outgoing' or 'incoming'.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>state</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The current state of the call. See 
-<a href="Calls.states">call.states</a>
- for possible states.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>localHold</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Indicates whether this call is currently being held locally.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteHold</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Indicates whether this call is currently being held remotely.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>localTracks</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)
-          </code>
-
-          
-
-          
-             : A list of Track IDs that the call is sending to the remote participant.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteTracks</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)
-          </code>
-
-          
-
-          
-             : A list of Track IDs that the call is receiving from the remote participant.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>remoteParticipant</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)
-          </code>
-
-          
-
-          
-             : Information about the other call participant.
-
-          
-          
-            <ul>
-              
-                <li><code>remoteParticipant.displayNumber</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
-                  
-                  <p>The User ID of the remote participant in the form "username@domain".</p>
-</li>
-              
-                <li><code>remoteParticipant.displayName</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
-                  
-                  <p>The display name of the remote participant.</p>
-</li>
-              
-            </ul>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>bandwidth</span> 
-          <code class='quiet'>
-            (BandwidthControls)
-          </code>
-
-          
-
-          
-             : The bandwidth limitations set for the call.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>startTime</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
-          </code>
-
-          
-
-          
-             : The start time of the call in milliseconds since the epoch.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>endTime</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
-          </code>
-
-          
-
-          
-             : The end time of the call in milliseconds since the epoch.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='calliceserver'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>IceServer</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>IceServer</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>urls</span> 
-          <code class='quiet'>
-            ((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))
-          </code>
-
-          
-
-          
-             : Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>credential</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
-          </code>
-
-          
-
-          
-             : The credential needed by the ICE server.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='callsdphandlerfunction'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4017,6 +3863,124 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
       </div>
     </div>
   
+    <div class='border-bottom' id='calldeviceinfo'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>DeviceInfo</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Contains information about a device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deviceId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The ID of the device.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>groupId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The group ID of the device. Devices that share a 
+<code>groupId</code>
+ belong to the same physical device.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>kind</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The type of the device (audioinput, audiooutput, videoinput).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>label</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The name of the device.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='calldevicesobject'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4094,6 +4058,245 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
 
           
              : A list of speaker device information.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callcallobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>CallObject</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Information about a Call.</p>
+<p>Can be retrieved using the <a href="Calls.getAll">call.getAll</a> or
+<a href="Calls.getById">call.getById</a> APIs.</p>
+
+
+  <div class='pre p1 fill-light mt0'>CallObject</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The ID of the call.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>direction</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>state</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The current state of the call. See 
+<a href="Calls.states">call.states</a>
+ for possible states.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>localHold</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Indicates whether this call is currently being held locally.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteHold</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Indicates whether this call is currently being held remotely.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>localTracks</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)
+          </code>
+
+          
+
+          
+             : A list of Track IDs that the call is sending to the remote participant.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteTracks</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)
+          </code>
+
+          
+
+          
+             : A list of Track IDs that the call is receiving from the remote participant.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>remoteParticipant</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)
+          </code>
+
+          
+
+          
+             : Information about the other call participant.
+
+          
+          
+            <ul>
+              
+                <li><code>remoteParticipant.displayNumber</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>The User ID of the remote participant in the form "username@domain".</p>
+</li>
+              
+                <li><code>remoteParticipant.displayName</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>The display name of the remote participant.</p>
+</li>
+              
+            </ul>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>bandwidth</span> 
+          <code class='quiet'>
+            (BandwidthControls)
+          </code>
+
+          
+
+          
+             : The bandwidth limitations set for the call.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>startTime</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : The start time of the call in milliseconds since the epoch.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>endTime</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
+          </code>
+
+          
+
+          
+             : The end time of the call in milliseconds since the epoch.
 
           
           
@@ -4325,11 +4528,11 @@ client.call.make(destination, mediaConstraints,
       </div>
     </div>
   
-    <div class='border-bottom' id='calldeviceinfo'>
+    <div class='border-bottom' id='calliceserver'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>DeviceInfo</span>
+            <span class='code strong strong truncate'>IceServer</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4337,10 +4540,9 @@ client.call.make(destination, mediaConstraints,
 
   
 
-  <p>Contains information about a device.</p>
+  
 
-
-  <div class='pre p1 fill-light mt0'>DeviceInfo</div>
+  <div class='pre p1 fill-light mt0'>IceServer</div>
   
     <p>
       Type:
@@ -4363,62 +4565,30 @@ client.call.make(destination, mediaConstraints,
     <div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>deviceId</span> 
+          <span class='code bold'>urls</span> 
           <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+            ((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))
           </code>
 
           
 
           
-             : The ID of the device.
+             : Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
 
           
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>groupId</span> 
+          <span class='code bold'>credential</span> 
           <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
           </code>
 
           
 
           
-             : The group ID of the device. Devices that share a 
-<code>groupId</code>
- belong to the same physical device.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>kind</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The type of the device (audioinput, audiooutput, videoinput).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>label</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The name of the device.
+             : The credential needed by the ICE server.
 
           
           
@@ -4571,6 +4741,7 @@ application will use this ID to identify and control the call after it
 has been initiated.</p>
 <p>The <a href="Calls.getById">call.getById</a> API can be used to retrieve the
 current information about the call.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:start">call:start</a> event
 locally when the operation completes. When the remote participant
 receives the call, a <a href="Calls.event:call:receive">call:receive</a>
@@ -4814,6 +4985,7 @@ client.on(<span class="hljs-string">'call:start'</span>, <span class="hljs-funct
   <p>Rejects an incoming call.</p>
 <p>The specified call to reject must be in a ringing state with an incoming
 direction. The call will be ended as a result of the operation.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. The remote participant
 will be notified, through their own
@@ -4881,6 +5053,7 @@ call was rejected.</p>
   <p>Answers an incoming call.</p>
 <p>The specified call to answer must be in a ringing state with an incoming
 direction. The call will become connected as a result of the operation.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. This indicates that the
 call has connected with the remote participant. The
@@ -4982,6 +5155,17 @@ permissions.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>media.screen</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
+  
+    (default <code>false</code>)
+  </td>
+  <td class='break-word'><span>Whether the call should have screenshare on start.
+</span></td>
+</tr>
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>media.videoOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
   </td>
   <td class='break-word'><span>Options for configuring the call's video.
@@ -5020,6 +5204,44 @@ permissions.</p>
   <td class='break-word'><span class='code bold'>media.videoOptions.frameRate</span> <code class='quiet'>MediaConstraint?</code>
   </td>
   <td class='break-word'><span>The frame rate of the video.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's screenShare.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.height</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The height of the screenShare.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.width</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The width of the screenShare.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.frameRate</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The frame rate of the screenShare.
 </span></td>
 </tr>
 
@@ -5102,6 +5324,7 @@ permissions.</p>
   <p>Ignores an incoming call.</p>
 <p>The specified call to ignore must be in a ringing state with an incoming
 direction. The call will be ended as a result of the operation.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. The remote participant
 will not be notified that the call was ignored.</p>
@@ -5171,6 +5394,7 @@ and any/all media being sent to the remote participant will stop
 being sent.</p>
 <p>Some call operations cannot be performed while the call is on hold. The
 call can be taken off hold with the <a href="Calls.unhold">call.unhold</a> API.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. The remote participant
 will be notified of the operation through a
@@ -5238,6 +5462,7 @@ will be notified of the operation through a
 <p>The specified call to unhold must be locally held. If the call is not
 also remotely held, call media will be reconnected as it was before
 the call was held.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. The remote participant
 will be notified of the operation through a
@@ -5441,6 +5666,7 @@ will be notified of the operation through a
 will be emitted to indicate which media tracks were stopped. See the
 <a href="Calls.event:call:trackEnded">call:trackEnded</a> event for more
 information.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:stateChange">call:stateChange</a>
 event locally when the operation completes. The remote participant
 will be notified, through their own
@@ -5507,6 +5733,7 @@ call was ended.</p>
 
   <p>Add new media tracks to an ongoing call.
 Will get new media tracks from the specific sources to add to the call.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:newTrack">call:newTrack</a> event
 both for the local and remote users to indicate a track has been
 added to the Call.</p>
@@ -5600,6 +5827,17 @@ added to the Call.</p>
 
               
                 <tr>
+  <td class='break-word'><span class='code bold'>media.screen</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
+  
+    (default <code>false</code>)
+  </td>
+  <td class='break-word'><span>Whether to add the screenshare to the call.
+</span></td>
+</tr>
+
+
+              
+                <tr>
   <td class='break-word'><span class='code bold'>media.videoOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
   </td>
   <td class='break-word'><span>Options for configuring the call's video.
@@ -5638,6 +5876,44 @@ added to the Call.</p>
   <td class='break-word'><span class='code bold'>media.videoOptions.frameRate</span> <code class='quiet'>MediaConstraint?</code>
   </td>
   <td class='break-word'><span>The frame rate of the video.
+</span></td>
+</tr>
+
+
+  
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
+  </td>
+  <td class='break-word'><span>Options for configuring the call's screenShare.
+</span></td>
+</tr>
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.height</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The height of the screenShare.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.width</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The width of the screenShare.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>media.screenOptions.frameRate</span> <code class='quiet'>MediaConstraint?</code>
+  </td>
+  <td class='break-word'><span>The frame rate of the screenShare.
 </span></td>
 </tr>
 
@@ -5719,6 +5995,7 @@ added to the Call.</p>
   
 
   <p>Remove tracks from an ongoing call.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Calls.event:call:trackEnded">call:trackEnded</a>
 event for both the local and remote users to indicate that a track
 has been removed.</p>
@@ -5828,10 +6105,11 @@ has been removed.</p>
 <p>The provided tone can either be a single DTMF tone (eg. '1') or a
 sequence of DTMF tones (eg. '123') which will be played one after the
 other.</p>
-<p>The specified call must be either in Connected or Ringing state,
-otherwise invoking this API will have no effect.</p>
+<p>The specified call must be either in Connected, Ringing, or Early Media
+state, otherwise invoking this API will have no effect.</p>
 <p>The tones will be sent as out-of-band tones if supported by the call,
 otherwise they will be added in-band to the call's audio.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 
 
   <div class='pre p1 fill-light mt0'>sendDTMF(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, tone: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, duration: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, intertoneGap: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
@@ -5925,6 +6203,7 @@ otherwise they will be added in-band to the call's audio.</p>
   <p>Get a report about low-level call statistical information.</p>
 <p>A Track ID can optionally be provided to get a report for a specific
 Track of the Call.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a
 <a href="Calls.event:call:statsReceived">call:statsReceived</a> event, after
 the operation completes, that has the report.</p>
@@ -6000,6 +6279,7 @@ provided, RTCStatsReport is generated for the Call itself.
   <p>Forwards an incoming call to another user.</p>
 <p>The specified destination will receive the Call instead of the current
 user.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a <a href="Call.event:call:stateChange">call:stateChange</a>
 event after the operation completes.</p>
 
@@ -6074,10 +6354,18 @@ event after the operation completes.</p>
 as an announced or warm transfer). This allows the current user to
 transfer the remote participant of a call to another user, after
 having spoken to both users.</p>
-<p>Both calls used for the transfer must be locally held. Both remote
-participants will see their call be unheld, and will be connected to
-one another after the operation. Both calls for the current user will
-be ended.</p>
+<p>Both calls used for the transfer must be locally held. After the
+operation, these calls will be ended, as indicated by a
+<a href="Calls.event:call:stateChange">call:stateChange</a> event.</p>
+<p>Both remote participants will see their call be unheld by the operation,
+as indicated by a
+<a href="Calls.event:call:stateChange">call:stateChange</a> event, and will
+be connected to one another afterwards.</p>
+<p>The progression of the operation will be tracked via the
+<a href="Calls.event:call:operation">call:operation</a> event. Both local
+calls will receive this event, since it is an operation on both calls,
+and the remote calls will receive it as if it were a "remote unhold"
+operation.</p>
 
 
   <div class='pre p1 fill-light mt0'>consultativeTransfer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, otherCallId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -6150,10 +6438,16 @@ be ended.</p>
 blind transfer). This allows the current user to transfer the remote
 participant of a call to another user, similar to a "forward"
 operation.</p>
-<p>The specified call must be locally held. The "destination" user will
-receive an incoming call, and when answered, they will be connected
-with the remote participant of the specified call. The current user's
-call will be ended after the operation.</p>
+<p>The specified call must be locally held. After the operation, this call
+will be ended, as indicated by a
+<a href="Calls.event:call:stateChange">call:stateChange</a> event.</p>
+<p>The "destination" user will receive an incoming call, and when answered,
+they will be connected with the remote participant of the specified
+call.</p>
+<p>The progression of the operation will be tracked via the
+<a href="Calls.event:call:operation">call:operation</a> event. The remote
+participant being transferred will receive it as if it were a "remote
+unhold" operation.</p>
 
 
   <div class='pre p1 fill-light mt0'>directTransfer(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, destination: (UserID | PhoneNumber))</div>
@@ -6225,12 +6519,17 @@ call will be ended after the operation.</p>
   <p>Performs a "join" on two ongoing calls.
 This allows the current user to establish a call with audio with two
 remote users.</p>
-<p>Both specified calls must be locally held. The "joined" call will be
+<p>Both specified calls must be locally held. The new, "joined" call will be
 audio-only, even if either previous call had video. Video cannot be
 added to the "joined" call. Both remote participants will see their
 call taken off hold, and will receive additional audio from other
-participants after the operation. Both calls for the current user will
-be ended after the operation.</p>
+participants after the operation. Both previous calls for the current
+user will be ended after the operation, as indicated by a
+<a href="Calls.event:call:stateChange">call:stateChange</a> event.</p>
+<p>The progress of the operation will be tracked via the
+<a href="Calls.event:call:operation">call:operation</a> event. Both remote
+participants will also receive this event as if it were a "remote
+unhold" operation.</p>
 
 
   <div class='pre p1 fill-light mt0'>join(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, otherCallId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
@@ -6303,6 +6602,7 @@ be ended after the operation.</p>
 <p>The operation will remove the old track from the call and add a
 new track to the call. This effectively allows for changing the
 track constraints (eg. device used) for an ongoing call.</p>
+<p>The progress of the operation will be tracked via the <a href="Calls.event:call:operation">call:operation</a> event.</p>
 <p>The SDK will emit a
 <a href="Calls.event:call:trackReplaced">call:trackReplaced</a> event
 locally when the operation completes. The newly added track will need
@@ -6582,6 +6882,24 @@ event when a Call's state changes from one state to another.</p>
 
           
              : The call has been received by both parties, and is waiting to be answered.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>EARLY_MEDIA</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The call has not been answered, but media
+is already being received. This may be network-ringing media, IVR
+system media, or other pre-answer medias. When early media is
+supported, this state may replace the Ringing state.
 
           
           
@@ -9157,6 +9475,192 @@ client.conversation.fetch({<span class="hljs-attr">type</span>: client.conversat
       </div>
     </div>
   
+    <div class='border-bottom' id='conversationmessage'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Message</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Message object represents an individual message that was delivered to a recipient and it is
+obtained through the <a href="#conversationgetmessages">Conversation.getMessages</a> or <a href="#conversationgetmessage">Conversation.getMessage</a> API on an existing conversation.</p>
+<p>Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.</p>
+<p>Once the sender sends a message, this message is saved in sender's state as an object.</p>
+<p>Similarly, once the recipient gets a message, this message is saved in recipient's state.</p>
+<p>Below are the properties pertaining to this saved message object in either sender or recipient's state.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Message</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>timestamp</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : A Unix timestamp in seconds marking the time when the message was created by sender.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>isPending</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Whether the message is in pending state or not (delivered by server or not).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>read</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Whether the message was read by recipient user or not.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>parts</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Part>)
+          </code>
+
+          
+
+          
+             : An array of Part Objects.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>sender</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The primary contact address of the sender.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>messageId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The unique id of the message. The message object (stored in sender's state) has a different id
+than the one associated with the message object stored in recipient's state.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The type of message that was sent. See 
+<a href="Messaging.chatTypes">chatTypes</a>
+ for valid types.
+This property applies only to message objects stored in sender's state.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>deliveryStatus</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
+This property applies only to the message object stored in sender's state.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='conversationmessagesender'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -9364,192 +9868,6 @@ the message can then be sent using the send function.</p>
 </div>
 
     
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='conversationmessage'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>Message</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the <a href="#conversationgetmessages">Conversation.getMessages</a> or <a href="#conversationgetmessage">Conversation.getMessage</a> API on an existing conversation.</p>
-<p>Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.</p>
-<p>Once the sender sends a message, this message is saved in sender's state as an object.</p>
-<p>Similarly, once the recipient gets a message, this message is saved in recipient's state.</p>
-<p>Below are the properties pertaining to this saved message object in either sender or recipient's state.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Message</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>timestamp</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
-          </code>
-
-          
-
-          
-             : A Unix timestamp in seconds marking the time when the message was created by sender.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>isPending</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Whether the message is in pending state or not (delivered by server or not).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>read</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
-          </code>
-
-          
-
-          
-             : Whether the message was read by recipient user or not.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>parts</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Part>)
-          </code>
-
-          
-
-          
-             : An array of Part Objects.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>sender</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The primary contact address of the sender.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>messageId</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The unique id of the message. The message object (stored in sender's state) has a different id
-than the one associated with the message object stored in recipient's state.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The type of message that was sent. See 
-<a href="Messaging.chatTypes">chatTypes</a>
- for valid types.
-This property applies only to message objects stored in sender's state.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>deliveryStatus</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
-This property applies only to the message object stored in sender's state.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
   
 
   

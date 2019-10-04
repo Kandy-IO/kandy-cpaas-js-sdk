@@ -5,6 +5,20 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.9.0 - beta
+
+### Added
+
+- Added Call functionality where local media tracks are deleted if they are not being used for the call. `KAA-1890`
+- Added a `call:operation` event which is fired by call operations to keep track of operation progress. `KAA-1949`
+
+### Changed 
+
+- Improved Call screenshare functionality. `KAA-2000`
+  - Added explicit screenshare options for APIs, separate from video options. See the `call.make`, `call.answer`, and `call.addMedia` APIs.
+  - A browser extension is no longer required for screensharing on Google Chrome.
+  - A Call can now be started and/or answered with screenshare.
+
 ## 4.8.0 - 2019-09-27
 
 ### Fixed
