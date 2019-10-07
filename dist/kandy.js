@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.152
+ * Version: 4.9.0-beta.153
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31044,7 +31044,7 @@ var _constants = __webpack_require__("../kandy/src/constants.js");
  * @param {Number} [reconnectTimeLimit=640000] Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with the reconnect time multiplier to prevent overly long delays between reconnection attempts.
  * @param {Boolean} [autoReconnect=true] Flag to determine whether the SDK will attempt to automatically reconnect after connectivity disruptions.
  * @param {Number} [maxMissedPings=3] Maximum pings sent (without receiving a response) before reporting an error.
- * @param {Boolean} [checkConnectivity=false] Flag to determine whether the SDK should check connectivity.
+ * @param {Boolean} [checkConnectivity=true] Flag to determine whether the SDK should check connectivity.
  */
 exports.default = {
   method: _constants.connCheckMethods.KEEP_ALIVE,
@@ -31112,7 +31112,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Number} [connectivity.reconnectTimeLimit=640000] Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts.
  * @param {Boolean} [connectivity.autoReconnect=true] Flag to determine whether reconnection will be attempted automatically after connectivity disruptions.
  * @param {Number} [connectivity.maxMissedPings=3] Maximum pings sent (without receiving a response) before reporting an error.
- * @param {Boolean} [connectivity.checkConnectivity=false] Flag to determine whether to enable connectivity checking or not.
+ * @param {Boolean} [connectivity.checkConnectivity=true] Flag to determine whether to enable connectivity checking or not.
  */
 
 /**
@@ -33336,7 +33336,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.152';
+  let version = '4.9.0-beta.153';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
