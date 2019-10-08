@@ -12,7 +12,7 @@ Kandy.js change log.
 - Added Call functionality where local media tracks are deleted if they are not being used for the call. `KAA-1890`
 - Added a `call:operation` event which is fired by call operations to keep track of operation progress. `KAA-1949`
 
-### Changed 
+### Changed
 
 - Improved Call screenshare functionality. `KAA-2000`
   - Added explicit screenshare options for APIs, separate from video options. See the `call.make`, `call.answer`, and `call.addMedia` APIs.
@@ -23,6 +23,7 @@ Kandy.js change log.
 
 - Fixed an issue where the "to" information of the call wasn't being set to where the call was actually sent. `KAA-2014`
 - Fixed an issue where the websocket connection is not closed when unsubscribing from all services. `KAA-2025`
+- Fixed the inconsistent order of media events for both incoming & outgoing calls. `KAA-1757`
 
 ## 4.8.0 - 2019-09-27
 

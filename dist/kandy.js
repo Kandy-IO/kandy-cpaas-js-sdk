@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.155
+ * Version: 4.9.0-beta.156
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21978,6 +21978,7 @@ const callPrefix = '@@KANDY/CALL/';
  */
 const MAKE_CALL = exports.MAKE_CALL = callPrefix + 'MAKE';
 const PENDING_MAKE_CALL = exports.PENDING_MAKE_CALL = callPrefix + 'PENDING_MAKE';
+const SESSION_CREATED = exports.SESSION_CREATED = callPrefix + 'SESSION_CREATED';
 const MAKE_CALL_FINISH = exports.MAKE_CALL_FINISH = callPrefix + 'MAKE_FINISH';
 
 const MAKE_ANONYMOUS_CALL = exports.MAKE_ANONYMOUS_CALL = callPrefix + 'MAKE_ANONYMOUS_CALL';
@@ -22092,6 +22093,7 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 var _extends3 = _interopRequireDefault(_extends2);
 
 exports.makeCall = makeCall;
+exports.sessionCreated = sessionCreated;
 exports.pendingMakeCall = pendingMakeCall;
 exports.makeCallFinish = makeCallFinish;
 exports.makeAnonymousCall = makeAnonymousCall;
@@ -22199,6 +22201,10 @@ function callActionHelper(type, id, payload = {}, meta = {}) {
 // Libraries.
 function makeCall(id, options) {
   return callActionHelper(actionTypes.MAKE_CALL, id, options);
+}
+
+function sessionCreated(id, params) {
+  return callActionHelper(actionTypes.SESSION_CREATED, id, params);
 }
 
 function pendingMakeCall(id, options) {
@@ -23944,7 +23950,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.MAKE_CALL, operation: _constants.OPERATIONS.MAKE }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -23955,15 +23961,23 @@ startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   };
 });
 
-// PENDING acitons
-callEvents[actionTypes.PENDING_MAKE_CALL] = (action, params) => {
+callEvents[actionTypes.MAKE_CALL] = (action, params) => {
   return [callOperationHandler(action, (0, _extends3.default)({}, params, {
     operation: _constants.OPERATIONS.MAKE,
-    transition: _constants.OP_TRANSITIONS.UPDATE,
+    transition: _constants.OP_TRANSITIONS.START,
     isLocal: true
   })), callEventHandler(eventTypes.CALL_STARTED, action, {
     error: action.payload.error
   })];
+};
+
+// PENDING actions
+callEvents[actionTypes.PENDING_MAKE_CALL] = (action, params) => {
+  return callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.MAKE,
+    transition: _constants.OP_TRANSITIONS.UPDATE,
+    isLocal: true
+  }));
 };
 
 callEvents[actionTypes.PENDING_OPERATION] = (action, params) => {
@@ -24115,6 +24129,7 @@ callEvents[actionTypes.UPDATE_CALL] = stateChangeHandler;
 
 callEvents[webrtcActionTypes.SESSION_NEW_TRACK] = (action, context) => {
   const state = context.state;
+  // The webrtc session should have been already created (by handling SESSION_CREATED action -- see above)
   const call = (0, _selectors.getCallByWebrtcSessionId)(state, action.payload.id);
 
   if (call) {
@@ -24302,10 +24317,16 @@ reducers[actionTypes.CALL_INCOMING] = {
 
 callReducers[actionTypes.CALL_RINGING] = {
   next(state, action) {
-    return (0, _extends3.default)({}, state, {
-      state: _constants.CALL_STATES.RINGING,
-      remoteParticipant: action.payload.remoteParticipant
-    });
+    if (action.payload.remoteParticipant) {
+      return (0, _extends3.default)({}, state, {
+        state: _constants.CALL_STATES.RINGING,
+        remoteParticipant: action.payload.remoteParticipant
+      });
+    } else {
+      return (0, _extends3.default)({}, state, {
+        state: _constants.CALL_STATES.RINGING
+      });
+    }
   }
 };
 
@@ -24384,6 +24405,17 @@ callReducers[actionTypes.REJECT_CALL_FINISH] = {
       startTime: now,
       endTime: now,
       state: _constants.CALL_STATES.ENDED
+    });
+  }
+};
+
+callReducers[actionTypes.SESSION_CREATED] = {
+  next(state, action) {
+    // When we get SESSION_CREATED action, the call object already exists as part of reducers state
+    // so we only add the webrtc session id. This way, when call:newTrack action is later triggered,
+    // we can find the call object by searching for this associated webrtcSessionId.
+    return (0, _extends3.default)({}, state, {
+      webrtcSessionId: action.payload.webrtcSessionId
     });
   }
 };
@@ -24661,7 +24693,7 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 /*
  * Reducer to handle specific call actions.
@@ -25926,7 +25958,8 @@ function* makeCall(deps, action) {
     sdpSemantics,
     turnInfo,
     trickleIceMode,
-    bandwidth
+    bandwidth,
+    callId: action.payload.id
   });
 
   // An error occured while trying to setup the WebRTC portion of the call.
@@ -26086,7 +26119,7 @@ function* answerCall(deps, action) {
     log.debug('Answering call.', action.payload.id);
 
     // Update the existing webRTC session with an answer.
-    const sessionOptions = { sessionId: incomingCall.webrtcSessionId, bandwidth };
+    const sessionOptions = { sessionId: incomingCall.webrtcSessionId, bandwidth, callId: incomingCall.id };
     webrtcInfo = yield (0, _effects.call)(_establish.answerWebrtcSession, deps, mediaConstraints, sessionOptions);
 
     if (webrtcInfo.error) {
@@ -27883,7 +27916,27 @@ function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber } = params;
 
-  let sessionId, isSlowStart;
+  const callId = yield (0, _effects.call)(_v2.default);
+
+  // Dispatch the action right away so the call is in state at this point.
+  yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
+    // TODO: Proper constants.
+    direction: 'incoming',
+    state: _constants.CALL_STATES.INITIATING,
+    remoteParticipant: {
+      displayName: remoteName,
+      displayNumber: remoteNumber
+    },
+    to: calleeNumber,
+    // Number of the remote participant when the call was established.
+    from: remoteNumber,
+    // The ID that the backend uses to track this webRTC session.
+    wrtcsSessionId,
+
+    // Whether the call was received as a slow start call or not.
+    isSlowStart: !sdp
+  }));
+
   /**
    * An incoming call may or may not have an SDP offer associated with it.
    * If it has an SDP, then it is a "regular" call scenario and can be handled
@@ -27894,29 +27947,27 @@ function* incomingCall(deps, params) {
    */
   if (sdp) {
     // Regular call.
-    isSlowStart = false;
     const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
     const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
 
     // Since we have the remote offer SDP, we can setup a webRTC session.
-    sessionId = yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
+    yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
       offer: {
         sdp
       },
       trickleIceMode,
       sdpSemantics,
-      turnInfo
+      turnInfo,
+      callId
     });
-  } else {
-    // Slow start call.
-    isSlowStart = true;
-    /*
-     * We can't setup a webRTC session yet because generating an offer requires
-     *   media constraints. We need to wait until the application provides
-     *   media information before we can setup the call.
-     */
-    sessionId = undefined;
-  }
+  } else {}
+  // Slow start call.
+  /*
+   * We can't setup a webRTC session yet because generating an offer requires
+   *   media constraints. We need to wait until the application provides
+   *   media information before we can setup the call.
+   */
+
 
   // Send update that the wrtcsSessionStatus is 'Ringing'
   const callInfo = { wrtcsSessionId };
@@ -27926,24 +27977,8 @@ function* incomingCall(deps, params) {
     log.error(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
   }
 
-  const callId = yield (0, _effects.call)(_v2.default);
-  yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
-    // TODO: Proper constants.
-    direction: 'incoming',
-    state: _constants.CALL_STATES.RINGING,
-    remoteParticipant: {
-      displayName: remoteName,
-      displayNumber: remoteNumber
-    },
-    to: calleeNumber,
-    // Number of the remote participant when the call was established.
-    from: remoteNumber,
-    // The ID that the backend uses to track this webRTC session.
-    wrtcsSessionId,
-    // The ID that the webRTC stack uses to track this webRTC session.
-    webrtcSessionId: sessionId,
-    // Whether the call was received as a slow start call or not.
-    isSlowStart
+  yield (0, _effects.put)(_actions.callActions.callRinging(callId, {
+    state: _constants.CALL_STATES.RINGING
   }));
 }
 
@@ -29541,6 +29576,8 @@ exports.setupCall = setupCall;
 exports.setupIncomingCall = setupIncomingCall;
 exports.answerWebrtcSession = answerWebrtcSession;
 
+var _actions = __webpack_require__("../kandy/src/call/interfaceNew/actions/index.js");
+
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 var _pipeline = __webpack_require__("../kandy/src/callstack/sdp/pipeline.js");
@@ -29558,6 +29595,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // WebRTC operations.
+
+
 // Helpers
 const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
@@ -29572,6 +29611,7 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
  * @param  {boolean} mediaConstraints.audio Whether to enable audio or not
  * @param  {boolean} mediaConstraints.video Whether to enable video or not
  * @param  {Object} sessionOptions
+ * @param  {Object} sessionOptions.callId The id of the call
  * @param  {Object} sessionOptions.sdpSemantics Semantics for Real Time Communication configurations
  * @param  {Object} sessionOptions.turnInfo Contains information required for setting up ICE servers
  * @param  {string} sessionOptions.trickleIceMode What mode to be used for trickle ICE
@@ -29584,9 +29624,10 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 
 
 // Libraries.
+// Call plugin.
 function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
-  const { sdpSemantics, turnInfo, trickleIceMode, bandwidth } = sessionOptions;
+  const { sdpSemantics, turnInfo, trickleIceMode, bandwidth, callId } = sessionOptions;
 
   const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
@@ -29604,6 +29645,11 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
       trickleIceMode
     }
   });
+
+  // Trigger a new action specifying that the session has been created
+  yield (0, _effects.put)(_actions.callActions.sessionCreated(callId, {
+    webrtcSessionId: session.id
+  }));
 
   // Add the tracks to the session.
   let allTracks = [];
@@ -29643,6 +29689,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
  * @param  {Object} deps.webRTC      The WebRTC stack.
  * @param  {Array}  deps.sdpHandlers SDP handlers.
  * @param  {Object} sessionOptions
+ * @param  {string} sessionOptions.callId the local call id
  * @param  {Object} sessionOptions.sdpSemantics semantics for the SDP, contains video and audio constraints
  * @param  {Object} sessionOptions.turnInfo TURN information, contains server info
  * @param  {string} sessionOptions.trickleIceMode the mode to enable for Trickle ICE
@@ -29651,7 +29698,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
  */
 function* setupIncomingCall(deps, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
-  const { sdpSemantics, turnInfo, trickleIceMode } = sessionOptions;
+  const { sdpSemantics, turnInfo, trickleIceMode, callId } = sessionOptions;
   let offer = sessionOptions.offer;
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
@@ -29678,6 +29725,11 @@ function* setupIncomingCall(deps, sessionOptions) {
     sdp: offer.sdp
   });
 
+  // Trigger a new action specifying that the session has been created
+  yield (0, _effects.put)(_actions.callActions.sessionCreated(callId, {
+    webrtcSessionId: session.id
+  }));
+
   return session.id;
 }
 
@@ -29693,6 +29745,7 @@ function* setupIncomingCall(deps, sessionOptions) {
  * @param  {boolean} mediaConstraints.video Whether to enable video or not
  * @param  {Object} sessionOptions
  * @param  {string} sessionOptions.sessionId the local webrtc session id
+ * @param  {string} sessionOptions.callId the local call id
  * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.answerSDP Session Description Protocol for answer
@@ -33342,7 +33395,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.155';
+  let version = '4.9.0-beta.156';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
