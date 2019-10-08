@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.153
+ * Version: 4.9.0-beta.154
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30524,6 +30524,11 @@ function* waitSaga(timeout, waitPatterns) {
 
     log.debug(`Waiting for actions timed out. ${waitSagaContext.numFinishedWaits} actions were processed out of ${waitSagaContext.numTotalWaits}.`);
   } else {
+    // NOTE: The `join` effect from the currently used version of redux-saga will return an object if one
+    // task is passed in, and an array if more than one tasks are passed. When updating redux-saga version
+    // check to see if this is still required
+    results = Array.isArray(results) ? results : [results];
+
     log.debug(`Waiting for actions completed, all ${waitSagaContext.numTotalWaits} actions were processed`);
   }
 
@@ -33336,7 +33341,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.153';
+  let version = '4.9.0-beta.154';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -43821,6 +43826,8 @@ var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
 
 var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
 
+var _constants = __webpack_require__("../kandy/src/auth/constants.js");
+
 var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 var _errors = __webpack_require__("../kandy/src/errors/index.js");
@@ -43833,23 +43840,23 @@ var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
-var _constants = __webpack_require__("../kandy/src/constants.js");
+var _constants2 = __webpack_require__("../kandy/src/constants.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Helpers.
-
-
-// Other plugins
-const platform = _constants.platforms.CPAAS;
+// Subscription plugin.
+const platform = _constants2.platforms.CPAAS;
 
 // Constants
 
 
 // Libraries.
-// Subscription plugin.
+
+
+// Other plugins
 
 const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
@@ -43906,22 +43913,9 @@ function* subscriptionFlow() {
 
       // Unsubscribe the services.
       const unsubResponses = yield (0, _effects2.call)(unsubscribeServices, action);
-
       if (unsubResponses.error) {
         yield (0, _effects2.put)(actions.unsubscribeFinished({
           error: unsubResponses.error,
-          type: action.payload.type
-        }));
-        continue;
-      }
-
-      const connectionInfo = yield (0, _effects2.select)(_selectors2.getConnectionInfo, platform);
-      const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
-
-      // if we're not connected or connection info is not available, unsub from all services.
-      if ((0, _fp.isUndefined)(connectionInfo)) {
-        yield (0, _effects2.put)(actions.unsubscribeFinished({
-          unsubscriptions: subscribedServices,
           type: action.payload.type
         }));
         continue;
@@ -43933,6 +43927,7 @@ function* subscriptionFlow() {
 
       // If there are no longer any subscribed services for this channel (and
       //    the channel is open), close it.
+      const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
       if (subscribedServices.length === 0 && channel) {
         const closeResponse = yield (0, _effects2.call)(_channels.closeChannel, channel, platform);
 
@@ -43946,7 +43941,6 @@ function* subscriptionFlow() {
 
       // Report that the unsubscription flow has finished.
       yield (0, _effects2.put)(actions.unsubscribeFinished({
-        unsubscriptions: unsubResponses,
         type: action.payload.type
       }));
     }
@@ -44049,8 +44043,13 @@ function* unsubscribeServices(action) {
   // Wait for a response from each plugin.
   const { results } = yield (0, _effects.waitFor)(subscriptionConfig.timeout * 1000, waitPatterns);
 
-  // TODO: Would it be better to handle partial results here?
-  return (0, _fp.compact)(results);
+  // Get the service from each of the unsubscribed actions
+  let resultServices = results;
+  if (Array.isArray(results)) {
+    resultServices = results.map(resultAction => resultAction.payload.service);
+  }
+
+  return (0, _fp.compact)(resultServices);
 }
 
 /**
@@ -44109,9 +44108,8 @@ function* onConnectionLostEntry() {
  * @method onConnectionLost
  */
 function* onConnectionLost() {
-  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices);
   yield (0, _effects2.put)(actions.unsubscribeFinished({
-    unsubscriptions: subscribedServices
+    reason: _constants.DISCONNECT_REASONS.LOST_CONNECTION
   }));
 }
 
@@ -44238,10 +44236,11 @@ function unsubscribe(services = [], type) {
  * @method unsubscribeFinished
  * @param  {string} type The type of notificationChannel.
  * @param  {Object} [error] An error object.
+ * @param  {string} [reason] The reason for the unsubscribe, if abnormal.
  * @return {Object} A flux standard action.
  */
-function unsubscribeFinished({ unsubscriptions, type, error }) {
-  return actionFormatter(actionTypes.UNSUBSCRIBE_FINISHED, { unsubscriptions, type, error });
+function unsubscribeFinished({ type, error, reason }) {
+  return actionFormatter(actionTypes.UNSUBSCRIBE_FINISHED, { type, error, reason });
 }
 
 /**
@@ -44598,6 +44597,8 @@ Object.defineProperty(exports, "__esModule", {
  * @public
  * @memberof services
  * @event subscription:change
+ * @param {Object} params
+ * @param {string} [params.reason] When unsolicited, the reason for the change.
  */
 const SUB_CHANGE = exports.SUB_CHANGE = 'subscription:change';
 
@@ -44639,7 +44640,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function subChangeEvent(action) {
   return {
     type: action.error ? eventTypes.SUB_ERROR : eventTypes.SUB_CHANGE,
-    args: action.error ? { error: action.payload.error } : {}
+    args: action.error ? { error: action.payload.error } : { reason: action.payload.reason }
   };
 }
 
@@ -44724,6 +44725,8 @@ var _actionTypes = __webpack_require__("../kandy/src/subscription/interface/acti
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
+var _constants = __webpack_require__("../kandy/src/auth/constants.js");
+
 var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
@@ -44753,6 +44756,9 @@ const defaultState = {
   isPending: false
 };
 
+// Other plugins.
+
+
 const reducers = {};
 
 // Helper function for changing the pending value.
@@ -44771,10 +44777,23 @@ reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
  */
 reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
   next(state, action) {
-    const subscribedServices = state.subscriptions.map(subscription => subscription.service);
+    const newState = (0, _extends3.default)({}, state, {
+      isPending: false
+
+      /*
+       * If connectivity was lost, remove all subscriptions to reflect that we
+       *    aren't receiving anything from them.
+       * In "normal" scenarios, other reducers handle the subscriptions state.
+       */
+    });if (action.payload.reason === _constants.DISCONNECT_REASONS.LOST_CONNECTION) {
+      newState.subscriptions = [];
+    }
+
+    return newState;
+  },
+  throw(state) {
     return (0, _extends3.default)({}, state, {
-      isPending: false,
-      subscriptions: (0, _fp.difference)(subscribedServices, action.payload.unsubscriptions)
+      isPending: false
     });
   }
 };
