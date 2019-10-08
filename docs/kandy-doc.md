@@ -314,6 +314,40 @@ client.call.make(destination, {
 })
 ```
 
+### BandwidthControls
+
+The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
+BandwidthControls only affect received remote tracks of the specified type.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `audio` **[number][8]?** The desired bandwidth bitrate in kilobits per second for received remote audio.
+-   `video` **[number][8]?** The desired bandwidth bitrate in kilobits per second for received remote video.
+
+**Examples**
+
+```javascript
+// Specify received remote video bandwidth limits when making a call.
+client.call.make(destination, mediaConstraints,
+ {
+   bandwidth: {
+     video: 5
+   }
+ }
+)
+```
+
+### IceServer
+
+Type: [Object][4]
+
+**Properties**
+
+-   `urls` **([Array][9]&lt;[string][5]> | [string][5])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+-   `credential` **[string][5]?** The credential needed by the ICE server.
+
 ### CallObject
 
 Information about a Call.
@@ -339,30 +373,41 @@ Type: [Object][4]
 -   `startTime` **[number][8]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][8]?** The end time of the call in milliseconds since the epoch.
 
-### DeviceInfo
-
-Contains information about a device.
+### SdpHandlerInfo
 
 Type: [Object][4]
 
 **Properties**
 
--   `deviceId` **[string][5]** The ID of the device.
--   `groupId` **[string][5]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][5]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][5]** The name of the device.
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][5]** Which end of the connection created the SDP.
 
-### DevicesObject
+### SdpHandlerFunction
 
-A collection of media devices and their information.
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][12]
+
+**Parameters**
+
+-   `newSdp` **[Object][4]** The SDP so far (could have been modified by previous handlers).
+-   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][4]** The SDP in its initial state.
+
+Returns **[Object][4]** The resulting modified SDP based on the changes made by this function.
+
+### MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 Type: [Object][4]
 
 **Properties**
 
--   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
--   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
--   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
+-   `id` **[string][5]** The ID of the Media object.
+-   `local` **[boolean][7]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][9]&lt;TrackObject>** A list of Track objects that are contained in this Media object.
 
 ### TrackObject
 
@@ -382,75 +427,30 @@ Type: [Object][4]
 -   `state` **[string][5]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][5]** The ID of the Media Stream that includes this Track.
 
-### MediaObject
+### DevicesObject
 
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][4]
-
-**Properties**
-
--   `id` **[string][5]** The ID of the Media object.
--   `local` **[boolean][7]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][9]&lt;TrackObject>** A list of Track objects that are contained in this Media object.
-
-### SdpHandlerFunction
-
-The form of an SDP handler function and the expected arguments that it receives.
-
-Type: [Function][12]
-
-**Parameters**
-
--   `newSdp` **[Object][4]** The SDP so far (could have been modified by previous handlers).
--   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][4]** The SDP in its initial state.
-
-Returns **[Object][4]** The resulting modified SDP based on the changes made by this function.
-
-### SdpHandlerInfo
+A collection of media devices and their information.
 
 Type: [Object][4]
 
 **Properties**
 
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][5]** Which end of the connection created the SDP.
+-   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
+-   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
+-   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
 
-### IceServer
+### DeviceInfo
 
-Type: [Object][4]
-
-**Properties**
-
--   `urls` **([Array][9]&lt;[string][5]> | [string][5])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
--   `credential` **[string][5]?** The credential needed by the ICE server.
-
-### BandwidthControls
-
-The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
-BandwidthControls only affect received remote tracks of the specified type.
+Contains information about a device.
 
 Type: [Object][4]
 
 **Properties**
 
--   `audio` **[number][8]?** The desired bandwidth bitrate in kilobits per second for received remote audio.
--   `video` **[number][8]?** The desired bandwidth bitrate in kilobits per second for received remote video.
-
-**Examples**
-
-```javascript
-// Specify received remote video bandwidth limits when making a call.
-client.call.make(destination, mediaConstraints,
- {
-   bandwidth: {
-     video: 5
-   }
- }
-)
-```
+-   `deviceId` **[string][5]** The ID of the device.
+-   `groupId` **[string][5]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][5]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][5]** The name of the device.
 
 ### make
 
