@@ -19,6 +19,9 @@ Kandy.js change log.
   - A browser extension is no longer required for screensharing on Google Chrome.
   - A Call can now be started and/or answered with screenshare.
 
+### Fixed
+
+- Fixed an issue where the "to" information of the call wasn't being set to where the call was actually sent. `KAA-2014`
 - Fixed an issue where the websocket connection is not closed when unsubscribing from all services. `KAA-2025`
 
 ## 4.8.0 - 2019-09-27
