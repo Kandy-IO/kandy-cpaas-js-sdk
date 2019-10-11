@@ -24,6 +24,7 @@ Kandy.js change log.
 - Fixed an issue where the "to" information of the call wasn't being set to where the call was actually sent. `KAA-2014`
 - Fixed an issue where the websocket connection is not closed when unsubscribing from all services. `KAA-2025`
 - Fixed the inconsistent order of media events for both incoming & outgoing calls. `KAA-1757`
+- Fixed an issue where the SIP number normalization was unnecessarily removing an '@' symbol. `KAA-1793`
 
 ## 4.8.0 - 2019-09-27
 
