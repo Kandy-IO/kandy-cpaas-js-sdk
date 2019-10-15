@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.159
+ * Version: 4.9.0-beta.160
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31081,7 +31081,7 @@ function getConfiguration(state) {
 
 /***/ }),
 
-/***/ "../kandy/src/connectivity/defaults.js":
+/***/ "../kandy/src/connectivity/common/base.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31090,57 +31090,15 @@ function getConfiguration(state) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-/**
- * Connectivity plugin defaults.
- * @param {String} [method='keepAlive'] The method of connectivity checking to use. Either connCheckMethods.PING_PONG or connCheckMethods.KEEP_ALIVE
- * @param {Number} [pingInterval=30000] Time in between websocket ping attempts (milliseconds).
- * @param {Number} [reconnectLimit=5] Number of failed reconnect attempts before reporting an error. Can be set to 0 to not limit reconnection attempts.
- * @param {Number} [reconnectDelay=5000] Base time between websocket reconnect attempts (milliseconds).
- * @param {Number} [reconnectTimeMultiplier=1] Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this factor after each failed reconnect attempt to increase the delay between attempts.
- * @param {Number} [reconnectTimeLimit=640000] Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with the reconnect time multiplier to prevent overly long delays between reconnection attempts.
- * @param {Boolean} [autoReconnect=true] Flag to determine whether the SDK will attempt to automatically reconnect after connectivity disruptions.
- * @param {Number} [maxMissedPings=3] Maximum pings sent (without receiving a response) before reporting an error.
- * @param {Boolean} [checkConnectivity=true] Flag to determine whether the SDK should check connectivity.
- */
-exports.default = {
-  method: _constants.connCheckMethods.KEEP_ALIVE,
-  pingInterval: 30000,
-  reconnectLimit: 5,
-  reconnectDelay: 5000,
-  reconnectTimeMultiplier: 1,
-  reconnectTimeLimit: 640000,
-  autoReconnect: true,
-  maxMissedPings: 3,
-  checkConnectivity: true
-};
-
-/***/ }),
-
-/***/ "../kandy/src/connectivity/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = connectivity;
+exports.default = baseConnectivity;
 
 var _interface = __webpack_require__("../kandy/src/connectivity/interface/index.js");
-
-var _defaults = __webpack_require__("../kandy/src/connectivity/defaults.js");
-
-var _defaults2 = _interopRequireDefault(_defaults);
 
 var _events = __webpack_require__("../kandy/src/connectivity/interface/events.js");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _sagas = __webpack_require__("../kandy/src/connectivity/sagas.js");
+var _sagas = __webpack_require__("../kandy/src/connectivity/common/sagas.js");
 
 var _actions = __webpack_require__("../kandy/src/config/interface/actions.js");
 
@@ -31148,42 +31106,24 @@ var _actions2 = __webpack_require__("../kandy/src/events/interface/actions.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
 var _constants = __webpack_require__("../kandy/src/constants.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Configuration options for the Connectivity feature.
- * @public
- * @name config.connectivity
- * @memberof config
- * @instance
- * @param {Object} connectivity Connectivity configs.
- * @param {Object} connectivity.method Configuration for how connectivity checks should be made.
- * @param {String} [connectivity.method.type='keepAlive'] The method of connectivity checking to use: `keepAlive` or `pingPong`.
- * @param {String} [connectivity.method.responsibleParty='client'] Configures who is responsible for initiating the connectivity check: `client` or `server`.
- * @param {Number} [connectivity.pingInterval=30000] Time in between websocket ping attempts (milliseconds). Only used for when the client is responsible for ping/connCheck.
- * @param {Number} [connectivity.reconnectLimit=5] Number of failed reconnect attempts before reporting an error. Can be set to 0 to not limit reconnection attempts.
- * @param {Number} [connectivity.reconnectDelay=5000] Base time between websocket reconnect attempts (milliseconds).
- * @param {Number} [connectivity.reconnectTimeMultiplier=1] Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this factor after each failed reconnect attempt to increase the delay between attempts.
- * @param {Number} [connectivity.reconnectTimeLimit=640000] Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts.
- * @param {Boolean} [connectivity.autoReconnect=true] Flag to determine whether reconnection will be attempted automatically after connectivity disruptions.
- * @param {Number} [connectivity.maxMissedPings=3] Maximum pings sent (without receiving a response) before reporting an error.
- * @param {Boolean} [connectivity.checkConnectivity=true] Flag to determine whether to enable connectivity checking or not.
- */
-
-/**
- * Connectivity plugin factory.
+ * Base Connectivity plugin factory.
  * Responsible for handling websockets.
- * @method connectivity
+ * @method baseConnectivity
  * @param  {Object} [options={}] Connectivity configs. See above.
  * @return {Object} Plugin - A connectivity plugin.
  */
-function connectivity(options = {}) {
-  options = (0, _fp.defaults)(_defaults2.default, options);
 
+
+// Libraries.
+
+
+// Other plugins.
+function baseConnectivity(options) {
   // For backwards compatibility, convert the old style to the new style.
   if (typeof options.method === 'string') {
     let method = options.method;
@@ -31206,13 +31146,607 @@ function connectivity(options = {}) {
     reducer: _interface.reducer,
     api: _interface.api
   };
-}
+} // Connectivity plugin.
 
-// Libraries.
+/***/ }),
+
+/***/ "../kandy/src/connectivity/common/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+exports.wsConnectFlow = wsConnectFlow;
+exports.websocketLifecycle = websocketLifecycle;
+exports.serverPingFlow = serverPingFlow;
+exports.clientPingFlow = clientPingFlow;
+exports.connectWebsocket = connectWebsocket;
+
+var _websocket = __webpack_require__("../kandy/src/connectivity/common/websocket.js");
+
+var _selectors = __webpack_require__("../kandy/src/connectivity/interface/selectors.js");
+
+var _actionTypes = __webpack_require__("../kandy/src/connectivity/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actions = __webpack_require__("../kandy/src/connectivity/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _logs = __webpack_require__("../kandy/src/logs/index.js");
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Get the logger
 
 
 // Other plugins.
 // Connectivity plugin.
+const log = (0, _logs.getLogManager)().getLogger('CONNECTIVITY');
+
+// Constants
+
+
+// Libraries.
+function* wsConnectFlow() {
+  const chan = yield (0, _effects.actionChannel)(actionTypes.WS_ATTEMPT_CONNECT);
+  yield (0, _effects.takeEvery)(chan, websocketLifecycle);
+}
+
+/**
+ * Saga that handles a websocket over its lifecycle.
+ * @method websocketLifecycle
+ * @param  {Object} wsConnectAction
+ */
+function* websocketLifecycle(wsConnectAction) {
+  const wsInfo = wsConnectAction.payload;
+  const { platform, isReconnect } = wsConnectAction.meta;
+
+  // Try to open the websocket.
+  let websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
+
+  // Append information to the websocket, so that its accessible elsewhere.
+  // TODO: Remove this and replace with proper redux state storage.
+  websocket.kandy = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+
+  websocket.kandy.wsInfo = wsInfo;
+  websocket.kandy.platform = platform;
+
+  // If the websocket didn't open, dispatch the error and stop here.
+  if (websocket.error) {
+    if (isReconnect) {
+      yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
+      return;
+    } else {
+      yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
+      return;
+    }
+  }
+
+  // set last contact in both cases to be now
+  websocket.kandy.lastContact = Date.now();
+
+  let emitTask = yield (0, _effects.fork)(_websocket.wsEmitter, websocket, platform);
+
+  // determine which pingFlow is appropriate
+  let pingFlow;
+  if (websocket.kandy.method.responsibleParty === _constants.connCheckResponsibility.SERVER) {
+    pingFlow = yield (0, _effects.fork)(serverPingFlow, websocket, platform);
+  } else {
+    pingFlow = yield (0, _effects.fork)(clientPingFlow, websocket, platform);
+  }
+
+  // Dispatch the finish action, to notify that the websocket is connected.
+  yield (0, _effects.put)(actions.wsConnectFinished(websocket, platform));
+
+  // Redux-saga take() pattern.
+  // Take end of lifecycle WS actions for this platform.
+  function closeWebsocketPattern(action) {
+    return (action.type === actionTypes.WS_DISCONNECT || action.type === actionTypes.LOST_CONNECTION) && action.meta.platform === platform;
+  }
+
+  // Wait for a disconnect or lost connection action.
+  const action = yield (0, _effects.take)(closeWebsocketPattern);
+
+  // Whether we're disconnecting or have lost connection,
+  //      we want to cancel these tasks either way.
+  yield (0, _effects.cancel)(emitTask, pingFlow);
+
+  if (action.type === actionTypes.WS_DISCONNECT) {
+    // If we're disconnecting, close the websocket to end it's lifecycle.
+    yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
+    yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
+  } else {
+    // If this is a Link websocket, we need to ensure the URL is using the
+    //     "latest" access token from state.
+    if (wsConnectAction.meta.platform === _constants.platforms.UC) {
+      let { notificationChannel } = yield (0, _effects.select)(_selectors2.getSubscriptionInfo);
+      let { accessToken, oauthToken } = yield (0, _effects.select)(_selectors2.getConnectionInfo);
+      wsInfo.url = notificationChannel;
+      if (oauthToken && !accessToken) {
+        wsInfo.params = {
+          access_token: oauthToken
+        };
+      } else {
+        wsInfo.params = {
+          token: accessToken
+        };
+      }
+    }
+
+    // If we've lost connection, re-dispatch the initial action, so that we can
+    //      start the lifecycle over.
+    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
+  }
+}
+
+/**
+ * if we receieve a server ping we want to respond with a pong,
+ * if there is none we want to check to see if its been too long since the server last pinged us and if it has been then reconnect,
+ * otherwise we just want to increment the time since the last ping
+ * @param {Object} ws a websocket connected to the backend
+ * @return {Object} yields a Flux standard action
+ */
+function* serverPingFlow(ws) {
+  const { lastContact, platform, maxMissedPings, autoReconnect } = ws.kandy;
+  let timeOfLastPing = Date.now();
+
+  while (true) {
+    let pingInterval = yield (0, _effects.select)(_selectors.getPingInterval);
+    pingInterval = typeof pingInterval !== 'undefined' ? pingInterval : 120000;
+    const maxIdleDuration = pingInterval * maxMissedPings;
+
+    // wait for incoming server pings or disconnect actions on an interval
+    const { serverPing, disconnect } = yield (0, _effects.race)({
+      expiry: (0, _effects.delay)(pingInterval),
+      serverPing: (0, _effects.take)(actionTypes.RECEIVE_SERVER_PING),
+      disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
+    });
+
+    // is disconnect action receieved then exit
+    if (disconnect) {
+      break;
+    }
+
+    if (serverPing) {
+      // server sent us a ping so reset the timeSinceLastPing
+      timeOfLastPing = Date.now();
+
+      // pingInterval is stored in milliseconds but comes in as seconds so convert
+      const pingIntervalMillis = serverPing.payload.connCheck.interval * 1000;
+      // Prevent firing actions if pingInterval hasnt changed
+      if (pingIntervalMillis !== pingInterval) {
+        yield (0, _effects.put)(actions.changePingInterval(pingIntervalMillis, platform));
+      }
+
+      const message = { connAck: {} };
+      const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
+
+      // if the pong websocket message has an error then try to reconnect
+      if (error) {
+        if (autoReconnect) {
+          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
+        }
+        break;
+      }
+    } else {
+      if (Date.now() - timeOfLastPing >= maxIdleDuration) {
+        log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
+
+        // try to reconnect or exit
+        if (autoReconnect) {
+          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
+        }
+        break;
+      } else {
+        log.debug(`${platform} websocket last contact: ${lastContact}. Reconnect after ${maxIdleDuration}.`);
+      }
+    }
+  }
+}
+
+/**
+ * This flow is rewponsible for handling keepAlive and pingPong methods for client,
+ * if keepAlive is used the client simply sends the keepAlive message to the websocket after waiting the pingInterval
+ * if pingPong is used the client is responsible for pinging the server and listening for server "pong" responses via the websocket
+ * the client will then determine if too much time has passed and attempt to reconnect if its not receiving server pongs or if an error occurs
+ * @param {Object} ws a websoocket connected to the backend
+ * @return {Object} yields a Flux standard action
+ */
+function* clientPingFlow(ws) {
+  const { lastContact, platform, maxMissedPings, autoReconnect } = ws.kandy;
+  const { checkConnectivity, method } = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+
+  let timeOfLastPong = Date.now();
+  let message = '';
+  let shouldCheck;
+
+  while (true) {
+    // If the flag was explicitly set in state, prefer that over the config.
+    shouldCheck = yield (0, _effects.select)(_selectors.getCheckConnectivity);
+    shouldCheck = typeof shouldCheck !== 'undefined' ? shouldCheck : checkConnectivity;
+
+    const { pingInterval } = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+    const maxIdleDuration = pingInterval * maxMissedPings;
+    const intervalInSeconds = pingInterval / 1000;
+
+    if (shouldCheck) {
+      if (method.type === _constants.connCheckMethods.PING_PONG) {
+        message = { connCheck: { interval: intervalInSeconds } };
+      } else if (method.type === _constants.connCheckMethods.KEEP_ALIVE) {
+        message = { message_type: 'ping' };
+      } else {
+        log.error(`invalid connectivity method ${method}`);
+        break;
+      }
+
+      log.debug(`${platform} sending a ${method.type}.`);
+
+      const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
+      if (error) {
+        log.error('Exception in pingFlow: ' + error.message);
+        if (autoReconnect) {
+          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
+        }
+        break;
+      }
+    } else {
+      log.debug('Set to not check websocket connectivity. Waiting for connectivity status change');
+
+      // If we shouldn't ping, wait until we receive a trigger to (maybe) ping.
+      const shouldCheckConnectivity = yield (0, _effects.take)(action => action.type === 'CHANGE_CONNECTIVITY_CHECKING' && action.payload);
+      log.debug(`Connectivity check setting changed. Check connectivity?: ${shouldCheckConnectivity}`);
+      continue;
+    }
+
+    const delayStartTime = Date.now();
+    // Wait for either the ping interval, a disconnect or a pong from the server
+    let { disconnect, serverPong } = yield (0, _effects.race)({
+      expiry: (0, _effects.delay)(pingInterval),
+      serverPong: (0, _effects.take)(actionTypes.RECEIVE_SERVER_PONG),
+      disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
+    });
+
+    // If we receive a serverPong, we will not have waited the full pingInterval duration.
+    //    Determine how long we were waiting for, so that we know how long to wait (again)
+    //    to fulfill the full pingInterval duration (before restarting the ping loop).
+    const timeElapsed = Date.now() - delayStartTime;
+
+    // If we received a disconnect action, stop the pings and exit.
+    if (disconnect) {
+      break;
+    }
+
+    if (method.type === _constants.connCheckMethods.PING_PONG) {
+      if (serverPong) {
+        // we receieved a pong, wait pingInterval to send another ping
+        timeOfLastPong = Date.now();
+
+        const timeUntilNextPing = pingInterval - timeElapsed;
+        let { disconnect } = yield (0, _effects.race)({
+          expiry: (0, _effects.delay)(timeUntilNextPing),
+          disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
+        });
+        // If we received a disconnect action, stop the pings and exit.
+        if (disconnect) {
+          break;
+        }
+      } else {
+        if (Date.now() - timeOfLastPong >= maxIdleDuration) {
+          log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
+
+          // its been too long since the last pong, attempt to reconnect or exit
+          if (autoReconnect) {
+            yield (0, _effects.put)(actions.lostConnection(undefined, platform));
+          }
+
+          break;
+        } else {
+          log.debug(`${platform} websocket last contact: ${lastContact}. Reconnect after ${maxIdleDuration}.`);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Generic Websocket message that takes a websocket and a message and sends it
+ * @param  {Object} ws  websocket
+ * @return {Object}     Error object
+ */
+function _sendWSMessage(ws, message) {
+  try {
+    if (ws && ws.readyState === 1) {
+      ws.send(message);
+    } else {
+      throw new Error('websocket was not in readyState');
+    }
+  } catch (e) {
+    return e;
+  }
+}
+
+/**
+ * Helper function for connecting to a websocket.
+ * Attempts to connect a specified number of times before returning an error.
+ * Includes a delay in between attempts, determined by configs.
+ * @method connectWebsocket
+ * @param  {Object} wsInfo
+ * @return {Websocket|Object}  Either a connected websocket or an error object.
+ */
+function* connectWebsocket(wsInfo, platform) {
+  let configs = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+  let connectionAttempt = 0;
+  let delayTime = 0;
+  let websocket;
+
+  // Redux-saga take() pattern.
+  // Take disconnect websocket action for this platform.
+  function disconnectWebsocketPattern(action) {
+    return action.type === actionTypes.WS_DISCONNECT && action.meta.platform === platform;
+  }
+
+  // If no limit is set, we will continually attempt to reconnect.
+  if (!configs.reconnectLimit) {
+    log.debug('No connectivity reconnect limit set.');
+  }
+
+  while (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
+    try {
+      // Try to open the websocket. Blocking call.
+      websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
+      log.debug('Successfully connected to websocket.', platform);
+      break;
+    } catch (err) {
+      connectionAttempt++;
+      websocket = err;
+      log.debug(`Failed websocket connection (#${connectionAttempt}): ${websocket.message}.`, platform);
+
+      // If we want to try to reconnect, delay a certain about of time before trying.
+      if (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
+        // Increase the delay time if we're not at the limit.
+        if (delayTime !== configs.reconnectTimeLimit) {
+          delayTime = configs.reconnectDelay * Math.pow(configs.reconnectTimeMultiplier, connectionAttempt - 1);
+          delayTime = delayTime < configs.reconnectTimeLimit ? delayTime : configs.reconnectTimeLimit;
+        }
+        log.debug(`Websocket reconnect attempt after ${delayTime}ms.`, platform);
+
+        // Wait for either the delay period or a trigger to stop connection attempts.
+        let { disconnect } = yield (0, _effects.race)({
+          delay: (0, _effects.delay)(delayTime),
+          disconnect: (0, _effects.take)(disconnectWebsocketPattern)
+        });
+
+        if (disconnect) {
+          break;
+        }
+      } else {
+        log.debug('Stopping websocket connection attempts.', platform);
+      }
+    }
+  }
+
+  // Return either the websocket or the latest error.
+  return websocket;
+}
+
+/***/ }),
+
+/***/ "../kandy/src/connectivity/common/websocket.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.openWebsocket = openWebsocket;
+exports.closeWebsocket = closeWebsocket;
+exports.wsEmitter = wsEmitter;
+
+var _actions = __webpack_require__("../kandy/src/connectivity/interface/actions.js");
+
+var _reduxSaga = __webpack_require__("../../node_modules/redux-saga/es/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _utils = __webpack_require__("../kandy/src/common/utils.js");
+
+var _actions2 = __webpack_require__("../kandy/src/notifications/interface/actions.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const INITIAL_BUFFER_SIZE = 50;
+
+/**
+ * Create a new websocket.
+ * @method openWebsocket
+ * @param  {Object} options Websocket configuration options.
+ * @param {string} options.protocol Websocket protocol to use.
+ * @param {string} options.server Websocket hostname.
+ * @param {string} options.port Websocket port to use.
+ * @param {string} options.url Websocket notification channel.
+ * @param {Object} options.params A list of URL params to attach to the websocket.
+ * @return {WebSocket} ws Newly connected websocket.
+ */
+function openWebsocket(options) {
+  // Create the websocket.
+  let ws = new WebSocket(`${options.protocol}://${options.server}:${options.port}${options.url}` + (0, _utils.toQueryString)(options.params));
+
+  // Use a promise to wait for the first message from the websocket.
+  // This indicates whether the WS opened successfully or not.
+  let validateWS = new _promise2.default((resolve, reject) => {
+    const onOpen = function () {
+      ws.onopen = null;
+      ws.onerror = null;
+      resolve(ws);
+    };
+    const onError = function () {
+      ws.onopen = null;
+      ws.onerror = null;
+
+      // TODO: Fix this?
+      /* eslint-disable-next-line prefer-promise-reject-errors */
+      reject({
+        error: true,
+        message: 'Could not connect to websocket. Received error on open.'
+      });
+    };
+    ws.onopen = onOpen;
+    ws.onerror = onError;
+  });
+  return validateWS;
+}
+
+/**
+ * Clean-up a provided websocket.
+ * @method closeWebsocket
+ * @param  {Websocket} ws Websocket to be cleaned-up.
+ * @return {Websocket} ws The websocket after being cleaned.
+ */
+function closeWebsocket(ws) {
+  if (ws.close) {
+    ws.close();
+  } else {
+    ws.onclose = null;
+  }
+
+  ws.onmessage = null;
+  ws.onopen = null;
+  ws.onerror = null;
+}
+
+/**
+ * Create an event channel for a given websocket
+ * @param  {WebSocket} ws       The websocket to make an event channel for.
+ * @param {string} [platform=link]    The backend platform associated with the websocket.
+ * @return {EventChannel}              The event channel corresponding to the WebSocket
+ */
+function createWsChannel(ws, platform) {
+  // this function handles server messages
+  return (0, _reduxSaga.eventChannel)(emit => {
+    // Define handlers
+    ws.onmessage = message => {
+      // Mark this websocket are being connected as of now.
+      ws.kandy.lastContact = Date.now();
+
+      var data = JSON.parse(message.data);
+      if (data.connCheck) {
+        // Handle CPaaS server pings
+        emit((0, _actions.receiveServerPing)(data, platform));
+      } else if (data.connAck) {
+        // Handle CPaaS server pongs
+        emit((0, _actions.receiveServerPong)(data, platform));
+      } else {
+        emit((0, _actions2.websocketNotification)(data, platform));
+      }
+    };
+    ws.onclose = data => {
+      emit((0, _actions.wsClosed)(data, platform));
+      emit(_reduxSaga.END);
+    };
+    ws.onerror = err => {
+      emit((0, _actions.wsError)(new Error(err), platform));
+      emit(_reduxSaga.END);
+    };
+
+    return () => closeWebsocket(ws);
+  }, _reduxSaga.buffers.expanding(INITIAL_BUFFER_SIZE));
+}
+
+/**
+ * Saga worker for creating a websocket and emitting its events
+ * @param {Object} ws configuration options.
+ * @param {string} [platform=link]    The backend platform associated with the websocket.
+ * @return {Generator}
+ */
+function* wsEmitter(ws, platform) {
+  var wsChannel = yield (0, _effects.call)(createWsChannel, ws, platform);
+  while (true) {
+    const action = yield (0, _effects.take)(wsChannel);
+    yield (0, _effects.put)(action);
+  }
+}
+
+/***/ }),
+
+/***/ "../kandy/src/connectivity/cpaas/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = connectivity;
+
+var _base = __webpack_require__("../kandy/src/connectivity/common/base.js");
+
+var _base2 = _interopRequireDefault(_base);
+
+var _constants = __webpack_require__("../kandy/src/constants.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const defaultValues = {
+  method: { type: _constants.connCheckMethods.PING_PONG, responsibleParty: 'client' },
+  pingInterval: 30000,
+  reconnectLimit: 5,
+  reconnectDelay: 5000,
+  reconnectTimeMultiplier: 1,
+  reconnectTimeLimit: 640000,
+  autoReconnect: true,
+  maxMissedPings: 3,
+  checkConnectivity: true
+
+  /**
+   * Configuration options for the Connectivity feature.
+   * @public
+   * @name config.connectivity
+   * @memberof config
+   * @instance
+   * @param {Object} connectivity Connectivity configs.
+   * @param {Object} connectivity.method Configuration for how connectivity checks should be made.
+   * @param {String} [connectivity.method.type='pingPong'] The method of connectivity checking to use: `keepAlive` or `pingPong`.
+   * @param {String} [connectivity.method.responsibleParty='client'] Configures who is responsible for initiating the connectivity check: `client` or `server`.
+   * @param {Number} [connectivity.pingInterval=30000] Time in between websocket ping attempts (milliseconds). Only used for when the client is responsible for ping/connCheck.
+   * @param {Number} [connectivity.reconnectLimit=5] Number of failed reconnect attempts before reporting an error. Can be set to 0 to not limit reconnection attempts.
+   * @param {Number} [connectivity.reconnectDelay=5000] Base time between websocket reconnect attempts (milliseconds).
+   * @param {Number} [connectivity.reconnectTimeMultiplier=1] Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this factor after each failed reconnect attempt to increase the delay between attempts.
+   * @param {Number} [connectivity.reconnectTimeLimit=640000] Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts.
+   * @param {Boolean} [connectivity.autoReconnect=true] Flag to determine whether reconnection will be attempted automatically after connectivity disruptions.
+   * @param {Number} [connectivity.maxMissedPings=3] Maximum pings sent (without receiving a response) before reporting an error.
+   * @param {Boolean} [connectivity.checkConnectivity=true] Flag to determine whether to enable connectivity checking or not.
+   */
+};function connectivity(options = {}) {
+  return (0, _base2.default)((0, _fp.defaults)(defaultValues, options));
+}
 
 /***/ }),
 
@@ -31766,549 +32300,6 @@ function getPingInterval(state) {
  */
 function getCheckConnectivity(state) {
   return state[_name2.default].checkConnectivity;
-}
-
-/***/ }),
-
-/***/ "../kandy/src/connectivity/sagas.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.wsConnectFlow = wsConnectFlow;
-exports.websocketLifecycle = websocketLifecycle;
-exports.serverPingFlow = serverPingFlow;
-exports.clientPingFlow = clientPingFlow;
-exports.connectWebsocket = connectWebsocket;
-
-var _websocket = __webpack_require__("../kandy/src/connectivity/websocket.js");
-
-var _selectors = __webpack_require__("../kandy/src/connectivity/interface/selectors.js");
-
-var _actionTypes = __webpack_require__("../kandy/src/connectivity/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _actions = __webpack_require__("../kandy/src/connectivity/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _logs = __webpack_require__("../kandy/src/logs/index.js");
-
-var _constants = __webpack_require__("../kandy/src/constants.js");
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Get the logger
-
-
-// Other plugins.
-// Connectivity plugin.
-const log = (0, _logs.getLogManager)().getLogger('CONNECTIVITY');
-
-// Constants
-
-
-// Libraries.
-function* wsConnectFlow() {
-  const chan = yield (0, _effects.actionChannel)(actionTypes.WS_ATTEMPT_CONNECT);
-  yield (0, _effects.takeEvery)(chan, websocketLifecycle);
-}
-
-/**
- * Saga that handles a websocket over its lifecycle.
- * @method websocketLifecycle
- * @param  {Object} wsConnectAction
- */
-function* websocketLifecycle(wsConnectAction) {
-  const wsInfo = wsConnectAction.payload;
-  const { platform, isReconnect } = wsConnectAction.meta;
-
-  // Try to open the websocket.
-  let websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
-
-  // Append information to the websocket, so that its accessible elsewhere.
-  // TODO: Remove this and replace with proper redux state storage.
-  websocket.kandy = yield (0, _effects.select)(_selectors.getConnectivityConfig);
-
-  websocket.kandy.wsInfo = wsInfo;
-  websocket.kandy.platform = platform;
-
-  // If the websocket didn't open, dispatch the error and stop here.
-  if (websocket.error) {
-    if (isReconnect) {
-      yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
-      return;
-    } else {
-      yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
-      return;
-    }
-  }
-
-  // set last contact in both cases to be now
-  websocket.kandy.lastContact = Date.now();
-
-  let emitTask = yield (0, _effects.fork)(_websocket.wsEmitter, websocket, platform);
-
-  // determine which pingFlow is appropriate
-  let pingFlow;
-  if (websocket.kandy.method.responsibleParty === _constants.connCheckResponsibility.SERVER) {
-    pingFlow = yield (0, _effects.fork)(serverPingFlow, websocket, platform);
-  } else {
-    pingFlow = yield (0, _effects.fork)(clientPingFlow, websocket, platform);
-  }
-
-  // Dispatch the finish action, to notify that the websocket is connected.
-  yield (0, _effects.put)(actions.wsConnectFinished(websocket, platform));
-
-  // Redux-saga take() pattern.
-  // Take end of lifecycle WS actions for this platform.
-  function closeWebsocketPattern(action) {
-    return (action.type === actionTypes.WS_DISCONNECT || action.type === actionTypes.LOST_CONNECTION) && action.meta.platform === platform;
-  }
-
-  // Wait for a disconnect or lost connection action.
-  const action = yield (0, _effects.take)(closeWebsocketPattern);
-
-  // Whether we're disconnecting or have lost connection,
-  //      we want to cancel these tasks either way.
-  yield (0, _effects.cancel)(emitTask, pingFlow);
-
-  if (action.type === actionTypes.WS_DISCONNECT) {
-    // If we're disconnecting, close the websocket to end it's lifecycle.
-    yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
-    yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
-  } else {
-    // If this is a Link websocket, we need to ensure the URL is using the
-    //     "latest" access token from state.
-    if (wsConnectAction.meta.platform === _constants.platforms.UC) {
-      let { notificationChannel } = yield (0, _effects.select)(_selectors2.getSubscriptionInfo);
-      let { accessToken, oauthToken } = yield (0, _effects.select)(_selectors2.getConnectionInfo);
-      wsInfo.url = notificationChannel;
-      if (oauthToken && !accessToken) {
-        wsInfo.params = {
-          access_token: oauthToken
-        };
-      } else {
-        wsInfo.params = {
-          token: accessToken
-        };
-      }
-    }
-
-    // If we've lost connection, re-dispatch the initial action, so that we can
-    //      start the lifecycle over.
-    yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
-  }
-}
-
-/**
- * if we receieve a server ping we want to respond with a pong,
- * if there is none we want to check to see if its been too long since the server last pinged us and if it has been then reconnect,
- * otherwise we just want to increment the time since the last ping
- * @param {Object} ws a websocket connected to the backend
- * @return {Object} yields a Flux standard action
- */
-function* serverPingFlow(ws) {
-  const { lastContact, platform, maxMissedPings, autoReconnect } = ws.kandy;
-  let timeOfLastPing = Date.now();
-
-  while (true) {
-    let pingInterval = yield (0, _effects.select)(_selectors.getPingInterval);
-    pingInterval = typeof pingInterval !== 'undefined' ? pingInterval : 120000;
-    const maxIdleDuration = pingInterval * maxMissedPings;
-
-    // wait for incoming server pings or disconnect actions on an interval
-    const { serverPing, disconnect } = yield (0, _effects.race)({
-      expiry: (0, _effects.delay)(pingInterval),
-      serverPing: (0, _effects.take)(actionTypes.RECEIVE_SERVER_PING),
-      disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
-    });
-
-    // is disconnect action receieved then exit
-    if (disconnect) {
-      break;
-    }
-
-    if (serverPing) {
-      // server sent us a ping so reset the timeSinceLastPing
-      timeOfLastPing = Date.now();
-
-      // pingInterval is stored in milliseconds but comes in as seconds so convert
-      const pingIntervalMillis = serverPing.payload.connCheck.interval * 1000;
-      // Prevent firing actions if pingInterval hasnt changed
-      if (pingIntervalMillis !== pingInterval) {
-        yield (0, _effects.put)(actions.changePingInterval(pingIntervalMillis, platform));
-      }
-
-      const message = { connAck: {} };
-      const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
-
-      // if the pong websocket message has an error then try to reconnect
-      if (error) {
-        if (autoReconnect) {
-          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
-        }
-        break;
-      }
-    } else {
-      if (Date.now() - timeOfLastPing >= maxIdleDuration) {
-        log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
-
-        // try to reconnect or exit
-        if (autoReconnect) {
-          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
-        }
-        break;
-      } else {
-        log.debug(`${platform} websocket last contact: ${lastContact}. Reconnect after ${maxIdleDuration}.`);
-      }
-    }
-  }
-}
-
-/**
- * This flow is rewponsible for handling keepAlive and pingPong methods for client,
- * if keepAlive is used the client simply sends the keepAlive message to the websocket after waiting the pingInterval
- * if pingPong is used the client is responsible for pinging the server and listening for server "pong" responses via the websocket
- * the client will then determine if too much time has passed and attempt to reconnect if its not receiving server pongs or if an error occurs
- * @param {Object} ws a websoocket connected to the backend
- * @return {Object} yields a Flux standard action
- */
-function* clientPingFlow(ws) {
-  const { lastContact, platform, maxMissedPings, autoReconnect } = ws.kandy;
-  const { checkConnectivity, method } = yield (0, _effects.select)(_selectors.getConnectivityConfig);
-
-  let timeOfLastPong = Date.now();
-  let message = '';
-  let shouldCheck;
-
-  while (true) {
-    // If the flag was explicitly set in state, prefer that over the config.
-    shouldCheck = yield (0, _effects.select)(_selectors.getCheckConnectivity);
-    shouldCheck = typeof shouldCheck !== 'undefined' ? shouldCheck : checkConnectivity;
-
-    const { pingInterval } = yield (0, _effects.select)(_selectors.getConnectivityConfig);
-    const maxIdleDuration = pingInterval * maxMissedPings;
-    const intervalInSeconds = pingInterval / 1000;
-
-    if (shouldCheck) {
-      if (method.type === _constants.connCheckMethods.PING_PONG) {
-        message = { connCheck: { interval: intervalInSeconds } };
-      } else if (method.type === _constants.connCheckMethods.KEEP_ALIVE) {
-        message = { message_type: 'ping' };
-      } else {
-        log.error(`invalid connectivity method ${method}`);
-        break;
-      }
-
-      log.debug(`${platform} sending a ${method.type}.`);
-
-      const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
-      if (error) {
-        log.error('Exception in pingFlow: ' + error.message);
-        if (autoReconnect) {
-          yield (0, _effects.put)(actions.lostConnection(undefined, platform));
-        }
-        break;
-      }
-    } else {
-      log.debug('Set to not check websocket connectivity. Waiting for connectivity status change');
-
-      // If we shouldn't ping, wait until we receive a trigger to (maybe) ping.
-      const shouldCheckConnectivity = yield (0, _effects.take)(action => action.type === 'CHANGE_CONNECTIVITY_CHECKING' && action.payload);
-      log.debug(`Connectivity check setting changed. Check connectivity?: ${shouldCheckConnectivity}`);
-      continue;
-    }
-
-    const delayStartTime = Date.now();
-    // Wait for either the ping interval, a disconnect or a pong from the server
-    let { disconnect, serverPong } = yield (0, _effects.race)({
-      expiry: (0, _effects.delay)(pingInterval),
-      serverPong: (0, _effects.take)(actionTypes.RECEIVE_SERVER_PONG),
-      disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
-    });
-
-    // If we receive a serverPong, we will not have waited the full pingInterval duration.
-    //    Determine how long we were waiting for, so that we know how long to wait (again)
-    //    to fulfill the full pingInterval duration (before restarting the ping loop).
-    const timeElapsed = Date.now() - delayStartTime;
-
-    // If we received a disconnect action, stop the pings and exit.
-    if (disconnect) {
-      break;
-    }
-
-    if (method.type === _constants.connCheckMethods.PING_PONG) {
-      if (serverPong) {
-        // we receieved a pong, wait pingInterval to send another ping
-        timeOfLastPong = Date.now();
-
-        const timeUntilNextPing = pingInterval - timeElapsed;
-        let { disconnect } = yield (0, _effects.race)({
-          expiry: (0, _effects.delay)(timeUntilNextPing),
-          disconnect: (0, _effects.take)(actionTypes.WS_DISCONNECT_FINISHED)
-        });
-        // If we received a disconnect action, stop the pings and exit.
-        if (disconnect) {
-          break;
-        }
-      } else {
-        if (Date.now() - timeOfLastPong >= maxIdleDuration) {
-          log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
-
-          // its been too long since the last pong, attempt to reconnect or exit
-          if (autoReconnect) {
-            yield (0, _effects.put)(actions.lostConnection(undefined, platform));
-          }
-
-          break;
-        } else {
-          log.debug(`${platform} websocket last contact: ${lastContact}. Reconnect after ${maxIdleDuration}.`);
-        }
-      }
-    }
-  }
-}
-
-/**
- * Generic Websocket message that takes a websocket and a message and sends it
- * @param  {Object} ws  websocket
- * @return {Object}     Error object
- */
-function _sendWSMessage(ws, message) {
-  try {
-    if (ws && ws.readyState === 1) {
-      ws.send(message);
-    } else {
-      throw new Error('websocket was not in readyState');
-    }
-  } catch (e) {
-    return e;
-  }
-}
-
-/**
- * Helper function for connecting to a websocket.
- * Attempts to connect a specified number of times before returning an error.
- * Includes a delay in between attempts, determined by configs.
- * @method connectWebsocket
- * @param  {Object} wsInfo
- * @return {Websocket|Object}  Either a connected websocket or an error object.
- */
-function* connectWebsocket(wsInfo, platform) {
-  let configs = yield (0, _effects.select)(_selectors.getConnectivityConfig);
-  let connectionAttempt = 0;
-  let delayTime = 0;
-  let websocket;
-
-  // Redux-saga take() pattern.
-  // Take disconnect websocket action for this platform.
-  function disconnectWebsocketPattern(action) {
-    return action.type === actionTypes.WS_DISCONNECT && action.meta.platform === platform;
-  }
-
-  // If no limit is set, we will continually attempt to reconnect.
-  if (!configs.reconnectLimit) {
-    log.debug('No connectivity reconnect limit set.');
-  }
-
-  while (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
-    try {
-      // Try to open the websocket. Blocking call.
-      websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
-      log.debug('Successfully connected to websocket.', platform);
-      break;
-    } catch (err) {
-      connectionAttempt++;
-      websocket = err;
-      log.debug(`Failed websocket connection (#${connectionAttempt}): ${websocket.message}.`, platform);
-
-      // If we want to try to reconnect, delay a certain about of time before trying.
-      if (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
-        // Increase the delay time if we're not at the limit.
-        if (delayTime !== configs.reconnectTimeLimit) {
-          delayTime = configs.reconnectDelay * Math.pow(configs.reconnectTimeMultiplier, connectionAttempt - 1);
-          delayTime = delayTime < configs.reconnectTimeLimit ? delayTime : configs.reconnectTimeLimit;
-        }
-        log.debug(`Websocket reconnect attempt after ${delayTime}ms.`, platform);
-
-        // Wait for either the delay period or a trigger to stop connection attempts.
-        let { disconnect } = yield (0, _effects.race)({
-          delay: (0, _effects.delay)(delayTime),
-          disconnect: (0, _effects.take)(disconnectWebsocketPattern)
-        });
-
-        if (disconnect) {
-          break;
-        }
-      } else {
-        log.debug('Stopping websocket connection attempts.', platform);
-      }
-    }
-  }
-
-  // Return either the websocket or the latest error.
-  return websocket;
-}
-
-/***/ }),
-
-/***/ "../kandy/src/connectivity/websocket.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
-
-var _promise2 = _interopRequireDefault(_promise);
-
-exports.openWebsocket = openWebsocket;
-exports.closeWebsocket = closeWebsocket;
-exports.wsEmitter = wsEmitter;
-
-var _actions = __webpack_require__("../kandy/src/connectivity/interface/actions.js");
-
-var _reduxSaga = __webpack_require__("../../node_modules/redux-saga/es/index.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _utils = __webpack_require__("../kandy/src/common/utils.js");
-
-var _actions2 = __webpack_require__("../kandy/src/notifications/interface/actions.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const INITIAL_BUFFER_SIZE = 50;
-
-/**
- * Create a new websocket.
- * @method openWebsocket
- * @param  {Object} options Websocket configuration options.
- * @param {string} options.protocol Websocket protocol to use.
- * @param {string} options.server Websocket hostname.
- * @param {string} options.port Websocket port to use.
- * @param {string} options.url Websocket notification channel.
- * @param {Object} options.params A list of URL params to attach to the websocket.
- * @return {WebSocket} ws Newly connected websocket.
- */
-function openWebsocket(options) {
-  // Create the websocket.
-  let ws = new WebSocket(`${options.protocol}://${options.server}:${options.port}${options.url}` + (0, _utils.toQueryString)(options.params));
-
-  // Use a promise to wait for the first message from the websocket.
-  // This indicates whether the WS opened successfully or not.
-  let validateWS = new _promise2.default((resolve, reject) => {
-    const onOpen = function () {
-      ws.onopen = null;
-      ws.onerror = null;
-      resolve(ws);
-    };
-    const onError = function () {
-      ws.onopen = null;
-      ws.onerror = null;
-
-      // TODO: Fix this?
-      /* eslint-disable-next-line prefer-promise-reject-errors */
-      reject({
-        error: true,
-        message: 'Could not connect to websocket. Received error on open.'
-      });
-    };
-    ws.onopen = onOpen;
-    ws.onerror = onError;
-  });
-  return validateWS;
-}
-
-/**
- * Clean-up a provided websocket.
- * @method closeWebsocket
- * @param  {Websocket} ws Websocket to be cleaned-up.
- * @return {Websocket} ws The websocket after being cleaned.
- */
-function closeWebsocket(ws) {
-  if (ws.close) {
-    ws.close();
-  } else {
-    ws.onclose = null;
-  }
-
-  ws.onmessage = null;
-  ws.onopen = null;
-  ws.onerror = null;
-}
-
-/**
- * Create an event channel for a given websocket
- * @param  {WebSocket} ws       The websocket to make an event channel for.
- * @param {string} [platform=link]    The backend platform associated with the websocket.
- * @return {EventChannel}              The event channel corresponding to the WebSocket
- */
-function createWsChannel(ws, platform) {
-  // this function handles server messages
-  return (0, _reduxSaga.eventChannel)(emit => {
-    // Define handlers
-    ws.onmessage = message => {
-      // Mark this websocket are being connected as of now.
-      ws.kandy.lastContact = Date.now();
-
-      var data = JSON.parse(message.data);
-      if (data.connCheck) {
-        // Handle CPaaS server pings
-        emit((0, _actions.receiveServerPing)(data, platform));
-      } else if (data.connAck) {
-        // Handle CPaaS server pongs
-        emit((0, _actions.receiveServerPong)(data, platform));
-      } else {
-        emit((0, _actions2.websocketNotification)(data, platform));
-      }
-    };
-    ws.onclose = data => {
-      emit((0, _actions.wsClosed)(data, platform));
-      emit(_reduxSaga.END);
-    };
-    ws.onerror = err => {
-      emit((0, _actions.wsError)(new Error(err), platform));
-      emit(_reduxSaga.END);
-    };
-
-    return () => closeWebsocket(ws);
-  }, _reduxSaga.buffers.expanding(INITIAL_BUFFER_SIZE));
-}
-
-/**
- * Saga worker for creating a websocket and emitting its events
- * @param {Object} ws configuration options.
- * @param {string} [platform=link]    The backend platform associated with the websocket.
- * @return {Generator}
- */
-function* wsEmitter(ws, platform) {
-  var wsChannel = yield (0, _effects.call)(createWsChannel, ws, platform);
-  while (true) {
-    const action = yield (0, _effects.take)(wsChannel);
-    yield (0, _effects.put)(action);
-  }
 }
 
 /***/ }),
@@ -33395,7 +33386,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.159';
+  let version = '4.9.0-beta.160';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -35880,43 +35871,43 @@ var _cpaas3 = __webpack_require__("../kandy/src/call/cpaas/index.js");
 
 var _cpaas4 = _interopRequireDefault(_cpaas3);
 
-var _connectivity = __webpack_require__("../kandy/src/connectivity/index.js");
-
-var _connectivity2 = _interopRequireDefault(_connectivity);
-
-var _cpaas5 = __webpack_require__("../kandy/src/messaging/cpaas/index.js");
+var _cpaas5 = __webpack_require__("../kandy/src/connectivity/cpaas/index.js");
 
 var _cpaas6 = _interopRequireDefault(_cpaas5);
 
-var _cpaas7 = __webpack_require__("../kandy/src/notifications/cpaas/index.js");
+var _cpaas7 = __webpack_require__("../kandy/src/messaging/cpaas/index.js");
 
 var _cpaas8 = _interopRequireDefault(_cpaas7);
 
-var _cpaas9 = __webpack_require__("../kandy/src/presence/cpaas/index.js");
+var _cpaas9 = __webpack_require__("../kandy/src/notifications/cpaas/index.js");
 
 var _cpaas10 = _interopRequireDefault(_cpaas9);
 
-var _cpaas11 = __webpack_require__("../kandy/src/groups/cpaas/index.js");
+var _cpaas11 = __webpack_require__("../kandy/src/presence/cpaas/index.js");
 
 var _cpaas12 = _interopRequireDefault(_cpaas11);
 
-var _cpaas13 = __webpack_require__("../kandy/src/subscription/cpaas/index.js");
+var _cpaas13 = __webpack_require__("../kandy/src/groups/cpaas/index.js");
 
 var _cpaas14 = _interopRequireDefault(_cpaas13);
+
+var _cpaas15 = __webpack_require__("../kandy/src/subscription/cpaas/index.js");
+
+var _cpaas16 = _interopRequireDefault(_cpaas15);
 
 var _codecRemover = __webpack_require__("../fcs/src/js/sdp/codecRemover.js");
 
 var _codecRemover2 = _interopRequireDefault(_codecRemover);
 
-var _cpaas15 = __webpack_require__("../kandy/src/users/cpaas/index.js");
+var _cpaas17 = __webpack_require__("../kandy/src/users/cpaas/index.js");
 
-var _cpaas16 = _interopRequireDefault(_cpaas15);
+var _cpaas18 = _interopRequireDefault(_cpaas17);
 
 __webpack_require__("../kandy/src/docs/docs.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _connectivity2.default }, { name: 'messaging', fn: _cpaas6.default }, { name: 'notifications', fn: _cpaas8.default }, { name: 'presence', fn: _cpaas10.default }, { name: 'groups', fn: _cpaas12.default }, { name: 'subscription', fn: _cpaas14.default }, { name: 'users', fn: _cpaas16.default }];
+const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
 
 // Plugins
 

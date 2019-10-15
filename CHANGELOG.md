@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.9.0 - beta
 
+### Fixed
+
+- Used the proper channel connectivity method for maintaining websocket channel lifetime. `KAA-2007`
+
 ### Added
 
 - Added Call functionality where local media tracks are deleted if they are not being used for the call. `KAA-1890`
