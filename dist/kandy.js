@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.161
+ * Version: 4.9.0-beta.162
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33420,7 +33420,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.161';
+  let version = '4.9.0-beta.162';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -44557,7 +44557,7 @@ function api({ dispatch, getState }) {
      *
      * The `subscribed` values are the SDK's services that the application has
      *    an active subscription for. Services are subscribed to using the
-     *    {@link Subscription.subcribe services.subscribe} API.
+     *    {@link Subscription.subscribe services.subscribe} API.
      *
      * @public
      * @static
