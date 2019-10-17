@@ -13670,346 +13670,68 @@
       ],
       "static": [
         {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 12,
-                        "offset": 86
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "exact",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 12,
-                        "offset": 86
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 19,
-                        "offset": 93
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " or ",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 19,
-                        "offset": 93
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 23,
-                        "offset": 97
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "ideal",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 23,
-                        "offset": 97
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 30,
-                        "offset": 104
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " property should be provided. If both are present, the\n   ",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 30,
-                        "offset": 104
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 4,
-                        "offset": 162
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "exact",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 4,
-                        "offset": 162
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 11,
-                        "offset": 169
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " value will be used.",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 11,
-                        "offset": 169
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 31,
-                        "offset": 189
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 3,
-                    "column": 31,
-                    "offset": 189
-                  },
-                  "indent": [
-                    1,
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "When the ",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 1,
-                        "offset": 191
-                      },
-                      "end": {
-                        "line": 5,
-                        "column": 10,
-                        "offset": 200
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "exact",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 10,
-                        "offset": 200
-                      },
-                      "end": {
-                        "line": 5,
-                        "column": 17,
-                        "offset": 207
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 17,
-                        "offset": 207
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 69,
-                        "offset": 348
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 5,
-                    "column": 1,
-                    "offset": 191
-                  },
-                  "end": {
-                    "line": 6,
-                    "column": 69,
-                    "offset": 348
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "When the ",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 1,
-                        "offset": 350
-                      },
-                      "end": {
-                        "line": 8,
-                        "column": 10,
-                        "offset": 359
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "ideal",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 10,
-                        "offset": 359
-                      },
-                      "end": {
-                        "line": 8,
-                        "column": 17,
-                        "offset": 366
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 17,
-                        "offset": 366
-                      },
-                      "end": {
-                        "line": 9,
-                        "column": 76,
-                        "offset": 520
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 8,
-                    "column": 1,
-                    "offset": 350
-                  },
-                  "end": {
-                    "line": 9,
-                    "column": 76,
-                    "offset": 520
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 9,
-                "column": 76,
-                "offset": 520
-              }
-            }
-          },
+          "description": "",
           "tags": [
             {
               "title": "public",
               "description": null,
-              "lineNumber": 11,
+              "lineNumber": 1,
               "type": null
             },
             {
               "title": "module",
               "description": null,
-              "lineNumber": 12,
+              "lineNumber": 2,
               "type": null,
-              "name": "MediaConstraint"
+              "name": "IceServer"
             },
             {
               "title": "typedef",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 3,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
               },
-              "name": "MediaConstraint"
+              "name": "IceServer"
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 14
+              "lineNumber": 4
             },
             {
               "title": "property",
-              "description": "The required value for the constraint. Other values will not be accepted.",
-              "lineNumber": 15,
+              "description": "Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.",
+              "lineNumber": 5,
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "urls"
+            },
+            {
+              "title": "property",
+              "description": "The credential needed by the ICE server.",
+              "lineNumber": 6,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -14017,34 +13739,16 @@
                   "name": "string"
                 }
               },
-              "name": "exact"
-            },
-            {
-              "title": "property",
-              "description": "The ideal value for the constraint. Other values will be considered if necessary.",
-              "lineNumber": 16,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
-              },
-              "name": "ideal"
-            },
-            {
-              "title": "example",
-              "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
-              "lineNumber": 17
+              "name": "credential"
             }
           ],
           "loc": {
             "start": {
-              "line": 58,
+              "line": 109,
               "column": 0
             },
             "end": {
-              "line": 86,
+              "line": 116,
               "column": 3
             }
           },
@@ -14062,17 +13766,13 @@
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
-          "examples": [
-            {
-              "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
-            }
-          ],
+          "examples": [],
           "params": [],
           "properties": [
             {
               "title": "property",
-              "name": "exact",
-              "lineNumber": 15,
+              "name": "urls",
+              "lineNumber": 5,
               "description": {
                 "type": "root",
                 "children": [
@@ -14081,7 +13781,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The required value for the constraint. Other values will not be accepted.",
+                        "value": "Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.",
                         "position": {
                           "start": {
                             "line": 1,
@@ -14090,8 +13790,8 @@
                           },
                           "end": {
                             "line": 1,
-                            "column": 74,
-                            "offset": 73
+                            "column": 106,
+                            "offset": 105
                           },
                           "indent": []
                         }
@@ -14105,8 +13805,8 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 74,
-                        "offset": 73
+                        "column": 106,
+                        "offset": 105
                       },
                       "indent": []
                     }
@@ -14120,23 +13820,38 @@
                   },
                   "end": {
                     "line": 1,
-                    "column": 74,
-                    "offset": 73
+                    "column": 106,
+                    "offset": 105
                   }
                 }
               },
               "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
               }
             },
             {
               "title": "property",
-              "name": "ideal",
-              "lineNumber": 16,
+              "name": "credential",
+              "lineNumber": 6,
               "description": {
                 "type": "root",
                 "children": [
@@ -14145,7 +13860,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The ideal value for the constraint. Other values will be considered if necessary.",
+                        "value": "The credential needed by the ICE server.",
                         "position": {
                           "start": {
                             "line": 1,
@@ -14154,8 +13869,8 @@
                           },
                           "end": {
                             "line": 1,
-                            "column": 82,
-                            "offset": 81
+                            "column": 41,
+                            "offset": 40
                           },
                           "indent": []
                         }
@@ -14169,8 +13884,8 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 82,
-                        "offset": 81
+                        "column": 41,
+                        "offset": 40
                       },
                       "indent": []
                     }
@@ -14184,8 +13899,8 @@
                   },
                   "end": {
                     "line": 1,
-                    "column": 82,
-                    "offset": 81
+                    "column": 41,
+                    "offset": 40
                   }
                 }
               },
@@ -14204,7 +13919,7 @@
           "todos": [],
           "access": "public",
           "kind": "typedef",
-          "name": "MediaConstraint",
+          "name": "IceServer",
           "type": {
             "type": "NameExpression",
             "name": "Object"
@@ -14223,11 +13938,11 @@
               "kind": "namespace"
             },
             {
-              "name": "MediaConstraint",
+              "name": "IceServer",
               "kind": "typedef"
             }
           ],
-          "namespace": "callMediaConstraint"
+          "namespace": "callIceServer"
         },
         {
           "description": {
@@ -15523,6 +15238,315 @@
           "namespace": "call.CallObject"
         },
         {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The BandwidthControls type defines the format for configuring media and/or track bandwidth options.\nBandwidthControls only affect received remote tracks of the specified type.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 76,
+                        "offset": 175
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 76,
+                    "offset": 175
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 76,
+                "offset": 175
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 4,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 5,
+              "type": null,
+              "name": "BandwidthControls"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "BandwidthControls"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 7
+            },
+            {
+              "title": "property",
+              "description": "The desired bandwidth bitrate in kilobits per second for received remote audio.",
+              "lineNumber": 8,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              },
+              "name": "audio"
+            },
+            {
+              "title": "property",
+              "description": "The desired bandwidth bitrate in kilobits per second for received remote video.",
+              "lineNumber": 9,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              },
+              "name": "video"
+            },
+            {
+              "title": "example",
+              "description": "// Specify received remote video bandwidth limits when making a call.\nclient.call.make(destination, mediaConstraints,\n {\n   bandwidth: {\n     video: 5\n   }\n }\n)",
+              "lineNumber": 10
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 88,
+              "column": 0
+            },
+            "end": {
+              "line": 107,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 204,
+                "column": 0
+              },
+              "end": {
+                "line": 208,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Specify received remote video bandwidth limits when making a call.\nclient.call.make(destination, mediaConstraints,\n {\n   bandwidth: {\n     video: 5\n   }\n }\n)"
+            }
+          ],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "audio",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The desired bandwidth bitrate in kilobits per second for received remote audio.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 80,
+                            "offset": 79
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 80,
+                        "offset": 79
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 80,
+                    "offset": 79
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              }
+            },
+            {
+              "title": "property",
+              "name": "video",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The desired bandwidth bitrate in kilobits per second for received remote video.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 80,
+                            "offset": 79
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 80,
+                        "offset": 79
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 80,
+                    "offset": 79
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "BandwidthControls",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "BandwidthControls",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "callBandwidthControls"
+        },
+        {
           "description": "",
           "tags": [
             {
@@ -15754,281 +15778,6 @@
             }
           ],
           "namespace": "callSdpHandlerInfo"
-        },
-        {
-          "description": "",
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 1,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 2,
-              "type": null,
-              "name": "IceServer"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 3,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "IceServer"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 4
-            },
-            {
-              "title": "property",
-              "description": "Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.",
-              "lineNumber": 5,
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              },
-              "name": "urls"
-            },
-            {
-              "title": "property",
-              "description": "The credential needed by the ICE server.",
-              "lineNumber": 6,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
-              },
-              "name": "credential"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 109,
-              "column": 0
-            },
-            "end": {
-              "line": 116,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 204,
-                "column": 0
-              },
-              "end": {
-                "line": 208,
-                "column": 1
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "urls",
-              "lineNumber": 5,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 106,
-                            "offset": 105
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 106,
-                        "offset": 105
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 106,
-                    "offset": 105
-                  }
-                }
-              },
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              }
-            },
-            {
-              "title": "property",
-              "name": "credential",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The credential needed by the ICE server.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 41,
-                            "offset": 40
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 41,
-                        "offset": 40
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 41,
-                    "offset": 40
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "IceServer",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "IceServer",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "callIceServer"
         },
         {
           "description": {
@@ -18015,6 +17764,566 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "The MediaConstraint type defines the format for configuring media options.\nEither the ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 12,
+                        "offset": 86
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "exact",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 12,
+                        "offset": 86
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 19,
+                        "offset": 93
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " or ",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 19,
+                        "offset": 93
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 23,
+                        "offset": 97
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "ideal",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 23,
+                        "offset": 97
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 30,
+                        "offset": 104
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " property should be provided. If both are present, the\n   ",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 30,
+                        "offset": 104
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 4,
+                        "offset": 162
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "exact",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 4,
+                        "offset": 162
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 11,
+                        "offset": 169
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " value will be used.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 11,
+                        "offset": 169
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 31,
+                        "offset": 189
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 31,
+                    "offset": 189
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "When the ",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 191
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 10,
+                        "offset": 200
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "exact",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 10,
+                        "offset": 200
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 17,
+                        "offset": 207
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " value is provided, it will be the only value considered for the option.\n   If it cannot be used, the constraint will be considered an error.",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 17,
+                        "offset": 207
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 69,
+                        "offset": 348
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 191
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 69,
+                    "offset": 348
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "When the ",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 1,
+                        "offset": 350
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 10,
+                        "offset": 359
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "ideal",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 10,
+                        "offset": 359
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 17,
+                        "offset": 366
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " value is provided, it will be considered as the optimal value for the option.\n   If it cannot be used, the closest acceptable value will be used instead.",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 17,
+                        "offset": 366
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 76,
+                        "offset": 520
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 350
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 76,
+                    "offset": 520
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 76,
+                "offset": 520
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 11,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 12,
+              "type": null,
+              "name": "MediaConstraint"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 13,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "MediaConstraint"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 14
+            },
+            {
+              "title": "property",
+              "description": "The required value for the constraint. Other values will not be accepted.",
+              "lineNumber": 15,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "exact"
+            },
+            {
+              "title": "property",
+              "description": "The ideal value for the constraint. Other values will be considered if necessary.",
+              "lineNumber": 16,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "ideal"
+            },
+            {
+              "title": "example",
+              "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
+              "lineNumber": 17
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 58,
+              "column": 0
+            },
+            "end": {
+              "line": 86,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 204,
+                "column": 0
+              },
+              "end": {
+                "line": 208,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})"
+            }
+          ],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "exact",
+              "lineNumber": 15,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The required value for the constraint. Other values will not be accepted.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 74,
+                            "offset": 73
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 74,
+                        "offset": 73
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 74,
+                    "offset": 73
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              }
+            },
+            {
+              "title": "property",
+              "name": "ideal",
+              "lineNumber": 16,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The ideal value for the constraint. Other values will be considered if necessary.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 82,
+                            "offset": 81
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 82,
+                        "offset": 81
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 82,
+                    "offset": 81
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "MediaConstraint",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "MediaConstraint",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "callMediaConstraint"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "Contains information about a device.",
                     "position": {
                       "start": {
@@ -18465,315 +18774,6 @@
             }
           ],
           "namespace": "callDeviceInfo"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The BandwidthControls type defines the format for configuring media and/or track bandwidth options.\nBandwidthControls only affect received remote tracks of the specified type.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 76,
-                        "offset": 175
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 76,
-                    "offset": 175
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 76,
-                "offset": 175
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 4,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 5,
-              "type": null,
-              "name": "BandwidthControls"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "BandwidthControls"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 7
-            },
-            {
-              "title": "property",
-              "description": "The desired bandwidth bitrate in kilobits per second for received remote audio.",
-              "lineNumber": 8,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "number"
-                }
-              },
-              "name": "audio"
-            },
-            {
-              "title": "property",
-              "description": "The desired bandwidth bitrate in kilobits per second for received remote video.",
-              "lineNumber": 9,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "number"
-                }
-              },
-              "name": "video"
-            },
-            {
-              "title": "example",
-              "description": "// Specify received remote video bandwidth limits when making a call.\nclient.call.make(destination, mediaConstraints,\n {\n   bandwidth: {\n     video: 5\n   }\n }\n)",
-              "lineNumber": 10
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 88,
-              "column": 0
-            },
-            "end": {
-              "line": 107,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 204,
-                "column": 0
-              },
-              "end": {
-                "line": 208,
-                "column": 1
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "// Specify received remote video bandwidth limits when making a call.\nclient.call.make(destination, mediaConstraints,\n {\n   bandwidth: {\n     video: 5\n   }\n }\n)"
-            }
-          ],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "audio",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The desired bandwidth bitrate in kilobits per second for received remote audio.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 80,
-                            "offset": 79
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 80,
-                        "offset": 79
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 80,
-                    "offset": 79
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "number"
-                }
-              }
-            },
-            {
-              "title": "property",
-              "name": "video",
-              "lineNumber": 9,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The desired bandwidth bitrate in kilobits per second for received remote video.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 80,
-                            "offset": 79
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 80,
-                        "offset": 79
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 80,
-                    "offset": 79
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "number"
-                }
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "BandwidthControls",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "BandwidthControls",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "callBandwidthControls"
         },
         {
           "description": {
@@ -46090,6 +46090,614 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 115,
+                        "offset": 114
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 115,
+                    "offset": 114
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 115,
+                "offset": 114
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "property",
+              "description": "The payload type. Can be `text`, `json`, or `file`.",
+              "lineNumber": 3,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "type"
+            },
+            {
+              "title": "property",
+              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+              "lineNumber": 4,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "text"
+            },
+            {
+              "title": "property",
+              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 5,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              },
+              "name": "json"
+            },
+            {
+              "title": "property",
+              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 6,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
+                }
+              },
+              "name": "file"
+            },
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 8,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 9,
+              "type": null,
+              "name": "Part"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "Part"
+            },
+            {
+              "title": "memberof",
+              "description": "conversation",
+              "lineNumber": 11
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 27,
+              "column": 0
+            },
+            "end": {
+              "line": 39,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 84,
+                "column": 0
+              },
+              "end": {
+                "line": 84,
+                "column": 42
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "type",
+              "lineNumber": 3,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The payload type. Can be ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "text",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "json",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", or ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "file",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ".",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 52,
+                    "offset": 51
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "text",
+              "lineNumber": 4,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 114,
+                            "offset": 113
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 114,
+                        "offset": 113
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 114,
+                    "offset": 113
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "json",
+              "lineNumber": 5,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The object corresponding to a json object to attach to a message. A ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 109,
+                            "offset": 108
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 109,
+                        "offset": 108
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 109,
+                    "offset": 108
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              }
+            },
+            {
+              "title": "property",
+              "name": "file",
+              "lineNumber": 6,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The file to attach to a message. A ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 76,
+                            "offset": 75
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 76,
+                        "offset": 75
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 76,
+                    "offset": 75
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
+                }
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "Part",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "conversation",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "conversation",
+              "kind": "namespace"
+            },
+            {
+              "name": "Part",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "conversationPart"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "A Message sender object is a means by which a sender can deliver information to a recipient.",
                     "position": {
                       "start": {
@@ -47963,614 +48571,6 @@
             }
           ],
           "namespace": "conversationMessage"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 115,
-                        "offset": 114
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 115,
-                    "offset": 114
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 115,
-                "offset": 114
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "property",
-              "description": "The payload type. Can be `text`, `json`, or `file`.",
-              "lineNumber": 3,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "type"
-            },
-            {
-              "title": "property",
-              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-              "lineNumber": 4,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "text"
-            },
-            {
-              "title": "property",
-              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 5,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              },
-              "name": "json"
-            },
-            {
-              "title": "property",
-              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 6,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              },
-              "name": "file"
-            },
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 8,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 9,
-              "type": null,
-              "name": "Part"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 10,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "Part"
-            },
-            {
-              "title": "memberof",
-              "description": "conversation",
-              "lineNumber": 11
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 27,
-              "column": 0
-            },
-            "end": {
-              "line": 39,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 84,
-                "column": 0
-              },
-              "end": {
-                "line": 84,
-                "column": 42
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "type",
-              "lineNumber": 3,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The payload type. Can be ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "text",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "json",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", or ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "file",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ".",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 52,
-                            "offset": 51
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 52,
-                        "offset": 51
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 52,
-                    "offset": 51
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "text",
-              "lineNumber": 4,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 114,
-                            "offset": 113
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 114,
-                        "offset": 113
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 114,
-                    "offset": 113
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "json",
-              "lineNumber": 5,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The object corresponding to a json object to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 109,
-                            "offset": 108
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 109,
-                        "offset": 108
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 109,
-                    "offset": 108
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              }
-            },
-            {
-              "title": "property",
-              "name": "file",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The file to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 76,
-                            "offset": 75
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 76,
-                        "offset": 75
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 76,
-                    "offset": 75
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "Part",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "conversation",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "conversation",
-              "kind": "namespace"
-            },
-            {
-              "name": "Part",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "conversationPart"
         }
       ]
     },
