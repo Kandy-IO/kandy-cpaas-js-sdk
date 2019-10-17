@@ -13678,6 +13678,383 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 40,
+                        "offset": 83
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 40,
+                    "offset": 83
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 40,
+                "offset": 83
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 4,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 5,
+              "type": null,
+              "name": "MediaObject"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "MediaObject"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 7
+            },
+            {
+              "title": "property",
+              "description": "The ID of the Media object.",
+              "lineNumber": 8,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "id"
+            },
+            {
+              "title": "property",
+              "description": "Indicator on whether this media is local or remote.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "local"
+            },
+            {
+              "title": "property",
+              "description": "A list of Track objects that are contained in this Media object.",
+              "lineNumber": 10,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "TrackObject"
+                  }
+                ]
+              },
+              "name": "tracks"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 139,
+              "column": 0
+            },
+            "end": {
+              "line": 150,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 204,
+                "column": 0
+              },
+              "end": {
+                "line": 208,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "id",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The ID of the Media object.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 28,
+                            "offset": 27
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 28,
+                        "offset": 27
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 28,
+                    "offset": 27
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "local",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Indicator on whether this media is local or remote.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 52,
+                    "offset": 51
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "tracks",
+              "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of Track objects that are contained in this Media object.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 65,
+                            "offset": 64
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 65,
+                        "offset": 64
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 65,
+                    "offset": 64
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "TrackObject"
+                  }
+                ]
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "MediaObject",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "MediaObject",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "callMediaObject"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "A Track is a stream of audio or video media from a single source.\nTracks can be retrieved using the Media module's ",
                     "position": {
                       "start": {
@@ -17988,383 +18365,6 @@
             }
           ],
           "namespace": "callSdpHandlerFunction"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 40,
-                        "offset": 83
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 40,
-                    "offset": 83
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 40,
-                "offset": 83
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 4,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 5,
-              "type": null,
-              "name": "MediaObject"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "MediaObject"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 7
-            },
-            {
-              "title": "property",
-              "description": "The ID of the Media object.",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "id"
-            },
-            {
-              "title": "property",
-              "description": "Indicator on whether this media is local or remote.",
-              "lineNumber": 9,
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              },
-              "name": "local"
-            },
-            {
-              "title": "property",
-              "description": "A list of Track objects that are contained in this Media object.",
-              "lineNumber": 10,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "TrackObject"
-                  }
-                ]
-              },
-              "name": "tracks"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 139,
-              "column": 0
-            },
-            "end": {
-              "line": 150,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 204,
-                "column": 0
-              },
-              "end": {
-                "line": 208,
-                "column": 1
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "id",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The ID of the Media object.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 28,
-                            "offset": 27
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 28,
-                        "offset": 27
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 28,
-                    "offset": 27
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "local",
-              "lineNumber": 9,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Indicator on whether this media is local or remote.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 52,
-                            "offset": 51
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 52,
-                        "offset": 51
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 52,
-                    "offset": 51
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              }
-            },
-            {
-              "title": "property",
-              "name": "tracks",
-              "lineNumber": 10,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of Track objects that are contained in this Media object.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 65,
-                            "offset": 64
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 65,
-                        "offset": 64
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 65,
-                    "offset": 64
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "TrackObject"
-                  }
-                ]
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "MediaObject",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "MediaObject",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "callMediaObject"
         },
         {
           "description": {
@@ -42468,6 +42468,1016 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "A Message object represents an individual message that was delivered to a recipient and it is\nobtained through the ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 22,
+                        "offset": 115
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#conversationgetmessages",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Conversation.getMessages"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 22,
+                        "offset": 115
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 79,
+                        "offset": 172
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " or ",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 79,
+                        "offset": 172
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 83,
+                        "offset": 176
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#conversationgetmessage",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Conversation.getMessage"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 83,
+                        "offset": 176
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 138,
+                        "offset": 231
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API on an existing conversation.",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 138,
+                        "offset": 231
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 171,
+                        "offset": 264
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 171,
+                    "offset": 264
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 266
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 113,
+                        "offset": 378
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 266
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 113,
+                    "offset": 378
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Once the sender sends a message, this message is saved in sender's state as an object.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 380
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 87,
+                        "offset": 466
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 380
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 87,
+                    "offset": 466
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Similarly, once the recipient gets a message, this message is saved in recipient's state.",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 1,
+                        "offset": 468
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 90,
+                        "offset": 557
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 468
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 90,
+                    "offset": 557
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Below are the properties pertaining to this saved message object in either sender or recipient's state.",
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 1,
+                        "offset": 559
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 104,
+                        "offset": 662
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 10,
+                    "column": 1,
+                    "offset": 559
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 104,
+                    "offset": 662
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 10,
+                "column": 104,
+                "offset": 662
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "property",
+              "description": "A Unix timestamp in seconds marking the time when the message was created by sender.",
+              "lineNumber": 12,
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              },
+              "name": "timestamp"
+            },
+            {
+              "title": "property",
+              "description": "Whether the message is in pending state or not (delivered by server or not).",
+              "lineNumber": 13,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "isPending"
+            },
+            {
+              "title": "property",
+              "description": "Whether the message was read by recipient user or not.",
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "read"
+            },
+            {
+              "title": "property",
+              "description": "An array of Part Objects.",
+              "lineNumber": 15,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Part"
+                  }
+                ]
+              },
+              "name": "parts"
+            },
+            {
+              "title": "property",
+              "description": "The primary contact address of the sender.",
+              "lineNumber": 16,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "sender"
+            },
+            {
+              "title": "property",
+              "description": "The unique id of the message. The message object (stored in sender's state) has a different id\nthan the one associated with the message object stored in recipient's state.",
+              "lineNumber": 17,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "messageId"
+            },
+            {
+              "title": "property",
+              "description": "The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.\nThis property applies only to message objects stored in sender's state.",
+              "lineNumber": 19,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "type"
+            },
+            {
+              "title": "property",
+              "description": "Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).\nThis property applies only to the message object stored in sender's state.",
+              "lineNumber": 21,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "deliveryStatus"
+            },
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 23,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 24,
+              "type": null,
+              "name": "Message"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 25,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "Message"
+            },
+            {
+              "title": "memberof",
+              "description": "conversation",
+              "lineNumber": 26
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 55,
+              "column": 0
+            },
+            "end": {
+              "line": 82,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 84,
+                "column": 0
+              },
+              "end": {
+                "line": 84,
+                "column": 42
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "timestamp",
+              "lineNumber": 12,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A Unix timestamp in seconds marking the time when the message was created by sender.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 85,
+                            "offset": 84
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 85,
+                        "offset": 84
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 85,
+                    "offset": 84
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              }
+            },
+            {
+              "title": "property",
+              "name": "isPending",
+              "lineNumber": 13,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Whether the message is in pending state or not (delivered by server or not).",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 77,
+                            "offset": 76
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 77,
+                        "offset": 76
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 77,
+                    "offset": 76
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "read",
+              "lineNumber": 14,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Whether the message was read by recipient user or not.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 55,
+                            "offset": 54
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 55,
+                        "offset": 54
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 55,
+                    "offset": 54
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "parts",
+              "lineNumber": 15,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An array of Part Objects.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 26,
+                        "offset": 25
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 26,
+                    "offset": 25
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Part"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "property",
+              "name": "sender",
+              "lineNumber": 16,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The primary contact address of the sender.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 43,
+                            "offset": 42
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 43,
+                        "offset": 42
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 43,
+                    "offset": 42
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "messageId",
+              "lineNumber": 17,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The unique id of the message. The message object (stored in sender's state) has a different id\nthan the one associated with the message object stored in recipient's state.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 77,
+                            "offset": 171
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 77,
+                        "offset": 171
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 77,
+                    "offset": 171
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "type",
+              "lineNumber": 19,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The type of message that was sent. See ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "url": "Messaging.chatTypes",
+                        "title": null,
+                        "jsdoc": true,
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "chatTypes"
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 77,
+                            "offset": 76
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " for valid types.\nThis property applies only to message objects stored in sender's state.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 77,
+                            "offset": 76
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 72,
+                            "offset": 165
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 72,
+                        "offset": 165
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 72,
+                    "offset": 165
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "deliveryStatus",
+              "lineNumber": 21,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).\nThis property applies only to the message object stored in sender's state.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 75,
+                            "offset": 168
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 75,
+                        "offset": 168
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 75,
+                    "offset": 168
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "Message",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "conversation",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "conversation",
+              "kind": "namespace"
+            },
+            {
+              "name": "Message",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "conversationMessage"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "A Conversation object represents a conversation either between two users, or between a\nuser and a group. A user can create a Conversation using ",
                     "position": {
                       "start": {
@@ -46090,7 +47100,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "A Message object represents an individual message that was delivered to a recipient and it is\nobtained through the ",
+                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
                     "position": {
                       "start": {
                         "line": 1,
@@ -46098,95 +47108,9 @@
                         "offset": 0
                       },
                       "end": {
-                        "line": 2,
-                        "column": 22,
-                        "offset": 115
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "#conversationgetmessages",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Conversation.getMessages"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 22,
-                        "offset": 115
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 79,
-                        "offset": 172
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " or ",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 79,
-                        "offset": 172
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 83,
-                        "offset": 176
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "#conversationgetmessage",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Conversation.getMessage"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 83,
-                        "offset": 176
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 138,
-                        "offset": 231
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " API on an existing conversation.",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 138,
-                        "offset": 231
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 171,
-                        "offset": 264
+                        "line": 1,
+                        "column": 115,
+                        "offset": 114
                       },
                       "indent": []
                     }
@@ -46199,151 +47123,9 @@
                     "offset": 0
                   },
                   "end": {
-                    "line": 2,
-                    "column": 171,
-                    "offset": 264
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.",
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 1,
-                        "offset": 266
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 113,
-                        "offset": 378
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 4,
-                    "column": 1,
-                    "offset": 266
-                  },
-                  "end": {
-                    "line": 4,
-                    "column": 113,
-                    "offset": 378
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Once the sender sends a message, this message is saved in sender's state as an object.",
-                    "position": {
-                      "start": {
-                        "line": 6,
-                        "column": 1,
-                        "offset": 380
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 87,
-                        "offset": 466
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 6,
-                    "column": 1,
-                    "offset": 380
-                  },
-                  "end": {
-                    "line": 6,
-                    "column": 87,
-                    "offset": 466
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Similarly, once the recipient gets a message, this message is saved in recipient's state.",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 1,
-                        "offset": 468
-                      },
-                      "end": {
-                        "line": 8,
-                        "column": 90,
-                        "offset": 557
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 8,
-                    "column": 1,
-                    "offset": 468
-                  },
-                  "end": {
-                    "line": 8,
-                    "column": 90,
-                    "offset": 557
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Below are the properties pertaining to this saved message object in either sender or recipient's state.",
-                    "position": {
-                      "start": {
-                        "line": 10,
-                        "column": 1,
-                        "offset": 559
-                      },
-                      "end": {
-                        "line": 10,
-                        "column": 104,
-                        "offset": 662
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 10,
-                    "column": 1,
-                    "offset": 559
-                  },
-                  "end": {
-                    "line": 10,
-                    "column": 104,
-                    "offset": 662
+                    "line": 1,
+                    "column": 115,
+                    "offset": 114
                   },
                   "indent": []
                 }
@@ -46356,86 +47138,17 @@
                 "offset": 0
               },
               "end": {
-                "line": 10,
-                "column": 104,
-                "offset": 662
+                "line": 1,
+                "column": 115,
+                "offset": 114
               }
             }
           },
           "tags": [
             {
               "title": "property",
-              "description": "A Unix timestamp in seconds marking the time when the message was created by sender.",
-              "lineNumber": 12,
-              "type": {
-                "type": "NameExpression",
-                "name": "number"
-              },
-              "name": "timestamp"
-            },
-            {
-              "title": "property",
-              "description": "Whether the message is in pending state or not (delivered by server or not).",
-              "lineNumber": 13,
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              },
-              "name": "isPending"
-            },
-            {
-              "title": "property",
-              "description": "Whether the message was read by recipient user or not.",
-              "lineNumber": 14,
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              },
-              "name": "read"
-            },
-            {
-              "title": "property",
-              "description": "An array of Part Objects.",
-              "lineNumber": 15,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "Part"
-                  }
-                ]
-              },
-              "name": "parts"
-            },
-            {
-              "title": "property",
-              "description": "The primary contact address of the sender.",
-              "lineNumber": 16,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "sender"
-            },
-            {
-              "title": "property",
-              "description": "The unique id of the message. The message object (stored in sender's state) has a different id\nthan the one associated with the message object stored in recipient's state.",
-              "lineNumber": 17,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "messageId"
-            },
-            {
-              "title": "property",
-              "description": "The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.\nThis property applies only to message objects stored in sender's state.",
-              "lineNumber": 19,
+              "description": "The payload type. Can be `text`, `json`, or `file`.",
+              "lineNumber": 3,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -46444,50 +47157,76 @@
             },
             {
               "title": "property",
-              "description": "Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).\nThis property applies only to the message object stored in sender's state.",
-              "lineNumber": 21,
+              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+              "lineNumber": 4,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
               },
-              "name": "deliveryStatus"
+              "name": "text"
+            },
+            {
+              "title": "property",
+              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 5,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              },
+              "name": "json"
+            },
+            {
+              "title": "property",
+              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 6,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
+                }
+              },
+              "name": "file"
             },
             {
               "title": "public",
               "description": null,
-              "lineNumber": 23,
+              "lineNumber": 8,
               "type": null
             },
             {
               "title": "module",
               "description": null,
-              "lineNumber": 24,
+              "lineNumber": 9,
               "type": null,
-              "name": "Message"
+              "name": "Part"
             },
             {
               "title": "typedef",
               "description": null,
-              "lineNumber": 25,
+              "lineNumber": 10,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
               },
-              "name": "Message"
+              "name": "Part"
             },
             {
               "title": "memberof",
               "description": "conversation",
-              "lineNumber": 26
+              "lineNumber": 11
             }
           ],
           "loc": {
             "start": {
-              "line": 55,
+              "line": 27,
               "column": 0
             },
             "end": {
-              "line": 82,
+              "line": 39,
               "column": 3
             }
           },
@@ -46510,8 +47249,8 @@
           "properties": [
             {
               "title": "property",
-              "name": "timestamp",
-              "lineNumber": 12,
+              "name": "type",
+              "lineNumber": 3,
               "description": {
                 "type": "root",
                 "children": [
@@ -46520,190 +47259,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "A Unix timestamp in seconds marking the time when the message was created by sender.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 85,
-                            "offset": 84
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 85,
-                        "offset": 84
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 85,
-                    "offset": 84
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "number"
-              }
-            },
-            {
-              "title": "property",
-              "name": "isPending",
-              "lineNumber": 13,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Whether the message is in pending state or not (delivered by server or not).",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 77,
-                            "offset": 76
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 77,
-                        "offset": 76
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 77,
-                    "offset": 76
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              }
-            },
-            {
-              "title": "property",
-              "name": "read",
-              "lineNumber": 14,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Whether the message was read by recipient user or not.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 55,
-                            "offset": 54
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 55,
-                        "offset": 54
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 55,
-                    "offset": 54
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              }
-            },
-            {
-              "title": "property",
-              "name": "parts",
-              "lineNumber": 15,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "An array of Part Objects.",
+                        "value": "The payload type. Can be ",
                         "position": {
                           "start": {
                             "line": 1,
@@ -46717,6 +47273,108 @@
                           },
                           "indent": []
                         }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "text",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "json",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", or ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "file",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ".",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
                       }
                     ],
                     "position": {
@@ -46727,8 +47385,8 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 26,
-                        "offset": 25
+                        "column": 52,
+                        "offset": 51
                       },
                       "indent": []
                     }
@@ -46742,29 +47400,179 @@
                   },
                   "end": {
                     "line": 1,
-                    "column": 26,
-                    "offset": 25
+                    "column": 52,
+                    "offset": 51
                   }
                 }
               },
               "type": {
-                "type": "TypeApplication",
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "text",
+              "lineNumber": 4,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 114,
+                            "offset": 113
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 114,
+                        "offset": 113
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 114,
+                    "offset": 113
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "json",
+              "lineNumber": 5,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The object corresponding to a json object to attach to a message. A ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 109,
+                            "offset": 108
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 109,
+                        "offset": 108
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 109,
+                    "offset": 108
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
                 "expression": {
                   "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "Part"
-                  }
-                ]
+                  "name": "Object"
+                }
               }
             },
             {
               "title": "property",
-              "name": "sender",
-              "lineNumber": 16,
+              "name": "file",
+              "lineNumber": 6,
               "description": {
                 "type": "root",
                 "children": [
@@ -46773,7 +47581,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The primary contact address of the sender.",
+                        "value": "The file to attach to a message. A ",
                         "position": {
                           "start": {
                             "line": 1,
@@ -46782,8 +47590,42 @@
                           },
                           "end": {
                             "line": 1,
-                            "column": 43,
-                            "offset": 42
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 76,
+                            "offset": 75
                           },
                           "indent": []
                         }
@@ -46797,8 +47639,8 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 43,
-                        "offset": 42
+                        "column": 76,
+                        "offset": 75
                       },
                       "indent": []
                     }
@@ -46812,251 +47654,17 @@
                   },
                   "end": {
                     "line": 1,
-                    "column": 43,
-                    "offset": 42
+                    "column": 76,
+                    "offset": 75
                   }
                 }
               },
               "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "messageId",
-              "lineNumber": 17,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The unique id of the message. The message object (stored in sender's state) has a different id\nthan the one associated with the message object stored in recipient's state.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 2,
-                            "column": 77,
-                            "offset": 171
-                          },
-                          "indent": [
-                            1
-                          ]
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 77,
-                        "offset": 171
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 77,
-                    "offset": 171
-                  }
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
                 }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "type",
-              "lineNumber": 19,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The type of message that was sent. See ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "link",
-                        "url": "Messaging.chatTypes",
-                        "title": null,
-                        "jsdoc": true,
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "chatTypes"
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 77,
-                            "offset": 76
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " for valid types.\nThis property applies only to message objects stored in sender's state.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 77,
-                            "offset": 76
-                          },
-                          "end": {
-                            "line": 2,
-                            "column": 72,
-                            "offset": 165
-                          },
-                          "indent": [
-                            1
-                          ]
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 72,
-                        "offset": 165
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 72,
-                    "offset": 165
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "deliveryStatus",
-              "lineNumber": 21,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).\nThis property applies only to the message object stored in sender's state.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 2,
-                            "column": 75,
-                            "offset": 168
-                          },
-                          "indent": [
-                            1
-                          ]
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 75,
-                        "offset": 168
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 75,
-                    "offset": 168
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
               }
             }
           ],
@@ -47066,7 +47674,7 @@
           "todos": [],
           "access": "public",
           "kind": "typedef",
-          "name": "Message",
+          "name": "Part",
           "type": {
             "type": "NameExpression",
             "name": "Object"
@@ -47085,11 +47693,11 @@
               "kind": "namespace"
             },
             {
-              "name": "Message",
+              "name": "Part",
               "kind": "typedef"
             }
           ],
-          "namespace": "conversationMessage"
+          "namespace": "conversationPart"
         },
         {
           "description": {
@@ -47963,614 +48571,6 @@
             }
           ],
           "namespace": "conversationMessageSender"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 115,
-                        "offset": 114
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 115,
-                    "offset": 114
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 115,
-                "offset": 114
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "property",
-              "description": "The payload type. Can be `text`, `json`, or `file`.",
-              "lineNumber": 3,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "type"
-            },
-            {
-              "title": "property",
-              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-              "lineNumber": 4,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "text"
-            },
-            {
-              "title": "property",
-              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 5,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              },
-              "name": "json"
-            },
-            {
-              "title": "property",
-              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 6,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              },
-              "name": "file"
-            },
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 8,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 9,
-              "type": null,
-              "name": "Part"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 10,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "Part"
-            },
-            {
-              "title": "memberof",
-              "description": "conversation",
-              "lineNumber": 11
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 27,
-              "column": 0
-            },
-            "end": {
-              "line": 39,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 84,
-                "column": 0
-              },
-              "end": {
-                "line": 84,
-                "column": 42
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "type",
-              "lineNumber": 3,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The payload type. Can be ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "text",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "json",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", or ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "file",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ".",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 52,
-                            "offset": 51
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 52,
-                        "offset": 51
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 52,
-                    "offset": 51
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "text",
-              "lineNumber": 4,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 114,
-                            "offset": 113
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 114,
-                        "offset": 113
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 114,
-                    "offset": 113
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "json",
-              "lineNumber": 5,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The object corresponding to a json object to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 109,
-                            "offset": 108
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 109,
-                        "offset": 108
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 109,
-                    "offset": 108
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              }
-            },
-            {
-              "title": "property",
-              "name": "file",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The file to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 76,
-                            "offset": 75
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 76,
-                        "offset": 75
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 76,
-                    "offset": 75
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "Part",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "conversation",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "conversation",
-              "kind": "namespace"
-            },
-            {
-              "name": "Part",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "conversationPart"
         }
       ]
     },

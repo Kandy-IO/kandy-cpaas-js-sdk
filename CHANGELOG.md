@@ -7,10 +7,6 @@ Kandy.js change log.
 
 ## 4.9.0 - beta
 
-### Fixed
-
-- Used the proper channel connectivity method for maintaining websocket channel lifetime. `KAA-2007`
-
 ### Added
 
 - Added Call functionality where local media tracks are deleted if they are not being used for the call. `KAA-1890`
@@ -29,6 +25,8 @@ Kandy.js change log.
 - Fixed an issue where the websocket connection is not closed when unsubscribing from all services. `KAA-2025`
 - Fixed the inconsistent order of media events for both incoming & outgoing calls. `KAA-1757`
 - Fixed an issue where the SIP number normalization was unnecessarily removing an '@' symbol. `KAA-1793`
+- Fixed the issue where an active call did not hang up when the call audit failed. `KAA-2003`
+- Used the proper channel connectivity method for maintaining websocket channel lifetime. `KAA-2007`
 
 ## 4.8.0 - 2019-09-27
 
