@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.163
+ * Version: 4.9.0-beta.164
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20903,6 +20903,7 @@ function* endSession(callInfo) {
   const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `sessions/${callInfo.wrtcsSessionId}`
   };
 
@@ -21009,6 +21010,7 @@ function* callSubscribe(requestInfo, channelInfo) {
 function* callUnsubscribe(requestInfo, subInfo) {
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}/` + `subscriptions/${subInfo.subscriptionId}`
   };
 
@@ -33420,7 +33422,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.163';
+  let version = '4.9.0-beta.164';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -33780,8 +33782,8 @@ function* deleteRequest(groupId, requestInfo) {
   const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}`;
   const requestOptions = {
     method: 'DELETE',
-    url,
-    responseType: 'text'
+    responseType: 'none',
+    url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
@@ -33845,6 +33847,7 @@ function* removeParticipantRequest({ groupId, participant }, requestInfo) {
   const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/${requestInfo.username}/group/${groupId}/participants/${participant}`;
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -33873,6 +33876,7 @@ function* leaveGroupRequest(groupId, requestInfo, userInfo) {
 
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -33989,6 +33993,7 @@ function* rejectInvitationRequest(groupId, requestInfo, userInfo) {
   const url = `${requestInfo.baseURL}/cpaas/chat/${requestInfo.version}/` + `${requestInfo.username}/group/${groupId}/participants/${userInfo.identity}`;
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url
   };
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -39081,6 +39086,7 @@ function* deleteChatConversationRequest(requestInfo, destination, type) {
 
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: url
   };
 
@@ -39119,6 +39125,7 @@ function* deleteChatMessageRequest(requestInfo, destination, messageId, type) {
 
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: url
   };
 
@@ -39184,6 +39191,7 @@ function* chatSubscribe(requestInfo, channel) {
 function* chatUnsubscribe(requestInfo, subInfo) {
   const requestOptions = {};
   requestOptions.method = 'DELETE';
+  requestOptions.responseType = 'none';
 
   requestOptions.url = `${requestInfo.baseURL}/cpaas/` + `chat/${requestInfo.version}/${requestInfo.username}/` + `subscriptions/${subInfo.subscriptionId}`;
 
@@ -39305,6 +39313,7 @@ function* smsInboundSubscribe(requestInfo, channelInfo) {
 function* smsInboundUnsubscribe(requestInfo, subInfo) {
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `inbound/subscriptions/${subInfo.subscriptionId}`
   };
 
@@ -39372,6 +39381,7 @@ function* smsOutboundSubscribe(requestInfo, channelInfo) {
 function* smsOutboundUnsubscribe(requestInfo, subInfo) {
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/` + `smsmessaging/${requestInfo.version}/${requestInfo.username}/` + `outbound/${requestInfo.username}/subscriptions/${subInfo.subscriptionId}`
   };
 
@@ -39865,7 +39875,7 @@ function* sendChatMessage(action) {
     } else if (part.type === 'file') {
       fileParts = fileParts.concat([part]);
     } else {
-      log.info('Unknown part type' + part.type);
+      log.info('Unknown part type: ' + part.type);
     }
   });
 
@@ -41544,6 +41554,7 @@ function* createList(user, requestInfo) {
 function* deleteList(presenceListId, requestInfo) {
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}`
   };
 
@@ -41676,6 +41687,7 @@ function* addUser(userId, presenceListId, requestInfo) {
 function* removeUser(userId, presenceListId, requestInfo) {
   const requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/presenceLists/${presenceListId}/` + `presenceContacts/${userId}`
   };
 
@@ -41767,6 +41779,7 @@ function* subscribe(presenceListId, callbackURL, requestInfo) {
 function* unsubscribe(presenceListId, subscriptionId, requestInfo) {
   let requestOptions = {
     method: 'DELETE',
+    responseType: 'none',
     url: `${requestInfo.baseURL}/cpaas/presence/${requestInfo.version}/` + `${requestInfo.username}/subscriptions/presenceListSubscriptions/` + `${presenceListId}/${subscriptionId}`
   };
 
@@ -43096,11 +43109,16 @@ const log = (0, _logs.getLogManager)().getLogger('REQUEST');
 const responseTypes = (0, _freeze2.default)({
   json: 'json',
   blob: 'blob',
-  text: 'text'
+  text: 'text',
+  none: 'none'
 });
 
 const contentTypes = (0, _freeze2.default)({
-  jsonType: 'application/json'
+  jsonType: 'application/json',
+  vdnJsonType: 'application/vdn.kandy.json',
+  plainTextType: 'text/plain',
+  xmlTextType: 'text/xml',
+  octetStream: 'application/octet-stream'
 });
 
 /*
@@ -43235,15 +43253,51 @@ async function makeRequest(options, requestId) {
         result
       };
     } else {
-      const isJson = contentType && contentType.includes(contentTypes.jsonType);
-
+      /**
+       * The SDK should only be parsing the responses as is expected without checking the content type of the response.
+       * This is deterministic depending on the `responseType` passed in to the request through the request options.
+       * However, if parsing with the expected responseType does fail, attempt parsing using the response's content-type
+       * header before returning a parse error.
+       */
       responseBody = {};
-      if (isJson && responseType === responseTypes.json) {
-        responseBody = await response.json();
-      } else if (responseType === responseTypes.blob) {
-        responseBody = await response.blob();
-      } else if (responseType === responseTypes.text) {
-        responseBody = await response.text();
+      try {
+        switch (responseType) {
+          case responseTypes.json:
+            responseBody = await response.json();
+            break;
+          case responseTypes.blob:
+            responseBody = await response.blob();
+            break;
+          case responseTypes.text:
+            responseBody = await response.text();
+            break;
+          case responseTypes.none:
+            // Do not parse the response
+            break;
+          default:
+            // Should never reach here
+            log.warn('Unexepected response type: ', responseType);
+        }
+      } catch (e) {
+        log.warn(`Failed to parse with response type: ${responseType}. Error: ${e}`);
+
+        // "Fallback" to try response parsing using the Content-Type header of the response
+        log.debug('Attempting to parse with the response content-type');
+        if (contentType) {
+          // Need to clone the response as the response body can only be read/attempted to be read once.
+          const responseClone = response.clone();
+          if (contentType.includes(contentTypes.jsonType) || contentType.includes(contentTypes.vdnJsonType)) {
+            responseBody = await responseClone.json();
+          } else if (contentType.includes(contentTypes.plainTextType) || contentType.includes(contentTypes.xmlTextType)) {
+            responseBody = await responseClone.text();
+          } else if (contentType.includes(contentTypes.octetStream)) {
+            responseBody = await responseClone.blob();
+          } else {
+            log.warn('Unexepected content-type of response: ', contentType);
+          }
+        } else {
+          log.debug('No content-type set in response, returning an empty object as the body');
+        }
       }
 
       return {
@@ -43529,6 +43583,7 @@ function* requestWebsocket(requestInfo, subscriptionInfo, connectivityInfo) {
 function* deleteChannel(channelId, requestInfo) {
   const requestOptions = {};
   requestOptions.method = 'DELETE';
+  requestOptions.responseType = 'none';
   requestOptions.url = `${requestInfo.baseURL}` + `/cpaas/notificationchannel/${requestInfo.version}/${requestInfo.username}` + `/channels/${channelId}`;
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
@@ -43574,6 +43629,7 @@ function* revokeWebsocket(connection, subscriptionURL, credentials) {
   // Build the revokeWebsocket request.
   let requestOptions = {};
   requestOptions.method = 'DELETE';
+  requestOptions.responseType = 'none';
 
   requestOptions.url = `${connection.server.protocol}://${connection.server.server}:${connection.server.port}` + subscriptionURL;
 
@@ -45198,7 +45254,8 @@ function* deleteContactRequest(requestInfo, contactId) {
   const url = `${requestInfo.baseURL}/cpaas/addressbook/v1/${requestInfo.username}/default/contacts/${contactId}`;
 
   const options = {
-    method: 'DELETE'
+    method: 'DELETE',
+    responseType: 'none'
   };
 
   const response = yield (0, _effects2.default)((0, _extends3.default)({ url }, options), requestInfo.options);
