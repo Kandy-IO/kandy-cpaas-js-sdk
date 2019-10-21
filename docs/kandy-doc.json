@@ -13678,6 +13678,415 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "A collection of media devices and their information.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 53,
+                        "offset": 52
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 53,
+                    "offset": 52
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 53,
+                "offset": 52
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 3,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 4,
+              "type": null,
+              "name": "DevicesObject"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 5,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "DevicesObject"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 6
+            },
+            {
+              "title": "property",
+              "description": "A list of camera device information.",
+              "lineNumber": 7,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              },
+              "name": "camera"
+            },
+            {
+              "title": "property",
+              "description": "A list of microphone device information.",
+              "lineNumber": 8,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              },
+              "name": "microphone"
+            },
+            {
+              "title": "property",
+              "description": "A list of speaker device information.",
+              "lineNumber": 9,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              },
+              "name": "speaker"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 170,
+              "column": 0
+            },
+            "end": {
+              "line": 180,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 204,
+                "column": 0
+              },
+              "end": {
+                "line": 208,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "camera",
+              "lineNumber": 7,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of camera device information.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 37,
+                            "offset": 36
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 37,
+                    "offset": 36
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "property",
+              "name": "microphone",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of microphone device information.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 41,
+                            "offset": 40
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 41,
+                        "offset": 40
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 41,
+                    "offset": 40
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "property",
+              "name": "speaker",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of speaker device information.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 38,
+                            "offset": 37
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 38,
+                        "offset": 37
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 38,
+                    "offset": 37
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "DeviceInfo"
+                  }
+                ]
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "DevicesObject",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "DevicesObject",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "callDevicesObject"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "Contains information about a device.",
                     "position": {
                       "start": {
@@ -18365,415 +18774,6 @@
             }
           ],
           "namespace": "callTrackObject"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A collection of media devices and their information.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 53,
-                        "offset": 52
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 53,
-                    "offset": 52
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 53,
-                "offset": 52
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 3,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 4,
-              "type": null,
-              "name": "DevicesObject"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 5,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "DevicesObject"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 6
-            },
-            {
-              "title": "property",
-              "description": "A list of camera device information.",
-              "lineNumber": 7,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              },
-              "name": "camera"
-            },
-            {
-              "title": "property",
-              "description": "A list of microphone device information.",
-              "lineNumber": 8,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              },
-              "name": "microphone"
-            },
-            {
-              "title": "property",
-              "description": "A list of speaker device information.",
-              "lineNumber": 9,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              },
-              "name": "speaker"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 170,
-              "column": 0
-            },
-            "end": {
-              "line": 180,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 204,
-                "column": 0
-              },
-              "end": {
-                "line": 208,
-                "column": 1
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "camera",
-              "lineNumber": 7,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of camera device information.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 37,
-                            "offset": 36
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 37,
-                        "offset": 36
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 37,
-                    "offset": 36
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              }
-            },
-            {
-              "title": "property",
-              "name": "microphone",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of microphone device information.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 41,
-                            "offset": 40
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 41,
-                        "offset": 40
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 41,
-                    "offset": 40
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              }
-            },
-            {
-              "title": "property",
-              "name": "speaker",
-              "lineNumber": 9,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of speaker device information.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 38,
-                            "offset": 37
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 38,
-                        "offset": 37
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 38,
-                    "offset": 37
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "DeviceInfo"
-                  }
-                ]
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "DevicesObject",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "DevicesObject",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "callDevicesObject"
         },
         {
           "description": {
@@ -46090,6 +46090,614 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 115,
+                        "offset": 114
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 115,
+                    "offset": 114
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 115,
+                "offset": 114
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "property",
+              "description": "The payload type. Can be `text`, `json`, or `file`.",
+              "lineNumber": 3,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "type"
+            },
+            {
+              "title": "property",
+              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+              "lineNumber": 4,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "text"
+            },
+            {
+              "title": "property",
+              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 5,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              },
+              "name": "json"
+            },
+            {
+              "title": "property",
+              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
+              "lineNumber": 6,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
+                }
+              },
+              "name": "file"
+            },
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 8,
+              "type": null
+            },
+            {
+              "title": "module",
+              "description": null,
+              "lineNumber": 9,
+              "type": null,
+              "name": "Part"
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "Part"
+            },
+            {
+              "title": "memberof",
+              "description": "conversation",
+              "lineNumber": 11
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 27,
+              "column": 0
+            },
+            "end": {
+              "line": 39,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 84,
+                "column": 0
+              },
+              "end": {
+                "line": 84,
+                "column": 42
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "type",
+              "lineNumber": 3,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The payload type. Can be ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "text",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 26,
+                            "offset": 25
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 32,
+                            "offset": 31
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "json",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", or ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 40,
+                            "offset": 39
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "file",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 45,
+                            "offset": 44
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ".",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 51,
+                            "offset": 50
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 52,
+                    "offset": 51
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "text",
+              "lineNumber": 4,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 114,
+                            "offset": 113
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 114,
+                        "offset": 113
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 114,
+                    "offset": 113
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "json",
+              "lineNumber": 5,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The object corresponding to a json object to attach to a message. A ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 69,
+                            "offset": 68
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 75,
+                            "offset": 74
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 109,
+                            "offset": 108
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 109,
+                        "offset": 108
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 109,
+                    "offset": 108
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              }
+            },
+            {
+              "title": "property",
+              "name": "file",
+              "lineNumber": 6,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The file to attach to a message. A ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "Part",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 36,
+                            "offset": 35
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " cannot have both json and a file.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 42,
+                            "offset": 41
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 76,
+                            "offset": 75
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 76,
+                        "offset": 75
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 76,
+                    "offset": 75
+                  }
+                }
+              },
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "File"
+                }
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "kind": "typedef",
+          "name": "Part",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "conversation",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "conversation",
+              "kind": "namespace"
+            },
+            {
+              "name": "Part",
+              "kind": "typedef"
+            }
+          ],
+          "namespace": "conversationPart"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "A Message sender object is a means by which a sender can deliver information to a recipient.",
                     "position": {
                       "start": {
@@ -46953,614 +47561,6 @@
             }
           ],
           "namespace": "conversationMessageSender"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 115,
-                        "offset": 114
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 115,
-                    "offset": 114
-                  },
-                  "indent": []
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 1,
-                "column": 115,
-                "offset": 114
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "property",
-              "description": "The payload type. Can be `text`, `json`, or `file`.",
-              "lineNumber": 3,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "type"
-            },
-            {
-              "title": "property",
-              "description": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-              "lineNumber": 4,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "text"
-            },
-            {
-              "title": "property",
-              "description": "The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 5,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              },
-              "name": "json"
-            },
-            {
-              "title": "property",
-              "description": "The file to attach to a message. A `Part` cannot have both json and a file.",
-              "lineNumber": 6,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              },
-              "name": "file"
-            },
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 8,
-              "type": null
-            },
-            {
-              "title": "module",
-              "description": null,
-              "lineNumber": 9,
-              "type": null,
-              "name": "Part"
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 10,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "Part"
-            },
-            {
-              "title": "memberof",
-              "description": "conversation",
-              "lineNumber": 11
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 27,
-              "column": 0
-            },
-            "end": {
-              "line": 39,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 84,
-                "column": 0
-              },
-              "end": {
-                "line": 84,
-                "column": 42
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/messaging/cpaas/interface/mixins.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "type",
-              "lineNumber": 3,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The payload type. Can be ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "text",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 26,
-                            "offset": 25
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "json",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 34,
-                            "offset": 33
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ", or ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 40,
-                            "offset": 39
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "file",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 45,
-                            "offset": 44
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": ".",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 51,
-                            "offset": 50
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 52,
-                            "offset": 51
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 52,
-                        "offset": 51
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 52,
-                    "offset": 51
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "text",
-              "lineNumber": 4,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The text of the message. Messages with file or json attachments are still required to have text associated to it.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 114,
-                            "offset": 113
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 114,
-                        "offset": 113
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 114,
-                    "offset": 113
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "json",
-              "lineNumber": 5,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The object corresponding to a json object to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 69,
-                            "offset": 68
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 75,
-                            "offset": 74
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 109,
-                            "offset": 108
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 109,
-                        "offset": 108
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 109,
-                    "offset": 108
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Object"
-                }
-              }
-            },
-            {
-              "title": "property",
-              "name": "file",
-              "lineNumber": 6,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The file to attach to a message. A ",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "inlineCode",
-                        "value": "Part",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 36,
-                            "offset": 35
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "indent": []
-                        }
-                      },
-                      {
-                        "type": "text",
-                        "value": " cannot have both json and a file.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 42,
-                            "offset": 41
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 76,
-                            "offset": 75
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 76,
-                        "offset": 75
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 76,
-                    "offset": 75
-                  }
-                }
-              },
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "File"
-                }
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "kind": "typedef",
-          "name": "Part",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "conversation",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "conversation",
-              "kind": "namespace"
-            },
-            {
-              "name": "Part",
-              "kind": "typedef"
-            }
-          ],
-          "namespace": "conversationPart"
         },
         {
           "description": {

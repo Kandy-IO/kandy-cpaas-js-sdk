@@ -280,6 +280,18 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
+### DevicesObject
+
+A collection of media devices and their information.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
+-   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
+-   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
+
 ### DeviceInfo
 
 Contains information about a device.
@@ -439,18 +451,6 @@ Type: [Object][4]
 -   `muted` **[boolean][7]** Indicator on whether this Track is muted or not.
 -   `state` **[string][5]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][5]** The ID of the Media Stream that includes this Track.
-
-### DevicesObject
-
-A collection of media devices and their information.
-
-Type: [Object][4]
-
-**Properties**
-
--   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
--   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
--   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
 
 ### make
 
@@ -1272,6 +1272,19 @@ If successful, the event [isTypingList:change][40] will be emitted.
 
 -   `isTyping` **[boolean][7]** Whether the user is typing or not
 
+### Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `type` **[string][5]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][5]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
 ### MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
@@ -1298,19 +1311,6 @@ Add an additional `Part` to a message.
 #### createImageLinks
 
 Creates a usable image link for the message in this `MessageSender`.
-
-### Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-Type: [Object][4]
-
-**Properties**
-
--   `type` **[string][5]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][5]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ### Message
 

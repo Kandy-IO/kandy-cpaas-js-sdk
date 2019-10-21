@@ -265,6 +265,12 @@
                     <li class='h5'><span>Types</span></li>
                     
                       <li><a
+                        href='#calldevicesobject'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> DevicesObject
+                      </a></li>
+                    
+                      <li><a
                         href='#calldeviceinfo'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> DeviceInfo
@@ -316,12 +322,6 @@
                         href='#calltrackobject'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> TrackObject
-                      </a></li>
-                    
-                      <li><a
-                        href='#calldevicesobject'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> DevicesObject
                       </a></li>
                     
                       <li><a
@@ -723,15 +723,15 @@
                       </a></li>
                     
                       <li><a
-                        href='#conversationmessagesender'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> MessageSender
-                      </a></li>
-                    
-                      <li><a
                         href='#conversationpart'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> Part
+                      </a></li>
+                    
+                      <li><a
+                        href='#conversationmessagesender'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> MessageSender
                       </a></li>
                     
                       <li><a
@@ -3406,6 +3406,107 @@ SIP users and PSTN phones.</p>
       <div class='py1 quiet mt1 prose-big'>Types</div>
       <div class="clearfix">
   
+    <div class='border-bottom' id='calldevicesobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>DevicesObject</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A collection of media devices and their information.</p>
+
+
+  <div class='pre p1 fill-light mt0'>DevicesObject</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>camera</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
+          </code>
+
+          
+
+          
+             : A list of camera device information.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>microphone</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
+          </code>
+
+          
+
+          
+             : A list of microphone device information.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>speaker</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
+          </code>
+
+          
+
+          
+             : A list of speaker device information.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='calldeviceinfo'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4488,107 +4589,6 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
 
           
              : The ID of the Media Stream that includes this Track.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='calldevicesobject'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>DevicesObject</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A collection of media devices and their information.</p>
-
-
-  <div class='pre p1 fill-light mt0'>DevicesObject</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>camera</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
-          </code>
-
-          
-
-          
-             : A list of camera device information.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>microphone</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
-          </code>
-
-          
-
-          
-             : A list of microphone device information.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>speaker</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;DeviceInfo>)
-          </code>
-
-          
-
-          
-             : A list of speaker device information.
 
           
           
@@ -10243,6 +10243,132 @@ Other participants will be notified of changes to the conversation's typing stat
       </div>
     </div>
   
+    <div class='border-bottom' id='conversationpart'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Part</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Part</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The payload type. Can be 
+<code>text</code>
+, 
+<code>json</code>
+, or 
+<code>file</code>
+.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>text</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>json</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
+          </code>
+
+          
+
+          
+             : The object corresponding to a json object to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>file</span> 
+          <code class='quiet'>
+            (File?)
+          </code>
+
+          
+
+          
+             : The file to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='conversationmessagesender'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -10450,132 +10576,6 @@ the message can then be sent using the send function.</p>
 </div>
 
     
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='conversationpart'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>Part</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Part</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The payload type. Can be 
-<code>text</code>
-, 
-<code>json</code>
-, or 
-<code>file</code>
-.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>text</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>json</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
-          </code>
-
-          
-
-          
-             : The object corresponding to a json object to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>file</span> 
-          <code class='quiet'>
-            (File?)
-          </code>
-
-          
-
-          
-             : The file to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
   
 
   
