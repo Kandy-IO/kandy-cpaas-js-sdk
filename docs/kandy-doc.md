@@ -280,17 +280,36 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### DevicesObject
+### DeviceInfo
 
-A collection of media devices and their information.
+Contains information about a device.
 
 Type: [Object][4]
 
 **Properties**
 
--   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
--   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
--   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
+-   `deviceId` **[string][5]** The ID of the device.
+-   `groupId` **[string][5]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][5]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][5]** The name of the device.
+
+### SdpHandlerInfo
+
+Type: [Object][4]
+
+**Properties**
+
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][5]** Which end of the connection created the SDP.
+
+### IceServer
+
+Type: [Object][4]
+
+**Properties**
+
+-   `urls` **([Array][9]&lt;[string][5]> | [string][5])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+-   `credential` **[string][5]?** The credential needed by the ICE server.
 
 ### BandwidthControls
 
@@ -316,69 +335,6 @@ client.call.make(destination, mediaConstraints,
  }
 )
 ```
-
-### TrackObject
-
-A Track is a stream of audio or video media from a single source.
-Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
-
-Type: [Object][4]
-
-**Properties**
-
--   `containers` **[Array][9]&lt;[string][5]>** The list of CSS selectors that were used to render this Track.
--   `disabled` **[boolean][7]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
--   `id` **[string][5]** The ID of the Track.
--   `kind` **[string][5]** The kind of Track this is (audio, video).
--   `label` **[string][5]** The label of the device this Track uses.
--   `muted` **[boolean][7]** Indicator on whether this Track is muted or not.
--   `state` **[string][5]** The state of this Track. Can be 'live' or 'ended'.
--   `streamId` **[string][5]** The ID of the Media Stream that includes this Track.
-
-### MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][4]
-
-**Properties**
-
--   `id` **[string][5]** The ID of the Media object.
--   `local` **[boolean][7]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][9]&lt;TrackObject>** A list of Track objects that are contained in this Media object.
-
-### SdpHandlerFunction
-
-The form of an SDP handler function and the expected arguments that it receives.
-
-Type: [Function][12]
-
-**Parameters**
-
--   `newSdp` **[Object][4]** The SDP so far (could have been modified by previous handlers).
--   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][4]** The SDP in its initial state.
-
-Returns **[Object][4]** The resulting modified SDP based on the changes made by this function.
-
-### SdpHandlerInfo
-
-Type: [Object][4]
-
-**Properties**
-
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][5]** Which end of the connection created the SDP.
-
-### IceServer
-
-Type: [Object][4]
-
-**Properties**
-
--   `urls` **([Array][9]&lt;[string][5]> | [string][5])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
--   `credential` **[string][5]?** The credential needed by the ICE server.
 
 ### MediaConstraint
 
@@ -439,18 +395,62 @@ Type: [Object][4]
 -   `startTime` **[number][8]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][8]?** The end time of the call in milliseconds since the epoch.
 
-### DeviceInfo
+### SdpHandlerFunction
 
-Contains information about a device.
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][12]
+
+**Parameters**
+
+-   `newSdp` **[Object][4]** The SDP so far (could have been modified by previous handlers).
+-   `info` **SdpHandlerInfo** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][4]** The SDP in its initial state.
+
+Returns **[Object][4]** The resulting modified SDP based on the changes made by this function.
+
+### MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
 
 Type: [Object][4]
 
 **Properties**
 
--   `deviceId` **[string][5]** The ID of the device.
--   `groupId` **[string][5]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][5]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][5]** The name of the device.
+-   `id` **[string][5]** The ID of the Media object.
+-   `local` **[boolean][7]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][9]&lt;TrackObject>** A list of Track objects that are contained in this Media object.
+
+### TrackObject
+
+A Track is a stream of audio or video media from a single source.
+Tracks can be retrieved using the Media module's `getTrackById` API and manipulated with other functions of the Media module.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `containers` **[Array][9]&lt;[string][5]>** The list of CSS selectors that were used to render this Track.
+-   `disabled` **[boolean][7]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+-   `id` **[string][5]** The ID of the Track.
+-   `kind` **[string][5]** The kind of Track this is (audio, video).
+-   `label` **[string][5]** The label of the device this Track uses.
+-   `muted` **[boolean][7]** Indicator on whether this Track is muted or not.
+-   `state` **[string][5]** The state of this Track. Can be 'live' or 'ended'.
+-   `streamId` **[string][5]** The ID of the Media Stream that includes this Track.
+
+### DevicesObject
+
+A collection of media devices and their information.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `camera` **[Array][9]&lt;DeviceInfo>** A list of camera device information.
+-   `microphone` **[Array][9]&lt;DeviceInfo>** A list of microphone device information.
+-   `speaker` **[Array][9]&lt;DeviceInfo>** A list of speaker device information.
 
 ### make
 
@@ -1272,42 +1272,13 @@ If successful, the event [isTypingList:change][40] will be emitted.
 
 -   `isTyping` **[boolean][7]** Whether the user is typing or not
 
-### Message
-
-A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the [Conversation.getMessages][39] or [Conversation.getMessage][41] API on an existing conversation.
-
-Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
-
-Once the sender sends a message, this message is saved in sender's state as an object.
-
-Similarly, once the recipient gets a message, this message is saved in recipient's state.
-
-Below are the properties pertaining to this saved message object in either sender or recipient's state.
-
-Type: [Object][4]
-
-**Properties**
-
--   `timestamp` **[number][8]** A Unix timestamp in seconds marking the time when the message was created by sender.
--   `isPending` **[boolean][7]** Whether the message is in pending state or not (delivered by server or not).
--   `read` **[boolean][7]** Whether the message was read by recipient user or not.
--   `parts` **[Array][9]&lt;Part>** An array of Part Objects.
--   `sender` **[string][5]** The primary contact address of the sender.
--   `messageId` **[string][5]** The unique id of the message. The message object (stored in sender's state) has a different id
-    than the one associated with the message object stored in recipient's state.
--   `type` **[string][5]** The type of message that was sent. See [chatTypes][32] for valid types.
-    This property applies only to message objects stored in sender's state.
--   `deliveryStatus` **[string][5]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
-    This property applies only to the message object stored in sender's state.
-
 ### MessageSender
 
 A Message sender object is a means by which a sender can deliver information to a recipient.
 
 This sender object can be obtained through the [conversation.createMessage][36] API on an existing conversation.
 
-Once all the desired parts have been added to it using the [MessageSender.addPart][42],
+Once all the desired parts have been added to it using the [MessageSender.addPart][41],
 the message can then be sent using the send function.
 
 Type: [Object][4]
@@ -1340,6 +1311,35 @@ Type: [Object][4]
 -   `text` **[string][5]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
 -   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
 -   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
+### Message
+
+A Message object represents an individual message that was delivered to a recipient and it is
+obtained through the [Conversation.getMessages][39] or [Conversation.getMessage][42] API on an existing conversation.
+
+Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
+
+Once the sender sends a message, this message is saved in sender's state as an object.
+
+Similarly, once the recipient gets a message, this message is saved in recipient's state.
+
+Below are the properties pertaining to this saved message object in either sender or recipient's state.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `timestamp` **[number][8]** A Unix timestamp in seconds marking the time when the message was created by sender.
+-   `isPending` **[boolean][7]** Whether the message is in pending state or not (delivered by server or not).
+-   `read` **[boolean][7]** Whether the message was read by recipient user or not.
+-   `parts` **[Array][9]&lt;Part>** An array of Part Objects.
+-   `sender` **[string][5]** The primary contact address of the sender.
+-   `messageId` **[string][5]** The unique id of the message. The message object (stored in sender's state) has a different id
+    than the one associated with the message object stored in recipient's state.
+-   `type` **[string][5]** The type of message that was sent. See [chatTypes][32] for valid types.
+    This property applies only to message objects stored in sender's state.
+-   `deliveryStatus` **[string][5]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
+    This property applies only to the message object stored in sender's state.
 
 ## groups
 
@@ -2085,9 +2085,9 @@ Type: [string][5]
 
 [40]: Messaging.event:isTypingList:change
 
-[41]: #conversationgetmessage
+[41]: #messagesenderaddpart
 
-[42]: #messagesenderaddpart
+[42]: #conversationgetmessage
 
 [43]: Messaging
 
