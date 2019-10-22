@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.167
+ * Version: 4.9.0-beta.168
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33422,7 +33422,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.167';
+  let version = '4.9.0-beta.168';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -47235,8 +47235,12 @@ function* watchDeviceEvents(manager) {
 // Webrtc plugin.
 function setListeners(manager, emit, END = 'END') {
   // Manager event handlers.
-  const change = devices => {
-    emit(_actions.deviceActions.devicesChanged(devices));
+  const change = () => {
+    // Get the latest devices after they changed, then emit the device list
+    //  upwards.
+    manager.checkDevices().then(devices => {
+      emit(_actions.deviceActions.devicesChanged(devices));
+    });
   };
 
   manager.on('change', change);
@@ -49859,8 +49863,8 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
 
   // Check devices on initialization.
   checkDevices().then(() => {
-    // Emit an initial event with the device lists.
-    emitter.emit('change', get());
+    // Emit an initial event to notify that devices are available.
+    emitter.emit('change');
   });
 
   // Check devices whenever they change.
@@ -49874,8 +49878,8 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
       setTimeout(() => {
         recentDeviceChange = false;
         checkDevices().then(() => {
-          // Emit an event with the updated device lists.
-          emitter.emit('change', get());
+          // Emit an event to notify of the change.
+          emitter.emit('change');
         });
       }, 50);
     }
@@ -49908,7 +49912,7 @@ const WEBRTC_DEVICE_KINDS = exports.WEBRTC_DEVICE_KINDS = {
               break;
           }
         });
-        resolve();
+        resolve(get());
       }).catch(reject);
     });
   }
