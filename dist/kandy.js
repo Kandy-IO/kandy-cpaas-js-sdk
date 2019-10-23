@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.170
+ * Version: 4.9.0-beta.171
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22973,6 +22973,152 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
+     * Adds local video to an ongoing Call, to start sending to the remote
+     *    participant.
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The {@link call.addMedia} API can be used to perform the same behaviour
+     *    as `startVideo`. {@link call.addMedia} is a general-purpose API for
+     *    adding media to a call, which covers the same functionality as
+     *    `startVideo`. Selecting only video options when using
+     *    {@link call.addMedia} will perform the same behaviour as using
+     *    `startVideo`.
+     *
+     * @public
+     * @static
+     * @method startVideo
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * // Select media options for adding only video.
+     * const media = {
+     *    audio: false,
+     *    video: true,
+     *    videoOptions: { ... },
+     *    screen: false
+     * }
+     *
+     * // Add the selected media to the call.
+     * client.call.addMedia(callId, media)
+     */
+
+    /**
+     * Removes local video from an ongoing Call, stopping it from being sent
+     *    to the remote participant.
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The {@link call.removeMedia} API can be used to perform the same
+     *    behaviour as `stopVideo`. {@link call.removeMedia} is a
+     *    general-purpose API for removing media from a call, which covers the
+     *    same functionality as `stopVideo`. Specifying only the video track(s)
+     *    when using {@link call.removeMedia} will perform the same behaviour
+     *    as using `stopVideo`.
+     *
+     * @public
+     * @static
+     * @method stopVideo
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * const call = client.call.getById(callId)
+     * // Get the ID of the Call's video track.
+     * const videoTrack = call.localTracks.find(trackId => {
+     *    const track = call.media.getTrackById(trackId)
+     *    return track.kind === 'video'
+     * })
+     *
+     * // Remove video from the call.
+     * client.call.removeMedia(callId, [ videoTrack ])
+     */
+
+    /**
+     * Adds local screenshare to an ongoing Call, to start sending to the remote
+     *    participant.
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The {@link call.addMedia} API can be used to perform the same behaviour
+     *    as `startScreenshare`. {@link call.addMedia} is a general-purpose API
+     *    for adding media to a call, which covers the same functionality as
+     *    `startScreenshare`. Selecting only screen options when using
+     *    {@link call.addMedia} will perform the same behaviour as using
+     *    `startScreenshare`.
+     *
+     * @public
+     * @static
+     * @method startScreenshare
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * // Select media options for adding only screenshare.
+     * const media = {
+     *    audio: false,
+     *    video: false,
+     *    screen: true,
+     *    screenOptions: { ... }
+     * }
+     *
+     * // Add the selected media to the call.
+     * client.call.addMedia(callId, media)
+     */
+
+    /**
+     * Removes local screenshare from an ongoing Call, stopping it from being
+     *    sent to the remote participant.
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The {@link call.removeMedia} API can be used to perform the same
+     *    behaviour as `stopScreenshare`. {@link call.removeMedia} is a
+     *    general-purpose API for removing media from a call, which covers the
+     *    same functionality as `stopScreenshare`. Specifying only the screen
+     *    track when using {@link call.removeMedia} will perform the same
+     *    behaviour as using `stopScreenshare`.
+     *
+     * There is a caveat that if a Call has multiple video tracks (for example,
+     *    both a video and a screen track), the SDK itself cannot yet
+     *    differentiate one from the other. The application will need to know
+     *    which track was the screen track in this scenario.
+     * @public
+     * @static
+     * @method stopScreenshare
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * const call = client.call.getById(callId)
+     * // Get the ID of any/all video tracks on the call.
+     * const videoTracks = call.localTracks.filter(trackId => {
+     *    const track = call.media.getTrackById(trackId)
+     *    // Both video and screen tracks have kind of 'video'.
+     *    return track.kind === 'video'
+     * })
+     *
+     * // Pick out the screen track.
+     * const screenTrack = videoTracks[0]
+     *
+     * // Remove screen from the call.
+     * client.call.removeMedia(callId, [ screenTrack ])
+     */
+
+    /**
      * Send DTMF tones to a call's audio.
      *
      * The provided tone can either be a single DTMF tone (eg. '1') or a
@@ -23301,11 +23447,107 @@ function callAPI({ dispatch, getState }) {
      *    const call = client.call.getById(params.callId)
      *    // Check if the call now has media flowing.
      *    if (call.state === client.call.states.CONNECTED) {
-     *      // Render call media ...
+     *      // The call is now active, and can perform midcall operations.
      *    }
      * })
      */
     states: _constants.CALL_STATES
+
+    /**
+     * The `setDefaultDevices` API from previous SDK releases (3.X) has been
+     *    deprecated in the latest releases (4.X+). The SDK no longer keeps
+     *    track of "default devices" on behalf of the application.
+     *
+     * The devices used for a call can be selected as part of the APIs for
+     *    starting the call. Microphone and/or camera can be chosen in the
+     *    {@link call.make} and {@link call.answer} APIs, and speaker can be
+     *    chosen when the audio track is rendered with the
+     *    {@link media.renderTracks} API.
+     * @public
+     * @static
+     * @method setDefaultDevices
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     */
+
+    /**
+     * Changes the camera and/or microphone used for a Call's media input.
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The same behaviour as the `changeInputDevices` API can be implemented
+     *    using the general-purpose {@link call.replaceTrack} API. This API can
+     *    be used to replace an existing media track with a new track of the
+     *    same type, allowing an application to change certain aspects of the
+     *    media, such as input device.
+     * @public
+     * @static
+     * @method changeInputDevices
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * const call = client.call.getById(callId)
+     * // Get the ID of the Call's video track.
+     * const videoTrack = call.localTracks.find(trackId => {
+     *    const track = client.media.getTrackById(trackId)
+     *    return track.kind === 'video'
+     * })
+     *
+     * // Select the new video options.
+     * const media = {
+     *    video: true,
+     *    videoOptions: {
+     *        deviceId: 'cameraId'
+     *    }
+     * }
+     *
+     * // Change the call's camera by replacing the video track.
+     * client.call.replaceTrack(callId, videoTrack, media)
+     */
+
+    /**
+     * Changes the speaker used for a Call's audio output. Supported on
+     *    browser's that support HTMLMediaElement.setSinkId().
+     *
+     * The latest SDK release (v4.X+) has not yet implemented this API in the
+     *    same way that it was available in previous releases (v3.X). In place
+     *    of this API, the SDK has a more general API that can be used for this
+     *    same behaviour.
+     *
+     * The same behaviour as the `changeSpeaker` API can be implemented by
+     *    re-rendering the Call's audio track.  A speaker can be selected when
+     *    rendering an audio track, so changing a speaker can be simulated
+     *    by unrendering the track with {@link media.removeTracks}, then
+     *    re-rendering it with a new speaker with {@link media.renderTracks}.
+     * @public
+     * @static
+     * @method changeSpeaker
+     * @memberof call
+     * @requires call
+     * @requires callMe
+     * @example
+     * const call = client.call.getById(callId)
+     * // Get the ID of the Call's audio track.
+     * const audioTrack = call.localTracks.find(trackId => {
+     *    const track = client.media.getTrackById(trackId)
+     *    return track.kind === 'audio'
+     * })
+     *
+     * // Where the audio track was previously rendered.
+     * const audioContainer = ...
+     *
+     * // Unrender the audio track we want to change speaker for.
+     * client.media.removeTrack([ audioTrack ], audioContainer)
+     * // Re-render the audio track with a new speaker.
+     * client.media.renderTrack([ audioTrack ], audioContainer, {
+     *    speakerId: 'speakerId'
+     * })
+     */
   };
 }
 
@@ -33422,7 +33664,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.170';
+  let version = '4.9.0-beta.171';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -48631,14 +48873,13 @@ function mediaAPI({ dispatch, getState }) {
      * @param  {Object} [options] Additional options for rendering the tracks.
      * @param  {string} [options.speakerId] The speaker's Device ID to use for audio tracks.
      * @example
-     * // When an outgoing call is accepted, render the Media used for the call.
-     * client.on('call:accepted', function (params) {
-     *     // Get the information about the call.
-     *     const call = client.call.getById(params.callId)
+     * // When a Call receives a new track, render it.
+     * client.on('call:newTrack', function (params) {
+     *    const track = client.media.getTrackById(params.trackId)
+     *    const container = params.local ? localContainer : remoteContainer
      *
-     *     // Render the call's local and remote media in their respective containers.
-     *     client.media.render(call.localMedia[0], localContainer)
-     *     client.media.render(call.remoteMedia[0], remoteContainer)
+     *    // Render the Call's new track when it first becomes available.
+     *    client.media.renderTracks([ track.id ], container)
      * })
      */
     renderTracks(trackIds, cssSelector, options = {}) {
