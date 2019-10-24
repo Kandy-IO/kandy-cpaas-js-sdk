@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.172
+ * Version: 4.9.0-beta.173
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33686,7 +33686,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.172';
+  let version = '4.9.0-beta.173';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -35182,19 +35182,18 @@ exports.default = function (context) {
     /**
      * Creates a Group.
      *
-     * The SDK will emit a {@link Group.event:group:new group:new} event locally
+     * The SDK will emit a {@link groups.event:group:new group:new} event locally
      *    when the operation completes. This event will include a Group ID that
      *    is used to uniquely identify the group.
      *
      * Remote users added to the Group during creation will receive a
      *    `group:invitation_received` event, which will include information
      *    about the Group. Group participants can be managed after creation
-     *    using the {@link Groups.addParticipant group.addParticipant} and
-     *    {@link Groups.removeParticipant group.removeParticipant} APIs.
+     *    using the {@link groups.addParticipant} and
+     *    {@link groups.removeParticipant} APIs.
      *
      * Group information will become available after the operation completes
-     *    using the {@link Groups.get group.get} and
-     *    {@link Group.getAll group.getAll} APIs.
+     *    using the {@link groups.get} and {@link groups.getAll} APIs.
      *
      * @public
      * @static
@@ -35221,14 +35220,14 @@ exports.default = function (context) {
      *    of. This will refresh the available Groups with any new information
      *    from the server.
      *
-     * The SDK will emit a {@link Group.event:group:refresh group:refresh} event
+     * The SDK will emit a {@link groups.event:group:refresh group:refresh} event
      *    when the operation completes.
      *
      * Information about an available Group can be retrieved using the
-     *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get}
-     *    APIs.
+     *    {@link groups.getAll} or {@link groups.get} APIs.
      *
      * @public
+     * @static
      * @memberof groups
      * @method fetch
      */
@@ -35283,10 +35282,11 @@ exports.default = function (context) {
     /**
      * Retrieves information about all Group invitations available.
      *
-     * The {@link Groups.event:group:invitation_received group:invitation_received}
+     * The {@link groups.event:group:invitation_received group:invitation_received}
      *    event indicates that a new Group invitation is available.
      *
      * @public
+     * @static
      * @memberof groups
      * @method getInvitations
      * @return {Array<Invitations>} The list of Group invitations.
@@ -35298,7 +35298,7 @@ exports.default = function (context) {
     /**
      * Leaves a Group.
      *
-     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     * The SDK will emit a {@link groups.event:group:change group:change} event
      *    when the operation completes.
      *
      * @public
@@ -35314,7 +35314,7 @@ exports.default = function (context) {
     /**
      * Accepts an invitation to a Group.
      *
-     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     * The SDK will emit a {@link groups.event:group:change group:change} event
      *    when the operation completes.
      *
      * @public
@@ -35330,7 +35330,7 @@ exports.default = function (context) {
     /**
      * Rejects an invitation to a Group.
      *
-     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     * The SDK will emit a {@link groups.event:group:change group:change} event
      *    when the operation completes.
      *
      * @public
@@ -35346,9 +35346,9 @@ exports.default = function (context) {
     /**
      * Adds participant to a Group.
      *
-     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     * The SDK will emit a {@link groups.event:group:change group:change} event
      *    when the operation completes. The participant being added will receive
-     *    a {@link Groups.event:group:invitation_received group:invitation_received}
+     *    a {@link groups.event:group:invitation_received group:invitation_received}
      *    event.
      *
      * @public
@@ -35366,7 +35366,7 @@ exports.default = function (context) {
     /**
      * Removes a participant from a Group.
      *
-     * The SDK will emit a {@link Groups.event:group:change group:change} event
+     * The SDK will emit a {@link groups.event:group:change group:change} event
      *    when the operation completes.
      *
      * @public
@@ -35384,10 +35384,10 @@ exports.default = function (context) {
     /**
      * Deletes a Group.
      *
-     * The Group will no longer be available using the {@link Groups.get group.get}
-     *    and {@link Group.getAll group.getAll} APIs.
+     * The Group will no longer be available using the {@link groups.get}
+     *    and {@link groups.getAll} APIs.
      *
-     * The SDK will emit a {@link Groups.event:group:delete group:delete} event
+     * The SDK will emit a {@link groups.event:group:delete group:delete} event
      *    for all participants in the Group.
      *
      * @public
@@ -35418,11 +35418,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 const log = (0, _logs.getLogManager)().getLogger('GROUPS'); /**
                                                              * The 'groups' namespace provides an interface for an application to create and
                                                              *    manage Groups for a User. Groups are used in conjuction with the
-                                                             *    {@link Messaging Messaging} feature to allow for group conversations.
+                                                             *    {@link conversation Messaging} feature to allow for group conversations.
                                                              *
                                                              * Groups are persisted by the server. When the SDK is initialized, there will
-                                                             *    be no Group information available, but the {@link Groups.fetch fetch}
-                                                             *    Group API is used to make available any Groups that were created
+                                                             *    be no Group information available, but the {@link groups.fetch}
+                                                             *    API is used to make available any Groups that were created
                                                              *    previously.
                                                              *
                                                              * The creator of a Group is the Group's administrator.
@@ -35447,7 +35447,7 @@ Object.defineProperty(exports, "__esModule", {
  * A new Group has been created and its information is now available.
  *
  * Information about an available Group can be retrieved using the
- *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
+ *    {@link groups.getAll} or {@link groups.get} APIs.
  *
  * @public
  * @static
@@ -35500,7 +35500,7 @@ const GROUP_DELETE = exports.GROUP_DELETE = 'group:delete';
  *    any otherwise unknown Groups may now be available.
  *
  * Information about an available Group can be retrieved using the
- *    {@link Groups.getAll group.getAll} or {@link Groups.get group.get} APIs.
+ *    {@link groups.getAll} or {@link groups.get} APIs.
  *
  * @public
  * @memberof groups
@@ -35512,7 +35512,7 @@ const GROUP_REFRESH = exports.GROUP_REFRESH = 'group:refresh';
  * An invitation to a Group has been received.
  *
  * Information about a Group invitation can be retrieved using the
- *    {@link Groups.getInvitations group.getInvitations} API.
+ *    {@link groups.getInvitations} API.
  *
  * @public
  * @static
@@ -37590,10 +37590,10 @@ var _mappings = __webpack_require__("../kandy/src/messaging/mappings.js");
  *
  * See the "Conversation" and "Message" sections of the documentation for more details.
  *
- * Available conversations can be retrieved using the
- *    {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging APIs.
+ * Available conversations can be retrieved using the {@link conversation.get}
+ *    or {@link conversation.getAll} APIs.
  *
- * Messaging functions are all part of the 'conversation' namespace. Ex: {@link Messaging.getAll client.conversation.getAll}
+ * Messaging functions are all part of the 'conversation' namespace. Ex: {@link messaging.getAll client.conversation.getAll}
  *
  * @public
  * @namespace conversation
@@ -37607,18 +37607,18 @@ function api(context) {
      * Fetches chat conversations that the current user is part of. This will refresh
      * the available information with any new information from the server.
      *
-     * If successful, the event {@link Messaging.event:conversations:change conversations:change} will be emitted.
+     * If successful, the event {@link conversation.event:conversations:change conversations:change} will be emitted.
      *
      * Available conversation information can be retrieved using the
-     * {@link Messaging.get get} or {@link Messaging.getAll getAll} Messaging
-     * APIs.
+     *    {@link conversation.get} or {@link conversation.getAll} Messaging
+     *    APIs.
      *
      * @public
      * @static
      * @method fetch
      * @memberof conversation
      * @param {Object} [options] A configuration object to query for more specific results.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to fetch. See {@link conversation.chatTypes} for valid types.
      */
     fetch: function (options = {}) {
       log.debug(_logs.API_LOG_TAG + 'conversation.fetch: ', options);
@@ -37631,8 +37631,8 @@ function api(context) {
     /**
      * Retrieves a conversation object matching the User ID and Type provided if available.
      *
-     * Conversations are made availble using the {@link Messaging.fetch fetch}
-     * or {@link Messaging.create create} Messaging APIs.
+     * Conversations are made availble using the {@link conversation.fetch} or
+     *    {@link conversation.create} Messaging APIs.
      *
      * @public
      * @static
@@ -37640,7 +37640,7 @@ function api(context) {
      * @memberof conversation
      * @param {string} recipient The User ID of the remote user with which the current user had a conversation.
      * @param {Object} [options] Options used to query for more specific results.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation to get. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to get. See {@link conversation.chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -37680,7 +37680,7 @@ function api(context) {
      * Creates and return a new conversation object. Any messages being sent through this Conversation
      * object will be sent to the destination provided.
      *
-     * If successful, the event {@link Messaging.event:conversations:new conversations:new} will be emitted.
+     * If successful, the event {@link conversation.event:conversations:new conversations:new} will be emitted.
      *
      * @public
      * @static
@@ -37688,7 +37688,7 @@ function api(context) {
      * @memberof conversation
      * @param {string} recipient The ID of the remote user to create a conversation with. The ID will be changed to lowercase.
      * @param {Object} [options] Options to use when creating a new conversation object.
-     * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link Messaging.chatTypes chatTypes} for valid types.
+     * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link conversation.chatTypes} for valid types.
      * @returns {Conversation} A Conversation object.
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
@@ -37714,8 +37714,8 @@ function api(context) {
     /**
      * Retrieves all available conversations for the current user.
      *
-     * Conversations are made availble using the {@link Messaging.fetch fetch}
-     * or {@link Messaging.create create} Messaging APIs.
+     * Conversations are made availble using the {@link conversation.fetch} or
+     *    {@link conversation.create} Messaging APIs.
      *
      * @public
      * @static
@@ -37769,7 +37769,7 @@ Object.defineProperty(exports, "__esModule", {
  * @event conversations:new
  * @param {Array<Object>} params An array containing one object with information about the newly created conversation.
  * @param {Array<string>} params.destination An array of destinations for messages created in this conversation.
- * @param {string} params.type The type of conversation created. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.type The type of conversation created. See {@link conversation.chatTypes} for valid types.
  */
 const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
 
@@ -37781,7 +37781,7 @@ const CONVERSATIONS_NEW = exports.CONVERSATIONS_NEW = 'conversations:new';
  * @event conversations:change
  * @param {Array<Object>} params An array of objects containing information about the conversations that have changed.
  * @param {Array<string>} params.destination An array of destinations for messages in this conversation.
- * @param {string} params.type The type of conversation changed. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.type The type of conversation changed. See {@link conversation.chatTypes} for valid types.
  */
 const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:change';
 
@@ -37794,7 +37794,7 @@ const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:chang
  * @event messages:change
  * @param {Object} params
  * @param {Array<string>} params.destination An array of destinations for the message affected.
- * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
  * @param {string} [params.sender] The username of the sender.
  */
@@ -37821,7 +37821,7 @@ const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
  * @param {Object} params
  * @param {Array<string>} params.destination An array of destinations in this conversation.
  * @param {string} params.sender The username of the sender that caused the event to fire.
- * @param {string} params.type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} params.type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @param {string} params.state (active/idle) The current state of the sender that caused the event to fire.
  */
 const IS_TYPING_LIST_CHANGE = exports.IS_TYPING_LIST_CHANGE = 'isTypingList:change';
@@ -38096,7 +38096,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  *
  * @param {Array<string>} destination The destination(s) for messages being sent through
  * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
  * @param {string} [id=undefined] id The unique identifier for the conversation.
  * @param {string} [description=''] The description associated with the conversation.
  * @param {Array<Message>} [messages=[]] An array containing the conversation's messages.
@@ -38107,7 +38107,8 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 // Events
 /**
  * A Conversation object represents a conversation either between two users, or between a
- * user and a group. A user can create a Conversation using {@link Messaging.create client.conversation.create} Messaging API.
+ * user and a group. A user can create a Conversation using {@link conversation.create client.conversation.create} Messaging API.
+ *
  * A Conversation can be used to create messages to send using the Conversation and Messaging APIs
  * {@link #conversationcreatemessage Conversation.createMessage} and {@link #messagesendersend Message.send} functions.
  *
@@ -38119,7 +38120,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {string} address The ID of the current user who is having a conversation.
  * @property {number} lastReceived The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
  * This property applies only to conversation object stored in recipient's state.
- * @property {string} type The type of conversation. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @property {string} type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
  * @property {Array<Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
@@ -38178,7 +38179,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
- * @property {string} type The type of message that was sent. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @property {string} type The type of message that was sent. See {@link conversation.chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
  * @property {string} deliveryStatus Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
  * This property applies only to the message object stored in sender's state.
@@ -38222,7 +38223,7 @@ const conversationBase = {
     /**
      * Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
      *
-     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @static
@@ -38258,7 +38259,7 @@ const conversationBase = {
     /**
      * Clears all messages in this conversation from local state.
      *
-     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @static
@@ -38346,7 +38347,7 @@ const conversationBase = {
      * Deletes specified messages from this conversation.
      * Provide an array of message IDs for the messages to be deleted.
      *
-     * If successful, the event {@link Messaging.event:messages:change messages:changed} will be emitted.
+     * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @static
@@ -38363,7 +38364,7 @@ const conversationBase = {
     /**
      * Delete the conversation.
      *
-     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
+     * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @static
@@ -38423,7 +38424,7 @@ const conversationBase = {
      * When the operation is complete, a `messages:change` event will be emitted.
      * Messages can then be retrieved using {@link #conversationgetmessages Conversation.getMessages}.
      *
-     * If successful, the event {@link Messaging.event:messages:change messages:change} will be emitted.
+     * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
      * @public
      * @static
@@ -38452,7 +38453,7 @@ const conversationBase = {
      * Sets the typing status of the conversation for the current user.
      * Other participants will be notified of changes to the conversation's typing status.
      *
-     * If successful, the event {@link Messaging.event:isTypingList:change isTypingList:change} will be emitted.
+     * If successful, the event {@link conversation.event:isTypingList:change isTypingList:change} will be emitted.
      *
      * @public
      * @static
@@ -38480,7 +38481,7 @@ const conversationBase = {
    * @param  {boolean} isFetchingLinks
    * @param  {string} sender The author of the message
    * @param  {string} messageId a unique ID for looking up the message
-   * @param  {string} [type='chat-oneToOne'] The message type. See {@link Messaging.chatTypes chatTypes} for valid types.
+   * @param  {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
    */
 };const messageBase = {
   initializers: [function ({
@@ -39707,7 +39708,7 @@ function* fetchConversationsRequest(requestInfo, type) {
  * @param {Object} requestInfo
  * @param {Object} params
  * @param {string} params.destination a target email or groupId to send the message to
- * @param {string} [params.type='chat-onToOne'] The type of messages to fetch. See {@link Messaging.chatTypes chatTypes} for valid types.
+ * @param {string} [params.type='chat-onToOne'] The type of messages to fetch. See {@link conversation.chatTypes} for valid types.
  * @return {Object}
  */
 function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE } = {}) {
