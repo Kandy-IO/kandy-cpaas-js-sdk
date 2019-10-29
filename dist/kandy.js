@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.173
+ * Version: 4.9.0-beta.174
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -24243,11 +24243,11 @@ callEvents[actionTypes.MAKE_CALL] = (action, params) => {
 
 // PENDING actions
 callEvents[actionTypes.PENDING_MAKE_CALL] = (action, params) => {
-  return callOperationHandler(action, (0, _extends3.default)({}, params, {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
     operation: _constants.OPERATIONS.MAKE,
     transition: _constants.OP_TRANSITIONS.UPDATE,
     isLocal: true
-  }));
+  })), stateChangeHandler(action, params)];
 };
 
 callEvents[actionTypes.PENDING_OPERATION] = (action, params) => {
@@ -33686,7 +33686,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.173';
+  let version = '4.9.0-beta.174';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
