@@ -1376,126 +1376,37 @@ Type: [Object][4]
 -   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
 -   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
-### Conversation
+### MessageSender
 
-A Conversation object represents a conversation either between two users, or between a
-user and a group. A user can create a Conversation using [client.conversation.create][41] Messaging API.
+A Message sender object is a means by which a sender can deliver information to a recipient.
 
-A Conversation can be used to create messages to send using the Conversation and Messaging APIs
-[Conversation.createMessage][43] and [Message.send][44] functions.
+This sender object can be obtained through the [conversation.createMessage][43] API on an existing conversation.
 
-Once a sender sends the initial message (within a conversation) to a recipient, there will be a
-conversation object saved in both sender and recipient's state.
+Once all the desired parts have been added to it using the [MessageSender.addPart][44],
+the message can then be sent using the send function.
 
 Type: [Object][4]
 
-**Properties**
+#### send
 
--   `destination` **[string][5]** The ID/group ID of the remote user with which the current user is having a conversation.
--   `address` **[string][5]** The ID of the current user who is having a conversation.
--   `lastReceived` **[number][8]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
-    This property applies only to conversation object stored in recipient's state.
--   `type` **[string][5]** The type of conversation. See [conversation.chatTypes][39] for valid types.
--   `lastMessage` **[string][5]** The last message received.
--   `messages` **[Array][9]&lt;Message>** The array of message objects.
--   `isTypingList` **[Array][9]&lt;[string][5]>** The array indentifying the User IDs of the users who are currently typing.
+Sends the message.
 
-#### createMessage
+#### addPart
 
-Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
-
-If successful, the event [messages:change][45] will be emitted.
+Add an additional `Part` to a message.
 
 **Parameters**
 
--   `part` **Part** The Part to add to the message.
+-   `part` **Part** The `Part` to add to the message.
 
-**Examples**
+#### createImageLinks
 
-```javascript
-conversation.createMessage({type: 'text', text: 'This is the message'});
-```
-
-Returns **Message** The newly created Message object.
-
-#### clearMessages
-
-Clears all messages in this conversation from local state.
-
-If successful, the event [messages:change][45] will be emitted.
-
-#### getMessages
-
-Gets all messages from this conversation.
-
-Returns **[Array][9]&lt;Message>** An array of messages.
-
-#### getMessage
-
-Gets a specific message from this conversation.
-
-**Parameters**
-
--   `messageId` **[string][5]** The ID of the message to retrieve.
-
-Returns **Message** A message object.
-
-#### deleteMessages
-
-Deletes specified messages from this conversation.
-Provide an array of message IDs for the messages to be deleted.
-
-If successful, the event [messages:change][45] will be emitted.
-
-**Parameters**
-
--   `messageIds` **[Array][9]&lt;[string][5]>** An array of message IDs for the messages to be deleted (optional, default `[]`)
-
-#### delete
-
-Delete the conversation.
-
-If successful, the event [messages:change][45] will be emitted.
-
-#### subscribe
-
-Subscribe to this conversation's messages list to receive notification of changes.
-
-**Parameters**
-
--   `subscriber` **[Function][11]** A subscriber function to be triggered when the messages array of this conversation is updated.
-    -   `subscriber.conversationId` **[string][5]** The conversation participant.
-    -   `subscriber.messageId` **[string][5]** The ID of the message that caused the event.
-
-Returns **[Function][11]** The unsubscribe function.
-
-#### fetchMessages
-
-Allows the user to fetch messages associated with a specific conversation to make them available.
-When the operation is complete, a `messages:change` event will be emitted.
-Messages can then be retrieved using [Conversation.getMessages][46].
-
-If successful, the event [messages:change][45] will be emitted.
-
-**Parameters**
-
--   `amount` **[number][8]** An amount of messages to fetch. (optional, default `50`)
-
-#### setIsTyping
-
-Sets the typing status of the conversation for the current user.
-Other participants will be notified of changes to the conversation's typing status.
-
-If successful, the event [isTypingList:change][47] will be emitted.
-
-**Parameters**
-
--   `isTyping` **[boolean][7]** Whether the user is typing or not
+Creates a usable image link for the message in this `MessageSender`.
 
 ### Message
 
 A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the [Conversation.getMessages][46] or [Conversation.getMessage][48] API on an existing conversation.
+obtained through the [Conversation.getMessages][45] or [Conversation.getMessage][46] API on an existing conversation.
 
 Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
 
@@ -1521,32 +1432,121 @@ Type: [Object][4]
 -   `deliveryStatus` **[string][5]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
     This property applies only to the message object stored in sender's state.
 
-### MessageSender
+### Conversation
 
-A Message sender object is a means by which a sender can deliver information to a recipient.
+A Conversation object represents a conversation either between two users, or between a
+user and a group. A user can create a Conversation using [client.conversation.create][41] Messaging API.
 
-This sender object can be obtained through the [conversation.createMessage][43] API on an existing conversation.
+A Conversation can be used to create messages to send using the Conversation and Messaging APIs
+[Conversation.createMessage][43] and [Message.send][47] functions.
 
-Once all the desired parts have been added to it using the [MessageSender.addPart][49],
-the message can then be sent using the send function.
+Once a sender sends the initial message (within a conversation) to a recipient, there will be a
+conversation object saved in both sender and recipient's state.
 
 Type: [Object][4]
 
-#### send
+**Properties**
 
-Sends the message.
+-   `destination` **[string][5]** The ID/group ID of the remote user with which the current user is having a conversation.
+-   `address` **[string][5]** The ID of the current user who is having a conversation.
+-   `lastReceived` **[number][8]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
+    This property applies only to conversation object stored in recipient's state.
+-   `type` **[string][5]** The type of conversation. See [conversation.chatTypes][39] for valid types.
+-   `lastMessage` **[string][5]** The last message received.
+-   `messages` **[Array][9]&lt;Message>** The array of message objects.
+-   `isTypingList` **[Array][9]&lt;[string][5]>** The array indentifying the User IDs of the users who are currently typing.
 
-#### addPart
+#### createMessage
 
-Add an additional `Part` to a message.
+Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
+
+If successful, the event [messages:change][48] will be emitted.
 
 **Parameters**
 
--   `part` **Part** The `Part` to add to the message.
+-   `part` **Part** The Part to add to the message.
 
-#### createImageLinks
+**Examples**
 
-Creates a usable image link for the message in this `MessageSender`.
+```javascript
+conversation.createMessage({type: 'text', text: 'This is the message'});
+```
+
+Returns **Message** The newly created Message object.
+
+#### clearMessages
+
+Clears all messages in this conversation from local state.
+
+If successful, the event [messages:change][48] will be emitted.
+
+#### getMessages
+
+Gets all messages from this conversation.
+
+Returns **[Array][9]&lt;Message>** An array of messages.
+
+#### getMessage
+
+Gets a specific message from this conversation.
+
+**Parameters**
+
+-   `messageId` **[string][5]** The ID of the message to retrieve.
+
+Returns **Message** A message object.
+
+#### deleteMessages
+
+Deletes specified messages from this conversation.
+Provide an array of message IDs for the messages to be deleted.
+
+If successful, the event [messages:change][48] will be emitted.
+
+**Parameters**
+
+-   `messageIds` **[Array][9]&lt;[string][5]>** An array of message IDs for the messages to be deleted (optional, default `[]`)
+
+#### delete
+
+Delete the conversation.
+
+If successful, the event [messages:change][48] will be emitted.
+
+#### subscribe
+
+Subscribe to this conversation's messages list to receive notification of changes.
+
+**Parameters**
+
+-   `subscriber` **[Function][11]** A subscriber function to be triggered when the messages array of this conversation is updated.
+    -   `subscriber.conversationId` **[string][5]** The conversation participant.
+    -   `subscriber.messageId` **[string][5]** The ID of the message that caused the event.
+
+Returns **[Function][11]** The unsubscribe function.
+
+#### fetchMessages
+
+Allows the user to fetch messages associated with a specific conversation to make them available.
+When the operation is complete, a `messages:change` event will be emitted.
+Messages can then be retrieved using [Conversation.getMessages][45].
+
+If successful, the event [messages:change][48] will be emitted.
+
+**Parameters**
+
+-   `amount` **[number][8]** An amount of messages to fetch. (optional, default `50`)
+
+#### setIsTyping
+
+Sets the typing status of the conversation for the current user.
+Other participants will be notified of changes to the conversation's typing status.
+
+If successful, the event [isTypingList:change][49] will be emitted.
+
+**Parameters**
+
+-   `isTyping` **[boolean][7]** Whether the user is typing or not
 
 ## groups
 
@@ -2287,17 +2287,17 @@ Type: [string][5]
 
 [43]: #conversationcreatemessage
 
-[44]: #messagesendersend
+[44]: #messagesenderaddpart
 
-[45]: #conversationeventmessageschange
+[45]: #conversationgetmessages
 
-[46]: #conversationgetmessages
+[46]: #conversationgetmessage
 
-[47]: #conversationeventistypinglistchange
+[47]: #messagesendersend
 
-[48]: #conversationgetmessage
+[48]: #conversationeventmessageschange
 
-[49]: #messagesenderaddpart
+[49]: #conversationeventistypinglistchange
 
 [50]: #conversation
 
