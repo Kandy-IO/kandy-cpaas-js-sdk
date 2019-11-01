@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.178
+ * Version: 4.9.0-beta.179
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33687,7 +33687,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.178';
+  let version = '4.9.0-beta.179';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -39358,7 +39358,12 @@ function* deleteChatConversationRequest(requestInfo, destination, type) {
 
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
-  if (response.error) {
+  // a 404 error results when the conversation has no messages and we try to delete it
+  // there is a mismatch between the CPaaS backend and how the SDK treats conversations.
+  // See KAA-1984 for more info
+  const legitError = response => response.error && (0, _fp.property)('payload.result.code')(response) !== 404;
+
+  if (legitError(response)) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Delete conversation')
     };

@@ -27,6 +27,7 @@ Kandy.js change log.
 - Fixed an issue where the SIP number normalization was unnecessarily removing an '@' symbol. `KAA-1793`
 - Fixed the issue where an active call did not hang up when the call audit failed. `KAA-2003`
 - Used the proper channel connectivity method for maintaining websocket channel lifetime. `KAA-2007`
+- Fixed the special case of deleting conversations with no messages so that it now works correctly. `KAA-1984`
 
 ## 4.8.0 - 2019-09-27
 
