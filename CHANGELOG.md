@@ -5,12 +5,14 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.9.0 - beta
+## 4.9.0 - 2019-11-01
 
 ### Added
 
 - Added Call functionality where local media tracks are deleted if they are not being used for the call. `KAA-1890`
 - Added a `call:operation` event which is fired by call operations to keep track of operation progress. `KAA-1949`
+- Added call related API docs to help with migration from 3.x API. `KAA-2062`
+- Added the emission of an event when call state changes from Initiating to Initiated. `KAA-2080`
 
 ### Changed
 
@@ -27,6 +29,9 @@ Kandy.js change log.
 - Fixed an issue where the SIP number normalization was unnecessarily removing an '@' symbol. `KAA-1793`
 - Fixed the issue where an active call did not hang up when the call audit failed. `KAA-2003`
 - Used the proper channel connectivity method for maintaining websocket channel lifetime. `KAA-2007`
+- Fixed CodePen tutorial for Directory search so that a message is logged when no contact is found. `KAA-1636`
+- Fixed documentation to reflect the correct default value for checkConnectivity parameter. `KAA-1876`
+- Fixed public doc links for call and media.
 - Fixed the special case of deleting conversations with no messages so that it now works correctly. `KAA-1984`
 
 ## 4.8.0 - 2019-09-27
