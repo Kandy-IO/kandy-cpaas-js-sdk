@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.9.0-beta.183
+ * Version: 4.10.0-beta.184
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21630,6 +21630,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Subscription saga. Creates a new call subscription channel.
  * @method callSubscribe
+ * @param {Object} config   The subscription request config
+ * @param {string} type     The type of notification channel for this subscription.
  */
 
 
@@ -21637,22 +21639,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Other plugins.
-function* subscribe(action) {
+function* subscribe(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors.getNotificationChannels);
-  const channelInfo = channels.notificationChannels[action.payload.type];
+  const channelInfo = channels.notificationChannels[type];
 
-  _loglevel2.default.debug(`Subscribing to call service on ${action.payload.type} channel.`);
   const requestOptions = {};
   requestOptions.method = 'POST';
   requestOptions.url = `${requestInfo.baseURL}` + `/cpaas/webrtcsignaling/${requestInfo.version}/${requestInfo.username}` + `/subscriptions`;
 
-  _loglevel2.default.debug(`Subscribing to call service on ${action.payload.type} channel.`);
+  _loglevel2.default.debug(`Subscribing to call service on ${type} channel.`);
   const response = yield (0, _effects.call)(_subscriptions.callSubscribe, requestInfo, channelInfo);
 
   yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
     service: 'call',
-    type: action.payload.type
+    type: type
   })));
 }
 
@@ -22035,6 +22036,11 @@ const CALL_HOLD_FINISH = exports.CALL_HOLD_FINISH = callPrefix + 'HOLD_FINISH';
 const CALL_UNHOLD = exports.CALL_UNHOLD = callPrefix + 'UNHOLD';
 const CALL_UNHOLD_FINISH = exports.CALL_UNHOLD_FINISH = callPrefix + 'UNHOLD_FINISH';
 
+const SET_CUSTOM_PARAMETERS = exports.SET_CUSTOM_PARAMETERS = callPrefix + 'SET_CUSTOM_PARAMETERS';
+
+const SEND_CUSTOM_PARAMETERS = exports.SEND_CUSTOM_PARAMETERS = callPrefix + 'SEND_CUSTOM_PARAMETERS';
+const SEND_CUSTOM_PARAMETERS_FINISH = exports.SEND_CUSTOM_PARAMETERS_FINISH = callPrefix + 'SEND_CUSTOM_PARAMETERS_FINISH';
+
 const ADD_MEDIA = exports.ADD_MEDIA = callPrefix + 'ADD_MEDIA';
 const ADD_MEDIA_FINISH = exports.ADD_MEDIA_FINISH = callPrefix + 'ADD_MEDIA_FINISH';
 
@@ -22105,6 +22111,7 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+exports.callActionHelper = callActionHelper;
 exports.makeCall = makeCall;
 exports.sessionCreated = sessionCreated;
 exports.pendingMakeCall = pendingMakeCall;
@@ -22128,6 +22135,9 @@ exports.holdCall = holdCall;
 exports.holdCallFinish = holdCallFinish;
 exports.unholdCall = unholdCall;
 exports.unholdCallFinish = unholdCallFinish;
+exports.setCustomParameters = setCustomParameters;
+exports.sendCustomParameters = sendCustomParameters;
+exports.sendCustomParametersFinish = sendCustomParametersFinish;
 exports.addMedia = addMedia;
 exports.addMediaFinish = addMediaFinish;
 exports.removeMedia = removeMedia;
@@ -22302,6 +22312,25 @@ function unholdCall(id, options) {
 
 function unholdCallFinish(id, params) {
   return callActionHelper(actionTypes.CALL_UNHOLD_FINISH, id, params);
+}
+
+function setCustomParameters(id, customParameters) {
+  const action = {
+    type: actionTypes.SET_CUSTOM_PARAMETERS,
+    payload: {
+      id,
+      customParameters
+    }
+  };
+  return action;
+}
+
+function sendCustomParameters(id, options) {
+  return callActionHelper(actionTypes.SEND_CUSTOM_PARAMETERS, id, options);
+}
+
+function sendCustomParametersFinish(id, params) {
+  return callActionHelper(actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, id, params);
 }
 
 function addMedia(id, params) {
@@ -22636,6 +22665,7 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} [options]
      * @param {call.BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @param {string} [options.displayName] Custom display name to be provided to the destination. Not supported in all environments and may use default display name.
+     * @param {Array<CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
      * @returns {string} The generated ID of the newly created call.
      * @example
      * // Listen for the event emitted after making a call.
@@ -22729,7 +22759,54 @@ function callAPI({ dispatch, getState }) {
      * @public
      * @static
      * @memberof call
-     * @requires call
+     * @requires cpaas_call
+     * @method answer
+     * @param {string} callId The ID of the call to answer.
+     * @param {Object} media The media options the call should be initialized with.
+     * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
+     * @param {Object} [media.audioOptions] Options for configuring the call's audio.
+     * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
+     * @param {boolean} [media.video=false] Whether the call should have video on start.
+     * @param {boolean} [media.screen=false] Whether the call should have screenshare on start.
+     * @param {Object} [media.videoOptions] Options for configuring the call's video.
+     * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
+     * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
+     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {MediaConstraint} [media.screenOptions.height] The height of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.width] The width of the screenShare.
+     * @param {MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
+     * @param {Object} [options]
+     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     */
+
+    /**
+     * Answers an incoming call.
+     *
+     * The specified call to answer must be in a ringing state with an incoming
+     *    direction. The call will become connected as a result of the operation.
+     *
+     * The progress of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event.
+     *
+     * The SDK will emit a {@link call.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. This indicates that the
+     *    call has connected with the remote participant. The
+     *    {@link call.getById} API can be used to retrieve the latest call state
+     *    after the change. Further events will be emitted to indicate that the
+     *    call has received media from the remote participant. See the
+     *    {@link call.event:call:newTrack call:newTrack} event for more
+     *    information about this.
+     *
+     * The SDK requires access to the system's media devices (eg. microphone)
+     *    in order to answer a call. If it does not already have permissions to
+     *    use the devices, the user may be prompted by the browser to give
+     *    permissions.
+     * @public
+     * @static
+     * @memberof call
+     * @requires link_call
      * @method answer
      * @param {string} callId The ID of the call to answer.
      * @param {Object} media The media options the call should be initialized with.
@@ -22749,6 +22826,7 @@ function callAPI({ dispatch, getState }) {
      * @param {call.MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
      * @param {call.BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     * @param {Array<CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
      */
     answer(callId, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
@@ -22844,6 +22922,56 @@ function callAPI({ dispatch, getState }) {
     unhold(callId) {
       log.debug(_logs.API_LOG_TAG + 'call.unhold: ', callId);
       dispatch(_actions.callActions.unholdCall(callId));
+    },
+
+    /**
+     * Set the custom parameters of a call.
+     *
+     * The specified parameters will be saved as part of the call's information throughout the duration of the call.
+     * All subsequent call operations will include these custom parameters.
+     * Therefore, invalid parameters, or parameters not previously configured on the server, will cause subsequent call operations to fail.
+     *
+     * A Call's custom parameters are a property of the Call's {@link call.CallObject CallObject},
+     *    which can be retrieved using the {@link call.getById} or
+     *    {@link call.getAll} APIs.
+     *
+     * The custom parameters set on a call can be sent directly with the {@link call.sendCustomParameters} API.
+     *
+     * Custom parameters can be removed from a call's information by setting them as undefined (e.g., `call.setCustomParameters(callId)`).
+     * Subsequent call operations will no longer send custom parameters.
+     * @public
+     * @static
+     * @memberof call
+     * @requires link_call
+     * @requires callMe
+     * @method setCustomParameters
+     * @param {string} callId The ID of the call.
+     * @param {Array<CustomParameter>} customParameters The custom parameters to set.
+     */
+    setCustomParameters(callId, customParameters) {
+      log.debug(_logs.API_LOG_TAG + 'call.setCustomParameters: ', callId, customParameters);
+      dispatch(_actions.callActions.setCustomParameters(callId, customParameters));
+    },
+
+    /**
+     * Send the custom parameters on an ongoing call.
+     *
+     * A Call's custom parameters are a property of the Call's {@link call.CallObject CallObject},
+     *    which can be retrieved using the {@link call.getById} or
+     *    {@link call.getAll} APIs.
+     *
+     * To change or remove the custom parameters on a call, use the {@link call.setCustomParameters} API.
+     * @public
+     * @static
+     * @memberof call
+     * @requires link_call
+     * @requires callMe
+     * @method sendCustomParameters
+     * @param {string} callId The ID of the call being acted on.
+     */
+    sendCustomParameters(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.sendCustomParameters: ', callId);
+      dispatch(_actions.callActions.sendCustomParameters(callId));
     },
 
     /**
@@ -23348,6 +23476,8 @@ function callAPI({ dispatch, getState }) {
      *    user will be ended after the operation, as indicated by a
      *    {@link call.event:call:stateChange call:stateChange} event.
      *
+     * If the first call specified has custom parameters set, these parameters will be carried over to the new call.
+     *
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event. Both remote
      *    participants will also receive this event as if it were a "remote
@@ -23355,7 +23485,7 @@ function callAPI({ dispatch, getState }) {
      * @public
      * @static
      * @memberof call
-     * @requires call
+     * @requires link_call
      * @method join
      * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
@@ -23605,6 +23735,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @static
  * @typedef {Object} CallObject
  * @memberof call
+ * @requires cpaas_call
  * @property {string} id The ID of the call.
  * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
  * @property {string} state The current state of the call. See {@link call.states} for possible states.
@@ -23616,6 +23747,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
  * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
  * @property {call.BandwidthControls} bandwidth The bandwidth limitations set for the call.
+ * @property {number} startTime The start time of the call in milliseconds since the epoch.
+ * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
+ */
+
+/**
+ * Information about a Call.
+ *
+ * Can be retrieved using the {@link call.getAll} or {@link call.getById} APIs.
+ *
+ * @public
+ * @static
+ * @module CallObject
+ * @typedef {Object} CallObject
+ * @memberof call
+ * @requires link_call
+ * @requires callMe
+ * @property {string} id The ID of the call.
+ * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+ * @property {string} state The current state of the call. See {@link call.states} for possible states.
+ * @property {boolean} localHold Indicates whether this call is currently being held locally.
+ * @property {boolean} remoteHold Indicates whether this call is currently being held remotely.
+ * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
+ * @property {Array<string>} remoteTracks A list of Track IDs that the call is receiving from the remote participant.
+ * @property {Object} remoteParticipant Information about the other call participant.
+ * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
+ * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
+ * @property {BandwidthControls} bandwidth The bandwidth limitations set for the call.
+ * @property {Array<CustomParameter>} customParameters The custom parameters set for the call.
  * @property {number} startTime The start time of the call in milliseconds since the epoch.
  * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
  */
@@ -23777,6 +23936,41 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
+ * Custom SIP headers can be used to convey additional information to a SIP endpoint.
+ *
+ * These headers must be configured on the server prior to making a request, otherwise the request will fail when trying to set the headers.
+ *
+ * These headers can be specified with the {@link call.make} and {@link call.answer} APIs.
+ * They can also be set on a call using the {@link call.setCustomParameters}, and sent using the {@link call.sendCustomParameters} API.
+ *
+ * A Call's custom parameters are a property of the Call's {@link call.CallObject CallObject},
+ *  which can be retrieved using the {@link call.getById} or
+ *  {@link call.getAll} APIs.
+ *
+ * @public
+ * @static
+ * @module CustomParameter
+ * @typedef {Object} CustomParameter
+ * @memberof call
+ * @requires link_call
+ * @requires callMe
+ * @property {string} name - The name of the custom parameter
+ * @property {string} value - The value of the custom parameter
+ * @example
+ * // Specify custom parameters when making a call.
+ * client.call.make(destination, mediaConstraints,
+ *  {
+ *    customParameters: [
+ *      {
+ *        name: 'X-GPS',
+ *        value: '42.686032,23.344565'
+ *      }
+ *    ]
+ *  }
+ * )
+ */
+
+/**
  * Call API index.
  * APIs are organized by their namespacing.
  * @method api
@@ -23821,6 +24015,7 @@ const OPERATIONS = exports.OPERATIONS = {
   // Midcall.
   HOLD: 'HOLD',
   UNHOLD: 'UNHOLD',
+  SEND_CUSTOM_PARAMETERS: 'SEND_CUSTOM_PARAMETERS',
   ADD_MEDIA: 'ADD_MEDIA',
   REMOVE_MEDIA: 'REMOVE_MEDIA',
   GET_STATS: 'GET_STATS',
@@ -23923,6 +24118,7 @@ const CALL_STARTED = exports.CALL_STARTED = 'call:start';
  *
  * @public
  * @memberof call
+ * @requires link_call
  * @event call:join
  * @param {Object} params
  * @param {string} params.callId The ID of the call.
@@ -24219,7 +24415,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -24287,11 +24483,11 @@ callEvents[actionTypes.PENDING_JOIN] = (action, params) => {
 
 // FINISH actions
 const finishActionTypesAndData = [{ type: actionTypes.MAKE_CALL_FINISH, operation: _constants.OPERATIONS.MAKE, isLocal: true }, { type: actionTypes.CALL_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: true }, { type: actionTypes.CALL_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: true }, { type: actionTypes.CALL_REMOTE_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: false }, { type: actionTypes.CALL_REMOTE_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: false }, { type: actionTypes.REJECT_CALL_FINISH, operation: _constants.OPERATIONS.REJECT, isLocal: true }, { type: actionTypes.IGNORE_CALL_FINISH, operation: _constants.OPERATIONS.IGNORE, isLocal: true }, { type: actionTypes.DIRECT_TRANSFER_FINISH, operation: _constants.OPERATIONS.DIRECT_TRANSFER, isLocal: true }, { type: actionTypes.CONSULTATIVE_TRANSFER_FINISH, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER, isLocal: true }, { type: actionTypes.JOIN_FINISH, operation: _constants.OPERATIONS.JOIN, isLocal: true }, { type: actionTypes.FORWARD_CALL_FINISH, operation: _constants.OPERATIONS.FORWARD_CALL, isLocal: true }];
-finishActionTypesAndData.forEach(finichActionTypeAndData => {
-  callEvents[finichActionTypeAndData.type] = (action, params) => {
+finishActionTypesAndData.forEach(finishActionTypeAndData => {
+  callEvents[finishActionTypeAndData.type] = (action, params) => {
     return [callOperationHandler(action, (0, _extends3.default)({}, params, {
-      operation: finichActionTypeAndData.operation,
-      isLocal: finichActionTypeAndData.isLocal,
+      operation: finishActionTypeAndData.operation,
+      isLocal: finishActionTypeAndData.isLocal,
       transition: _constants.OP_TRANSITIONS.FINISH
     })), stateChangeHandler(action, params)];
   };
@@ -24379,6 +24575,14 @@ callEvents[actionTypes.SEND_DTMF_FINISH] = (action, params) => {
     operation: _constants.OPERATIONS.SEND_DTMF,
     transition: _constants.OP_TRANSITIONS.FINISH,
     isLocal: true
+  }));
+};
+
+callEvents[actionTypes.SEND_CUSTOM_PARAMETERS_FINISH] = (action, params) => {
+  return callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS,
+    isLocal: true,
+    transition: _constants.OP_TRANSITIONS.FINISH
   }));
 };
 
@@ -24623,6 +24827,7 @@ callReducers[actionTypes.PENDING_OPERATION] = noop;
 callReducers[actionTypes.ANSWER_CALL] = noop;
 callReducers[actionTypes.CALL_HOLD] = noop;
 callReducers[actionTypes.CALL_UNHOLD] = noop;
+callReducers[actionTypes.SEND_CUSTOM_PARAMETERS] = noop;
 callReducers[actionTypes.END_CALL] = noop;
 callReducers[actionTypes.ADD_MEDIA] = noop;
 callReducers[actionTypes.REMOVE_MEDIA] = noop;
@@ -24696,7 +24901,8 @@ callReducers[actionTypes.PENDING_MAKE_CALL] = {
       wrtcsSessionId: action.payload.wrtcsSessionId,
       webrtcSessionId: action.payload.webrtcSessionId,
       bandwidth: action.payload.bandwidth,
-      displayName: action.payload.displayName
+      displayName: action.payload.displayName,
+      customParameters: action.payload.customParameters
     });
   }
 };
@@ -24725,7 +24931,8 @@ callReducers[actionTypes.ANSWER_CALL_FINISH] = {
       webrtcSessionId: webrtcId,
       localHold: false,
       remoteHold: false,
-      bandwidth: action.payload.bandwidth
+      bandwidth: action.payload.bandwidth,
+      customParameters: action.payload.customParameters
 
       // Add start time to the call's state here if the call is not a slowstart call
     });if (action.meta && !action.meta.isSlowStart) {
@@ -24781,6 +24988,24 @@ callReducers[actionTypes.CALL_UNHOLD_FINISH] = {
       localHold: false,
       state: callState
     });
+  }
+};
+
+callReducers[actionTypes.SET_CUSTOM_PARAMETERS] = {
+  next(state, action) {
+    let customParameters = action.payload.customParameters;
+    if (Array.isArray(customParameters) && customParameters.length === 0) {
+      customParameters = undefined;
+    }
+    return (0, _extends3.default)({}, state, {
+      customParameters
+    });
+  }
+};
+
+callReducers[actionTypes.SEND_CUSTOM_PARAMETERS_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, action.payload);
   }
 };
 
@@ -24903,7 +25128,8 @@ reducers[actionTypes.PENDING_JOIN] = {
       isCaller: true,
       wrtcsSessionId: action.payload.wrtcsSessionId,
       webrtcSessionId: action.payload.webrtcSessionId,
-      isJoinedCall: true
+      isJoinedCall: true,
+      customParameters: action.payload.customParameters
     };
 
     return (0, _fp.concat)(state.map(call => {
@@ -24962,7 +25188,7 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 /*
  * Reducer to handle specific call actions.
@@ -26247,7 +26473,8 @@ function* makeCall(deps, action) {
     from: action.payload.from,
     account: action.payload.account,
     offer: offerSdp,
-    displayName: action.payload.displayName ? action.payload.displayName : ''
+    displayName: action.payload.displayName ? action.payload.displayName : '',
+    customParameters: action.payload.customParameters
   };
 
   const response = yield (0, _effects.call)(requests.createSession, callInfo);
@@ -26265,7 +26492,9 @@ function* makeCall(deps, action) {
       // The bandwidth of the call.
       bandwidth,
       // The custom display name to use. Not supported on all environments.
-      displayName: action.payload.displayName
+      displayName: action.payload.displayName,
+      // The custom parameters of the call
+      customParameters: action.payload.customParameters
     }));
   } else {
     // The call failed, so stop the Media object created for the call.
@@ -26376,7 +26605,8 @@ function* answerCall(deps, action) {
 
     callInfo = {
       answer: webrtcInfo.offerSdp,
-      wrtcsSessionId: incomingCall.wrtcsSessionId
+      wrtcsSessionId: incomingCall.wrtcsSessionId,
+      customParameters: action.payload.customParameters
 
       // Even if the answer request is successful, we still need to wait for a
       //    notification from the signaling server to know if the call is complete.
@@ -26405,7 +26635,8 @@ function* answerCall(deps, action) {
 
     callInfo = {
       answer: webrtcInfo.answerSDP,
-      wrtcsSessionId: incomingCall.wrtcsSessionId
+      wrtcsSessionId: incomingCall.wrtcsSessionId,
+      customParameters: action.payload.customParameters
 
       // If the answer request is successful, then the call can be considered complete.
     };nextState = _constants.CALL_STATES.CONNECTED;
@@ -26426,7 +26657,9 @@ function* answerCall(deps, action) {
       // TODO: Properly track the media that the call has.
       mediaConstraints,
       // The bandwidth of the call
-      bandwidth
+      bandwidth,
+      // The custom parameters of the call
+      customParameters: action.payload.customParameters
     }, {
       isSlowStart: incomingCall.isSlowStart
     }));
@@ -26600,6 +26833,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.endCall = endCall;
 exports.offerInactiveMedia = offerInactiveMedia;
 exports.offerFullMedia = offerFullMedia;
+exports.sendCustomParameters = sendCustomParameters;
 exports.getStats = getStats;
 exports.addMedia = addMedia;
 exports.removeMedia = removeMedia;
@@ -26738,7 +26972,7 @@ function* offerInactiveMedia(deps, action) {
   }
 
   const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account } = targetCall;
+  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account, customParameters } = targetCall;
 
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
@@ -26763,7 +26997,8 @@ function* offerInactiveMedia(deps, action) {
     wrtcsSessionId,
     offer: offer.sdp,
     isAnonymous,
-    account
+    account,
+    customParameters
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -26820,7 +27055,7 @@ function* offerFullMedia(deps, action) {
   }
 
   const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
-  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account } = targetCall;
+  const { wrtcsSessionId, webrtcSessionId, isAnonymous, account, customParameters } = targetCall;
 
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
@@ -26845,7 +27080,8 @@ function* offerFullMedia(deps, action) {
     wrtcsSessionId,
     offer: offer.sdp,
     isAnonymous,
-    account
+    account,
+    customParameters
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -26860,6 +27096,66 @@ function* offerFullMedia(deps, action) {
     log.debug('Successfully sent unhold offer.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
       operation: targetCall.localOp.operation
+    }));
+  }
+}
+
+/**
+ * Sends custom parameters for a call.
+ * @param {Object}   deps                                   Dependences that the saga uses.
+ * @param {Object}   deps.webRTC                            The WebRTC stack.
+ * @param {Object}   deps.requests                          The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateCustomParameters   "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers                       The list of SDP handlers to run.
+ * @param {Object} action A "sent Custom Parameters" action.
+ */
+function* sendCustomParameters(deps, action) {
+  const requests = deps.requests;
+
+  // Get the call.
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  // Validate call exists and call state is correct
+  if (!targetCall) {
+    log.debug(`Invalid Call ID. No call found with Call ID: ${action.payload.id}`);
+    yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: `Invalid Call ID. No call found with Call ID: ${action.payload.id}`
+      })
+    }));
+    return;
+  } else if (targetCall.state !== _constants.CALL_STATES.CONNECTED && targetCall.state !== _constants.CALL_STATES.ON_HOLD) {
+    log.debug(`Call in invalid state for sending custom parameters. Call state: ${targetCall.state}`);
+    yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_STATE,
+        message: `Call in invalid state for sending custom parameters. Call state: ${targetCall.state}`
+      })
+    }));
+    return;
+  }
+
+  const { wrtcsSessionId, isAnonymous, account, customParameters } = targetCall;
+
+  const callInfo = {
+    wrtcsSessionId,
+    isAnonymous,
+    account,
+    customParameters
+  };
+
+  const response = yield (0, _effects.call)(requests.updateCustomParameters, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send custom parameters');
+    yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent custom parameters');
+    yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
+      error: false
     }));
   }
 }
@@ -26960,7 +27256,15 @@ function* addMedia(deps, action) {
   }
 
   // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId, bandwidth: callBandwidth, isAnonymous, account, localOp } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const {
+    webrtcSessionId,
+    wrtcsSessionId,
+    bandwidth: callBandwidth,
+    isAnonymous,
+    account,
+    localOp,
+    customParameters
+  } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
   const finalBandwidth = {
     audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
@@ -26983,7 +27287,8 @@ function* addMedia(deps, action) {
     wrtcsSessionId,
     offer: sdp,
     isAnonymous,
-    account
+    account,
+    customParameters
 
     // Perform signalling to add media
   };const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -27059,7 +27364,15 @@ function* removeMedia(deps, action) {
     return;
   }
   // Get some call data.
-  const { webrtcSessionId, wrtcsSessionId, bandwidth: callBandwidth, isAnonymous, account, localOp } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  const {
+    webrtcSessionId,
+    wrtcsSessionId,
+    bandwidth: callBandwidth,
+    isAnonymous,
+    account,
+    localOp,
+    customParameters
+  } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
   const finalBandwidth = {
     audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
@@ -27083,7 +27396,8 @@ function* removeMedia(deps, action) {
     wrtcsSessionId,
     offer: sdp,
     isAnonymous,
-    account
+    account,
+    customParameters
   };
 
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
@@ -27300,7 +27614,9 @@ function* join(deps, action) {
   const callInfo = {
     wrtcsSessionId: currentCall.wrtcsSessionId,
     otherWrtcsSessionId: otherCall.wrtcsSessionId,
-    sdp: offerSdp
+    sdp: offerSdp,
+    // Use the customParameters of the current call
+    customParameters: currentCall.customParameters
   };
   const response = yield (0, _effects.call)(requests.joinSessions, callInfo);
 
@@ -27348,7 +27664,9 @@ function* join(deps, action) {
     // This call's current user
     from: action.payload.from,
     // The ids of the calls that were used for joining.
-    usedCallIds: [currentCall.id, otherCall.id]
+    usedCallIds: [currentCall.id, otherCall.id],
+    // The custom parameters of the combined call
+    customParameters: currentCall.customParameters
   }));
 }
 
@@ -27637,7 +27955,8 @@ function* handleUpdateRequest(deps, targetCall, params) {
     wrtcsSessionId: targetCall.wrtcsSessionId,
     answer: answerSDP,
     isAnonymous: targetCall.isAnonymous,
-    account: targetCall.account
+    account: targetCall.account,
+    customParameters: targetCall.customParameters
   };
 
   const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
@@ -27745,7 +28064,8 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
     wrtcsSessionId: targetCall.wrtcsSessionId,
     answer: slowOffer.sdp,
     isAnonymous: targetCall.isAnonymous,
-    account: targetCall.account
+    account: targetCall.account,
+    customParameters: targetCall.customParameters
 
     // Respond with our "offer".
   };const response = yield (0, _effects.call)(requests.updateSessionResponse, callInfo);
@@ -33681,7 +34001,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.9.0-beta.183';
+  let version = '4.10.0-beta.184';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -40607,15 +40927,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Plugin chat subscription saga.
  * Handles subscribing to the chat service needed for the messaging plugin.
  * @method chatSubscription
+ * @param {Object} config   The subscription request config
+ * @param {string} type     The type of notification channel for this subscription.
  */
 
 // Libraries.
-function* chatSubscription(action) {
+function* chatSubscription(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
+  const channel = channels.notificationChannels[type];
 
-  _loglevel2.default.info(`Subscribing to chat service on ${action.payload.type} channel.`);
+  _loglevel2.default.info(`Subscribing to chat service on ${type} channel.`);
 
   const response = yield (0, _effects.call)(_requests.chatSubscribe, requestInfo, channel);
 
@@ -40624,13 +40946,13 @@ function* chatSubscription(action) {
     // TODO: Create a subscription effect for this?
     (0, _actions.reportSubscriptionFinished)({
       service: 'chat',
-      type: action.payload.type,
+      type: type,
       error: response.error
     }));
   } else {
     yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
       service: 'chat',
-      type: action.payload.type,
+      type: type,
       subscription: response.subscription
     }));
   }
@@ -40687,24 +41009,25 @@ function* chatUnsubscription(action) {
 /**
  * Subscription saga for inbound SMS notifications.
  * @method smsInboundSubscription
- * @param  {Object} action
+ * @param {Object} config   The subscription request config
+ * @param {string} type     The type of notification channel for this subscription.
  */
-function* smsInboundSubscription(action) {
+function* smsInboundSubscription(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
+  const channel = channels.notificationChannels[type];
 
   // TODO: Remove this workaround -----
   const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
   requestInfo.destinationAddress = messagingConfig.smsFrom;
   // END Workaround -----
 
-  _loglevel2.default.debug(`Subscribing to SMS inbound service on ${action.payload.type} channel.`);
+  _loglevel2.default.debug(`Subscribing to SMS inbound service on ${type} channel.`);
   const response = yield (0, _effects.call)(_requests.smsInboundSubscribe, requestInfo, channel);
 
   yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
     service: 'smsinbound',
-    type: action.payload.type
+    type: type
   })));
 }
 
@@ -40738,19 +41061,20 @@ function* smsInboundUnsubscription(action) {
 /**
  * Subscription saga for outbound SMS notifications.
  * @method smsOutboundSubscription
- * @param  {Object} action
+ * @param {Object} config   The subscription request config
+ * @param {string} type     The type of notification channel for this subscription.
  */
-function* smsOutboundSubscription(action) {
+function* smsOutboundSubscription(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
-  const channel = channels.notificationChannels[action.payload.type];
+  const channel = channels.notificationChannels[type];
 
-  _loglevel2.default.debug(`Subscribing to SMS outbound service on ${action.payload.type} channel.`);
+  _loglevel2.default.debug(`Subscribing to SMS outbound service on ${type} channel.`);
   const response = yield (0, _effects.call)(_requests.smsOutboundSubscribe, requestInfo, channel);
 
   yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
     service: 'smsoutbound',
-    type: action.payload.type
+    type: type
   })));
 }
 
@@ -42424,16 +42748,19 @@ const log = (0, _logs.getLogManager)().getLogger('PRESENCE');
 /**
  * Subscription saga. Creates a new presence subscription channel.
  * @method presenceSubscribe
+ * @param {Object} config   The subscription request config
+ * @param {string} type     The type of notification channel for this subscription.
  */
 
 
 // Libraries.
-function* presenceSubscribe() {
+function* presenceSubscribe(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors2.getNotificationChannels);
 
   const callbackURL = channels.notificationChannels.websocket.callbackURL;
 
+  log.debug('Subscribing to presence service');
   // either use an existing presence list, or create a new one
   const presenceListResponse = yield (0, _effects.call)(_presence.getPresenceLists, requestInfo);
   log.debug('Received presenceLists response:', presenceListResponse);
@@ -44350,21 +44677,41 @@ function* subscriptionFlow() {
  * the subscription response information.
  * @method subscribeForServices
  * @param  {Object} action A subscription action.
+ * @param  {Object} action.payload The action's payload
+ * @param  {string} action.payload.type The type of notification channel for this subscription.
+ * @param  {Array<Object>} action.payload.services The requested services for this subscription
  * @return {Object}
  */
 function* subscribeForServices(action) {
+  const requestedServices = action.payload.services;
+
+  // Get lists of registered and subscribed services
   const registeredServices = yield (0, _effects2.select)(_selectors.getRegisteredServices);
+  const subscribedServices = yield (0, _effects2.select)(_selectors.getSubscribedServices, action.payload.type);
 
-  // Get the list of services that were requested, but plugins did not register.
-  const notRegistered = (0, _fp.difference)(registeredServices, action.payload.services);
+  // Filter requested services to remove invalid services (services not registered / already subscribed to)
+  let notRegistered = [];
+  let alreadySubscribed = [];
+  const validServices = requestedServices.filter(serviceConfig => {
+    // Remove requested services of plugins that are not registered
+    if (!registeredServices.includes(serviceConfig.service)) {
+      notRegistered.push(serviceConfig.service);
+      return false;
+      // Remove requested services already subscribed to
+    } else if (subscribedServices.includes(serviceConfig.service)) {
+      alreadySubscribed.push(serviceConfig.service);
+      return false;
+    }
+    // Valid requested service
+    return true;
+  });
+
   if (notRegistered.length > 0) {
-    log.debug(`Not registered for requested services: ${notRegistered}.`);
+    log.debug(`Not registered for requested service(s): ${notRegistered}.`);
   }
-
-  // TODO: Don't allow subscribing for services with existing subscription.
-  // Get the list of services that were requested, and plugins did register.
-  const validServices = (0, _fp.intersection)(registeredServices, action.payload.services);
-  log.info(`Requesting subscriptions for services: ${validServices}.`);
+  if (alreadySubscribed.length > 0) {
+    log.debug(`Already subscribed for requested service(s): ${alreadySubscribed}.`);
+  }
 
   if (validServices.length === 0) {
     // TODO: Proper error / return.
@@ -44376,15 +44723,15 @@ function* subscribeForServices(action) {
       })
     };
   }
-
-  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
+  log.info(`Requesting subscriptions for services: ${validServices.map(serviceConfig => serviceConfig.service)}.`);
 
   // Announce to all plugins that subscriptions should happen.
   yield (0, _effects2.put)(actions.doPluginSubscriptions(validServices, action.payload.type));
 
   // What we're waiting for.
-  const waitPatterns = validServices.map(service => action => action.type === actionTypes.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === service);
+  const waitPatterns = validServices.map(serviceConfig => action => action.type === actionTypes.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === serviceConfig.service);
 
+  const subscriptionConfig = yield (0, _effects2.select)(_selectors.getSubscriptionConfig, platform);
   // Wait for a response from each plugin.
   const { results } = yield (0, _effects.waitFor)(subscriptionConfig.timeout * 1000, waitPatterns);
 
@@ -44653,7 +45000,7 @@ function registerService(services = []) {
  * Indicates that the subscription plugin expects plugins to subscribe
  * for the specified services.
  * @method doPluginSubscriptions
- * @param  {Array}  services The list of services that should be subscribed to.
+ * @param  {Array<Object>}  services The list of services that should be subscribed to.
  * @param  {string} type The type of notification channel for these subscriptions.
  * @return {Object} A flux standard action.
  */
@@ -44750,6 +45097,8 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__("../kandy/src/subscription/interface/selectors.js");
 
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
 var _selectors2 = __webpack_require__("../kandy/src/auth/interface/selectors.js");
 
 var _constants = __webpack_require__("../kandy/src/constants.js");
@@ -44758,22 +45107,6 @@ var _logs = __webpack_require__("../kandy/src/logs/index.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
-
-/**
- * Service API. All functions in this plugin are part of the 'services' namespace.
- * @method api
- * @param  {Function} params
- * @param  {Function} params.dispatch - The redux store's dispatch function.
- * @param  {Function} params.getState - The redux store's getState function.
- * @return {Object} api - The subscription API object.
- */
-
-
-// Logs
-
-
-// Auth plugin.
 /**
  * The 'services' namespace allows an application to manage how they wish the SDK to
  *    receive communications from the platform. An application can subscribe to
@@ -44796,6 +45129,22 @@ const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
  */
 
 // Subscription plugin.
+const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
+
+/**
+ * Service API. All functions in this plugin are part of the 'services' namespace.
+ * @method api
+ * @param  {Function} params
+ * @param  {Function} params.dispatch - The redux store's dispatch function.
+ * @param  {Function} params.getState - The redux store's getState function.
+ * @return {Object} api - The subscription API object.
+ */
+
+
+// Logs
+
+
+// Auth plugin.
 function api({ dispatch, getState }) {
   const subscriptionApi = {
     /**
@@ -44804,6 +45153,12 @@ function api({ dispatch, getState }) {
      * Subscriptions can only be made for services available to the SDK. See
      *    {@link services.getSubscriptions} for information about services.
      *
+     * Extra configurations can be provided for a subscription as part of its
+     *    "service configurations" object (see the `services` parameter). This
+     *    configuration object must contain a `service` property with the
+     *    service name, but may also include other properties as extra
+     *    subscription configurations.
+     *
      * The SDK currently only supports the `websocket` channel as a subscription
      *    type.
      *
@@ -44811,14 +45166,31 @@ function api({ dispatch, getState }) {
      * @static
      * @memberof services
      * @method subscribe
-     * @param {Array<string>} services A list of available services.
+     * @param {Array<Object>} services A list of service configurations.
      * @param {string} [type='websocket'] The method of how to receive service updates.
+     * @example
+     * // Subscribe for chat and SMS services.
+     * const services = [
+     *    { service: 'chat' },
+     *    { service: 'smsoutbound' },
+     *    // Specify extra configurations for certain services.
+     *    { service: 'smsinbound', smsFrom: '<phoneNumber>' }
+     * ]
+     *
+     * client.services.subscribe(services)
      */
     subscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.subscribe: ', services, type);
       const userInfo = (0, _selectors2.getUserInfo)(getState());
       if (userInfo && userInfo.accessToken) {
-        services = services.map(service => service.toLowerCase());
+        // Normalize services array
+        services = services.map(service => {
+          if ((0, _fp.isPlainObject)(service) && service.hasOwnProperty('service')) {
+            service.service = service.service.toLowerCase();
+            return service;
+          }
+          return { service: service.toLowerCase() };
+        });
         dispatch(actions.subscribe(services, type));
       } else {
         // TODO: Directly emit error event
@@ -44836,9 +45208,14 @@ function api({ dispatch, getState }) {
      * @static
      * @memberof services
      * @method unsubscribe
-     * @param {Array<string>} services A list of subscribed services.
+     * @param {Array<string>} services A list of subscribed service names.
      * @param {string} [type='websocket'] The method of how the service updates
      *    are being received.
+     * @example
+     * // Unsubscribe from chat and SMS services.
+     * const services = [ 'chat', 'smsoutbound', 'smsinbound' ]
+     *
+     * client.services.unsubscribe(services)
      */
     unsubscribe(services, type = _constants.notificationTypes.WEBSOCKET) {
       log.debug(_logs.API_LOG_TAG + 'services.unsubscribe: ', services, type);
@@ -44948,18 +45325,28 @@ function* registerService(service, subscribeSaga, unsubscribeSaga) {
 
   // Redux-saga take() pattern.
   function serviceSubscribePattern(action) {
-    return action.type === _actionTypes.PLUGIN_SUBSCRIPTION && action.payload.services.indexOf(service) !== -1;
+    if (action.type === _actionTypes.PLUGIN_SUBSCRIPTION) {
+      return action.payload.services.some(serviceConfig => {
+        return serviceConfig.service === service;
+      });
+    }
   }
   // Redux-saga take() pattern.
   function serviceUnsubscribePattern(action) {
     return action.type === _actionTypes.PLUGIN_UNSUBSCRIPTION && action.payload.services.indexOf(service) !== -1;
   }
 
+  // Intermediate saga to extract and pass only relevant service config from the payload to the subscribe saga
+  function* extractConfigAndSubscribe(action) {
+    const serviceConfig = action.payload.services.find(serviceConfig => serviceConfig.service === service);
+    yield (0, _effects.call)(subscribeSaga, serviceConfig, action.payload.type);
+  }
+
   // Ensure that `takeEvery` is only called when an actual function/saga is provided.
   //    Otherwise it may cause infinite loop error issues.
   if ((0, _fp.isFunction)(subscribeSaga)) {
     // Perform subscription logic when triggered by the action.
-    yield (0, _effects.takeEvery)(serviceSubscribePattern, subscribeSaga);
+    yield (0, _effects.takeEvery)(serviceSubscribePattern, extractConfigAndSubscribe);
   } else {
     log.error(`Registering ${service} service without subscribe functionality.`);
   }
