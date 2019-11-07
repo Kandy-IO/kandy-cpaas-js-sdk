@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.188
+ * Version: 4.10.0-beta.189
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19664,7 +19664,7 @@ const AUTH_CHANGE = exports.AUTH_CHANGE = 'auth:change';
  * @requires connect
  * @event auth:error
  * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
+ * @param {api.BasicError} params.error The Basic error object.
  *
  */
 const AUTH_ERROR = exports.AUTH_ERROR = 'auth:error';
@@ -19682,7 +19682,7 @@ const AUTH_ERROR = exports.AUTH_ERROR = 'auth:error';
  * @param {Object} params
  * @param {number} params.attemptNum The attempt number of this resubscription.
  * @param {boolean} params.isFailure Whether the resubscription failed or not.
- * @param {BasicError} [params.error] The Basic error object.
+ * @param {api.BasicError} [params.error] The Basic error object.
  */
 const AUTH_RESUB = exports.AUTH_RESUB = 'auth:resub';
 
@@ -20519,9 +20519,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @instance
  * @param {Object} call The call configuration object.
  * @param {string} [call.sdpSemantics='unified-plan'] The sdpSemantics to use (`'unified-plan'` or `'plan-b'`).
- * @param {Array<IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
+ * @param {Array<call.IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
- * @param {Array<SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
+ * @param {Array<call.SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  */
 
@@ -22592,7 +22592,7 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} [options]
      * @param {call.BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      * @param {string} [options.displayName] Custom display name to be provided to the destination. Not supported in all environments and may use default display name.
-     * @param {Array<CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
+     * @param {Array<call.CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
      * @returns {string} The generated ID of the newly created call.
      * @example
      * // Listen for the event emitted after making a call.
@@ -22692,20 +22692,20 @@ function callAPI({ dispatch, getState }) {
      * @param {Object} media The media options the call should be initialized with.
      * @param {boolean} [media.audio=false] Whether the call should have audio on start. Currently, audio-less calls are not supported.
      * @param {Object} [media.audioOptions] Options for configuring the call's audio.
-     * @param {MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
+     * @param {call.MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether the call should have video on start.
      * @param {boolean} [media.screen=false] Whether the call should have screenshare on start.
      * @param {Object} [media.videoOptions] Options for configuring the call's video.
      * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
-     * @param {MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
-     * @param {MediaConstraint} [media.videoOptions.height] The height of the video.
-     * @param {MediaConstraint} [media.videoOptions.width] The width of the video.
-     * @param {MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
-     * @param {MediaConstraint} [media.screenOptions.height] The height of the screenShare.
-     * @param {MediaConstraint} [media.screenOptions.width] The width of the screenShare.
-     * @param {MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
+     * @param {call.MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
+     * @param {call.MediaConstraint} [media.videoOptions.height] The height of the video.
+     * @param {call.MediaConstraint} [media.videoOptions.width] The width of the video.
+     * @param {call.MediaConstraint} [media.videoOptions.frameRate] The frame rate of the video.
+     * @param {call.MediaConstraint} [media.screenOptions.height] The height of the screenShare.
+     * @param {call.MediaConstraint} [media.screenOptions.width] The width of the screenShare.
+     * @param {call.MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
-     * @param {BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
+     * @param {call.BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
      */
 
     /**
@@ -22753,7 +22753,7 @@ function callAPI({ dispatch, getState }) {
      * @param {call.MediaConstraint} [media.screenOptions.frameRate] The frame rate of the screenShare.
      * @param {Object} [options]
      * @param {call.BandwidthControls} [options.bandwidth] Options for configuring media's bandwidth.
-     * @param {Array<CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
+     * @param {Array<call.CustomParameter>} [options.customParameters] Custom SIP header parameters for the SIP backend
      */
     answer(callId, media, options = {}) {
       log.debug(_logs.API_LOG_TAG + 'call.answer: ', callId, media, options);
@@ -22873,7 +22873,7 @@ function callAPI({ dispatch, getState }) {
      * @requires callMe
      * @method setCustomParameters
      * @param {string} callId The ID of the call.
-     * @param {Array<CustomParameter>} customParameters The custom parameters to set.
+     * @param {Array<call.CustomParameter>} customParameters The custom parameters to set.
      */
     setCustomParameters(callId, customParameters) {
       log.debug(_logs.API_LOG_TAG + 'call.setCustomParameters: ', callId, customParameters);
@@ -23700,8 +23700,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {Object} remoteParticipant Information about the other call participant.
  * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
  * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
- * @property {BandwidthControls} bandwidth The bandwidth limitations set for the call.
- * @property {Array<CustomParameter>} customParameters The custom parameters set for the call.
+ * @property {call.BandwidthControls} bandwidth The bandwidth limitations set for the call.
+ * @property {Array<call.CustomParameter>} customParameters The custom parameters set for the call.
  * @property {number} startTime The start time of the call in milliseconds since the epoch.
  * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
  */
@@ -32919,7 +32919,6 @@ const connCheckMethods = exports.connCheckMethods = {
  *
  * @public
  * @static
- * @module UserID
  * @typedef {string} UserID
  * @memberof user
  * @requires cpaas_user_id
@@ -33963,7 +33962,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.188';
+  let version = '4.10.0-beta.189';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -35810,7 +35809,7 @@ const GROUP_INVITATION_RECEIVED = exports.GROUP_INVITATION_RECEIVED = 'group:inv
  * @memberof groups
  * @event group:error
  * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
+ * @param {api.BasicError} params.error The Basic error object.
  */
 const GROUP_ERROR = exports.GROUP_ERROR = 'group:error';
 
@@ -36398,7 +36397,7 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * @memberof sdpHandlers
  * @method createCodecRemover
  * @param {Array<string>} codecs A list of codec names to remove from the SDP.
- * @returns {SdpHandlerFunction} The resulting SDP handler that will remove the codec.
+ * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
  * @example
  * import { create, sdpHandlers } from 'kandy';
  * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
@@ -37918,7 +37917,7 @@ function api(context) {
      * @param {string} recipient The User ID of the remote user with which the current user had a conversation.
      * @param {Object} [options] Options used to query for more specific results.
      * @param {string} [options.type='chat-oneToOne'] The type of conversation to get. See {@link conversation.chatTypes} for valid types.
-     * @returns {Conversation} A Conversation object.
+     * @returns {conversation.Conversation} A Conversation object.
      */
     get: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
       log.debug(_logs.API_LOG_TAG + 'conversation.get: ', recipient, options);
@@ -37966,7 +37965,7 @@ function api(context) {
      * @param {string} recipient The ID of the remote user to create a conversation with. The ID will be changed to lowercase.
      * @param {Object} [options] Options to use when creating a new conversation object.
      * @param {string} [options.type='chat-oneToOne'] The type of conversation to create. See {@link conversation.chatTypes} for valid types.
-     * @returns {Conversation} A Conversation object.
+     * @returns {conversation.Conversation} A Conversation object.
      */
     create: function (recipient, options = { type: _mappings.chatTypes.ONETOONE }) {
       log.debug(_logs.API_LOG_TAG + 'conversation.create');
@@ -37998,7 +37997,7 @@ function api(context) {
      * @static
      * @method getAll
      * @memberof conversation
-     * @returns {Array<Conversation>} An array of Conversation objects.
+     * @returns {Array<conversation.Conversation>} An array of Conversation objects.
      */
     getAll: function () {
       log.debug(_logs.API_LOG_TAG + 'conversation.getAll');
@@ -38084,7 +38083,7 @@ const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
  * @memberof conversation
  * @event messages:error
  * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
+ * @param {api.BasicError} params.error The Basic error object.
  */
 const MESSAGES_ERROR = exports.MESSAGES_ERROR = 'messages:error';
 
@@ -38376,7 +38375,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
  * @param {string} [id=undefined] id The unique identifier for the conversation.
  * @param {string} [description=''] The description associated with the conversation.
- * @param {Array<Message>} [messages=[]] An array containing the conversation's messages.
+ * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
  * @param {Array<string>} [isTypingList=[]] A array that represents the list of usings who are currently typing.
  * @param {number} lastReceived The timestamp associated with the last received message.
  */
@@ -38384,10 +38383,10 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 // Events
 /**
  * A Conversation object represents a conversation either between two users, or between a
- * user and a group. A user can create a Conversation using {@link conversation.create client.conversation.create} Messaging API.
+ * user and a group. A user can create a Conversation using {@link conversation.create} Messaging API.
  *
  * A Conversation can be used to create messages to send using the Conversation and Messaging APIs
- * {@link #conversationcreatemessage Conversation.createMessage} and {@link #messagesendersend Message.send} functions.
+ * {@link conversation.Conversation.createMessage Conversation.createMessage} and {@link conversation.MessageSender.send Message.send} functions.
  *
  *
  * Once a sender sends the initial message (within a conversation) to a recipient, there will be a
@@ -38399,11 +38398,11 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * This property applies only to conversation object stored in recipient's state.
  * @property {string} type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
- * @property {Array<Message>} messages The array of message objects.
+ * @property {Array<conversation.Message>} messages The array of message objects.
  * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
  *
  * @public
- * @module Conversation
+ * @static
  * @typedef {Object} Conversation
  * @memberof conversation
  */
@@ -38418,7 +38417,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {File} [file] The file to attach to a message. A `Part` cannot have both json and a file.
  *
  * @public
- * @module Part
+ * @static
  * @typedef {Object} Part
  * @memberof conversation
  */
@@ -38426,20 +38425,20 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
 /**
  * A Message sender object is a means by which a sender can deliver information to a recipient.
  *
- * This sender object can be obtained through the {@link #conversationcreatemessage conversation.createMessage} API on an existing conversation.
+ * This sender object can be obtained through the {@link conversation.Conversation.createMessage conversation.createMessage} API on an existing conversation.
  *
- * Once all the desired parts have been added to it using the {@link #messagesenderaddpart MessageSender.addPart},
+ * Once all the desired parts have been added to it using the {@link conversation.MessageSender.addPart MessageSender.addPart},
  * the message can then be sent using the send function.
  *
  * @public
- * @module MessageSender
+ * @static
  * @typedef {Object} MessageSender
  * @memberof conversation
  */
 
 /**
  * A Message object represents an individual message that was delivered to a recipient and it is
- * obtained through the {@link #conversationgetmessages Conversation.getMessages} or {@link #conversationgetmessage Conversation.getMessage} API on an existing conversation.
+ * obtained through the {@link conversation.Conversation.getMessages Conversation.getMessages} or {@link conversation.Conversation.getMessage Conversation.getMessage} API on an existing conversation.
  *
  * Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
  *
@@ -38452,7 +38451,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {number} timestamp A Unix timestamp in seconds marking the time when the message was created by sender.
  * @property {boolean} isPending Whether the message is in pending state or not (delivered by server or not).
  * @property {boolean} read Whether the message was read by recipient user or not.
- * @property {Array<Part>} parts An array of Part Objects.
+ * @property {Array<conversation.Part>} parts An array of Part Objects.
  * @property {string} sender The primary contact address of the sender.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
@@ -38461,7 +38460,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * @property {string} deliveryStatus Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
  * This property applies only to the message object stored in sender's state.
  * @public
- * @module Message
+ * @static
  * @typedef {Object} Message
  * @memberof conversation
  */
@@ -38507,8 +38506,8 @@ const conversationBase = {
      * @memberof conversation.Conversation
      * @method createMessage
      * @constructs Message
-     * @param {Part} part The Part to add to the message.
-     * @returns {Message} The newly created Message object.
+     * @param {conversation.Part} part The Part to add to the message.
+     * @returns {conversation.Message} The newly created Message object.
      *
      * @example
      * conversation.createMessage({type: 'text', text: 'This is the message'});
@@ -38554,7 +38553,7 @@ const conversationBase = {
      * @static
      * @memberof conversation.Conversation
      * @method getMessages
-     * @return {Array<Message>} An array of messages.
+     * @return {Array<conversation.Message>} An array of messages.
      */
     getMessages: function () {
       const conversation = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
@@ -38576,7 +38575,7 @@ const conversationBase = {
      * @method getMessage
      * @memberof conversation.Conversation
      * @param {string} messageId The ID of the message to retrieve.
-     * @return {Message} A message object.
+     * @return {conversation.Message} A message object.
      */
     getMessage(messageId) {
       const convo = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
@@ -38699,7 +38698,7 @@ const conversationBase = {
     /**
      * Allows the user to fetch messages associated with a specific conversation to make them available.
      * When the operation is complete, a `messages:change` event will be emitted.
-     * Messages can then be retrieved using {@link #conversationgetmessages Conversation.getMessages}.
+     * Messages can then be retrieved using {@link conversation.Conversation.getMessages Conversation.getMessages}.
      *
      * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
@@ -38817,7 +38816,7 @@ const conversationBase = {
      * @public
      * @static
      * @memberof conversation.MessageSender
-     * @param {Part} part The `Part` to add to the message.
+     * @param {conversation.Part} part The `Part` to add to the message.
      */
     addPart(part) {
       // Validate the part. If not valid, returns an error.
@@ -41631,7 +41630,7 @@ const NOTI_CHANGE = exports.NOTI_CHANGE = 'notifications:change';
  * @memberof notification
  * @event notifications:error
  * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
+ * @param {api.BasicError} params.error The Basic error object.
  * @param {string} params.channel The channel for the notification.
  */
 const NOTI_ERROR = exports.NOTI_ERROR = 'notifications:error';
@@ -43256,7 +43255,7 @@ const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
  * @requires presence
  * @event presence:error
  * @param {Object} params
- * @param {BasicError} params.error The Basic error object.
+ * @param {api.BasicError} params.error The Basic error object.
  */
 const ERROR = exports.ERROR = 'presence:error';
 
@@ -47118,7 +47117,7 @@ function usersAPI({ dispatch, getState, primitives }) {
    * The User data object.
    *
    * @public
-   * @module User
+   * @static
    * @typedef {Object} User
    * @memberof user
    * @property {string} userId The User ID of the user.
@@ -47200,7 +47199,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @memberof user
      * @method get
      * @param {string} userId The User ID of the user.
-     * @returns {User} The User object for the specified user.
+     * @returns {user.User} The User object for the specified user.
      */
     get(userId) {
       log.debug(_logs.API_LOG_TAG + 'user.get: ', userId);
@@ -47216,7 +47215,7 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @public
      * @memberof user
      * @method getAll
-     * @returns {Array<User>} An array of all the User objects.
+     * @returns {Array<user.User>} An array of all the User objects.
      */
     getAll() {
       log.debug(_logs.API_LOG_TAG + 'user.getAll');
@@ -47393,7 +47392,7 @@ const CONTACTS_CHANGE = exports.CONTACTS_CHANGE = 'contacts:change';
  * @memberof user
  * @event directory:change
  * @param {Object} params
- * @param {Array<User>} params.results The Users' information returned by the
+ * @param {Array<user.User>} params.results The Users' information returned by the
  *    operation.
  */
 const DIRECTORY_CHANGE = exports.DIRECTORY_CHANGE = 'directory:change';
@@ -49226,7 +49225,7 @@ function mediaAPI({ dispatch, getState }) {
      * @memberof media
      * @method getById
      * @param  {string} mediaId The ID of the Media to retrieve.
-     * @return {MediaObject} A Media object.
+     * @return {call.MediaObject} A Media object.
      */
     getById(mediaId) {
       log.debug(_logs.API_LOG_TAG + 'media.getById: ', mediaId);
@@ -49240,7 +49239,7 @@ function mediaAPI({ dispatch, getState }) {
      * @memberof media
      * @method getTrackById
      * @param  {string} trackId The ID of the Track to retrieve.
-     * @return {TrackObject} A Track object.
+     * @return {call.TrackObject} A Track object.
      */
     getTrackById(trackId) {
       log.debug(_logs.API_LOG_TAG + 'media.getByTrackId: ', trackId);
