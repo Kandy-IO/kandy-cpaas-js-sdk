@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.185
+ * Version: 4.10.0-beta.186
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33963,7 +33963,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.185';
+  let version = '4.10.0-beta.186';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -45737,7 +45737,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Other plugins.
 // Users plugin.
-const capabilities = ['addContactAsBuddy', 'selfInfoAsUserSearch'];
+const capabilities = ['addContactAsBuddy', 'selfInfoAsUserSearch', 'advancedSearch'];
 
 // Libraries.
 function cpaasUsers() {
@@ -47226,6 +47226,9 @@ function usersAPI({ dispatch, getState, primitives }) {
     /**
      * Searches the domain's directory for Users.
      *
+     * Directory searching only supports one filter. If multiple filters are provided, only one of the filters will be used for the search.
+     * A search with no filters provided will return all users.
+     *
      * The SDK will emit a {@link user.event:directory:change directory:change}
      *    event after the operation completes. The search results will be
      *    provided as part of the event, and will also be available using the
@@ -47235,6 +47238,29 @@ function usersAPI({ dispatch, getState, primitives }) {
      * @static
      * @memberof user
      * @method search
+     * @requires limitedSearch
+     * @param {Object} filters The filter options for the search.
+     * @param {string} [filters.userId] Matches the User ID of the user.
+     * @param {string} [filters.name] Matches the firstName or lastName.
+     * @param {string} [filters.firstName] Matches the firstName.
+     * @param {string} [filters.lastName] Matches the lastName.
+     * @param {string} [filters.userName] Matches the userName.
+     * @param {string} [filters.phoneNumber] Matches the phoneNumber.
+     */
+
+    /**
+     * Searches the domain's directory for Users.
+     *
+     * The SDK will emit a {@link user.event:directory:change directory:change}
+     *    event after the operation completes. The search results will be
+     *    provided as part of the event, and will also be available using the
+     *    {@link user.get} and {@link user.getAll} APIs.
+     *
+     * @public
+     * @static
+     * @memberof user
+     * @method search
+     * @requires advancedSearch
      * @param {Object} filters The filter options for the search.
      * @param {string} [filters.userId] Matches the User ID of the user.
      * @param {string} [filters.name] Matches the firstName or lastName.
