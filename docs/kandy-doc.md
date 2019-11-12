@@ -707,6 +707,38 @@ The SDK will emit a [call:trackEnded][34]
 -   `options` **[Object][4]?**  (optional, default `{}`)
     -   `options.bandwidth` **[call.BandwidthControls][21]?** Options for configuring media's bandwidth.
 
+### startVideo
+
+Adds local video to an ongoing Call, to start sending to the remote
+   participant.
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The [call.addMedia][35] API can be used to perform the same behaviour
+   as `startVideo`. [call.addMedia][35] is a general-purpose API for
+   adding media to a call, which covers the same functionality as
+   `startVideo`. Selecting only video options when using
+   [call.addMedia][35] will perform the same behaviour as using
+   `startVideo`.
+
+**Examples**
+
+```javascript
+// Select media options for adding only video.
+const media = {
+   audio: false,
+   video: true,
+   videoOptions: { ... },
+   screen: false
+}
+
+// Add the selected media to the call.
+client.call.addMedia(callId, media)
+```
+
 ### stopScreenshare
 
 Removes local screenshare from an ongoing Call, stopping it from being
@@ -717,11 +749,11 @@ The latest SDK release (v4.X+) has not yet implemented this API in the
    of this API, the SDK has a more general API that can be used for this
    same behaviour.
 
-The [call.removeMedia][35] API can be used to perform the same
-   behaviour as `stopScreenshare`. [call.removeMedia][35] is a
+The [call.removeMedia][36] API can be used to perform the same
+   behaviour as `stopScreenshare`. [call.removeMedia][36] is a
    general-purpose API for removing media from a call, which covers the
    same functionality as `stopScreenshare`. Specifying only the screen
-   track when using [call.removeMedia][35] will perform the same
+   track when using [call.removeMedia][36] will perform the same
    behaviour as using `stopScreenshare`.
 
 There is a caveat that if a Call has multiple video tracks (for example,
@@ -745,69 +777,6 @@ const screenTrack = videoTracks[0]
 
 // Remove screen from the call.
 client.call.removeMedia(callId, [ screenTrack ])
-```
-
-### startVideo
-
-Adds local video to an ongoing Call, to start sending to the remote
-   participant.
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The [call.addMedia][36] API can be used to perform the same behaviour
-   as `startVideo`. [call.addMedia][36] is a general-purpose API for
-   adding media to a call, which covers the same functionality as
-   `startVideo`. Selecting only video options when using
-   [call.addMedia][36] will perform the same behaviour as using
-   `startVideo`.
-
-**Examples**
-
-```javascript
-// Select media options for adding only video.
-const media = {
-   audio: false,
-   video: true,
-   videoOptions: { ... },
-   screen: false
-}
-
-// Add the selected media to the call.
-client.call.addMedia(callId, media)
-```
-
-### stopVideo
-
-Removes local video from an ongoing Call, stopping it from being sent
-   to the remote participant.
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The [call.removeMedia][35] API can be used to perform the same
-   behaviour as `stopVideo`. [call.removeMedia][35] is a
-   general-purpose API for removing media from a call, which covers the
-   same functionality as `stopVideo`. Specifying only the video track(s)
-   when using [call.removeMedia][35] will perform the same behaviour
-   as using `stopVideo`.
-
-**Examples**
-
-```javascript
-const call = client.call.getById(callId)
-// Get the ID of the Call's video track.
-const videoTrack = call.localTracks.find(trackId => {
-   const track = call.media.getTrackById(trackId)
-   return track.kind === 'video'
-})
-
-// Remove video from the call.
-client.call.removeMedia(callId, [ videoTrack ])
 ```
 
 ### sendDTMF
@@ -834,6 +803,37 @@ The progress of the operation will be tracked via the
 -   `duration` **[number][8]** The amount of time, in milliseconds, that each DTMF tone should last. (optional, default `100`)
 -   `intertoneGap` **[number][8]** The length of time, in milliseconds, to wait between tones. (optional, default `70`)
 
+### stopVideo
+
+Removes local video from an ongoing Call, stopping it from being sent
+   to the remote participant.
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The [call.removeMedia][36] API can be used to perform the same
+   behaviour as `stopVideo`. [call.removeMedia][36] is a
+   general-purpose API for removing media from a call, which covers the
+   same functionality as `stopVideo`. Specifying only the video track(s)
+   when using [call.removeMedia][36] will perform the same behaviour
+   as using `stopVideo`.
+
+**Examples**
+
+```javascript
+const call = client.call.getById(callId)
+// Get the ID of the Call's video track.
+const videoTrack = call.localTracks.find(trackId => {
+   const track = call.media.getTrackById(trackId)
+   return track.kind === 'video'
+})
+
+// Remove video from the call.
+client.call.removeMedia(callId, [ videoTrack ])
+```
+
 ### startScreenshare
 
 Adds local screenshare to an ongoing Call, to start sending to the remote
@@ -844,11 +844,11 @@ The latest SDK release (v4.X+) has not yet implemented this API in the
    of this API, the SDK has a more general API that can be used for this
    same behaviour.
 
-The [call.addMedia][36] API can be used to perform the same behaviour
-   as `startScreenshare`. [call.addMedia][36] is a general-purpose API
+The [call.addMedia][35] API can be used to perform the same behaviour
+   as `startScreenshare`. [call.addMedia][35] is a general-purpose API
    for adding media to a call, which covers the same functionality as
    `startScreenshare`. Selecting only screen options when using
-   [call.addMedia][36] will perform the same behaviour as using
+   [call.addMedia][35] will perform the same behaviour as using
    `startScreenshare`.
 
 **Examples**
@@ -1053,43 +1053,6 @@ client.on('call:stateChange', function (params) {
 })
 ```
 
-### changeSpeaker
-
-Changes the speaker used for a Call's audio output. Supported on
-   browser's that support HTMLMediaElement.setSinkId().
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The same behaviour as the `changeSpeaker` API can be implemented by
-   re-rendering the Call's audio track.  A speaker can be selected when
-   rendering an audio track, so changing a speaker can be simulated
-   by unrendering the track with [media.removeTracks][40], then
-   re-rendering it with a new speaker with [media.renderTracks][41].
-
-**Examples**
-
-```javascript
-const call = client.call.getById(callId)
-// Get the ID of the Call's audio track.
-const audioTrack = call.localTracks.find(trackId => {
-   const track = client.media.getTrackById(trackId)
-   return track.kind === 'audio'
-})
-
-// Where the audio track was previously rendered.
-const audioContainer = ...
-
-// Unrender the audio track we want to change speaker for.
-client.media.removeTrack([ audioTrack ], audioContainer)
-// Re-render the audio track with a new speaker.
-client.media.renderTrack([ audioTrack ], audioContainer, {
-   speakerId: 'speakerId'
-})
-```
-
 ### changeInputDevices
 
 Changes the camera and/or microphone used for a Call's media input.
@@ -1100,7 +1063,7 @@ The latest SDK release (v4.X+) has not yet implemented this API in the
    same behaviour.
 
 The same behaviour as the `changeInputDevices` API can be implemented
-   using the general-purpose [call.replaceTrack][42] API. This API can
+   using the general-purpose [call.replaceTrack][40] API. This API can
    be used to replace an existing media track with a new track of the
    same type, allowing an application to change certain aspects of the
    media, such as input device.
@@ -1135,9 +1098,46 @@ The `setDefaultDevices` API from previous SDK releases (3.X) has been
 
 The devices used for a call can be selected as part of the APIs for
    starting the call. Microphone and/or camera can be chosen in the
-   [call.make][43] and [call.answer][44] APIs, and speaker can be
+   [call.make][41] and [call.answer][42] APIs, and speaker can be
    chosen when the audio track is rendered with the
-   [media.renderTracks][41] API.
+   [media.renderTracks][43] API.
+
+### changeSpeaker
+
+Changes the speaker used for a Call's audio output. Supported on
+   browser's that support HTMLMediaElement.setSinkId().
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The same behaviour as the `changeSpeaker` API can be implemented by
+   re-rendering the Call's audio track.  A speaker can be selected when
+   rendering an audio track, so changing a speaker can be simulated
+   by unrendering the track with [media.removeTracks][44], then
+   re-rendering it with a new speaker with [media.renderTracks][43].
+
+**Examples**
+
+```javascript
+const call = client.call.getById(callId)
+// Get the ID of the Call's audio track.
+const audioTrack = call.localTracks.find(trackId => {
+   const track = client.media.getTrackById(trackId)
+   return track.kind === 'audio'
+})
+
+// Where the audio track was previously rendered.
+const audioContainer = ...
+
+// Unrender the audio track we want to change speaker for.
+client.media.removeTrack([ audioTrack ], audioContainer)
+// Re-render the audio track with a new speaker.
+client.media.renderTrack([ audioTrack ], audioContainer, {
+   speakerId: 'speakerId'
+})
+```
 
 ### PhoneNumber
 
@@ -1339,82 +1339,13 @@ Type: [Object][4]
 client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
 ```
 
-### MessageSender
-
-A Message sender object is a means by which a sender can deliver information to a recipient.
-
-This sender object can be obtained through the [conversation.createMessage][54] API on an existing conversation.
-
-Once all the desired parts have been added to it using the [MessageSender.addPart][55],
-the message can then be sent using the send function.
-
-Type: [Object][4]
-
-#### send
-
-Sends the message.
-
-#### addPart
-
-Add an additional `Part` to a message.
-
-**Parameters**
-
--   `part` **[conversation.Part][56]** The `Part` to add to the message.
-
-#### createImageLinks
-
-Creates a usable image link for the message in this `MessageSender`.
-
-### Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-Type: [Object][4]
-
-**Properties**
-
--   `type` **[string][5]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][5]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
-
-### Message
-
-A Message object represents an individual message that was delivered to a recipient and it is
-obtained through the [Conversation.getMessages][57] or [Conversation.getMessage][58] API on an existing conversation.
-
-Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
-
-Once the sender sends a message, this message is saved in sender's state as an object.
-
-Similarly, once the recipient gets a message, this message is saved in recipient's state.
-
-Below are the properties pertaining to this saved message object in either sender or recipient's state.
-
-Type: [Object][4]
-
-**Properties**
-
--   `timestamp` **[number][8]** A Unix timestamp in seconds marking the time when the message was created by sender.
--   `isPending` **[boolean][7]** Whether the message is in pending state or not (delivered by server or not).
--   `read` **[boolean][7]** Whether the message was read by recipient user or not.
--   `parts` **[Array][9]&lt;[conversation.Part][56]>** An array of Part Objects.
--   `sender` **[string][5]** The primary contact address of the sender.
--   `messageId` **[string][5]** The unique id of the message. The message object (stored in sender's state) has a different id
-    than the one associated with the message object stored in recipient's state.
--   `type` **[string][5]** The type of message that was sent. See [conversation.chatTypes][49] for valid types.
-    This property applies only to message objects stored in sender's state.
--   `deliveryStatus` **[string][5]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
-    This property applies only to the message object stored in sender's state.
-
 ### Conversation
 
 A Conversation object represents a conversation either between two users, or between a
 user and a group. A user can create a Conversation using [conversation.create][51] Messaging API.
 
 A Conversation can be used to create messages to send using the Conversation and Messaging APIs
-[Conversation.createMessage][54] and [Message.send][59] functions.
+[Conversation.createMessage][54] and [Message.send][55] functions.
 
 Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender and recipient's state.
@@ -1429,18 +1360,18 @@ Type: [Object][4]
     This property applies only to conversation object stored in recipient's state.
 -   `type` **[string][5]** The type of conversation. See [conversation.chatTypes][49] for valid types.
 -   `lastMessage` **[string][5]** The last message received.
--   `messages` **[Array][9]&lt;[conversation.Message][60]>** The array of message objects.
+-   `messages` **[Array][9]&lt;[conversation.Message][56]>** The array of message objects.
 -   `isTypingList` **[Array][9]&lt;[string][5]>** The array indentifying the User IDs of the users who are currently typing.
 
 #### createMessage
 
 Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
 
-If successful, the event [messages:change][61] will be emitted.
+If successful, the event [messages:change][57] will be emitted.
 
 **Parameters**
 
--   `part` **[conversation.Part][56]** The Part to add to the message.
+-   `part` **[conversation.Part][58]** The Part to add to the message.
 
 **Examples**
 
@@ -1448,19 +1379,19 @@ If successful, the event [messages:change][61] will be emitted.
 conversation.createMessage({type: 'text', text: 'This is the message'});
 ```
 
-Returns **[conversation.Message][60]** The newly created Message object.
+Returns **[conversation.Message][56]** The newly created Message object.
 
 #### clearMessages
 
 Clears all messages in this conversation from local state.
 
-If successful, the event [messages:change][61] will be emitted.
+If successful, the event [messages:change][57] will be emitted.
 
 #### getMessages
 
 Gets all messages from this conversation.
 
-Returns **[Array][9]&lt;[conversation.Message][60]>** An array of messages.
+Returns **[Array][9]&lt;[conversation.Message][56]>** An array of messages.
 
 #### getMessage
 
@@ -1470,14 +1401,14 @@ Gets a specific message from this conversation.
 
 -   `messageId` **[string][5]** The ID of the message to retrieve.
 
-Returns **[conversation.Message][60]** A message object.
+Returns **[conversation.Message][56]** A message object.
 
 #### deleteMessages
 
 Deletes specified messages from this conversation.
 Provide an array of message IDs for the messages to be deleted.
 
-If successful, the event [messages:change][61] will be emitted.
+If successful, the event [messages:change][57] will be emitted.
 
 **Parameters**
 
@@ -1487,7 +1418,7 @@ If successful, the event [messages:change][61] will be emitted.
 
 Delete the conversation.
 
-If successful, the event [messages:change][61] will be emitted.
+If successful, the event [messages:change][57] will be emitted.
 
 #### subscribe
 
@@ -1505,9 +1436,9 @@ Returns **[Function][13]** The unsubscribe function.
 
 Allows the user to fetch messages associated with a specific conversation to make them available.
 When the operation is complete, a `messages:change` event will be emitted.
-Messages can then be retrieved using [Conversation.getMessages][57].
+Messages can then be retrieved using [Conversation.getMessages][59].
 
-If successful, the event [messages:change][61] will be emitted.
+If successful, the event [messages:change][57] will be emitted.
 
 **Parameters**
 
@@ -1518,11 +1449,80 @@ If successful, the event [messages:change][61] will be emitted.
 Sets the typing status of the conversation for the current user.
 Other participants will be notified of changes to the conversation's typing status.
 
-If successful, the event [isTypingList:change][62] will be emitted.
+If successful, the event [isTypingList:change][60] will be emitted.
 
 **Parameters**
 
 -   `isTyping` **[boolean][7]** Whether the user is typing or not
+
+### Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `type` **[string][5]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][5]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][4]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
+### MessageSender
+
+A Message sender object is a means by which a sender can deliver information to a recipient.
+
+This sender object can be obtained through the [conversation.createMessage][54] API on an existing conversation.
+
+Once all the desired parts have been added to it using the [MessageSender.addPart][61],
+the message can then be sent using the send function.
+
+Type: [Object][4]
+
+#### send
+
+Sends the message.
+
+#### addPart
+
+Add an additional `Part` to a message.
+
+**Parameters**
+
+-   `part` **[conversation.Part][58]** The `Part` to add to the message.
+
+#### createImageLinks
+
+Creates a usable image link for the message in this `MessageSender`.
+
+### Message
+
+A Message object represents an individual message that was delivered to a recipient and it is
+obtained through the [Conversation.getMessages][59] or [Conversation.getMessage][62] API on an existing conversation.
+
+Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
+
+Once the sender sends a message, this message is saved in sender's state as an object.
+
+Similarly, once the recipient gets a message, this message is saved in recipient's state.
+
+Below are the properties pertaining to this saved message object in either sender or recipient's state.
+
+Type: [Object][4]
+
+**Properties**
+
+-   `timestamp` **[number][8]** A Unix timestamp in seconds marking the time when the message was created by sender.
+-   `isPending` **[boolean][7]** Whether the message is in pending state or not (delivered by server or not).
+-   `read` **[boolean][7]** Whether the message was read by recipient user or not.
+-   `parts` **[Array][9]&lt;[conversation.Part][58]>** An array of Part Objects.
+-   `sender` **[string][5]** The primary contact address of the sender.
+-   `messageId` **[string][5]** The unique id of the message. The message object (stored in sender's state) has a different id
+    than the one associated with the message object stored in recipient's state.
+-   `type` **[string][5]** The type of message that was sent. See [conversation.chatTypes][49] for valid types.
+    This property applies only to message objects stored in sender's state.
+-   `deliveryStatus` **[string][5]** Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
+    This property applies only to the message object stored in sender's state.
 
 ## groups
 
@@ -2274,9 +2274,9 @@ Type: [string][5]
 
 [34]: #calleventcalltrackended
 
-[35]: #callremovemedia
+[35]: #calladdmedia
 
-[36]: #calladdmedia
+[36]: #callremovemedia
 
 [37]: #calleventcallstatsreceived
 
@@ -2284,15 +2284,15 @@ Type: [string][5]
 
 [39]: #callcallobject
 
-[40]: #mediaremovetracks
+[40]: #callreplacetrack
 
-[41]: #mediarendertracks
+[41]: #callmake
 
-[42]: #callreplacetrack
+[42]: #callanswer
 
-[43]: #callmake
+[43]: #mediarendertracks
 
-[44]: #callanswer
+[44]: #mediaremovetracks
 
 [45]: #conversationget
 
@@ -2314,21 +2314,21 @@ Type: [string][5]
 
 [54]: #conversationconversationcreatemessage
 
-[55]: #conversationmessagesenderaddpart
+[55]: #conversationmessagesendersend
 
-[56]: #conversationpart
+[56]: #conversationmessage
 
-[57]: #conversationconversationgetmessages
+[57]: #conversationeventmessageschange
 
-[58]: #conversationconversationgetmessage
+[58]: #conversationpart
 
-[59]: #conversationmessagesendersend
+[59]: #conversationconversationgetmessages
 
-[60]: #conversationmessage
+[60]: #conversationeventistypinglistchange
 
-[61]: #conversationeventmessageschange
+[61]: #conversationmessagesenderaddpart
 
-[62]: #conversationeventistypinglistchange
+[62]: #conversationconversationgetmessage
 
 [63]: #conversation
 
