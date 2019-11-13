@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.196
+ * Version: 4.10.0-beta.197
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33890,14 +33890,6 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _defineProperty = __webpack_require__("../../node_modules/babel-runtime/core-js/object/define-property.js");
-
-var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-var _getOwnPropertyDescriptor = __webpack_require__("../../node_modules/babel-runtime/core-js/object/get-own-property-descriptor.js");
-
-var _getOwnPropertyDescriptor2 = _interopRequireDefault(_getOwnPropertyDescriptor);
-
 exports.factory = factory;
 
 var _redux = __webpack_require__("../../node_modules/redux/es/index.js");
@@ -33926,27 +33918,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Libraries.
 const log = (0, _logs.getLogManager)().getLogger('FACTORY');
 
-/**
- * Returns whether the passed in property descriptor represents a normal ES3 property defined like so:
- *
- * ```
- * var bar = {
- *    name: 'value'
- * };
- *
- * isNormalProperty(bar.getOwnPropertyDescriptor('name'));
- * // => true
- * ```
- *
- * @param {PropertyDescriptor} propertyDescriptor The property descriptor to check for normalcy.
- * @return {boolean} True if the property is a normal property, false otherwise.
- */
-
-
 // Plugins.
-function isNormalProperty({ enumerable, configurable, writable, get, set }) {
-  return configurable && enumerable && writable && !get && !set;
-}
+
 
 const factoryDefaults = {
   enableReduxDevTools: false,
@@ -33962,7 +33935,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.196';
+  let version = '4.10.0-beta.197';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -34024,21 +33997,7 @@ const factoryDefaults = {
       }
     }
     if (plugin.api) {
-      // The following mergeWith uses a customizer that functions like Object.assign
-      // except it copies property descriptors so that accessor type properties
-      // are copied fully instead of just copying their current values.
-      // The first two parameters are not being used.
-      context.api = (0, _fp.mergeWith)((objValue, srcValue, property, destination, source) => {
-        const descriptor = (0, _getOwnPropertyDescriptor2.default)(source, property);
-        if (descriptor && !isNormalProperty(descriptor)) {
-          (0, _defineProperty2.default)(destination, property, descriptor);
-        } else {
-          if (destination === undefined) {
-            destination = {};
-          }
-          destination[property] = source[property];
-        }
-      }, context.api, plugin.api(context));
+      context.api = (0, _fp.merge)(context.api, plugin.api(context));
     }
     if (plugin.init) {
       initSagas.push(plugin.init);
