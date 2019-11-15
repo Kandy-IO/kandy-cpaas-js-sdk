@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.197
+ * Version: 4.10.0-beta.198
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33935,7 +33935,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.197';
+  let version = '4.10.0-beta.198';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -38345,7 +38345,7 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  * user and a group. A user can create a Conversation using {@link conversation.create} Messaging API.
  *
  * A Conversation can be used to create messages to send using the Conversation and Messaging APIs
- * {@link conversation.Conversation.createMessage Conversation.createMessage} and {@link conversation.MessageSender.send Message.send} functions.
+ * {@link conversation.Conversation.createMessage Conversation.createMessage} and {@link conversation.Message.send Message.send} functions.
  *
  *
  * Once a sender sends the initial message (within a conversation) to a recipient, there will be a
@@ -38382,42 +38382,35 @@ const log = (0, _logs.getLogManager)().getLogger('MESSAGING');
  */
 
 /**
- * A Message sender object is a means by which a sender can deliver information to a recipient.
+ * A Message object is a means by which a sender can deliver information to a recipient.
  *
- * This sender object can be obtained through the {@link conversation.Conversation.createMessage conversation.createMessage} API on an existing conversation.
+ * Creating and sending a message:
  *
- * Once all the desired parts have been added to it using the {@link conversation.MessageSender.addPart MessageSender.addPart},
- * the message can then be sent using the send function.
- *
- * @public
- * @static
- * @typedef {Object} MessageSender
- * @memberof conversation
- */
-
-/**
- * A Message object represents an individual message that was delivered to a recipient and it is
- * obtained through the {@link conversation.Conversation.getMessages Conversation.getMessages} or {@link conversation.Conversation.getMessage Conversation.getMessage} API on an existing conversation.
+ * The message object can be obtained through the {@link conversation.Conversation.createMessage Conversation.createMessage} API on an existing conversation.
  *
  * Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
+ * Once all the desired parts have been added to the message using the {@link conversation.Message.addPart Message.addPart} function,
+ * the message can then be sent using the {@link conversation.Message.send Message.send} function.
  *
  * Once the sender sends a message, this message is saved in sender's state as an object.
- *
  * Similarly, once the recipient gets a message, this message is saved in recipient's state.
  *
- * Below are the properties pertaining to this saved message object in either sender or recipient's state.
+ * Retrieving a delivered message:
+ *
+ * Once a message is delivered successfully, it can be
+ * obtained through the {@link conversation.Conversation.getMessages Conversation.getMessages} or {@link conversation.Conversation.getMessage Conversation.getMessage} API on an existing conversation.
+ *
+ * Below are the properties pertaining to the message object, returned by Conversation.getMessage(s) APIs, for either sender or recipient.
  *
  * @property {number} timestamp A Unix timestamp in seconds marking the time when the message was created by sender.
- * @property {boolean} isPending Whether the message is in pending state or not (delivered by server or not).
- * @property {boolean} read Whether the message was read by recipient user or not.
  * @property {Array<conversation.Part>} parts An array of Part Objects.
  * @property {string} sender The primary contact address of the sender.
+ * @property {Array<string>} destination An array of primary contact addresses associated with various destinations to which the message is meant to be delivered.
  * @property {string} messageId The unique id of the message. The message object (stored in sender's state) has a different id
  * than the one associated with the message object stored in recipient's state.
  * @property {string} type The type of message that was sent. See {@link conversation.chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
- * @property {string} deliveryStatus Tracks the status of the outgoing message ('Pending', 'Delivered', 'Failed', 'Unknown', etc).
- * This property applies only to the message object stored in sender's state.
+ * @property {boolean} isFetchingLinks Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
  * @public
  * @static
  * @typedef {Object} Message
@@ -38712,10 +38705,10 @@ const conversationBase = {
    * @param  {Array} context.features Array of features the conversation supports.
    * @param  {string} type The type of conversation ('chat-onToOne', 'chat-group' or 'sms')
    * @param  {Function} context.send Function for sending the message.
-   * @param  {number} timestamp unix timestamp in seconds
-   * @param  {boolean} isFetchingLinks
-   * @param  {string} sender The author of the message
-   * @param  {string} messageId a unique ID for looking up the message
+   * @param  {number} timestamp unix timestamp in seconds.
+   * @param  {boolean} isFetchingLinks Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
+   * @param  {string} sender The author of the message.
+   * @param  {string} messageId A unique ID for looking up the message.
    * @param  {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
    */
 };const messageBase = {
@@ -38745,7 +38738,7 @@ const conversationBase = {
      * @public
      * @static
      * @method send
-     * @memberof conversation.MessageSender
+     * @memberof conversation.Message
      */
     send() {
       log.debug('Send message', this);
@@ -38774,7 +38767,7 @@ const conversationBase = {
      *
      * @public
      * @static
-     * @memberof conversation.MessageSender
+     * @memberof conversation.Message
      * @param {conversation.Part} part The `Part` to add to the message.
      */
     addPart(part) {
@@ -38803,11 +38796,11 @@ const conversationBase = {
   }],
   methods: {
     /**
-     * Creates a usable image link for the message in this `MessageSender`.
+     * Creates a usable image link for the message in this `Message` instance.
      *
      * @public
      * @static
-     * @memberof conversation.MessageSender
+     * @memberof conversation.Message
      */
     createImageLinks() {
       const { parts, destination, type, messageId } = this;
