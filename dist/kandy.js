@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.201
+ * Version: 4.10.0-beta.202
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33934,7 +33934,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.201';
+  let version = '4.10.0-beta.202';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -51576,8 +51576,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @typedef {Object} PeerConfig
  * @property {Object} [rtcConfig] Configuration for the native RTCPeerConnection.
  * @property {String} [trickleIceMode=FULL] The initial mode the Peer will use when receiving ICE candidates.
- * @property {Number} [iceTimeout=10000] Duration (in ms) that the Peer should wait for ICE candidate collection.
+ * @property {Number} [iceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
  * @property {Function} [halfTrickleThreshold] Function that determines whether the threshold has been met when in HALF trickle mode.
+ * @property {Number} [iceCollectionDelay=1000] The time (in ms) between ICE collection checks.
+ * @property {Function} [iceCollectionCheck] The function to check whether enough ICE candidates
+ *    have been collected to continue with negotiation. Must return a boolean value.
  */
 
 
@@ -51588,8 +51591,10 @@ const defaultConfig = {
   },
   trickleIceMode: _constants.PEER.TRICKLE_ICE.FULL,
   removeBundling: true,
-  iceTimeout: 10000,
-  halfTrickleThreshold: isPassedHalfTrickleThreshold
+  iceTimeout: 3000,
+  halfTrickleThreshold: isPassedHalfTrickleThreshold,
+  iceCollectionDelay: 1000,
+  iceCollectionCheck: iceCollectionCheck
 
   /**
    * Default function for determining whether the HALF trickle ICE threshold has
@@ -51609,6 +51614,17 @@ function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
   const passedHalf = iceCandidate.candidate.indexOf('relay') !== -1;
   _loglevel2.default.debug(`Peer's half trickle threshold ${!passedHalf ? 'not ' : ''}reached.`);
   return passedHalf;
+}
+
+/**
+ * Default function to determine if the ice candidates is enough to negotiate.
+ * We assume that: at least one relay candidate is good enough to try negotiation.
+ * @method iceCollectionCheck
+ * @param {Array<RTCIceCandidate>} iceCandidates List of collected ICE candidates.
+ * @return {Boolean} Whether the ice Candidates is enough for negotiation.
+ */
+function iceCollectionCheck(iceCandidates) {
+  return iceCandidates.some(candidate => candidate.type === 'relay');
 }
 
 /**
@@ -51634,8 +51650,32 @@ function Peer(id, config = {}, trackManager) {
    */
   let dtlsRole;
 
+  // To keep track of the iceCandidates received
+  let iceCandidates = [];
+  // How long ICE collection has taken so far.
+  let iceCollectionMaxTime = 0;
+
   // Bubble up the RTCPeerConnection events.
   const events = ['oniceconnectionstatechange', 'onsignalingstatechange', 'onnegotiationneeded'];
+
+  /**
+   * When ice Candidates is enough, Peer will be considered ready for negotiation after that point.
+   * or wait for 1sec until candidates is enough
+   * @method iceCollectionLoop
+   */
+  const iceCollectionLoop = () => {
+    iceCollectionMaxTime += config.iceCollectionDelay;
+    const shouldTimeout = config.iceCollectionCheck(iceCandidates);
+    if (shouldTimeout || iceCollectionMaxTime >= config.iceTimeout) {
+      iceCandidates = [];
+      iceCollectionMaxTime = 0;
+      emitter.emit('onnegotiationready');
+    } else {
+      setTimeout(function () {
+        iceCollectionLoop();
+      }, config.iceCollectionDelay);
+    }
+  };
 
   /**
    * Intercept the PeerConnection onicecandidate event.
@@ -51648,6 +51688,10 @@ function Peer(id, config = {}, trackManager) {
    */
   peerConnection.onicecandidate = event => {
     _loglevel2.default.debug(`ICE candidate received (trickling?: ${config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL}): `, event.candidate);
+
+    if (event.candidate !== null) {
+      iceCandidates.push(event.candidate);
+    }
 
     if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
       // If trickling is enabled, emit an event for every ICE candidate. The
@@ -51983,9 +52027,9 @@ function Peer(id, config = {}, trackManager) {
               emitter.emit('onnegotiationready');
             } else {
               _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${config.trickleIceMode}).`);
-              // TODO: Handle this scenario properly.
               // If ICE collection never finishes, we need to time it out at some point.
-              setTimeout(() => emitter.emit('onnegotiationready'), 3000);
+              //    Start the timeout-out loop after an initial delay.
+              setTimeout(iceCollectionLoop, config.iceCollectionDelay);
             }
           }, 25);
         }
