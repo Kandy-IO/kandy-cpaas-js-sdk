@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.202
+ * Version: 4.10.0-beta.203
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20520,6 +20520,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Object} call The call configuration object.
  * @param {string} [call.sdpSemantics='unified-plan'] The sdpSemantics to use (`'unified-plan'` or `'plan-b'`).
  * @param {Array<call.IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
+ * @param {number} [call.iceCollectionDelay=1000] Time, in milliseconds, to delay in between
+ *    ICE candidate checks. If ICE collection does not complete normally, the SDK will check
+ *    collected candidates at this interval to determine if the opertion can continue.
+ * @param {number} [call.maxIceTimeout=3000] Maximum time, in milliseconds, to wait for ICE
+ *    collection to complete normally. After this time, the process will timeout and the
+ *    operation will attempt to continue no matter how many candidates have been collected.
+ * @param {Function} [call.iceCollectionCheck] Function to check whether collected candidates
+ *    can be used to continue the operation. The function will receive an array of ICE
+ *    candidates and must return a boolean value of whether the SDK should attempt to continue
+ *    the operation. By default, the check is to ensure at least one relay candidate has been
+ *    collected.
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
  * @param {Array<call.SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
@@ -20543,6 +20554,10 @@ function cpaasCalls(options = {}) {
       urls: 'turns:turn-ucc-2.genband.com:443?transport=tcp',
       credential: ''
     }],
+    // Time in ms to what between checking ICE candidates during negotiation.
+    iceCollectionDelay: 1000,
+    // The maximum time, in ms, to wait before timing out ICE collection.
+    maxIceTimeout: 3000,
     // TODO: Remove this once all the browsers use unified-plan
     sdpSemantics: 'unified-plan',
     // Whether the SDK should fetch turn credentials.
@@ -20555,6 +20570,8 @@ function cpaasCalls(options = {}) {
     removeH264Codecs: true,
     // Set this to false to bypass sip address normalization
     normalizeDestination: true
+    // Defaults set by the Webrtc stack:
+    //    iceCollectionCheck: Has at least one relay candidate.
   };
 
   options = (0, _utils2.mergeValues)(defaultOptions, options);
@@ -26372,16 +26389,20 @@ function* makeCall(deps, action) {
   };
 
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-  const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+  const callOptions = yield (0, _effects.select)(_selectors.getOptions);
 
   const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
 
   const { error, offerSdp, sessionId, mediaIds } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
-    sdpSemantics,
+    sdpSemantics: callOptions.sdpSemantics,
     turnInfo,
-    trickleIceMode,
     bandwidth,
-    callId: action.payload.id
+    callId: action.payload.id,
+    // ICE related configs.
+    trickleIceMode: callOptions.trickleIceMode,
+    iceCollectionDelay: callOptions.iceCollectionDelay,
+    iceCollectionCheck: callOptions.iceCollectionCheck,
+    maxIceTimeout: callOptions.maxIceTimeout
   });
 
   // An error occured while trying to setup the WebRTC portion of the call.
@@ -26511,14 +26532,18 @@ function* answerCall(deps, action) {
     log.debug('Answering slow start call.', action.payload.id);
 
     const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-    const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+    const callOptions = yield (0, _effects.select)(_selectors.getOptions);
 
     // Setup a webRTC session.
     webrtcInfo = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
-      sdpSemantics,
+      sdpSemantics: callOptions.sdpSemantics,
       turnInfo,
-      trickleIceMode,
-      bandwidth
+      bandwidth,
+      // ICE related configs.
+      trickleIceMode: callOptions.trickleIceMode,
+      iceCollectionDelay: callOptions.iceCollectionDelay,
+      iceCollectionCheck: callOptions.iceCollectionCheck,
+      maxIceTimeout: callOptions.maxIceTimeout
     });
 
     if (webrtcInfo.error) {
@@ -30189,6 +30214,9 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
  * @param  {Object} sessionOptions.sdpSemantics Semantics for Real Time Communication configurations
  * @param  {Object} sessionOptions.turnInfo Contains information required for setting up ICE servers
  * @param  {string} sessionOptions.trickleIceMode What mode to be used for trickle ICE
+ * @param  {number} sessionOptions.iceCollectionDelay
+ * @param  {number} sessionOptions.maxIceTimeout
+ * @param  {Function} sessionOptions.iceCollectionCheck
  * @param  {Object} [sessionOptions.bandwidth] Contains configuration details for setting bandwidth
  * @return {Object} Object
  * @return {string} Object.offerSdp Session Description Protocol for a call offer
@@ -30201,7 +30229,16 @@ const log = (0, _logs.getLogManager)().getLogger('CALLSTACK');
 // Call plugin.
 function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
-  const { sdpSemantics, turnInfo, trickleIceMode, bandwidth, callId } = sessionOptions;
+  const {
+    sdpSemantics,
+    turnInfo,
+    trickleIceMode,
+    bandwidth,
+    callId,
+    iceCollectionCheck,
+    iceCollectionDelay,
+    maxIceTimeout
+  } = sessionOptions;
 
   const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
@@ -30216,7 +30253,10 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
         sdpSemantics,
         iceServers: turnInfo.servers
       },
-      trickleIceMode
+      trickleIceMode,
+      iceCollectionCheck,
+      iceCollectionDelay,
+      maxIceTimeout
     }
   });
 
@@ -30267,12 +30307,23 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
  * @param  {Object} sessionOptions.sdpSemantics semantics for the SDP, contains video and audio constraints
  * @param  {Object} sessionOptions.turnInfo TURN information, contains server info
  * @param  {string} sessionOptions.trickleIceMode the mode to enable for Trickle ICE
+ * @param  {number} sessionOptions.iceCollectionDelay
+ * @param  {number} sessionOptions.maxIceTimeout
+ * @param  {Function} sessionOptions.iceCollectionCheck
  * @param  {Object} sessionOptions.offer an offer containing an SDP
  * @return {string} sessionId an identifier for the session
  */
 function* setupIncomingCall(deps, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
-  const { sdpSemantics, turnInfo, trickleIceMode, callId } = sessionOptions;
+  const {
+    sdpSemantics,
+    turnInfo,
+    trickleIceMode,
+    callId,
+    iceCollectionDelay,
+    maxIceTimeout,
+    iceCollectionCheck
+  } = sessionOptions;
   let offer = sessionOptions.offer;
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
@@ -30281,7 +30332,10 @@ function* setupIncomingCall(deps, sessionOptions) {
         sdpSemantics,
         iceServers: turnInfo.servers
       },
-      trickleIceMode
+      trickleIceMode,
+      iceCollectionDelay,
+      maxIceTimeout,
+      iceCollectionCheck
     }
   });
 
@@ -33934,7 +33988,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.202';
+  let version = '4.10.0-beta.203';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -51576,7 +51630,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @typedef {Object} PeerConfig
  * @property {Object} [rtcConfig] Configuration for the native RTCPeerConnection.
  * @property {String} [trickleIceMode=FULL] The initial mode the Peer will use when receiving ICE candidates.
- * @property {Number} [iceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
+ * @property {Number} [maxIceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
  * @property {Function} [halfTrickleThreshold] Function that determines whether the threshold has been met when in HALF trickle mode.
  * @property {Number} [iceCollectionDelay=1000] The time (in ms) between ICE collection checks.
  * @property {Function} [iceCollectionCheck] The function to check whether enough ICE candidates
@@ -51591,7 +51645,7 @@ const defaultConfig = {
   },
   trickleIceMode: _constants.PEER.TRICKLE_ICE.FULL,
   removeBundling: true,
-  iceTimeout: 3000,
+  maxIceTimeout: 3000,
   halfTrickleThreshold: isPassedHalfTrickleThreshold,
   iceCollectionDelay: 1000,
   iceCollectionCheck: iceCollectionCheck
@@ -51664,13 +51718,32 @@ function Peer(id, config = {}, trackManager) {
    * @method iceCollectionLoop
    */
   const iceCollectionLoop = () => {
+    // If gathering completed during the delay, we don't need to loop anymore.
+    if (peerConnection.iceGatheringState === 'complete') {
+      _loglevel2.default.debug('ICE collection completed; stopping candidate check loop.');
+      // Gathering completes when the null candidate is received. The "on
+      //    negotiation ready" event should be emitted at that time.
+      iceCandidates = [];
+      iceCollectionMaxTime = 0;
+      return;
+    }
+
     iceCollectionMaxTime += config.iceCollectionDelay;
-    const shouldTimeout = config.iceCollectionCheck(iceCandidates);
-    if (shouldTimeout || iceCollectionMaxTime >= config.iceTimeout) {
+    const enoughCandidates = config.iceCollectionCheck(iceCandidates);
+    const hasReachedTimeout = iceCollectionMaxTime >= config.maxIceTimeout;
+
+    if (hasReachedTimeout) {
+      _loglevel2.default.debug('ICE collection timeout reached; continuing with negotiation.');
+      iceCandidates = [];
+      iceCollectionMaxTime = 0;
+      emitter.emit('onnegotiationready');
+    } else if (enoughCandidates) {
+      _loglevel2.default.debug('ICE candidates sufficient for negotiation; continuing.');
       iceCandidates = [];
       iceCollectionMaxTime = 0;
       emitter.emit('onnegotiationready');
     } else {
+      _loglevel2.default.debug(`ICE candidates not sufficient for negotiation, delaying another ${config.iceCollectionDelay}ms.`);
       setTimeout(function () {
         iceCollectionLoop();
       }, config.iceCollectionDelay);
