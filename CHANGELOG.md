@@ -5,6 +5,25 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.10.0 - 2019-11-29
+
+### Added
+
+- Added new user event, `users:change`, to notify when we fetch information about a user. `KAA-1882`
+- Added new Call configurations to provide flexibility for the ICE collection process. `KAA-1469`
+  - See `config.call` for new configs: `iceCollectionDelay`, `maxIceTimeout`, and `iceCollectionCheck`.
+  - These configs should only be needed when the ICE collection process does not complete normally. This should not happen in most scenarios, but can be determined if there is a delay (of 3 seconds or the value set for `maxIceTimeout`) during call establishment.
+  - These configurations allow an application to customize the ICE collection process according to their network / scenario, in order to workaround issues.
+
+### Changed
+
+- Changed the event emitted when a user is fetched to `users:change`. `KAA-1882`
+
+### Fixed
+
+- Fixed public documentation hyperlinks for custom type definitions. `KAA-2011`
+- Fixed public documentation for messaging. `KAA-1881`
+
 ## 4.9.0 - 2019-11-01
 
 ### Added
