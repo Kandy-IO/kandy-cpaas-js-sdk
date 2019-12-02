@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.10.0 - beta
+## 4.10.0 - 2019-11-29
 
 ### Added
 
@@ -22,6 +22,7 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed public documentation hyperlinks for custom type definitions. `KAA-2011`
+- Fixed public documentation for messaging. `KAA-1881`
 
 ## 4.9.0 - 2019-11-01
 
