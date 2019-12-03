@@ -14,6 +14,8 @@ Kandy.js change log.
   - See `config.call` for new configs: `iceCollectionDelay`, `maxIceTimeout`, and `iceCollectionCheck`.
   - These configs should only be needed when the ICE collection process does not complete normally. This should not happen in most scenarios, but can be determined if there is a delay (of 3 seconds or the value set for `maxIceTimeout`) during call establishment.
   - These configurations allow an application to customize the ICE collection process according to their network / scenario, in order to workaround issues.
+- Added two new events to notify of Presence subscribe and unsubscribe operations, and Presence fetch now triggers a `presence:change` event for a successful fetch. `KAA-1878`
+  - Presence subscribe triggers the new `presence:subscribe` event, and Presence unsubscribe will trigger the new `presence:unsubscribe` event.
 
 ### Changed
 

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.210
+ * Version: 4.10.0-beta.211
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33988,7 +33988,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.210';
+  let version = '4.10.0-beta.211';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -41940,6 +41940,7 @@ exports.default = () => {
      * Possible presence status values.
      * @public
      * @static
+     * @name statuses
      * @memberof presence
      * @type {Object}
      * @property {string} OPEN
@@ -41954,6 +41955,7 @@ exports.default = () => {
      * Possible presence activity values.
      * @public
      * @static
+     * @name activities
      * @memberof presence
      * @type {Object}
      * @property {string} AVAILABLE
@@ -42583,7 +42585,7 @@ const activityMapUcToCPaaS = {
 /**
  * fetchPresence.
  * @method fetchPresence
- * @param  {Array<string>|string} users A single userId or array of userIds
+ * @param  {Array<string>} users An array of userIds.
  */
 function* fetchPresence({ payload }) {
   const users = payload;
@@ -42643,7 +42645,7 @@ function* unsubscribePresence({ payload }) {
   log.debug('Received response from removeUser request:', response);
 
   if (!response.error) {
-    yield (0, _effects.put)(actions.unsubscribePresenceFinish(userId));
+    yield (0, _effects.put)(actions.unsubscribePresenceFinish({ presentityUserId: userId }));
   } else {
     yield (0, _effects.put)(actions.unsubscribePresenceFinish(response.error));
   }
@@ -42950,6 +42952,9 @@ function subscribePresence(users) {
 }
 
 function subscribePresenceFinish(payload) {
+  if (!Array.isArray(payload.presentityUserId)) {
+    payload.presentityUserId = [payload.presentityUserId];
+  }
   return {
     type: actionTypes.SUBSCRIBE_FINISH,
     error: payload instanceof Error || payload instanceof _errors2.default,
@@ -42970,6 +42975,9 @@ function unsubscribePresence(users) {
 }
 
 function unsubscribePresenceFinish(payload) {
+  if (!Array.isArray(payload.presentityUserId)) {
+    payload.presentityUserId = [payload.presentityUserId];
+  }
   return {
     type: actionTypes.UNSUBSCRIBE_FINISH,
     error: payload instanceof Error || payload instanceof _errors2.default,
@@ -43213,6 +43221,29 @@ const log = (0, _logs.getLogManager)().getLogger('PRESENCE'); /**
                                                                * @namespace presence
                                                                */
 
+/**
+ * The PresenceStatus type defines the user's current status in terms of the user's availability to
+ * communicate/respond to other users in the network.
+ * An instance of this type can be obtained by invoking the {@link presence.get} function.
+ *
+ * Reporting when a user is on the phone is enabled (by default), which means that presence update notifications
+ * will be sent whenever a user is in a call, as well as when the call has ended.
+ * This is a user preference enabled or disabled on server side, and it can only be changed on the server side.
+ *
+ * The status is set to {@link presence.statuses open} as soon as a user subscribes for the presence service.
+ *
+ * @public
+ * @static
+ * @typedef {Object} PresenceStatus
+ * @memberof presence
+ * @property {string} userId The unique identifier for the user associated with this presence status.
+ * @property {string} status The current status the user has set for themselves. For supported values see {@link presence.statuses}.
+ * @property {string} activity The current activity of the user.
+ *      For supported values see {@link presence.activities}.
+ * @property {string} note Additional message acompanying the status & activity.
+ * @property {boolean} loading Whether the presence information has been loaded or is in the process of loading.
+ */
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/presence/interface/eventTypes.js":
@@ -43226,6 +43257,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * A presence update about a subscribed user has been received.
+ *
+ * This event is generated as a result of {@link presence.fetch} or {@link presence.update} operations.
+ *
+ * For the latter operation, the current user receives a presence update of another user that the current user is subscribed to.
+ *
+ * The changed information can be retrieved using the {@link presence.get}
+ *    API.
  *
  * @public
  * @memberof presence
@@ -43251,6 +43289,30 @@ const RECEIVED = exports.RECEIVED = 'presence:change';
  * @event presence:selfChange
  */
 const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
+
+/**
+ * An update (as a result of subscribing to a specific user's presence) has been received.
+ *
+ * @public
+ * @memberof presence
+ * @requires presence
+ * @event presence:subscribe
+ * @param {Object} params A subscription object containing data.
+ * @param {Array<string>} params.userIds The ID(s) of the user(s) whose presence needs to be watched.
+ */
+const SUBSCRIBE = exports.SUBSCRIBE = 'presence:subscribe';
+
+/**
+ * An update (as a result of unsubscribing to a specific user's presence) has been received.
+ *
+ * @public
+ * @memberof presence
+ * @requires presence
+ * @event presence:unsubscribe
+ * @param {Object} params A subscription object containing data.
+ * @param {Array<string>} params.userIds The ID(s) of the user(s) whose presence no longer requires to be watched.
+ */
+const UNSUBSCRIBE = exports.UNSUBSCRIBE = 'presence:unsubscribe';
 
 /**
  * An error occurred with presence.
@@ -43318,10 +43380,49 @@ eventsMap[actionTypes.UPDATE_FINISH] = action => {
   }
 };
 
+eventsMap[actionTypes.GET_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.RECEIVED,
+      args: {
+        userId: action.payload.userId,
+        status: action.payload.status,
+        activity: action.payload.activity,
+        note: action.payload.note
+      }
+    };
+  }
+};
+
+eventsMap[actionTypes.SUBSCRIBE_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.SUBSCRIBE,
+      args: {
+        userIds: action.payload.presentityUserId
+      }
+    };
+  }
+};
+
+eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.UNSUBSCRIBE,
+      args: {
+        userIds: action.payload.presentityUserId
+      }
+    };
+  }
+};
+
 // TODO: Should have events to notifiy of successful operations for these actions.
-eventsMap[actionTypes.GET_FINISH] = presenceError;
-eventsMap[actionTypes.SUBSCRIBE_FINISH] = presenceError;
-eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = presenceError;
 eventsMap[actionTypes.CREATE_PRESENCE_LIST_FINISH] = presenceError;
 
 exports.default = eventsMap;
@@ -43448,9 +43549,11 @@ reducers[actionTypes.GET_FINISH] = {
     for (let contact of payload.presenceContact) {
       let presenceObject = {};
       presenceObject.userId = contact.presentityUserId;
-      presenceObject.activity = contact.presence.person.activities.activityValue;
-      presenceObject.status = contact.presence.person['overriding-willingness'].overridingWillingnessValue;
-      presenceObject.note = contact.presence.person.activities.other;
+      if (contact.presence && contact.presence.person) {
+        presenceObject.activity = contact.presence.person.activities.activityValue;
+        presenceObject.status = contact.presence.person['overriding-willingness'].overridingWillingnessValue;
+        presenceObject.note = contact.presence.person.activities.other;
+      }
       presenceObject.loading = false;
       users[contact.presentityUserId] = presenceObject;
     }
@@ -43482,7 +43585,7 @@ reducers[actionTypes.RECEIVED] = {
 reducers[actionTypes.UNSUBSCRIBE_FINISH] = {
   next(state, { payload }) {
     return (0, _extends3.default)({}, state, {
-      users: (0, _fp.omit)(payload, state.users)
+      users: (0, _fp.omit)(payload.presentityUserId, state.users)
     });
   }
 };
