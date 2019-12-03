@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0-beta.209
+ * Version: 4.10.0-beta.210
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33988,7 +33988,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0-beta.209';
+  let version = '4.10.0-beta.210';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -51807,10 +51807,12 @@ function Peer(id, config = {}, trackManager) {
     _loglevel2.default.debug(`Peer's iceGatheringState changed to ${gatheringState}.`);
 
     if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
+      // This event signifies that the browser has begun ICE candidate collection.
       iceTimer.start();
-      // TODO: Handle "ICE collection taking too long" scenario.
     } else if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.COMPLETE) {
-      _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates.`);
+      // This event signifies that the browser has finished collection. This
+      //    process may been timed-out early by the SDK if it took too long.
+      _loglevel2.default.debug(`ICE candidate collection complete after ${iceTimer.timeFromStart()}ms.`);
       iceTimer.stop();
     }
     // Bubble the event up.
