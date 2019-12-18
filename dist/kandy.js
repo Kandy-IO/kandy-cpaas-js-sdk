@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.11.0-beta.232
+ * Version: 4.11.0-beta.233
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -26496,22 +26496,14 @@ var _establish = __webpack_require__("../../packages/kandy/src/callstack/webrtc/
 
 var _midcall = __webpack_require__("../../packages/kandy/src/callstack/webrtc/midcall.js");
 
-var _negotiation = __webpack_require__("../../packages/kandy/src/callstack/webrtc/negotiation.js");
-
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 // Other plugins.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
 
-// Call plugin.
+
+// Callstack plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -26536,9 +26528,15 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 
 // Libraries.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
 
-
-// Callstack plugin.
+// Call plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
 
@@ -26639,9 +26637,8 @@ function* makeCall(deps, action) {
  * Responsibilities:
  *    1. Determine whether Regular or Slow Start negotiation is to be used.
  *    2. Regular: Create an answer for the call, using the webRTC helpers.
- *    3. Regular: Remove local tracks that aren't being used for the call.
- *    4. Regular: Update the call on the server with the answer.
- *    5. Regular: Update call state (via redux actions).
+ *    3. Regular: Update the call on the server with the answer.
+ *    4. Regular: Update call state (via redux actions).
  *    2. Slow Start: Setup the call locally, using the webRTC helper saga.
  *    3. Slow Start: Update the call on the server with an offer.
  *    4. Slow Start: Update state (via redux actions).
@@ -26742,9 +26739,6 @@ function* answerCall(deps, action) {
       }));
       return;
     }
-
-    // This removes local tracks that aren't being sent to the other side.
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, incomingCall.webrtcSessionId);
 
     callInfo = {
       answer: webrtcInfo.answerSDP,
@@ -28001,9 +27995,8 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * Responsibilities:
  *    1. Determine what the remote operation was (ie. what is being offered).
  *    2. Process the offer based on remote oepration and current local state.
- *    3. Remove local tracks that aren't being used for the call.
- *    4. Respond to the request.
- *    5. Update call state (via redux action).
+ *    3. Respond to the request.
+ *    4. Update call state (via redux action).
  * @method handleUpdateRequest
  * @param {Object}   deps          Dependencies that the saga uses.
  * @param {Object}   deps.webRTC   The WebRTC stack.
@@ -28149,22 +28142,6 @@ function* handleUpdateRequest(deps, targetCall, params) {
     // TODO: Dispatch an error action to notify of the error scenario.
     // The call may now be in a bad state and needs to be fixed.
     return;
-  }
-
-  /**
-   * This removes local tracks that aren't being sent to the other side. These are being
-   *    removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - No Change - There are no changes so we don't need to remove local tracks.
-   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, webRTC, targetCall.webrtcSessionId);
   }
 
   // Send answer sdp back to remote side
@@ -28323,9 +28300,8 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  *        - Indicates that it was a regular negotiation process.
  * Responsibilities:
  *    1. Have the callstack process the answer SDP.
- *    2. Remove local tracks that aren't being used for the call.
- *    3. TODO: Determine what the original operation was.
- *    4. Update call state (via redux action).
+ *    2. TODO: Determine what the original operation was.
+ *    3. Update call state (via redux action).
  * @method handleUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -28359,22 +28335,6 @@ function* handleUpdateResponse(deps, targetCall, params) {
   }
 
   const localOp = targetCall.localOp;
-
-  /**
-   * This removes local tracks that aren't being sent to the other side.
-   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - localOp does not exist - Means that
-   *    - the call was created as part of a Join operation and so it isn't doing any operations of its own right now.
-   *    - the call was Direct Transferred to and so it isn't doing any operations of its own right now.
-   *  - Local Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (localOp && localOp.operation !== _constants2.OPERATIONS.HOLD && !(localOp.operation === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
-  }
 
   // Update call state depending on what the current call state is.
   if ([_constants.CALL_STATES.RINGING, _constants.CALL_STATES.INITIATED, _constants.CALL_STATES.EARLY_MEDIA].includes(targetCall.state)) {
@@ -28475,8 +28435,7 @@ function* handleUpdateResponse(deps, targetCall, params) {
  * Responsibilities:
  *    1. Determine what the original operation was.
  *    2. Have the callstack process the answer SDP.
- *    3. Remove local tracks that aren't being used for the call.
- *    4. Update call state (via redux action) based on original operation.
+ *    3. Update call state (via redux action) based on original operation.
  * @method handleSlowUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -28545,22 +28504,6 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
     // TODO: Dispatch an error action to notify of the error scenario.
     // The call may now be in a bad state and needs to be fixed.
     return;
-  }
-
-  /*
-   * This removes local tracks that aren't being sent to the other side.
-   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - No Change - There are no changes so we don't need to remove local tracks.
-   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
   }
 
   if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
@@ -31207,13 +31150,7 @@ function* webRtcReplaceTrack(webRTC, params) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
-
-var _keys2 = _interopRequireDefault(_keys);
-
 exports.isSameSdpSessionId = isSameSdpSessionId;
-exports.removeUnusedLocalTracks = removeUnusedLocalTracks;
 exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
@@ -31261,31 +31198,6 @@ function* isSameSdpSessionId(webRTC, sessionId, sdp) {
     const sameId = yield (0, _effects.call)(_sdp.hasSameSessionId, currentDesc.sdp, sdp);
     return sameId;
   }
-}
-
-/**
- * Removes local tracks that are not being sent to the other side.
- * This is meant to be called when a remote sdp has been processed.
- * @method removeUnusedLocalTracks
- * @param  {Object}  webRTC    The webRTC stack.
- * @param  {string}  sessionId ID of the Session under question.
- */
-function* removeUnusedLocalTracks(webRTC, sessionId) {
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
-  const localTracksIsSending = yield (0, _effects.call)([session, 'getLocalTracksIsSendingStatus']);
-
-  // Only get the track ids where the track is not sending.
-  const trackIdsToRemove = (0, _keys2.default)(localTracksIsSending).filter(localTrackId => !localTracksIsSending[localTrackId]);
-  const tracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIdsToRemove);
-  log.debug(`Tracks to be removed due to not being actively used for the call: ${trackIdsToRemove}`);
-
-  // Removes tracks from peer (Will stop tracks from being sent to remote participant).
-  // Does NOT end the tracks.
-  yield (0, _effects.call)([session, 'removeTracks'], trackIdsToRemove);
-
-  // Ends the tracks.
-  // Clean-up the local tracks.
-  yield (0, _effects.all)(tracksToRemove.map(track => (0, _effects.call)([track, 'cleanup'])));
 }
 
 /**
@@ -34260,7 +34172,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.11.0-beta.232';
+  let version = '4.11.0-beta.233';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -54106,10 +54018,6 @@ var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
-var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
-
-var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -54121,7 +54029,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// SDP Helpers.
+// Libraries.
+// Helpers.
 function Session(id, managers, config = {}) {
   // Internal variables.
   const sessionId = id;
@@ -54422,76 +54331,6 @@ function Session(id, managers, config = {}) {
     }
   }
 
-  /**
-   * This function is used to figure out if our local tracks are being sent to the other side.
-   * This is meant to be called after a remote sdp is processed so that:
-   *  a. Transceivers are up-to-date.
-   *  b. The latestRemoteDescription is really the latest one.
-   * @method getLocalTracksIsSendingStatus
-   * @return {TracksIsSendingStatuses}
-   */
-  function getLocalTracksIsSendingStatus() {
-    /**
-     * An object with flags indicating whether a track is sending data or not where:
-     *  key: <string> track ID
-     *  value: <boolean> isSending.
-     * @typedef {Object} TracksIsSendingStatuses
-     */
-    const tracksIsSending = {};
-
-    /**
-     * For Unified-plan, we consider a track to being sent if
-     *  currentDirection is NOT `inactive` and NOT `recvonly`.
-     * IE: Tracks are being sent if
-     *  currentDirection is `sendrecv` or `sendonly` (both contain `send`).
-     */
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
-      const transceivers = peer.getTransceivers()
-      // Only check transceivers that have tracks.
-      .filter(transceiver => Boolean(transceiver.sender && transceiver.sender.track));
-
-      transceivers.forEach(transceiver => {
-        if (transceiver.sender.track && transceiver.currentDirection) {
-          tracksIsSending[transceiver.sender.track.id] = transceiver.currentDirection.includes('send');
-        } else {
-          // If `currentDirection` doesn't exist yet then use `direction`.
-          // This is because if the remote sdp didn't have a certain kind of media and we add that new kind of media,
-          //  the transceiver will have `currentDirection` as null.
-          tracksIsSending[transceiver.sender.track.id] = transceiver.direction.includes('send');
-        }
-      });
-    } else {
-      /**
-       * For Plan-B, we check the remote sdp and consider a track be sent if
-       *  direction is NOT `inactive` and NOT `sendonly`.
-       * IE: Tracks are being sent if
-       *  direction is `sendrecv` or `recvonly` (both contain `recv`).
-       */
-      const sdpObj = _sdpTransform2.default.parse(latestRemoteDescription.sdp);
-
-      /**
-       * Get the direction of each kind of media.
-       * For plan-b, there are is only 1 m-line for audio and 1 m-line for video.
-       * This means that tracks of the same kind will share the same direction.
-       */
-      const directions = {};
-      sdpObj.media.forEach(media => {
-        const { type, direction } = media;
-        directions[type] = direction;
-      });
-      peer.localTracks.forEach(track => {
-        const nativeTrack = track.track;
-        // If the track's kind isn't on the latest remote sdp, that means it may be supported
-        //  (since it doesn't explicitly have direction of `inactive`).
-        if (directions[nativeTrack.kind] === undefined) {
-          tracksIsSending[nativeTrack.id] = true;
-        } else {
-          tracksIsSending[nativeTrack.id] = directions[nativeTrack.kind].includes('recv');
-        }
-      });
-    }
-    return tracksIsSending;
-  }
   /**
    * Processes (and sets) a remote SDP offer.
    * @method processOffer
@@ -54870,7 +54709,6 @@ function Session(id, managers, config = {}) {
     processOffer,
     generateAnswer,
     processAnswer,
-    getLocalTracksIsSendingStatus,
     // Other APIs.
     recreatePeer,
     addIceCandidate,
@@ -54884,8 +54722,7 @@ function Session(id, managers, config = {}) {
   };
 }
 
-// Libraries.
-// Helpers.
+// SDP Helpers.
 
 /***/ }),
 

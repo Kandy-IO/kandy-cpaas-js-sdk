@@ -18,6 +18,8 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed SMS-related requests to use destination address coming from smsinbound subscription instead of global configuration object. `KAA-2060`
+- Fixed a Call issue where some slow-start midcall operations (eg. transfer, unhold) would fail. `KAA-2110`
+  - This fix re-introduces a previous issue fixed in v4.9.0: `KAA-1890`.
 - Fixed an issue where call was failing when the user(caller) has no user@domain format. `KAA-2131`
 
 ## 4.10.0 - 2019-11-29
