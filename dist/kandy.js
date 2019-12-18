@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.11.0-beta.231
+ * Version: 4.11.0-beta.232
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -96,7 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "../../packages/kandy/src/index.cpaas.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -20292,42 +20292,6 @@ function getRequestInfo(state, platform) {
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/basePlugins.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
-
-var _logs2 = _interopRequireDefault(_logs);
-
-var _config = __webpack_require__("../../packages/kandy/src/config/index.js");
-
-var _config2 = _interopRequireDefault(_config);
-
-var _events = __webpack_require__("../../packages/kandy/src/events/index.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
-
-var _request2 = _interopRequireDefault(_request);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
- * to the SDK.
- */
-exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
-
-/***/ }),
-
 /***/ "../../packages/kandy/src/call/constants.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -34296,7 +34260,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.11.0-beta.231';
+  let version = '4.11.0-beta.232';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -36624,206 +36588,6 @@ function marshallGroup(groupNotification) {
   const groupId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
   return { name, participants, subject, groupId, image };
 }
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/index.common.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = commonIndex;
-
-var _factory = __webpack_require__("../../packages/kandy/src/factory.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-// This is a hack to fix an issue where Lodash will add itself to
-// the window scope even if it's loaded via ES6. You can remove this when
-// we have an answer to https://github.com/lodash/lodash/issues/1798 .
-// eslint-disable-next-line
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
-/**
- * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
- * The SDK instance will be refered as 'api' throughout the rest of the documentation content.
- * @public
- * @method create
- * @param {config} config The configuration object.
- * @return {api} The SDK instance.
- * @example
- * // Instantiate the SDK.
- * import { create } from 'kandy'
- * const client = create({
- *     authentication: { ... },
- *     logs: { ... },
- *     ...
- * });
- * // Use the SDK's API.
- * client.on( ... );
- */
-
-/**
- * The 'api' is the type returned by the create function.
- * It contains various top-level functions that pertain to SDK global instance
- * as well as several nested namespaces that pertain to various features (e.g. call, contacts, presence, etc).
- *
- * @public
- * @module api
- */
-
-/**
- * The configuration object. This object defines what different configuration
- * values you can use when instantiating the SDK using the {@link create} function.
- * @public
- * @module config
- */
-
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
-/**
- * A set of {@link call.SdpHandlerFunction SdpHandlerFunction}s for manipulating SDP information.
- * These handlers are used to customize low-level call behaviour for very specific
- * environments and/or scenarios. They can be provided during SDK instantiation
- * to be used for all calls.
- *
- * @public
- * @namespace sdpHandlers
- * @example
- * import { create, sdpHandlers } from 'kandy';
- * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
- * const client = create({
- *   call: {
- *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
- *   }
- * })
- */
-
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
-/**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
- * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
- *
- * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
- *
- * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
- *
- * @public
- * @memberof sdpHandlers
- * @method createCodecRemover
- * @param {Array<string>} codecs A list of codec names to remove from the SDP.
- * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
- * @example
- * import { create, sdpHandlers } from 'kandy';
- * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
- * const client = create({
- *   call: {
- *     sdpHandlers: [codecRemover]
- *   }
- * })
- *
- */
-
-/*
- * Index template file that is used to create pre-defined version of the SDK.
- */
-if (_fp._) _fp._.noConflict();
-
-function commonIndex(options = {}, plugins = []) {
-  const pluginInstances = (0, _fp.map)(function (plugin) {
-    return plugin.fn(options[plugin.name]);
-  }, plugins);
-
-  return (0, _factory.factory)(pluginInstances, options.common);
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/index.cpaas.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _index = __webpack_require__("../../packages/kandy/src/index.common.js");
-
-var _index2 = _interopRequireDefault(_index);
-
-var _basePlugins = __webpack_require__("../../packages/kandy/src/basePlugins.js");
-
-var _basePlugins2 = _interopRequireDefault(_basePlugins);
-
-var _cpaas = __webpack_require__("../../packages/kandy/src/auth/cpaas/index.js");
-
-var _cpaas2 = _interopRequireDefault(_cpaas);
-
-var _webrtc = __webpack_require__("../../packages/kandy/src/webrtc/index.js");
-
-var _webrtc2 = _interopRequireDefault(_webrtc);
-
-var _cpaas3 = __webpack_require__("../../packages/kandy/src/call/cpaas/index.js");
-
-var _cpaas4 = _interopRequireDefault(_cpaas3);
-
-var _cpaas5 = __webpack_require__("../../packages/kandy/src/connectivity/cpaas/index.js");
-
-var _cpaas6 = _interopRequireDefault(_cpaas5);
-
-var _cpaas7 = __webpack_require__("../../packages/kandy/src/messaging/cpaas/index.js");
-
-var _cpaas8 = _interopRequireDefault(_cpaas7);
-
-var _cpaas9 = __webpack_require__("../../packages/kandy/src/notifications/cpaas/index.js");
-
-var _cpaas10 = _interopRequireDefault(_cpaas9);
-
-var _cpaas11 = __webpack_require__("../../packages/kandy/src/presence/cpaas/index.js");
-
-var _cpaas12 = _interopRequireDefault(_cpaas11);
-
-var _cpaas13 = __webpack_require__("../../packages/kandy/src/groups/cpaas/index.js");
-
-var _cpaas14 = _interopRequireDefault(_cpaas13);
-
-var _cpaas15 = __webpack_require__("../../packages/kandy/src/subscription/cpaas/index.js");
-
-var _cpaas16 = _interopRequireDefault(_cpaas15);
-
-var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
-
-var _codecRemover2 = _interopRequireDefault(_codecRemover);
-
-var _cpaas17 = __webpack_require__("../../packages/kandy/src/users/cpaas/index.js");
-
-var _cpaas18 = _interopRequireDefault(_cpaas17);
-
-__webpack_require__("../../packages/kandy/src/docs/docs.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
-
-// Plugins
-
-
-function root(options = {}, plugins = []) {
-  return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
-}
-
-// Alias 'create' to be equal to the root function
-root.create = root;
-
-root.sdpHandlers = {
-  createCodecRemover: _codecRemover2.default
-
-  // Export this way as a work-around, so it can be used as `<export>();`.
-  // See: https://github.com/webpack/webpack/issues/706
-};module.exports = root;
 
 /***/ }),
 
@@ -55881,6 +55645,242 @@ function makeSafeForCSS(name) {
     return name.replace(/[^a-z0-9]/g, '');
   }
 }
+
+/***/ }),
+
+/***/ "../core/basePlugins.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _logs2 = _interopRequireDefault(_logs);
+
+var _config = __webpack_require__("../../packages/kandy/src/config/index.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _events = __webpack_require__("../../packages/kandy/src/events/index.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
+
+var _request2 = _interopRequireDefault(_request);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
+ * to the SDK.
+ */
+exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
+
+/***/ }),
+
+/***/ "../core/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = commonIndex;
+
+var _factory = __webpack_require__("../../packages/kandy/src/factory.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+// This is a hack to fix an issue where Lodash will add itself to
+// the window scope even if it's loaded via ES6. You can remove this when
+// we have an answer to https://github.com/lodash/lodash/issues/1798 .
+// eslint-disable-next-line
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
+ * The SDK instance will be refered as 'api' throughout the rest of the documentation content.
+ * @public
+ * @method create
+ * @param {config} config The configuration object.
+ * @return {api} The SDK instance.
+ * @example
+ * // Instantiate the SDK.
+ * import { create } from 'kandy'
+ * const client = create({
+ *     authentication: { ... },
+ *     logs: { ... },
+ *     ...
+ * });
+ * // Use the SDK's API.
+ * client.on( ... );
+ */
+
+/**
+ * The 'api' is the type returned by the create function.
+ * It contains various top-level functions that pertain to SDK global instance
+ * as well as several nested namespaces that pertain to various features (e.g. call, contacts, presence, etc).
+ *
+ * @public
+ * @module api
+ */
+
+/**
+ * The configuration object. This object defines what different configuration
+ * values you can use when instantiating the SDK using the {@link create} function.
+ * @public
+ * @module config
+ */
+
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * A set of {@link call.SdpHandlerFunction SdpHandlerFunction}s for manipulating SDP information.
+ * These handlers are used to customize low-level call behaviour for very specific
+ * environments and/or scenarios. They can be provided during SDK instantiation
+ * to be used for all calls.
+ *
+ * @public
+ * @namespace sdpHandlers
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
+ *   }
+ * })
+ */
+
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+ * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+ *
+ * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
+ *
+ * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+ *
+ * @public
+ * @memberof sdpHandlers
+ * @method createCodecRemover
+ * @param {Array<string>} codecs A list of codec names to remove from the SDP.
+ * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [codecRemover]
+ *   }
+ * })
+ *
+ */
+
+/*
+ * Index template file that is used to create pre-defined version of the SDK.
+ */
+if (_fp._) _fp._.noConflict();
+
+function commonIndex(options = {}, plugins = []) {
+  const pluginInstances = (0, _fp.map)(function (plugin) {
+    return plugin.fn(options[plugin.name]);
+  }, plugins);
+
+  return (0, _factory.factory)(pluginInstances, options.common);
+}
+
+/***/ }),
+
+/***/ "./index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _core = __webpack_require__("../core/index.js");
+
+var _core2 = _interopRequireDefault(_core);
+
+var _basePlugins = __webpack_require__("../core/basePlugins.js");
+
+var _basePlugins2 = _interopRequireDefault(_basePlugins);
+
+var _cpaas = __webpack_require__("../../packages/kandy/src/auth/cpaas/index.js");
+
+var _cpaas2 = _interopRequireDefault(_cpaas);
+
+var _webrtc = __webpack_require__("../../packages/kandy/src/webrtc/index.js");
+
+var _webrtc2 = _interopRequireDefault(_webrtc);
+
+var _cpaas3 = __webpack_require__("../../packages/kandy/src/call/cpaas/index.js");
+
+var _cpaas4 = _interopRequireDefault(_cpaas3);
+
+var _cpaas5 = __webpack_require__("../../packages/kandy/src/connectivity/cpaas/index.js");
+
+var _cpaas6 = _interopRequireDefault(_cpaas5);
+
+var _cpaas7 = __webpack_require__("../../packages/kandy/src/messaging/cpaas/index.js");
+
+var _cpaas8 = _interopRequireDefault(_cpaas7);
+
+var _cpaas9 = __webpack_require__("../../packages/kandy/src/notifications/cpaas/index.js");
+
+var _cpaas10 = _interopRequireDefault(_cpaas9);
+
+var _cpaas11 = __webpack_require__("../../packages/kandy/src/presence/cpaas/index.js");
+
+var _cpaas12 = _interopRequireDefault(_cpaas11);
+
+var _cpaas13 = __webpack_require__("../../packages/kandy/src/groups/cpaas/index.js");
+
+var _cpaas14 = _interopRequireDefault(_cpaas13);
+
+var _cpaas15 = __webpack_require__("../../packages/kandy/src/subscription/cpaas/index.js");
+
+var _cpaas16 = _interopRequireDefault(_cpaas15);
+
+var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
+
+var _codecRemover2 = _interopRequireDefault(_codecRemover);
+
+var _cpaas17 = __webpack_require__("../../packages/kandy/src/users/cpaas/index.js");
+
+var _cpaas18 = _interopRequireDefault(_cpaas17);
+
+__webpack_require__("../../packages/kandy/src/docs/docs.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
+
+// Plugins
+
+
+function root(options = {}, plugins = []) {
+  return (0, _core2.default)(options, [...defaultPlugins, ...plugins]);
+}
+
+// Alias 'create' to be equal to the root function
+root.create = root;
+
+root.sdpHandlers = {
+  createCodecRemover: _codecRemover2.default
+
+  // Export this way as a work-around, so it can be used as `<export>();`.
+  // See: https://github.com/webpack/webpack/issues/706
+};module.exports = root;
 
 /***/ })
 
