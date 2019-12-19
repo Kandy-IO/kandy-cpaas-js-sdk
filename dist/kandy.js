@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.11.0-beta.234
+ * Version: 4.11.0-beta.235
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21158,6 +21158,8 @@ exports.addMediaEntry = addMediaEntry;
 exports.removeMediaEntry = removeMediaEntry;
 exports.addBasicMediaEntry = addBasicMediaEntry;
 exports.removeBasicMediaEntry = removeBasicMediaEntry;
+exports.checkRenegotiationFlagEntry = checkRenegotiationFlagEntry;
+exports.renegotiationEntry = renegotiationEntry;
 exports.sendDTMFEntry = sendDTMFEntry;
 exports.incomingCallNotification = incomingCallNotification;
 exports.callAcceptedNotification = callAcceptedNotification;
@@ -21184,6 +21186,10 @@ var _actionTypes = __webpack_require__("../../packages/kandy/src/call/interfaceN
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
+var _actionTypes2 = __webpack_require__("../../packages/kandy/src/webrtc/interface/actionTypes.js");
+
+var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
+
 var _calls = __webpack_require__("../../packages/kandy/src/call/cpaas/requests/calls.js");
 
 var requests = _interopRequireWildcard(_calls);
@@ -21204,9 +21210,9 @@ var _support2 = __webpack_require__("../../packages/kandy/src/callstack/call/sup
 
 var _effects = __webpack_require__("../../packages/kandy/src/subscription/interface/effects.js");
 
-var _actionTypes2 = __webpack_require__("../../packages/kandy/src/subscription/interface/actionTypes.js");
+var _actionTypes3 = __webpack_require__("../../packages/kandy/src/subscription/interface/actionTypes.js");
 
-var _actionTypes3 = __webpack_require__("../../packages/kandy/src/notifications/interface/actionTypes.js");
+var _actionTypes4 = __webpack_require__("../../packages/kandy/src/notifications/interface/actionTypes.js");
 
 var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
@@ -21221,6 +21227,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Other plugins.
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// Call plugin.
 function* registerCall() {
   yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
 }
@@ -21242,12 +21254,6 @@ function* registerCall() {
 
 
 // Callstack plugin.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
-
-// Call plugin.
 function* createCall(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, (0, _extends3.default)({}, deps, { requests }));
 }
@@ -21347,6 +21353,28 @@ function* removeBasicMediaEntry(deps) {
 }
 
 /**
+ * Check if renegotiation is needed.
+ * @method checkRenegotiationFlagEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* checkRenegotiationFlagEntry(deps) {
+  yield (0, _effects2.takeEvery)(webrtcActionTypes.SESSION_TRACK_ENDED, midcallSagas.checkRenegotiationFlag, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Peform a call renegotitation.
+ * @method renegotiationEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* renegotiationEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.RENEGOTIATE, midcallSagas.renegotiate, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
  * Send DTMF tones for a call.
  * @method sendDTMF
  * @param {Object} deps             Dependencies to be injected.
@@ -21405,7 +21433,7 @@ function* incomingCallNotification(deps) {
 
   // Redux-saga take() pattern.
   function incomingCallPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
   }
   yield (0, _effects2.takeEvery)(incomingCallPattern, cpaasIncomingCall);
 }
@@ -21438,7 +21466,7 @@ function* callAcceptedNotification(deps) {
 
   // Redux-saga take() pattern.
   function callAcceptedPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
   }
 
   yield (0, _effects2.takeEvery)(callAcceptedPattern, parseAcceptedNotification);
@@ -21452,7 +21480,7 @@ function* callAcceptedNotification(deps) {
 function* callStatusNotification(deps) {
   function statusUpdatePattern(status) {
     return function statusPattern(action) {
-      return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
+      return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
     };
   }
 
@@ -21545,7 +21573,7 @@ function* callOfferNotification(deps) {
 
   // Redux-saga take() pattern.
   function callOfferPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
   }
 
   yield (0, _effects2.takeEvery)(callOfferPattern, parseOfferNotification);
@@ -21579,7 +21607,7 @@ function* callAnswerNotification(deps) {
 
   // Redux-saga take() pattern.
   function callAnswerPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
   }
 
   yield (0, _effects2.takeEvery)(callAnswerPattern, parseAnswerNotification);
@@ -21639,7 +21667,7 @@ function* getStatsEntry(deps) {
  */
 function* setTurnCredentials() {
   function callSubscribePattern(action) {
-    return action.type === _actionTypes2.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === 'call' && !action.error;
+    return action.type === _actionTypes3.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === 'call' && !action.error;
   }
 
   yield (0, _effects2.takeEvery)(callSubscribePattern, supportSagas.setTurnCredentials);
@@ -22114,6 +22142,9 @@ const REMOVE_MEDIA = exports.REMOVE_MEDIA = callPrefix + 'REMOVE_MEDIA';
 const REMOVE_MEDIA_FINISH = exports.REMOVE_MEDIA_FINISH = callPrefix + 'REMOVE_MEDIA_FINISH';
 const REMOVE_BASIC_MEDIA = exports.REMOVE_BASIC_MEDIA = callPrefix + 'REMOVE_BASIC_MEDIA';
 
+const RENEGOTIATE = exports.RENEGOTIATE = callPrefix + 'RENEGOTIATE';
+const RENEGOTIATE_FINISH = exports.RENEGOTIATE_FINISH = callPrefix + 'RENEGOTIATE_FINISH';
+
 const MUSIC_ON_HOLD = exports.MUSIC_ON_HOLD = callPrefix + 'MUSIC_ON_HOLD';
 
 const SEND_DTMF = exports.SEND_DTMF = callPrefix + 'SEND_DTMF';
@@ -22211,6 +22242,8 @@ exports.addBasicMedia = addBasicMedia;
 exports.removeMedia = removeMedia;
 exports.removeMediaFinish = removeMediaFinish;
 exports.removeBasicMedia = removeBasicMedia;
+exports.renegotiate = renegotiate;
+exports.renegotiateFinish = renegotiateFinish;
 exports.sendDTMF = sendDTMF;
 exports.sendDTMFFinish = sendDTMFFinish;
 exports.getStats = getStats;
@@ -22424,6 +22457,14 @@ function removeMediaFinish(id, params) {
 
 function removeBasicMedia(id, params) {
   return callActionHelper(actionTypes.REMOVE_BASIC_MEDIA, id, params);
+}
+
+function renegotiate(id, params) {
+  return callActionHelper(actionTypes.RENEGOTIATE, id, params);
+}
+
+function renegotiateFinish(id, params) {
+  return callActionHelper(actionTypes.RENEGOTIATE_FINISH, id, params);
 }
 
 function sendDTMF(id, params) {
@@ -24094,6 +24135,7 @@ const OPERATIONS = exports.OPERATIONS = {
   ADD_BASIC_MEDIA: 'ADD_BASIC_MEDIA',
   REMOVE_MEDIA: 'REMOVE_MEDIA',
   REMOVE_BASIC_MEDIA: 'REMOVE_BASIC_MEDIA',
+  RENEGOTIATE: 'RENEGOTIATE',
   GET_STATS: 'GET_STATS',
   SEND_DTMF: 'SEND_DTMF',
   CONSULTATIVE_TRANSFER: 'CONSULTATIVE_TRANSFER',
@@ -24496,7 +24538,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -24622,6 +24664,22 @@ callEvents[actionTypes.REMOVE_MEDIA_FINISH] = (action, params) => {
     isLocal: action.payload.local
   })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
     local: action.payload.local,
+    tracks: action.payload.tracks,
+    error: action.payload.error
+  })];
+};
+
+/*
+ * Currently the RENEGOTIATE operation is only triggered after an unsolicted removal of media,
+ *  hence the CALL_REMOVED_MEDIA event handler is used
+ */
+callEvents[actionTypes.RENEGOTIATE_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.RENEGOTIATE,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: action.payload.local
+  })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
+    loca: action.payload.local,
     tracks: action.payload.tracks,
     error: action.payload.error
   })];
@@ -24914,6 +24972,7 @@ callReducers[actionTypes.ADD_MEDIA] = noop;
 callReducers[actionTypes.REMOVE_MEDIA] = noop;
 callReducers[actionTypes.ADD_BASIC_MEDIA] = noop;
 callReducers[actionTypes.REMOVE_BASIC_MEDIA] = noop;
+callReducers[actionTypes.RENEGOTIATE] = noop;
 callReducers[actionTypes.FORWARD_CALL] = noop;
 callReducers[actionTypes.REJECT_CALL] = noop;
 callReducers[actionTypes.SEND_DTMF] = noop;
@@ -25264,6 +25323,14 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
   }
 };
 
+callReducers[actionTypes.RENEGOTIATE_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      bandwidth: action.payload.bandwidth
+    });
+  }
+};
+
 /*
  * Combine all of the call-tier reducers into a single reducer,
  *      each with a default state of empty object.
@@ -25271,7 +25338,7 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 /*
  * Reducer to handle specific call actions.
@@ -26949,6 +27016,8 @@ exports.sendCustomParameters = sendCustomParameters;
 exports.getStats = getStats;
 exports.addMedia = addMedia;
 exports.removeMedia = removeMedia;
+exports.checkRenegotiationFlag = checkRenegotiationFlag;
+exports.renegotiate = renegotiate;
 exports.addBasicMedia = addBasicMedia;
 exports.removeBasicMedia = removeBasicMedia;
 exports.directTransfer = directTransfer;
@@ -27532,6 +27601,123 @@ function* removeMedia(deps, action) {
         local: true,
         tracks: tracks,
         bandwidth: finalBandwidth
+      }
+    }));
+  }
+}
+
+/**
+ *
+ * Checks whether a renegotiation is necessary depending on the flag
+ *
+ * Responsibilities:
+ *    1. If renegotiation is necessary, dispatch a call action to start the renegotiation operaetion
+ * @method renegotiate
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   action An action of type `SESSION_TRACK_ENDED`.
+ * @param {Object}   action.payload The action's payload.
+ * @param {string}   action.payload.id The webRTC session ID.
+ * @param {string}   action.payload.trackId The ID of the track that was ended.
+ * @param {boolean}  action.payload.performRenegotiation A flag that determines whether renegotiation is necessary.
+ */
+function* checkRenegotiationFlag(deps, action) {
+  const { id, trackId, performRenegotiation } = action.payload;
+
+  // This saga could be triggered by the removeMedia API or by a remote notification of a track being removed.
+  // (since it picks up on the SESSION_TRACK_REMOVED action).
+  // In these scenario this flag will be set to `false` as the saga that handles these scenarios will perform the renegotiation itself.
+  if (performRenegotiation) {
+    log.debug('Renegotiation is needed.');
+    const { id: callId } = yield (0, _effects.select)(_selectors.getCallByWebrtcSessionId, id);
+    yield (0, _effects.put)(_actions.callActions.renegotiate(callId, {
+      trackId
+    }));
+  }
+}
+
+/**
+ *
+ * Performs a call renegotiation
+ *
+ * This saga handles creating the new SDP offer and performs the signalling for renegotiation.
+ * Assumptions:
+ *    2. The call is in the 'Connected' state
+ * Responsibilities:
+ *    1. Perform the signaling to tell the server that we are renegotiating
+ *    2. Update call state (via redux actions).
+ * @method renegotiate
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
+ * @param {Object}   action An action of type `RENEGOTIATE`.
+ */
+function* renegotiate(deps, action) {
+  const requests = deps.requests;
+  const { id, trackId } = action.payload;
+
+  // Get some call data.
+  const {
+    id: callId,
+    webrtcSessionId,
+    wrtcsSessionId,
+    bandwidth,
+    isAnonymous,
+    account,
+    localOp,
+    customParameters
+  } = yield (0, _effects.select)(_selectors.getCallById, id);
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, callId, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state:  ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      stateError
+    }));
+    return;
+  }
+
+  // Update media and tracks using webRTC
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, deps, webrtcSessionId, {}, bandwidth);
+  if (!offer) {
+    log.debug('Failed to generate offer.');
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_OFFER,
+        message: 'Failed to generate SDP offer'
+      })
+    }));
+    return;
+  }
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: offer.sdp,
+    isAnonymous,
+    account,
+    customParameters
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send renegotiation offer.');
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent renegotiation offer.');
+    yield (0, _effects.put)(_actions.callActions.pendingOperation(callId, {
+      operation: localOp.operation,
+      operationData: {
+        local: true,
+        tracks: [trackId],
+        bandwidth
       }
     }));
   }
@@ -28394,6 +28580,9 @@ function* handleUpdateResponse(deps, targetCall, params) {
           break;
         case _constants2.OPERATIONS.REMOVE_MEDIA:
           finishAction = _actions.callActions.removeMediaFinish;
+          break;
+        case _constants2.OPERATIONS.RENEGOTIATE:
+          finishAction = _actions.callActions.renegotiateFinish;
           break;
       }
       if (finishAction) {
@@ -34172,7 +34361,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.11.0-beta.234';
+  let version = '4.11.0-beta.235';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -48803,7 +48992,7 @@ function setListeners(session, emit, END = 'END') {
     }));
   };
 
-  const trackEnded = ({ local, trackId }) => {
+  const trackEnded = ({ local, trackId, performRenegotiation }) => {
     /**
      * When a track has ended,
      * update redux state's webrtc.session.localTracks/remoteTracks array
@@ -48812,7 +49001,8 @@ function setListeners(session, emit, END = 'END') {
      */
     emit(_actions.sessionActions.sessionTrackEnded(session.id, {
       local,
-      trackId
+      trackId,
+      performRenegotiation
     }));
   };
 
@@ -51842,7 +52032,8 @@ function getState() {
     localDesc: proxyPeer.localDescription,
     signalingState: proxyPeer.signalingState,
     localTracks: proxyPeer.localTracks,
-    remoteTracks: proxyPeer.remoteTracks
+    remoteTracks: proxyPeer.remoteTracks,
+    senderTracks: proxyPeer.senderTracks
   };
 }
 
@@ -52019,7 +52210,7 @@ function removeTrack(trackId) {
   const { nativePeer, proxyPeer, id } = this;
   _loglevel2.default.info(`Peer ${id} removing track ${trackId}.`);
 
-  const track = proxyPeer.localTracks.find(track => track.id === trackId);
+  const track = proxyPeer.senderTracks.find(track => track.id === trackId);
   if (!track) {
     _loglevel2.default.debug(`Invalid track ID ${trackId}; cannot remove track.`);
     return;
@@ -52467,9 +52658,13 @@ var _remoteTracks = __webpack_require__("../../packages/webrtc/src/Peer/properti
 
 var _remoteTracks2 = _interopRequireDefault(_remoteTracks);
 
+var _senderTracks = __webpack_require__("../../packages/webrtc/src/Peer/properties/senderTracks.js");
+
+var _senderTracks2 = _interopRequireDefault(_senderTracks);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = { localDescription: _localDescription2.default, localTracks: _localTracks2.default, remoteDescription: _remoteDescription2.default, remoteTracks: _remoteTracks2.default };
+exports.default = { localDescription: _localDescription2.default, localTracks: _localTracks2.default, remoteDescription: _remoteDescription2.default, remoteTracks: _remoteTracks2.default, senderTracks: _senderTracks2.default };
 
 /***/ }),
 
@@ -52641,6 +52836,49 @@ function getRemoteTracks() {
     // It's possble that Peer has the receiver but not the actual track yet.
     return track && track.getState().state === 'live' && track.getStream().active;
   });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/senderTracks.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = senderTracks;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This method is similar to the `localTracks` method, however this method returns
+ *  all of the sender's tracks (ended or not) rather than just the active/live ones.
+ *
+ * @method senderTracks
+ * @return {Array} List of Track objects added to the Peer locally.
+ */
+function senderTracks() {
+  const { proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} getting sender tracks.`);
+
+  // Return the list of Tracks from senders.
+  return proxyPeer.getSenders()
+  /**
+   * Remove any Senders that do not have an associated track.
+   * We only want to retrieve Senders that do have tracks, because those are
+   *    the local tracks that have been added to the Peer.
+   * Senders without tracks are part of a Transceiver where the Receiver has
+   *    a remote track, but no local track has been added to it. We don't
+   *    care about this for the "get local tracks" operation.
+   */
+  .filter(sender => Boolean(sender.track)).map(sender => sender.track);
 }
 
 /***/ }),
@@ -53703,7 +53941,7 @@ function TrackManager() {
    * @param  {string} trackId
    * @return {Boolean} Whether the Track existed (and hence removed).
    */
-  function remove(trackId) {
+  function remove({ trackId }) {
     const track = get(trackId);
     if (track) {
       tracks.delete(trackId);
@@ -54178,14 +54416,15 @@ function Session(id, managers, config = {}) {
             });
           }
 
-          track.once('ended', () => {
+          track.once('ended', ({ performRenegotiation }) => {
             // If the PeerConnection is closed, we don't need to worry about
             //    removing the track (and it would throw an error anyway).
             if (peer.signalingState !== 'closed') {
               peer.removeTrack(track.id);
               emitter.emit('track:ended', {
                 local: true,
-                trackId: track.id
+                trackId: track.id,
+                performRenegotiation: performRenegotiation
               });
             }
           });
@@ -54625,7 +54864,9 @@ function Session(id, managers, config = {}) {
       track.once('ended', () => {
         emitter.emit('track:ended', {
           local: false,
-          trackId: track.id
+          trackId: track.id,
+          // If a remote track is ended, we don't want to manually perform a renegotiation
+          performRenegotiation: false
         });
       });
 
@@ -54769,7 +55010,17 @@ function Track(mediaTrack, mediaStream) {
    */
   track.onended = event => {
     _loglevel2.default.debug('Event emitted: ', event);
-    emitter.emit('ended', track.id);
+    emitter.emit('ended', {
+      trackId: track.id,
+      // If the event is defined:
+      //   The event is triggered either from a remote notification or browser action.
+      //   In case of browser action (e.g. "Stop sharing" screenshare on chrome), SDK will (eventually) receive a SESSION_TRACK_REMOVED action.
+      //   This action is dispatched when the session picks up on this ended event and triggers a 'track:ended' event.
+      //   When dispatching this action, we need to tell the SDK to perform renegotiation (but for browser actions only)
+      // If the event is undefined:
+      //   `track.onended` is manually triggered and the saga that eventually triggered this function will handle the renegotiation itself.
+      performRenegotiation: !!event
+    });
   };
 
   function setStream(newStream) {
