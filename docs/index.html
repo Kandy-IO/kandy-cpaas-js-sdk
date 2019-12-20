@@ -1,0 +1,485 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>kandy 4.11.0 | Documentation</title>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='assets/bass.css' type='text/css' rel='stylesheet' />
+  <link href='assets/style.css' type='text/css' rel='stylesheet' />
+  <link href='assets/github.css' type='text/css' rel='stylesheet' />
+  <link href='assets/split.css' type='text/css' rel='stylesheet' />
+</head>
+<body class='documentation m0'>
+    <div class='flex'>
+      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
+        <div class='py1 px2'>
+          <h3 class='mb0 no-anchor'>kandy</h3>
+          <div class='mb1'><code>4.11.0</code></div>
+          <input
+            placeholder='Filter'
+            id='filter-input'
+            class='col12 block input'
+            type='text' />
+          <div id='toc'>
+            <ul class='list-reset h5 py1-ul'>
+              
+
+                <li>
+
+                  
+                      <div style="color:black;font-size:14px;font-weight:bold;">Functions</div> 
+                  
+                    <span style="color:green">ⓕ</span>
+                  
+                <a
+                  href='#create'
+                  class="
+                     
+                     
+                  ">
+                  
+                  
+                    create
+                  
+                  
+                </a>
+                
+                </li>
+              
+
+                <li>
+
+                  
+                      <div style="color:black;font-size:14px;font-weight:bold;">Types</div> 
+                  
+                    <span style="color:blue">ⓣ</span>
+                  
+                <a
+                  href='#config'
+                  class="
+                     
+                     
+                  ">
+                  
+                  
+                    config
+                  
+                  
+                </a>
+                
+                </li>
+              
+
+                <li>
+
+                  
+                    <span style="color:blue">ⓣ</span>
+                  
+                <a
+                  href='#api'
+                  class="
+                     
+                     
+                  ">
+                  
+                  
+                    api
+                  
+                  
+                </a>
+                
+                </li>
+              
+
+              <div style="color:black;font-size:14px;font-weight:bold;">Extras</div> 
+              
+                 <li>
+                  <span style="color:magenta">ⓝ</span>
+                  <a
+                   href='#sdphandlers'
+                   class="
+                     
+                      
+                        toggle-sibling
+                     
+                   ">
+                  
+                    sdpHandlers
+                   
+                     <span class='icon'>▸</span>
+                   
+                  </a>
+                
+                  <div class='toggle-target display-none'>
+                   
+                    <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Functions</span></li>
+                    
+                      <li><a
+                        href='#sdphandlerscreatecodecremover'
+                        class='regular pre-open'>
+                        <span style="color:green">ⓕ</span> .createCodecRemover
+                      </a></li>
+                    
+                    </ul>
+                  
+                  </div>
+                
+              </li>
+            
+
+            </ul>
+          </div>
+          <div class='mt1 h6 quiet'>
+            <a href='http://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
+          </div>
+        </div>
+      </div>
+      <div id='split-right' class='relative overflow-auto height-viewport-100'>
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='create'>
+      create
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
+The SDK instance will be refered as 'api' throughout the rest of the documentation content.</p>
+
+
+  <div class='pre p1 fill-light mt0'>create(config: <a href="#config">config</a>): <a href="#api">api</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="#config">config</a>)</code>
+	    The configuration object.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="#api">api</a></code>:
+          The SDK instance.
+
+        
+      </div>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Instantiate the SDK.</span>
+<span class="hljs-keyword">import</span> { create } <span class="hljs-keyword">from</span> <span class="hljs-string">'kandy'</span>
+<span class="hljs-keyword">const</span> client = create({
+    <span class="hljs-attr">authentication</span>: { ... },
+    <span class="hljs-attr">logs</span>: { ... },
+    ...
+});
+<span class="hljs-comment">// Use the SDK's API.</span>
+client.on( ... );</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='config'>
+      config
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The configuration object. This object defines what different configuration
+values you can use when instantiating the SDK using the <a href="#create">create</a> function.</p>
+
+
+  <div class='pre p1 fill-light mt0'>config</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='api'>
+      api
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The 'api' is the type returned by the create function.
+It contains various top-level functions that pertain to SDK global instance
+as well as several nested namespaces that pertain to various features (e.g. call, contacts, presence, etc).</p>
+
+
+  <div class='pre p1 fill-light mt0'>api</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='sdphandlers'>
+      sdpHandlers
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>A set of <a href="call.SdpHandlerFunction">SdpHandlerFunction</a>s for manipulating SDP information.
+These handlers are used to customize low-level call behaviour for very specific
+environments and/or scenarios. They can be provided during SDK instantiation
+to be used for all calls.</p>
+
+
+  <div class='pre p1 fill-light mt0'>sdpHandlers</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">import</span> { create, sdpHandlers } <span class="hljs-keyword">from</span> <span class="hljs-string">'kandy'</span>;
+<span class="hljs-keyword">const</span> codecRemover = sdpHandlers.createCodecRemover([<span class="hljs-string">'VP8'</span>, <span class="hljs-string">'VP9'</span>])
+<span class="hljs-keyword">const</span> client = create({
+  <span class="hljs-attr">call</span>: {
+    <span class="hljs-attr">sdpHandlers</span>: [ <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Your-SDP-Handler-Function</span>&gt;</span>, ...]
+  }
+})</span></pre>
+    
+  
+
+  
+
+    
+      <div class='py1 quiet mt1 prose-big'>Functions</div>
+      <div class="clearfix">
+  
+    <div class='border-bottom' id='sdphandlerscreatecodecremover'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>createCodecRemover(codecs)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.</p>
+<p>To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.</p>
+<p>The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.</p>
+
+
+  <div class='pre p1 fill-light mt0'>createCodecRemover(codecs: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>): call.SdpHandlerFunction</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>codecs</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+	    A list of codec names to remove from the SDP.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code>call.SdpHandlerFunction</code>:
+          The resulting SDP handler that will remove the codec.
+
+        
+      </div>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">import</span> { create, sdpHandlers } <span class="hljs-keyword">from</span> <span class="hljs-string">'kandy'</span>;
+<span class="hljs-keyword">const</span> codecRemover = sdpHandlers.createCodecRemover([<span class="hljs-string">'VP8'</span>, <span class="hljs-string">'VP9'</span>])
+<span class="hljs-keyword">const</span> client = create({
+  <span class="hljs-attr">call</span>: {
+    <span class="hljs-attr">sdpHandlers</span>: [codecRemover]
+  }
+})</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+    
+  
+
+  
+
+  
+</section>
+
+          
+        
+      </div>
+    </div>
+  <script src='assets/anchor.js'></script>
+  <script src='assets/split.js'></script>
+  <script src='assets/site.js'></script>
+</body>
+</html>
