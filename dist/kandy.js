@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.10.0
+ * Version: 4.11.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -96,7 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "../../packages/kandy/src/index.cpaas.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -203,6 +203,13 @@ module.exports = { "default": __webpack_require__("../../node_modules/core-js/li
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__("../../node_modules/core-js/library/fn/promise.js"), __esModule: true };
+
+/***/ }),
+
+/***/ "../../node_modules/babel-runtime/core-js/reflect/set.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__("../../node_modules/core-js/library/fn/reflect/set.js"), __esModule: true };
 
 /***/ }),
 
@@ -437,6 +444,15 @@ __webpack_require__("../../node_modules/core-js/library/modules/es6.promise.js")
 __webpack_require__("../../node_modules/core-js/library/modules/es7.promise.finally.js");
 __webpack_require__("../../node_modules/core-js/library/modules/es7.promise.try.js");
 module.exports = __webpack_require__("../../node_modules/core-js/library/modules/_core.js").Promise;
+
+
+/***/ }),
+
+/***/ "../../node_modules/core-js/library/fn/reflect/set.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__("../../node_modules/core-js/library/modules/es6.reflect.set.js");
+module.exports = __webpack_require__("../../node_modules/core-js/library/modules/_core.js").Reflect.set;
 
 
 /***/ }),
@@ -2960,6 +2976,46 @@ $export($export.S + $export.F * !(USE_NATIVE && __webpack_require__("../../node_
     return capability.promise;
   }
 });
+
+
+/***/ }),
+
+/***/ "../../node_modules/core-js/library/modules/es6.reflect.set.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 26.1.13 Reflect.set(target, propertyKey, V [, receiver])
+var dP = __webpack_require__("../../node_modules/core-js/library/modules/_object-dp.js");
+var gOPD = __webpack_require__("../../node_modules/core-js/library/modules/_object-gopd.js");
+var getPrototypeOf = __webpack_require__("../../node_modules/core-js/library/modules/_object-gpo.js");
+var has = __webpack_require__("../../node_modules/core-js/library/modules/_has.js");
+var $export = __webpack_require__("../../node_modules/core-js/library/modules/_export.js");
+var createDesc = __webpack_require__("../../node_modules/core-js/library/modules/_property-desc.js");
+var anObject = __webpack_require__("../../node_modules/core-js/library/modules/_an-object.js");
+var isObject = __webpack_require__("../../node_modules/core-js/library/modules/_is-object.js");
+
+function set(target, propertyKey, V /* , receiver */) {
+  var receiver = arguments.length < 4 ? target : arguments[3];
+  var ownDesc = gOPD.f(anObject(target), propertyKey);
+  var existingDescriptor, proto;
+  if (!ownDesc) {
+    if (isObject(proto = getPrototypeOf(target))) {
+      return set(proto, propertyKey, V, receiver);
+    }
+    ownDesc = createDesc(0);
+  }
+  if (has(ownDesc, 'value')) {
+    if (ownDesc.writable === false || !isObject(receiver)) return false;
+    if (existingDescriptor = gOPD.f(receiver, propertyKey)) {
+      if (existingDescriptor.get || existingDescriptor.set || existingDescriptor.writable === false) return false;
+      existingDescriptor.value = V;
+      dP.f(receiver, propertyKey, existingDescriptor);
+    } else dP.f(receiver, propertyKey, createDesc(0, V));
+    return true;
+  }
+  return ownDesc.set === undefined ? false : (ownDesc.set.call(receiver, V), true);
+}
+
+$export($export.S, 'Reflect', { set: set });
 
 
 /***/ }),
@@ -19026,12 +19082,13 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *
  * @method connect
  * @param {Object} credentials The credentials to pass to the connect action.
+ * @param {Object} [options] Any parameters that aren't credentials.
  * @return {Object} A flux standard action.
  */
-function connect(credentials) {
+function connect(credentials, options) {
   return {
     type: actionTypes.CONNECT,
-    payload: { credentials },
+    payload: { credentials, options },
     meta: {
       isSensitive: true
     }
@@ -19345,11 +19402,15 @@ function api({ dispatch, getState }) {
      * @param {string} credentials.username The username including the application's domain.
      * @param {string} credentials.password The user's password.
      * @param {string} [credentials.authname] The user's authorization name.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {boolean} [options.forceLogOut] Force the oldest connection to log out if too many simultaneous connections. Link only.
      * @example
      * client.connect({
      *   username: 'alfred@example.com',
      *   password: '********'
      *   authname: '********'
+     * }, {
+     *   forceLogOut: true
      * });
      */
     /**
@@ -19406,6 +19467,8 @@ function api({ dispatch, getState }) {
      * @param {Object} credentials The credentials object.
      * @param {string} credentials.username The username.
      * @param {string} credentials.hmacToken An HMAC token for the user with the provided user ID.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {boolean} [options.forceLogOut] Force the oldest connection to log out if too many simultaneous connections.
      * @example
      * const hmacToken = HmacSHA1Algorithm({
      *   authenticationTokenRequest: {
@@ -19417,7 +19480,9 @@ function api({ dispatch, getState }) {
      * client.connect({
      *   username: 'alfred@example.com',
      *   hmacToken
-     * })
+     * }, {
+     *   forceLogOut: true
+     * });
      */
     /**
      * Connect by providing a refresh token, to any backend services that the SDK instance deals with.
@@ -19453,11 +19518,11 @@ function api({ dispatch, getState }) {
      *   oauthToken: 'RTG9SV3QAoJaeUSEQCZAHqrhde1yT'
      * });
      */
-    connect(credentials) {
+    connect(credentials, options) {
       // We won't expose oauthToken because it essentially acts as a password being used in conjunction with username
       // ..and passwords should NOT be logged.
       log.debug(_logs.API_LOG_TAG + 'connect: ', credentials.username);
-      dispatch(actions.connect(credentials));
+      dispatch(actions.connect(credentials, options));
     },
 
     /**
@@ -20227,42 +20292,6 @@ function getRequestInfo(state, platform) {
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/basePlugins.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
-
-var _logs2 = _interopRequireDefault(_logs);
-
-var _config = __webpack_require__("../../packages/kandy/src/config/index.js");
-
-var _config2 = _interopRequireDefault(_config);
-
-var _events = __webpack_require__("../../packages/kandy/src/events/index.js");
-
-var _events2 = _interopRequireDefault(_events);
-
-var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
-
-var _request2 = _interopRequireDefault(_request);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
- * to the SDK.
- */
-exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
-
-/***/ }),
-
 /***/ "../../packages/kandy/src/call/constants.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20536,6 +20565,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  */
 
+/**
+ * @private
+ * @name config.call
+ * @memberof config
+ * @instance
+ * @param {string} [trickleIceMode='NONE'] The Trickle ICE method to use for calls. Currently, no mode is supported.
+ * @param {boolean} [normalizeDestination=true] Specifies whether or not SIP address normalization will be applied.
+ */
+
 // Libraries.
 
 
@@ -20646,6 +20684,7 @@ var _stringify2 = _interopRequireDefault(_stringify);
 
 exports.createSession = createSession;
 exports.answerSession = answerSession;
+exports.forwardSession = forwardSession;
 exports.fetchCredentials = fetchCredentials;
 exports.updateSession = updateSession;
 exports.updateSessionStatus = updateSessionStatus;
@@ -20771,6 +20810,52 @@ function* answerSession(callInfo) {
   if (response.error) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Answer session')
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Forwards an incoming session to another destination address.
+ * Cpaas-specific signaling function.
+ *
+ * This saga "forwards" the server session to a specified destination address.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ *    2. There is an incoming session.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method forwardSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.address The address to forward the session to.
+ * @return {Object} response Signalling response.
+ * @return {Object} response.error An error object, if signalling failed.
+ */
+function* forwardSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
+
+  const options = {
+    method: 'PUT',
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}` + `/sessions/${callInfo.wrtcsSessionId}/forward`,
+    body: (0, _stringify2.default)({
+      wrtcsForward: {
+        clientCorrelator: requestInfo.clientCorrelator,
+        address: callInfo.address
+      }
+    })
+  };
+
+  const response = yield (0, _effects2.default)(options, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Forward session')
     };
   } else {
     return {
@@ -21066,10 +21151,15 @@ var _extends3 = _interopRequireDefault(_extends2);
 exports.registerCall = registerCall;
 exports.createCall = createCall;
 exports.answerCallEntry = answerCallEntry;
+exports.forwardCallEntry = forwardCallEntry;
 exports.holdCall = holdCall;
 exports.unholdCall = unholdCall;
 exports.addMediaEntry = addMediaEntry;
 exports.removeMediaEntry = removeMediaEntry;
+exports.addBasicMediaEntry = addBasicMediaEntry;
+exports.removeBasicMediaEntry = removeBasicMediaEntry;
+exports.checkRenegotiationFlagEntry = checkRenegotiationFlagEntry;
+exports.renegotiationEntry = renegotiationEntry;
 exports.sendDTMFEntry = sendDTMFEntry;
 exports.incomingCallNotification = incomingCallNotification;
 exports.callAcceptedNotification = callAcceptedNotification;
@@ -21096,6 +21186,10 @@ var _actionTypes = __webpack_require__("../../packages/kandy/src/call/interfaceN
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
+var _actionTypes2 = __webpack_require__("../../packages/kandy/src/webrtc/interface/actionTypes.js");
+
+var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
+
 var _calls = __webpack_require__("../../packages/kandy/src/call/cpaas/requests/calls.js");
 
 var requests = _interopRequireWildcard(_calls);
@@ -21116,9 +21210,9 @@ var _support2 = __webpack_require__("../../packages/kandy/src/callstack/call/sup
 
 var _effects = __webpack_require__("../../packages/kandy/src/subscription/interface/effects.js");
 
-var _actionTypes2 = __webpack_require__("../../packages/kandy/src/subscription/interface/actionTypes.js");
+var _actionTypes3 = __webpack_require__("../../packages/kandy/src/subscription/interface/actionTypes.js");
 
-var _actionTypes3 = __webpack_require__("../../packages/kandy/src/notifications/interface/actionTypes.js");
+var _actionTypes4 = __webpack_require__("../../packages/kandy/src/notifications/interface/actionTypes.js");
 
 var _effects2 = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
@@ -21133,6 +21227,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Other plugins.
+/**
+ * Call saga index.
+ * Defines which actions trigger which sagas.
+ */
+
+// Call plugin.
 function* registerCall() {
   yield (0, _effects.registerService)('call', subSagas.subscribe, subSagas.unsubscribe);
 }
@@ -21154,12 +21254,6 @@ function* registerCall() {
 
 
 // Callstack plugin.
-/**
- * Call saga index.
- * Defines which actions trigger which sagas.
- */
-
-// Call plugin.
 function* createCall(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, (0, _extends3.default)({}, deps, { requests }));
 }
@@ -21173,6 +21267,17 @@ function* createCall(deps) {
  */
 function* answerCallEntry(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.ANSWER_CALL, establishSagas.answerCall, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Forward an incoming call.
+ * @method forwardCallEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* forwardCallEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.FORWARD_CALL, establishSagas.forwardCall, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
@@ -21223,6 +21328,50 @@ function* addMediaEntry(deps) {
  */
 function* removeMediaEntry(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.REMOVE_MEDIA, midcallSagas.removeMedia, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Add media to a call.
+ * @method addMedia
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* addBasicMediaEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.ADD_BASIC_MEDIA, midcallSagas.addBasicMedia, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Remove media from a call.
+ * @method removeMedia
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* removeBasicMediaEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.REMOVE_BASIC_MEDIA, midcallSagas.removeBasicMedia, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Check if renegotiation is needed.
+ * @method checkRenegotiationFlagEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* checkRenegotiationFlagEntry(deps) {
+  yield (0, _effects2.takeEvery)(webrtcActionTypes.SESSION_TRACK_ENDED, midcallSagas.checkRenegotiationFlag, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Peform a call renegotitation.
+ * @method renegotiationEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* renegotiationEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.RENEGOTIATE, midcallSagas.renegotiate, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
@@ -21284,7 +21433,7 @@ function* incomingCallNotification(deps) {
 
   // Redux-saga take() pattern.
   function incomingCallPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsSessionInvitationNotification;
   }
   yield (0, _effects2.takeEvery)(incomingCallPattern, cpaasIncomingCall);
 }
@@ -21317,7 +21466,7 @@ function* callAcceptedNotification(deps) {
 
   // Redux-saga take() pattern.
   function callAcceptedPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsAcceptanceNotification;
   }
 
   yield (0, _effects2.takeEvery)(callAcceptedPattern, parseAcceptedNotification);
@@ -21331,7 +21480,7 @@ function* callAcceptedNotification(deps) {
 function* callStatusNotification(deps) {
   function statusUpdatePattern(status) {
     return function statusPattern(action) {
-      return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
+      return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsEventNotification && action.payload.wrtcsEventNotification.eventType === status;
     };
   }
 
@@ -21424,7 +21573,7 @@ function* callOfferNotification(deps) {
 
   // Redux-saga take() pattern.
   function callOfferPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsOfferNotification;
   }
 
   yield (0, _effects2.takeEvery)(callOfferPattern, parseOfferNotification);
@@ -21458,7 +21607,7 @@ function* callAnswerNotification(deps) {
 
   // Redux-saga take() pattern.
   function callAnswerPattern(action) {
-    return action.type === _actionTypes3.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
+    return action.type === _actionTypes4.NOTIFICATION_RECEIVED && action.payload.wrtcsAnswerNotification;
   }
 
   yield (0, _effects2.takeEvery)(callAnswerPattern, parseAnswerNotification);
@@ -21518,7 +21667,7 @@ function* getStatsEntry(deps) {
  */
 function* setTurnCredentials() {
   function callSubscribePattern(action) {
-    return action.type === _actionTypes2.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === 'call' && !action.error;
+    return action.type === _actionTypes3.PLUGIN_SUBSCRIPTION_FINISHED && action.payload.service === 'call' && !action.error;
   }
 
   yield (0, _effects2.takeEvery)(callSubscribePattern, supportSagas.setTurnCredentials);
@@ -21987,9 +22136,14 @@ const SEND_CUSTOM_PARAMETERS_FINISH = exports.SEND_CUSTOM_PARAMETERS_FINISH = ca
 
 const ADD_MEDIA = exports.ADD_MEDIA = callPrefix + 'ADD_MEDIA';
 const ADD_MEDIA_FINISH = exports.ADD_MEDIA_FINISH = callPrefix + 'ADD_MEDIA_FINISH';
+const ADD_BASIC_MEDIA = exports.ADD_BASIC_MEDIA = callPrefix + 'ADD_BASIC_MEDIA';
 
 const REMOVE_MEDIA = exports.REMOVE_MEDIA = callPrefix + 'REMOVE_MEDIA';
 const REMOVE_MEDIA_FINISH = exports.REMOVE_MEDIA_FINISH = callPrefix + 'REMOVE_MEDIA_FINISH';
+const REMOVE_BASIC_MEDIA = exports.REMOVE_BASIC_MEDIA = callPrefix + 'REMOVE_BASIC_MEDIA';
+
+const RENEGOTIATE = exports.RENEGOTIATE = callPrefix + 'RENEGOTIATE';
+const RENEGOTIATE_FINISH = exports.RENEGOTIATE_FINISH = callPrefix + 'RENEGOTIATE_FINISH';
 
 const MUSIC_ON_HOLD = exports.MUSIC_ON_HOLD = callPrefix + 'MUSIC_ON_HOLD';
 
@@ -22084,8 +22238,12 @@ exports.sendCustomParameters = sendCustomParameters;
 exports.sendCustomParametersFinish = sendCustomParametersFinish;
 exports.addMedia = addMedia;
 exports.addMediaFinish = addMediaFinish;
+exports.addBasicMedia = addBasicMedia;
 exports.removeMedia = removeMedia;
 exports.removeMediaFinish = removeMediaFinish;
+exports.removeBasicMedia = removeBasicMedia;
+exports.renegotiate = renegotiate;
+exports.renegotiateFinish = renegotiateFinish;
 exports.sendDTMF = sendDTMF;
 exports.sendDTMFFinish = sendDTMFFinish;
 exports.getStats = getStats;
@@ -22285,12 +22443,28 @@ function addMediaFinish(id, params) {
   return callActionHelper(actionTypes.ADD_MEDIA_FINISH, id, params);
 }
 
+function addBasicMedia(id, params) {
+  return callActionHelper(actionTypes.ADD_BASIC_MEDIA, id, params);
+}
+
 function removeMedia(id, params) {
   return callActionHelper(actionTypes.REMOVE_MEDIA, id, params);
 }
 
 function removeMediaFinish(id, params) {
   return callActionHelper(actionTypes.REMOVE_MEDIA_FINISH, id, params);
+}
+
+function removeBasicMedia(id, params) {
+  return callActionHelper(actionTypes.REMOVE_BASIC_MEDIA, id, params);
+}
+
+function renegotiate(id, params) {
+  return callActionHelper(actionTypes.RENEGOTIATE, id, params);
+}
+
+function renegotiateFinish(id, params) {
+  return callActionHelper(actionTypes.RENEGOTIATE_FINISH, id, params);
 }
 
 function sendDTMF(id, params) {
@@ -23000,15 +23174,15 @@ function callAPI({ dispatch, getState }) {
      * @memberof call
      * @requires call
      * @requires callMe
-     * @param {string} callId The ID of the call to add media to.
-     * @param {Object} [media={}] The media options to add to the call.
+     * @param {string}  callId The ID of the call to add media to.
+     * @param {Object}  [media={}] The media options to add to the call.
      * @param {boolean} [media.audio=false] Whether to add audio to the call.
-     * @param {Object} [media.audioOptions] Options for configuring the call's audio.
-     * @param {call.MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {boolean} [media.video=false] Whether to add video to the call.
      * @param {boolean} [media.screen=false] Whether to add the screenshare to the call.
-     * @param {Object} [media.videoOptions] Options for configuring the call's video.
-     * @param {Object} [media.screenOptions] Options for configuring the call's screenShare.
+     * @param {Object}  [media.audioOptions] Options for configuring the call's audio.
+     * @param {Object}  [media.videoOptions] Options for configuring the call's video.
+     * @param {Object}  [media.screenOptions] Options for configuring the call's screenShare.
+     * @param {call.MediaConstraint} [media.audioOptions.deviceId] ID of the microphone to receive audio from.
      * @param {call.MediaConstraint} [media.videoOptions.deviceId] ID of the camera to receive video from.
      * @param {call.MediaConstraint} [media.videoOptions.height] The height of the video.
      * @param {call.MediaConstraint} [media.videoOptions.width] The width of the video.
@@ -23059,17 +23233,16 @@ function callAPI({ dispatch, getState }) {
      * Adds local video to an ongoing Call, to start sending to the remote
      *    participant.
      *
-     * The latest SDK release (v4.X+) has not yet implemented this API in the
-     *    same way that it was available in previous releases (v3.X). In place
-     *    of this API, the SDK has a more general API that can be used for this
-     *    same behaviour.
+     * Can only be used in a basic media scenario, where the Call does not
+     *    already have video. For more advanced scenarios, the
+     *    {@link call.addMedia} API can be used.
      *
-     * The {@link call.addMedia} API can be used to perform the same behaviour
-     *    as `startVideo`. {@link call.addMedia} is a general-purpose API for
-     *    adding media to a call, which covers the same functionality as
-     *    `startVideo`. Selecting only video options when using
-     *    {@link call.addMedia} will perform the same behaviour as using
-     *    `startVideo`.
+     * The progress of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event.
+     *
+     * The SDK will emit a {@link call.event:call:newTrack call:newTrack} event
+     *    both for the local and remote users to indicate a track has been
+     *    added to the Call.
      *
      * @public
      * @static
@@ -23077,34 +23250,37 @@ function callAPI({ dispatch, getState }) {
      * @memberof call
      * @requires call
      * @requires callMe
-     * @example
-     * // Select media options for adding only video.
-     * const media = {
-     *    audio: false,
-     *    video: true,
-     *    videoOptions: { ... },
-     *    screen: false
-     * }
-     *
-     * // Add the selected media to the call.
-     * client.call.addMedia(callId, media)
+     * @param {string}               callId              ID of the call being acted on.
+     * @param {Object}               [options]           Options for configuring the call's video.
+     * @param {call.MediaConstraint} [options.deviceId]  ID of the camera to receive video from.
+     * @param {call.MediaConstraint} [options.height]    The height of the video.
+     * @param {call.MediaConstraint} [options.width]     The width of the video.
+     * @param {call.MediaConstraint} [options.frameRate] The frame rate of the video.
      */
+    startVideo(callId, options = {}) {
+      log.debug(_logs.API_LOG_TAG + 'call.startVideo: ', callId, options);
+      const mediaConstraints = {
+        audio: false,
+        video: !(0, _fp.isEmpty)(options) ? options : true,
+        screenShare: false
+      };
+      dispatch(_actions.callActions.addBasicMedia(callId, { mediaConstraints, kind: 'video' }));
+    },
 
     /**
      * Removes local video from an ongoing Call, stopping it from being sent
      *    to the remote participant.
      *
-     * The latest SDK release (v4.X+) has not yet implemented this API in the
-     *    same way that it was available in previous releases (v3.X). In place
-     *    of this API, the SDK has a more general API that can be used for this
-     *    same behaviour.
+     * Can only be used in a basic media scenario, where the Call has only one
+     *    video track. For more advanced scenarios, the
+     *    {@link call.removeMedia} API can be used.
      *
-     * The {@link call.removeMedia} API can be used to perform the same
-     *    behaviour as `stopVideo`. {@link call.removeMedia} is a
-     *    general-purpose API for removing media from a call, which covers the
-     *    same functionality as `stopVideo`. Specifying only the video track(s)
-     *    when using {@link call.removeMedia} will perform the same behaviour
-     *    as using `stopVideo`.
+     * The progress of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event.
+     *
+     * The SDK will emit a {@link call.event:call:trackEnded call:trackEnded}
+     *    event for both the local and remote users to indicate that a track
+     *    has been removed.
      *
      * @public
      * @static
@@ -23112,17 +23288,12 @@ function callAPI({ dispatch, getState }) {
      * @memberof call
      * @requires call
      * @requires callMe
-     * @example
-     * const call = client.call.getById(callId)
-     * // Get the ID of the Call's video track.
-     * const videoTrack = call.localTracks.find(trackId => {
-     *    const track = call.media.getTrackById(trackId)
-     *    return track.kind === 'video'
-     * })
-     *
-     * // Remove video from the call.
-     * client.call.removeMedia(callId, [ videoTrack ])
+     * @param {string} callId ID of the call being acted on.
      */
+    stopVideo(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.stopVideo: ', callId);
+      dispatch(_actions.callActions.removeBasicMedia(callId, { kind: 'video' }));
+    },
 
     /**
      * Adds local screenshare to an ongoing Call, to start sending to the remote
@@ -23292,7 +23463,7 @@ function callAPI({ dispatch, getState }) {
      *
      * The SDK will emit a {@link call.event:call:stateChange call:stateChange}
      *    event after the operation completes.
-     * @public
+     * @private
      * @static
      * @memberof call
      * @requires cpaas_call
@@ -23961,7 +24132,10 @@ const OPERATIONS = exports.OPERATIONS = {
   UNHOLD: 'UNHOLD',
   SEND_CUSTOM_PARAMETERS: 'SEND_CUSTOM_PARAMETERS',
   ADD_MEDIA: 'ADD_MEDIA',
+  ADD_BASIC_MEDIA: 'ADD_BASIC_MEDIA',
   REMOVE_MEDIA: 'REMOVE_MEDIA',
+  REMOVE_BASIC_MEDIA: 'REMOVE_BASIC_MEDIA',
+  RENEGOTIATE: 'RENEGOTIATE',
   GET_STATS: 'GET_STATS',
   SEND_DTMF: 'SEND_DTMF',
   CONSULTATIVE_TRANSFER: 'CONSULTATIVE_TRANSFER',
@@ -23997,7 +24171,12 @@ const OPERATIONS = exports.OPERATIONS = {
   START: 'START', // The operation is starting.
   UPDATE: 'UPDATE', // The operation is ongoing.
   FINISH: 'FINISH' // The operation has finished.
-};
+
+
+  /*
+   * Operations that don't have a corresponding finish operation
+   */
+};const NO_FINISH_OPS = exports.NO_FINISH_OPS = [OPERATIONS.ADD_BASIC_MEDIA, OPERATIONS.REMOVE_BASIC_MEDIA];
 
 /***/ }),
 
@@ -24359,7 +24538,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -24485,6 +24664,22 @@ callEvents[actionTypes.REMOVE_MEDIA_FINISH] = (action, params) => {
     isLocal: action.payload.local
   })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
     local: action.payload.local,
+    tracks: action.payload.tracks,
+    error: action.payload.error
+  })];
+};
+
+/*
+ * Currently the RENEGOTIATE operation is only triggered after an unsolicted removal of media,
+ *  hence the CALL_REMOVED_MEDIA event handler is used
+ */
+callEvents[actionTypes.RENEGOTIATE_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.RENEGOTIATE,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: action.payload.local
+  })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
+    loca: action.payload.local,
     tracks: action.payload.tracks,
     error: action.payload.error
   })];
@@ -24775,6 +24970,9 @@ callReducers[actionTypes.SEND_CUSTOM_PARAMETERS] = noop;
 callReducers[actionTypes.END_CALL] = noop;
 callReducers[actionTypes.ADD_MEDIA] = noop;
 callReducers[actionTypes.REMOVE_MEDIA] = noop;
+callReducers[actionTypes.ADD_BASIC_MEDIA] = noop;
+callReducers[actionTypes.REMOVE_BASIC_MEDIA] = noop;
+callReducers[actionTypes.RENEGOTIATE] = noop;
 callReducers[actionTypes.FORWARD_CALL] = noop;
 callReducers[actionTypes.REJECT_CALL] = noop;
 callReducers[actionTypes.SEND_DTMF] = noop;
@@ -25125,6 +25323,14 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
   }
 };
 
+callReducers[actionTypes.RENEGOTIATE_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      bandwidth: action.payload.bandwidth
+    });
+  }
+};
+
 /*
  * Combine all of the call-tier reducers into a single reducer,
  *      each with a default state of empty object.
@@ -25132,7 +25338,7 @@ callReducers[actionTypes.REMOVE_MEDIA_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 /*
  * Reducer to handle specific call actions.
@@ -25394,6 +25600,8 @@ exports.setOperationState = setOperationState;
 
 var _constants = __webpack_require__("../../packages/kandy/src/call/interfaceNew/constants.js");
 
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
@@ -25406,6 +25614,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {boolean} opMeta.isLocal     Whether the operation was started locally or not.
  * @throws {Error}   Input must be a standard call action type.
  */
+// Call plugin.
 function getOperationMeta(actionType) {
   // Make sure the input is a call action type.
   if (typeof actionType !== 'string' || !actionType.includes('/CALL/')) {
@@ -25488,7 +25697,9 @@ function getOperationMeta(actionType) {
  * @param  {Object} state  Redux state of a [single] call.
  * @param  {Object} action A call action.
  */
-// Call plugin.
+
+
+// Lodash FP
 function setOperationState(state, action) {
   let meta;
   try {
@@ -25497,10 +25708,11 @@ function setOperationState(state, action) {
     // Action type is not a call operation, don't change operation state.
     return state;
   }
+  const metaOp = meta.operation;
 
   // The operation has to be defined for start/finish transitions.
   //    Don't update state if it isn't.
-  if (!meta.operation && meta.transition !== _constants.OP_TRANSITIONS.UPDATE) {
+  if (!metaOp && meta.transition !== _constants.OP_TRANSITIONS.UPDATE) {
     return state;
   }
 
@@ -25520,7 +25732,7 @@ function setOperationState(state, action) {
       // Set the new operation in state.
       return (0, _extends3.default)({}, state, {
         [stateProp]: {
-          operation: meta.operation,
+          operation: metaOp,
           status: _constants.OP_STATUS.ONGOING
         }
       });
@@ -25533,20 +25745,30 @@ function setOperationState(state, action) {
       })
     });
   } else {
-    // An on-going operation is finishing...
+    const isRemote = !meta.isLocal;
+    const unsetOperation = (0, _extends3.default)({}, state, {
+      [stateProp]: undefined
+    });
 
-    if (current && current.operation === meta.operation) {
+    const currentOp = (0, _fp.property)('operation')(current);
+    if ((0, _fp.isNil)(currentOp)) {
+      // Should be considered an error scenario.
+      return state;
+    }
+
+    // An on-going operation is finishing...
+    if (currentOp === metaOp) {
       // The operation matches the current on-going operation.
-      // Unset it in state.
-      return (0, _extends3.default)({}, state, {
-        [stateProp]: undefined
-      });
-    } else if (!meta.isLocal && current && current.operation === _constants.OPERATIONS.SLOW_START) {
+      //    Unset it in state.
+      return unsetOperation;
+    } else if (isRemote && currentOp === _constants.OPERATIONS.SLOW_START) {
       // Special case: If the current operation was a remote slow start,
       //    then the 'finish' won't match. Allow any 'finish' to unset it.
-      return (0, _extends3.default)({}, state, {
-        [stateProp]: undefined
-      });
+      return unsetOperation;
+    } else if ((0, _fp.contains)(currentOp)(_constants.NO_FINISH_OPS)) {
+      // Special case: If the current operation is one that doesn't have a finish
+      //    operation, allow any 'finish' to unset it.
+      return unsetOperation;
     } else {
       // ...but it wasn't tracked in state?
       // Should be considered an error scenario.
@@ -25688,7 +25910,13 @@ function processAddress(addressString) {
  * @returns {string} The domain with "@" symbol at the beginning if it doesn't exist.
  */
 function processDomain(domainString) {
-  return (domainString.indexOf('@') === 0 ? '' : '@') + domainString;
+  if (domainString === '' || domainString === undefined) {
+    return '';
+  } else if (domainString.indexOf('@') === 0) {
+    return domainString;
+  } else {
+    return '@' + domainString;
+  }
 }
 
 /**
@@ -26335,22 +26563,14 @@ var _establish = __webpack_require__("../../packages/kandy/src/callstack/webrtc/
 
 var _midcall = __webpack_require__("../../packages/kandy/src/callstack/webrtc/midcall.js");
 
-var _negotiation = __webpack_require__("../../packages/kandy/src/callstack/webrtc/negotiation.js");
-
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 // Other plugins.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
 
-// Call plugin.
+
+// Callstack plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -26375,9 +26595,15 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 
 // Libraries.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
 
-
-// Callstack plugin.
+// Call plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
 
@@ -26478,9 +26704,8 @@ function* makeCall(deps, action) {
  * Responsibilities:
  *    1. Determine whether Regular or Slow Start negotiation is to be used.
  *    2. Regular: Create an answer for the call, using the webRTC helpers.
- *    3. Regular: Remove local tracks that aren't being used for the call.
- *    4. Regular: Update the call on the server with the answer.
- *    5. Regular: Update call state (via redux actions).
+ *    3. Regular: Update the call on the server with the answer.
+ *    4. Regular: Update call state (via redux actions).
  *    2. Slow Start: Setup the call locally, using the webRTC helper saga.
  *    3. Slow Start: Update the call on the server with an offer.
  *    4. Slow Start: Update state (via redux actions).
@@ -26581,9 +26806,6 @@ function* answerCall(deps, action) {
       }));
       return;
     }
-
-    // This removes local tracks that aren't being sent to the other side.
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, incomingCall.webrtcSessionId);
 
     callInfo = {
       answer: webrtcInfo.answerSDP,
@@ -26782,6 +27004,11 @@ function* forwardCall(deps, action) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.endCall = endCall;
 exports.offerInactiveMedia = offerInactiveMedia;
 exports.offerFullMedia = offerFullMedia;
@@ -26789,6 +27016,10 @@ exports.sendCustomParameters = sendCustomParameters;
 exports.getStats = getStats;
 exports.addMedia = addMedia;
 exports.removeMedia = removeMedia;
+exports.checkRenegotiationFlag = checkRenegotiationFlag;
+exports.renegotiate = renegotiate;
+exports.addBasicMedia = addBasicMedia;
+exports.removeBasicMedia = removeBasicMedia;
 exports.directTransfer = directTransfer;
 exports.consultativeTransfer = consultativeTransfer;
 exports.join = join;
@@ -26808,6 +27039,8 @@ var _errors = __webpack_require__("../../packages/kandy/src/errors/index.js");
 
 var _errors2 = _interopRequireDefault(_errors);
 
+var _selectors2 = __webpack_require__("../../packages/kandy/src/webrtc/interface/selectors.js");
+
 var _utils = __webpack_require__("../../packages/kandy/src/call/cpaas/utils/index.js");
 
 var _constants = __webpack_require__("../../packages/kandy/src/call/constants.js");
@@ -26822,20 +27055,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Helpers.
-
-
-// Other plugins.
-
-
-// Call plugin.
-/**
- * "Midcall sagas" handle performing local mid-call operations.
- *
- * These sagas assume that there is an established session (webRTC and server-
- *    side) to perform the operation on. Otherwise, it is considered an error.
- */
-
-// Callstack plugin.
 const log = (0, _logs.getLogManager)().getLogger('CALL');
 
 /**
@@ -26853,6 +27072,20 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * @param {Function} deps.requests.endSession "End session" signalling function.
  * @param {Object}   action An action of type `END_CALL`.
  */
+
+
+// Other plugins.
+
+
+// Call plugin.
+/**
+ * "Midcall sagas" handle performing local mid-call operations.
+ *
+ * These sagas assume that there is an established session (webRTC and server-
+ *    side) to perform the operation on. Otherwise, it is considered an error.
+ */
+
+// Callstack plugin.
 function* endCall(deps, action) {
   const { webRTC, requests } = deps;
   const { id } = action.payload;
@@ -27185,22 +27418,22 @@ function* getStats(deps, action) {
  *    2. Update the backend with the new state.
  *    3. Update local state, using Redux
  * @method addMedia
- * @param {Object}  deps          Injected dependencies that addMedia relies on
- * @param {Object}  deps.webRTC   The WebRTC stack.
- * @param {Object}  deps.requests requests that addMedia relies on
- * @param {Function}  deps.requests.updateSession request to update the session on the backend
+ * @param {Object}   deps          Injected dependencies that addMedia relies on
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests requests that addMedia relies on
+ * @param {Function} deps.requests.updateSession request to update the session on the backend
  * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
- * @param  {Object} action        An "add media" action.
+ * @param {Object}   action        An "add media" action.
  */
 function* addMedia(deps, action) {
   const requests = deps.requests;
-  const { bandwidth } = action.payload;
+  const { bandwidth, mediaConstraints, id } = action.payload;
 
   // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, id, { state: _constants.CALL_STATES.CONNECTED });
   if (stateError) {
     log.debug(`Invalid call state: ${stateError.message}`);
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(id, {
       local: true,
       error: stateError
     }));
@@ -27216,19 +27449,19 @@ function* addMedia(deps, action) {
     account,
     localOp,
     customParameters
-  } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  } = yield (0, _effects.select)(_selectors.getCallById, id);
 
   const finalBandwidth = {
     audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
     video: bandwidth && bandwidth.video ? bandwidth.video : callBandwidth.video
     // Create media and add tracks using webRTC
-  };const { error, sdp, medias } = yield (0, _effects.call)(_midcall.webRtcAddMedia, deps, action.payload.mediaConstraints, {
+  };const { error, sdp, medias } = yield (0, _effects.call)(_midcall.webRtcAddMedia, deps, mediaConstraints, {
     sessionId: webrtcSessionId,
     bandwidth: finalBandwidth
   });
 
   if (error) {
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(id, {
       local: true,
       error: error
     }));
@@ -27247,7 +27480,7 @@ function* addMedia(deps, action) {
 
   if (response.error) {
     log.debug('Failed to send add media offer.');
-    yield (0, _effects.put)(_actions.callActions.addMediaFinish(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(id, {
       local: true,
       error: response.error
     }));
@@ -27257,7 +27490,7 @@ function* addMedia(deps, action) {
       tracks = tracks.concat(media.tracks.map(track => track.id));
     });
     log.debug('Successfully sent add media offer.', tracks);
-    yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.pendingOperation(id, {
       operation: localOp.operation,
       operationData: {
         local: true,
@@ -27324,7 +27557,7 @@ function* removeMedia(deps, action) {
     account,
     localOp,
     customParameters
-  } = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  } = yield (0, _effects.select)(_selectors.getCallById, id);
 
   const finalBandwidth = {
     audio: bandwidth && bandwidth.audio ? bandwidth.audio : callBandwidth.audio,
@@ -27362,7 +27595,7 @@ function* removeMedia(deps, action) {
     }));
   } else {
     log.debug('Successfully sent remove media offer.');
-    yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
+    yield (0, _effects.put)(_actions.callActions.pendingOperation(id, {
       operation: localOp.operation,
       operationData: {
         local: true,
@@ -27373,6 +27606,218 @@ function* removeMedia(deps, action) {
   }
 }
 
+/**
+ *
+ * Checks whether a renegotiation is necessary depending on the flag
+ *
+ * Responsibilities:
+ *    1. If renegotiation is necessary, dispatch a call action to start the renegotiation operaetion
+ * @method renegotiate
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   action An action of type `SESSION_TRACK_ENDED`.
+ * @param {Object}   action.payload The action's payload.
+ * @param {string}   action.payload.id The webRTC session ID.
+ * @param {string}   action.payload.trackId The ID of the track that was ended.
+ * @param {boolean}  action.payload.performRenegotiation A flag that determines whether renegotiation is necessary.
+ */
+function* checkRenegotiationFlag(deps, action) {
+  const { id, trackId, performRenegotiation } = action.payload;
+
+  // This saga could be triggered by the removeMedia API or by a remote notification of a track being removed.
+  // (since it picks up on the SESSION_TRACK_REMOVED action).
+  // In these scenario this flag will be set to `false` as the saga that handles these scenarios will perform the renegotiation itself.
+  if (performRenegotiation) {
+    log.debug('Renegotiation is needed.');
+    const { id: callId } = yield (0, _effects.select)(_selectors.getCallByWebrtcSessionId, id);
+    yield (0, _effects.put)(_actions.callActions.renegotiate(callId, {
+      trackId
+    }));
+  }
+}
+
+/**
+ *
+ * Performs a call renegotiation
+ *
+ * This saga handles creating the new SDP offer and performs the signalling for renegotiation.
+ * Assumptions:
+ *    2. The call is in the 'Connected' state
+ * Responsibilities:
+ *    1. Perform the signaling to tell the server that we are renegotiating
+ *    2. Update call state (via redux actions).
+ * @method renegotiate
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
+ * @param {Object}   action An action of type `RENEGOTIATE`.
+ */
+function* renegotiate(deps, action) {
+  const requests = deps.requests;
+  const { id, trackId } = action.payload;
+
+  // Get some call data.
+  const {
+    id: callId,
+    webrtcSessionId,
+    wrtcsSessionId,
+    bandwidth,
+    isAnonymous,
+    account,
+    localOp,
+    customParameters
+  } = yield (0, _effects.select)(_selectors.getCallById, id);
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, callId, { state: _constants.CALL_STATES.CONNECTED });
+  if (stateError) {
+    log.debug(`Invalid call state:  ${stateError.message}`);
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      stateError
+    }));
+    return;
+  }
+
+  // Update media and tracks using webRTC
+  const offer = yield (0, _effects.call)(_midcall.generateOffer, deps, webrtcSessionId, {}, bandwidth);
+  if (!offer) {
+    log.debug('Failed to generate offer.');
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_OFFER,
+        message: 'Failed to generate SDP offer'
+      })
+    }));
+    return;
+  }
+
+  const callInfo = {
+    wrtcsSessionId,
+    offer: offer.sdp,
+    isAnonymous,
+    account,
+    customParameters
+  };
+
+  const response = yield (0, _effects.call)(requests.updateSession, callInfo);
+
+  if (response.error) {
+    log.debug('Failed to send renegotiation offer.');
+    yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
+      local: true,
+      error: response.error
+    }));
+  } else {
+    log.debug('Successfully sent renegotiation offer.');
+    yield (0, _effects.put)(_actions.callActions.pendingOperation(callId, {
+      operation: localOp.operation,
+      operationData: {
+        local: true,
+        tracks: [trackId],
+        bandwidth
+      }
+    }));
+  }
+}
+
+/**
+ * Adds basic media scenario to the call
+ *
+ * This saga wraps addMedia as an easier to use function for simple scenarios
+ * Assumptions:
+ *    1. Validate that the call state is "Connected".
+ *        - The call is connected.
+ *    2. The track being added cannot already be on the call.
+ * Responsibilities:
+ *    1. Check that there isn't already a track of the same kind on the call
+ *    2. Call addMedia with the correct parameters
+ * @method addBasicMedia
+ * @param {Object}   deps          Injected dependencies that addMedia relies on
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests requests that addMedia relies on
+ * @param {Function} deps.requests.updateSession request to update the session on the backend
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
+ * @param {Object}   action        An action of type `ADD_BASIC_MEDIA`.
+ */
+function* addBasicMedia(deps, action) {
+  const { id, kind } = action.payload;
+  const tracks = yield getTracks(id, kind);
+
+  if (tracks.length >= 1) {
+    const message = `Too many ${kind} tracks for basic scenario!`;
+    log.debug(message);
+    yield (0, _effects.put)(_actions.callActions.addMediaFinish(id, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: message
+      })
+    }));
+  } else {
+    yield (0, _effects.call)(addMedia, deps, action);
+  }
+}
+
+/**
+ *
+ * Removes basic media from an existing session.
+ *
+ * This saga wraps removeMedia as an easier to use function for simple scenarios
+ * Assumptions:
+ *    1. The call is in the 'Connected' state
+ *    2. The track being removed should be the only one of its kind on the call.
+ * Responsibilities:
+ *    1. Check that this is a basic scenario (removing the only kind of track on the call)
+ *    2. Call removeMedia with the correct parameters
+ * @method removeMedia
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateSession "Update call" signalling function.
+ * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
+ * @param {Object}   action An action of type `REMOVE_BASIC_MEDIA`.
+ */
+function* removeBasicMedia(deps, action) {
+  const { id, kind } = action.payload;
+  const tracks = yield getTracks(id, kind);
+
+  if (tracks.length !== 1) {
+    const message = `Must have only one ${kind} track for basic scenario!`;
+    log.debug(message);
+    yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
+      local: true,
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: message
+      })
+    }));
+  } else {
+    yield (0, _effects.call)(removeMedia, deps, (0, _extends3.default)({}, action, {
+      payload: (0, _extends3.default)({}, action.payload, {
+        tracks: tracks
+      })
+    }));
+  }
+}
+
+/**
+ *
+ * Helper function to get all tracks of a certain type
+ *
+ * @param {string} id     - the id of the call
+ * @param {string} kind   - Kind must be of type 'audio', 'video', or 'screen'
+ * @return {Array} tracks - returns the array of tracks of the given type
+ */
+function* getTracks(id, kind) {
+  const call = yield (0, _effects.select)(_selectors.getCallById, id);
+  const localTracks = call ? call.localTracks : [];
+  const tracks = yield (0, _effects.all)(localTracks.map(id => (0, _effects.select)(_selectors2.getTrackById, id)));
+  const mediaTracks = tracks.filter(track => track.kind === kind);
+  return mediaTracks.map(trackObj => trackObj.trackId);
+}
 /**
  *
  * Direct Transfers an ongoing call.
@@ -27736,9 +28181,8 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
  * Responsibilities:
  *    1. Determine what the remote operation was (ie. what is being offered).
  *    2. Process the offer based on remote oepration and current local state.
- *    3. Remove local tracks that aren't being used for the call.
- *    4. Respond to the request.
- *    5. Update call state (via redux action).
+ *    3. Respond to the request.
+ *    4. Update call state (via redux action).
  * @method handleUpdateRequest
  * @param {Object}   deps          Dependencies that the saga uses.
  * @param {Object}   deps.webRTC   The WebRTC stack.
@@ -27884,22 +28328,6 @@ function* handleUpdateRequest(deps, targetCall, params) {
     // TODO: Dispatch an error action to notify of the error scenario.
     // The call may now be in a bad state and needs to be fixed.
     return;
-  }
-
-  /**
-   * This removes local tracks that aren't being sent to the other side. These are being
-   *    removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - No Change - There are no changes so we don't need to remove local tracks.
-   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, webRTC, targetCall.webrtcSessionId);
   }
 
   // Send answer sdp back to remote side
@@ -28058,9 +28486,8 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  *        - Indicates that it was a regular negotiation process.
  * Responsibilities:
  *    1. Have the callstack process the answer SDP.
- *    2. Remove local tracks that aren't being used for the call.
- *    3. TODO: Determine what the original operation was.
- *    4. Update call state (via redux action).
+ *    2. TODO: Determine what the original operation was.
+ *    3. Update call state (via redux action).
  * @method handleUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -28094,22 +28521,6 @@ function* handleUpdateResponse(deps, targetCall, params) {
   }
 
   const localOp = targetCall.localOp;
-
-  /**
-   * This removes local tracks that aren't being sent to the other side.
-   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - localOp does not exist - Means that
-   *    - the call was created as part of a Join operation and so it isn't doing any operations of its own right now.
-   *    - the call was Direct Transferred to and so it isn't doing any operations of its own right now.
-   *  - Local Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (localOp && localOp.operation !== _constants2.OPERATIONS.HOLD && !(localOp.operation === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
-  }
 
   // Update call state depending on what the current call state is.
   if ([_constants.CALL_STATES.RINGING, _constants.CALL_STATES.INITIATED, _constants.CALL_STATES.EARLY_MEDIA].includes(targetCall.state)) {
@@ -28158,11 +28569,20 @@ function* handleUpdateResponse(deps, targetCall, params) {
         case _constants2.OPERATIONS.UNHOLD:
           finishAction = _actions.callActions.unholdCallFinish;
           break;
+        case _constants2.OPERATIONS.ADD_BASIC_MEDIA:
+          finishAction = _actions.callActions.addMediaFinish;
+          break;
         case _constants2.OPERATIONS.ADD_MEDIA:
           finishAction = _actions.callActions.addMediaFinish;
           break;
+        case _constants2.OPERATIONS.REMOVE_BASIC_MEDIA:
+          finishAction = _actions.callActions.removeMediaFinish;
+          break;
         case _constants2.OPERATIONS.REMOVE_MEDIA:
           finishAction = _actions.callActions.removeMediaFinish;
+          break;
+        case _constants2.OPERATIONS.RENEGOTIATE:
+          finishAction = _actions.callActions.renegotiateFinish;
           break;
       }
       if (finishAction) {
@@ -28204,8 +28624,7 @@ function* handleUpdateResponse(deps, targetCall, params) {
  * Responsibilities:
  *    1. Determine what the original operation was.
  *    2. Have the callstack process the answer SDP.
- *    3. Remove local tracks that aren't being used for the call.
- *    4. Update call state (via redux action) based on original operation.
+ *    3. Update call state (via redux action) based on original operation.
  * @method handleSlowUpdateResponse
  * @param {Object}  deps          Dependencies that the saga uses.
  * @param {Object}  deps.webRTC   The WebRTC stack.
@@ -28274,22 +28693,6 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
     // TODO: Dispatch an error action to notify of the error scenario.
     // The call may now be in a bad state and needs to be fixed.
     return;
-  }
-
-  /*
-   * This removes local tracks that aren't being sent to the other side.
-   * These are being removed to prevent any unintended side-effects in subsequent negotiations.
-   * We will not be doing this for the following scenarios:
-   *  - Remote Music-on-Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - Remote Hold - Our senders will have direction as `inactive` and we don't want to
-   *     remove local tracks in this scenario.
-   *  - No Change - There are no changes so we don't need to remove local tracks.
-   *  - Remote Unhold while in Dual Hold state - Unholding while in Dual Hold will still keep
-   *     sender direction as `inactive` so we don't want to remove local tracks in this scenario.
-   */
-  if (remoteOp !== _constants2.OPERATIONS.START_MOH && remoteOp !== _constants2.OPERATIONS.HOLD && remoteOp !== 'NO_CHANGE' && !(remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.localHold && targetCall.remoteHold)) {
-    yield (0, _effects.call)(_negotiation.removeUnusedLocalTracks, deps.webRTC, targetCall.webrtcSessionId);
   }
 
   if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
@@ -30766,17 +31169,18 @@ function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
 function* webRtcRemoveMedia(deps, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
   const { sessionId, tracks, bandwidth } = sessionOptions;
+
   // Get the tracks that we want to remove
   const localTracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], tracks);
-  const invalidTrackIds = [];
-  for (var i = 0; i < localTracksToRemove.length; i++) {
-    if ((0, _fp.isUndefined)(localTracksToRemove[i])) {
-      invalidTrackIds.push(tracks[i]);
-    }
-  }
+  // Get the indexes of undefined tracks.
+  const invalidIndexes = localTracksToRemove.reduce((acc, cur, ind) => {
+    return (0, _fp.isUndefined)(cur) ? acc.concat(ind) : acc;
+  }, []);
+  // Get the track IDs of those indexes.
+  const invalidTracks = invalidIndexes.map(ind => tracks[ind]);
 
-  if (!(0, _fp.isEmpty)(invalidTrackIds)) {
-    const message = 'Invalid track id(s) provided';
+  if (!(0, _fp.isEmpty)(invalidTracks)) {
+    const message = `The following invalid track ids were provided: ${invalidTracks.join(', ')}`;
     log.debug(message);
     return {
       error: new _errors2.default({
@@ -30935,13 +31339,7 @@ function* webRtcReplaceTrack(webRTC, params) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
-
-var _keys2 = _interopRequireDefault(_keys);
-
 exports.isSameSdpSessionId = isSameSdpSessionId;
-exports.removeUnusedLocalTracks = removeUnusedLocalTracks;
 exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
@@ -30989,31 +31387,6 @@ function* isSameSdpSessionId(webRTC, sessionId, sdp) {
     const sameId = yield (0, _effects.call)(_sdp.hasSameSessionId, currentDesc.sdp, sdp);
     return sameId;
   }
-}
-
-/**
- * Removes local tracks that are not being sent to the other side.
- * This is meant to be called when a remote sdp has been processed.
- * @method removeUnusedLocalTracks
- * @param  {Object}  webRTC    The webRTC stack.
- * @param  {string}  sessionId ID of the Session under question.
- */
-function* removeUnusedLocalTracks(webRTC, sessionId) {
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
-  const localTracksIsSending = yield (0, _effects.call)([session, 'getLocalTracksIsSendingStatus']);
-
-  // Only get the track ids where the track is not sending.
-  const trackIdsToRemove = (0, _keys2.default)(localTracksIsSending).filter(localTrackId => !localTracksIsSending[localTrackId]);
-  const tracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIdsToRemove);
-  log.debug(`Tracks to be removed due to not being actively used for the call: ${trackIdsToRemove}`);
-
-  // Removes tracks from peer (Will stop tracks from being sent to remote participant).
-  // Does NOT end the tracks.
-  yield (0, _effects.call)([session, 'removeTracks'], trackIdsToRemove);
-
-  // Ends the tracks.
-  // Clean-up the local tracks.
-  yield (0, _effects.all)(tracksToRemove.map(track => (0, _effects.call)([track, 'cleanup'])));
 }
 
 /**
@@ -33988,7 +34361,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.10.0';
+  let version = '4.11.0';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -36319,7 +36692,7 @@ function marshallGroup(groupNotification) {
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/index.common.js":
+/***/ "../../packages/kandy/src/logs/actions/actionHandler.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36328,198 +36701,48 @@ function marshallGroup(groupNotification) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = commonIndex;
-
-var _factory = __webpack_require__("../../packages/kandy/src/factory.js");
-
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
-// This is a hack to fix an issue where Lodash will add itself to
-// the window scope even if it's loaded via ES6. You can remove this when
-// we have an answer to https://github.com/lodash/lodash/issues/1798 .
-// eslint-disable-next-line
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
+exports.default = defaultActionHandler;
 /**
- * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
- * The SDK instance will be refered as 'api' throughout the rest of the documentation content.
- * @public
- * @method create
- * @param {config} config The configuration object.
- * @return {api} The SDK instance.
- * @example
- * // Instantiate the SDK.
- * import { create } from 'kandy'
- * const client = create({
- *     authentication: { ... },
- *     logs: { ... },
- *     ...
- * });
- * // Use the SDK's API.
- * client.on( ... );
+ * Default function for the SDK to use for logging actions.
+ * Action entries come in 4 different types:
+ *    1. start: Log the message directly and "open the group".
+ *    2. state: Log a prefix, state type, and state itself.
+ *      (prev state and next state)
+ *    3. payload: Log a prefix, action type, and payload.
+ *    4. end: Close the group.
+ * @method defaultActionHandler
+ * @param  {LogEntry} entry
  */
+function defaultActionHandler(entry) {
+  // Handle the "start" and "stop" action log entries specifically.
+  if (['group', 'groupCollapsed'].includes(entry.method)) {
+    console[entry.method](...entry.messages);
+    return;
+  } else if (entry.method === 'groupEnd') {
+    console.groupEnd();
+    return;
+  }
 
-/**
- * The 'api' is the type returned by the create function.
- * It contains various top-level functions that pertain to SDK global instance
- * as well as several nested namespaces that pertain to various features (e.g. call, contacts, presence, etc).
- *
- * @public
- * @module api
- */
+  const { timestamp, level } = entry;
+  const logInfo = `${timestamp} - ACTION - ${level}`;
 
-/**
- * The configuration object. This object defines what different configuration
- * values you can use when instantiating the SDK using the {@link create} function.
- * @public
- * @module config
- */
+  const [logType, payload] = entry.messages;
 
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
-/**
- * A set of {@link call.SdpHandlerFunction SdpHandlerFunction}s for manipulating SDP information.
- * These handlers are used to customize low-level call behaviour for very specific
- * environments and/or scenarios. They can be provided during SDK instantiation
- * to be used for all calls.
- *
- * @public
- * @namespace sdpHandlers
- * @example
- * import { create, sdpHandlers } from 'kandy';
- * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
- * const client = create({
- *   call: {
- *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
- *   }
- * })
- */
+  let prefix;
+  if (logType.includes('state')) {
+    // If the log is for prev state / next state, display that in the prefix.
+    prefix = `${logInfo} - ${logType.toUpperCase()}`;
+  } else {
+    // Else the log is the action itself, so use the action type.
+    prefix = `${logInfo} - ${payload.type}`;
+  }
 
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
-/**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
- * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
- *
- * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
- *
- * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
- *
- * @public
- * @memberof sdpHandlers
- * @method createCodecRemover
- * @param {Array<string>} codecs A list of codec names to remove from the SDP.
- * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
- * @example
- * import { create, sdpHandlers } from 'kandy';
- * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
- * const client = create({
- *   call: {
- *     sdpHandlers: [codecRemover]
- *   }
- * })
- *
- */
-
-/*
- * Index template file that is used to create pre-defined version of the SDK.
- */
-if (_fp._) _fp._.noConflict();
-
-function commonIndex(options = {}, plugins = []) {
-  const pluginInstances = (0, _fp.map)(function (plugin) {
-    return plugin.fn(options[plugin.name]);
-  }, plugins);
-
-  return (0, _factory.factory)(pluginInstances, options.common);
+  console[entry.method](prefix, payload);
 }
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/index.cpaas.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _index = __webpack_require__("../../packages/kandy/src/index.common.js");
-
-var _index2 = _interopRequireDefault(_index);
-
-var _basePlugins = __webpack_require__("../../packages/kandy/src/basePlugins.js");
-
-var _basePlugins2 = _interopRequireDefault(_basePlugins);
-
-var _cpaas = __webpack_require__("../../packages/kandy/src/auth/cpaas/index.js");
-
-var _cpaas2 = _interopRequireDefault(_cpaas);
-
-var _webrtc = __webpack_require__("../../packages/kandy/src/webrtc/index.js");
-
-var _webrtc2 = _interopRequireDefault(_webrtc);
-
-var _cpaas3 = __webpack_require__("../../packages/kandy/src/call/cpaas/index.js");
-
-var _cpaas4 = _interopRequireDefault(_cpaas3);
-
-var _cpaas5 = __webpack_require__("../../packages/kandy/src/connectivity/cpaas/index.js");
-
-var _cpaas6 = _interopRequireDefault(_cpaas5);
-
-var _cpaas7 = __webpack_require__("../../packages/kandy/src/messaging/cpaas/index.js");
-
-var _cpaas8 = _interopRequireDefault(_cpaas7);
-
-var _cpaas9 = __webpack_require__("../../packages/kandy/src/notifications/cpaas/index.js");
-
-var _cpaas10 = _interopRequireDefault(_cpaas9);
-
-var _cpaas11 = __webpack_require__("../../packages/kandy/src/presence/cpaas/index.js");
-
-var _cpaas12 = _interopRequireDefault(_cpaas11);
-
-var _cpaas13 = __webpack_require__("../../packages/kandy/src/groups/cpaas/index.js");
-
-var _cpaas14 = _interopRequireDefault(_cpaas13);
-
-var _cpaas15 = __webpack_require__("../../packages/kandy/src/subscription/cpaas/index.js");
-
-var _cpaas16 = _interopRequireDefault(_cpaas15);
-
-var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
-
-var _codecRemover2 = _interopRequireDefault(_codecRemover);
-
-var _cpaas17 = __webpack_require__("../../packages/kandy/src/users/cpaas/index.js");
-
-var _cpaas18 = _interopRequireDefault(_cpaas17);
-
-__webpack_require__("../../packages/kandy/src/docs/docs.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
-
-// Plugins
-
-
-function root(options = {}, plugins = []) {
-  return (0, _index2.default)(options, [...defaultPlugins, ...plugins]);
-}
-
-// Alias 'create' to be equal to the root function
-root.create = root;
-
-root.sdpHandlers = {
-  createCodecRemover: _codecRemover2.default
-
-  // Export this way as a work-around, so it can be used as `<export>();`.
-  // See: https://github.com/webpack/webpack/issues/706
-};module.exports = root;
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/index.js":
+/***/ "../../packages/kandy/src/logs/actions/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36528,186 +36751,79 @@ root.sdpHandlers = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.API_LOG_TAG = undefined;
 
 var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-exports.default = logger;
-exports.getLogManager = getLogManager;
+exports.default = createActionLogger;
 
-var _transformers = __webpack_require__("../../packages/kandy/src/logs/transformers.js");
+var _index = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
+
+var _transformers = __webpack_require__("../../packages/kandy/src/logs/actions/transformers.js");
 
 var _transformers2 = _interopRequireDefault(_transformers);
 
-var _api = __webpack_require__("../../packages/kandy/src/logs/interface/api.js");
-
-var _api2 = _interopRequireDefault(_api);
-
-var _actions = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
-
-var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
-
-var _logManager = __webpack_require__("../../packages/kandy/src/logs/logManager.js");
-
-var _logManager2 = _interopRequireDefault(_logManager);
-
-var _utils2 = __webpack_require__("../../packages/kandy/src/logs/utils.js");
+var _utils = __webpack_require__("../../packages/kandy/src/logs/actions/utils.js");
 
 var _reduxLogger = __webpack_require__("../../node_modules/redux-logger/dist/redux-logger.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Default logging options
-
-
-// Other plugins.
-// Logs plugin.
-const defaultOptions = {
-  // Possible levels: trace, debug, info, warn, error, silent.
-  logLevel: 'debug',
-  // Flatten the log entries into a string, rather than logging more complex data types.
-  flatten: false,
-  // Configuration options relevant to the logging of actions
-  logActions: {
-    // Only show action out of prevState, action, newState.
-    actionOnly: true,
-    // Collapse prevState, action, nextState objects by default.
-    collapsed: false,
-    // Log the diff for each action.
-    diff: false,
-    // set redux-logger's level to debug
-    level: 'debug',
-    // Allow action payloads to be exposed in the logs, potentially displaying sensitive information
-    exposePayloads: false
-  },
-  enableFcsLogs: true
-
-  // Logs generated as a result of invoking the public API will contain this tag
-};
-
-// Redux Logger middleware
-
-
-// Log manager, log levels and redux-logger options
-
-
-// Libraries.
-const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
-
-// Instantiate the log manager
-const logMgr = getLogManager(defaultOptions);
-
 /**
- * Configuration options for the Logs feature.
- * @public
- * @static
- * @name config.logs
- * @memberof config
- * @requires logs
- * @instance
- * @param {Object} logs Logs configs.
- * @param  {string} [logs.logLevel='debug'] Log level to be set. See {@link logger.levels}.
- * @param  {boolean} [logs.flatten=false] Whether all logs should be output in a string-only format.
- * @param  {Object} [logs.logActions] Options specifically for action logs when logLevel is at DEBUG+ levels. Set this to false to not output action logs.
- * @param  {boolean} [logs.logActions.actionOnly=true] Only output information about the action itself. Omits the SDK context for when it occurred.
- * @param  {boolean} [logs.logActions.collapsed=false] Whether logs should be minimized when initially output. The full log is still output and can be inspected on the console.
- * @param  {boolean} [logs.logActions.diff=false] Include a diff of what SDK context was changed by the action.
- * @param {boolean} [logs.logActions.exposePayloads=false] Allow action payloads to be exposed in the logs, potentially displaying sensitive information
- * @param  {boolean} [logs.enableFcsLogs=true] Enable the detailed call logger.
- * @param  {boolean} [logs.enableGrouping=true] Whether to group information about an action log together in the console.
+ * Creates a redux middleware for logging actions.
+ * @method createActionLogger
+ * @param  {Object}     options
+ * @return {Middleware}
  */
+function createActionLogger(options) {
+  const logManager = (0, _index.getLogManager)();
+  // Create a Logger for handling the action logs.
+  const logger = logManager.getLogger('ACTION');
+  logger.logHandler = options.logActions.handler;
+  logger.level = options.logActions.level;
 
-/**
- * Logger Plugin.
- * @method logger
- * @param  {Object} [options] Plugin configurations. See above.
- * @return {Object} plugin A plugin object.
- */
-function logger(options = {}) {
-  const name = 'logs';
-  // Backwards compatibility: flatten replaced logActions.flattenActions
-  // TODO: Remove this after awhile.
-  if (options.logActions && options.logActions.flattenActions && options.flatten === undefined) {
-    logMgr.getLogger('LOGS').warn('The Logs plugin config "logActions.flattenActions" has been ' + 'deprecated in favour of "flatten", and will be removed in a future build.');
-    options.flatten = options.logActions.flattenActions;
-  }
-  options = (0, _utils.mergeValues)(defaultOptions, options);
-  // Now that plugins are being called, we can update the log manager with our desired configuration options
-  logMgr.updateManager(options);
+  const setLevel = _constants.logLevels[options.logLevel];
 
-  function* init() {
-    // Send the provided options to the store.
-    // This will be `state.config[name]`.
-    yield (0, _effects.put)((0, _actions.update)(options, name));
+  let actionOptions = {};
+  // Use different options for redux-logger depending on log level.
+  if (setLevel === _constants.logLevels.INFO) {
+    // At the INFO level, hide everything except the action name.
+    actionOptions.level = false;
+    actionOptions.diff = false;
+  } else {
+    // At the DEBUG+ levels, use the configs.
+    actionOptions = (0, _extends3.default)({}, options.logActions);
   }
 
-  var components = {
-    name,
-    capabilities: ['logs'],
-    init,
-    api: _api2.default
-    // Consider actions to be at the INFO log level.
-    // Only export a middleware (for actions) at the appropriate levels.
-  };if (logMgr.getLevel() <= _logManager.logLevels.INFO && options.logActions !== false) {
-    let actionOptions = {};
-    // Use different options for redux-logger depending on log level.
-    if (logMgr.getLevel() === _logManager.logLevels.INFO) {
-      // At the INFO level, hide everything except the action name.
-      actionOptions.level = false;
-      actionOptions.diff = false;
-    } else {
-      // At the DEBUG+ levels, use the configs.
-      actionOptions = (0, _extends3.default)({}, options.logActions);
-    }
-
-    if (options.logActions.actionOnly) {
-      // Hide prevState and nextState.
-      // Log action and error at info level, so the browser won't hide it by default.
-      actionOptions.level = {
-        prevState: false,
-        action: 'info',
-        error: 'info',
-        nextState: false
-      };
-    }
-
-    if (options.logActions.excludeActions) {
-      actionOptions.predicate = excludeActions(options.logActions.excludeActions);
-    }
-
-    // ALWAYS use our own logger
-    actionOptions.logger = logMgr.getLogger('ACTION');
-    // ALWAYS remove theming/styling from the action log messages
-    actionOptions.titleFormatter = _utils2.titleFormatter;
-    actionOptions.colors = false;
-    // Setup the transformers based on the options.
-    let transformers = (0, _transformers2.default)(options.logActions);
-    // Create the logger middleware.
-    components.middleware = (0, _reduxLogger.createLogger)((0, _extends3.default)({}, actionOptions, transformers));
+  if (options.logActions.actionOnly) {
+    // Hide prevState and nextState.
+    // Log action and error at info level, so the browser won't hide it by default.
+    actionOptions.level = {
+      prevState: false,
+      action: 'info',
+      error: 'info',
+      nextState: false
+    };
   }
-  return components;
-}
 
-/**
- * Getter checks to see if an instance of logManager exists, instantiates it if it does not, and returns
- * the instance of LogManager
- * @param {Object} [options]
- * @param {string} [options.logLevel] The logging level, as per options found in logManager.levels
- * @param {boolean} [options.flatten] Stringifies the output
- * @param {boolean} [options.enableGrouping] Group log messages together
- * @returns {LogManager} an instance of our LogManager
- *
- * TODO:Fix this ugly singleton.
- */
-function getLogManager(options) {
-  if (!getLogManager.instance) {
-    getLogManager.instance = new _logManager2.default(options);
+  if (options.logActions.excludeActions) {
+    actionOptions.predicate = excludeActions(options.logActions.excludeActions);
   }
-  return getLogManager.instance;
+
+  // ALWAYS use our own logger
+  actionOptions.logger = logger;
+  // ALWAYS remove theming/styling from the action log messages
+  actionOptions.titleFormatter = _utils.titleFormatter;
+  actionOptions.colors = false;
+
+  // Setup the transformers based on the options.
+  let transformers = (0, _transformers2.default)(options.logActions);
+  // Create the logger middleware.
+
+  return (0, _reduxLogger.createLogger)((0, _extends3.default)({}, actionOptions, transformers));
 }
 
 /**
@@ -36716,402 +36832,19 @@ function getLogManager(options) {
  * @param {Array} actions An array of action types to exclude from logs
  * @returns {function} A predicate function
  */
+
+
+// Libraries.
+
+// Action specific.
+// Logs plugin.
 function excludeActions(actions) {
   return (getState, action) => !actions.includes(action.type);
 }
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/logs/interface/api.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = api;
-/**
- * The internal logger is used to provide information about the SDK's behaviour.
- * The logger can provide two types of logs: basic logs and action logs. Basic
- * logs are simple lines of information about what the SDK is doing during operations.
- * Action logs are complete information about a specific action that occurred
- * within the SDK, providing debug information describing it.
- * The amount of information logged can be configured as part of the SDK configuration.
- * See {@link #configconfiglogs config.logs} .
- *
- * @public
- * @namespace logger
- * @requires logs
- */
-
-function api() {
-  let api = {
-    /**
-     * Possible levels for the SDK logger.
-     * @public
-     * @static
-     * @memberof logger
-     * @property {string} SILENT Log nothing.
-     * @property {string} ERROR Log only unhandled errors.
-     * @property {string} WARN Log issues that may cause problems or unexpected behaviour.
-     * @property {string} INFO Log useful information and messages to indicate the SDK's internal operations.
-     * @property {string} DEBUG Log information to help diagnose problematic behaviour.
-     */
-    levels: {
-      SILENT: 'silent',
-      ERROR: 'error',
-      WARN: 'warn',
-      INFO: 'info',
-      DEBUG: 'debug'
-    }
-  };
-
-  return {
-    logger: api
-  };
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/logManager.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.logLevels = undefined;
-
-var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-exports.default = LogManager;
-
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Exposed logLevels object describes the level hierarchy
- *
- * @type {{TRACE: number, DEBUG: number, INFO: number, WARN: number, ERROR: number, SILENT: number}}
- */
-const logLevels = exports.logLevels = {
-  TRACE: 0,
-  DEBUG: 1,
-  INFO: 2,
-  WARN: 3,
-  ERROR: 4,
-  SILENT: 5
-
-  /**
-   * Creates a log manager to provision loggers and coordinate processing of log entries
-   * @method LogManager
-   * @param {Object} [options]
-   * @param {string} [options.logLevel='INFO']
-   * @param {boolean} [options.flatten=false]
-   * @param {boolean} [options.enableGrouping=true]
-   */
-};function LogManager({ logLevel = 'INFO', flatten = false, enableGrouping = true }) {
-  // Create a property to reference the master logger
-  this._log = _loglevel2.default;
-  // Always convert the logLevel string to upper case for consistency
-  this.level = logLevels[logLevel.toUpperCase()];
-  this._log.setLevel(this.level, false);
-  // Setting flatten to true will result in stringified output
-  this.flatten = flatten;
-
-  const loggers = {};
-  const _logMgr = this;
-
-  _logMgr._log.info('Creating Log Manager');
-
-  /**
-   * Logger getter function to be used to retrieve all loggers in the SDK
-   * @method getLogger
-   * @param {string} name, The name of the logger to be created/retrieved
-   * @returns {Logger}
-   */
-  this.getLogger = function getLogger(name) {
-    var logger;
-
-    if (loggers[name]) {
-      logger = loggers[name];
-    } else {
-      logger = new Logger(name);
-      loggers[logger.getName()] = logger;
-    }
-
-    return logger;
-  };
-
-  /**
-   * Log handler to compose a log message and determine the appropriate console logging function to
-   * print log entry
-   * @method logHandler
-   * @param {string} name Name of the logger.
-   * @param {LogItem} logItem
-   */
-  this.logHandler = function logHandler(name, logItem) {
-    const msg = parseLogMessage(name, logItem);
-
-    if (logLevels[logItem.level] >= _logMgr.level) {
-      switch (logLevels[logItem.level]) {
-        case logLevels.TRACE:
-          _logMgr._log.trace(msg, ...logItem.args);
-          break;
-        case logLevels.DEBUG:
-          _logMgr._log.debug(msg, ...logItem.args);
-          break;
-        case logLevels.INFO:
-          _logMgr._log.info(msg, ...logItem.args);
-          break;
-        case logLevels.WARN:
-          _logMgr._log.warn(msg, ...logItem.args);
-          break;
-        case logLevels.ERROR:
-          _logMgr._log.error(msg, ...logItem.args);
-          break;
-        case logLevels.SILENT:
-          /* TODO we should implement a secondary logging mechanism, which would save the logs on a private server this secondary mechanism would also include messages that were created while logging level was set to SILENT */
-          break;
-        default:
-          _logMgr._log.info(msg, ...logItem.args);
-          break;
-      }
-    } else {
-      /* Log level is not sufficiently Low to allow message to be visible */
-    }
-  };
-
-  /**
-   * Creates a new logger which can be identified by name for subsequent retrieval
-   * @param name
-   * @constructor
-   */
-  function Logger(name) {
-    this.name = name;
-    /**
-     * Logger name getter function
-     * @returns {string} name - The name of the logger
-     */
-    this.getName = () => {
-      return this.name;
-    };
-
-    /**
-     * Log function to instantiate a log item and send to handler
-     * for processing
-     * @param {string} level - The log function level which was used to create the log message
-     * @param {string} message - The unparsed log message
-     * @param {*} args - The arguments provided along the message
-     */
-    function log(level, message, args) {
-      const logItem = new LogItem(level, message, args);
-      if (_logMgr) {
-        _logMgr.logHandler(name, logItem);
-      }
-    }
-
-    this.error = (msg, ...args) => {
-      return log('ERROR', msg, args);
-    };
-
-    this.warn = (msg, ...args) => {
-      return log('WARN', msg, args);
-    };
-
-    this.info = (msg, ...args) => {
-      return log('INFO', msg, args);
-    };
-
-    this.debug = (msg, ...args) => {
-      return log('DEBUG', msg, args);
-    };
-
-    this.trace = (msg, ...args) => {
-      return log('TRACE', msg, args);
-    };
-
-    // Treat `logger.log` as a special case for now. Pass it straight through
-    //   to the logger (without parsing/formatting). Prevents logs that aren't
-    //   setup to work with the logger from being double-formatted (eg. FCS).
-    // TODO: Remove `logger.log` when FCS logs work well with this log manager.
-    this.log = (msg, ...args) => {
-      _logMgr._log.log(msg, ...args);
-    };
-
-    /**
-     * Handle group-related console functions
-     * @param data
-     */
-    this.group = data => {
-      if (_logMgr.enableGrouping === false) {
-        return;
-      }
-      window.console.group(data);
-    };
-
-    this.groupCollapsed = data => {
-      if (_logMgr.enableGrouping === false) {
-        return;
-      }
-      window.console.groupCollapsed(data);
-    };
-
-    this.groupEnd = () => {
-      if (_logMgr.enableGrouping === false) {
-        return;
-      }
-      window.console.groupEnd();
-    };
-  }
-
-  /**
-   * Update the configuration of the log manager after it has been instantiated
-   *
-   * This is necessary as the log manager needs to be created prior to initializing each
-   * of the plugins in the SDK.
-   * @method updateManager
-   * @param {Object} [options]
-   * @param {string} [options.logLevel] the logging level, as per options found in logManager.levels
-   * @param {Boolean} [options.flatten]
-   */
-  this.updateManager = ({ logLevel, flatten, enableGrouping }) => {
-    // Update the manager's options _if_ they were provided.
-    _logMgr.level = logLevel ? logLevels[logLevel.toUpperCase()] : _logMgr.level;
-    _logMgr._log.setLevel(this.level, false);
-    _logMgr.flatten = flatten || _logMgr.flatten;
-    _logMgr.enableGrouping = enableGrouping;
-  };
-
-  /**
-   * Getter to return the current level set in the log manager
-   * @method getLevel
-   * @returns {string}
-   */
-  this.getLevel = () => {
-    return _logMgr.level;
-  };
-
-  /**
-   * Helper function to check if verbose mode is enabled
-   * @returns {boolean}
-   */
-  function isVerboseEnabled() {
-    return _logMgr.flatten;
-  }
-
-  /**
-   * Determines type of log entry being recorded and composes an appropriate message
-   * @param {string} name - The name of the logger for which this message is being parsed
-   * @param {Object} logItem - The log entry
-   * @returns {string} logMessage - The fully composed log message
-   */
-  function parseLogMessage(name, logItem) {
-    let logMessage;
-    switch (name) {
-      case 'ACTION':
-        logMessage = parseActionMessage(name, logItem);
-        break;
-
-      case 'GENERAL':
-        logMessage = parseMessage(name, logItem);
-        break;
-
-      default:
-        logMessage = parseMessage(name, logItem);
-        break;
-    }
-    return logMessage;
-  }
-
-  /**
-   * Determines the specific type of action if the log entry is of messageTypes.ACTION
-   * @param actionArgs
-   * @param message
-   * @returns {*}
-   */
-  function getActionType(actionArgs, message) {
-    if (actionArgs.length > 0 && 'type' in actionArgs[0]) {
-      return actionArgs[0].type;
-    }
-    return message.indexOf('prev') !== -1 ? 'PREV STATE' : 'NEXT STATE';
-  }
-
-  /**
-   * Parses a general purpose log message
-   * @param {string} name
-   * @param {Object} logItem
-   * @returns {string}
-   */
-  function parseMessage(name, logItem) {
-    if (typeof logItem !== 'undefined' && logItem.hasOwnProperty('message')) {
-      if (isVerboseEnabled()) {
-        // TODO: Improve the stringification process to mitigate circular JSON errors
-        return `${logItem.timestamp} - ${name} - ${logItem.level} - MESSAGE - ${(0, _stringify2.default)(logItem.message)} - ARGS - ${(0, _stringify2.default)(logItem.args)}`;
-      }
-      return `${logItem.timestamp} - ${name} - ${logItem.level} - ${logItem.message}`;
-    }
-  }
-
-  /**
-   * Parses log items containing actions and composes an informative log message
-   * @param name
-   * @param logItem
-   * @returns {string}
-   */
-  function parseActionMessage(name, logItem) {
-    var actionType = getActionType(logItem.args, logItem.message);
-
-    if (isVerboseEnabled()) {
-      return `${logItem.timestamp} - ${name} - ${logItem.level} - MESSAGE - ${(0, _stringify2.default)(logItem.message)} - ARGS - ${(0, _stringify2.default)(logItem.args)}`;
-    }
-
-    return `${logItem.timestamp} - ${name} - ${logItem.level} - ${actionType}`;
-  }
-}
-
-/**
- * Base structure for a log entry
- *
- * @constructor
- *
- * @property {string} message - The visible message being displayed by the log entry, undefined at instantiation
- * @property {string} level - The logging level
- * @property {*} args - The arguments supplied with the log entry, if supplied
- * @property {string} timestamp - The time of the log entry
- *
- * @param level
- * @param msg
- * @param [args]
-
- * @returns {LogItem}
- */
-function LogItem(level, msg, args) {
-  this.level = level;
-  this.timestamp = Date.now();
-  this.message = msg;
-
-  if (typeof args !== 'undefined') {
-    // Always return args as an array, as this produces a consistent behaviour wherein we maintain the option to add a stack trace to the log message
-    this.args = typeof args !== 'undefined' ? args : [];
-  } else {
-    delete this.args;
-  }
-  return this;
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/transformers.js":
+/***/ "../../packages/kandy/src/logs/actions/transformers.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37179,7 +36912,7 @@ function removePayloads(action) {
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/logs/utils.js":
+/***/ "../../packages/kandy/src/logs/actions/utils.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37206,6 +36939,555 @@ function titleFormatter(action, time, took) {
   parts.push('(in ' + took.toFixed(2) + ' ms)');
 
   return parts.join(' ');
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/config.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _logHandler = __webpack_require__("../../packages/kandy/src/logs/logHandler.js");
+
+var _logHandler2 = _interopRequireDefault(_logHandler);
+
+var _actionHandler = __webpack_require__("../../packages/kandy/src/logs/actions/actionHandler.js");
+
+var _actionHandler2 = _interopRequireDefault(_actionHandler);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Configuration options for the Logs feature.
+ *
+ * The SDK will log information about the operations it is performing. The
+ *    amount of information will depend on how the Logs feature is configured.
+ *
+ * The format of logs can also be customized by providing a
+ *    {@link logger.LogHandler LogHandler}. This function will receive a
+ *    {@link logger.LogEntry LogEntry} which it can handle as it sees fit. By
+ *    default, the SDK will log information to the console.
+ *
+ * @public
+ * @static
+ * @name config.logs
+ * @memberof config
+ * @requires logs
+ * @instance
+ * @param {Object} logs Logs configs.
+ * @param {string} [logs.logLevel='debug'] Log level to be set. See {@link logger.levels}.
+ * @param {logger.LogHandler} [logs.handler] The function to receive log entries from the
+ *    SDK. If not provided, a default handler will be used that logs entries
+ *    to the console.
+ * @param  {boolean} [logs.enableFcsLogs=true] Enable the detailed call logger
+ *    for v3.X. Requires log level debug.
+ * @param {Object} [logs.logActions] Options specifically for action logs when
+ *    logLevel is at DEBUG+ levels. Set this to false to not output action logs.
+ * @param {logger.LogHandler} [logs.logActions.handler] The function to receive action
+ *    log entries from the SDK. If not provided, a default handler will be used
+ *    that logs actions to the console.
+ * @param {boolean} [logs.logActions.actionOnly=true] Only output information
+ *    about the action itself. Omits the SDK context for when it occurred.
+ * @param {boolean} [logs.logActions.collapsed=false] Whether logs should be
+ *    minimized when initially output. The full log is still output and can be
+ *    inspected on the console.
+ * @param {boolean} [logs.logActions.diff=false] Include a diff of what SDK
+ *    context was changed by the action.
+ * @param {boolean} [logs.logActions.exposePayloads=false] Allow action payloads
+ *    to be exposed in the logs, potentially displaying sensitive information.
+ */
+exports.default = {
+  logLevel: 'debug',
+  handler: _logHandler2.default,
+  enableFcsLogs: true,
+
+  // Action-specific configs.
+  logActions: {
+    handler: _actionHandler2.default,
+    actionOnly: true,
+    collapsed: false,
+    diff: false,
+    level: 'debug',
+    exposePayloads: false
+  }
+};
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/constants.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Log levels used by the SDK.
+ * When a level is set, all logs of that level and higher will be logged.
+ */
+const logLevels = exports.logLevels = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  SILENT: 5
+};
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.API_LOG_TAG = undefined;
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
+exports.getLogManager = getLogManager;
+exports.default = logPlugin;
+
+var _api = __webpack_require__("../../packages/kandy/src/logs/interface/api.js");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _config = __webpack_require__("../../packages/kandy/src/logs/config.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
+
+var _actions = __webpack_require__("../../packages/kandy/src/logs/actions/index.js");
+
+var _actions2 = _interopRequireDefault(_actions);
+
+var _logManager = __webpack_require__("../../packages/kandy/src/logs/logManager.js");
+
+var _logManager2 = _interopRequireDefault(_logManager);
+
+var _actions3 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
+
+var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Create the LogManager right away so that it is available. The SDK has not
+ *    been instantiated yet, so we have to use the default options until we get
+ *    the application's configs.
+ */
+// Logs plugin.
+const logManager = (0, _logManager2.default)('SDK', _config2.default);
+
+// Libraries.
+
+
+// Other plugins.
+function getLogManager() {
+  return logManager;
+}
+
+// Logs generated as a result of invoking the public API will contain this tag
+const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
+
+function logPlugin(options = {}) {
+  const name = 'logs';
+
+  options = (0, _utils.mergeValues)(_config2.default, options);
+  options.logLevel = options.logLevel.toUpperCase();
+
+  // Now that we have the application's log configs, update everything to
+  //    use those values instead of default values.
+  logManager.level = options.logLevel;
+  logManager.logHandler = options.handler;
+
+  (0, _values2.default)(logManager.getLoggers()).forEach(logger => {
+    logger.level = options.logLevel;
+    logger.logHandler = options.handler;
+  });
+
+  function* init() {
+    // Send the provided options to the store.
+    // This will be `state.config[name]`.
+    yield (0, _effects.put)((0, _actions3.update)(options, name));
+  }
+
+  const components = {
+    name,
+    capabilities: ['logs'],
+    init,
+    api: _api2.default
+  };
+
+  const setLevel = _constants.logLevels[options.logLevel];
+  // Consider actions to be at the INFO log level.
+  // Only export a middleware (for actions) at the appropriate levels.
+  if (setLevel <= _constants.logLevels.INFO && options.logActions !== false) {
+    components.middleware = (0, _actions2.default)(options);
+  }
+
+  return components;
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/interface/api.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = api;
+/**
+ * The internal logger is used to provide information about the SDK's behaviour.
+ * The logger can provide two types of logs: basic logs and action logs. Basic
+ * logs are simple lines of information about what the SDK is doing during operations.
+ * Action logs are complete information about a specific action that occurred
+ * within the SDK, providing debug information describing it.
+ * The amount of information logged can be configured as part of the SDK configuration.
+ * See {@link #configconfiglogs config.logs} .
+ *
+ * @public
+ * @namespace logger
+ * @requires logs
+ */
+
+function api() {
+  let api = {
+    /**
+     * Possible levels for the SDK logger.
+     * @public
+     * @static
+     * @memberof logger
+     * @property {string} SILENT Log nothing.
+     * @property {string} ERROR Log only unhandled errors.
+     * @property {string} WARN Log issues that may cause problems or unexpected behaviour.
+     * @property {string} INFO Log useful information and messages to indicate the SDK's internal operations.
+     * @property {string} DEBUG Log information to help diagnose problematic behaviour.
+     */
+    levels: {
+      SILENT: 'silent',
+      ERROR: 'error',
+      WARN: 'warn',
+      INFO: 'info',
+      DEBUG: 'debug'
+    }
+  };
+
+  return {
+    logger: api
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/logHandler.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = defaultLogHandler;
+/**
+ * A LogHandler can be used to customize how the SDK should log information. By
+ *    default, the SDK will log information to the console, but a LogHandler can
+ *    be configured to change this behaviour.
+ *
+ * A LogHandler can be provided to the SDK as part of its configuration (see
+ *    {@link #configconfiglogs config.logs}). The SDK will then provide this
+ *    function with the logged information.
+ *
+ * @public
+ * @static
+ * @typedef {Function} LogHandler
+ * @memberof logger
+ * @requires logs
+ * @param {Object} LogEntry The LogEntry to be logged.
+ * @example
+ * // Define a custom function to handle logs.
+ * function logHandler (logEntry) {
+ *   // Compile the meta info of the log for a prefix.
+ *   const { timestamp, level, method, target } = logEntry
+ *   const logInfo = `${timestamp} - ${target.name} - ${level}`
+ *
+ *   // Assume that the first message parameter is a string.
+ *   const [log, ...extra] = logEntry.messages
+ *
+ *   console[method](`${logInfo} - ${log}`, ...extra)
+ * }
+ *
+ * // Provide the LogHandler as part of the SDK configurations.
+ * const configs = { ... }
+ * configs.logs.handler = logHandler
+ * const client = create(configs)
+ */
+
+/**
+ * Default function for the SDK to use for logging.
+ *    Uses entry information to form a prefix, then logs to console.
+ * @method defaultLogHandler
+ * @param  {LogEntry} entry
+ */
+function defaultLogHandler(entry) {
+  // Compile the meta info of the log for a prefix.
+  const { timestamp, level, method, target } = entry;
+  const logInfo = `${timestamp} - ${target.name} - ${level}`;
+
+  // Assume that the first message parameter is a string.
+  const [log, ...extra] = entry.messages;
+
+  console[method](`${logInfo} - ${log}`, ...extra);
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/logManager.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = createManager;
+
+var _logger = __webpack_require__("../../packages/kandy/src/logs/logger.js");
+
+var _logger2 = _interopRequireDefault(_logger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Creates a Log Manager.
+ * @method createManager
+ * @param  {string}     managerName
+ * @param  {Object}     [options={}]
+ * @return {LogManager}
+ */
+function createManager(managerName, options = {}) {
+  /*
+   * This log is pointless, but is here to workaround a weird issue in Chrome.
+   * The Chrome console will lag when it is loading the sourcemap for a file.
+   *    Logging from the SDK will force Chrome to load its sourcemap (if its
+   *    not already loaded). So this ensures that /something/ is logged from the
+   *    SDK file as early as possible, to help avoid this lag being visible to
+   *    a developer.
+   */
+  console.debug(`Creating LogManager ${managerName}.`);
+
+  let logHandler = options.handler;
+  let level = options.logLevel;
+  const loggers = {};
+
+  /**
+   * Gets a specific logger. If the logger doesn't exist, a new one will be
+   *    created.
+   * @method getLogger
+   * @param  {string} name Human-readable name for the logger.
+   * @param  {string} [id] A unique identifier for the logger.
+   * @return {Logger}
+   */
+  function getLogger(name, id) {
+    // Combine the name and ID to create the "full" logger name.
+    const loggerName = id ? `${name}-${id}` : name;
+
+    let logger = loggers[loggerName];
+    // If the logger does not exist, create a new one.
+    if (!logger) {
+      // This logger logs items from a specific "target".
+      const target = { name, id };
+      logger = (0, _logger2.default)(target, logHandler, { level });
+
+      // Save the new logger to be returned by future getter cals.
+      loggers[loggerName] = logger;
+    }
+
+    return logger;
+  }
+
+  /**
+   * Gets all created loggers.
+   * @method getLoggers
+   * @return {Object} Object of loggers, keyed by logger name-id.
+   */
+  function getLoggers() {
+    return loggers;
+  }
+
+  return {
+    getLogger,
+    getLoggers,
+    get logHandler() {
+      return logHandler;
+    },
+    set logHandler(handler) {
+      logHandler = handler;
+    },
+    set level(newLevel) {
+      level = newLevel.toUpperCase();
+    }
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/logger.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = createLogger;
+
+var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
+
+/**
+ * A LogEntry object is the data that the SDK compiles when information is
+ *    logged. It contains both the logged information and meta-info about when
+ *    and who logged it.
+ *
+ * A {@link logger.LogHandler LogHandler} provided to the SDK (see
+ *    {@link #configconfiglogs config.logs}) will need to handle LogEntry
+ *    objects.
+ *
+ * @public
+ * @static
+ * @typedef {Object} LogEntry
+ * @memberof logger
+ * @requires logs
+ * @property {number} timestamp When the log was created, based on UNIX epoch.
+ * @property {string} method The log function that was used to create the log.
+ * @property {string} level The level of severity the log.
+ * @property {Object} target The subject that the log is about.
+ * @property {string} target.name The name of the target. This is also
+ *    used as the name of the Logger.
+ * @property {string} [target.id] A unique identifer for the target.
+ * @property {Array} messages The logged information, given to the Logger
+ *    method as parameters.
+ * @example
+ * function defaultLogHandler (logEntry) {
+ *   // Compile the meta info of the log for a prefix.
+ *   const { timestamp, level, method, target } = logEntry
+ *   const logInfo = `${timestamp} - ${target.name} - ${level}`
+ *
+ *   // Assume that the first message parameter is a string.
+ *   const [log, ...extra] = logEntry.messages
+ *
+ *   console[method](`${logInfo} - ${log}`, ...extra)
+ * }
+ */
+
+/**
+ * Creates a Logger.
+ * @method createLogger
+ * @param  {Object}   target       The subject of the logs from this logger.
+ * @param  {Function} handler      The function to receive/handle log entries.
+ * @param  {Object}   [options={}]
+ * @return {Logger}
+ */
+function createLogger(target, handler, options = {}) {
+  /**
+   * Currying function to dynamically create the Logger's logging methods.
+   * @method logFunc
+   * @param  {string} method Name of the logger method to create.
+   * @return {Function} A log method.
+   */
+  function logFunc(method) {
+    // The level that this function logs at.
+    let logLevel;
+    // Consider non-standard log levels to be debug.
+    if (['group', 'groupEnd', 'groupCollapsed', 'log'].includes(method)) {
+      logLevel = 'DEBUG';
+    } else {
+      // Otherwise, the method and log level match directly.
+      logLevel = method.toUpperCase();
+    }
+
+    /*
+     * Return the function that will be used as `log.<method>`.
+     */
+    return function (...args) {
+      // Compare the logged level and the configured level.
+      const setLevel = logger.level.toUpperCase();
+      const shouldLog = _constants.logLevels[logLevel] >= _constants.logLevels[setLevel];
+      // If this entry shouldn't be logged, don't do anything.
+      if (!shouldLog) {
+        return;
+      }
+
+      // Create the Log Entry to be handed off to the handler.
+
+      const entry = {
+        // Meta-info about the log.
+        method,
+        timestamp: Date.now(),
+        level: logLevel,
+        target: logger.target,
+        // The actual arguments logged.
+        messages: [...args]
+      };
+
+      logger.logHandler(entry);
+    };
+  }
+
+  const logger = {
+    target,
+    level: options.level,
+    logHandler: handler,
+    name: target.name
+
+    // Supported console methods.
+  };const consoleMethods = ['trace', 'debug', 'warn', 'info', 'error', 'log', 'group', 'groupEnd', 'groupCollapsed'];
+
+  const api = {
+    get logHandler() {
+      return logger.logHandler;
+    },
+    set logHandler(handler) {
+      logger.logHandler = handler;
+    },
+    get level() {
+      return logger.level;
+    },
+    set level(newLevel) {
+      logger.level = newLevel;
+    }
+  };
+
+  // For all supported log methods, create a function on the Logger for it.
+  consoleMethods.forEach(method => {
+    api[method] = logFunc(method);
+  });
+
+  return api;
 }
 
 /***/ }),
@@ -37268,7 +37550,7 @@ function cpaasMessaging(options = {}) {
     yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
   }
 
-  const capabilities = ['sms', 'chat', 'parts', 'history', 'internalAndSmsMessaging', 'isTyping', 'richMessagingWithoutLocation', 'fetchConversations'];
+  const capabilities = ['sms', 'chat', 'parts', 'history', 'internalAndSmsMessaging', 'isTyping', 'richMessagingWithoutLocation', 'fetchConversations', 'fetchSmsConversations'];
 
   return {
     capabilities,
@@ -37373,9 +37655,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @method createConversation
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {Object} options The options object can contain any keys an app may want passed along into the conversation object in the store.
+ * @param {string} source An optional parameter indicating the source of any messages created in this conversation.
+ *        Applies only for sms type of conversations.
  * @returns {Object} A flux standard action representing the create conversation action.
  */
-function createConversation(destination, options) {
+function createConversation(destination, options, source) {
+  // Assumption here is that if 'source' param is passed, then 'options' must be passed to explicitly specify that this is for sms.
+  if (options && options.type === 'sms' && source) {
+    return {
+      type: actionTypes.CREATE_CONVERSATION,
+      payload: (0, _extends3.default)({
+        id: source + '--' + destination,
+        source: source,
+        destination: destination,
+        messages: [],
+        isTypingList: []
+      }, options)
+    };
+  }
+
   return {
     type: actionTypes.CREATE_CONVERSATION,
     payload: (0, _extends3.default)({
@@ -37435,14 +37733,16 @@ function updateConversation(conversation) {
 /**
  * Deletes all the messages from a conversation.
  * @method deleteConversation
+ * @param {string} id The unique id of the conversation being deleted.
  * @param  {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the delete conversation action.
  */
-function deleteConversation(destination, type) {
+function deleteConversation(id, destination, type) {
   return {
     type: actionTypes.DELETE_CONVERSATION,
     payload: {
+      id: id,
       destination: destination,
       type: type
     }
@@ -37731,14 +38031,16 @@ function sendMessageReadFinish({ messageId, participant, error }) {
 /**
  * Creates a fetch messages action. This is dispatched by the API directly.
  * @method fetchMessages
+ * @param {string} id The ID of the conversation whose messages are about to be fetched.
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {number} amount A number representing the amount of messages to fetch.
+ * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the fetch messages action.
  */
-function fetchMessages(destination, amount, type) {
+function fetchMessages(id, destination, amount, type) {
   return {
     type: actionTypes.FETCH_MESSAGES,
-    payload: { destination, amount, type }
+    payload: { id, destination, amount, type }
   };
 }
 
@@ -37779,15 +38081,17 @@ function clearMessages(destination, type) {
 /**
  * Request to delete all the messages from a conversation.
  * @method deleteMessage
+ * @param {string} id The conversation id whose message is in the process of being deleted.
  * @param  {string} destination The destination for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @param {string} messageId The ID of the message targeted for deletion
  * @returns {Object} A flux standard action.
  */
-function deleteMessage(destination, type, messageId) {
+function deleteMessage(id, destination, type, messageId) {
   return {
     type: actionTypes.DELETE_MESSAGE,
     payload: {
+      id: id,
       destination: destination,
       type: type,
       messageId: messageId
@@ -37867,27 +38171,27 @@ var _actions = __webpack_require__("../../packages/kandy/src/messaging/cpaas/int
 
 var _selectors = __webpack_require__("../../packages/kandy/src/messaging/cpaas/interface/selectors.js");
 
+var _selectors2 = __webpack_require__("../../packages/kandy/src/subscription/interface/selectors.js");
+
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _mappings = __webpack_require__("../../packages/kandy/src/messaging/mappings.js");
 
 // Retrieve logger
-/**
- * The messaging feature revolves around a 'conversation' namespace. It is responsible for storing the conversations
- * and its messages, and returning conversation objects when requested.
- *
- * See the "Conversation" and "Message" sections of the documentation for more details.
- *
- * Available conversations can be retrieved using the {@link conversation.get}
- *    or {@link conversation.getAll} APIs.
- *
- * Messaging functions are all part of the 'conversation' namespace. Ex: {@link messaging.getAll client.conversation.getAll}
- *
- * @public
- * @namespace conversation
- */
-
-const log = (0, _logs.getLogManager)().getLogger('Messaging');
+const log = (0, _logs.getLogManager)().getLogger('Messaging'); /**
+                                                                * The messaging feature revolves around a 'conversation' namespace. It is responsible for storing the conversations
+                                                                * and its messages, and returning conversation objects when requested.
+                                                                *
+                                                                * See the "Conversation" and "Message" sections of the documentation for more details.
+                                                                *
+                                                                * Available conversations can be retrieved using the {@link conversation.get}
+                                                                *    or {@link conversation.getAll} APIs.
+                                                                *
+                                                                * Messaging functions are all part of the 'conversation' namespace. Ex: {@link messaging.getAll client.conversation.getAll}
+                                                                *
+                                                                * @public
+                                                                * @namespace conversation
+                                                                */
 
 function api(context) {
   const messagingApi = {
@@ -37991,7 +38295,25 @@ function api(context) {
       const prevConv = (0, _selectors.findConversation)(context.getState(), destination, options.type);
 
       if (!prevConv) {
-        context.dispatch(_actions.convoActions.createConversation(destination, options));
+        if (options.type === _mappings.chatTypes.SMS) {
+          // When creating an SMS conversation, provide both sender & receiver information
+          // because sender can use different phone numbers to login from multiple places.
+          // The sender's phone number will actually come from 'destinationAddress' of the registered subscription for 'smsinbound'.
+          let subscriptions = (0, _selectors2.getSubscriptions)(context.getState(), 'smsinbound', 'websocket');
+          let sender;
+          if (subscriptions.length > 0) {
+            // [0]: There should be only one subscription for the given service & given channel type
+            sender = subscriptions[0].destinationAddress;
+          } else {
+            // Backwards compatibility which eventually needs to be phased out/deprecated.
+            sender = context.getState().config.messaging.smsFrom;
+          }
+
+          context.dispatch(_actions.convoActions.createConversation(destination, options, sender));
+        } else {
+          // For chat & group, receiver information is enough.
+          context.dispatch(_actions.convoActions.createConversation(destination, options));
+        }
       }
 
       return context.primitives.Conversation({
@@ -38638,7 +38960,7 @@ const conversationBase = {
      */
     deleteMessages: function (messageIds = []) {
       messageIds.forEach(messageId => {
-        this.context.dispatch(_actions.messageActions.deleteMessage(this.destination, this.type, messageId));
+        this.context.dispatch(_actions.messageActions.deleteMessage(this.id, this.destination, this.type, messageId));
       });
     },
 
@@ -38653,7 +38975,7 @@ const conversationBase = {
      * @method delete
      */
     delete: function () {
-      this.context.dispatch(_actions.convoActions.deleteConversation(this.destination, this.type));
+      this.context.dispatch(_actions.convoActions.deleteConversation(this.id, this.destination, this.type));
     },
 
     /**
@@ -38714,7 +39036,7 @@ const conversationBase = {
      * @param {number} [amount=50] An amount of messages to fetch.
      */
     fetchMessages: function (amount = 50) {
-      this.context.dispatch(_actions.messageActions.fetchMessages(this.destination, amount, this.type));
+      this.context.dispatch(_actions.messageActions.fetchMessages(this.id, this.destination, amount, this.type));
     }
   }
   /*
@@ -39403,7 +39725,9 @@ exports.smsInboundUnsubscribe = smsInboundUnsubscribe;
 exports.smsOutboundSubscribe = smsOutboundSubscribe;
 exports.smsOutboundUnsubscribe = smsOutboundUnsubscribe;
 exports.fetchConversationsRequest = fetchConversationsRequest;
+exports.fetchSmsConversationsRequest = fetchSmsConversationsRequest;
 exports.fetchMessagesRequest = fetchMessagesRequest;
+exports.fetchSmsMessagesRequest = fetchSmsMessagesRequest;
 exports.fetchImageLinks = fetchImageLinks;
 
 var _effects = __webpack_require__("../../packages/kandy/src/request/effects.js");
@@ -39661,7 +39985,7 @@ function* deleteChatConversationRequest(requestInfo, destination, type) {
  * @param {Object} requestInfo
  * @param {Object} destination Destination associated with the conversation
  * @param {Object} messageId MessageId of message to delete
- * @param {Object} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group"
+ * @param {Object} type Type of conversation. Can be one of "chat-oneToOne" or "chat-group" or "sms"
  * @returns {Object}
  */
 function* deleteChatMessageRequest(requestInfo, destination, messageId, type) {
@@ -39956,6 +40280,7 @@ function* smsOutboundUnsubscribe(requestInfo, subInfo) {
  * Performs a REST request to fetch a list of chat sessions
  * @method fetchConversationsRequest
  * @param {Object} requestInfo
+ * @param {string} type
  * @return {Object} a list of chat sessions
  */
 
@@ -39983,6 +40308,37 @@ function* fetchConversationsRequest(requestInfo, type) {
     // return a list of conversations
     return {
       chatSession: response.payload.body.chatSessionList.chatSession,
+      error: false
+    };
+  }
+}
+
+/**
+ * Performs a REST request to fetch a list of SMS messaging sessions
+ * @method fetchSmsConversationsRequest
+ * @param {Object} requestInfo
+ * @return {Object} a list of SMS messaging sessions
+ */
+
+function* fetchSmsConversationsRequest(requestInfo) {
+  let url = `${requestInfo.baseURL}/cpaas/smsmessaging/v1/${requestInfo.username}/remoteAddresses`;
+
+  const requestOptions = {
+    method: 'GET',
+    url: url
+  };
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+  if (response.error) {
+    return {
+      error: new _errors2.default({
+        message: 'Failed to fetch conversations.',
+        code: _errors.messagingCodes.FETCH_CONVERSATIONS_FAIL
+      })
+    };
+  } else {
+    // return a list of conversations
+    return {
+      chatSession: response.payload.body.smsThreadList.smsThread,
       error: false
     };
   }
@@ -40024,6 +40380,47 @@ function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chat
     };
   } else {
     return (0, _extends3.default)({}, response.payload.body.chatMessageList, {
+      error: false
+    });
+  }
+}
+
+/**
+ * Performs a REST request to fetch a list of messages for a particular sms conversation
+ * @method fetchSmsMessagesRequest
+ * @param {Object} requestInfo
+ * @param {Object} params
+ * @param {string} params.source the phone number associated with source of messages.
+ * @param {string} params.destination phone number(s) associated with the destination of those messages.
+ *
+ * @param {string} [params.type='sms'] The type of messages to fetch. See {@link conversation.chatTypes} for valid types.
+ * @return {Object}
+ */
+function* fetchSmsMessagesRequest(requestInfo, { source, destination, type } = {}) {
+  let url;
+  if (type === _mappings.chatTypes.SMS) {
+    url = `${requestInfo.baseURL}/cpaas/smsmessaging/v1/${requestInfo.username}/remoteAddresses/${destination}/localAddresses/${source}/messages`;
+  } else {
+    return {
+      error: new _errors2.default({
+        message: 'Unrecognized type, ensure the type is "sms"',
+        code: _errors.subscriptionCodes.FETCH_MESSAGES_FAIL
+      })
+    };
+  }
+
+  const requestOptions = { method: 'GET', url };
+
+  const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
+  if (response.error) {
+    return {
+      error: new _errors2.default({
+        message: 'Failed to fetch sms messages.',
+        code: _errors.subscriptionCodes.FETCH_MESSAGES_FAIL
+      })
+    };
+  } else {
+    return (0, _extends3.default)({}, response.payload.body.smsMessageList, {
       error: false
     });
   }
@@ -40078,7 +40475,7 @@ exports.sendSMS = sendSMS;
 exports.receiveSMS = receiveSMS;
 exports.receiveDeliveryReceipt = receiveDeliveryReceipt;
 exports.fetchConversations = fetchConversations;
-exports.fetchChatMessages = fetchChatMessages;
+exports.fetchMessages = fetchMessages;
 exports.setIsTyping = setIsTyping;
 exports.receiveIsTypingNotification = receiveIsTypingNotification;
 exports.getImageLinks = getImageLinks;
@@ -40234,25 +40631,41 @@ function* receiveDeliveryReceipt() {
 }
 
 /**
- * Waits for fetch conversation actions and triggers fetchChatConversations saga
- * @method fetchChatConversations
+ * Waits for fetch conversation actions and depending on the action.payload.type, it triggers
+ * fetchConversations saga (for fetching one-on-one/group conversations) or
+ * fetchSmsConversations saga (for fetching sms conversations)
+ * @method fetchConversations
  */
 function* fetchConversations() {
   function fetchConversationPattern(action) {
-    return action.type === actionTypes.FETCH_CONVERSATIONS;
+    return action.type === actionTypes.FETCH_CONVERSATIONS && action.payload.type !== 'sms';
   }
+
+  function fetchSmsConversationPattern(action) {
+    return action.type === actionTypes.FETCH_CONVERSATIONS && action.payload.type === 'sms';
+  }
+
   yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchConversations);
+
+  yield (0, _effects2.takeEvery)(fetchSmsConversationPattern, messagingSagas.fetchSmsConversations);
 }
 
 /**
- * Waits for fetch message actions and triggers fetchChatMessages saga
- * @method fetchChatMessages
+ * Waits for fetch message actions and triggers fetchChatMessages saga or fetchSmsMessages,
+ * depending of the type specified in the action's payload.
+ * @method fetchMessages
  */
-function* fetchChatMessages() {
-  function fetchConversationPattern(action) {
-    return action.type === actionTypes.FETCH_MESSAGES;
+function* fetchMessages() {
+  function fetchChatMessagesPattern(action) {
+    return action.type === actionTypes.FETCH_MESSAGES && action.payload.type !== 'sms';
   }
-  yield (0, _effects2.takeEvery)(fetchConversationPattern, messagingSagas.fetchChatMessages);
+
+  function fetchSmsMessagesPattern(action) {
+    return action.type === actionTypes.FETCH_MESSAGES && action.payload.type === 'sms';
+  }
+  yield (0, _effects2.takeEvery)(fetchChatMessagesPattern, messagingSagas.fetchChatMessages);
+
+  yield (0, _effects2.takeEvery)(fetchSmsMessagesPattern, messagingSagas.fetchSmsMessages);
 }
 
 /**
@@ -40314,7 +40727,9 @@ exports.handleDeliveryReceipts = handleDeliveryReceipts;
 exports.sendSMS = sendSMS;
 exports.handleIncomingSMS = handleIncomingSMS;
 exports.fetchConversations = fetchConversations;
+exports.fetchSmsConversations = fetchSmsConversations;
 exports.fetchChatMessages = fetchChatMessages;
+exports.fetchSmsMessages = fetchSmsMessages;
 exports.getImageLinks = getImageLinks;
 
 var _actions = __webpack_require__("../../packages/kandy/src/messaging/cpaas/interface/actions/index.js");
@@ -40500,9 +40915,14 @@ function* deleteConversation(action) {
   const chatType = action.payload.type;
 
   if (chatType === _mappings.chatTypes.SMS) {
-    // sms delete requires originators phone number
-    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-    requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+    // sms delete requires originators phone number, which we'll get from the id passed in action's payload
+    if (action.payload.id) {
+      requestInfo.senderAddress = action.payload.id.split('--')[0];
+    } else {
+      // Maintaining backwards compatibility
+      const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+      requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+    }
   }
   deleteResponse = yield (0, _effects.call)(_requests.deleteChatConversationRequest, requestInfo, action.payload.destination[0], chatType);
 
@@ -40531,9 +40951,14 @@ function* deleteMessage(action) {
   let deleteResponse;
   const chatType = action.payload.type;
   if (chatType === _mappings.chatTypes.SMS) {
-    // sms delete requires originators phone number
-    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-    requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+    // sms delete requires originators phone number, which we'll get from the id passed in action's payload
+    if (action.payload.id) {
+      requestInfo.senderAddress = action.payload.id.split('--')[0];
+    } else {
+      // Maintain backwards compatibility
+      const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+      requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+    }
   }
   deleteResponse = yield (0, _effects.call)(_requests.deleteChatMessageRequest, requestInfo, action.payload.destination[0], action.payload.messageId, chatType);
 
@@ -40635,10 +41060,15 @@ function* handleDeliveryReceipts(action) {
 function* sendSMS(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
 
-  // TODO: Remove this big workaround ---
-  const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-  requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
-  // END Workaround
+  if (action.payload.id) {
+    // id is the current conversation id, which is  of the form: <senderAddress>--<destinationAddress>
+    // We just need to extract the senderAddress.
+    requestInfo.senderAddress = action.payload.id.split('--')[0];
+  } else {
+    // Maintain backwards compatibility
+    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+    requestInfo.senderAddress = messagingConfig.smsFrom || 'default';
+  }
 
   const { destination, message } = action.payload;
   const response = yield (0, _effects.call)(_requests.sendSMSRequest, requestInfo, destination[0], message.parts[0].text);
@@ -40734,6 +41164,52 @@ function* fetchConversations(action) {
 }
 
 /**
+ * Saga that fetches a list of SMS Conversations
+ * @method fetchSmsConversations
+ * @param {Object} action A 'FETCH_CONVERSATIONS' action.
+ */
+function* fetchSmsConversations(action) {
+  const type = action.payload.type;
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+  const response = yield (0, _effects.call)(_requests.fetchSmsConversationsRequest, requestInfo, type);
+
+  if (response.error) {
+    yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
+      error: response.error
+    }));
+  } else {
+    const smsSessions = response.chatSession.map(smsThread => {
+      const { remoteAddress, localAddress, threadDetails, resourceURL } = smsThread;
+      const { lastText, lastPullTime, firstMessageTime, lastMessageTime, length } = threadDetails;
+      // the remote & local info are at the end of a string (`.../smsmessaging/v1/<userID>/remoteAddresses/<address1>/localAddresses/<address2>`).
+      const tmp = resourceURL.split('/remoteAddresses/')[1];
+      const addresses = tmp.split('/localAddresses/');
+
+      // NOTE: Just like when an SMS conversation is created, the id of that conversation is generated as follows:
+      //       <source>--<destination>
+      return {
+        id: addresses[1] + '--' + addresses[0],
+        destination: [remoteAddress],
+        address: localAddress,
+        type: _mappings.chatTypes.SMS,
+        lastMessage: lastText,
+        lastReceived: lastMessageTime,
+        lastPull: lastPullTime,
+        isTypingList: [],
+        messages: [],
+        firstReceived: firstMessageTime,
+        length: length
+      };
+    });
+
+    yield (0, _effects.put)(_actions.convoActions.fetchConversationsFinished({
+      conversations: smsSessions,
+      error: false
+    }));
+  }
+}
+
+/**
  * Saga that fetches all chat messages for a particular conversation
  * @method fetchChatMessages
  * @param {Object} action A 'FETCH_MESSAGES' action.
@@ -40765,6 +41241,85 @@ function* fetchChatMessages(action) {
       parts: parts,
       sender: message.senderAddress,
       destination: message['x-destinationAddress'],
+      timestamp: message.dateTime,
+      messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
+    };
+  });
+
+  if (response.error) {
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, response.error));
+  } else {
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, null));
+  }
+}
+
+/**
+ * Saga that fetches all sms messages for a particular conversation.
+ * @method fetchSmsMessages
+ * @param {Object} action A 'FETCH_MESSAGES' action.
+ */
+function* fetchSmsMessages(action) {
+  const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
+
+  let senderAddress;
+
+  if (action.payload.id) {
+    // id is the current conversation id, which is  of the form: <senderAddress>--<destinationAddress>
+    // We just need to extract the senderAddress.
+    senderAddress = action.payload.id.split('--')[0];
+  } else {
+    // Maintain backwards compatibility
+    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+    senderAddress = messagingConfig.smsFrom || 'default';
+  }
+
+  const response = yield (0, _effects.call)(_requests.fetchSmsMessagesRequest, requestInfo, {
+    source: senderAddress,
+    destination: action.payload.destination[0],
+    type: action.payload.type
+  });
+
+  const messageList = response.smsMessage.map(message => {
+    let parts = [];
+    // In the SMS use case, message.message is the actual sms message in plain text.
+    if (message.message) {
+      parts = parts.concat({ type: 'text', text: message.message });
+    }
+    if (message.attachment) {
+      parts = parts.concat(message.attachment.map(attachment => {
+        return (0, _extends3.default)({
+          type: 'file'
+        }, attachment, {
+          rawURL: attachment.link,
+          name: attachment.name
+        });
+      }));
+    }
+
+    // the remote & local info are at the end of a string (`.../smsmessaging/v1/<userID>/remoteAddresses/<address1>/localAddresses/<address2>`).
+    const tmp = message.resourceURL.split('/remoteAddresses/')[1];
+    const tmp2 = tmp.split('/localAddresses/');
+    const remoteAddress = tmp2[0];
+    const localAddress = tmp2[1].split('/messages/')[0];
+
+    // message.type is either outbound or inboud
+    // Assume type is 'outboud'.
+    // This means the senderAddress is localAddress & destinationAddress is remoteAddress.
+    let senderAddress = localAddress;
+    let destinationAddress = remoteAddress;
+
+    if (message.type !== 'outbound') {
+      // otheriwse, the values are swapped
+      senderAddress = remoteAddress;
+      destinationAddress = localAddress;
+    }
+
+    return {
+      parts: parts,
+      status: message.status,
+      type: message.type,
+      sender: senderAddress,
+      destination: destinationAddress,
       timestamp: message.dateTime,
       messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
     };
@@ -40983,12 +41538,15 @@ function* smsInboundSubscription(config, type) {
   const channels = yield (0, _effects.select)(_selectors3.getNotificationChannels);
   const channel = channels.notificationChannels[type];
 
-  // TODO: Remove this workaround -----
-  const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
-  requestInfo.destinationAddress = messagingConfig.smsFrom;
-  // END Workaround -----
+  if (config && config.params && config.params.destinationAddress) {
+    requestInfo.destinationAddress = config.params.destinationAddress;
+  } else {
+    // we need to be backwards compatible, so get the sms number from global configuration obj.
+    const messagingConfig = yield (0, _effects.select)(_selectors.getMessagingConfig);
+    requestInfo.destinationAddress = messagingConfig.smsFrom;
+  }
+  _loglevel2.default.debug(`Subscribing to SMS inbound service on ${type} channel for destination address: ${requestInfo.destinationAddress}.`);
 
-  _loglevel2.default.debug(`Subscribing to SMS inbound service on ${type} channel.`);
   const response = yield (0, _effects.call)(_requests.smsInboundSubscribe, requestInfo, channel);
 
   yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)((0, _extends3.default)({}, response, {
@@ -41940,6 +42498,7 @@ exports.default = () => {
      * Possible presence status values.
      * @public
      * @static
+     * @name statuses
      * @memberof presence
      * @type {Object}
      * @property {string} OPEN
@@ -41954,6 +42513,7 @@ exports.default = () => {
      * Possible presence activity values.
      * @public
      * @static
+     * @name activities
      * @memberof presence
      * @type {Object}
      * @property {string} AVAILABLE
@@ -42583,7 +43143,7 @@ const activityMapUcToCPaaS = {
 /**
  * fetchPresence.
  * @method fetchPresence
- * @param  {Array<string>|string} users A single userId or array of userIds
+ * @param  {Array<string>} users An array of userIds.
  */
 function* fetchPresence({ payload }) {
   const users = payload;
@@ -42643,7 +43203,7 @@ function* unsubscribePresence({ payload }) {
   log.debug('Received response from removeUser request:', response);
 
   if (!response.error) {
-    yield (0, _effects.put)(actions.unsubscribePresenceFinish(userId));
+    yield (0, _effects.put)(actions.unsubscribePresenceFinish({ presentityUserId: userId }));
   } else {
     yield (0, _effects.put)(actions.unsubscribePresenceFinish(response.error));
   }
@@ -42950,6 +43510,9 @@ function subscribePresence(users) {
 }
 
 function subscribePresenceFinish(payload) {
+  if (!Array.isArray(payload.presentityUserId)) {
+    payload.presentityUserId = [payload.presentityUserId];
+  }
   return {
     type: actionTypes.SUBSCRIBE_FINISH,
     error: payload instanceof Error || payload instanceof _errors2.default,
@@ -42970,6 +43533,9 @@ function unsubscribePresence(users) {
 }
 
 function unsubscribePresenceFinish(payload) {
+  if (!Array.isArray(payload.presentityUserId)) {
+    payload.presentityUserId = [payload.presentityUserId];
+  }
   return {
     type: actionTypes.UNSUBSCRIBE_FINISH,
     error: payload instanceof Error || payload instanceof _errors2.default,
@@ -43213,6 +43779,29 @@ const log = (0, _logs.getLogManager)().getLogger('PRESENCE'); /**
                                                                * @namespace presence
                                                                */
 
+/**
+ * The PresenceStatus type defines the user's current status in terms of the user's availability to
+ * communicate/respond to other users in the network.
+ * An instance of this type can be obtained by invoking the {@link presence.get} function.
+ *
+ * Reporting when a user is on the phone is enabled (by default), which means that presence update notifications
+ * will be sent whenever a user is in a call, as well as when the call has ended.
+ * This is a user preference enabled or disabled on server side, and it can only be changed on the server side.
+ *
+ * The status is set to {@link presence.statuses open} as soon as a user subscribes for the presence service.
+ *
+ * @public
+ * @static
+ * @typedef {Object} PresenceStatus
+ * @memberof presence
+ * @property {string} userId The unique identifier for the user associated with this presence status.
+ * @property {string} status The current status the user has set for themselves. For supported values see {@link presence.statuses}.
+ * @property {string} activity The current activity of the user.
+ *      For supported values see {@link presence.activities}.
+ * @property {string} note Additional message acompanying the status & activity.
+ * @property {boolean} loading Whether the presence information has been loaded or is in the process of loading.
+ */
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/presence/interface/eventTypes.js":
@@ -43226,6 +43815,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * A presence update about a subscribed user has been received.
+ *
+ * This event is generated as a result of {@link presence.fetch} or {@link presence.update} operations.
+ *
+ * For the latter operation, the current user receives a presence update of another user that the current user is subscribed to.
+ *
+ * The changed information can be retrieved using the {@link presence.get}
+ *    API.
  *
  * @public
  * @memberof presence
@@ -43251,6 +43847,30 @@ const RECEIVED = exports.RECEIVED = 'presence:change';
  * @event presence:selfChange
  */
 const SELF_CHANGE = exports.SELF_CHANGE = 'presence:selfChange';
+
+/**
+ * An update (as a result of subscribing to a specific user's presence) has been received.
+ *
+ * @public
+ * @memberof presence
+ * @requires presence
+ * @event presence:subscribe
+ * @param {Object} params A subscription object containing data.
+ * @param {Array<string>} params.userIds The ID(s) of the user(s) whose presence needs to be watched.
+ */
+const SUBSCRIBE = exports.SUBSCRIBE = 'presence:subscribe';
+
+/**
+ * An update (as a result of unsubscribing to a specific user's presence) has been received.
+ *
+ * @public
+ * @memberof presence
+ * @requires presence
+ * @event presence:unsubscribe
+ * @param {Object} params A subscription object containing data.
+ * @param {Array<string>} params.userIds The ID(s) of the user(s) whose presence no longer requires to be watched.
+ */
+const UNSUBSCRIBE = exports.UNSUBSCRIBE = 'presence:unsubscribe';
 
 /**
  * An error occurred with presence.
@@ -43318,10 +43938,49 @@ eventsMap[actionTypes.UPDATE_FINISH] = action => {
   }
 };
 
+eventsMap[actionTypes.GET_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.RECEIVED,
+      args: {
+        userId: action.payload.userId,
+        status: action.payload.status,
+        activity: action.payload.activity,
+        note: action.payload.note
+      }
+    };
+  }
+};
+
+eventsMap[actionTypes.SUBSCRIBE_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.SUBSCRIBE,
+      args: {
+        userIds: action.payload.presentityUserId
+      }
+    };
+  }
+};
+
+eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = action => {
+  if (action.error) {
+    return presenceError(action);
+  } else {
+    return {
+      type: eventTypes.UNSUBSCRIBE,
+      args: {
+        userIds: action.payload.presentityUserId
+      }
+    };
+  }
+};
+
 // TODO: Should have events to notifiy of successful operations for these actions.
-eventsMap[actionTypes.GET_FINISH] = presenceError;
-eventsMap[actionTypes.SUBSCRIBE_FINISH] = presenceError;
-eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = presenceError;
 eventsMap[actionTypes.CREATE_PRESENCE_LIST_FINISH] = presenceError;
 
 exports.default = eventsMap;
@@ -43448,9 +44107,11 @@ reducers[actionTypes.GET_FINISH] = {
     for (let contact of payload.presenceContact) {
       let presenceObject = {};
       presenceObject.userId = contact.presentityUserId;
-      presenceObject.activity = contact.presence.person.activities.activityValue;
-      presenceObject.status = contact.presence.person['overriding-willingness'].overridingWillingnessValue;
-      presenceObject.note = contact.presence.person.activities.other;
+      if (contact.presence && contact.presence.person) {
+        presenceObject.activity = contact.presence.person.activities.activityValue;
+        presenceObject.status = contact.presence.person['overriding-willingness'].overridingWillingnessValue;
+        presenceObject.note = contact.presence.person.activities.other;
+      }
       presenceObject.loading = false;
       users[contact.presentityUserId] = presenceObject;
     }
@@ -43482,7 +44143,7 @@ reducers[actionTypes.RECEIVED] = {
 reducers[actionTypes.UNSUBSCRIBE_FINISH] = {
   next(state, { payload }) {
     return (0, _extends3.default)({}, state, {
-      users: (0, _fp.omit)(payload, state.users)
+      users: (0, _fp.omit)(payload.presentityUserId, state.users)
     });
   }
 };
@@ -45094,6 +45755,48 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @namespace services
  */
 
+/**
+ * The ServiceDescriptor type defines the format for specifying how to subscribe for a certain service.
+ * This is the service configuration object that needs to be passed (as part of an array of configuration objects) when calling
+ * the {@link services.subscribe} function.
+ * Only some plugins (`call`, `messaging` and `presence`) support such configuration object that needs to be passed
+ * to the subscribe function.
+ *
+ * @public
+ * @static
+ * @typedef {Object} ServiceDescriptor
+ * @property {string} service The name of the available service user wants to subscribe to.
+ * The available service names are `chat`, `presence`, `call` and `smsinbound`.
+ *
+ * @property {Object} [params] An object containing any additional parameters required for subscribing to that service.
+ * This is an optional property as not all service subscriptions require it.
+ * @memberof services
+ * @example
+ * // Subscribe to chat, presence & call services on a WebSocket channel.
+ * client.services.subscribe([
+ *    {service: 'chat'},
+ *    {service: 'presence'},
+ *    {service: 'call'},
+ * ], 'websocket')
+ */
+
+/**
+ * The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
+ * This is the configuration object that needs to be passed as the value for the {@link services.ServiceDescriptor ServiceDescriptor.params} property.
+ *
+ * @public
+ * @static
+ * @typedef {Object} SmsInboundServiceParams
+ * @memberof services
+ * @property {string} destinationAddress An E164 formatted DID number.
+ *     The subscription created will provide notifications for inbound SMS messages destined for this address.
+ * @example
+ * // Subscribe to smsinbound service on a WebSocket channel.
+ * client.services.subscribe([
+ *    {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}
+ * ], 'websocket')
+ */
+
 // Subscription plugin.
 const log = (0, _logs.getLogManager)().getLogger('SUBSCRIPTION');
 
@@ -45132,15 +45835,14 @@ function api({ dispatch, getState }) {
      * @static
      * @memberof services
      * @method subscribe
-     * @param {Array<Object>} services A list of service configurations.
+     * @param {Array<string | services.ServiceDescriptor>} services A list of service configurations.
      * @param {string} [type='websocket'] The method of how to receive service updates.
      * @example
      * // Subscribe for chat and SMS services.
      * const services = [
      *    { service: 'chat' },
-     *    { service: 'smsoutbound' },
      *    // Specify extra configurations for certain services.
-     *    { service: 'smsinbound', smsFrom: '<phoneNumber>' }
+     *    { service: 'smsinbound', params: {destinationAddress: '<phoneNumber>' }}
      * ]
      *
      * client.services.subscribe(services)
@@ -45179,7 +45881,7 @@ function api({ dispatch, getState }) {
      *    are being received.
      * @example
      * // Unsubscribe from chat and SMS services.
-     * const services = [ 'chat', 'smsoutbound', 'smsinbound' ]
+     * const services = [ 'chat', 'smsinbound' ]
      *
      * client.services.unsubscribe(services)
      */
@@ -45640,6 +46342,7 @@ exports.getSubscriptionConfig = getSubscriptionConfig;
 exports.getRegisteredServices = getRegisteredServices;
 exports.getNotificationChannels = getNotificationChannels;
 exports.getSubscribedServices = getSubscribedServices;
+exports.getSubscriptions = getSubscriptions;
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
@@ -45690,6 +46393,19 @@ function getSubscribedServices(state, type) {
 
   // Massage the subscriptions to be a list of service names.
   subscriptions = subscriptions.map(subscription => subscription.service);
+  return (0, _fp.cloneDeep)(subscriptions);
+}
+
+/**
+ * Retrieve the list of subscriptions matching a given channel type and service name.
+ * @method getSubscriptions
+ * @param {string} service the name of the service we want to get specifically (e.g. smsinbound)
+ * @param {string} type the type of communication channel we want to get specifically (e.g. websocket)
+ * @return {Array}
+ */
+function getSubscriptions(state, service, type) {
+  let subscriptions = state.subscription.subscriptions;
+  subscriptions = subscriptions.filter(subscription => subscription.service === service && subscription.channelType === type);
   return (0, _fp.cloneDeep)(subscriptions);
 }
 
@@ -48276,7 +48992,7 @@ function setListeners(session, emit, END = 'END') {
     }));
   };
 
-  const trackEnded = ({ local, trackId }) => {
+  const trackEnded = ({ local, trackId, performRenegotiation }) => {
     /**
      * When a track has ended,
      * update redux state's webrtc.session.localTracks/remoteTracks array
@@ -48285,7 +49001,8 @@ function setListeners(session, emit, END = 'END') {
      */
     emit(_actions.sessionActions.sessionTrackEnded(session.id, {
       local,
-      trackId
+      trackId,
+      performRenegotiation
     }));
   };
 
@@ -50315,6 +51032,1924 @@ function* unmuteTracks(webRTC, action) {
 
 /***/ }),
 
+/***/ "../../packages/webrtc/src/Peer/config.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Configuration object for a Peer.
+ * @typedef {Object} PeerConfig
+ * @property {Object} [rtcConfig] Configuration for the native RTCPeerConnection.
+ * @property {String} [trickleIceMode=FULL] The initial mode the Peer will use when receiving ICE candidates.
+ * @property {Function} [halfTrickleThreshold] Function that determines whether the threshold has been met when in HALF trickle mode.
+ * @property {Number} [iceCollectionDelay=1000] The time (in ms) between ICE collection checks.
+ * @property {Number} [maxIceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
+ * @property {Function} [iceCollectionCheck] The function to check whether enough ICE candidates
+ *    have been collected to continue with negotiation. Must return a boolean value.
+ */
+exports.default = {
+  rtcConfig: {
+    sdpSemantics: _constants.PEER.SDP_SEMANTICS.PLAN_B
+  },
+  trickleIceMode: _constants.PEER.TRICKLE_ICE.FULL,
+  removeBundling: true,
+  halfTrickleThreshold: isPassedHalfTrickleThreshold,
+  iceCollectionDelay: 1000,
+  maxIceTimeout: 3000,
+  iceCollectionCheck: iceCollectionCheck
+
+  /**
+   * Default function for determining whether the HALF trickle ICE threshold has
+   *    been met, to start trickling ICE candidates.
+   * Defines the threshold as one relay candidate being gathered.
+   * @method isPassedHalfTrickleThreshold
+   * @param  {String}             sdp          The local SDP of the Peer.
+   * @param  {RTCIceCandidate}    iceCandidate The native candidate object that triggered this check.
+   * @param  {Number}             time         The amount of time (ms) since ICE collection began.
+   * @return {Boolean} Whether the "half trickle" threshold has been passed.
+   */
+};
+function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
+  const passedHalf = iceCandidate.candidate.indexOf('relay') !== -1;
+  _loglevel2.default.debug(`Peer's half trickle threshold ${!passedHalf ? 'not ' : ''}reached.`);
+  return passedHalf;
+}
+
+/**
+ * Default function to determine if the ice candidates is enough to negotiate.
+ * We assume that: at least one relay candidate is good enough to try negotiation.
+ * @method iceCollectionCheck
+ * @param {Array<RTCIceCandidate>} iceCandidates List of collected ICE candidates.
+ * @return {Boolean} Whether the ice Candidates is enough for negotiation.
+ */
+function iceCollectionCheck(iceCandidates) {
+  return iceCandidates.some(candidate => candidate.type === 'relay');
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/icecandidate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = onicecandidate;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `icecandidate` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onicecandidate
+ * @method onicecandidate
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function onicecandidate(listener) {
+  const { nativePeer, proxyPeer, config, iceTimer, emitter, iceCandidates } = this;
+
+  /**
+   * Intercept the PeerConnection onicecandidate event.
+   * Handle the candidate as defined by the current trickle ICE mode config.
+   * Trickle ICE scenarios:
+   *   - FULL: Trickle.
+   *   - HALF, pre-half: Wait for "half" or null candidate.
+   *   - HALF, post-half: Trickle.
+   *   - NONE: Wait for null candidate.
+   */
+  nativePeer.onicecandidate = event => {
+    _loglevel2.default.debug(`ICE candidate received (trickling?: ${config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL}): `, event.candidate);
+
+    // Keep track of all candidates gathered by this collection process.
+    if (event.candidate !== null) {
+      iceCandidates.push(event.candidate);
+    }
+
+    if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
+      // If trickling is enabled, emit an event for every ICE candidate. The
+      //    Peer is already ready for negotiation at this point.
+      if (event.candidate) {
+        // Only trickle non-null (ie. actual) candidates.
+        listener(event);
+      }
+    } else if (event.candidate === null) {
+      // If we received the last candidate (null), then gathering is done and
+      //    Peer is ready for negotiation (no matter the scenario).
+      _loglevel2.default.debug('ICE collection process complete; ready for negotiation.');
+
+      // Clear the candidate array without redefining it (it's a const).
+      iceCandidates.length = 0;
+
+      emitter.emit('onnegotiationready');
+    } else if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.HALF) {
+      // For half trickle, only start trickling after a certain threshold.
+      //    Peer will be considered ready for negotiation after that point.
+      const haveHalf = config.halfTrickleThreshold({
+        sdp: proxyPeer.localDescription.sdp,
+        iceCandidate: event.candidate,
+        time: iceTimer.timeFromStart()
+      });
+
+      if (haveHalf) {
+        _loglevel2.default.debug('Half ICE collection process complete; ready for negotiation.');
+        config.trickleIceMode = _constants.PEER.TRICKLE_ICE.FULL;
+        emitter.emit('onnegotiationready');
+      }
+    }
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/iceconnectionstatechange.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = oniceconnectionstatechange;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `iceconnectionstatechange` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/oniceconnectionstatechange
+ * @method oniceconnectionstatechange
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function oniceconnectionstatechange(listener) {
+  const { nativePeer, id } = this;
+
+  nativePeer.oniceconnectionstatechange = function (event) {
+    _loglevel2.default.debug(`Peer ${id} received iceconnectionstatechange event: ${nativePeer.iceConnectionState}`);
+    listener(event);
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/icegatheringstatechange.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = onicegatheringstatechange;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `icegatheringstatechange` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onicegatheringstatechange
+ * @method onicegatheringstatechange
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function onicegatheringstatechange(listener) {
+  const { nativePeer, id, iceTimer } = this;
+
+  /**
+   * Intercept the PeerConnection onicegatheringstatechange event.
+   * Time how long ICE collection takes and handles scenarios when it takes
+   *    too long.
+   */
+  nativePeer.onicegatheringstatechange = event => {
+    const gatheringState = event.target.iceGatheringState;
+    _loglevel2.default.debug(`Peer ${id} iceGatheringState changed to ${gatheringState}.`);
+
+    if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
+      iceTimer.start();
+      // TODO: Handle "ICE collection taking too long" scenario.
+    } else if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.COMPLETE) {
+      _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates.`);
+      iceTimer.stop();
+    }
+    // Bubble the event up.
+    listener(event);
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _icecandidate = __webpack_require__("../../packages/webrtc/src/Peer/events/icecandidate.js");
+
+var _icecandidate2 = _interopRequireDefault(_icecandidate);
+
+var _iceconnectionstatechange = __webpack_require__("../../packages/webrtc/src/Peer/events/iceconnectionstatechange.js");
+
+var _iceconnectionstatechange2 = _interopRequireDefault(_iceconnectionstatechange);
+
+var _icegatheringstatechange = __webpack_require__("../../packages/webrtc/src/Peer/events/icegatheringstatechange.js");
+
+var _icegatheringstatechange2 = _interopRequireDefault(_icegatheringstatechange);
+
+var _negotiationneeded = __webpack_require__("../../packages/webrtc/src/Peer/events/negotiationneeded.js");
+
+var _negotiationneeded2 = _interopRequireDefault(_negotiationneeded);
+
+var _signalingstatechange = __webpack_require__("../../packages/webrtc/src/Peer/events/signalingstatechange.js");
+
+var _signalingstatechange2 = _interopRequireDefault(_signalingstatechange);
+
+var _track = __webpack_require__("../../packages/webrtc/src/Peer/events/track.js");
+
+var _track2 = _interopRequireDefault(_track);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  onicecandidate: _icecandidate2.default,
+  oniceconnectionstatechange: _iceconnectionstatechange2.default,
+  onicegatheringstatechange: _icegatheringstatechange2.default,
+  onnegotiationneeded: _negotiationneeded2.default,
+  onsignalingstatechange: _signalingstatechange2.default,
+  ontrack: _track2.default
+};
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/negotiationneeded.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = onnegotiationneeded;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `negotiationneeded` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onnegotiationneeded
+ * @method onnegotiationneeded
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function onnegotiationneeded(listener) {
+  const { nativePeer, id } = this;
+
+  nativePeer.onnegotiationneeded = function (event) {
+    _loglevel2.default.debug(`Peer ${id} received negotiationneeded event.`);
+    listener(event);
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/signalingstatechange.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = onsignalingstatechange;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `signalingstatechange` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onsignalingstatechange
+ * @method onsignalingstatechange
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function onsignalingstatechange(listener) {
+  const { nativePeer, id } = this;
+
+  nativePeer.onsignalingstatechange = function (event) {
+    _loglevel2.default.debug(`Peer ${id} received signalingstatechange event: ${nativePeer.signalingState}`);
+    listener(event);
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/events/track.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = ontrack;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Event wrapper for `track` event.
+ * Reference: developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/ontrack
+ * @method ontrack
+ * @param  {Function} listener The listener function for the event.
+ * @return {Boolean}  Whether the assignment succeeded or not.
+ */
+function ontrack(listener) {
+  const { nativePeer, id, trackManager } = this;
+
+  nativePeer.ontrack = event => {
+    /**
+     * transceiver: The RTCRtpTransceiver for this remote track. (Available in unified-plan)
+     * receiver: The RTCRtpReceiver for this remote track.
+     * track: The remote MediaStreamTrack.
+     * streams: Array of MediaStreams the track is in.
+     */
+    // event object contains transceiver which already has track attached to its receiver
+    const { track: nativeTrack, streams } = event;
+
+    // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
+    //  a stream is not associated with it so we get no stream here.
+    // So we create our own stream here.
+    // In the future, support will be available for `sender.setStreams` on the remote side
+    //  so this is a temporary workaround.
+    let targetStream;
+    if (streams.length === 0) {
+      targetStream = new MediaStream([nativeTrack]);
+    } else {
+      targetStream = streams[0];
+    }
+
+    // Convert the native MediaStreamTrack into a Track object.
+    const track = trackManager.add(nativeTrack, targetStream);
+
+    _loglevel2.default.debug(`Peer ${id} received ${nativeTrack.kind} Track ${track.id}.`);
+    listener(track);
+  };
+
+  return true;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _set = __webpack_require__("../../node_modules/babel-runtime/core-js/reflect/set.js");
+
+var _set2 = _interopRequireDefault(_set);
+
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+exports.default = peer;
+
+var _events = __webpack_require__("../../packages/webrtc/src/Peer/events/index.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _methods = __webpack_require__("../../packages/webrtc/src/Peer/methods/index.js");
+
+var _methods2 = _interopRequireDefault(_methods);
+
+var _properties = __webpack_require__("../../packages/webrtc/src/Peer/properties/index.js");
+
+var _properties2 = _interopRequireDefault(_properties);
+
+var _utils = __webpack_require__("../../packages/webrtc/src/utils.js");
+
+var _config = __webpack_require__("../../packages/webrtc/src/Peer/config.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.js");
+
+var _eventemitter2 = _interopRequireDefault(_eventemitter);
+
+var _timerMachine = __webpack_require__("../../node_modules/timer-machine/lib/timer.js");
+
+var _timerMachine2 = _interopRequireDefault(_timerMachine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Create a Proxied Peer.
+ * This Peer is a native PeerConnection that has had some new functionality
+ *    added and some existing functionality "augmented". Where an event, a
+ *    method, or a property has been defined (see folders), we intercept/add
+ *    that functionality.
+ * @method peer
+ * @return {Peer}
+ */
+/*
+ * Wrapper imports.
+ * Events, methods, and properties that we want to wrap/add to the native Peer.
+ */
+function peer(id, config = {}, trackManager) {
+  config = (0, _utils.mergeValues)(_config2.default, config);
+
+  const iceTimer = _timerMachine2.default.get(`ice-${id}`);
+  const emitter = new _eventemitter2.default();
+
+  // Create the native Peer.
+  _loglevel2.default.info(`Creating peer connection with ID: ${id}.`, config);
+  const nativePeer = new RTCPeerConnection(config.rtcConfig);
+
+  // Add the event emitter methods to the wrapped methods as well.
+  const customMethods = (0, _extends3.default)({}, _methods2.default, {
+    on: emitter.on.bind(emitter),
+    off: emitter.off.bind(emitter),
+    once: emitter.once.bind(emitter)
+
+    /**
+     * The Peer model.
+     * @typedef {Peer}
+     * @property {RTCPeerConnection} peer     The native PeerConnection.
+     * @property {string}            id       The unique identifier for the Peer.
+     * @property {boolean}           dtlsRole The DTLS role selected for this PeerConnection. Set after the initial negotiation is completed.
+     * @property {Object}            trackManager Manager that tracks all MediaStreamTracks.
+     * @property {Object}            iceTimer Timer tool (specifically for ICE collection).
+     * @property {EventEmitter}      emitter
+     * @property {Array<RTCIceCandidate>} iceCandidates Gathered candidates.
+     */
+  });const base = {
+    nativePeer,
+    proxyPeer: undefined,
+    id,
+    dtlsRole: null,
+    config,
+    trackManager,
+    iceTimer,
+    emitter,
+    iceCandidates: []
+
+    /**
+     * Create the Proxy object that will be used as the PeerConnection.
+     *
+     * This will intercept all `get` and `set` operations and either forward them
+     *    directly to the real PeerConnection or to our wrapped operations.
+     * This allows us to shim part or all of the PeerConnection's API. We can
+     *    decide which operations we want to intercept while allowing others to
+     *    pass through unchanged.
+     */
+  };base.proxyPeer = new Proxy(base, {
+    /**
+     * Intercept "get" calls on the Proxy.
+     * This function is called anytime a property on `base` is accessed,
+     *    eg. `base.someProp`
+     * @param {Object} target    base
+     * @param {string} prop      Property being accessed.
+     * @param {Object} receiver  The Proxy object.
+     */
+    get: function (target, prop, receiver) {
+      if (typeof base.nativePeer[prop] === 'function') {
+        /*
+         * If a function is being accessed, determine whether we want to
+         *    return the native function or our own.
+         */
+        if ((0, _keys2.default)(customMethods).includes(prop)) {
+          // Return our wrapped version of the original function.
+          return customMethods[prop].bind(base);
+        } else {
+          // Return the original function, bound to have the original context.
+          return base.nativePeer[prop].bind(base.nativePeer);
+        }
+      } else if (customMethods[prop] && typeof customMethods[prop] === 'function') {
+        /*
+         * If a non-native function is being accessed, return our custom method.
+         * These are methods that are not on the native RTCPeerConnection
+         *    object, but we added to the old Peer model.
+         */
+        // TODO: Move all of this functionality to a higher level of abstraction.
+        return customMethods[prop].bind(base);
+      } else if (_properties2.default[prop]) {
+        /*
+         * If a PeerConnection property is being accessed, and we have a
+         *    wrapping for it, return our wrapper property.
+         */
+        if (typeof _properties2.default[prop] === 'function') {
+          // If our property wrapper is a function, call the function and return
+          //    the results.
+          return _properties2.default[prop].bind(base)();
+        } else {
+          // Otherwise, just return the original results.
+          return base.nativePeer[prop];
+        }
+      } else if (prop !== 'nativePeer' && base[prop]) {
+        /*
+         * If a Peer model property, other than the peer, is being accessed,
+         *    return it. The Peer model shouldn't have any properties that the
+         *    PeerConnection also has (to avoid conflicts).
+         */
+        return base[prop];
+      } else {
+        // Otherwise, return the property from the PeerConnection itself.
+        return base.nativePeer[prop];
+      }
+    },
+
+    /**
+     * Intercept "set" calls on the Proxy.
+     * This function is called anytime a property on `base` is assigned,
+     *    eg. `base.someProp = value`
+     * @method
+     * @param  {Object} target   base
+     * @param  {string} prop     Property being set.
+     * @param  {Any}    value    The value being set.
+     * @param  {Proxy}  receiver The Proxy object.
+     * @return {boolean}         Whether the assignment succeeded or not.
+     */
+    set: function (target, prop, value, receiver) {
+      if (_events2.default[prop]) {
+        // If a value is being set on one of our "wrapped events", then call
+        //    the "event function".
+        return _events2.default[prop].bind(base)(value);
+      } else if (prop === 'dtlsRole') {
+        /**
+         * Only allow the `dtlsRole` property of the Peer model be set. The
+         *    Session needs to be able to get/set this property, in the case
+         *    where it recreates the Peer multiple times, so it needs to set the
+         *    role to something specific.
+         * Reference: KAA-1816
+         */
+        base.dtlsRole = value;
+        return true;
+      } else {
+        // Otherwise, try to set the value on the native Peer.
+        return (0, _set2.default)(base.nativePeer, prop, value);
+      }
+    }
+  });
+
+  /**
+   * For event debugging purposes, start with a dummy listener for every event.
+   *    This ensures our Proxy is listening for the events (in the case nothing
+   *    else is listening), so that debug information from the event wrappers
+   *    are logged.
+   */
+  for (let eventName in _events2.default) {
+    base.proxyPeer[eventName] = () => {};
+  }
+
+  return base.proxyPeer;
+}
+
+// Libraries.
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/addIceCandidate.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = addIceCandidate;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Add an ICE candidate to the connection.
+ * @method addIceCandidate
+ * @param  {RTCIceCandidate} candidate A native candidate object.
+ * @return {Promise} Resolves when the candidate is successfully added.
+ */
+function addIceCandidate(candidate) {
+  const { nativePeer, proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} adding ICE candidate.`);
+
+  return new _promise2.default((resolve, reject) => {
+    if (proxyPeer.remoteDescription.type && proxyPeer.remoteDescription.sdp) {
+      nativePeer.addIceCandidate(candidate).then(resolve).catch(reject);
+    } else {
+      _loglevel2.default.debug(`Peer ${id} cannot set remote ICE candidate without a remote description.`);
+      // TODO: Better error.
+      reject(new Error(`Peer ${id} cannot set remote ICE candidate without a remote description.`));
+    }
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/addTrack.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = addTrack;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Add a Track to the connection.
+ * @method addTrack
+ * @param  {Track} track A Track object.
+ * @return {RTCRtpSender}
+ */
+function addTrack(track) {
+  const { nativePeer, id } = this;
+
+  _loglevel2.default.info(`Peer ${id} adding new track.`);
+
+  let sender;
+  try {
+    sender = nativePeer.addTrack(track.track, track.getStream());
+  } catch (err) {
+    // TODO: Better error handling.
+    _loglevel2.default.debug(err.message);
+  }
+  // TODO: What to return here? Probably shouldn't expose the rtpSender itself.
+  return sender;
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/close.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = close;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Clean the Peer by closing the RTCPeerConnection.
+ * @method close
+ */
+function close() {
+  const { nativePeer, id, emitter } = this;
+  _loglevel2.default.debug(`Peer ${id} closing.`);
+
+  nativePeer.close();
+  emitter.emit('peer:closed', id);
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/createAnswer.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = createAnswer;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
+
+var _pipeline = __webpack_require__("../../packages/webrtc/src/sdpUtils/pipeline.js");
+
+var _handlers = __webpack_require__("../../packages/webrtc/src/sdpUtils/handlers.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Creates an SDP answer, given that a remote offer has been set.
+ * @method createAnswer
+ * @param  {RTCAnswerOptions} [options={}] Options used to customize the answer.
+ * @param  {Object} [options.mediaDirections] Directions to use for media.
+ * @param  {string} [options.mediaDirections.audio]
+ * @param  {string} [options.mediaDirections.video]
+ * @return {Promise} Resolves with the answer.
+ */
+function createAnswer(options = {}) {
+  const { nativePeer, id, config, dtlsRole } = this;
+
+  _loglevel2.default.info(`Peer ${id} creating local answer.`);
+
+  // If using unified-plan, remove options.mediaDirections.
+  // This is because directions are now set in transceivers.
+  if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+    delete options.mediaDirections;
+  }
+
+  return new _promise2.default((resolve, reject) => {
+    nativePeer.createAnswer(options).then(answer => {
+      const sdpHandlers = [];
+
+      /*
+       * Always include the `preventDtlsRoleChange` handler. This ensures
+       *    that the SDP's DTLS role does not change during a renegotiation.
+       */
+      sdpHandlers.push(_handlers.preventDtlsRoleChange);
+
+      if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
+        // Modify the answer to claim the Peer doesn't suport trickle ICE.
+        sdpHandlers.push(_handlers.removeTrickleIce);
+      }
+      if (config.removeBundling) {
+        // Modify the offer to remove media bundling
+        sdpHandlers.push(_handlers.removeBundling);
+      }
+      if (options.mediaDirections) {
+        // Modify the answer to set media directions as desired.
+        sdpHandlers.push((0, _handlers.changeMediaDirection)(options.mediaDirections));
+      }
+      if (sdpHandlers.length > 0) {
+        // Run the SDP pipeline with only these handlers.
+        answer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, answer.sdp, {
+          type: answer.type,
+          endpoint: _constants.PEER.ENDPOINT.LOCAL,
+          dtlsRole: dtlsRole
+        });
+      }
+      resolve(answer);
+    }).catch(reject);
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/createOffer.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = createOffer;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
+
+var _pipeline = __webpack_require__("../../packages/webrtc/src/sdpUtils/pipeline.js");
+
+var _handlers = __webpack_require__("../../packages/webrtc/src/sdpUtils/handlers.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Creates an SDP offer.
+ * @method createOffer
+ * @param  {RTCOfferOptions} [options={}] Options used to customize the offer.
+ * @param  {Object} [options.mediaDirections] Directions to use for media.
+ * @param  {string} [options.mediaDirections.audio]
+ * @param  {string} [options.mediaDirections.video]
+ * @return {Promise} Resolves with the offer.
+ */
+function createOffer(options = {}) {
+  const { nativePeer, id, config } = this;
+
+  _loglevel2.default.info(`Peer ${id} creating local offer.`);
+
+  // If using unified-plan, remove options.mediaDirections.
+  // This is because directions are now set in transceivers.
+  if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+    delete options.mediaDirections;
+  }
+
+  return new _promise2.default((resolve, reject) => {
+    nativePeer.createOffer(options).then(offer => {
+      const sdpHandlers = [];
+      if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
+        // Modify the offer to claim the Peer doesn't suport trickle ICE.
+        sdpHandlers.push(_handlers.removeTrickleIce);
+      }
+      if (config.removeBundling) {
+        // Modify the offer to remove media bundling
+        sdpHandlers.push(_handlers.removeBundling);
+      }
+      if (options.mediaDirections) {
+        // Modify the offer to set media directions as desired.
+        sdpHandlers.push((0, _handlers.changeMediaDirection)(options.mediaDirections));
+      }
+      if (sdpHandlers.length > 0) {
+        // Run the SDP pipeline with only these handlers.
+        offer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, offer.sdp, {
+          type: offer.type,
+          endpoint: _constants.PEER.ENDPOINT.LOCAL
+        });
+      }
+      resolve(offer);
+    }).catch(reject);
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/findReusableTransceiver.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = findReusableTransceiver;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Finds a transceiver that can be reused.
+ * A transceiver can be reused if it satisfies the following conditions:
+ *   - it does not have a track on its sender
+ *   - it has the same kind (audio or video) as what we specified
+ *   - it has been used before (if it has not been used then we are not "reusing" it)
+ * @method findReusableTransceiver
+ * @param {string} kind The kind of transceiver to find (audio or video)
+ * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
+ */
+function findReusableTransceiver(kind) {
+  const { proxyPeer, config, id } = this;
+  _loglevel2.default.info(`Peer ${id} finding reusable transceiver.`);
+
+  if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+    const transceivers = proxyPeer.getTransceivers();
+    return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
+    );
+  } else {
+    _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/getState.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getState;
+/**
+ * Retrieve a snapshot of the Peer object's current state.
+ * @method getState
+ * @return {Object}
+ */
+function getState() {
+  const { proxyPeer, config, id } = this;
+
+  return {
+    id,
+    config: config,
+    localDesc: proxyPeer.localDescription,
+    signalingState: proxyPeer.signalingState,
+    localTracks: proxyPeer.localTracks,
+    remoteTracks: proxyPeer.remoteTracks,
+    senderTracks: proxyPeer.senderTracks
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/getStats.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = getStats;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Retrieve RTCStatsReport for a sender or the peerConnection.
+ * @method getStats
+ * @param {string} [TrackId] Return stats for peerConnection if trackId is not provided
+ * @return {Promise} Resolves with the RTCStatsReport
+ */
+function getStats(trackId) {
+  const { nativePeer, proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} getting stats ${trackId ? 'for track.' : '.'}`);
+  // If no trackId is supplied, get the stats from the RTCPeerConnection. Otherwise, find an RTCSender
+  // associated with the trackId and get the stats from it.
+
+  // Use the trackId if it was provided
+  if (trackId) {
+    return new _promise2.default((resolve, reject) => {
+      const senders = proxyPeer.getSenders();
+      // search for a sender associated with the trackId
+      const sender = senders.find(sender => sender.track.id === trackId);
+      if (sender) {
+        sender.getStats().then(resolve).catch(reject);
+      } else {
+        const errMsg = `Cannot find sender with trackId: ${trackId}`;
+        _loglevel2.default.debug(errMsg);
+        reject(new Error(errMsg));
+      }
+    });
+  } else {
+    // get the stats associated with the peerConnection if no trackId is supplied
+    return nativePeer.getStats();
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _addIceCandidate = __webpack_require__("../../packages/webrtc/src/Peer/methods/addIceCandidate.js");
+
+var _addIceCandidate2 = _interopRequireDefault(_addIceCandidate);
+
+var _addTrack = __webpack_require__("../../packages/webrtc/src/Peer/methods/addTrack.js");
+
+var _addTrack2 = _interopRequireDefault(_addTrack);
+
+var _close = __webpack_require__("../../packages/webrtc/src/Peer/methods/close.js");
+
+var _close2 = _interopRequireDefault(_close);
+
+var _createAnswer = __webpack_require__("../../packages/webrtc/src/Peer/methods/createAnswer.js");
+
+var _createAnswer2 = _interopRequireDefault(_createAnswer);
+
+var _createOffer = __webpack_require__("../../packages/webrtc/src/Peer/methods/createOffer.js");
+
+var _createOffer2 = _interopRequireDefault(_createOffer);
+
+var _findReusableTransceiver = __webpack_require__("../../packages/webrtc/src/Peer/methods/findReusableTransceiver.js");
+
+var _findReusableTransceiver2 = _interopRequireDefault(_findReusableTransceiver);
+
+var _getState = __webpack_require__("../../packages/webrtc/src/Peer/methods/getState.js");
+
+var _getState2 = _interopRequireDefault(_getState);
+
+var _getStats = __webpack_require__("../../packages/webrtc/src/Peer/methods/getStats.js");
+
+var _getStats2 = _interopRequireDefault(_getStats);
+
+var _removeTrack = __webpack_require__("../../packages/webrtc/src/Peer/methods/removeTrack.js");
+
+var _removeTrack2 = _interopRequireDefault(_removeTrack);
+
+var _replaceTrack = __webpack_require__("../../packages/webrtc/src/Peer/methods/replaceTrack.js");
+
+var _replaceTrack2 = _interopRequireDefault(_replaceTrack);
+
+var _sendDTMF = __webpack_require__("../../packages/webrtc/src/Peer/methods/sendDTMF.js");
+
+var _sendDTMF2 = _interopRequireDefault(_sendDTMF);
+
+var _setLocalDescription = __webpack_require__("../../packages/webrtc/src/Peer/methods/setLocalDescription.js");
+
+var _setLocalDescription2 = _interopRequireDefault(_setLocalDescription);
+
+var _setRemoteDescription = __webpack_require__("../../packages/webrtc/src/Peer/methods/setRemoteDescription.js");
+
+var _setRemoteDescription2 = _interopRequireDefault(_setRemoteDescription);
+
+var _setTransceiversDirection = __webpack_require__("../../packages/webrtc/src/Peer/methods/setTransceiversDirection.js");
+
+var _setTransceiversDirection2 = _interopRequireDefault(_setTransceiversDirection);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const methods = {
+  addIceCandidate: _addIceCandidate2.default,
+  addTrack: _addTrack2.default,
+  close: _close2.default,
+  createAnswer: _createAnswer2.default,
+  createOffer: _createOffer2.default,
+  findReusableTransceiver: _findReusableTransceiver2.default,
+  getState: _getState2.default,
+  getStats: _getStats2.default,
+  removeTrack: _removeTrack2.default,
+  replaceTrack: _replaceTrack2.default,
+  sendDTMF: _sendDTMF2.default,
+  setLocalDescription: _setLocalDescription2.default,
+  setRemoteDescription: _setRemoteDescription2.default,
+  setTransceiversDirection: _setTransceiversDirection2.default
+};
+
+exports.default = methods;
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/removeTrack.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = removeTrack;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Remove a Track from the connection.
+ * @method removeTrack
+ * @param  {string} trackId An id for a Track object.
+ */
+function removeTrack(trackId) {
+  const { nativePeer, proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} removing track ${trackId}.`);
+
+  const track = proxyPeer.senderTracks.find(track => track.id === trackId);
+  if (!track) {
+    _loglevel2.default.debug(`Invalid track ID ${trackId}; cannot remove track.`);
+    return;
+  } else if (proxyPeer.signalingState === ' closed') {
+    _loglevel2.default.debug(`Peer ${id} is closed; cannot remove track.`);
+    return;
+  }
+
+  // Get the RtpSender for the Track we want to remove.
+  const sender = proxyPeer.getSenders().filter(sender => sender.track !== null).find(sender => sender.track.id === trackId);
+  nativePeer.removeTrack(sender);
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/replaceTrack.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = replaceTrack;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Replaces a specified transceiver's sender.track.
+ * @method replaceTrack
+ * @param {Object} newTrack The MediaStreamTrack we want to place into the sender.
+ * @param {Object} options Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
+ * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
+ * @return {Object} A Promise object which is fulfilled once the track has been replaced
+ */
+function replaceTrack(newTrack, options) {
+  const { proxyPeer, id, config } = this;
+  _loglevel2.default.info(`Peer ${id} replacing track ${options.trackId}.`);
+
+  return new _promise2.default((resolve, reject) => {
+    let sender;
+    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+      // Find the transceiver related to the provided track ID.
+      const targetTransceiver = proxyPeer.getTransceivers().find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
+
+      sender = targetTransceiver ? targetTransceiver.sender : undefined;
+    } else {
+      sender = proxyPeer.getSenders().find(sender => sender.track.id === options.trackId);
+    }
+
+    if (sender) {
+      sender.replaceTrack(newTrack).then(resolve).catch(reject);
+    } else {
+      reject(new Error(`Sender for track ${options.trackId} not found.`));
+    }
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/sendDTMF.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = sendDTMF;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Send DTMF tones.
+ * @method sendDTMF
+ * @param {Object} DTMFOptions The DTMF options.
+ * @param {string} DTMFOptions.tone DTMF tone to send. Valid values are [0,1,2,3,4,5,6,7,8,9,#].
+ * @param {number} DTMFOptions.duration=100 The amount of time, in milliseconds, that each DTMF tone should last.
+ * @param {number} DTMFOptions.intertoneGap=70 The length of time, in milliseconds, to wait between tones.
+ * @param {Object} [sendOptions] The send options.
+ * @param {func} [sendOptions.callback] Optional callback for tone event .
+ * @param {string} [sendOptions.trackId] The trackId of the sender to use.
+ * @return {Boolean} Whether the DTMF tones were inserted
+ */
+function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, trackId }) {
+  const { proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} sending DTMF tones.`);
+
+  if (!proxyPeer.getSenders) {
+    _loglevel2.default.debug('RTCPeerConnection method getSenders() is required which is not support by this browser.');
+    return false;
+  }
+  const senders = proxyPeer.getSenders();
+  // Use the trackId if it was provided
+  if (trackId) {
+    let sender = senders.find(sender => sender.track.id === trackId);
+    if (!sender) {
+      _loglevel2.default.debug('No sender with that trackId');
+      return false;
+    }
+    insertDTMF(sender, tone, duration, intertoneGap, callback);
+    return true;
+  } else {
+    let result;
+    for (let i = 0; i < senders.length; i++) {
+      result = insertDTMF(senders[i], tone, duration, intertoneGap, callback);
+      if (result) {
+        return true;
+      }
+    }
+    _loglevel2.default.debug('No appropriate senders were found');
+    return false;
+  }
+}
+
+/**
+ * Event handler when tone is played.
+ * @private
+ * @method handleToneChangeEvent
+ * @param  {event} event
+ */
+function handleToneChangeEvent(event) {
+  if (event.tone !== '') {
+    _loglevel2.default.debug('Tone played: ' + event.tone);
+  } else {
+    _loglevel2.default.debug('All tones have played.');
+  }
+}
+
+/**
+ * Helper function to sendDTMF tones .
+ * @private
+ * @method insertDTMF
+ * @param {sender} object
+ * @param {string} tone
+ * @param {number} duration
+ * @param {number} intertoneGap
+ * @param {Function} callback
+ */
+function insertDTMF(sender, tone, duration, intertoneGap, callback) {
+  if (sender.dtmf) {
+    const dtmfSender = sender.dtmf;
+    if (callback) {
+      dtmfSender.ontonechange = callback;
+    } else {
+      dtmfSender.ontonechange = handleToneChangeEvent;
+    }
+    try {
+      dtmfSender.insertDTMF(tone, duration, intertoneGap);
+      return true;
+    } catch (err) {
+      _loglevel2.default.debug(err.message);
+      return false;
+    }
+  } else {
+    _loglevel2.default.debug('The sender requires DTMF which is not support by this browser.');
+    return false;
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/setLocalDescription.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = setLocalDescription;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
+
+var _iceCollectionLoop = __webpack_require__("../../packages/webrtc/src/Peer/utils/iceCollectionLoop.js");
+
+var _iceCollectionLoop2 = _interopRequireDefault(_iceCollectionLoop);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Sets an SDP as the local description of the connection.
+ * The returned Promise will resolve when the Peer is ready for negotiation,
+ *    taking into account the Peer's `trickleIceMode` configuration.
+ * @method setLocalDescription
+ * @param  {RTCSessionDescription} sessionDesc
+ * @return {Promise}
+ */
+function setLocalDescription(desc) {
+  const { nativePeer, proxyPeer, config, id, emitter, iceTimer } = this;
+
+  // TODO: SDP pipeline here.
+  _loglevel2.default.debug(`Peer ${id} setting local description ${desc.type}:`, desc.sdp);
+
+  /**
+   * Scenario: A local answer SDP is being applied to the Peer, but it does
+   *    not have a selected DTLS role yet. This should occur during initial
+   *    negotiation, before responding with this Peer's answer.
+   * Set the local Peer's DTLS role depending on what role was generated. This
+   *    role will be kept throughout all renegotiations.
+   */
+  if (!this.dtlsRole && desc.type === 'answer') {
+    const dtlsMatch = desc.sdp.match(/a=setup:(\w*?)[\r\n]/);
+    if (dtlsMatch) {
+      _loglevel2.default.debug(`Peer ${id} selecting DTLS role ${dtlsMatch[1]}.`);
+      this.dtlsRole = dtlsMatch[1];
+    }
+  }
+
+  return new _promise2.default((resolve, reject) => {
+    // We always want to wait for the PeerConnection to be ready for
+    //    negotiation before resolving setLocalDescription.
+    // Each trickle ICE option (FULL/HALF/NONE) emits "negotiation ready" event once.
+    emitter.once('onnegotiationready', () => {
+      if (iceTimer.isStarted()) {
+        // In a HALF trickle scenario, the Peer will be ready for negotiation
+        //    before ICE collection has completed. Log that timing.
+        _loglevel2.default.debug(`Peer ${id} took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
+      }
+      resolve();
+    });
+
+    nativePeer.setLocalDescription(desc).then(() => {
+      _loglevel2.default.info(`Peer ${id} set local description.`);
+      _loglevel2.default.debug(`Peer ${id} state is now ${proxyPeer.signalingState}.`);
+
+      if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
+        // Trickling ICE candidates means that we can begin negotiation immediately.
+        _loglevel2.default.debug(`Peer ${id} ready for negotiation (full trickleICE).`);
+        emitter.emit('onnegotiationready');
+      } else {
+        // ICE candidates aren't always gathered (only initially and when something
+        //    changes), but we rely on "gathering complete" to know when the Peer is
+        //    ready for negotiation. Give the Peer some time to start gathering
+        //    before deciding if we need to wait for gathering to complete or not.
+        // The timeout is needed because of a bug in Chrome:
+        //    https://bugs.chromium.org/p/webrtc/issues/detail?id=1873
+        // Known issue: If candidate collection takes less time than this timeout,
+        //    the logged message will be incorrect, but will functionally still work.
+        setTimeout(() => {
+          if (proxyPeer.iceGatheringState === 'complete') {
+            // Gathering is "complete", so we are ready for negotiation.
+            _loglevel2.default.debug(`Peer ${id} ready for negotiation; ICE candidate collection not needed.`);
+            emitter.emit('onnegotiationready');
+          } else {
+            _loglevel2.default.debug(`Peer ${id} waiting for ICE collection process (${config.trickleIceMode}).`);
+            // If ICE collection never finishes, we need to time it out at some point.
+            //    Start the timeout-out loop after an initial delay.
+            setTimeout(() => {
+              (0, _iceCollectionLoop2.default)(this, config.iceCollectionDelay);
+            }, config.iceCollectionDelay);
+          }
+        }, 25);
+      }
+    }).catch(err => {
+      _loglevel2.default.info(`Peer ${id} failed to set local description.`);
+      _loglevel2.default.debug(`Peer ${id}: ${err}`);
+      // Parse native error. Make it more understand and/or
+      //    provide a better log about what went wrong.
+      reject(err);
+    });
+  });
+}
+
+// Utils.
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/setRemoteDescription.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = setRemoteDescription;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Sets an SDP as the remote description of the connection.
+ * @method setRemoteDescription
+ * @param  {RTCSessionDescription} sessionDesc
+ */
+function setRemoteDescription(desc) {
+  const { nativePeer, proxyPeer, id } = this;
+
+  /**
+   * Scenario: A remote answer SDP is being applied to the Peer, but it does
+   *    not have a selected DTLS role yet. This should occur only when the
+   *    initial negotiation is being completed.
+   * Set the local Peer's DTLS role depending on what the remote Peer
+   *    selected. This role will be kept throughout all renegotiations.
+   */
+  if (!this.dtlsRole && desc.type === 'answer') {
+    const dtlsMatch = desc.sdp.match(/a=setup:(\w*?)[\r\n]/);
+    if (dtlsMatch) {
+      const localRole = dtlsMatch[1] === 'active' ? 'passive' : 'active';
+      _loglevel2.default.debug(`Peer ${id} selecting DTLS role ${localRole}. Remote Peer selected ${dtlsMatch[1]} DTLS role.`);
+      this.dtlsRole = localRole;
+    }
+  }
+
+  // TODO: Update `config.trickleIceMode` to either NONE or FULL (from HALF)
+  //    depending on remote support, since HALF is only needed for initial.
+  return new _promise2.default((resolve, reject) => {
+    _loglevel2.default.debug(`Peer ${id} setting remote description ${desc.type}:`, desc.sdp);
+    nativePeer.setRemoteDescription(desc).then(() => {
+      _loglevel2.default.info(`Peer ${id} set remote description.`);
+      _loglevel2.default.debug(`Peer ${id} state is now ${proxyPeer.signalingState}.`);
+      resolve();
+    }).catch(err => {
+      _loglevel2.default.info(`Peer ${id} failed to set remote description.`);
+      _loglevel2.default.debug(`Peer ${id}: ${err}`);
+      // Parse native error. Make it more understand and/or
+      //    provide a better log about what went wrong.
+      reject(err);
+    });
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/methods/setTransceiversDirection.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = setTransceiversDirection;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
+
+var _transceiverUtils = __webpack_require__("../../packages/webrtc/src/sdpUtils/transceiverUtils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Sets the direction of transceivers.
+ * @method setTransceiversDirection
+ * @param {string} targetDirection The desired direction to set the transceivers to.
+ * @param {Object} [options] Options for specifying which transceivers should be affected. They are ordered by priority.
+ * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
+ * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
+ */
+function setTransceiversDirection(targetDirection, options = {}) {
+  const { proxyPeer, config, id } = this;
+  _loglevel2.default.info(`Peer ${id} setting transceiver direction to ${targetDirection}.`);
+
+  if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
+    let transceivers = proxyPeer.getTransceivers();
+
+    if (options.trackIds) {
+      transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
+    }
+
+    const failures = [];
+    transceivers.forEach(transceiver => {
+      if (!(0, _transceiverUtils.setTransceiverDirection)(transceiver, targetDirection)) {
+        failures.push(transceiver);
+      }
+    });
+    return {
+      error: failures.length !== 0,
+      failures
+    };
+  } else {
+    _loglevel2.default.info(`Transceiver direction modification is only available in unified-plan.`);
+    return {
+      error: true
+    };
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _localDescription = __webpack_require__("../../packages/webrtc/src/Peer/properties/localDescription.js");
+
+var _localDescription2 = _interopRequireDefault(_localDescription);
+
+var _localTracks = __webpack_require__("../../packages/webrtc/src/Peer/properties/localTracks.js");
+
+var _localTracks2 = _interopRequireDefault(_localTracks);
+
+var _remoteDescription = __webpack_require__("../../packages/webrtc/src/Peer/properties/remoteDescription.js");
+
+var _remoteDescription2 = _interopRequireDefault(_remoteDescription);
+
+var _remoteTracks = __webpack_require__("../../packages/webrtc/src/Peer/properties/remoteTracks.js");
+
+var _remoteTracks2 = _interopRequireDefault(_remoteTracks);
+
+var _senderTracks = __webpack_require__("../../packages/webrtc/src/Peer/properties/senderTracks.js");
+
+var _senderTracks2 = _interopRequireDefault(_senderTracks);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = { localDescription: _localDescription2.default, localTracks: _localTracks2.default, remoteDescription: _remoteDescription2.default, remoteTracks: _remoteTracks2.default, senderTracks: _senderTracks2.default };
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/localDescription.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getLocalDescription;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * The SDP for the local end of the connection.
+ * @method getLocalDescription
+ */
+function getLocalDescription() {
+  const { nativePeer, id } = this;
+  _loglevel2.default.debug(`Peer ${id} getting local description.`);
+
+  const localDesc = nativePeer.localDescription;
+  /*
+   * Ensure it is a RTCSessionDescription object.
+   * In some scenarios (based on browser?), it may return an empty object
+   *    instead of undefined when there is no local description.
+   * TODO: Determine if this is still needed, or if we can use the native
+   *    property directly.
+   */
+  if (localDesc && localDesc.sdp && localDesc.type) {
+    return localDesc;
+  } else {
+    return undefined;
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/localTracks.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = localTracks;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * @method getLocalTracks
+ * @return {Array} List of active Track objects added to the Peer locally.
+ */
+function localTracks() {
+  const { proxyPeer, id, trackManager } = this;
+  _loglevel2.default.info(`Peer ${id} getting local tracks.`);
+
+  // Return the list of Tracks from active senders.
+  return proxyPeer.getSenders()
+  /**
+   * Remove any Senders that do not have an associated track.
+   * We only want to retrieve Senders that do have tracks, because those are
+   *    the local tracks that have been added to the Peer.
+   * Senders without tracks are part of a Transceiver where the Receiver has
+   *    a remote track, but no local track has been added to it. We don't
+   *    care about this for the "get local tracks" operation.
+   */
+  .filter(sender => Boolean(sender.track)).map(sender => trackManager.get(sender.track.id)).filter(track => {
+    // Make sure the trackManager has the track and that its active.
+    // It's possble that Peer has the sender but not the actual track yet.
+    return track && track.getState().state === 'live' && track.getStream().active;
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/remoteDescription.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getRemoteDescription;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * The SDP for the remote end of the connection.
+ * @method getRemoteDescription
+ */
+function getRemoteDescription() {
+  const { nativePeer, id } = this;
+  _loglevel2.default.debug(`Peer ${id} getting remote description.`);
+
+  const remoteDesc = nativePeer.remoteDescription;
+  /*
+   * Ensure it is a RTCSessionDescription object.
+   * In some scenarios (based on browser?), it may return an empty object
+   *    instead of undefined when there is no local description.
+   * TODO: Determine if this is still needed, or if we can use the native
+   *    property directly.
+   */
+  if (remoteDesc && remoteDesc.sdp && remoteDesc.type) {
+    return remoteDesc;
+  } else {
+    return undefined;
+  }
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/remoteTracks.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getRemoteTracks;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * @method getRemoteTracks
+ * @return {Array} List of active Track objects the Peer has received remotely.
+ */
+function getRemoteTracks() {
+  const { proxyPeer, id, trackManager } = this;
+  _loglevel2.default.info(`Peer ${id} getting remote tracks.`);
+
+  // Return the list of Tracks from active receivers.
+  return proxyPeer.getReceivers()
+  /**
+   * Remove any Receivers that do not have an associated track.
+   * We only want to retrieve Receivers that do have tracks, because those are
+   *    the remote tracks that have been added to the Peer.
+   * Receivers without tracks are part of a Transceiver where the Sender has
+   *    a local track, but no remote track has been added to it. We don't
+   *    care about this for the "get remote tracks" operation.
+   */
+  .filter(receiver => Boolean(receiver.track)).map(receiver => trackManager.get(receiver.track.id)).filter(track => {
+    // Make sure the trackManager has the track and that its active.
+    // It's possble that Peer has the receiver but not the actual track yet.
+    return track && track.getState().state === 'live' && track.getStream().active;
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/senderTracks.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = senderTracks;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This method is similar to the `localTracks` method, however this method returns
+ *  all of the sender's tracks (ended or not) rather than just the active/live ones.
+ *
+ * @method senderTracks
+ * @return {Array} List of Track objects added to the Peer locally.
+ */
+function senderTracks() {
+  const { proxyPeer, id } = this;
+  _loglevel2.default.info(`Peer ${id} getting sender tracks.`);
+
+  // Return the list of Tracks from senders.
+  return proxyPeer.getSenders()
+  /**
+   * Remove any Senders that do not have an associated track.
+   * We only want to retrieve Senders that do have tracks, because those are
+   *    the local tracks that have been added to the Peer.
+   * Senders without tracks are part of a Transceiver where the Receiver has
+   *    a remote track, but no local track has been added to it. We don't
+   *    care about this for the "get local tracks" operation.
+   */
+  .filter(sender => Boolean(sender.track)).map(sender => sender.track);
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/utils/iceCollectionLoop.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = iceCollectionLoop;
+
+var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
+
+var _loglevel2 = _interopRequireDefault(_loglevel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Recursive function for checking whether the ICE collection process should
+ *    be timed-out.
+ *
+ * If the ICE collection process does not complete normally (or is just taking
+ *    too long), there are two conditions where we want to timeout:
+ *      1. ICE candidates collected so far are "good enough".
+ *      2. We have reached the "max timeout".
+ *
+ * This function checks for these conditions at a configured interval. If either
+ *    are met, "manually" triggers the "ready for negotiation" event.
+ * @method iceCollectionLoop
+ * @param {Object} proxyBase The "base" of the Proxy Peer object.
+ * @param {number} elapsedTime The time, in milliseconds, that ICE collection has taken so far.
+ */
+function iceCollectionLoop(proxyBase, elapsedTime) {
+  const { proxyPeer, iceCandidates, emitter, config } = proxyBase;
+
+  // If gathering completed during the delay, we don't need to loop anymore.
+  if (proxyPeer.iceGatheringState === 'complete') {
+    _loglevel2.default.debug('ICE collection completed; stopping candidate check loop.');
+    // Gathering completes when the null candidate is received. The "on
+    //    negotiation ready" event should be emitted at that time.
+
+    // Clear the candidate array without redefining it (it's a const).
+    iceCandidates.length = 0;
+    return;
+  }
+
+  const enoughCandidates = config.iceCollectionCheck(iceCandidates);
+  const hasReachedTimeout = elapsedTime >= config.maxIceTimeout;
+
+  if (hasReachedTimeout) {
+    _loglevel2.default.debug('ICE collection timeout reached; continuing with negotiation.');
+    iceCandidates.length = 0;
+    emitter.emit('onnegotiationready');
+  } else if (enoughCandidates) {
+    _loglevel2.default.debug('ICE candidates sufficient for negotiation; continuing.');
+    iceCandidates.length = 0;
+    emitter.emit('onnegotiationready');
+  } else {
+    _loglevel2.default.debug(`ICE candidates not sufficient for negotiation, delaying another ${config.iceCollectionDelay}ms.`);
+    setTimeout(function () {
+      iceCollectionLoop(proxyBase, elapsedTime + config.iceCollectionDelay);
+    }, config.iceCollectionDelay);
+  }
+}
+
+/***/ }),
+
 /***/ "../../packages/webrtc/src/constants.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -50380,9 +53015,9 @@ var _media = __webpack_require__("../../packages/webrtc/src/models/media.js");
 
 var _media2 = _interopRequireDefault(_media);
 
-var _peer = __webpack_require__("../../packages/webrtc/src/models/peer.js");
+var _Peer = __webpack_require__("../../packages/webrtc/src/Peer/index.js");
 
-var _peer2 = _interopRequireDefault(_peer);
+var _Peer2 = _interopRequireDefault(_Peer);
 
 var _mediaManager = __webpack_require__("../../packages/webrtc/src/managers/mediaManager.js");
 
@@ -50448,7 +53083,7 @@ function initialize() {
     models: {
       Track: _track2.default,
       Media: _media2.default,
-      Peer: _peer2.default
+      Peer: _Peer2.default
     },
     // TODO: Make naming consistent.
     managers: {
@@ -50974,9 +53609,9 @@ var _map2 = _interopRequireDefault(_map);
 
 exports.default = PeerManager;
 
-var _peer = __webpack_require__("../../packages/webrtc/src/models/peer.js");
+var _Peer = __webpack_require__("../../packages/webrtc/src/Peer/index.js");
 
-var _peer2 = _interopRequireDefault(_peer);
+var _Peer2 = _interopRequireDefault(_Peer);
 
 var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
 
@@ -51019,7 +53654,7 @@ function PeerManager(managers) {
    * @return {Peer}
    */
   function create(config = {}) {
-    const peer = new _peer2.default((0, _v2.default)(), config, trackManager);
+    const peer = new _Peer2.default((0, _v2.default)(), config, trackManager);
     peer.once('peer:closed', id => peers.delete(id));
     peers.set(peer.id, peer);
     emitter.emit('peer:new', peer.id);
@@ -51306,7 +53941,7 @@ function TrackManager() {
    * @param  {string} trackId
    * @return {Boolean} Whether the Track existed (and hence removed).
    */
-  function remove(trackId) {
+  function remove({ trackId }) {
     const track = get(trackId);
     if (track) {
       tracks.delete(trackId);
@@ -51583,919 +54218,6 @@ function Media(nativeStream, isLocal) {
 
 /***/ }),
 
-/***/ "../../packages/webrtc/src/models/peer.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _promise = __webpack_require__("../../node_modules/babel-runtime/core-js/promise.js");
-
-var _promise2 = _interopRequireDefault(_promise);
-
-exports.default = Peer;
-
-var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
-
-var _pipeline = __webpack_require__("../../packages/webrtc/src/sdpUtils/pipeline.js");
-
-var _handlers = __webpack_require__("../../packages/webrtc/src/sdpUtils/handlers.js");
-
-var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
-
-var _utils = __webpack_require__("../../packages/webrtc/src/utils.js");
-
-var _transceiverUtils = __webpack_require__("../../packages/webrtc/src/sdpUtils/transceiverUtils.js");
-
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
-
-var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.js");
-
-var _eventemitter2 = _interopRequireDefault(_eventemitter);
-
-var _timerMachine = __webpack_require__("../../node_modules/timer-machine/lib/timer.js");
-
-var _timerMachine2 = _interopRequireDefault(_timerMachine);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Configuration object for a Peer.
- * @typedef {Object} PeerConfig
- * @property {Object} [rtcConfig] Configuration for the native RTCPeerConnection.
- * @property {String} [trickleIceMode=FULL] The initial mode the Peer will use when receiving ICE candidates.
- * @property {Number} [maxIceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
- * @property {Function} [halfTrickleThreshold] Function that determines whether the threshold has been met when in HALF trickle mode.
- * @property {Number} [iceCollectionDelay=1000] The time (in ms) between ICE collection checks.
- * @property {Function} [iceCollectionCheck] The function to check whether enough ICE candidates
- *    have been collected to continue with negotiation. Must return a boolean value.
- */
-
-
-// SDP Helpers.
-const defaultConfig = {
-  rtcConfig: {
-    sdpSemantics: _constants.PEER.SDP_SEMANTICS.PLAN_B
-  },
-  trickleIceMode: _constants.PEER.TRICKLE_ICE.FULL,
-  removeBundling: true,
-  maxIceTimeout: 3000,
-  halfTrickleThreshold: isPassedHalfTrickleThreshold,
-  iceCollectionDelay: 1000,
-  iceCollectionCheck: iceCollectionCheck
-
-  /**
-   * Default function for determining whether the HALF trickle ICE threshold has
-   *    been met, to start trickling ICE candidates.
-   * Defines the threshold as one relay candidate being gathered.
-   * @method isPassedHalfTrickleThreshold
-   * @param  {String}             sdp          The local SDP of the Peer.
-   * @param  {RTCIceCandidate}    iceCandidate The native candidate object that triggered this check.
-   * @param  {Number}             time         The amount of time (ms) since ICE collection began.
-   * @return {Boolean} Whether the "half trickle" threshold has been passed.
-   */
-};
-
-// Libraries.
-// Helpers.
-function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
-  const passedHalf = iceCandidate.candidate.indexOf('relay') !== -1;
-  _loglevel2.default.debug(`Peer's half trickle threshold ${!passedHalf ? 'not ' : ''}reached.`);
-  return passedHalf;
-}
-
-/**
- * Default function to determine if the ice candidates is enough to negotiate.
- * We assume that: at least one relay candidate is good enough to try negotiation.
- * @method iceCollectionCheck
- * @param {Array<RTCIceCandidate>} iceCandidates List of collected ICE candidates.
- * @return {Boolean} Whether the ice Candidates is enough for negotiation.
- */
-function iceCollectionCheck(iceCandidates) {
-  return iceCandidates.some(candidate => candidate.type === 'relay');
-}
-
-/**
- * Wrapper object for a native RTCPeerConnection object.
- * Ref: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
- * @method Peer
- * TODO: Should this be renamed to PeerConnection or Connection? Just so its clearer?
- */
-function Peer(id, config = {}, trackManager) {
-  // Internal variables.
-  config = (0, _utils.mergeValues)(defaultConfig, config);
-
-  const peerId = id;
-  _loglevel2.default.info(`Creating peer connection with ID: ${peerId}.`, config);
-  const peerConnection = new RTCPeerConnection(config.rtcConfig);
-  const iceTimer = _timerMachine2.default.get(`ice-${peerId}`);
-  const emitter = new _eventemitter2.default();
-
-  /**
-   * The DTLS role selected for this PeerConnection. Set after the initial
-   *    negotiation is completed.
-   * @type {string}
-   */
-  let dtlsRole;
-
-  // To keep track of the iceCandidates received
-  let iceCandidates = [];
-  // How long ICE collection has taken so far.
-  let iceCollectionMaxTime = 0;
-
-  // Bubble up the RTCPeerConnection events.
-  const events = ['oniceconnectionstatechange', 'onsignalingstatechange', 'onnegotiationneeded'];
-
-  /**
-   * When ice Candidates is enough, Peer will be considered ready for negotiation after that point.
-   * or wait for 1sec until candidates is enough
-   * @method iceCollectionLoop
-   */
-  const iceCollectionLoop = () => {
-    // If gathering completed during the delay, we don't need to loop anymore.
-    if (peerConnection.iceGatheringState === 'complete') {
-      _loglevel2.default.debug('ICE collection completed; stopping candidate check loop.');
-      // Gathering completes when the null candidate is received. The "on
-      //    negotiation ready" event should be emitted at that time.
-      iceCandidates = [];
-      iceCollectionMaxTime = 0;
-      return;
-    }
-
-    iceCollectionMaxTime += config.iceCollectionDelay;
-    const enoughCandidates = config.iceCollectionCheck(iceCandidates);
-    const hasReachedTimeout = iceCollectionMaxTime >= config.maxIceTimeout;
-
-    if (hasReachedTimeout) {
-      _loglevel2.default.debug('ICE collection timeout reached; continuing with negotiation.');
-      iceCandidates = [];
-      iceCollectionMaxTime = 0;
-      emitter.emit('onnegotiationready');
-    } else if (enoughCandidates) {
-      _loglevel2.default.debug('ICE candidates sufficient for negotiation; continuing.');
-      iceCandidates = [];
-      iceCollectionMaxTime = 0;
-      emitter.emit('onnegotiationready');
-    } else {
-      _loglevel2.default.debug(`ICE candidates not sufficient for negotiation, delaying another ${config.iceCollectionDelay}ms.`);
-      setTimeout(function () {
-        iceCollectionLoop();
-      }, config.iceCollectionDelay);
-    }
-  };
-
-  /**
-   * Intercept the PeerConnection onicecandidate event.
-   * Handle the candidate as defined by the current trickle ICE mode config.
-   * Trickle ICE scenarios:
-   *   - FULL: Trickle.
-   *   - HALF, pre-half: Wait for "half" or null candidate.
-   *   - HALF, post-half: Trickle.
-   *   - NONE: Wait for null candidate.
-   */
-  peerConnection.onicecandidate = event => {
-    _loglevel2.default.debug(`ICE candidate received (trickling?: ${config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL}): `, event.candidate);
-
-    if (event.candidate !== null) {
-      iceCandidates.push(event.candidate);
-    }
-
-    if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
-      // If trickling is enabled, emit an event for every ICE candidate. The
-      //    Peer is already ready for negotiation at this point.
-      if (event.candidate) {
-        // Only trickle non-null (ie. actual) candidates.
-        emitter.emit('onicecandidate', event);
-      }
-    } else if (event.candidate === null) {
-      // If we received the last candidate (null), then gathering is done and
-      //    Peer is ready for negotiation (no matter the scenario).
-      _loglevel2.default.debug('ICE collection process complete; ready for negotiation.');
-      emitter.emit('onnegotiationready');
-    } else if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.HALF) {
-      // For half trickle, only start trickling after a certain threshold.
-      //    Peer will be considered ready for negotiation after that point.
-      const haveHalf = config.halfTrickleThreshold({
-        sdp: peerConnection.localDescription.sdp,
-        iceCandidate: event.candidate,
-        time: iceTimer.timeFromStart()
-      });
-
-      if (haveHalf) {
-        _loglevel2.default.debug('Half ICE collection process complete; ready for negotiation.');
-        config.trickleIceMode = _constants.PEER.TRICKLE_ICE.FULL;
-        emitter.emit('onnegotiationready');
-      }
-    }
-  };
-
-  /**
-   * Intercept the PeerConnection onicegatheringstatechange event.
-   * Time how long ICE collection takes and handles scenarios when it takes
-   *    too long.
-   * TODO: Figure out how we should do events. Makes events simpler/better,
-   *    with proper formats.
-   */
-  peerConnection.onicegatheringstatechange = event => {
-    const gatheringState = event.target.iceGatheringState;
-    _loglevel2.default.debug(`Peer's iceGatheringState changed to ${gatheringState}.`);
-
-    if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
-      iceTimer.start();
-      // TODO: Handle "ICE collection taking too long" scenario.
-    } else if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.COMPLETE) {
-      _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates.`);
-      iceTimer.stop();
-    }
-    // Bubble the event up.
-    emitter.emit('onicegatheringstatechange', event);
-  };
-
-  // TODO: Is this how we want business logic to listen for PeerConnection events?
-  events.forEach(eventType => {
-    peerConnection[eventType] = event => {
-      _loglevel2.default.debug(`Peer ${eventType} event.`, event);
-      // TODO: Should this be eventType or event.type?
-      emitter.emit(eventType, event);
-    };
-  });
-
-  /**
-   * Intercept the PeerConnection ontrack event.
-   * Check whether the track is from a new MediaStream or not.
-   * TODO: Figure out how we should do events. Makes events simpler/better,
-   *    with proper formats.
-   */
-  peerConnection.ontrack = event => {
-    /**
-     * transceiver: The RTCRtpTransceiver for this remote track. (Available in unified-plan)
-     * receiver: The RTCRtpReceiver for this remote track.
-     * track: The remote MediaStreamTrack.
-     * streams: Array of MediaStreams the track is in.
-     */
-    // event object contains transceiver which already has track attached to its receiver
-    const { track: nativeTrack, streams } = event;
-
-    // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
-    //  a stream is not associated with it so we get no stream here.
-    // So we create our own stream here.
-    // In the future, support will be available for `sender.setStreams` on the remote side
-    //  so this is a temporary workaround.
-    let targetStream;
-    if (streams.length === 0) {
-      targetStream = new MediaStream([nativeTrack]);
-    } else {
-      targetStream = streams[0];
-    }
-
-    // Convert the native MediaStreamTrack into a Track object.
-    const track = trackManager.add(nativeTrack, targetStream);
-
-    _loglevel2.default.debug(`Peer (${peerId}) received track (${track.id}).`);
-    emitter.emit('ontrack', track);
-  };
-
-  /**
-   * @method getLocalTracks
-   * @return {Array} List of active Track objects added to the Peer locally.
-   */
-  function getLocalTracks() {
-    // Return the list of Tracks from active senders.
-    return peerConnection.getSenders()
-    /**
-     * Remove any Senders that do not have an associated track.
-     * We only want to retrieve Senders that do have tracks, because those are
-     *    the local tracks that have been added to the Peer.
-     * Senders without tracks are part of a Transceiver where the Receiver has
-     *    a remote track, but no local track has been added to it. We don't
-     *    care about this for the "get local tracks" operation.
-     */
-    .filter(sender => Boolean(sender.track)).map(sender => trackManager.get(sender.track.id)).filter(track => {
-      // Make sure the trackManager has the track and that its active.
-      // It's possble that Peer has the sender but not the actual track yet.
-      return track && track.getState().state === 'live' && track.getStream().active;
-    });
-  }
-
-  /**
-   * @method getRemoteTracks
-   * @return {Array} List of active Track objects the Peer has received remotely.
-   */
-  function getRemoteTracks() {
-    // Return the list of Tracks from active receivers.
-    return peerConnection.getReceivers()
-    /**
-     * Remove any Receivers that do not have an associated track.
-     * We only want to retrieve Receivers that do have tracks, because those are
-     *    the remote tracks that have been added to the Peer.
-     * Receivers without tracks are part of a Transceiver where the Sender has
-     *    a local track, but no remote track has been added to it. We don't
-     *    care about this for the "get remote tracks" operation.
-     */
-    .filter(receiver => Boolean(receiver.track)).map(receiver => trackManager.get(receiver.track.id)).filter(track => {
-      // Make sure the trackManager has the track and that its active.
-      // It's possble that Peer has the receiver but not the actual track yet.
-      return track && track.getState().state === 'live' && track.getStream().active;
-    });
-  }
-
-  /**
-   * Retrieve a snapshot of the Peer object's current state.
-   * @method getState
-   * @return {Object}
-   */
-  function getState() {
-    return {
-      id: peerId,
-      config: config,
-      localDesc: getLocalDescription(),
-      signalingState: peerConnection.signalingState,
-      localTracks: getLocalTracks(),
-      remoteTracks: getRemoteTracks()
-    };
-  }
-
-  /**
-   * Creates an SDP offer.
-   * @method createOffer
-   * @param  {RTCOfferOptions} [options={}] Options used to customize the offer.
-   * @param  {Object} [options.mediaDirections] Directions to use for media.
-   * @param  {string} [options.mediaDirections.audio]
-   * @param  {string} [options.mediaDirections.video]
-   * @return {Promise} Resolves with the offer.
-   */
-  function createOffer(options = {}) {
-    // If using unified-plan, remove options.mediaDirections.
-    // This is because directions are now set in transceivers.
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
-      delete options.mediaDirections;
-    }
-
-    return new _promise2.default((resolve, reject) => {
-      peerConnection.createOffer(options).then(offer => {
-        const sdpHandlers = [];
-        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
-          // Modify the offer to claim the Peer doesn't suport trickle ICE.
-          sdpHandlers.push(_handlers.removeTrickleIce);
-        }
-        if (config.removeBundling) {
-          // Modify the offer to remove media bundling
-          sdpHandlers.push(_handlers.removeBundling);
-        }
-        if (options.mediaDirections) {
-          // Modify the offer to set media directions as desired.
-          sdpHandlers.push((0, _handlers.changeMediaDirection)(options.mediaDirections));
-        }
-        if (sdpHandlers.length > 0) {
-          // Run the SDP pipeline with only these handlers.
-          offer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, offer.sdp, {
-            type: offer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL
-          });
-        }
-        resolve(offer);
-      }).catch(reject);
-    });
-  }
-
-  /**
-   * Creates an SDP answer, given that a remote offer has been set.
-   * @method createOffer
-   * @param  {RTCAnswerOptions} [options={}] Options used to customize the answer.
-   * @param  {Object} [options.mediaDirections] Directions to use for media.
-   * @param  {string} [options.mediaDirections.audio]
-   * @param  {string} [options.mediaDirections.video]
-   * @return {Promise} Resolves with the answer.
-   */
-  function createAnswer(options = {}) {
-    // If using unified-plan, remove options.mediaDirections.
-    // This is because directions are now set in transceivers.
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
-      delete options.mediaDirections;
-    }
-
-    return new _promise2.default((resolve, reject) => {
-      peerConnection.createAnswer(options).then(answer => {
-        const sdpHandlers = [];
-
-        /*
-         * Always include the `preventDtlsRoleChange` handler. This ensures
-         *    that the SDP's DTLS role does not change during a renegotiation.
-         */
-        sdpHandlers.push(_handlers.preventDtlsRoleChange);
-
-        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
-          // Modify the answer to claim the Peer doesn't suport trickle ICE.
-          sdpHandlers.push(_handlers.removeTrickleIce);
-        }
-        if (config.removeBundling) {
-          // Modify the offer to remove media bundling
-          sdpHandlers.push(_handlers.removeBundling);
-        }
-        if (options.mediaDirections) {
-          // Modify the answer to set media directions as desired.
-          sdpHandlers.push((0, _handlers.changeMediaDirection)(options.mediaDirections));
-        }
-        if (sdpHandlers.length > 0) {
-          // Run the SDP pipeline with only these handlers.
-          answer.sdp = (0, _pipeline.runPipeline)(sdpHandlers, answer.sdp, {
-            type: answer.type,
-            endpoint: _constants.PEER.ENDPOINT.LOCAL,
-            dtlsRole: dtlsRole
-          });
-        }
-        resolve(answer);
-      }).catch(reject);
-    });
-  }
-
-  /**
-   * The SDP for the local end of the connection.
-   * @method getLocalDescription
-   */
-  function getLocalDescription() {
-    const localDesc = peerConnection.localDescription;
-    if (localDesc && localDesc.sdp && localDesc.type) {
-      return localDesc;
-    } else {
-      return undefined;
-    }
-  }
-
-  /**
-   * The SDP for the remote end of the connection.
-   * @method getRemoteDescription
-   */
-  function getRemoteDescription() {
-    const remoteDesc = peerConnection.remoteDescription;
-    if (remoteDesc && remoteDesc.sdp && remoteDesc.type) {
-      return remoteDesc;
-    } else {
-      return undefined;
-    }
-  }
-
-  /**
-   * Sets an SDP as the local description of the connection.
-   * The returned Promise will resolve when the Peer is ready for negotiation,
-   *    taking into account the Peer's `trickleIceMode` configuration.
-   * @method setLocalDescription
-   * @param  {RTCSessionDescription} sessionDesc
-   * @return {Promise}
-   */
-  function setLocalDescription(sessionDesc) {
-    // TODO: SDP pipeline here.
-    _loglevel2.default.info(`Setting local description ${sessionDesc.type}:`, sessionDesc.sdp);
-
-    /**
-     * Scenario: A local answer SDP is being applied to the Peer, but it does
-     *    not have a selected DTLS role yet. This should occur during initial
-     *    negotiation, before responding with this Peer's answer.
-     * Set the local Peer's DTLS role depending on what role was generated. This
-     *    role will be kept throughout all renegotiations.
-     */
-    if (!dtlsRole && sessionDesc.type === 'answer') {
-      const localRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
-      _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer.`);
-      dtlsRole = localRole;
-    }
-
-    return new _promise2.default((resolve, reject) => {
-      // We always want to wait for the PeerConnection to be ready for
-      //    negotiation before resolving setLocalDescription.
-      // Each trickle ICE option (FULL/HALF/NONE) emits "negotiation ready" event once.
-      emitter.once('onnegotiationready', () => {
-        if (iceTimer.isStarted()) {
-          // In a HALF trickle scenario, the Peer will be ready for negotiation
-          //    before ICE collection has completed. Log that timing.
-          _loglevel2.default.debug(`Peer took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
-        }
-        resolve();
-      });
-
-      peerConnection.setLocalDescription(sessionDesc).then(() => {
-        if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
-          // Trickling ICE candidates means that we can begin negotiation immediately.
-          _loglevel2.default.debug('Local description set; ready for negotiation (full trickleICE).');
-          emitter.emit('onnegotiationready');
-        } else {
-          // ICE candidates aren't always gathered (only initially and when something
-          //  changes), but we rely on "gathering complete" to know when the Peer is
-          //  ready for negotiation. Give the Peer some time to start gathering
-          //  before deciding if we need to wait for gathering to complete or not.
-          // The timeout is needed because of a bug in Chrome:
-          //    https://bugs.chromium.org/p/webrtc/issues/detail?id=1873
-          // Known issue: If candidate collection takes less time than this timeout,
-          //  the logged message will be incorrect, but will functionality still work.
-          setTimeout(() => {
-            if (peerConnection.iceGatheringState === 'complete') {
-              // Gathering is "complete", so we are ready for negotiation.
-              _loglevel2.default.debug(`Local description set, ICE candidate collection not needed; ready for negotiation.`);
-              emitter.emit('onnegotiationready');
-            } else {
-              _loglevel2.default.debug(`Local description set, waiting for ICE collection process (${config.trickleIceMode}).`);
-              // If ICE collection never finishes, we need to time it out at some point.
-              //    Start the timeout-out loop after an initial delay.
-              setTimeout(iceCollectionLoop, config.iceCollectionDelay);
-            }
-          }, 25);
-        }
-      }).catch(reject);
-    });
-  }
-
-  /**
-   * Sets an SDP as the remote description of the connection.
-   * @method setRemoteDescription
-   * @param  {RTCSessionDescription} sessionDesc
-   */
-  function setRemoteDescription(sessionDesc) {
-    /**
-     * Scenario: A remote answer SDP is being applied to the Peer, but it does
-     *    not have a selected DTLS role yet. This should occur only when the
-     *    initial negotiation is being completed.
-     * Set the local Peer's DTLS role depending on what the remote Peer
-     *    selected. This role will be kept throughout all renegotiations.
-     */
-    if (!dtlsRole && sessionDesc.type === 'answer') {
-      const remoteRole = sessionDesc.sdp.match(/a=setup:(\w*?)[\r\n]/)[1];
-      const localRole = remoteRole === 'active' ? 'passive' : 'active';
-      _loglevel2.default.debug(`Selecting DTLS role ${localRole} for Peer. Remote Peer selected ${remoteRole} DTLS role.`);
-      dtlsRole = localRole;
-    }
-
-    // TODO: SDP pipeline here.
-    // TODO: Update `config.trickleIceMode` to either NONE or FULL (from HALF)
-    //    depending on remote support, since HALF is only needed for initial.
-    _loglevel2.default.info(`Setting remote description ${sessionDesc.type}:`, sessionDesc.sdp);
-    return peerConnection.setRemoteDescription(sessionDesc);
-  }
-
-  /**
-   * Finds a specific transceiver depending on the options passed in
-   * @method findTransceiver
-   * @param {Object} [options] Only one of these options will be taken. They are ordered by priority.
-   * @param {string} [options.trackId] The transceiver with the specific sender.track.id.
-   * @return {Object} The transceiver that was found (undefined if not found).
-   */
-  function findTransceiver(options) {
-    const transceivers = peerConnection.getTransceivers();
-    if (options.trackId) {
-      return transceivers.find(transceiver => transceiver.sender.track && transceiver.sender.track.id === options.trackId);
-    }
-  }
-
-  /**
-   * Replaces a specified transceiver's sender.track.
-   * @method replaceTrack
-   * @param {Object} newTrack The MediaStreamTrack we want to place into the sender.
-   * @param {Object} options Options for specifying which transceiver's sender should be replaced. They are ordered by priority.
-   * @param {Array} [options.trackId] The track id whose transceivers we want to set the direction of.
-   * @return {Object} A Promise object which is fulfilled once the track has been replaced
-   */
-  function replaceTrack(newTrack, options) {
-    return new _promise2.default((resolve, reject) => {
-      let sender;
-      if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
-        const targetTransceiver = findTransceiver(options);
-        sender = targetTransceiver ? targetTransceiver.sender : undefined;
-      } else {
-        sender = peerConnection.getSenders().find(sender => sender.track.id === options.trackId);
-      }
-
-      if (sender) {
-        sender.replaceTrack(newTrack).then(resolve).catch(reject);
-      } else {
-        reject(new Error(`Sender for track ${options.trackId} not found.`));
-      }
-    });
-  }
-
-  /**
-   * Finds a transceiver that can be reused.
-   * A transceiver can be reused if it satisfies the following conditions:
-   *   - it does not have a track on its sender
-   *   - it has the same kind (audio or video) as what we specified
-   *   - it has been used before (if it has not been used then we are not "reusing" it)
-   * @method findReusableTransceiver
-   * @param {string} kind The kind of transceiver to find (audio or video)
-   * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
-   */
-  function findReusableTransceiver(kind) {
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
-      const transceivers = peerConnection.getTransceivers();
-      return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
-      );
-    } else {
-      _loglevel2.default.info(`Transceivers are only available in unified-plan.`);
-    }
-  }
-
-  /**
-   * Add a Track to the connection.
-   * @method addTrack
-   * @param  {Track} track A Track object.
-   * @return {RTCRtpSender}
-   */
-  function addTrack(track) {
-    // Ensure the track wasn't already added to the Peer.
-    if (getLocalTracks().findIndex(localTrack => localTrack.id === track.id) > -1) {
-      _loglevel2.default.debug(`Track (${track.id}) already added to Peer (${peerId}).`);
-      return;
-    }
-
-    let sender;
-    try {
-      sender = peerConnection.addTrack(track.track, track.getStream());
-    } catch (err) {
-      // TODO: Better error handling.
-      _loglevel2.default.debug(err.message);
-    }
-    // TODO: What to return here? Probably shouldn't expose the rtpSender itself.
-    return sender;
-  }
-
-  /**
-   * Add an ICE candidate to the connection.
-   * @method addIceCandidate
-   * @param  {RTCIceCandidate} candidate A native candidate object.
-   * @return {Promise} Resolves when the candidate is successfully added.
-   */
-  function addIceCandidate(candidate) {
-    return new _promise2.default((resolve, reject) => {
-      if (peerConnection.remoteDescription.type && peerConnection.remoteDescription.sdp) {
-        peerConnection.addIceCandidate(candidate).then(resolve).catch(reject);
-      } else {
-        _loglevel2.default.debug(`Peer ${peerId} cannot set remote ICE candidate without a remote description.`);
-        // TODO: Better error.
-        reject(new Error(`Peer ${peerId} cannot set remote ICE candidate without a remote description.`));
-      }
-    });
-  }
-
-  /**
-   * Clean the Peer by closing the RTCPeerConnection.
-   * @method close
-   */
-  function close() {
-    peerConnection.close();
-    emitter.emit('peer:closed', peerId);
-  }
-
-  /**
-   * Remove a Track from the connection.
-   * @method removeTrack
-   * @param  {string} trackId An id for a Track object.
-   */
-  function removeTrack(trackId) {
-    const track = getLocalTracks().find(track => track.id === trackId);
-    if (!track) {
-      _loglevel2.default.debug(`Invalid track ID ${trackId}; cannot remove track.`);
-      return;
-    } else if (peerConnection.signalingState === ' closed') {
-      _loglevel2.default.debug(`Peer ${peerId} is closed; cannot remove track.`);
-      return;
-    }
-
-    // Get the RtpSender for the Track we want to remove.
-    const sender = peerConnection.getSenders().filter(sender => sender.track !== null).find(sender => sender.track.id === trackId);
-    peerConnection.removeTrack(sender);
-  }
-
-  /**
-   * Event handler when tone is played.
-   * @private
-   * @method handleToneChangeEvent
-   * @param  {event} event
-   */
-  function handleToneChangeEvent(event) {
-    if (event.tone !== '') {
-      _loglevel2.default.debug('Tone played: ' + event.tone);
-    } else {
-      _loglevel2.default.debug('All tones have played.');
-    }
-  }
-
-  /**
-   * Helper function to sendDTMF tones .
-   * @private
-   * @method insertDTMF
-   * @param {sender} object
-   * @param {string} tone
-   * @param {number} duration
-   * @param {number} intertoneGap
-   * @param {Function} callback
-   */
-  function insertDTMF(sender, tone, duration, intertoneGap, callback) {
-    if (sender.dtmf) {
-      const dtmfSender = sender.dtmf;
-      if (callback) {
-        dtmfSender.ontonechange = callback;
-      } else {
-        dtmfSender.ontonechange = handleToneChangeEvent;
-      }
-      try {
-        dtmfSender.insertDTMF(tone, duration, intertoneGap);
-        return true;
-      } catch (err) {
-        _loglevel2.default.debug(err.message);
-        return false;
-      }
-    } else {
-      _loglevel2.default.debug('The sender requires DTMF which is not support by this browser.');
-      return false;
-    }
-  }
-
-  /**
-   * Send DTMF tones.
-   * @method sendDTMF
-   * @param {Object} DTMFOptions The DTMF options.
-   * @param {string} DTMFOptions.tone DTMF tone to send. Valid values are [0,1,2,3,4,5,6,7,8,9,#].
-   * @param {number} DTMFOptions.duration=100 The amount of time, in milliseconds, that each DTMF tone should last.
-   * @param {number} DTMFOptions.intertoneGap=70 The length of time, in milliseconds, to wait between tones.
-   * @param {Object} [sendOptions] The send options.
-   * @param {func} [sendOptions.callback] Optional callback for tone event .
-   * @param {string} [sendOptions.trackId] The trackId of the sender to use.
-   * @return {Boolean} Whether the DTMF tones were inserted
-   */
-  function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, trackId }) {
-    if (!peerConnection.getSenders) {
-      _loglevel2.default.debug('RTCPeerConnection method getSenders() is required which is not support by this browser.');
-      return false;
-    }
-    const senders = peerConnection.getSenders();
-    // Use the trackId if it was provided
-    if (trackId) {
-      let sender = senders.find(sender => sender.track.id === trackId);
-      if (!sender) {
-        _loglevel2.default.debug('No sender with that trackId');
-        return false;
-      }
-      insertDTMF(sender, tone, duration, intertoneGap, callback);
-      return true;
-    } else {
-      let result;
-      for (let i = 0; i < senders.length; i++) {
-        result = insertDTMF(senders[i], tone, duration, intertoneGap, callback);
-        if (result) {
-          return true;
-        }
-      }
-      _loglevel2.default.debug('No appropriate senders were found');
-      return false;
-    }
-  }
-
-  /**
-   * Retrieve RTCStatsReport for a sender or the peerConnection.
-   * @method getStats
-   * @param {string} [TrackId] Return stats for peerConnection if trackId is not provided
-   * @return {Promise} Resolves with the RTCStatsReport
-   */
-  function getStats(trackId) {
-    // If no trackId is supplied, get the stats from the RTCPeerConnection. Otherwise, find an RTCSender
-    // associated with the trackId and get the stats from it.
-
-    // Use the trackId if it was provided
-    if (trackId) {
-      return new _promise2.default((resolve, reject) => {
-        const senders = peerConnection.getSenders();
-        // search for a sender associated with the trackId
-        const sender = senders.find(sender => sender.track.id === trackId);
-        if (sender) {
-          sender.getStats().then(resolve).catch(reject);
-        } else {
-          const errMsg = `Cannot find sender with trackId: ${trackId}`;
-          _loglevel2.default.debug(errMsg);
-          reject(new Error(errMsg));
-        }
-      });
-    } else {
-      // get the stats associated with the peerConnection if no trackId is supplied
-      return peerConnection.getStats();
-    }
-  }
-
-  /**
-   * Sets the direction of transceivers.
-   * @method setTransceiversDirection
-   * @param {string} targetDirection The desired direction to set the transceivers to.
-   * @param {Object} [options] Options for specifying which transceivers should be affected. They are ordered by priority.
-   * @param {Array} [options.trackIds] The optional list of track ids whose transceivers we want to set the direction of.
-   * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
-   */
-  function setTransceiversDirection(targetDirection, options = {}) {
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
-      let transceivers = peerConnection.getTransceivers();
-
-      if (options.trackIds) {
-        transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
-      }
-
-      const failures = [];
-      transceivers.forEach(transceiver => {
-        if (!(0, _transceiverUtils.setTransceiverDirection)(transceiver, targetDirection)) {
-          failures.push(transceiver);
-        }
-      });
-      return {
-        error: failures.length !== 0,
-        failures
-      };
-    } else {
-      _loglevel2.default.info(`Transceiver direction modification is only available in unified-plan.`);
-      return {
-        error: true
-      };
-    }
-  }
-
-  /**
-   * Gets the current dtls role of the peer.
-   * @returns {string} The dtls role of this peer.
-   */
-  function getDtlsRole() {
-    return dtlsRole;
-  }
-
-  /**
-   * Sets the current dtls role of the peer.
-   * @param {string} targetRole The dtls role we want to use.
-   */
-  function setDtlsRole(targetRole) {
-    dtlsRole = targetRole;
-  }
-
-  function on(...args) {
-    return emitter.on(...args);
-  }
-
-  function once(...args) {
-    return emitter.once(...args);
-  }
-
-  function off(...args) {
-    return emitter.off(...args);
-  }
-
-  /**
-   * The exposed API.
-   */
-  return {
-    id: peerId,
-    // Getter APIs.
-    get localTracks() {
-      return getLocalTracks();
-    },
-    get remoteTracks() {
-      return getRemoteTracks();
-    },
-    get localDescription() {
-      return getLocalDescription();
-    },
-    get remoteDescription() {
-      return getRemoteDescription();
-    },
-    getState,
-    findTransceiver,
-    findReusableTransceiver,
-    // Negotiation APIs.
-    createOffer,
-    createAnswer,
-    setLocalDescription,
-    setRemoteDescription,
-    setTransceiversDirection,
-    getDtlsRole,
-    setDtlsRole,
-    // Media APIs.
-    addTrack,
-    removeTrack,
-    replaceTrack,
-    // Other APIs.
-    addIceCandidate,
-    close,
-    sendDTMF,
-    getStats,
-    // Event APIs.
-    on,
-    once,
-    off,
-    // The native PeerConnection was accessible before, so it was used when it
-    //    probably shouldn't have been.
-    // TODO: Find a better solution.
-    peerConnection
-  };
-}
-
-/***/ }),
-
 /***/ "../../packages/webrtc/src/models/session.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -52534,10 +54256,6 @@ var _eventemitter = __webpack_require__("../../node_modules/eventemitter3/index.
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
-var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
-
-var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -52549,7 +54267,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// SDP Helpers.
+// Libraries.
+// Helpers.
 function Session(id, managers, config = {}) {
   // Internal variables.
   const sessionId = id;
@@ -52587,7 +54306,7 @@ function Session(id, managers, config = {}) {
   function recordNewDtlsRole() {
     const remoteSdpSessionId = (0, _extractors.getSdpSessionId)(peer.remoteDescription.sdp);
     if (!dtlsRoleRecord.get(remoteSdpSessionId)) {
-      dtlsRoleRecord.set(remoteSdpSessionId, peer.getDtlsRole());
+      dtlsRoleRecord.set(remoteSdpSessionId, peer.dtlsRole);
     }
   }
 
@@ -52697,14 +54416,15 @@ function Session(id, managers, config = {}) {
             });
           }
 
-          track.once('ended', () => {
+          track.once('ended', ({ performRenegotiation }) => {
             // If the PeerConnection is closed, we don't need to worry about
             //    removing the track (and it would throw an error anyway).
-            if (peer.peerConnection.signalingState !== 'closed') {
+            if (peer.signalingState !== 'closed') {
               peer.removeTrack(track.id);
               emitter.emit('track:ended', {
                 local: true,
-                trackId: track.id
+                trackId: track.id,
+                performRenegotiation: performRenegotiation
               });
             }
           });
@@ -52851,76 +54571,6 @@ function Session(id, managers, config = {}) {
   }
 
   /**
-   * This function is used to figure out if our local tracks are being sent to the other side.
-   * This is meant to be called after a remote sdp is processed so that:
-   *  a. Transceivers are up-to-date.
-   *  b. The latestRemoteDescription is really the latest one.
-   * @method getLocalTracksIsSendingStatus
-   * @return {TracksIsSendingStatuses}
-   */
-  function getLocalTracksIsSendingStatus() {
-    /**
-     * An object with flags indicating whether a track is sending data or not where:
-     *  key: <string> track ID
-     *  value: <boolean> isSending.
-     * @typedef {Object} TracksIsSendingStatuses
-     */
-    const tracksIsSending = {};
-
-    /**
-     * For Unified-plan, we consider a track to being sent if
-     *  currentDirection is NOT `inactive` and NOT `recvonly`.
-     * IE: Tracks are being sent if
-     *  currentDirection is `sendrecv` or `sendonly` (both contain `send`).
-     */
-    if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
-      const transceivers = peer.peerConnection.getTransceivers()
-      // Only check transceivers that have tracks.
-      .filter(transceiver => Boolean(transceiver.sender && transceiver.sender.track));
-
-      transceivers.forEach(transceiver => {
-        if (transceiver.sender.track && transceiver.currentDirection) {
-          tracksIsSending[transceiver.sender.track.id] = transceiver.currentDirection.includes('send');
-        } else {
-          // If `currentDirection` doesn't exist yet then use `direction`.
-          // This is because if the remote sdp didn't have a certain kind of media and we add that new kind of media,
-          //  the transceiver will have `currentDirection` as null.
-          tracksIsSending[transceiver.sender.track.id] = transceiver.direction.includes('send');
-        }
-      });
-    } else {
-      /**
-       * For Plan-B, we check the remote sdp and consider a track be sent if
-       *  direction is NOT `inactive` and NOT `sendonly`.
-       * IE: Tracks are being sent if
-       *  direction is `sendrecv` or `recvonly` (both contain `recv`).
-       */
-      const sdpObj = _sdpTransform2.default.parse(latestRemoteDescription.sdp);
-
-      /**
-       * Get the direction of each kind of media.
-       * For plan-b, there are is only 1 m-line for audio and 1 m-line for video.
-       * This means that tracks of the same kind will share the same direction.
-       */
-      const directions = {};
-      sdpObj.media.forEach(media => {
-        const { type, direction } = media;
-        directions[type] = direction;
-      });
-      peer.localTracks.forEach(track => {
-        const nativeTrack = track.track;
-        // If the track's kind isn't on the latest remote sdp, that means it may be supported
-        //  (since it doesn't explicitly have direction of `inactive`).
-        if (directions[nativeTrack.kind] === undefined) {
-          tracksIsSending[nativeTrack.id] = true;
-        } else {
-          tracksIsSending[nativeTrack.id] = directions[nativeTrack.kind].includes('recv');
-        }
-      });
-    }
-    return tracksIsSending;
-  }
-  /**
    * Processes (and sets) a remote SDP offer.
    * @method processOffer
    * @param  {RTCSessionDescription} offer
@@ -52998,8 +54648,8 @@ function Session(id, managers, config = {}) {
       // - It hasn't been set on a recreated peer yet.
       const remoteSdpSessionId = (0, _extractors.getSdpSessionId)(peer.remoteDescription.sdp);
       const previousDtlsRole = dtlsRoleRecord.get(remoteSdpSessionId);
-      if (!peer.getDtlsRole() && previousDtlsRole) {
-        peer.setDtlsRole(previousDtlsRole);
+      if (!peer.dtlsRole && previousDtlsRole) {
+        peer.dtlsRole = previousDtlsRole;
       }
 
       peer.createAnswer(options).then(answer => {
@@ -53171,14 +54821,14 @@ function Session(id, managers, config = {}) {
     // TODO: Use `uniqueLabel` when setting event listeners (and bubbling events).
     // When the peer gets an ICE candidate, emit it as
     //  a message to be sent to the other end.
-    targetPeer.on('onicecandidate', event => {
+    targetPeer.onicecandidate = event => {
       emitter.emit('onicecandidate', {
         candidate: event.candidate
       });
-    });
+    };
 
     // Handle when the Peer receives a new remote track.
-    targetPeer.on('ontrack', track => {
+    targetPeer.ontrack = track => {
       let media = mediaManager.get(track.getStream().id);
       if (media) {
         // Add the new Track to its Media object.
@@ -53214,7 +54864,9 @@ function Session(id, managers, config = {}) {
       track.once('ended', () => {
         emitter.emit('track:ended', {
           local: false,
-          trackId: track.id
+          trackId: track.id,
+          // If a remote track is ended, we don't want to manually perform a renegotiation
+          performRenegotiation: false
         });
       });
 
@@ -53223,7 +54875,7 @@ function Session(id, managers, config = {}) {
         local: false,
         trackId: track.id
       });
-    });
+    };
   }
 
   /**
@@ -53298,7 +54950,6 @@ function Session(id, managers, config = {}) {
     processOffer,
     generateAnswer,
     processAnswer,
-    getLocalTracksIsSendingStatus,
     // Other APIs.
     recreatePeer,
     addIceCandidate,
@@ -53312,8 +54963,7 @@ function Session(id, managers, config = {}) {
   };
 }
 
-// Libraries.
-// Helpers.
+// SDP Helpers.
 
 /***/ }),
 
@@ -53360,7 +55010,17 @@ function Track(mediaTrack, mediaStream) {
    */
   track.onended = event => {
     _loglevel2.default.debug('Event emitted: ', event);
-    emitter.emit('ended', track.id);
+    emitter.emit('ended', {
+      trackId: track.id,
+      // If the event is defined:
+      //   The event is triggered either from a remote notification or browser action.
+      //   In case of browser action (e.g. "Stop sharing" screenshare on chrome), SDK will (eventually) receive a SESSION_TRACK_REMOVED action.
+      //   This action is dispatched when the session picks up on this ended event and triggers a 'track:ended' event.
+      //   When dispatching this action, we need to tell the SDK to perform renegotiation (but for browser actions only)
+      // If the event is undefined:
+      //   `track.onended` is manually triggered and the saga that eventually triggered this function will handle the renegotiation itself.
+      performRenegotiation: !!event
+    });
   };
 
   function setStream(newStream) {
@@ -54073,6 +55733,242 @@ function makeSafeForCSS(name) {
     return name.replace(/[^a-z0-9]/g, '');
   }
 }
+
+/***/ }),
+
+/***/ "../core/basePlugins.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _logs2 = _interopRequireDefault(_logs);
+
+var _config = __webpack_require__("../../packages/kandy/src/config/index.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _events = __webpack_require__("../../packages/kandy/src/events/index.js");
+
+var _events2 = _interopRequireDefault(_events);
+
+var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
+
+var _request2 = _interopRequireDefault(_request);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
+ * to the SDK.
+ */
+exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
+
+/***/ }),
+
+/***/ "../core/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = commonIndex;
+
+var _factory = __webpack_require__("../../packages/kandy/src/factory.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+// This is a hack to fix an issue where Lodash will add itself to
+// the window scope even if it's loaded via ES6. You can remove this when
+// we have an answer to https://github.com/lodash/lodash/issues/1798 .
+// eslint-disable-next-line
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
+ * The SDK instance will be refered as 'api' throughout the rest of the documentation content.
+ * @public
+ * @method create
+ * @param {config} config The configuration object.
+ * @return {api} The SDK instance.
+ * @example
+ * // Instantiate the SDK.
+ * import { create } from 'kandy'
+ * const client = create({
+ *     authentication: { ... },
+ *     logs: { ... },
+ *     ...
+ * });
+ * // Use the SDK's API.
+ * client.on( ... );
+ */
+
+/**
+ * The 'api' is the type returned by the create function.
+ * It contains various top-level functions that pertain to SDK global instance
+ * as well as several nested namespaces that pertain to various features (e.g. call, contacts, presence, etc).
+ *
+ * @public
+ * @module api
+ */
+
+/**
+ * The configuration object. This object defines what different configuration
+ * values you can use when instantiating the SDK using the {@link create} function.
+ * @public
+ * @module config
+ */
+
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * A set of {@link call.SdpHandlerFunction SdpHandlerFunction}s for manipulating SDP information.
+ * These handlers are used to customize low-level call behaviour for very specific
+ * environments and/or scenarios. They can be provided during SDK instantiation
+ * to be used for all calls.
+ *
+ * @public
+ * @namespace sdpHandlers
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [ <Your-SDP-Handler-Function>, ...]
+ *   }
+ * })
+ */
+
+// Disabling eslint for the next comment as we want to be able to use a disallowed word
+// eslint-disable-next-line no-warning-comments
+/**
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+ * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
+ *
+ * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
+ *
+ * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+ *
+ * @public
+ * @memberof sdpHandlers
+ * @method createCodecRemover
+ * @param {Array<string>} codecs A list of codec names to remove from the SDP.
+ * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
+ * @example
+ * import { create, sdpHandlers } from 'kandy';
+ * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const client = create({
+ *   call: {
+ *     sdpHandlers: [codecRemover]
+ *   }
+ * })
+ *
+ */
+
+/*
+ * Index template file that is used to create pre-defined version of the SDK.
+ */
+if (_fp._) _fp._.noConflict();
+
+function commonIndex(options = {}, plugins = []) {
+  const pluginInstances = (0, _fp.map)(function (plugin) {
+    return plugin.fn(options[plugin.name]);
+  }, plugins);
+
+  return (0, _factory.factory)(pluginInstances, options.common);
+}
+
+/***/ }),
+
+/***/ "./index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _core = __webpack_require__("../core/index.js");
+
+var _core2 = _interopRequireDefault(_core);
+
+var _basePlugins = __webpack_require__("../core/basePlugins.js");
+
+var _basePlugins2 = _interopRequireDefault(_basePlugins);
+
+var _cpaas = __webpack_require__("../../packages/kandy/src/auth/cpaas/index.js");
+
+var _cpaas2 = _interopRequireDefault(_cpaas);
+
+var _webrtc = __webpack_require__("../../packages/kandy/src/webrtc/index.js");
+
+var _webrtc2 = _interopRequireDefault(_webrtc);
+
+var _cpaas3 = __webpack_require__("../../packages/kandy/src/call/cpaas/index.js");
+
+var _cpaas4 = _interopRequireDefault(_cpaas3);
+
+var _cpaas5 = __webpack_require__("../../packages/kandy/src/connectivity/cpaas/index.js");
+
+var _cpaas6 = _interopRequireDefault(_cpaas5);
+
+var _cpaas7 = __webpack_require__("../../packages/kandy/src/messaging/cpaas/index.js");
+
+var _cpaas8 = _interopRequireDefault(_cpaas7);
+
+var _cpaas9 = __webpack_require__("../../packages/kandy/src/notifications/cpaas/index.js");
+
+var _cpaas10 = _interopRequireDefault(_cpaas9);
+
+var _cpaas11 = __webpack_require__("../../packages/kandy/src/presence/cpaas/index.js");
+
+var _cpaas12 = _interopRequireDefault(_cpaas11);
+
+var _cpaas13 = __webpack_require__("../../packages/kandy/src/groups/cpaas/index.js");
+
+var _cpaas14 = _interopRequireDefault(_cpaas13);
+
+var _cpaas15 = __webpack_require__("../../packages/kandy/src/subscription/cpaas/index.js");
+
+var _cpaas16 = _interopRequireDefault(_cpaas15);
+
+var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
+
+var _codecRemover2 = _interopRequireDefault(_codecRemover);
+
+var _cpaas17 = __webpack_require__("../../packages/kandy/src/users/cpaas/index.js");
+
+var _cpaas18 = _interopRequireDefault(_cpaas17);
+
+__webpack_require__("../../packages/kandy/src/docs/docs.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
+
+// Plugins
+
+
+function root(options = {}, plugins = []) {
+  return (0, _core2.default)(options, [...defaultPlugins, ...plugins]);
+}
+
+// Alias 'create' to be equal to the root function
+root.create = root;
+
+root.sdpHandlers = {
+  createCodecRemover: _codecRemover2.default
+
+  // Export this way as a work-around, so it can be used as `<export>();`.
+  // See: https://github.com/webpack/webpack/issues/706
+};module.exports = root;
 
 /***/ })
 

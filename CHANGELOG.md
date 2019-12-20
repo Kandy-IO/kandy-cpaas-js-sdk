@@ -5,6 +5,23 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.11.0 - 2019-12-20
+
+### Added
+
+- Added SMS History support. `KAA-2017`
+- Added new Logger functionality to allow applications to customize the format of information that the SDK logs.
+  - See `config.logs.handler`, `config.logs.logActions.handler`, `logger.LogHandler`, and `logger.LogEntry`.
+  - An application can now provide a `LogHandler` function to the SDK via configuration. The SDK will use this function for logging information. By default, the SDK will continue to log information to the console.
+- Added new helper functions for simple call scenarios. `startVideo` is used to add video to a call that doesn't have a video track yet. `stopVideo` is used to remove video from a call that only has one video track started. The idea is these are simpler to use than the more configurable `addMedia`/`removeMedia`. `KAA-1971`
+
+### Fixed
+
+- Fixed SMS-related requests to use destination address coming from smsinbound subscription instead of global configuration object. `KAA-2060`
+- Fixed a Call issue where some slow-start midcall operations (eg. transfer, unhold) would fail. `KAA-2110`
+  - This fix re-introduces a previous issue fixed in v4.9.0: `KAA-1890`.
+- Fixed an issue where call was failing when the user(caller) has no user@domain format. `KAA-2131`
+
 ## 4.10.0 - 2019-11-29
 
 ### Added
@@ -14,6 +31,8 @@ Kandy.js change log.
   - See `config.call` for new configs: `iceCollectionDelay`, `maxIceTimeout`, and `iceCollectionCheck`.
   - These configs should only be needed when the ICE collection process does not complete normally. This should not happen in most scenarios, but can be determined if there is a delay (of 3 seconds or the value set for `maxIceTimeout`) during call establishment.
   - These configurations allow an application to customize the ICE collection process according to their network / scenario, in order to workaround issues.
+- Added two new events to notify of Presence subscribe and unsubscribe operations, and Presence fetch now triggers a `presence:change` event for a successful fetch. `KAA-1878`
+  - Presence subscribe triggers the new `presence:subscribe` event, and Presence unsubscribe will trigger the new `presence:unsubscribe` event.
 
 ### Changed
 
