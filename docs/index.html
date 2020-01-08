@@ -1287,15 +1287,15 @@
                     <li class='h5'><span>Types</span></li>
                     
                       <li><a
-                        href='#servicesservicedescriptor'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> ServiceDescriptor
-                      </a></li>
-                    
-                      <li><a
                         href='#servicessmsinboundserviceparams'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> SmsInboundServiceParams
+                      </a></li>
+                    
+                      <li><a
+                        href='#servicesservicedescriptor'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> ServiceDescriptor
                       </a></li>
                     
                     </ul>
@@ -16418,6 +16418,88 @@ websocket cannot be used, will be available in the future.</p>
       <div class='py1 quiet mt1 prose-big'>Types</div>
       <div class="clearfix">
   
+    <div class='border-bottom' id='servicessmsinboundserviceparams'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>SmsInboundServiceParams</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
+This is the configuration object that needs to be passed as the value for the <a href="#servicesservicedescriptor">ServiceDescriptor.params</a> property.</p>
+
+
+  <div class='pre p1 fill-light mt0'>SmsInboundServiceParams</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>destinationAddress</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : An E164 formatted DID number.
+The subscription created will provide notifications for inbound SMS messages destined for this address.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Subscribe to smsinbound service on a WebSocket channel.</span>
+client.services.subscribe([
+   {<span class="hljs-attr">service</span>: <span class="hljs-string">'smsinbound'</span>, <span class="hljs-attr">params</span>: {<span class="hljs-attr">destinationAddress</span>: <span class="hljs-string">'+18001234567'</span>}}
+], <span class="hljs-string">'websocket'</span>)</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='servicesservicedescriptor'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -16515,88 +16597,6 @@ client.services.subscribe([
    {<span class="hljs-attr">service</span>: <span class="hljs-string">'chat'</span>},
    {<span class="hljs-attr">service</span>: <span class="hljs-string">'presence'</span>},
    {<span class="hljs-attr">service</span>: <span class="hljs-string">'call'</span>},
-], <span class="hljs-string">'websocket'</span>)</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='servicessmsinboundserviceparams'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>SmsInboundServiceParams</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
-This is the configuration object that needs to be passed as the value for the <a href="#servicesservicedescriptor">ServiceDescriptor.params</a> property.</p>
-
-
-  <div class='pre p1 fill-light mt0'>SmsInboundServiceParams</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>destinationAddress</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : An E164 formatted DID number.
-The subscription created will provide notifications for inbound SMS messages destined for this address.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Subscribe to smsinbound service on a WebSocket channel.</span>
-client.services.subscribe([
-   {<span class="hljs-attr">service</span>: <span class="hljs-string">'smsinbound'</span>, <span class="hljs-attr">params</span>: {<span class="hljs-attr">destinationAddress</span>: <span class="hljs-string">'+18001234567'</span>}}
 ], <span class="hljs-string">'websocket'</span>)</pre>
     
   
