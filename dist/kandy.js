@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.12.0-beta.268
+ * Version: 4.12.0-beta.269
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29868,6 +29868,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = getOperation;
 exports.wasHold = wasHold;
 exports.wasUnhold = wasUnhold;
+exports.was3xHold = was3xHold;
+exports.was3xUnhold = was3xUnhold;
 exports.wasAddMedia = wasAddMedia;
 exports.wasRemoveMedia = wasRemoveMedia;
 exports.wasStartMoh = wasStartMoh;
@@ -29892,9 +29894,9 @@ function getOperation(mediaDiff) {
   // TODO: Make this more efficient?
   // TODO: These MoH checks should take into account current call state.
   //    Start/Stop MoH should only be possible in specific states.
-  if (wasHold(mediaDiff)) {
+  if (wasHold(mediaDiff) || was3xHold(mediaDiff)) {
     return _constants.OPERATIONS.HOLD;
-  } else if (wasUnhold(mediaDiff)) {
+  } else if (wasUnhold(mediaDiff) || was3xUnhold(mediaDiff)) {
     return _constants.OPERATIONS.UNHOLD;
   } else if (wasStartMoh(mediaDiff)) {
     // Check 'start MoH' before 'add media' because 'start MoH' is a special
@@ -30048,6 +30050,101 @@ function wasUnhold(mediaDiff) {
   });
 
   return startedFlowing && sameMedia && noUnchangedSend && didChange && onlyStartChanges;
+}
+
+/**
+ * A "3.X hold" opeation is when a v3.X SDK performs hold. This is for interop.
+ *
+ * This operation is the same as a "regular" hold, except that media changes to
+ *    sendonly instead of inactive.
+ *
+ * In terms of SDP changes, it is defined as:
+ *    1) At least one media was 'flowing' before the SDP change.
+ *    2) All changed media is not 'sendonly'.
+ *        ie. is being "v3.X held"
+ *    3) No media was added.
+ *    4) No media was removed.
+ *    5) All media that is unchanged is not sending/receiving.
+ *        ie. was already "held".
+ *
+ * @method was3xUnhold
+ * @param  {MediaDiff} mediaDiff Media differences described between two SDPs.
+ * @return {boolean}
+ */
+function was3xHold(mediaDiff) {
+  const { added, removed, changed, unchanged } = mediaDiff;
+
+  /*
+   * 1) Some media was flowing before the change.
+   * 2) All changed media is now "sendonly".
+   */
+  const wasFlowing = hadMediaFlowing(mediaDiff);
+  const allSendOnly = changed.every(({ media, changes }) => {
+    return changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP;
+  });
+
+  /*
+   * 3) & 4) No media was added or removed.
+   */
+  const sameMedia = added.length === 0 && removed.length === 0;
+
+  /*
+   * 5) For all media that was not changed,
+   *    no media is being sent/received.
+   */
+  const noUnchangedSend = unchanged.every(media => {
+    return !media.willSend && !media.willReceive;
+  });
+
+  return wasFlowing && allSendOnly && sameMedia && noUnchangedSend;
+}
+
+/**
+ * A "3.X unhold" opeation is when a v3.X SDK performs unhold. This is for
+ *    interop.
+ *
+ * This operation is the same as a "regular" unhold, except that media changes
+ *    from sendonly instead of inactive.
+ *
+ * In terms of SDP changes, it is defined as:
+ *    1) Some media is flowing afterwards.
+ *    2) All media that changed was started receiving.
+ *        ie. is being "3.X unheld"
+ *    3) No media was added.
+ *    4) No media was removed.
+ *    5) All media that is unchanged is not sending/receiving.
+ *        ie. was (and still is) "held"
+ *
+ * @method was3xUnhold
+ * @param  {MediaDiff} mediaDiff Media differences described between two SDPs.
+ * @return {boolean}
+ */
+function was3xUnhold(mediaDiff) {
+  const { added, removed, changed, unchanged } = mediaDiff;
+
+  /*
+   * 1) Some media was flowing before the change.
+   * 2) All changed media is now went from "sendonly" to "sendrecv".
+   */
+  const isFlowing = hasMediaFlowing(mediaDiff);
+  const allSending = changed.every(({ media, changes }) => {
+    return changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.START;
+  });
+
+  /*
+   * 3) & 4) No media was added or removed.
+   */
+  const sameMedia = added.length === 0 && removed.length === 0;
+
+  /*
+   * 5) For all media that was not changed,
+   *    no media is being sent/received.
+   */
+  const noUnchangedSend = unchanged.every(media => {
+    return !media.willSend && !media.willReceive;
+  });
+
+  return isFlowing && allSending && sameMedia && noUnchangedSend;
 }
 
 /**
@@ -34431,7 +34528,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.12.0-beta.268';
+  let version = '4.12.0-beta.269';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
