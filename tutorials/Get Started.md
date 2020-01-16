@@ -12,6 +12,14 @@ categories:
 
 In this quickstart, we will help you dip your toes in before you dive in. This guide will help you get started with the $KANDY$ Javascript SDK.
 
+## Base URL
+
+This is the HTTPS entry point that you will use for Javascript SDK authentication, REST service and websocket notifications. It will need to be included in the configurations for the SDK (see below).
+
+```
+  $KANDYFQDN$
+```
+
 ## Using the SDK
 
 To begin, you will need to include the javascript library in your application. The library can be included as a UMD module by using a `<script>` tag or bundled with your application as a CommonJS module.
