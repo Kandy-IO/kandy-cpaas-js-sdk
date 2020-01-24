@@ -7,6 +7,11 @@ Kandy.js change log.
 
 ## 4.12.0 - beta
 
+### Fixed
+
+- Fixed a Call issue where Call configurations for the ICE collection process were not used for incoming calls. `KAA-2184`
+  - See `KAA-1469` in v4.10.0 for affected configurations.
+
 ## 4.11.1 - 2020-01-02
 
 ### Fixed
