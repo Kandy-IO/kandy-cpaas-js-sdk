@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.12.0-beta.284
+ * Version: 4.12.0-beta.285
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22090,6 +22090,7 @@ const SESSION_CREATED = exports.SESSION_CREATED = callPrefix + 'SESSION_CREATED'
 const MAKE_CALL_FINISH = exports.MAKE_CALL_FINISH = callPrefix + 'MAKE_FINISH';
 
 const MAKE_ANONYMOUS_CALL = exports.MAKE_ANONYMOUS_CALL = callPrefix + 'MAKE_ANONYMOUS_CALL';
+const MAKE_ANONYMOUS_CALL_FINISH = exports.MAKE_ANONYMOUS_CALL_FINISH = callPrefix + 'MAKE_ANONYMOUS_CALL_FINISH';
 
 const CALL_INCOMING = exports.CALL_INCOMING = callPrefix + 'INCOMING';
 
@@ -22221,6 +22222,7 @@ exports.sessionCreated = sessionCreated;
 exports.pendingMakeCall = pendingMakeCall;
 exports.makeCallFinish = makeCallFinish;
 exports.makeAnonymousCall = makeAnonymousCall;
+exports.makeAnonymousCallFinish = makeAnonymousCallFinish;
 exports.callIncoming = callIncoming;
 exports.callRinging = callRinging;
 exports.sessionProgress = sessionProgress;
@@ -22349,6 +22351,10 @@ function makeCallFinish(id, params) {
 
 function makeAnonymousCall(id, params) {
   return callActionHelper(actionTypes.MAKE_ANONYMOUS_CALL, id, params);
+}
+
+function makeAnonymousCallFinish(id, params) {
+  return callActionHelper(actionTypes.MAKE_ANONYMOUS_CALL_FINISH, id, params);
 }
 
 function callIncoming(id, params) {
@@ -24802,6 +24808,10 @@ callEvents[webrtcActionTypes.SESSION_TRACK_ENDED] = (action, context) => {
       callId: call.id
     }));
   }
+};
+
+callEvents[actionTypes.MAKE_ANONYMOUS_CALL_FINISH] = (action, context) => {
+  return callEventHandler(eventTypes.CALL_STARTED, action);
 };
 
 exports.default = (0, _extends3.default)({}, callEvents);
@@ -34619,7 +34629,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.12.0-beta.284';
+  let version = '4.12.0-beta.285';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
