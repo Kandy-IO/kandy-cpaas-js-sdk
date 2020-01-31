@@ -5,6 +5,20 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.12.0 - 2020-01-31
+
+### Added
+
+- Added SDP Handler functionality to allow modifying a local SDP after it has been set locally but before sending it to the remote endpoint. `KAA-2136`
+  - A `step` property has been added to the `SdpHandlerInfo` parameter given to a `SdpHandlerFunction`. This indicates whether the next step is to `set` the SDP locally or `send` the SDP to the remote endpoint.
+
+### Fixed
+
+- Fixed a Call issue where Call configurations for the ICE collection process were not used for incoming calls. `KAA-2184`
+  - See `KAA-1469` in v4.10.0 for affected configurations.
+- Fixed an SDP Handler issue where `SdpHandlerInfo.type` was undefined the first time an SDP Handler is called on receiving a call.
+- Fixed a midcall issue where removal of a remote media track did not trigger an event notification to application level. `KAA-2150`
+
 ## 4.11.1 - 2020-01-02
 
 ### Fixed
