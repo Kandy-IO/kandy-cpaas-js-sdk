@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.12.0-beta.290
+ * Version: 4.12.0-beta.291
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23523,7 +23523,36 @@ function callAPI({ dispatch, getState }) {
      * @public
      * @static
      * @memberof call
-     * @requires call
+     * @requires link_call
+     * @method consultativeTransfer
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} otherCallId ID of the other call being acted on.
+     */
+
+    /**
+     * Performs a "consultative" transfer between two ongoing calls (also known
+     *    as an announced or warm transfer). This allows the current user to
+     *    transfer the remote participant of a call to another user, after
+     *    having spoken to both users.
+     *
+     * Both calls used for the transfer must be locally held. After the
+     *    operation, these calls will be ended, as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event.
+     *
+     * Both remote participants will see their call be unheld by the operation,
+     *    as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event, and will
+     *    be connected to one another afterwards.
+     *
+     * The progression of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event. Both local
+     *    calls will receive this event, since it is an operation on both calls,
+     *    and the remote calls will receive it as if it were a "remote unhold"
+     *    operation.
+     * @private
+     * @static
+     * @memberof call
+     * @requires cpaas_call
      * @method consultativeTransfer
      * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
@@ -23577,7 +23606,7 @@ function callAPI({ dispatch, getState }) {
      *    {@link call.event:call:operation call:operation} event. The remote
      *    participant being transferred will receive it as if it were a "remote
      *    unhold" operation.
-     * @public
+     * @private
      * @static
      * @memberof call
      * @requires cpaas_call
@@ -23619,6 +23648,34 @@ function callAPI({ dispatch, getState }) {
      * @static
      * @memberof call
      * @requires link_call
+     * @method join
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} otherCallId ID of the other call being acted on.
+     */
+
+    /**
+     * Performs a "join" on two ongoing calls.
+     * This allows the current user to establish a call with audio with two
+     *    remote users.
+     *
+     * Both specified calls must be locally held. The new, "joined" call will be
+     *    audio-only, even if either previous call had video. Video cannot be
+     *    added to the "joined" call. Both remote participants will see their
+     *    call taken off hold, and will receive additional audio from other
+     *    participants after the operation. Both previous calls for the current
+     *    user will be ended after the operation, as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event.
+     *
+     * If the first call specified has custom parameters set, these parameters will be carried over to the new call.
+     *
+     * The progress of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event. Both remote
+     *    participants will also receive this event as if it were a "remote
+     *    unhold" operation.
+     * @private
+     * @static
+     * @memberof call
+     * @requires cpaas_call
      * @method join
      * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
@@ -34629,7 +34686,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.12.0-beta.290';
+  let version = '4.12.0-beta.291';
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
