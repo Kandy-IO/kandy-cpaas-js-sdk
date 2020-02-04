@@ -5,6 +5,14 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.13.0 - beta
+
+### Added
+
+- Added a custom header (containing SDK name and version) which will be included in any REST request sent to server. This is based on cofiguration and its default value is set to false (i.e. don't send this custom header) `KAA-2103`
+- Added a destroy function to allow users to wipe the SDK state and render the SDK unusuable. `KAA-2181`
+  - This is useful when a user is finished with the SDK and wants their data to not be available to the next SDK consumer. After destroy is called, the SDK must be recreated for an application to continue working.
+
 ## 4.12.0 - 2020-01-31
 
 ### Added
