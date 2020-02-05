@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.295
+ * Version: 4.13.0-beta.296
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20579,6 +20579,8 @@ var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/a
 
 var _utils = __webpack_require__("../../packages/kandy/src/callstack/utils/index.js");
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 var _utils2 = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
@@ -20593,6 +20595,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
 /**
  * Configuration options for the call feature.
  * @public
@@ -20604,7 +20615,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Array<call.IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
  * @param {number} [call.iceCollectionDelay=1000] Time, in milliseconds, to delay in between
  *    ICE candidate checks. If ICE collection does not complete normally, the SDK will check
- *    collected candidates at this interval to determine if the opertion can continue.
+ *    collected candidates at this interval to determine if the operation can continue.
  * @param {number} [call.maxIceTimeout=3000] Maximum time, in milliseconds, to wait for ICE
  *    collection to complete normally. After this time, the process will timeout and the
  *    operation will attempt to continue no matter how many candidates have been collected.
@@ -20627,10 +20638,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {boolean} [normalizeDestination=true] Specifies whether or not SIP address normalization will be applied.
  */
 
-// Libraries.
-
-
-// Helpers.
 // Call plugin.
 function cpaasCalls(options = {}) {
   const defaultOptions = {
@@ -20668,6 +20675,14 @@ function cpaasCalls(options = {}) {
   options = (0, _utils2.mergeValues)(defaultOptions, options);
 
   function* init({ webRTC }) {
+    // Change sdpSemantics if not supported
+    const isPlanB = options.sdpSemantics === 'plan-b';
+    const isNotChrome = webRTC.getBrowserDetails().browser !== 'chrome';
+    if (isPlanB && isNotChrome) {
+      log.warn('Only Chrome supports `plan-b` sdpSemantics. Switching to `unified-plan`.');
+      options.sdpSemantics = 'unified-plan';
+    }
+
     yield (0, _effects.put)((0, _actions2.update)(options, _interfaceNew2.default.name));
     yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
 
@@ -20678,7 +20693,7 @@ function cpaasCalls(options = {}) {
      *
      * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
      *    crypto method enabled. WebRTC only allows one method to be enabled.
-     *    This is needed for interopability with non-browser endpoints that include
+     *    This is needed for interoperability with non-browser endpoints that include
      *    SDES as a fallback method.
      *
      * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
@@ -20716,8 +20731,6 @@ function cpaasCalls(options = {}) {
     capabilities: ['call', 'cpaas_call', 'cpaas_user_id', 'cpaas_pstn']
   };
 }
-
-// Other plugins.
 
 /***/ }),
 
@@ -32347,7 +32360,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.295';
+  return '4.13.0-beta.296';
 }
 
 /***/ }),

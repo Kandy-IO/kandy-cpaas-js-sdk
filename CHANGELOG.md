@@ -9,9 +9,13 @@ Kandy.js change log.
 
 ### Added
 
-- Added a custom header (containing SDK name and version) which will be included in any REST request sent to server. This is based on cofiguration and its default value is set to false (i.e. don't send this custom header) `KAA-2103`
-- Added a destroy function to allow users to wipe the SDK state and render the SDK unusuable. `KAA-2181`
+- Added a custom header (containing SDK name and version) which will be included in any REST request sent to server. This is based on configuration and its default value is set to false (i.e. don't send this custom header) `KAA-2103`
+- Added a destroy function to allow users to wipe the SDK state and render the SDK unusable. `KAA-2181`
   - This is useful when a user is finished with the SDK and wants their data to not be available to the next SDK consumer. After destroy is called, the SDK must be recreated for an application to continue working.
+
+### Fixed
+
+- Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
 
 ## 4.12.0 - 2020-01-31
 
