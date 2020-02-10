@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.297
+ * Version: 4.13.0-beta.298
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19418,6 +19418,12 @@ var _constants = __webpack_require__("../../packages/kandy/src/auth/constants.js
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
+var _jwtDecode = __webpack_require__("../../node_modules/jwt-decode/lib/index.js");
+
+var _jwtDecode2 = _interopRequireDefault(_jwtDecode);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 const log = (0, _logs.getLogManager)().getLogger('AUTH');
@@ -19734,7 +19740,13 @@ function api({ dispatch, getState }) {
     setTokens({ accessToken, idToken }) {
       // We won't log both tokens, just the id one, so that we can still be able to debug.
       log.debug(_logs.API_LOG_TAG + 'setTokens: ', idToken);
-      dispatch(actions.setTokens({ accessToken, idToken }));
+      // validate token
+      try {
+        const jwt = (0, _jwtDecode2.default)(idToken);
+        dispatch(actions.setTokens({ accessToken, idToken: jwt }));
+      } catch (error) {
+        log.error(`${idToken} is not a valid JWT`);
+      }
     }
   };
 }
@@ -19927,10 +19939,6 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
 
-var _jwtDecode = __webpack_require__("../../node_modules/jwt-decode/lib/index.js");
-
-var _jwtDecode2 = _interopRequireDefault(_jwtDecode);
-
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -20072,9 +20080,7 @@ reducers[actionTypes.SET_TOKEN] = {
     // We received an idToken which is a JWT token that represents the identity of
     // the user. This token contains information about the user. For now we only need
     // the username. In the future we might use more from this token.
-
-    const idTokenPayload = (0, _jwtDecode2.default)(action.payload.idToken);
-
+    const idTokenPayload = action.payload.idToken;
     return (0, _extends3.default)({}, state, {
       userInfo: (0, _extends3.default)({}, state.userInfo, {
         accessToken: action.payload.accessToken,
@@ -32360,7 +32366,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.297';
+  return '4.13.0-beta.298';
 }
 
 /***/ }),
