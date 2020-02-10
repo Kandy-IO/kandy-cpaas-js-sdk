@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.296
+ * Version: 4.13.0-beta.297
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32360,7 +32360,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.296';
+  return '4.13.0-beta.297';
 }
 
 /***/ }),
