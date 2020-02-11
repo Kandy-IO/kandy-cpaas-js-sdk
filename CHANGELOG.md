@@ -15,6 +15,7 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed a Call issue where a slow-start, remote hold operation, when entering a "dual hold" state, was not being processed correctly. `KAA-2183`
 - Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
 
 ## 4.12.0 - 2020-01-31

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.299
+ * Version: 4.13.0-beta.300
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -28952,9 +28952,22 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
   const remoteDesc = yield (0, _effects.call)([session, 'getLatestRemoteDesc']);
   const mediaDiff = yield (0, _effects.call)(_compareMedia2.default, remoteDesc.sdp, sdp);
 
-  const remoteOp = yield (0, _effects.call)(_operations2.default, mediaDiff);
-
+  let remoteOp = yield (0, _effects.call)(_operations2.default, mediaDiff);
   const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, sdp);
+
+  /**
+   * Special case: Assume the remote operation was actually a Hold.
+   * The operation was interpreted as "no change" because the remote media did
+   *    not change in the remote operation. But all media is inactive and we are
+   *    in a Local Hold state. This means that the previous media was inactive
+   *    because of our local hold. So the new media being inactive is a change
+   *    that was done on the remote side, ie. it was actually a remote hold.
+   */
+  if (remoteOp === 'NO_CHANGE' && !mediaFlowing && mediaState === _constants.CALL_MEDIA_STATES.LOCAL_HOLD) {
+    remoteOp = _constants2.OPERATIONS.HOLD;
+    log.debug(`Interpreting NO_CHANGE operation as ${remoteOp} due to ${mediaState} state.`);
+  }
+
   log.info(`Handling state change as remote ${remoteOp} in ${mediaState} scenario.`);
 
   /*
@@ -32366,7 +32379,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.299';
+  return '4.13.0-beta.300';
 }
 
 /***/ }),
