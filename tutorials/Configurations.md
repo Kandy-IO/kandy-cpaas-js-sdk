@@ -28,21 +28,6 @@ const client = create({
 
 In most cases, the default values will suffice for an application, but specifying your own configurations allows you to customize certain behaviors. The exception is the authentication configurations, which are always required.
 
-## ICE Servers
-
-Use these ICE servers in the Javascript SDK when connecting and making calls. This is needed to ensure that calls can be established even when the call peers are on different
-networks, behind firewalls. When the ICE server connects, it will try the primary URL first and if it fails, it will try the secondary URL. See the "Example Configurations" section below for how to include these in the SDK configurations.
-
-### Primary URL
-
-* TURN URL: turns:turn-1-cpaas.att.com:443?transport=tcp
-* STUN URL: stun:turn-1-cpaas.att.com:3478?transport=udp
-
-### Secondary URL
-
-* TURN URL: turns:turn-2-cpaas.att.com:443?transport=tcp
-* STUN URL: stun:turn-2-cpaas.att.com:3478?transport=udp
-
 ## Example Configurations
 
 This quickstart will showcase a few samples of why you may want to use certain configurations. For a full list of the possible configurations, see the Configuration Documentation.
@@ -81,10 +66,10 @@ The Call configs are used to initialize call/network settings. This can customiz
 call: {
   // Specify the TURN/STUN servers that should be used.
   iceServers: [
-    { urls: 'turns:turn-1-cpaas.att.com:443?transport=tcp' },
-    { urls: 'stun:turn-1-cpaas.att.com:3478?transport=udp' },
-    { urls: 'turns:turn-2-cpaas.att.com:443?transport=tcp' },
-    { urls: 'stun:turn-2-cpaas.att.com:3478?transport=udp' }
+    { urls: '$KANDYTURN1$' },
+    { urls: '$KANDYSTUN1$' },
+    { urls: '$KANDYTURN2$' },
+    { urls: '$KANDYSTUN2$' }
   ],
   // Specify that credentials should be fetched from the server.
   serverTurnCredentials: true

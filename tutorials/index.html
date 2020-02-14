@@ -103,6 +103,34 @@
             }
           },
           {
+            name: 'Convert KANDYTURN1',
+            extend(api) {
+              const kandyTURN1 = queryParams.get('KANDYTURN1') || '$KANDYTURN1$'
+              api.processMarkdown(md => md.replace(/\$KANDYTURN1\$/gm, kandyTURN1))
+            }
+          },
+          {
+            name: 'Convert KANDYTURN2',
+            extend(api) {
+              const kandyTURN2 = queryParams.get('KANDYTURN2') || '$KANDYTURN2$'
+              api.processMarkdown(md => md.replace(/\$KANDYTURN2\$/gm, kandyTURN2))
+            }
+          },
+          {
+            name: 'Convert KANDYSTUN1',
+            extend(api) {
+              const kandySTUN1 = queryParams.get('KANDYSTUN1') || '$KANDYSTUN1$'
+              api.processMarkdown(md => md.replace(/\$KANDYSTUN1\$/gm, kandySTUN1))
+            }
+          },
+          {
+            name: 'Convert KANDYSTUN2',
+            extend(api) {
+              const kandySTUN2 = queryParams.get('KANDYSTUN2') || '$KANDYSTUN2$'
+              api.processMarkdown(md => md.replace(/\$KANDYSTUN2\$/gm, kandySTUN2))
+            }
+          },
+          {
             name: 'Convert KANDY',
             extend(api) {
               const kandy = queryParams.get('KANDY') || '$KANDY$'

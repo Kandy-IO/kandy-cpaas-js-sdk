@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.306
+ * Version: 4.13.0-beta.307
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20647,17 +20647,6 @@ const log = (0, _logs.getLogManager)().getLogger('CALL');
 // Call plugin.
 function cpaasCalls(options = {}) {
   const defaultOptions = {
-    // The list of TURN/STUN servers to use.
-
-    // TODO: Remove this default once the CPaaS server configuration feature is implemented. These
-    // servers should be sent to us by CPaaS. This default is just here fo ease of use in production.
-    iceServers: [{
-      urls: 'turns:turn-ucc-1.genband.com:443?transport=tcp',
-      credential: ''
-    }, {
-      urls: 'turns:turn-ucc-2.genband.com:443?transport=tcp',
-      credential: ''
-    }],
     // Time in ms to what between checking ICE candidates during negotiation.
     iceCollectionDelay: 1000,
     // The maximum time, in ms, to wait before timing out ICE collection.
@@ -24234,7 +24223,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @static
  * @typedef {Object} IceServer
  * @memberof call
- * @property {Array<string>|string} urls Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+ * @property {Array<string>|string} urls Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls RTCIceServers.urls documentation} to learn more about the actual url format.
  * @property {string} [credential] The credential needed by the ICE server.
  */
 
@@ -32379,7 +32368,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.306';
+  return '4.13.0-beta.307';
 }
 
 /***/ }),
