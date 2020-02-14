@@ -152,20 +152,6 @@
             }
           },
           {
-            name: 'Convert ICESERVER1',
-            extend(api) {
-              const iceServer1 = queryParams.get('ICESERVER1') || '$ICESERVER1$'
-              api.processMarkdown(md => md.replace(/\$ICESERVER1\$/gm, iceServer1))
-            }
-          },
-          {
-            name: 'Convert ICESERVER2',
-            extend(api) {
-              const iceServer2 = queryParams.get('ICESERVER2') || '$ICESERVER2$'
-              api.processMarkdown(md => md.replace(/\$ICESERVER2\$/gm, iceServer2))
-            }
-          },
-          {
             // This is required so that docute/vue don't mangle
             // the codepen form.
             name: 'Unescape HTML',
