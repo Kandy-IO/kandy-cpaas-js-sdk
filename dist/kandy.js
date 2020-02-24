@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.311
+ * Version: 4.13.0-beta.312
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32368,7 +32368,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.311';
+  return '4.13.0-beta.312';
 }
 
 /***/ }),
@@ -45969,6 +45969,15 @@ function* subscribeForServices(action) {
   }
 
   if (validServices.length === 0) {
+    // eslint-disable-next-line no-warning-comments
+    /**
+     * While odd looking, delay(0) is needed to let the "subscribe action" finish its flow
+     * before the "subscribe finish" action is dispatched.
+     * For a very in-depth explanation, see comments on this PR:
+     * <https://github.com/Fring/Kandy.js/pull/2579#issuecomment-589670097>
+     */
+    yield (0, _effects2.delay)(0);
+
     // TODO: Proper error / return.
     return {
       error: new _errors2.default({
