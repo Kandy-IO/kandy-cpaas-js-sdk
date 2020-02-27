@@ -18,6 +18,7 @@ Kandy.js change log.
 - Fixed the ICE servers documentation for the CPaaS SDK. `KAA-2194`
 - Fixed a Call issue where a slow-start, remote hold operation, when entering a "dual hold" state, was not being processed correctly. `KAA-2183`
 - Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
+- Fixed an issue where the `conversation.subscribe` listener not being triggered. `KAA-2200`
 
 ## 4.12.0 - 2020-01-31
 

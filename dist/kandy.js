@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.13.0-beta.315
+ * Version: 4.13.0-beta.316
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32368,7 +32368,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.13.0-beta.315';
+  return '4.13.0-beta.316';
 }
 
 /***/ }),
@@ -39396,7 +39396,7 @@ const conversationBase = {
      * @static
      * @memberof conversation.Conversation
      * @param {Function} subscriber A subscriber function to be triggered when the messages array of this conversation is updated.
-     * @param {string} subscriber.conversationId The conversation participant.
+     * @param {string} subscriber.destination The conversation participants.
      * @param {string} subscriber.messageId The ID of the message that caused the event.
      * @return {Function} The unsubscribe function.
      */
@@ -39404,9 +39404,9 @@ const conversationBase = {
       if (subscriber) {
         // Create a subscriber wrapper to properly determine if this messages:change event is relevant to this convo
         // TODO: we might need to change the name of `conversationId` as it is used here. Conversations have actual IDs in the backend, which are an integer value rather than an array of strings, as is the case with destination. We track conversation IDs, as they exist in the back end, as we are required to identify the conversation by `id` when performing actions in the backend on a Group Conversation.
-        const subscriberWrapper = ({ conversationId, messageId }) => {
-          if (conversationId === this.destination) {
-            subscriber({ conversationId, messageId });
+        const subscriberWrapper = ({ destination, messageId }) => {
+          if ((0, _fp.isEqual)(destination, this.destination)) {
+            subscriber({ destination, messageId });
           }
         };
         // Subscribe to the messages:change event with the wrapped subscriber
