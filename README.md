@@ -14,8 +14,8 @@ To install a particular build branch or beta branch with the Github URL, run:
 
 ### In the browser :
 ```html
-<script src="https://unpkg.com/@kandy-io/cpaas-sdk@4.12.0/dist/kandy.js"
-  integrity="sha384-zJ4/KGpqDwWwbe+69SoDMeCUk52Yk3hVrZr7n9mi4UQvZ+iNm2DS2TikMi01YoT6"
+<script src="https://unpkg.com/@kandy-io/cpaas-sdk@4.13.0/dist/kandy.js"
+  integrity="sha384-Wa8CBqzYNDcYr19G9DfxrnVSyfSPZIx47kGYFMDw99WFLfTqMQlk67/+8l9HQHMA"
   crossorigin="anonymous">
 </script>
 ```
@@ -25,4 +25,4 @@ The information about tutorials and documents can be found in the links below
 
 * `Documents`: [docs](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs)
 
-* `Tutorials`:  [Get Started](https://kandy-io.github.io/kandy-cpaas-js-sdk/tutorials/?KANDY=Kandy&KANDYFQDN=oauth-cpaas.att.com#/Get%20Started)
+* `Tutorials`:  [Get Started](https://kandy-io.github.io/kandy-cpaas-js-sdk/tutorials/?KANDY=Kandy&KANDYTURN1=turns:turn-1-cpaas.att.com:443?transport=tcp&KANDYTURN2=turns:turn-2-cpaas.att.com:443?transport=tcp&KANDYSTUN1=stun:turn-1-cpaas.att.com:3478?transport=udp&KANDYSTUN2=stun:turn-2-cpaas.att.com:3478?transport=udp&KANDYFQDN=oauth-cpaas.att.com#/Get%20Started)

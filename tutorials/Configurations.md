@@ -66,11 +66,10 @@ The Call configs are used to initialize call/network settings. This can customiz
 call: {
   // Specify the TURN/STUN servers that should be used.
   iceServers: [
-    {
-      urls: 'turns:...',
-      // ...
-    },
-    // ...
+    { urls: '$KANDYTURN1$' },
+    { urls: '$KANDYSTUN1$' },
+    { urls: '$KANDYTURN2$' },
+    { urls: '$KANDYSTUN2$' }
   ],
   // Specify that credentials should be fetched from the server.
   serverTurnCredentials: true

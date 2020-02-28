@@ -103,6 +103,34 @@
             }
           },
           {
+            name: 'Convert KANDYTURN1',
+            extend(api) {
+              const kandyTURN1 = queryParams.get('KANDYTURN1') || '$KANDYTURN1$'
+              api.processMarkdown(md => md.replace(/\$KANDYTURN1\$/gm, kandyTURN1))
+            }
+          },
+          {
+            name: 'Convert KANDYTURN2',
+            extend(api) {
+              const kandyTURN2 = queryParams.get('KANDYTURN2') || '$KANDYTURN2$'
+              api.processMarkdown(md => md.replace(/\$KANDYTURN2\$/gm, kandyTURN2))
+            }
+          },
+          {
+            name: 'Convert KANDYSTUN1',
+            extend(api) {
+              const kandySTUN1 = queryParams.get('KANDYSTUN1') || '$KANDYSTUN1$'
+              api.processMarkdown(md => md.replace(/\$KANDYSTUN1\$/gm, kandySTUN1))
+            }
+          },
+          {
+            name: 'Convert KANDYSTUN2',
+            extend(api) {
+              const kandySTUN2 = queryParams.get('KANDYSTUN2') || '$KANDYSTUN2$'
+              api.processMarkdown(md => md.replace(/\$KANDYSTUN2\$/gm, kandySTUN2))
+            }
+          },
+          {
             name: 'Convert KANDY',
             extend(api) {
               const kandy = queryParams.get('KANDY') || '$KANDY$'
@@ -121,20 +149,6 @@
             extend(api) {
               const webSocketFQDN = queryParams.get('WEBSOCKETFQDN') || '$WEBSOCKETFQDN$'
               api.processMarkdown(md => md.replace(/\$WEBSOCKETFQDN\$/gm, webSocketFQDN))
-            }
-          },
-          {
-            name: 'Convert ICESERVER1',
-            extend(api) {
-              const iceServer1 = queryParams.get('ICESERVER1') || '$ICESERVER1$'
-              api.processMarkdown(md => md.replace(/\$ICESERVER1\$/gm, iceServer1))
-            }
-          },
-          {
-            name: 'Convert ICESERVER2',
-            extend(api) {
-              const iceServer2 = queryParams.get('ICESERVER2') || '$ICESERVER2$'
-              api.processMarkdown(md => md.replace(/\$ICESERVER2\$/gm, iceServer2))
             }
           },
           {

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.12.0
+ * Version: 4.13.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6797,6 +6797,25 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 
     return defaultLogger;
 }));
+
+
+/***/ }),
+
+/***/ "../../node_modules/p-defer/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = () => {
+	const ret = {};
+
+	ret.promise = new Promise((resolve, reject) => {
+		ret.resolve = resolve;
+		ret.reject = reject;
+	});
+
+	return ret;
+};
 
 
 /***/ }),
@@ -19031,6 +19050,7 @@ Object.defineProperty(exports, "__esModule", {
 const prefix = '@@KANDY/';
 
 const CONNECT = exports.CONNECT = prefix + 'CONNECT';
+const SET_CONNECTION_INFO = exports.SET_CONNECTION_INFO = prefix + 'SET_CONNECTION_INFO';
 const CONNECTION_OCCURRED = exports.CONNECTION_OCCURRED = prefix + 'CONNECTION_OCCURRED';
 const CONNECT_FINISHED = exports.CONNECT_FINISHED = prefix + 'CONNECT_FINISHED';
 const GET_USER_DETAILS = exports.GET_USER_DETAILS = prefix + 'GET_USER_DETAILS';
@@ -19058,6 +19078,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.connect = connect;
+exports.setConnectionInfo = setConnectionInfo;
 exports.connectionOccured = connectionOccured;
 exports.connectFinished = connectFinished;
 exports.getUserDetails = getUserDetails;
@@ -19090,6 +19111,26 @@ function connect(credentials, options) {
     type: actionTypes.CONNECT,
     payload: { credentials, options },
     meta: {
+      isSensitive: true
+    }
+  };
+}
+
+/**
+ * Create a set connection info action that takes a connection and user info object
+ *
+ * @method connectFinished
+ * @param {Object} $0
+ * @param {Object} $0.userInfo An object representing the user information.
+ * @param {Object} $0.connection A connection object. Information about how to connect to the backend services.
+ * @return {Object} A flux standard action.
+ */
+function setConnectionInfo({ userInfo, connection }, platform) {
+  return {
+    type: actionTypes.SET_CONNECTION_INFO,
+    payload: { userInfo, connection },
+    meta: {
+      platform,
       isSensitive: true
     }
   };
@@ -19376,6 +19417,12 @@ var _selectors = __webpack_require__("../../packages/kandy/src/auth/interface/se
 var _constants = __webpack_require__("../../packages/kandy/src/auth/constants.js");
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _jwtDecode = __webpack_require__("../../node_modules/jwt-decode/lib/index.js");
+
+var _jwtDecode2 = _interopRequireDefault(_jwtDecode);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -19693,7 +19740,13 @@ function api({ dispatch, getState }) {
     setTokens({ accessToken, idToken }) {
       // We won't log both tokens, just the id one, so that we can still be able to debug.
       log.debug(_logs.API_LOG_TAG + 'setTokens: ', idToken);
-      dispatch(actions.setTokens({ accessToken, idToken }));
+      // validate token
+      try {
+        const jwt = (0, _jwtDecode2.default)(idToken);
+        dispatch(actions.setTokens({ accessToken, idToken: jwt }));
+      } catch (error) {
+        log.error(`${idToken} is not a valid JWT`);
+      }
     }
   };
 }
@@ -19886,10 +19939,6 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
 
-var _jwtDecode = __webpack_require__("../../node_modules/jwt-decode/lib/index.js");
-
-var _jwtDecode2 = _interopRequireDefault(_jwtDecode);
-
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -19903,6 +19952,18 @@ reducers[actionTypes.CONNECT] = {
     return (0, _extends3.default)({}, state, {
       isPending: true,
       error: undefined
+    });
+  }
+};
+
+reducers[actionTypes.SET_CONNECTION_INFO] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      platform: action.meta.platform,
+      connection: (0, _extends3.default)({}, state.connection, {
+        [action.meta.platform]: action.payload.connection
+      }),
+      userInfo: action.payload.userInfo
     });
   }
 };
@@ -20019,9 +20080,7 @@ reducers[actionTypes.SET_TOKEN] = {
     // We received an idToken which is a JWT token that represents the identity of
     // the user. This token contains information about the user. For now we only need
     // the username. In the future we might use more from this token.
-
-    const idTokenPayload = (0, _jwtDecode2.default)(action.payload.idToken);
-
+    const idTokenPayload = action.payload.idToken;
     return (0, _extends3.default)({}, state, {
       userInfo: (0, _extends3.default)({}, state.userInfo, {
         accessToken: action.payload.accessToken,
@@ -20526,6 +20585,8 @@ var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/a
 
 var _utils = __webpack_require__("../../packages/kandy/src/callstack/utils/index.js");
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 var _utils2 = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _codecRemover = __webpack_require__("../../packages/fcs/src/js/sdp/codecRemover.js");
@@ -20540,6 +20601,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Libraries.
+
+
+// Helpers.
+
+
+// Other plugins.
+const log = (0, _logs.getLogManager)().getLogger('CALL');
+
 /**
  * Configuration options for the call feature.
  * @public
@@ -20551,7 +20621,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Array<call.IceServer>} [call.iceServers] The list of ICE servers to be used for calls.
  * @param {number} [call.iceCollectionDelay=1000] Time, in milliseconds, to delay in between
  *    ICE candidate checks. If ICE collection does not complete normally, the SDK will check
- *    collected candidates at this interval to determine if the opertion can continue.
+ *    collected candidates at this interval to determine if the operation can continue.
  * @param {number} [call.maxIceTimeout=3000] Maximum time, in milliseconds, to wait for ICE
  *    collection to complete normally. After this time, the process will timeout and the
  *    operation will attempt to continue no matter how many candidates have been collected.
@@ -20574,24 +20644,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {boolean} [normalizeDestination=true] Specifies whether or not SIP address normalization will be applied.
  */
 
-// Libraries.
-
-
-// Helpers.
 // Call plugin.
 function cpaasCalls(options = {}) {
   const defaultOptions = {
-    // The list of TURN/STUN servers to use.
-
-    // TODO: Remove this default once the CPaaS server configuration feature is implemented. These
-    // servers should be sent to us by CPaaS. This default is just here fo ease of use in production.
-    iceServers: [{
-      urls: 'turns:turn-ucc-1.genband.com:443?transport=tcp',
-      credential: ''
-    }, {
-      urls: 'turns:turn-ucc-2.genband.com:443?transport=tcp',
-      credential: ''
-    }],
     // Time in ms to what between checking ICE candidates during negotiation.
     iceCollectionDelay: 1000,
     // The maximum time, in ms, to wait before timing out ICE collection.
@@ -20615,6 +20670,14 @@ function cpaasCalls(options = {}) {
   options = (0, _utils2.mergeValues)(defaultOptions, options);
 
   function* init({ webRTC }) {
+    // Change sdpSemantics if not supported
+    const isPlanB = options.sdpSemantics === 'plan-b';
+    const isNotChrome = webRTC.getBrowserDetails().browser !== 'chrome';
+    if (isPlanB && isNotChrome) {
+      log.warn('Only Chrome supports `plan-b` sdpSemantics. Switching to `unified-plan`.');
+      options.sdpSemantics = 'unified-plan';
+    }
+
     yield (0, _effects.put)((0, _actions2.update)(options, _interfaceNew2.default.name));
     yield (0, _effects.put)((0, _actions.mapEvents)(_events2.default));
 
@@ -20625,7 +20688,7 @@ function cpaasCalls(options = {}) {
      *
      * 2. Disable DTLS-SDES crypto method (ie. delete the line) if there's a better
      *    crypto method enabled. WebRTC only allows one method to be enabled.
-     *    This is needed for interopability with non-browser endpoints that include
+     *    This is needed for interoperability with non-browser endpoints that include
      *    SDES as a fallback method.
      *
      * 3. [optional] Disable H264 Codecs for video calls, used to reduce SDP size
@@ -20664,8 +20727,6 @@ function cpaasCalls(options = {}) {
   };
 }
 
-// Other plugins.
-
 /***/ }),
 
 /***/ "../../packages/kandy/src/call/cpaas/requests/calls.js":
@@ -20685,6 +20746,8 @@ var _stringify2 = _interopRequireDefault(_stringify);
 exports.createSession = createSession;
 exports.answerSession = answerSession;
 exports.forwardSession = forwardSession;
+exports.directTransferSession = directTransferSession;
+exports.consultativeTransferSessions = consultativeTransferSessions;
 exports.fetchCredentials = fetchCredentials;
 exports.updateSession = updateSession;
 exports.updateSessionStatus = updateSessionStatus;
@@ -20856,6 +20919,99 @@ function* forwardSession(callInfo) {
   if (response.error) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Forward session')
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Direct Transfers an incoming session to another destination address.
+ * Cpaas-specific signaling function.
+ *
+ * This saga "direct transfers" the server session to a specified destination address.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method directTransferSession
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.address The address to forward the session to.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ */
+function* directTransferSession(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
+
+  const options = {
+    method: 'PUT',
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}` + `/sessions/${callInfo.wrtcsSessionId}/transfer`,
+    body: (0, _stringify2.default)({
+      wrtcsTransfer: {
+        clientCorrelator: requestInfo.clientCorrelator,
+        address: callInfo.address
+      }
+    })
+  };
+
+  const response = yield (0, _effects2.default)(options, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Direct transfer session')
+    };
+  } else {
+    return {
+      error: false
+    };
+  }
+}
+
+/**
+ * Transfers ongoing sessions into one another.
+ * CPaaS-specific signaling function.
+ *
+ * This saga "transfers" the server sessions.
+ * Assumptions:
+ *    1. The current user is authenticated.
+ * Responsibilities:
+ *    1. Format parameters as needed for signalling.
+ *    2. Perform the REST request.
+ *    3. Return the response, formatted.
+ * @method consultativeTransferSessions
+ * @param  {Object} callInfo
+ * @param  {string} callInfo.wrtcsSessionId The ID the backend uses to track the session.
+ * @param  {string} callInfo.otherWrtcsSessionId The ID the backend uses to track the other session.
+ * @param  {string} callInfo.destination The address of the other session to transfer to.
+ * @return {Object} response object from the server.
+ * @return {Object} [response.error] An error object, if signalling failed.
+ * @return {string} [response.newWrtcsSessionId] The back-end session id, if signalling succeeded.
+ */
+function* consultativeTransferSessions(callInfo) {
+  const requestInfo = yield (0, _effects3.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
+
+  const options = {
+    method: 'PUT',
+    url: `${requestInfo.baseURL}/cpaas/` + `webrtcsignaling/${requestInfo.version}/${requestInfo.username}` + `/sessions/${callInfo.wrtcsSessionId}/transfer`,
+    body: (0, _stringify2.default)({
+      wrtcsTransfer: {
+        clientCorrelator: requestInfo.clientCorrelator,
+        address: callInfo.destination,
+        sessionId: callInfo.otherWrtcsSessionId
+      }
+    })
+  };
+
+  const response = yield (0, _effects2.default)(options, requestInfo.options);
+
+  if (response.error) {
+    return {
+      error: (0, _helpers.handleRequestError)(response, 'Consultative transfer session')
     };
   } else {
     return {
@@ -21152,6 +21308,8 @@ exports.registerCall = registerCall;
 exports.createCall = createCall;
 exports.answerCallEntry = answerCallEntry;
 exports.forwardCallEntry = forwardCallEntry;
+exports.directTransferEntry = directTransferEntry;
+exports.consultativeTransferEntry = consultativeTransferEntry;
 exports.holdCall = holdCall;
 exports.unholdCall = unholdCall;
 exports.addMediaEntry = addMediaEntry;
@@ -21278,6 +21436,28 @@ function* answerCallEntry(deps) {
  */
 function* forwardCallEntry(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.FORWARD_CALL, establishSagas.forwardCall, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Direct Transfer an ongoing call.
+ * @method directTransferEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* directTransferEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.DIRECT_TRANSFER, midcallSagas.directTransfer, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Transfers 2 ongoing calls to one another.
+ * @method consultativeTransferEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ * @param {Array}  deps.sdpHandlers SDP handlers.
+ */
+function* consultativeTransferEntry(deps) {
+  yield (0, _effects2.takeEvery)(actionTypes.CONSULTATIVE_TRANSFER, midcallSagas.consultativeTransfer, (0, _extends3.default)({}, deps, { requests }));
 }
 
 /**
@@ -22052,9 +22232,8 @@ function* validateCallState(callId, expected) {
  * However, if only SDES is available, don't disable it.
  * @method sanitizeSdesFromSdp
  * @param {Object} newSdp The sdp so far (could have been modified by previous handlers).
- * @param {Object} info Information about the session description.
+ * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
- * @param {string} info.step The step that will occur after the Pipeline is run.
  * @param {string} info.endpoint Which end of the connection created the SDP.
  * @param {Object} originalSdp The sdp in its initial state.
  * @return {Object} The sanitized sdp with crypto removed (if fingerprint exists)
@@ -23523,7 +23702,36 @@ function callAPI({ dispatch, getState }) {
      * @public
      * @static
      * @memberof call
-     * @requires call
+     * @requires link_call
+     * @method consultativeTransfer
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} otherCallId ID of the other call being acted on.
+     */
+
+    /**
+     * Performs a "consultative" transfer between two ongoing calls (also known
+     *    as an announced or warm transfer). This allows the current user to
+     *    transfer the remote participant of a call to another user, after
+     *    having spoken to both users.
+     *
+     * Both calls used for the transfer must be locally held. After the
+     *    operation, these calls will be ended, as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event.
+     *
+     * Both remote participants will see their call be unheld by the operation,
+     *    as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event, and will
+     *    be connected to one another afterwards.
+     *
+     * The progression of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event. Both local
+     *    calls will receive this event, since it is an operation on both calls,
+     *    and the remote calls will receive it as if it were a "remote unhold"
+     *    operation.
+     * @private
+     * @static
+     * @memberof call
+     * @requires cpaas_call
      * @method consultativeTransfer
      * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
@@ -23577,7 +23785,7 @@ function callAPI({ dispatch, getState }) {
      *    {@link call.event:call:operation call:operation} event. The remote
      *    participant being transferred will receive it as if it were a "remote
      *    unhold" operation.
-     * @public
+     * @private
      * @static
      * @memberof call
      * @requires cpaas_call
@@ -23619,6 +23827,34 @@ function callAPI({ dispatch, getState }) {
      * @static
      * @memberof call
      * @requires link_call
+     * @method join
+     * @param {string} callId ID of the call being acted on.
+     * @param {string} otherCallId ID of the other call being acted on.
+     */
+
+    /**
+     * Performs a "join" on two ongoing calls.
+     * This allows the current user to establish a call with audio with two
+     *    remote users.
+     *
+     * Both specified calls must be locally held. The new, "joined" call will be
+     *    audio-only, even if either previous call had video. Video cannot be
+     *    added to the "joined" call. Both remote participants will see their
+     *    call taken off hold, and will receive additional audio from other
+     *    participants after the operation. Both previous calls for the current
+     *    user will be ended after the operation, as indicated by a
+     *    {@link call.event:call:stateChange call:stateChange} event.
+     *
+     * If the first call specified has custom parameters set, these parameters will be carried over to the new call.
+     *
+     * The progress of the operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} event. Both remote
+     *    participants will also receive this event as if it were a "remote
+     *    unhold" operation.
+     * @private
+     * @static
+     * @memberof call
+     * @requires cpaas_call
      * @method join
      * @param {string} callId ID of the call being acted on.
      * @param {string} otherCallId ID of the other call being acted on.
@@ -23987,7 +24223,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @static
  * @typedef {Object} IceServer
  * @memberof call
- * @property {Array<string>|string} urls Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server.
+ * @property {Array<string>|string} urls Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls RTCIceServers.urls documentation} to learn more about the actual url format.
  * @property {string} [credential] The credential needed by the ICE server.
  */
 
@@ -23997,9 +24233,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @typedef {Object} SdpHandlerInfo
  * @memberof call
  * @property {RTCSdpType} type The session description's type.
- * @property {string} step The step that will occur after the SDP Handlers are run.
- *    Will be either 'set' (the SDP will be set locally) or 'send' (the SDP will
- *    be sent to the remote endpoint).
  * @property {string} endpoint Which end of the connection created the SDP.
  */
 
@@ -28708,9 +28941,22 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
   const remoteDesc = yield (0, _effects.call)([session, 'getLatestRemoteDesc']);
   const mediaDiff = yield (0, _effects.call)(_compareMedia2.default, remoteDesc.sdp, sdp);
 
-  const remoteOp = yield (0, _effects.call)(_operations2.default, mediaDiff);
-
+  let remoteOp = yield (0, _effects.call)(_operations2.default, mediaDiff);
   const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, sdp);
+
+  /**
+   * Special case: Assume the remote operation was actually a Hold.
+   * The operation was interpreted as "no change" because the remote media did
+   *    not change in the remote operation. But all media is inactive and we are
+   *    in a Local Hold state. This means that the previous media was inactive
+   *    because of our local hold. So the new media being inactive is a change
+   *    that was done on the remote side, ie. it was actually a remote hold.
+   */
+  if (remoteOp === 'NO_CHANGE' && !mediaFlowing && mediaState === _constants.CALL_MEDIA_STATES.LOCAL_HOLD) {
+    remoteOp = _constants2.OPERATIONS.HOLD;
+    log.debug(`Interpreting NO_CHANGE operation as ${remoteOp} due to ${mediaState} state.`);
+  }
+
   log.info(`Handling state change as remote ${remoteOp} in ${mediaState} scenario.`);
 
   /*
@@ -28954,8 +29200,7 @@ function* incomingCall(deps, params) {
     // Since we have the remote offer SDP, we can setup a webRTC session.
     yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
       offer: {
-        sdp,
-        type: 'offer'
+        sdp
       },
       trickleIceMode: callOptions.sdpSemantics,
       sdpSemantics: callOptions.sdpSemantics,
@@ -29452,10 +29697,8 @@ function* receiveEarlyMedia(deps, params) {
     /*
      * Run the remote SDP pranswer through any SDP handlers provided, then set it
      *    as the Session's remote description.
-     * This is the "pre set remote" stage.
      */
     const sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, params.sdp, {
-      step: 'set',
       type: 'pranswer',
       endpoint: 'remote'
     });
@@ -29489,6 +29732,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.sendCallAudit = sendCallAudit;
+exports.getSessions = getSessions;
+exports.updateCallState = updateCallState;
 
 var _actions = __webpack_require__("../../packages/kandy/src/call/interfaceNew/actions/index.js");
 
@@ -29597,6 +29842,97 @@ function* sendCallAudit(deps, action) {
       isLocal: true,
       transition: { statusCode: 9909, reasonText: 'Call has ended due to call audit failure.' }
     }));
+  }
+}
+
+/**
+ * Filters which call needs to be re-synched and calls the helper saga (`updateCallState`) to perform the re-synching.
+ *
+ * Responsibilities:
+ *    1. Ensure resyncOnConnect config is set
+ *    2. Filter out inactive calls (calls already in an ended state)
+ *    3. In parallel, use the helper saga (`updateCallState`) to perform the re-synching of the active calls
+ * @method sendCallAudit
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   action        The action that triggered the audit.
+ */
+function* getSessions(deps, action) {
+  const config = yield (0, _effects.select)(_selectors.getOptions);
+  if (!config.resyncOnConnect) {
+    return;
+  }
+  // Grab all active calls
+  const calls = yield (0, _effects.select)(_selectors.getCalls);
+  const activeCalls = calls.filter(call => call.state !== _constants.CALL_STATES.CANCELLED && call.state !== _constants.CALL_STATES.ENDED);
+
+  // Check and update the call state of each call if necessary
+  yield (0, _effects.all)(activeCalls.map(activeCall => (0, _effects.call)(updateCallState, deps, activeCall)));
+}
+
+// eslint-disable-next-line no-warning-comments
+/**
+ * Sends a GET session request and updates call if required.
+ *
+ * This saga performs the signaling operation to get the status of a call session on the server.
+ *    There are no local webRTC operations involved.
+ *
+ * Assumptions:
+ *    1. The server uses Kandy Link 4.7.1+
+ * Responsibilities:
+ *    2. Update the call state if the call is out of sync (call's status does not match response from server)
+ * @method sendCallAudit
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.getSession GET session signalling function.
+ * @param {Object}   action        The call being acted on.
+ */
+function* updateCallState(deps, activeCall) {
+  const { webRTC, requests } = deps;
+  const callStateAfterConnect = activeCall.state;
+
+  // If there is an ongoing operation when the WS connects, the response to that operation will re-sync the state
+  // Otherwise, we need to get the status of the session from the server
+  if (!activeCall.localOp && !activeCall.remoteOp) {
+    const sessionStatusResponse = yield (0, _effects.call)(requests.getSession, {
+      wrtcsSessionId: activeCall.wrtcsSessionId
+    });
+
+    // Get state of the call again before evaluating the response as an operation request and response
+    // could have been processed in between the request to get the session and the response received
+    const currentCall = yield (0, _effects.select)(_selectors.getCallById, activeCall.id);
+
+    // Do nothing if an operation was triggered in between the GET sessions request and response, and is ongoing
+    if (!currentCall.localOp && !currentCall.remoteOp) {
+      /*
+       * If the current call state is ringing OR if the state of the call was connected/on hold before we
+       * did the GET, look at the response of the GET request.
+       * If call is ringing and GET session returns ringing, we don't need to do anything
+       * Also, if we were previously connected, but GET returns ringing, this could be due to an operation that was resolved
+       * between the GET request and response. In any case, no need to look at GET response for this scenario.
+       */
+      if (currentCall.state === _constants.CALL_STATES.RINGING || callStateAfterConnect !== _constants.CALL_STATES.RINGING) {
+        // Call not found
+        if (sessionStatusResponse.error && sessionStatusResponse.error.code === 47) {
+          // End the call as the session does not exist on the server anymore (statusCode 47 response)
+          yield (0, _effects.call)(_midcall.closeCall, webRTC, activeCall.webrtcSessionId);
+          yield (0, _effects.put)(_actions.callActions.endCallFinish(activeCall.id, {
+            isLocal: true,
+            error: sessionStatusResponse.error
+          }));
+
+          // GET response errors other than session not found
+        } else if (sessionStatusResponse.error) {
+          log.info(`Unable to resync call: ${currentCall.id} due to error: ${sessionStatusResponse.error}`);
+
+          // If the call is answered, but not by us
+        } else if (sessionStatusResponse.state === 'ANSWERED' && currentCall.state !== _constants.CALL_STATES.CONNECTED && currentCall.state !== _constants.CALL_STATES.ON_HOLD) {
+          // Report call as cancelled
+          yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, activeCall.webrtcSessionId);
+          yield (0, _effects.put)(_actions.callActions.callCancelled(activeCall.id));
+        }
+      }
+    }
   }
 }
 
@@ -30548,11 +30884,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @method sdpPipeline
  * @param  {Array}      handlers       List of functions that transform the SDP.
  * @param  {string}     sdp            The session description.
- * @param  {Object}     info           Information about the session description.
+ * @param  {RTCSdpType} info           Information about the session description.
  * @param  {RTCSdpType} info.type      The session description's type.
- * @param  {string}     info.step      The step that will occur after the Pipeline is run.
- *    Will be either 'set' (the SDP will be set locally) or 'send' (the SDP will be sent
- *    to the remote endpoint).
  * @param  {string}     info.endpoint  Which end of the connection created the SDP.
  * @param  {boolean}    info.isInitiator Whether this session initiated the connection or not.
  * @param  {BandwidthControls} [info.bandwidth] Information about bandwidth controls.
@@ -30642,9 +30975,8 @@ const log = (0, _logs.getLogManager)().getLogger('SDPHANDLER');
  *
  * @method sanitizeSdesFromSdp
  * @param {Object} newSdp The SDP so far (could have been modified by previous handlers).
- * @param {Object} info Information about the session description.
+ * @param {RTCSdpType} info Information about the session description.
  * @param {RTCSdpType} info.type The session description's type.
- * @param {string} info.step The step that will occur after the Pipeline is run.
  * @param {string} info.endpoint Which end of the connection created the SDP.
  * @param {Object} originalSdp The SDP in its initial state.
  * @return {Object} The sanitized SDP with crypto removed (if fingerprint exists)
@@ -30874,24 +31206,12 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
    */
   let offer = yield (0, _effects.call)([session, 'createOffer']);
 
-  // Run the SDP through the Pipeline before we set it locally.
-  //    This is the "pre set local" stage.
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
-
-  // Run the SDP through the Pipeline again before we send it to the remote side.
-  //    This is the "pre send local" stage.
-  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
-    type: offer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   return {
     error: false,
@@ -30948,11 +31268,9 @@ function* setupIncomingCall(deps, sessionOptions) {
   /*
    * Run the remote SDP offer through any SDP handlers provided, then set it
    *    as the Session's remote description.
-   * This is the "pre set remote" stage.
    */
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
-    step: 'set',
     endpoint: 'remote'
   });
 
@@ -31019,24 +31337,12 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
    *    then set it as the Session's local description.
    */
   let answer = yield (0, _effects.call)([session, 'createAnswer']);
-
-  // This is the "pre set local" stage.
   answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
     type: answer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   answer = yield (0, _effects.call)([session, 'setLocalDescription'], answer);
-
-  // Run the SDP through the Pipeline again before we send it to the remote side.
-  //    This is the "pre send local" stage.
-  answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
-    type: answer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   return {
     error: false,
@@ -31234,11 +31540,9 @@ function* handleOffer(deps, offer, webrtcSessionId, bandwidth) {
   /*
    * Run the remote SDP offer through any SDP handlers provided, then set it
    *    as the Session's remote description.
-   * This is the "pre set remote" stage.
    */
   offer = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer, {
     type: 'offer',
-    step: 'set',
     endpoint: 'remote'
   });
 
@@ -31257,24 +31561,12 @@ function* handleOffer(deps, offer, webrtcSessionId, bandwidth) {
    *    then set it as the Session's local description.
    */
   let answer = yield (0, _effects.call)([session, 'createAnswer']);
-
-  // This is the "pre set local" stage.
   answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
     type: answer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   answer = yield (0, _effects.call)([session, 'setLocalDescription'], answer);
-
-  // Run the SDP through the Pipeline again before we send it to the remote side.
-  //    This is the "pre send local" stage.
-  answer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answer.sdp, {
-    type: answer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   return {
     answerSDP: answer.sdp
@@ -31313,23 +31605,12 @@ function* generateOffer(deps, sessionId, mediaDirections, bandwidth) {
   let offer = yield (0, _effects.call)([session, 'createOffer'], {
     mediaDirections
   });
-
-  // This is the "pre set local" stage.
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
-
-  // This is the "pre send local" stage.
-  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
-    type: offer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   return offer;
 }
@@ -31377,23 +31658,12 @@ function* webRtcAddMedia(deps, mediaConstraints, sessionOptions) {
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
   let offer = yield (0, _effects.call)([session, 'createOffer']);
-
-  // This is the "pre set local" stage.
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
-
-  // This is the "pre send local" stage.
-  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
-    type: offer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   let mediaStates = [];
 
@@ -31461,23 +31731,12 @@ function* webRtcRemoveMedia(deps, sessionOptions) {
   // TODO: Make sure the session is in the correct signaling state to start a
   //    renegotiation operation.
   let offer = yield (0, _effects.call)([session, 'createOffer']);
-
-  // This is the "pre set local" stage.
   offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
     type: offer.type,
-    step: 'set',
     endpoint: 'local',
     bandwidth
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
-
-  // This is the "pre send local" stage.
-  offer.sdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, offer.sdp, {
-    type: offer.type,
-    step: 'send',
-    endpoint: 'local',
-    bandwidth
-  });
 
   return {
     sdp: offer.sdp
@@ -31717,11 +31976,9 @@ function* receivedAnswer(deps, sessionInfo, targetCall) {
     /*
      * Run the remote SDP answer through any SDP handlers provided, then set it
      *    as the Session's remote description.
-     * This is the "pre set remote" stage.
      */
     answerSdp = yield (0, _effects.call)(_pipeline2.default, sdpHandlers, answerSdp, {
       type: 'answer',
-      step: 'set',
       endpoint: 'remote'
     });
     yield (0, _effects.call)([session, 'processAnswer'], {
@@ -32089,6 +32346,29 @@ function autoRestart(saga) {
       }
     } while (shouldRestart);
   };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/common/version.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getVersion = getVersion;
+/**
+ * Returns the version of the currently running SDK.
+ *
+ * It must be used by any plugins (including the factory) as the unique source of truth when it comes to determine the current SDK version.
+ * The actual version value is provided by the build process scripts (aka webpack.config.***.js) which simply do a string substitution
+ * for the @@ tag below with actual version value.
+ */
+function getVersion() {
+  return '4.13.0';
 }
 
 /***/ }),
@@ -34604,15 +34884,19 @@ var _compose2 = _interopRequireDefault(_compose);
 
 var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Helpers.
-// Libraries.
 const log = (0, _logs.getLogManager)().getLogger('FACTORY');
 
 // Plugins.
+
+
+// Helpers.
+// Libraries.
 
 
 const factoryDefaults = {
@@ -34629,7 +34913,7 @@ const factoryDefaults = {
    */
 };function factory(plugins, options = factoryDefaults) {
   // Log the SDK's version (templated by webpack) on initialization.
-  let version = '4.12.0';
+  let version = (0, _version.getVersion)();
   log.info(`SDK version: ${version}`);
 
   var sagas = [];
@@ -34638,6 +34922,7 @@ const factoryDefaults = {
   var middlewares = [];
   var reducers = {};
   var initSagas = [];
+  var taskDescriptor;
   const shared = {};
   var context = {
     capabilities: [],
@@ -34646,6 +34931,9 @@ const factoryDefaults = {
     getState() {
       if (!store) {
         throw Error('Store is not available during factory creation');
+      }
+      if (destroyedSDK) {
+        throw Error('State is not available if the SDK has been destroyed');
       }
       return store.getState();
     },
@@ -34665,6 +34953,15 @@ const factoryDefaults = {
 
   // Special case middleware for logging.
   var loggerMiddleware;
+
+  var destroyedSDK = false;
+  var destroyedSDKMiddleware = store => next => action => {
+    if (destroyedSDK) {
+      return null;
+    } else {
+      return next(action);
+    }
+  };
 
   // Run all the plugins to build the context.
   // Set up each plugin component individually.
@@ -34775,12 +35072,12 @@ const factoryDefaults = {
     var sagaMiddleware = (0, _reduxSaga2.default)();
 
     // Create the store with the plugins (incl. sagas) and with the configuration as the initial state.
-    store = (0, _redux.createStore)((0, _redux.combineReducers)(reducers), composeMiddleware((0, _redux.applyMiddleware)(sagaMiddleware, ...middlewares)));
+    store = (0, _redux.createStore)((0, _redux.combineReducers)(reducers), composeMiddleware((0, _redux.applyMiddleware)(destroyedSDKMiddleware, sagaMiddleware, ...middlewares)));
 
-    sagaMiddleware.run(rootSaga);
+    taskDescriptor = sagaMiddleware.run(rootSaga);
   } else {
     // Create the store with the plugins (excl. sagas) and with the configuration as the initial state.
-    store = (0, _redux.createStore)((0, _redux.combineReducers)(reducers), composeMiddleware((0, _redux.applyMiddleware)(...middlewares)));
+    store = (0, _redux.createStore)((0, _redux.combineReducers)(reducers), composeMiddleware((0, _redux.applyMiddleware)(destroyedSDKMiddleware, ...middlewares)));
   }
 
   // setup the API
@@ -34790,7 +35087,7 @@ const factoryDefaults = {
     // Determine what state should be exposed to an application.
     plugins.forEach(function (plugin) {
       let name = plugin.name;
-      // If the plugin designates a selector to filter publuc state, use it.
+      // If the plugin designates a selector to filter public state, use it.
       if (selectors[name]) {
         exposedState[name] = selectors[name](state[name]);
       } else if (state[name]) {
@@ -34812,11 +35109,67 @@ const factoryDefaults = {
         return store.subscribe(...args);
       }
     },
+    /**
+     * Return all the capabilities currently available to the plugin system.
+     *
+     * @memberof api
+     * @method getCapabilities
+     */
     getCapabilities() {
       return context.capabilities;
     },
+    /**
+     * Returns the current version of the API.
+     *
+     * @public
+     * @memberof api
+     * @method getVersion
+     */
     getVersion() {
       return version;
+    },
+    // Disabling eslint for the next comment as we want to be able to use a disallowed word
+    // eslint-disable-next-line no-warning-comments
+    /**
+     * Destroys the SDK, and removes its state, rendering the SDK unusable.
+     * Useful when a user logs out and their call data needs to be destroyed.
+     * The SDK must be recreated to be usable again.
+     *
+     * @public
+     * @memberof api
+     * @method destroy
+     * @example
+     * // Instantiate the SDK.
+     * import { create } from 'kandy'
+     * const config = {
+     *     authentication: { ... },
+     *     logs: { ... },
+     *     ...
+     * }
+     * let client = create(config);
+     * client.on( ... )
+     * // Use the SDK
+     * ...
+     * // Destroy the SDK, then recreate on the next step
+     * client.destroy()
+     * client = create(config)
+     * client.on( ... )
+     */
+    destroy() {
+      // TODO: Give plugins a chance to clean up, disconnect from WS, etc
+      // Needs to happen before the sagas are cancelled
+
+      // Cancel all the sagas
+      if (taskDescriptor) taskDescriptor.cancel();
+
+      // Clear the state
+      function destroyStateReducer(state, action) {
+        return null;
+      }
+      store.replaceReducer(destroyStateReducer);
+
+      // Neuter all actions
+      destroyedSDK = true;
     }
   });
 
@@ -37028,7 +37381,7 @@ exports.default = createActionLogger;
 
 var _index = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
-var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
+var _constants = __webpack_require__("../../packages/logger/src/constants.js");
 
 var _transformers = __webpack_require__("../../packages/kandy/src/logs/actions/transformers.js");
 
@@ -37221,10 +37574,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _logHandler = __webpack_require__("../../packages/kandy/src/logs/logHandler.js");
-
-var _logHandler2 = _interopRequireDefault(_logHandler);
-
 var _actionHandler = __webpack_require__("../../packages/kandy/src/logs/actions/actionHandler.js");
 
 var _actionHandler2 = _interopRequireDefault(_actionHandler);
@@ -37272,7 +37621,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 exports.default = {
   logLevel: 'debug',
-  handler: _logHandler2.default,
+  handler: undefined,
   enableFcsLogs: true,
 
   // Action-specific configs.
@@ -37288,27 +37637,89 @@ exports.default = {
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/logs/constants.js":
+/***/ "../../packages/kandy/src/logs/docs.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Log levels used by the SDK.
- * When a level is set, all logs of that level and higher will be logged.
+/*
+ * This file contains SDK documentation for stuff defined by the Logger package.
+ * They are here to 1) ensure they are picked up by our documentation tool and
+ *    2) ensure they are written from the perspective of the SDK (not the Logger
+ *    library).
  */
-const logLevels = exports.logLevels = {
-  TRACE: 0,
-  DEBUG: 1,
-  INFO: 2,
-  WARN: 3,
-  ERROR: 4,
-  SILENT: 5
-};
+
+/**
+ * A LogEntry object is the data that the SDK compiles when information is
+ *    logged. It contains both the logged information and meta-info about when
+ *    and who logged it.
+ *
+ * A {@link logger.LogHandler LogHandler} provided to the SDK (see
+ *    {@link #configconfiglogs config.logs}) will need to handle LogEntry
+ *    objects.
+ *
+ * @public
+ * @static
+ * @typedef {Object} LogEntry
+ * @memberof logger
+ * @requires logs
+ * @property {number} timestamp When the log was created, based on UNIX epoch.
+ * @property {string} method The log function that was used to create the log.
+ * @property {string} level The level of severity the log.
+ * @property {Object} target The subject that the log is about.
+ * @property {string} target.type The type of the target. This is also
+ *    used as part of the name of the Logger.
+ * @property {string} [target.id] A unique identifer for the target.
+ * @property {string} target.name A combination of the target type and ID. If no
+ *    id was provided, this will be the same as the type.
+ * @property {Array} messages The logged information, given to the Logger
+ *    method as parameters.
+ * @example
+ * function defaultLogHandler (logEntry) {
+ *   // Compile the meta info of the log for a prefix.
+ *   const { timestamp, level, method, target } = logEntry
+ *   const logInfo = `${timestamp} - ${target.type} - ${level}`
+ *
+ *   // Assume that the first message parameter is a string.
+ *   const [log, ...extra] = logEntry.messages
+ *
+ *   console[method](`${logInfo} - ${log}`, ...extra)
+ * }
+ */
+
+/**
+ * A LogHandler can be used to customize how the SDK should log information. By
+ *    default, the SDK will log information to the console, but a LogHandler can
+ *    be configured to change this behaviour.
+ *
+ * A LogHandler can be provided to the SDK as part of its configuration (see
+ *    {@link #configconfiglogs config.logs}). The SDK will then provide this
+ *    function with the logged information.
+ *
+ * @public
+ * @static
+ * @typedef {Function} LogHandler
+ * @memberof logger
+ * @requires logs
+ * @param {Object} LogEntry The LogEntry to be logged.
+ * @example
+ * // Define a custom function to handle logs.
+ * function logHandler (logEntry) {
+ *   // Compile the meta info of the log for a prefix.
+ *   const { timestamp, level, method, target } = logEntry
+ *   const logInfo = `${timestamp} - ${target.type} - ${level}`
+ *
+ *   // Assume that the first message parameter is a string.
+ *   const [log, ...extra] = logEntry.messages
+ *
+ *   console[method](`${logInfo} - ${log}`, ...extra)
+ * }
+ *
+ * // Provide the LogHandler as part of the SDK configurations.
+ * const configs = { ... }
+ * configs.logs.handler = logHandler
+ * const client = create(configs)
+ */
+
 
 /***/ }),
 
@@ -37327,6 +37738,10 @@ var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/obje
 
 var _values2 = _interopRequireDefault(_values);
 
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
 exports.getLogManager = getLogManager;
 exports.default = logPlugin;
 
@@ -37338,21 +37753,21 @@ var _config = __webpack_require__("../../packages/kandy/src/logs/config.js");
 
 var _config2 = _interopRequireDefault(_config);
 
-var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
-
 var _actions = __webpack_require__("../../packages/kandy/src/logs/actions/index.js");
 
 var _actions2 = _interopRequireDefault(_actions);
-
-var _logManager = __webpack_require__("../../packages/kandy/src/logs/logManager.js");
-
-var _logManager2 = _interopRequireDefault(_logManager);
 
 var _actions3 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
 
 var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _kandyLogger = __webpack_require__("../../packages/logger/src/index.js");
+
+var _kandyLogger2 = _interopRequireDefault(_kandyLogger);
+
+__webpack_require__("../../packages/kandy/src/logs/docs.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37362,7 +37777,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    the application's configs.
  */
 // Logs plugin.
-const logManager = (0, _logManager2.default)('SDK', _config2.default);
+const logManager = (0, _kandyLogger2.default)(_config2.default);
+
+// Include the extra JSDoc items.
+
 
 // Libraries.
 
@@ -37378,17 +37796,32 @@ const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
 function logPlugin(options = {}) {
   const name = 'logs';
 
-  options = (0, _utils.mergeValues)(_config2.default, options);
-  options.logLevel = options.logLevel.toUpperCase();
+  const logger = logManager.getLogger('LOGS');
+  // Make sure the configured log handler was a function.
+  if (typeof options.handler !== 'function') {
+    delete options.handler;
+    logger.warn('Invalid log handler configuration provided; using default instead.');
+  }
 
+  // Make sure configured log level is supported.
+  if (options.logLevel && !(0, _keys2.default)(_kandyLogger.logLevels).includes(options.logLevel.toUpperCase())) {
+    delete options.logLevel;
+    logger.warn('Invalid log level configuration provided; using default instead.');
+  }
+
+  options = (0, _utils.mergeValues)(_config2.default, options);
   // Now that we have the application's log configs, update everything to
   //    use those values instead of default values.
   logManager.level = options.logLevel;
-  logManager.logHandler = options.handler;
+  if (options.handler) {
+    logManager.handler = options.handler;
+  }
 
   (0, _values2.default)(logManager.getLoggers()).forEach(logger => {
     logger.level = options.logLevel;
-    logger.logHandler = options.handler;
+    if (options.handler) {
+      logger.handler = options.handler;
+    }
   });
 
   function* init() {
@@ -37404,10 +37837,11 @@ function logPlugin(options = {}) {
     api: _api2.default
   };
 
-  const setLevel = _constants.logLevels[options.logLevel];
+  options.logLevel = options.logLevel.toUpperCase();
+  const setLevel = _kandyLogger.logLevels[options.logLevel];
   // Consider actions to be at the INFO log level.
   // Only export a middleware (for actions) at the appropriate levels.
-  if (setLevel <= _constants.logLevels.INFO && options.logActions !== false) {
+  if (setLevel <= _kandyLogger.logLevels.INFO && options.logActions !== false) {
     components.middleware = (0, _actions2.default)(options);
   }
 
@@ -37465,297 +37899,6 @@ function api() {
   return {
     logger: api
   };
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/logHandler.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = defaultLogHandler;
-/**
- * A LogHandler can be used to customize how the SDK should log information. By
- *    default, the SDK will log information to the console, but a LogHandler can
- *    be configured to change this behaviour.
- *
- * A LogHandler can be provided to the SDK as part of its configuration (see
- *    {@link #configconfiglogs config.logs}). The SDK will then provide this
- *    function with the logged information.
- *
- * @public
- * @static
- * @typedef {Function} LogHandler
- * @memberof logger
- * @requires logs
- * @param {Object} LogEntry The LogEntry to be logged.
- * @example
- * // Define a custom function to handle logs.
- * function logHandler (logEntry) {
- *   // Compile the meta info of the log for a prefix.
- *   const { timestamp, level, method, target } = logEntry
- *   const logInfo = `${timestamp} - ${target.name} - ${level}`
- *
- *   // Assume that the first message parameter is a string.
- *   const [log, ...extra] = logEntry.messages
- *
- *   console[method](`${logInfo} - ${log}`, ...extra)
- * }
- *
- * // Provide the LogHandler as part of the SDK configurations.
- * const configs = { ... }
- * configs.logs.handler = logHandler
- * const client = create(configs)
- */
-
-/**
- * Default function for the SDK to use for logging.
- *    Uses entry information to form a prefix, then logs to console.
- * @method defaultLogHandler
- * @param  {LogEntry} entry
- */
-function defaultLogHandler(entry) {
-  // Compile the meta info of the log for a prefix.
-  const { timestamp, level, method, target } = entry;
-  const logInfo = `${timestamp} - ${target.name} - ${level}`;
-
-  // Assume that the first message parameter is a string.
-  const [log, ...extra] = entry.messages;
-
-  console[method](`${logInfo} - ${log}`, ...extra);
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/logManager.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = createManager;
-
-var _logger = __webpack_require__("../../packages/kandy/src/logs/logger.js");
-
-var _logger2 = _interopRequireDefault(_logger);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Creates a Log Manager.
- * @method createManager
- * @param  {string}     managerName
- * @param  {Object}     [options={}]
- * @return {LogManager}
- */
-function createManager(managerName, options = {}) {
-  /*
-   * This log is pointless, but is here to workaround a weird issue in Chrome.
-   * The Chrome console will lag when it is loading the sourcemap for a file.
-   *    Logging from the SDK will force Chrome to load its sourcemap (if its
-   *    not already loaded). So this ensures that /something/ is logged from the
-   *    SDK file as early as possible, to help avoid this lag being visible to
-   *    a developer.
-   */
-  console.debug(`Creating LogManager ${managerName}.`);
-
-  let logHandler = options.handler;
-  let level = options.logLevel;
-  const loggers = {};
-
-  /**
-   * Gets a specific logger. If the logger doesn't exist, a new one will be
-   *    created.
-   * @method getLogger
-   * @param  {string} name Human-readable name for the logger.
-   * @param  {string} [id] A unique identifier for the logger.
-   * @return {Logger}
-   */
-  function getLogger(name, id) {
-    // Combine the name and ID to create the "full" logger name.
-    const loggerName = id ? `${name}-${id}` : name;
-
-    let logger = loggers[loggerName];
-    // If the logger does not exist, create a new one.
-    if (!logger) {
-      // This logger logs items from a specific "target".
-      const target = { name, id };
-      logger = (0, _logger2.default)(target, logHandler, { level });
-
-      // Save the new logger to be returned by future getter cals.
-      loggers[loggerName] = logger;
-    }
-
-    return logger;
-  }
-
-  /**
-   * Gets all created loggers.
-   * @method getLoggers
-   * @return {Object} Object of loggers, keyed by logger name-id.
-   */
-  function getLoggers() {
-    return loggers;
-  }
-
-  return {
-    getLogger,
-    getLoggers,
-    get logHandler() {
-      return logHandler;
-    },
-    set logHandler(handler) {
-      logHandler = handler;
-    },
-    set level(newLevel) {
-      level = newLevel.toUpperCase();
-    }
-  };
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/logs/logger.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = createLogger;
-
-var _constants = __webpack_require__("../../packages/kandy/src/logs/constants.js");
-
-/**
- * A LogEntry object is the data that the SDK compiles when information is
- *    logged. It contains both the logged information and meta-info about when
- *    and who logged it.
- *
- * A {@link logger.LogHandler LogHandler} provided to the SDK (see
- *    {@link #configconfiglogs config.logs}) will need to handle LogEntry
- *    objects.
- *
- * @public
- * @static
- * @typedef {Object} LogEntry
- * @memberof logger
- * @requires logs
- * @property {number} timestamp When the log was created, based on UNIX epoch.
- * @property {string} method The log function that was used to create the log.
- * @property {string} level The level of severity the log.
- * @property {Object} target The subject that the log is about.
- * @property {string} target.name The name of the target. This is also
- *    used as the name of the Logger.
- * @property {string} [target.id] A unique identifer for the target.
- * @property {Array} messages The logged information, given to the Logger
- *    method as parameters.
- * @example
- * function defaultLogHandler (logEntry) {
- *   // Compile the meta info of the log for a prefix.
- *   const { timestamp, level, method, target } = logEntry
- *   const logInfo = `${timestamp} - ${target.name} - ${level}`
- *
- *   // Assume that the first message parameter is a string.
- *   const [log, ...extra] = logEntry.messages
- *
- *   console[method](`${logInfo} - ${log}`, ...extra)
- * }
- */
-
-/**
- * Creates a Logger.
- * @method createLogger
- * @param  {Object}   target       The subject of the logs from this logger.
- * @param  {Function} handler      The function to receive/handle log entries.
- * @param  {Object}   [options={}]
- * @return {Logger}
- */
-function createLogger(target, handler, options = {}) {
-  /**
-   * Currying function to dynamically create the Logger's logging methods.
-   * @method logFunc
-   * @param  {string} method Name of the logger method to create.
-   * @return {Function} A log method.
-   */
-  function logFunc(method) {
-    // The level that this function logs at.
-    let logLevel;
-    // Consider non-standard log levels to be debug.
-    if (['group', 'groupEnd', 'groupCollapsed', 'log'].includes(method)) {
-      logLevel = 'DEBUG';
-    } else {
-      // Otherwise, the method and log level match directly.
-      logLevel = method.toUpperCase();
-    }
-
-    /*
-     * Return the function that will be used as `log.<method>`.
-     */
-    return function (...args) {
-      // Compare the logged level and the configured level.
-      const setLevel = logger.level.toUpperCase();
-      const shouldLog = _constants.logLevels[logLevel] >= _constants.logLevels[setLevel];
-      // If this entry shouldn't be logged, don't do anything.
-      if (!shouldLog) {
-        return;
-      }
-
-      // Create the Log Entry to be handed off to the handler.
-
-      const entry = {
-        // Meta-info about the log.
-        method,
-        timestamp: Date.now(),
-        level: logLevel,
-        target: logger.target,
-        // The actual arguments logged.
-        messages: [...args]
-      };
-
-      logger.logHandler(entry);
-    };
-  }
-
-  const logger = {
-    target,
-    level: options.level,
-    logHandler: handler,
-    name: target.name
-
-    // Supported console methods.
-  };const consoleMethods = ['trace', 'debug', 'warn', 'info', 'error', 'log', 'group', 'groupEnd', 'groupCollapsed'];
-
-  const api = {
-    get logHandler() {
-      return logger.logHandler;
-    },
-    set logHandler(handler) {
-      logger.logHandler = handler;
-    },
-    get level() {
-      return logger.level;
-    },
-    set level(newLevel) {
-      logger.level = newLevel;
-    }
-  };
-
-  // For all supported log methods, create a function on the Logger for it.
-  consoleMethods.forEach(method => {
-    api[method] = logFunc(method);
-  });
-
-  return api;
 }
 
 /***/ }),
@@ -42151,6 +42294,12 @@ const NOTIFICATION_RECEIVED = exports.NOTIFICATION_RECEIVED = prefix + 'NOTIFICA
 const ENABLE_NOTIFICATION_CHANNEL = exports.ENABLE_NOTIFICATION_CHANNEL = prefix + 'ENABLE_NOTIFICATION_CHANNEL';
 const ENABLE_NOTIFICATION_CHANNEL_FINISH = exports.ENABLE_NOTIFICATION_CHANNEL_FINISH = prefix + 'ENABLE_NOTIFICATION_CHANNEL_FINISH';
 
+const REGISTER_APPLE_PUSH_NOTIFICATION = exports.REGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'REGISTER_APPLE_PUSH_NOTIFICATION';
+const REGISTER_ANDROID_PUSH_NOTIFICATION = exports.REGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'REGISTER_ANDROID_PUSH_NOTIFICATION';
+
+const UNREGISTER_APPLE_PUSH_NOTIFICATION = exports.UNREGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'UNREGISTER_APPLE_PUSH_NOTIFICATION';
+const UNREGISTER_ANDROID_PUSH_NOTIFICATION = exports.UNREGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'UNREGISTER_ANDROID_PUSH_NOTIFICATION';
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/notifications/interface/actions.js":
@@ -42172,6 +42321,10 @@ exports.externalNotification = externalNotification;
 exports.notificationReceived = notificationReceived;
 exports.processNotificationFinish = processNotificationFinish;
 exports.enableNotificationChannel = enableNotificationChannel;
+exports.registerApplePushNotification = registerApplePushNotification;
+exports.registerAndroidPushNotification = registerAndroidPushNotification;
+exports.unregisterApplePushNotification = unregisterApplePushNotification;
+exports.unregisterAndroidPushNotification = unregisterAndroidPushNotification;
 exports.enableNotificationChannelFinish = enableNotificationChannelFinish;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/notifications/interface/actionTypes.js");
@@ -42220,10 +42373,10 @@ function websocketNotification(notification, platform = _constants.platforms.LIN
  * Represents an application request to process an external notification.
  * @method externalNotification
  * @param  {Object} notification
- * @param  {string} [channel='EXTERNAL'] - The channel that the notification came from.
+ * @param  {string} [channel='PUSH'] - The channel that the notification came from.
  * @return {Object} A flux standard action.
  */
-function externalNotification(notification, channel = 'EXTERNAL', platform) {
+function externalNotification(notification, channel = 'PUSH', platform) {
   // TODO: Are external notifications _only_ for Link?
   return notificationHelper(channel.toUpperCase(), notification, platform);
 }
@@ -42283,6 +42436,78 @@ function enableNotificationChannel(channel, params = {}) {
 }
 
 /**
+ * Represents a request to change a notification channel status.
+ * @method registerApplePushNotification
+ * @param  {Object} params
+ * @return {Object} A flux standard action.
+ */
+function registerApplePushNotification(params, deferred) {
+  return {
+    type: actionTypes.REGISTER_APPLE_PUSH_NOTIFICATION,
+    payload: (0, _extends3.default)({}, params, {
+      pushProvider: 'apple'
+    }),
+    meta: {
+      deferred
+    }
+  };
+}
+
+/**
+ * Represents a request to change a notification channel status.
+ * @method registerAndroidPushNotification
+ * @param  {Object} params
+ * @return {Object} A flux standard action.
+ */
+function registerAndroidPushNotification(params, deferred) {
+  return {
+    type: actionTypes.REGISTER_ANDROID_PUSH_NOTIFICATION,
+    payload: (0, _extends3.default)({}, params, {
+      pushProvider: 'google'
+    }),
+    meta: {
+      deferred
+    }
+  };
+}
+
+/**
+ * Represents a request to change a notification channel status.
+ * @method unregisterApplePushNotification
+ * @param  {string} registration
+ * @return {Object} A flux standard action.
+ */
+function unregisterApplePushNotification(registration, deferred) {
+  return {
+    type: actionTypes.UNREGISTER_APPLE_PUSH_NOTIFICATION,
+    payload: {
+      registration
+    },
+    meta: {
+      deferred
+    }
+  };
+}
+
+/**
+ * Represents a request to change a notification channel status.
+ * @method unregisterAndroidPushNotification
+ * @param  {string} registration
+ * @return {Object} A flux standard action.
+ */
+function unregisterAndroidPushNotification(registration, deferred) {
+  return {
+    type: actionTypes.UNREGISTER_ANDROID_PUSH_NOTIFICATION,
+    payload: {
+      registration
+    },
+    meta: {
+      deferred
+    }
+  };
+}
+
+/**
  * Represents the response of a change in a notification channel status.
  * @method enableNotificationChannelFinish
  * @param  {string} channel - The notification channel being affected.
@@ -42322,11 +42547,6 @@ function enableNotificationChannelFinish(channel, { params, error } = {}) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 exports.default = api;
 
 var _actions = __webpack_require__("../../packages/kandy/src/notifications/interface/actions.js");
@@ -42339,7 +42559,14 @@ var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+const pDefer = __webpack_require__("../../node_modules/p-defer/index.js"); /**
+                                    * The 'notification' namespace allows user to register/deregister for/from push notifications as well as
+                                    * enabling/disabling the processing of websocket notifications.
+                                    *
+                                    * @public
+                                    * @requires externalNotifications
+                                    * @namespace notification
+                                    */
 
 const log = (0, _logs.getLogManager)().getLogger('NOTIFICATION');
 
@@ -42349,15 +42576,6 @@ const log = (0, _logs.getLogManager)().getLogger('NOTIFICATION');
  * @param {Function} dispatch The redux store's dispatch function.
  * @return {Object} api  The notifications API object.
  */
-/**
- * The 'notification' namespace allows user to register/deregister for/from push notifications as well as
- * enabling/disabling the processing of websocket notifications.
- *
- * @public
- * @requires externalNotifications
- * @namespace notification
- */
-
 function api({ dispatch }) {
   const notificationApi = {
     /**
@@ -42376,38 +42594,124 @@ function api({ dispatch }) {
     },
 
     /**
-     * Registers a device token for push notifications.
+     * Registers with Apple push notification service. Once registration is successful, the application will be able to receive
+     * standard and/or voip push notifications. It can then send these notifications to the SDK with {@link api.notifications.process}
+     * in order for the SDK to process them.
      *
      * @public
      * @requires push
      * @memberof notification
-     * @method registerPush
+     * @method registerApplePush
      * @param {Object} params
-     * @param {string} params.deviceToken - The device token to be registered.
-     * @param {string[]} params.services - Array of services to register for.
-     * @param {string} params.pushProvider - The push provider, can be either 'apple' or 'google'.
+     * @param {string[]} params.services - Array of services for which we wish to receive notifications.
+     * @param {string} params.voipDeviceToken - The voip device token used for voip push on iOS.
+     *                                          This token is required if registering for call service notifications on iOS.
+     * @param {string} params.standardDeviceToken - The standardDevice token used for standard push on iOS .
+     *                                              This token is required when registering for non-call service notifications.
+     * @param {string} params.bundleId - The bundleId to identify the application receiving the push notification.
      * @param {string} params.clientCorrelator - Unique identifier for a client device.
+     * @param {string} params.realm - The realm used by the push registration service to identify and
+     *                                establish a connection with the service gateway.
+     * @param {boolean} params.isProduction - If true, push notification will be sent to production.
+     *                                        If false, push notification will be sent to sandbox.
+     * @return {Promise} When successful,  the information of the registration.
+     *                   Promise will reject with error object otherwise.
      */
-    registerPush(params) {
-      log.debug(_logs.API_LOG_TAG + 'notification.registerPush', params);
-      dispatch(actions.enableNotificationChannel('PUSH', (0, _extends3.default)({}, params, {
-        channelEnabled: true
-      })));
+    registerApplePush({
+      services,
+      voipDeviceToken,
+      standardDeviceToken,
+      bundleId,
+      clientCorrelator,
+      realm,
+      isProduction
+    }) {
+      const deferredResult = pDefer();
+      log.debug(_logs.API_LOG_TAG + 'notification.registerApplePush', arguments);
+
+      dispatch(actions.registerApplePushNotification({
+        services,
+        voipDeviceToken,
+        standardDeviceToken,
+        bundleId,
+        clientCorrelator,
+        realm,
+        isProduction
+      }, deferredResult));
+
+      return deferredResult.promise;
     },
 
     /**
-     * Deregisters for push notifications.
+     * Registers with Google push notification service. Once registration is successful, the application will be able to receive
+     * standard and/or voip push notifications. It can then send these notifications to the SDK with {@link api.notifications.process}
+     * in order for the SDK to process them.
      *
      * @public
      * @requires push
      * @memberof notification
-     * @method deregisterPush
+     * @method registerAndroidPush
+     * @param {Object} params
+     * @param {string[]} params.services - Array of services to register for.
+     * @param {string} params.deviceToken - The device token used for standard push on Android. This token is required
+     *                                      when registering for all related services notifications.
+     * @param {string} params.bundleId - The bundleId to identify the application receiving the push notification.
+     * @param {string} params.clientCorrelator - Unique identifier for a client device.
+     * @param {string} params.realm - The realm used by the push registration service to identify
+     *                                and establish a connection with the service gateway.
+     * @return {Promise} When successful,  the information of the registration.
+     *                   Promise will reject with error object otherwise.
      */
-    deregisterPush() {
-      log.debug(_logs.API_LOG_TAG + 'notification.deregisterPush');
-      dispatch(actions.enableNotificationChannel('PUSH', {
-        channelEnabled: false
-      }));
+    registerAndroidPush({ services, deviceToken, bundleId, clientCorrelator, realm }) {
+      const deferredResult = pDefer();
+      log.debug(_logs.API_LOG_TAG + 'notification.registerAndroidPush', arguments);
+
+      dispatch(actions.registerAndroidPushNotification({
+        services,
+        deviceToken,
+        bundleId,
+        clientCorrelator,
+        realm
+      }, deferredResult));
+      return deferredResult.promise;
+    },
+
+    /**
+     * Unregister Apple push notifications.
+     *
+     * @public
+     * @requires push
+     * @memberof notification
+     * @method unregisterApplePush
+     * @param {string} registrationInfo - The data returned from the push registration
+     * @return {Promise} When successful, the promise will resolve with undefined.
+     *                   Promise will reject with error object otherwise.
+     */
+    unregisterApplePush(registrationInfo) {
+      const deferredResult = pDefer();
+      log.debug(_logs.API_LOG_TAG + 'notification.unregisterPush');
+      dispatch(actions.unregisterApplePushNotification(registrationInfo, deferredResult));
+
+      return deferredResult.promise;
+    },
+
+    /**
+     * Unregister Android push notifications.
+     *
+     * @public
+     * @requires push
+     * @memberof notification
+     * @method unregisterAndroidPush
+     * @param {string} registrationInfo - The data returned from the push registration
+     * @return {Promise} When successful, the promise will resolve with undefined.
+     *                   Promise will reject with error object otherwise.
+     */
+    unregisterAndroidPush(registrationInfo) {
+      const deferredResult = pDefer();
+      log.debug(_logs.API_LOG_TAG + 'notification.unregisterPush');
+      dispatch(actions.unregisterAndroidPushNotification(registrationInfo, deferredResult));
+
+      return deferredResult.promise;
     },
 
     /**
@@ -42625,9 +42929,6 @@ const defaultState = {
     channelEnabled: false
   },
   PUSH: {
-    channelEnabled: true
-  },
-  EXTERNAL: {
     channelEnabled: true
   }
 
@@ -44497,6 +44798,10 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
+var _selectors = __webpack_require__("../../packages/kandy/src/request/interface/selectors.js");
+
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 /**
@@ -44527,6 +44832,15 @@ function* requestSaga(options, commonOptions) {
   // Merge any extra request options into the provided options
   //      for this request. Priority is for the passed-in options.
   options = (0, _utils.mergeValues)(commonOptions, options);
+
+  const useCustomHeader = yield (0, _effects.select)(_selectors.injectAgentVersionHeader);
+  if (useCustomHeader) {
+    options = (0, _utils.mergeValues)(options, {
+      headers: {
+        'X-Cpaas-Agent': `cpaas-js-sdk/${(0, _version.getVersion)()}`
+      }
+    });
+  }
 
   const requestAction = yield (0, _effects.put)(actions.request(options));
   const responseAction = yield (0, _effects.take)(action => action.type === _actionTypes.RESPONSE && (0, _fp.get)('meta.requestId', action) === requestAction.meta.requestId);
@@ -44579,11 +44893,16 @@ var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
+var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const { fetch } = (0, _fetchPonyfill2.default)({ Promise: _promise2.default });
+
+// State setters.
+
 const log = (0, _logs.getLogManager)().getLogger('REQUEST');
 
 /**
@@ -44604,13 +44923,32 @@ const contentTypes = (0, _freeze2.default)({
   octetStream: 'application/octet-stream'
 });
 
-/*
- * HTTP request plugin.
+const pluginName = 'requests';
+
+/**
+ * Configurable properties 'published' by this "Request" plugin.
+ *
+ * @property {boolean} injectAgentVersionHeader Option to automatically inject an agent version header to every REST request.
+ *            This header is used to help with diagnostics and analytics in a completely anonymous fashion.
+ *            TODO: Set it to 'true' after server side whitelists that actual custom header.
  */
-function request() {
+const defaultOptions = {
+  injectAgentVersionHeader: false
+
+  /*
+   * HTTP request plugin.
+   */
+};function request(options = {}) {
+  options = (0, _utils.mergeValues)(defaultOptions, options);
+
+  function* init() {
+    yield (0, _effects.put)((0, _actions2.update)(options, pluginName));
+  }
+
   return {
     sagas: [watchRequests],
-    name: 'requests'
+    name: pluginName,
+    init
   };
 }
 
@@ -44880,6 +45218,28 @@ function response(requestId, result, error = false) {
       requestId: requestId
     }
   };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.injectAgentVersionHeader = injectAgentVersionHeader;
+/**
+ * Retrieves the flag which specifies wether or not this SDK should use a custom header as part of any requests being sent to server.
+ * This custom header refers to the current agent version.
+ * @param {Object} state  The current Redux state object.
+ * @return {boolean} True if custom header should be used, false otherwise.
+ */
+function injectAgentVersionHeader(state) {
+  return state.config.requests.injectAgentVersionHeader;
 }
 
 /***/ }),
@@ -45609,6 +45969,15 @@ function* subscribeForServices(action) {
   }
 
   if (validServices.length === 0) {
+    // eslint-disable-next-line no-warning-comments
+    /**
+     * While odd looking, delay(0) is needed to let the "subscribe action" finish its flow
+     * before the "subscribe finish" action is dispatched.
+     * For a very in-depth explanation, see comments on this PR:
+     * <https://github.com/Fring/Kandy.js/pull/2579#issuecomment-589670097>
+     */
+    yield (0, _effects2.delay)(0);
+
     // TODO: Proper error / return.
     return {
       error: new _errors2.default({
@@ -51296,6 +51665,384 @@ function* unmuteTracks(webRTC, action) {
 
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.unmuteTracksFinish(tracks.map(track => track.id)));
+}
+
+/***/ }),
+
+/***/ "../../packages/logger/src/constants.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Log levels supported by Loggers.
+ * When a level is set, all logs of that level and higher will be logged.
+ * @type {Object}
+ */
+const logLevels = exports.logLevels = {
+  TRACE: 'TRACE',
+  DEBUG: 'DEBUG',
+  INFO: 'INFO',
+  WARN: 'WARN',
+  ERROR: 'ERROR',
+  SILENT: 'SILENT'
+
+  /**
+   * Numeric values for each log level.
+   * When a level is set, all logs of that level and higher will be logged.
+   * @type {Object}
+   */
+};const levelValues = exports.levelValues = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  SILENT: 5
+};
+
+/***/ }),
+
+/***/ "../../packages/logger/src/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.logLevels = undefined;
+
+var _logManager = __webpack_require__("../../packages/logger/src/logManager.js");
+
+var _logManager2 = _interopRequireDefault(_logManager);
+
+var _constants = __webpack_require__("../../packages/logger/src/constants.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Package main.
+ */
+
+// Main export is the manager's factory function.
+exports.default = _logManager2.default;
+
+// Named export for the log level constants the package uses / expects.
+
+const logLevels = exports.logLevels = _constants.logLevels;
+
+/***/ }),
+
+/***/ "../../packages/logger/src/logHandler.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = defaultLogHandler;
+/**
+ * Default function for the SDK to use for logging.
+ *    Uses entry information to form a prefix, then logs to console.
+ * @method defaultLogHandler
+ * @param  {LogEntry} entry
+ */
+function defaultLogHandler(entry) {
+  // Compile the meta info of the log for a prefix.
+  const { timestamp, level, method, target } = entry;
+  const logInfo = `${timestamp} - ${target.type} - ${level}`;
+
+  // Assume that the first message parameter is a string.
+  const [log, ...extra] = entry.messages;
+
+  console[method](`${logInfo} - ${log}`, ...extra);
+}
+
+/***/ }),
+
+/***/ "../../packages/logger/src/logManager.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
+exports.default = createManager;
+
+var _logger = __webpack_require__("../../packages/logger/src/logger.js");
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _logHandler = __webpack_require__("../../packages/logger/src/logHandler.js");
+
+var _logHandler2 = _interopRequireDefault(_logHandler);
+
+var _constants = __webpack_require__("../../packages/logger/src/constants.js");
+
+var _validation = __webpack_require__("../../packages/logger/src/validation.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Creates a Log Manager.
+ * @method createManager
+ * @param  {Object}     [options={}]
+ * @param  {Function}   [options.handler] The function to receive/handle log entries.
+ * @param  {string}     [options.level='INFO'] The log level to be set.
+ * @return {LogManager}
+ */
+function createManager(options = {}) {
+  /*
+   * This log is pointless, but is here to workaround a weird issue in Chrome.
+   * The Chrome console will lag when it is loading the sourcemap for a file.
+   *    Logging from the SDK will force Chrome to load its sourcemap (if its
+   *    not already loaded). So this ensures that /something/ is logged from the
+   *    SDK file as early as possible, to help avoid this lag being visible to
+   *    a developer.
+   */
+  console.debug(`Creating LogManager.`);
+
+  let handler = options.handler ? (0, _validation.checkHandler)(options.handler) : _logHandler2.default;
+  let level = options.level ? (0, _validation.checkLevel)(options.level) : _constants.logLevels.INFO;
+  const loggers = {};
+
+  /**
+   * Gets a specific logger. If the logger doesn't exist, a new one will be
+   *    created.
+   * @method getLogger
+   * @param  {string} type Human-readable type/name for the logger.
+   * @param  {string} [id] A unique identifier for the logger.
+   * @return {Logger}
+   */
+  function getLogger(type, id) {
+    // Combine the name and ID to create the "full" logger name.
+    const loggerName = id ? `${type}-${id}` : type;
+
+    let logger = loggers[loggerName];
+    // If the logger does not exist, create a new one.
+    if (!logger) {
+      // This logger logs items from a specific "target".
+      const target = { type, id, name: loggerName };
+      logger = (0, _logger2.default)(target, { level, handler });
+
+      // Save the new logger to be returned by future getter cals.
+      loggers[loggerName] = logger;
+    }
+
+    return logger;
+  }
+
+  /**
+   * Gets all created loggers, or Loggers of a specific type.
+   * @method getLoggers
+   * @param {string} [type] The type of Loggers to retrieve.
+   * @return {Array<Logger>} List of Loggers.
+   */
+  function getLoggers(type) {
+    if (type) {
+      return (0, _values2.default)(loggers).filter(logger => logger.type === type);
+    } else {
+      return (0, _values2.default)(loggers);
+    }
+  }
+
+  return {
+    getLogger,
+    getLoggers,
+    get handler() {
+      return handler;
+    },
+    set handler(newHandler) {
+      handler = (0, _validation.checkHandler)(newHandler);
+    },
+    set level(newLevel) {
+      level = (0, _validation.checkLevel)(newLevel);
+    },
+    get level() {
+      return level;
+    }
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/logger/src/logger.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = createLogger;
+
+var _constants = __webpack_require__("../../packages/logger/src/constants.js");
+
+var _validation = __webpack_require__("../../packages/logger/src/validation.js");
+
+/**
+ * Creates a Logger.
+ * @method createLogger
+ * @param  {Object}   target          The subject of the logs from this logger.
+ * @param  {Object}   options
+ * @param  {Function} options.handler The function to receive/handle log entries.
+ * @param  {string}   options.level   The log level to be set.
+ * @return {Logger}
+ */
+function createLogger(target, options = {}) {
+  // Validate provided options. Do not let invalid options be set.
+  const level = (0, _validation.checkLevel)(options.level);
+  const handler = (0, _validation.checkHandler)(options.handler);
+
+  /**
+   * Currying function to dynamically create the Logger's logging methods.
+   * @method logFunc
+   * @param  {string} method Name of the logger method to create.
+   * @return {Function} A log method.
+   */
+  function logFunc(method) {
+    // The level that this function logs at.
+    let logLevel;
+    // Consider non-standard log levels to be debug.
+    if (['group', 'groupEnd', 'groupCollapsed', 'log'].includes(method)) {
+      logLevel = _constants.logLevels.DEBUG;
+    } else {
+      // Otherwise, the method and log level match directly.
+      logLevel = _constants.logLevels[method.toUpperCase()];
+    }
+
+    /*
+     * Return the function that will be used as `log.<method>`.
+     */
+    return function (...args) {
+      // Compare the logged level and the configured level.
+      const setLevel = _constants.levelValues[logger.level];
+      const shouldLog = _constants.levelValues[logLevel] >= setLevel;
+      // If this entry shouldn't be logged, don't do anything.
+      if (!shouldLog) {
+        return;
+      }
+
+      // Create the Log Entry to be handed off to the handler.
+      const entry = {
+        // Meta-info about the log.
+        method,
+        timestamp: Date.now(),
+        level: logLevel,
+        target: logger.target,
+        // The actual arguments logged.
+        messages: [...args]
+      };
+
+      logger.handler(entry);
+    };
+  }
+
+  const logger = {
+    target,
+    level,
+    handler
+
+    // Supported console methods.
+  };const consoleMethods = ['trace', 'debug', 'warn', 'info', 'error', 'log', 'group', 'groupEnd', 'groupCollapsed'];
+
+  const api = {
+    get handler() {
+      return logger.handler;
+    },
+    set handler(handler) {
+      logger.handler = (0, _validation.checkHandler)(handler);
+    },
+    get level() {
+      return logger.level;
+    },
+    set level(newLevel) {
+      logger.level = (0, _validation.checkLevel)(newLevel);
+    },
+    get type() {
+      return logger.target.type;
+    },
+    get id() {
+      return logger.target.id;
+    },
+    get name() {
+      return logger.target.name;
+    }
+  };
+
+  // For all supported log methods, create a function on the Logger for it.
+  consoleMethods.forEach(method => {
+    api[method] = logFunc(method);
+  });
+
+  return api;
+}
+
+/***/ }),
+
+/***/ "../../packages/logger/src/validation.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.checkLevel = checkLevel;
+exports.checkHandler = checkHandler;
+
+var _constants = __webpack_require__("../../packages/logger/src/constants.js");
+
+/**
+ * Helper function to validate a "log level" string before its used in the library.
+ * @method checkLevel
+ * @param  {string} level A log level provided by a user.
+ * @return {string}       The log level as expected by the library.
+ * @throws Will throw an error if the `level` parameter is invalid.
+ */
+function checkLevel(level) {
+  // Ensure: is defined and is a string.
+  const upperLevel = level && level.toUpperCase && level.toUpperCase();
+
+  // Ensure: is a supported log level.
+  if (upperLevel && _constants.logLevels[upperLevel]) {
+    return _constants.logLevels[upperLevel];
+  } else {
+    throw new Error('Provided level is not a valid log level.');
+  }
+}
+
+/**
+ * Helper function to validate a "log handler".
+ * Basically just "is function" that throws an error if false.
+ * @method checkHandler
+ * @param  {Function} handler A log handler function, ideally.
+ * @return {Function}         The same log handler function, ideally.
+ * @throws Will throw an error if the `handler` provided is not a function.
+ */
+function checkHandler(handler) {
+  if (handler && typeof handler === 'function') {
+    return handler;
+  } else {
+    throw new Error('Provided log handler is not a function.');
+  }
 }
 
 /***/ }),

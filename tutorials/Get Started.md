@@ -12,6 +12,27 @@ categories:
 
 In this quickstart, we will help you dip your toes in before you dive in. This guide will help you get started with the $KANDY$ Javascript SDK.
 
+## Base URL
+
+This is the HTTPS entry point that you will use for Javascript SDK authentication, REST service and websocket notifications. It will need to be included in the configurations for the SDK (see below).
+
+```
+  $KANDYFQDN$
+```
+
+## Getting the SDK
+
+The Kandy SDK is available on NPM and can be added to your project using either npm or yarn.
+
+**NPM**
+```
+  > npm install @kandy-io/cpaas-sdk
+```
+**Yarn**
+```
+  > yarn add @kandy-io/cpaas-sdk
+```
+
 ## Using the SDK
 
 To begin, you will need to include the javascript library in your application. The library can be included as a UMD module by using a `<script>` tag or bundled with your application as a CommonJS module.
@@ -42,9 +63,9 @@ Different module bundlers can be used to bundle the library with your applicatio
 
 ``` javascript
 // ES6 import or...
-import { create } from './path/to/Kandy'
+import { create } from '@kandy-io/cpaas-sdk'
 // CommonJS module.
-var create = require('./path/to/Kandy').create
+var create = require('@kandy-io/cpaas-sdk').create
 
 // Instantiate the library.
 const client = create(configs)
@@ -55,13 +76,15 @@ client.on( ... )
 
 After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The API reference documentation will help to explain the details of the available features.
 
+The examples that follow will assume that you are using bundling and that the Kandy library is accessible from the */node_modules/* folder and therefore required to be accessed by the name `@kandy-io/cpaas-sdk` only.
+
 ## Configurations
 
 When instantiating the library, there are many configurations that will help to customize behavior to what best serve your application's needs. This can be done by providing a configuration object to the library factory as shown below.
 
 ```javascript
 // Instantiate the SDK.
-import { create } from 'Kandy'
+import { create } from '@kandy-io/cpaas-sdk'
 const client = create({
   // Required: Server connection configs.
   authentication: {
