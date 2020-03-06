@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.328
+ * Version: 4.14.0-beta.329
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32486,7 +32486,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.328';
+  return '4.14.0-beta.329';
 }
 
 /***/ }),
@@ -42975,13 +42975,14 @@ function externalNotification(notification, channel = 'PUSH', platform) {
  * @param  {string} platform
  * @return {Object} A flux standard action.
  */
-function notificationReceived(notification, platform) {
+function notificationReceived(notification, platform, channel) {
   return {
     type: actionTypes.NOTIFICATION_RECEIVED,
     payload: notification,
     error: notification instanceof Error,
     meta: {
-      platform
+      platform,
+      channel
     }
   };
 }
