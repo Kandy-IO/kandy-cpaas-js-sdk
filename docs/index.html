@@ -264,12 +264,6 @@
                       </a></li>
                     
                       <li><a
-                        href='#callbandwidthcontrols'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> BandwidthControls
-                      </a></li>
-                    
-                      <li><a
                         href='#calliceserver'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> IceServer
@@ -315,6 +309,12 @@
                         href='#calldevicesobject'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> DevicesObject
+                      </a></li>
+                    
+                      <li><a
+                        href='#callbandwidthcontrols'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> BandwidthControls
                       </a></li>
                     
                       <li><a
@@ -3608,106 +3608,6 @@ client.call.make(destination, {
       </div>
     </div>
   
-    <div class='border-bottom' id='callbandwidthcontrols'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>BandwidthControls</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
-BandwidthControls only affect received remote tracks of the specified type.</p>
-
-
-  <div class='pre p1 fill-light mt0'>BandwidthControls</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>audio</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
-          </code>
-
-          
-
-          
-             : The desired bandwidth bitrate in kilobits per second for received remote audio.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>video</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
-          </code>
-
-          
-
-          
-             : The desired bandwidth bitrate in kilobits per second for received remote video.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify received remote video bandwidth limits when making a call.</span>
-client.call.make(destination, mediaConstraints,
- {
-   <span class="hljs-attr">bandwidth</span>: {
-     <span class="hljs-attr">video</span>: <span class="hljs-number">5</span>
-   }
- }
-)</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='calliceserver'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4697,6 +4597,106 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
 
   
 
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callbandwidthcontrols'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>BandwidthControls</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The BandwidthControls type defines the format for configuring media and/or track bandwidth options.
+BandwidthControls only affect received remote tracks of the specified type.</p>
+
+
+  <div class='pre p1 fill-light mt0'>BandwidthControls</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>audio</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
+          </code>
+
+          
+
+          
+             : The desired bandwidth bitrate in kilobits per second for received remote audio.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>video</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)
+          </code>
+
+          
+
+          
+             : The desired bandwidth bitrate in kilobits per second for received remote video.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Specify received remote video bandwidth limits when making a call.</span>
+client.call.make(destination, mediaConstraints,
+ {
+   <span class="hljs-attr">bandwidth</span>: {
+     <span class="hljs-attr">video</span>: <span class="hljs-number">5</span>
+   }
+ }
+)</pre>
+    
   
 
   
