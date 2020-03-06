@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.326
+ * Version: 4.14.0-beta.327
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23987,11 +23987,27 @@ function callAPI({ dispatch, getState }) {
      *     deviceId: cameraId
      *   }
      * })
+     *
+     * @example
+     * const callId = ...
+     * // Get the video track used by the call.
+     * const videoTrack = ...
+     *
+     * // Can also replace the specified video track of the call with a new
+     * // screen sharing track because screen sharing is delivered as a video stream to remote peer.
+     * // User will then be prompted to pick a specific screen to share and thus the device id will be selected.
+     * client.call.replaceTrack(callId, videoTrack.id, {
+     *   // The track should be replaced with a screen sharing track.
+     *   // Note that 'screenOptions' property is not mandatory, as API will use default values
+     *   // for properties like: width, height, frameRate.
+     *   screen: true
+     * })
      */
     replaceTrack(callId, trackId, media) {
       const mediaConstraints = {
         audio: media.audio && !(0, _fp.isEmpty)(media.audioOptions) ? media.audioOptions : media.audio,
-        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video
+        video: media.video && !(0, _fp.isEmpty)(media.videoOptions) ? media.videoOptions : media.video,
+        screenShare: media.screen && !(0, _fp.isEmpty)(media.screenOptions) ? media.screenOptions : media.screen
       };
       dispatch(_actions.callActions.replaceTrack(callId, { trackId, mediaConstraints }));
     },
@@ -31514,6 +31530,11 @@ function* createLocal(webRTC, mediaConstraints) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _entries = __webpack_require__("../../node_modules/babel-runtime/core-js/object/entries.js");
+
+var _entries2 = _interopRequireDefault(_entries);
+
 exports.recreatePeer = recreatePeer;
 exports.closeCall = closeCall;
 exports.handleOffer = handleOffer;
@@ -31826,6 +31847,7 @@ function* webRtcRemoveMedia(deps, sessionOptions) {
  * @param  {Object} params.mediaConstraints Video or audio media constraints
  * @param  {Object|boolean} params.mediaConstraints.audio Audio configs
  * @param  {Object|boolean} params.mediaConstraints.video Video configs
+ * @param  {Object|boolean} params.mediaConstraints.screenShare Screen sharing configs
  * @returns {Object} replaceTrackResult The result of the track replace operation
  * @returns {BasicError} [replaceTrackResult.error] Error object
  * @returns {string} newTrackId The ID of the new track that we used to replace the old one.
@@ -31833,6 +31855,29 @@ function* webRtcRemoveMedia(deps, sessionOptions) {
  */
 function* webRtcReplaceTrack(webRTC, params) {
   const { sessionId, trackId, mediaConstraints } = params;
+
+  let noOfTruthyTrackTypes = 0;
+  let newTrackKind;
+  (0, _entries2.default)(mediaConstraints).forEach(([key, value]) => {
+    if (value) {
+      noOfTruthyTrackTypes++;
+      newTrackKind = key;
+    }
+  });
+
+  // Need to handle both cases as valid media constraints, for example:
+  //   mediaConstraints = {video: true, audio: false, screenShare: false}
+  //   mediaConstraints = {video: true}
+  if (noOfTruthyTrackTypes !== 1) {
+    // We require exactly one new track to be provided by API.
+    return {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: `Require exactly one new track type to be specified. Found ${noOfTruthyTrackTypes} track types.`
+      }),
+      newTrackId: undefined
+    };
+  }
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
   const oldTrack = session.localTracks.find(track => track.id === trackId);
@@ -31850,22 +31895,23 @@ function* webRtcReplaceTrack(webRTC, params) {
   const oldTrackState = yield (0, _effects.call)([oldTrack, 'getState']);
   const oldTrackKind = oldTrackState.kind;
 
-  // Verify that there are constraints for the old track's kind.
-  if (!mediaConstraints[oldTrackKind]) {
+  // At the moment, only video & screen share are compatible tracks that can replace each other.
+  // (That's because screen share is sent as a video track to remote peer)
+  // Otherwise, the exact media type is required in order to allow a track replacement.
+  const compatibleTrackKinds = oldTrackKind === 'audio' && newTrackKind === 'audio' || oldTrackKind === 'video' && ['video', 'screenShare'].includes(newTrackKind);
+
+  if (!compatibleTrackKinds) {
     return {
       error: new _errors2.default({
         code: _errors.callCodes.INVALID_PARAM,
-        message: `Media constraints missing data for ${oldTrackKind}.`
+        message: `Media constraints incompatible for old track kind: ${oldTrackKind}.`
       }),
       newTrackId: undefined
     };
   }
 
-  const finalMediaConstraints = {
-    [oldTrackKind]: mediaConstraints[oldTrackKind]
-
-    // Create Media
-  };const { medias: newMedias, error: createLocalError } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, finalMediaConstraints);
+  // Create Media
+  const { medias: newMedias, error: createLocalError } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
   if (createLocalError) {
     return { error: createLocalError, newTrackId: undefined };
   }
@@ -31873,7 +31919,6 @@ function* webRtcReplaceTrack(webRTC, params) {
   let allNewTracks = [];
 
   // Find the new track that matches the old track we want to replace.
-
   for (let eachMedia of newMedias) {
     let newTracks = yield (0, _effects.call)([eachMedia, 'getTracks']);
     allNewTracks = [...allNewTracks, ...newTracks];
@@ -32441,7 +32486,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.326';
+  return '4.14.0-beta.327';
 }
 
 /***/ }),
