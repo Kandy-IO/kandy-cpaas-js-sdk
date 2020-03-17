@@ -258,9 +258,9 @@
                     <li class='h5'><span>Types</span></li>
                     
                       <li><a
-                        href='#callsdphandlerfunction'
+                        href='#callsdphandlerinfo'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> SdpHandlerFunction
+                        <span style="color:blue">ⓣ</span> SdpHandlerInfo
                       </a></li>
                     
                       <li><a
@@ -288,9 +288,9 @@
                       </a></li>
                     
                       <li><a
-                        href='#callsdphandlerinfo'
+                        href='#callsdphandlerfunction'
                         class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> SdpHandlerInfo
+                        <span style="color:blue">ⓣ</span> SdpHandlerFunction
                       </a></li>
                     
                       <li><a
@@ -318,15 +318,15 @@
                       </a></li>
                     
                       <li><a
-                        href='#callphonenumber'
-                        class='regular pre-open'>
-                        <span style="color:blue">ⓣ</span> PhoneNumber
-                      </a></li>
-                    
-                      <li><a
                         href='#calluserid'
                         class='regular pre-open'>
                         <span style="color:blue">ⓣ</span> UserID
+                      </a></li>
+                    
+                      <li><a
+                        href='#callphonenumber'
+                        class='regular pre-open'>
+                        <span style="color:blue">ⓣ</span> PhoneNumber
                       </a></li>
                     
                     </ul>
@@ -413,6 +413,12 @@
                       </a></li>
                     
                       <li><a
+                        href='#callstopscreenshare'
+                        class='regular pre-open'>
+                        <span style="color:green">ⓕ</span> .stopScreenshare
+                      </a></li>
+                    
+                      <li><a
                         href='#callstartscreenshare'
                         class='regular pre-open'>
                         <span style="color:green">ⓕ</span> .startScreenshare
@@ -422,12 +428,6 @@
                         href='#callsenddtmf'
                         class='regular pre-open'>
                         <span style="color:green">ⓕ</span> .sendDTMF
-                      </a></li>
-                    
-                      <li><a
-                        href='#callstopscreenshare'
-                        class='regular pre-open'>
-                        <span style="color:green">ⓕ</span> .stopScreenshare
                       </a></li>
                     
                       <li><a
@@ -449,9 +449,9 @@
                       </a></li>
                     
                       <li><a
-                        href='#callchangespeaker'
+                        href='#callsetdefaultdevices'
                         class='regular pre-open'>
-                        <span style="color:green">ⓕ</span> .changeSpeaker
+                        <span style="color:green">ⓕ</span> .setDefaultDevices
                       </a></li>
                     
                       <li><a
@@ -461,9 +461,9 @@
                       </a></li>
                     
                       <li><a
-                        href='#callsetdefaultdevices'
+                        href='#callchangespeaker'
                         class='regular pre-open'>
-                        <span style="color:green">ⓕ</span> .setDefaultDevices
+                        <span style="color:green">ⓕ</span> .changeSpeaker
                       </a></li>
                     
                     </ul>
@@ -3509,11 +3509,11 @@ SIP users and PSTN phones.</p>
       <div class='py1 quiet mt1 prose-big'>Types</div>
       <div class="clearfix">
   
-    <div class='border-bottom' id='callsdphandlerfunction'>
+    <div class='border-bottom' id='callsdphandlerinfo'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>SdpHandlerFunction(newSdp, info, originalSdp)</span>
+            <span class='code strong strong truncate'>SdpHandlerInfo</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3521,14 +3521,13 @@ SIP users and PSTN phones.</p>
 
   
 
-  <p>The form of an SDP handler function and the expected arguments that it receives.</p>
+  
 
-
-  <div class='pre p1 fill-light mt0'>SdpHandlerFunction(newSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, info: <a href="#callsdphandlerinfo">call.SdpHandlerInfo</a>, originalSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
   
     <p>
       Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
     </p>
   
   
@@ -3541,51 +3540,44 @@ SIP users and PSTN phones.</p>
   
 
   
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
       
         <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>newSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    The SDP so far (could have been modified by previous handlers).
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (RTCSdpType)
+          </code>
 
-          </div>
+          
+
+          
+             : The session description's type.
+
+          
           
         </div>
       
         <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>info</span> <code class='quiet'>(<a href="#callsdphandlerinfo">call.SdpHandlerInfo</a>)</code>
-	    Additional information that might be useful when making SDP modifications.
+          <span class='code bold'>endpoint</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
 
-          </div>
           
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>originalSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    The SDP in its initial state.
 
-          </div>
+          
+             : Which end of the connection created the SDP.
+
+          
           
         </div>
       
     </div>
   
 
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Returns</div>
-    
-      <div>
-        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-          The resulting modified SDP based on the changes made by this function.
-
-        
-      </div>
-    
   
 
   
@@ -4134,11 +4126,11 @@ client.call.make(destination, mediaConstraints,
       </div>
     </div>
   
-    <div class='border-bottom' id='callsdphandlerinfo'>
+    <div class='border-bottom' id='callsdphandlerfunction'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>SdpHandlerInfo</span>
+            <span class='code strong strong truncate'>SdpHandlerFunction(newSdp, info, originalSdp)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4146,13 +4138,14 @@ client.call.make(destination, mediaConstraints,
 
   
 
-  
+  <p>The form of an SDP handler function and the expected arguments that it receives.</p>
 
-  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
+
+  <div class='pre p1 fill-light mt0'>SdpHandlerFunction(newSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, info: <a href="#callsdphandlerinfo">call.SdpHandlerInfo</a>, originalSdp: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
     <p>
       Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>
     </p>
   
   
@@ -4165,44 +4158,51 @@ client.call.make(destination, mediaConstraints,
   
 
   
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
       
         <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (RTCSdpType)
-          </code>
+          <div>
+            <span class='code bold'>newSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The SDP so far (could have been modified by previous handlers).
 
-          
-
-          
-             : The session description's type.
-
-          
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>endpoint</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
+          <div>
+            <span class='code bold'>info</span> <code class='quiet'>(<a href="#callsdphandlerinfo">call.SdpHandlerInfo</a>)</code>
+	    Additional information that might be useful when making SDP modifications.
 
+          </div>
           
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>originalSdp</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The SDP in its initial state.
 
-          
-             : Which end of the connection created the SDP.
-
-          
+          </div>
           
         </div>
       
     </div>
   
 
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+          The resulting modified SDP based on the changes made by this function.
+
+        
+      </div>
+    
   
 
   
@@ -4717,11 +4717,11 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
       </div>
     </div>
   
-    <div class='border-bottom' id='callphonenumber'>
+    <div class='border-bottom' id='calluserid'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>PhoneNumber</span>
+            <span class='code strong strong truncate'>UserID</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4729,10 +4729,10 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
 
   
 
-  <p>The Phone Numer ie: +18885559876</p>
+  <p>The User ID ie: joe@test.3s5j.att.com</p>
 
 
-  <div class='pre p1 fill-light mt0'>PhoneNumber</div>
+  <div class='pre p1 fill-light mt0'>UserID</div>
   
     <p>
       Type:
@@ -4768,11 +4768,11 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
       </div>
     </div>
   
-    <div class='border-bottom' id='calluserid'>
+    <div class='border-bottom' id='callphonenumber'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>UserID</span>
+            <span class='code strong strong truncate'>PhoneNumber</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4780,10 +4780,10 @@ Tracks can be retrieved using the Media module's <code>getTrackById</code> API a
 
   
 
-  <p>The User ID ie: joe@test.3s5j.att.com</p>
+  <p>The Phone Numer ie: +18885559876</p>
 
 
-  <div class='pre p1 fill-light mt0'>UserID</div>
+  <div class='pre p1 fill-light mt0'>PhoneNumber</div>
   
     <p>
       Type:
@@ -6402,6 +6402,85 @@ has been removed.</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='callstopscreenshare'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>stopScreenshare()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Removes local screenshare from an ongoing Call, stopping it from being
+sent to the remote participant.</p>
+<p>The latest SDK release (v4.X+) has not yet implemented this API in the
+same way that it was available in previous releases (v3.X). In place
+of this API, the SDK has a more general API that can be used for this
+same behaviour.</p>
+<p>The <a href="#callremovemedia">call.removeMedia</a> API can be used to perform the same
+behaviour as <code>stopScreenshare</code>. <a href="#callremovemedia">call.removeMedia</a> is a
+general-purpose API for removing media from a call, which covers the
+same functionality as <code>stopScreenshare</code>. Specifying only the screen
+track when using <a href="#callremovemedia">call.removeMedia</a> will perform the same
+behaviour as using <code>stopScreenshare</code>.</p>
+<p>There is a caveat that if a Call has multiple video tracks (for example,
+both a video and a screen track), the SDK itself cannot yet
+differentiate one from the other. The application will need to know
+which track was the screen track in this scenario.</p>
+
+
+  <div class='pre p1 fill-light mt0'>stopScreenshare()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
+<span class="hljs-comment">// Get the ID of any/all video tracks on the call.</span>
+<span class="hljs-keyword">const</span> videoTracks = call.localTracks.filter(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
+   <span class="hljs-keyword">const</span> track = call.media.getTrackById(trackId)
+   <span class="hljs-comment">// Both video and screen tracks have kind of 'video'.</span>
+   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'video'</span>
+})
+
+<span class="hljs-comment">// Pick out the screen track.</span>
+<span class="hljs-keyword">const</span> screenTrack = videoTracks[<span class="hljs-number">0</span>]
+
+<span class="hljs-comment">// Remove screen from the call.</span>
+client.call.removeMedia(callId, [ screenTrack ])</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='callstartscreenshare'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -6562,85 +6641,6 @@ otherwise they will be added in-band to the call's audio.</p>
 
   
 
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='callstopscreenshare'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>stopScreenshare()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Removes local screenshare from an ongoing Call, stopping it from being
-sent to the remote participant.</p>
-<p>The latest SDK release (v4.X+) has not yet implemented this API in the
-same way that it was available in previous releases (v3.X). In place
-of this API, the SDK has a more general API that can be used for this
-same behaviour.</p>
-<p>The <a href="#callremovemedia">call.removeMedia</a> API can be used to perform the same
-behaviour as <code>stopScreenshare</code>. <a href="#callremovemedia">call.removeMedia</a> is a
-general-purpose API for removing media from a call, which covers the
-same functionality as <code>stopScreenshare</code>. Specifying only the screen
-track when using <a href="#callremovemedia">call.removeMedia</a> will perform the same
-behaviour as using <code>stopScreenshare</code>.</p>
-<p>There is a caveat that if a Call has multiple video tracks (for example,
-both a video and a screen track), the SDK itself cannot yet
-differentiate one from the other. The application will need to know
-which track was the screen track in this scenario.</p>
-
-
-  <div class='pre p1 fill-light mt0'>stopScreenshare()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
-<span class="hljs-comment">// Get the ID of any/all video tracks on the call.</span>
-<span class="hljs-keyword">const</span> videoTracks = call.localTracks.filter(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
-   <span class="hljs-keyword">const</span> track = call.media.getTrackById(trackId)
-   <span class="hljs-comment">// Both video and screen tracks have kind of 'video'.</span>
-   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'video'</span>
-})
-
-<span class="hljs-comment">// Pick out the screen track.</span>
-<span class="hljs-keyword">const</span> screenTrack = videoTracks[<span class="hljs-number">0</span>]
-
-<span class="hljs-comment">// Remove screen from the call.</span>
-client.call.removeMedia(callId, [ screenTrack ])</pre>
-    
   
 
   
@@ -7157,11 +7157,11 @@ client.on(<span class="hljs-string">'call:stateChange'</span>, <span class="hljs
       </div>
     </div>
   
-    <div class='border-bottom' id='callchangespeaker'>
+    <div class='border-bottom' id='callsetdefaultdevices'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>changeSpeaker()</span>
+            <span class='code strong strong truncate'>setDefaultDevices()</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -7169,20 +7169,17 @@ client.on(<span class="hljs-string">'call:stateChange'</span>, <span class="hljs
 
   
 
-  <p>Changes the speaker used for a Call's audio output. Supported on
-browser's that support HTMLMediaElement.setSinkId().</p>
-<p>The latest SDK release (v4.X+) has not yet implemented this API in the
-same way that it was available in previous releases (v3.X). In place
-of this API, the SDK has a more general API that can be used for this
-same behaviour.</p>
-<p>The same behaviour as the <code>changeSpeaker</code> API can be implemented by
-re-rendering the Call's audio track.  A speaker can be selected when
-rendering an audio track, so changing a speaker can be simulated
-by unrendering the track with <a href="#mediaremovetracks">media.removeTracks</a>, then
-re-rendering it with a new speaker with <a href="#mediarendertracks">media.renderTracks</a>.</p>
+  <p>The <code>setDefaultDevices</code> API from previous SDK releases (3.X) has been
+deprecated in the latest releases (4.X+). The SDK no longer keeps
+track of "default devices" on behalf of the application.</p>
+<p>The devices used for a call can be selected as part of the APIs for
+starting the call. Microphone and/or camera can be chosen in the
+<a href="#callmake">call.make</a> and <a href="#callanswer">call.answer</a> APIs, and speaker can be
+chosen when the audio track is rendered with the
+<a href="#mediarendertracks">media.renderTracks</a> API.</p>
 
 
-  <div class='pre p1 fill-light mt0'>changeSpeaker()</div>
+  <div class='pre p1 fill-light mt0'>setDefaultDevices()</div>
   
   
 
@@ -7201,27 +7198,6 @@ re-rendering it with a new speaker with <a href="#mediarendertracks">media.rende
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
-<span class="hljs-comment">// Get the ID of the Call's audio track.</span>
-<span class="hljs-keyword">const</span> audioTrack = call.localTracks.find(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
-   <span class="hljs-keyword">const</span> track = client.media.getTrackById(trackId)
-   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'audio'</span>
-})
-
-<span class="hljs-comment">// Where the audio track was previously rendered.</span>
-<span class="hljs-keyword">const</span> audioContainer = ...
-
-<span class="hljs-comment">// Unrender the audio track we want to change speaker for.</span>
-client.media.removeTrack([ audioTrack ], audioContainer)
-<span class="hljs-comment">// Re-render the audio track with a new speaker.</span>
-client.media.renderTrack([ audioTrack ], audioContainer, {
-   <span class="hljs-attr">speakerId</span>: <span class="hljs-string">'speakerId'</span>
-})</pre>
-    
   
 
   
@@ -7311,11 +7287,11 @@ client.call.replaceTrack(callId, videoTrack, media)</pre>
       </div>
     </div>
   
-    <div class='border-bottom' id='callsetdefaultdevices'>
+    <div class='border-bottom' id='callchangespeaker'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>setDefaultDevices()</span>
+            <span class='code strong strong truncate'>changeSpeaker()</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -7323,35 +7299,59 @@ client.call.replaceTrack(callId, videoTrack, media)</pre>
 
   
 
-  <p>The <code>setDefaultDevices</code> API from previous SDK releases (3.X) has been
-deprecated in the latest releases (4.X+). The SDK no longer keeps
-track of "default devices" on behalf of the application.</p>
-<p>The devices used for a call can be selected as part of the APIs for
-starting the call. Microphone and/or camera can be chosen in the
-<a href="#callmake">call.make</a> and <a href="#callanswer">call.answer</a> APIs, and speaker can be
-chosen when the audio track is rendered with the
-<a href="#mediarendertracks">media.renderTracks</a> API.</p>
+  <p>Changes the speaker used for a Call's audio output. Supported on
+browser's that support HTMLMediaElement.setSinkId().</p>
+<p>The latest SDK release (v4.X+) has not yet implemented this API in the
+same way that it was available in previous releases (v3.X). In place
+of this API, the SDK has a more general API that can be used for this
+same behaviour.</p>
+<p>The same behaviour as the <code>changeSpeaker</code> API can be implemented by
+re-rendering the Call's audio track.  A speaker can be selected when
+rendering an audio track, so changing a speaker can be simulated
+by unrendering the track with <a href="#mediaremovetracks">media.removeTracks</a>, then
+re-rendering it with a new speaker with <a href="#mediarendertracks">media.renderTracks</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>setDefaultDevices()</div>
-  
-  
-
-  
-  
-  
-  
+  <div class='pre p1 fill-light mt0'>changeSpeaker()</div>
   
   
 
   
-
+  
+  
+  
+  
   
 
   
 
   
 
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
+<span class="hljs-comment">// Get the ID of the Call's audio track.</span>
+<span class="hljs-keyword">const</span> audioTrack = call.localTracks.find(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
+   <span class="hljs-keyword">const</span> track = client.media.getTrackById(trackId)
+   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'audio'</span>
+})
+
+<span class="hljs-comment">// Where the audio track was previously rendered.</span>
+<span class="hljs-keyword">const</span> audioContainer = ...
+
+<span class="hljs-comment">// Unrender the audio track we want to change speaker for.</span>
+client.media.removeTrack([ audioTrack ], audioContainer)
+<span class="hljs-comment">// Re-render the audio track with a new speaker.</span>
+client.media.renderTrack([ audioTrack ], audioContainer, {
+   <span class="hljs-attr">speakerId</span>: <span class="hljs-string">'speakerId'</span>
+})</pre>
+    
   
 
   
