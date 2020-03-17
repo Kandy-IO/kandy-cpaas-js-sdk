@@ -24,10 +24,10 @@ const client = Kandy.create({
   call: {
     // Specify the TURN/STUN servers that should be used.
     iceServers: [
-      { urls: '$KANDYTURN1$' },
-      { urls: '$KANDYSTUN1$' },
-      { urls: '$KANDYTURN2$' },
-      { urls: '$KANDYSTUN2$' }
+      { urls: "$KANDYTURN1$" },
+      { urls: "$KANDYSTUN1$" },
+      { urls: "$KANDYTURN2$" },
+      { urls: "$KANDYSTUN2$" }
     ],
     // Specify that credentials should be fetched from the server.
     serverTurnCredentials: true
@@ -36,15 +36,15 @@ const client = Kandy.create({
   // Required: Server connection configs.
   authentication: {
     server: {
-      base: '$KANDYFQDN$'
+      base: "$KANDYFQDN$"
     },
-    clientCorrelator: 'sampleCorrelator'
+    clientCorrelator: "sampleCorrelator"
   }
-})
+});
 ```
 
-Even though call specific configuration is not mandatory, when it comes to making calls, 
-providing ICE servers is required if various network topologies need to be supported. 
+Even though call specific configuration is not mandatory, when it comes to making calls,
+providing ICE servers is required if various network topologies need to be supported.
 See section below for what those ICE servers need to be.
 
 To learn more about call configs, refer to the [Configurations Quickstart](Configurations).
@@ -55,13 +55,13 @@ ICE servers are needed to ensure that media (audio and video) can be established
 
 ### Primary ICE Server
 
-* TURN URL: $KANDYTURN1$
-* STUN URL: $KANDYSTUN1$
+- TURN URL: $KANDYTURN1$
+- STUN URL: $KANDYSTUN1$
 
 ### Secondary ICE Server
 
-* TURN URL: $KANDYTURN2$
-* STUN URL: $KANDYSTUN2$
+- TURN URL: $KANDYTURN2$
+- STUN URL: $KANDYSTUN2$
 
 For further documentation on ICE Servers, see the `call.IceServer` API.
 
@@ -75,21 +75,20 @@ Once we have authenticated, we can subscribe for notifications on the services w
  * Do this after logging in.
  */
 function subscribe() {
-  const services = ['call']
-  const subscriptionType = 'websocket'
-  client.services.subscribe(services, subscriptionType)
+  const services = ["call"];
+  const subscriptionType = "websocket";
+  client.services.subscribe(services, subscriptionType);
 }
 
 // Listen for subscription changes.
-client.on('subscription:change', function() {
-
+client.on("subscription:change", function() {
   if (
     client.services.getSubscriptions().isPending === false &&
     client.services.getSubscriptions().subscribed.length > 0
   ) {
-    log('Successfully subscribed')
+    log("Successfully subscribed");
   }
-})
+});
 ```
 
 To learn more about authentication, services and channels, refer to the [Authentication Quickstart](Authentication)
@@ -100,47 +99,47 @@ To interact with our demo application, we will have a basic UI that allows us to
 
 ```html
 <div>
-    <fieldset>
-        <legend>Authenticate using your account information</legend>
-        Client ID: <input type='text' id='clientId'/>
-        User Email: <input type='text' id='userEmail'/>
-        Password: <input type='password' id='password'/>
-        <input type='button' value='Login' onclick='login();' />
-    </fieldset>
-    <fieldset>
-        <legend>Subscribe To Call Service Websocket Channel</legend>
-        <input type='button' value='Subscribe' onclick='subscribe();' />
-    </fieldset>
-    <fieldset>
-        <legend>Make a Call</legend>
-        <!-- User input for making a call. -->
-        <input type='button' value='Make Call' onclick='makeCall();' />
-        to <input type='text' id='callee' />
-        with video <input type='checkbox' id='make-with-video' checked/>
-        <br/>
-        <sub><i>Ex: janedoe@somedomain.com</i></sub>
-    </fieldset>
+  <fieldset>
+    <legend>Authenticate using your account information</legend>
+    Client ID: <input type="text" id="clientId" /> User Email:
+    <input type="text" id="userEmail" /> Password:
+    <input type="password" id="password" />
+    <input type="button" value="Login" onclick="login();" />
+  </fieldset>
+  <fieldset>
+    <legend>Subscribe To Call Service Websocket Channel</legend>
+    <input type="button" value="Subscribe" onclick="subscribe();" />
+  </fieldset>
+  <fieldset>
+    <legend>Make a Call</legend>
+    <!-- User input for making a call. -->
+    <input type="button" value="Make Call" onclick="makeCall();" />
+    to <input type="text" id="callee" /> with video
+    <input type="checkbox" id="make-with-video" checked />
+    <br />
+    <sub><i>Ex: janedoe@somedomain.com</i></sub>
+  </fieldset>
 
-    <fieldset>
-        <legend>Respond to a Call</legend>
-        <!-- User input for responding to an incoming call. -->
-        <input type='button' value='Answer Call' onclick='answerCall();' />
-        with video <input type='checkbox' id='answer-with-video' checked/>
-        <br/>
-        <input type='button' value='Reject Call' onclick='rejectCall();' />
-    </fieldset>
+  <fieldset>
+    <legend>Respond to a Call</legend>
+    <!-- User input for responding to an incoming call. -->
+    <input type="button" value="Answer Call" onclick="answerCall();" />
+    with video <input type="checkbox" id="answer-with-video" checked />
+    <br />
+    <input type="button" value="Reject Call" onclick="rejectCall();" />
+  </fieldset>
 
-    <fieldset>
-        <legend>End a Call</legend>
-        <!-- User input for ending an ongoing call. -->
-        <input type='button' value='End Call' onclick='endCall();' />
-    </fieldset>
+  <fieldset>
+    <legend>End a Call</legend>
+    <!-- User input for ending an ongoing call. -->
+    <input type="button" value="End Call" onclick="endCall();" />
+  </fieldset>
 
-    <fieldset>
-        <!-- Message output container. -->
-        <legend>Messages</legend>
-        <div id='messages'></div>
-    </fieldset>
+  <fieldset>
+    <!-- Message output container. -->
+    <legend>Messages</legend>
+    <div id="messages"></div>
+  </fieldset>
 </div>
 ```
 
@@ -151,10 +150,10 @@ To display information to the user, a `log` function will be used to append new 
 function log(message) {
   // Wrap message in textNode to guarantee that it is a string
   // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html
-  const textNode = document.createTextNode(message)
-  const divContainer = document.createElement('div')
-  divContainer.appendChild(textNode)
-  document.getElementById('messages').appendChild(divContainer)
+  const textNode = document.createTextNode(message);
+  const divContainer = document.createElement("div");
+  divContainer.appendChild(textNode);
+  document.getElementById("messages").appendChild(divContainer);
 }
 ```
 
@@ -162,8 +161,10 @@ An important part of the UI for calls are the media containers. These containers
 
 ```html
 <!-- Media containers. -->
-Remote video: <div id="remote-container"></div>
-Local video: <div id="local-container"></div>
+Remote video:
+<div id="remote-container"></div>
+Local video:
+<div id="local-container"></div>
 ```
 
 With that, there is nothing more needed for the user interface.
@@ -178,19 +179,19 @@ When the user clicks on the 'Make Call' button, we want our `makeCall` function 
  */
 
 // Variable to keep track of the call.
-let callId
+let callId;
 
 // Get user input and make a call to the callee.
 function makeCall() {
   // Gather call options.
-  const destination = document.getElementById('callee').value
-  const withVideo = document.getElementById('make-with-video').checked
+  const destination = document.getElementById("callee").value;
+  const withVideo = document.getElementById("make-with-video").checked;
 
   const mediaConstraints = {
     audio: true,
     video: withVideo
-  }
-  callId = client.call.make(destination, mediaConstraints)
+  };
+  callId = client.call.make(destination, mediaConstraints);
 }
 ```
 
@@ -205,22 +206,22 @@ Once we receive an incoming call, we will be able to either answer or reject it.
 // Answer an incoming call.
 function answerCall() {
   // Gather call options.
-  const withVideo = document.getElementById('answer-with-video').checked
+  const withVideo = document.getElementById("answer-with-video").checked;
 
-  log('Answering call')
+  log("Answering call");
 
   const mediaConstraints = {
     audio: true,
     video: withVideo
-  }
-  client.call.answer(callId, mediaConstraints)
+  };
+  client.call.answer(callId, mediaConstraints);
 }
 
 // Reject an incoming call.
 function rejectCall() {
-  log('Rejecting call')
+  log("Rejecting call");
 
-  client.call.reject(callId)
+  client.call.reject(callId);
 }
 ```
 
@@ -233,9 +234,9 @@ If our user has an ongoing call, they can end it by providing the call's ID to t
 ```javascript
 // End an ongoing call.
 function endCall() {
-  log('Ending call')
+  log("Ending call");
 
-  client.call.end(callId)
+  client.call.end(callId);
 }
 ```
 
@@ -248,18 +249,18 @@ We will use this function to render local visual media and remote audio/visual m
 ```javascript
 function renderMedia(callId) {
   // Retrieve call state.
-  const call = client.call.getById(callId)
+  const call = client.call.getById(callId);
 
   // Retrieve the local track that belongs to video
   const videoTrack = call.localTracks.find(trackId => {
-    return client.media.getTrackById(trackId).kind === 'video'
-  })
+    return client.media.getTrackById(trackId).kind === "video";
+  });
 
   // Render local visual media.
-  client.media.renderTracks([videoTrack], '#local-container')
+  client.media.renderTracks([videoTrack], "#local-container");
 
   // Render the remote audio/visual media.
-  client.media.renderTracks(call.remoteTracks, '#remote-container')
+  client.media.renderTracks(call.remoteTracks, "#remote-container");
 }
 ```
 
@@ -269,9 +270,9 @@ The `call:start` event informs us that an outgoing call that we made has success
 
 ```javascript
 // Set listener for successful call starts.
-client.on('call:start', function(params) {
-  log('Call successfully started. Waiting for response.')
-})
+client.on("call:start", function(params) {
+  log("Call successfully started. Waiting for response.");
+});
 ```
 
 ### `call:error`
@@ -280,33 +281,34 @@ The `call:error` event informs us that a problem was encountered with the call.
 
 ```javascript
 // Set listener for generic call errors.
-client.on('call:error', function(params) {
-  log('Error: Encountered error on call: ' + params.error.message)
-})
+client.on("call:error", function(params) {
+  log("Error: Encountered error on call: " + params.error.message);
+});
 ```
 
 ### `call:stateChange`
 
 As the call is acted upon (such as answered or rejected), its state will change. We can react to changes in the call by listening for the `call:stateChange` event. This event includes the state that the call transitioned out of, and we can get the current call information to know what state the call is now in.
+To see all possible call states supported in this SDK, see `api.call.states` in API documentation.
 
 ```javascript
 // Set listener for changes in a call's state.
-client.on('call:stateChange', function(params) {
+client.on("call:stateChange", function(params) {
   // Retrieve call state.
-  const call = client.call.getById(params.callId)
+  const call = client.call.getById(params.callId);
 
   if (params.error && params.error.message) {
-    log('Error: ' + params.error.message)
+    log("Error: " + params.error.message);
   }
-  log('Call state changed from ' + params.previous.state + ' to ' + call.state)
+  log("Call state changed from " + params.previous.state + " to " + call.state);
 
-  renderMedia(params.callId)
+  renderMedia(params.callId);
 
   // If the call ended, stop tracking the callId.
-  if (call.state === 'ENDED') {
-    callId = null
+  if (call.state === "ENDED") {
+    callId = null;
   }
-})
+});
 ```
 
 ### `call:receive`
@@ -315,14 +317,14 @@ The `call:receive` event informs us that we have received an incoming call. The 
 
 ```javascript
 // Set listener for incoming calls.
-client.on('call:receive', function(params) {
+client.on("call:receive", function(params) {
   // Keep track of the callId.
-  callId = params.callId
+  callId = params.callId;
 
   // Retrieve call information.
-  call = client.call.getById(params.callId)
-  log('Received incoming call')
-})
+  call = client.call.getById(params.callId);
+  log("Received incoming call");
+});
 ```
 
 We can now call the demo application done. We've covered the basics of what is needed to allow a user to use call functionality.
@@ -332,23 +334,24 @@ We can now call the demo application done. We've covered the basics of what is n
 Do you want to try this example for yourself? Click the button below to get started.
 
 ### Instructions For Demo
-* Open two browser instances of Google Chrome®, or [another supported browser](Get%20Started), by clicking __Try it__ two times.
-  * One instance will start the call (User A) and the other instance will answer it (User B).
-* Enter your Client ID for your account or project in both instances.
-  * Enter the email address of User A in the first instance (account or project users).
-  * Enter the email address of User B in the second instance (account or project users).
-* Enter the passwords for each user.
-* Click __Login__ to get your time-limited access token in both instances.
-  * Note: If the token expires, you’ll need to login again.
-* Click __Subscribe__ to receive notifications from the server for both users.
-* Enter the User ID of User B in the *to* field of User A's instance.
-* Click __Make Call__ to start the call from User A to User B.
-* Click __Answer Call__ to answer the call once User B has received the incoming call request.
-  * You should see the text "Received incoming call" under Messages on User B's instance.
-* After a short time, User A and User B should be in an established call.
-* Click __End Call__ in either instance to end the call.
 
-<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * Javascript SDK Voice and Video Call Demo\n */\n\nconst client = Kandy.create({\n  call: {\n    // Specify the TURN/STUN servers that should be used.\n    iceServers: [\n      { urls: &apos;$KANDYTURN1$&apos; },\n      { urls: &apos;$KANDYSTUN1$&apos; },\n      { urls: &apos;$KANDYTURN2$&apos; },\n      { urls: &apos;$KANDYSTUN2$&apos; }\n    ],\n    // Specify that credentials should be fetched from the server.\n    serverTurnCredentials: true\n  },\n\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: &apos;$KANDYFQDN$&apos;\n    },\n    clientCorrelator: &apos;sampleCorrelator&apos;\n  }\n})\n\n/**\n * Subscribes to the call service on the websocket channel for notifications.\n * Do this after logging in.\n */\nfunction subscribe() {\n  const services = [&apos;call&apos;]\n  const subscriptionType = &apos;websocket&apos;\n  client.services.subscribe(services, subscriptionType)\n}\n\n// Listen for subscription changes.\nclient.on(&apos;subscription:change&apos;, function() {\n\n  if (\n    client.services.getSubscriptions().isPending === false &&\n    client.services.getSubscriptions().subscribed.length > 0\n  ) {\n    log(&apos;Successfully subscribed&apos;)\n  }\n})\n\nclient.on(&apos;subscription:error&apos;, function() {\n  log(&apos;Error: Unable to subscribe&apos;)\n})\n\nconst cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody(paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n\n  // POST a request to create a new authentication access token.\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n\n  return { accessToken: data.access_token, idToken: data.id_token, expiresIn: data.expires_in }\n}\n\nasync function login() {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;userEmail&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n\n  try {\n    const {accessToken, idToken, expiresIn} = await getTokens({ clientId, username: userEmail, password })\n    client.setTokens({accessToken, idToken})\n    log(&apos;Successfully logged in as &apos; + userEmail + &apos;. Your access token will expire in &apos; + expiresIn/60 + &apos; minutes&apos;)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\n// Utility function for appending messages to the message div.\nfunction log(message) {\n  // Wrap message in textNode to guarantee that it is a string\n  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html\n  const textNode = document.createTextNode(message)\n  const divContainer = document.createElement(&apos;div&apos;)\n  divContainer.appendChild(textNode)\n  document.getElementById(&apos;messages&apos;).appendChild(divContainer)\n}\n\n/*\n *  Voice and Video Call functionality.\n */\n\n// Variable to keep track of the call.\nlet callId\n\n// Get user input and make a call to the callee.\nfunction makeCall() {\n  // Gather call options.\n  const destination = document.getElementById(&apos;callee&apos;).value\n  const withVideo = document.getElementById(&apos;make-with-video&apos;).checked\n\n  const mediaConstraints = {\n    audio: true,\n    video: withVideo\n  }\n  callId = client.call.make(destination, mediaConstraints)\n}\n\n// Answer an incoming call.\nfunction answerCall() {\n  // Gather call options.\n  const withVideo = document.getElementById(&apos;answer-with-video&apos;).checked\n\n  log(&apos;Answering call&apos;)\n\n  const mediaConstraints = {\n    audio: true,\n    video: withVideo\n  }\n  client.call.answer(callId, mediaConstraints)\n}\n\n// Reject an incoming call.\nfunction rejectCall() {\n  log(&apos;Rejecting call&apos;)\n\n  client.call.reject(callId)\n}\n\n// End an ongoing call.\nfunction endCall() {\n  log(&apos;Ending call&apos;)\n\n  client.call.end(callId)\n}\n\nfunction renderMedia(callId) {\n  // Retrieve call state.\n  const call = client.call.getById(callId)\n\n  // Retrieve the local track that belongs to video\n  const videoTrack = call.localTracks.find(trackId => {\n    return client.media.getTrackById(trackId).kind === &apos;video&apos;\n  })\n\n  // Render local visual media.\n  client.media.renderTracks([videoTrack], &apos;#local-container&apos;)\n\n  // Render the remote audio/visual media.\n  client.media.renderTracks(call.remoteTracks, &apos;#remote-container&apos;)\n}\n\n// Set listener for successful call starts.\nclient.on(&apos;call:start&apos;, function(params) {\n  log(&apos;Call successfully started. Waiting for response.&apos;)\n})\n\n// Set listener for generic call errors.\nclient.on(&apos;call:error&apos;, function(params) {\n  log(&apos;Error: Encountered error on call: &apos; + params.error.message)\n})\n\n// Set listener for changes in a call&apos;s state.\nclient.on(&apos;call:stateChange&apos;, function(params) {\n  // Retrieve call state.\n  const call = client.call.getById(params.callId)\n\n  if (params.error && params.error.message) {\n    log(&apos;Error: &apos; + params.error.message)\n  }\n  log(&apos;Call state changed from &apos; + params.previous.state + &apos; to &apos; + call.state)\n\n  renderMedia(params.callId)\n\n  // If the call ended, stop tracking the callId.\n  if (call.state === &apos;ENDED&apos;) {\n    callId = null\n  }\n})\n\n// Set listener for incoming calls.\nclient.on(&apos;call:receive&apos;, function(params) {\n  // Keep track of the callId.\n  callId = params.callId\n\n  // Retrieve call information.\n  call = client.call.getById(params.callId)\n  log(&apos;Received incoming call&apos;)\n})\n\n&quot;,&quot;html&quot;:&quot;<div>\n    <fieldset>\n        <legend>Authenticate using your account information</legend>\n        Client ID: <input type=&apos;text&apos; id=&apos;clientId&apos;/>\n        User Email: <input type=&apos;text&apos; id=&apos;userEmail&apos;/>\n        Password: <input type=&apos;password&apos; id=&apos;password&apos;/>\n        <input type=&apos;button&apos; value=&apos;Login&apos; onclick=&apos;login();&apos; />\n    </fieldset>\n    <fieldset>\n        <legend>Subscribe To Call Service Websocket Channel</legend>\n        <input type=&apos;button&apos; value=&apos;Subscribe&apos; onclick=&apos;subscribe();&apos; />\n    </fieldset>\n    <fieldset>\n        <legend>Make a Call</legend>\n        <!-- User input for making a call. -->\n        <input type=&apos;button&apos; value=&apos;Make Call&apos; onclick=&apos;makeCall();&apos; />\n        to <input type=&apos;text&apos; id=&apos;callee&apos; />\n        with video <input type=&apos;checkbox&apos; id=&apos;make-with-video&apos; checked/>\n        <br/>\n        <sub><i>Ex: janedoe@somedomain.com</i></sub>\n    </fieldset>\n\n    <fieldset>\n        <legend>Respond to a Call</legend>\n        <!-- User input for responding to an incoming call. -->\n        <input type=&apos;button&apos; value=&apos;Answer Call&apos; onclick=&apos;answerCall();&apos; />\n        with video <input type=&apos;checkbox&apos; id=&apos;answer-with-video&apos; checked/>\n        <br/>\n        <input type=&apos;button&apos; value=&apos;Reject Call&apos; onclick=&apos;rejectCall();&apos; />\n    </fieldset>\n\n    <fieldset>\n        <legend>End a Call</legend>\n        <!-- User input for ending an ongoing call. -->\n        <input type=&apos;button&apos; value=&apos;End Call&apos; onclick=&apos;endCall();&apos; />\n    </fieldset>\n\n    <fieldset>\n        <!-- Message output container. -->\n        <legend>Messages</legend>\n        <div id=&apos;messages&apos;></div>\n    </fieldset>\n</div>\n\n<!-- Media containers. -->\nRemote video: <div id=\&quot;remote-container\&quot;></div>\nLocal video: <div id=\&quot;local-container\&quot;></div>\n\n&quot;,&quot;css&quot;:&quot;video {\n  width: 50% !important;\n}\n\n&quot;,&quot;title&quot;:&quot;Javascript SDK Voice and Video Call Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@336/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
+- Open two browser instances of Google Chrome®, or [another supported browser](Get%20Started), by clicking **Try it** two times.
+  - One instance will start the call (User A) and the other instance will answer it (User B).
+- Enter your Client ID for your account or project in both instances.
+  - Enter the email address of User A in the first instance (account or project users).
+  - Enter the email address of User B in the second instance (account or project users).
+- Enter the passwords for each user.
+- Click **Login** to get your time-limited access token in both instances.
+  - Note: If the token expires, you’ll need to login again.
+- Click **Subscribe** to receive notifications from the server for both users.
+- Enter the User ID of User B in the _to_ field of User A's instance.
+- Click **Make Call** to start the call from User A to User B.
+- Click **Answer Call** to answer the call once User B has received the incoming call request.
+  - You should see the text "Received incoming call" under Messages on User B's instance.
+- After a short time, User A and User B should be in an established call.
+- Click **End Call** in either instance to end the call.
 
-*Note: You’ll be sent to an external website.*
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * Javascript SDK Voice and Video Call Demo\n */\n\nconst client = Kandy.create({\n  call: {\n    // Specify the TURN/STUN servers that should be used.\n    iceServers: [\n      { urls: \&quot;$KANDYTURN1$\&quot; },\n      { urls: \&quot;$KANDYSTUN1$\&quot; },\n      { urls: \&quot;$KANDYTURN2$\&quot; },\n      { urls: \&quot;$KANDYSTUN2$\&quot; }\n    ],\n    // Specify that credentials should be fetched from the server.\n    serverTurnCredentials: true\n  },\n\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: \&quot;$KANDYFQDN$\&quot;\n    },\n    clientCorrelator: \&quot;sampleCorrelator\&quot;\n  }\n});\n\n/**\n * Subscribes to the call service on the websocket channel for notifications.\n * Do this after logging in.\n */\nfunction subscribe() {\n  const services = [\&quot;call\&quot;];\n  const subscriptionType = \&quot;websocket\&quot;;\n  client.services.subscribe(services, subscriptionType);\n}\n\n// Listen for subscription changes.\nclient.on(\&quot;subscription:change\&quot;, function() {\n  if (\n    client.services.getSubscriptions().isPending === false &&\n    client.services.getSubscriptions().subscribed.length > 0\n  ) {\n    log(\&quot;Successfully subscribed\&quot;);\n  }\n});\n\nclient.on(&apos;subscription:error&apos;, function() {\n  log(&apos;Error: Unable to subscribe&apos;)\n})\n\nconst cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody(paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n\n  // POST a request to create a new authentication access token.\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n\n  return { accessToken: data.access_token, idToken: data.id_token, expiresIn: data.expires_in }\n}\n\nasync function login() {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;userEmail&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n\n  try {\n    const {accessToken, idToken, expiresIn} = await getTokens({ clientId, username: userEmail, password })\n    client.setTokens({accessToken, idToken})\n    log(&apos;Successfully logged in as &apos; + userEmail + &apos;. Your access token will expire in &apos; + expiresIn/60 + &apos; minutes&apos;)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\n// Utility function for appending messages to the message div.\nfunction log(message) {\n  // Wrap message in textNode to guarantee that it is a string\n  // https://stackoverflow.com/questions/476821/is-a-dom-text-node-guaranteed-to-not-be-interpreted-as-html\n  const textNode = document.createTextNode(message);\n  const divContainer = document.createElement(\&quot;div\&quot;);\n  divContainer.appendChild(textNode);\n  document.getElementById(\&quot;messages\&quot;).appendChild(divContainer);\n}\n\n/*\n *  Voice and Video Call functionality.\n */\n\n// Variable to keep track of the call.\nlet callId;\n\n// Get user input and make a call to the callee.\nfunction makeCall() {\n  // Gather call options.\n  const destination = document.getElementById(\&quot;callee\&quot;).value;\n  const withVideo = document.getElementById(\&quot;make-with-video\&quot;).checked;\n\n  const mediaConstraints = {\n    audio: true,\n    video: withVideo\n  };\n  callId = client.call.make(destination, mediaConstraints);\n}\n\n// Answer an incoming call.\nfunction answerCall() {\n  // Gather call options.\n  const withVideo = document.getElementById(\&quot;answer-with-video\&quot;).checked;\n\n  log(\&quot;Answering call\&quot;);\n\n  const mediaConstraints = {\n    audio: true,\n    video: withVideo\n  };\n  client.call.answer(callId, mediaConstraints);\n}\n\n// Reject an incoming call.\nfunction rejectCall() {\n  log(\&quot;Rejecting call\&quot;);\n\n  client.call.reject(callId);\n}\n\n// End an ongoing call.\nfunction endCall() {\n  log(\&quot;Ending call\&quot;);\n\n  client.call.end(callId);\n}\n\nfunction renderMedia(callId) {\n  // Retrieve call state.\n  const call = client.call.getById(callId);\n\n  // Retrieve the local track that belongs to video\n  const videoTrack = call.localTracks.find(trackId => {\n    return client.media.getTrackById(trackId).kind === \&quot;video\&quot;;\n  });\n\n  // Render local visual media.\n  client.media.renderTracks([videoTrack], \&quot;#local-container\&quot;);\n\n  // Render the remote audio/visual media.\n  client.media.renderTracks(call.remoteTracks, \&quot;#remote-container\&quot;);\n}\n\n// Set listener for successful call starts.\nclient.on(\&quot;call:start\&quot;, function(params) {\n  log(\&quot;Call successfully started. Waiting for response.\&quot;);\n});\n\n// Set listener for generic call errors.\nclient.on(\&quot;call:error\&quot;, function(params) {\n  log(\&quot;Error: Encountered error on call: \&quot; + params.error.message);\n});\n\n// Set listener for changes in a call&apos;s state.\nclient.on(\&quot;call:stateChange\&quot;, function(params) {\n  // Retrieve call state.\n  const call = client.call.getById(params.callId);\n\n  if (params.error && params.error.message) {\n    log(\&quot;Error: \&quot; + params.error.message);\n  }\n  log(\&quot;Call state changed from \&quot; + params.previous.state + \&quot; to \&quot; + call.state);\n\n  renderMedia(params.callId);\n\n  // If the call ended, stop tracking the callId.\n  if (call.state === \&quot;ENDED\&quot;) {\n    callId = null;\n  }\n});\n\n// Set listener for incoming calls.\nclient.on(\&quot;call:receive\&quot;, function(params) {\n  // Keep track of the callId.\n  callId = params.callId;\n\n  // Retrieve call information.\n  call = client.call.getById(params.callId);\n  log(\&quot;Received incoming call\&quot;);\n});\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Authenticate using your account information</legend>\n    Client ID: <input type=\&quot;text\&quot; id=\&quot;clientId\&quot; /> User Email:\n    <input type=\&quot;text\&quot; id=\&quot;userEmail\&quot; /> Password:\n    <input type=\&quot;password\&quot; id=\&quot;password\&quot; />\n    <input type=\&quot;button\&quot; value=\&quot;Login\&quot; onclick=\&quot;login();\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Subscribe To Call Service Websocket Channel</legend>\n    <input type=\&quot;button\&quot; value=\&quot;Subscribe\&quot; onclick=\&quot;subscribe();\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Make a Call</legend>\n    <!-- User input for making a call. -->\n    <input type=\&quot;button\&quot; value=\&quot;Make Call\&quot; onclick=\&quot;makeCall();\&quot; />\n    to <input type=\&quot;text\&quot; id=\&quot;callee\&quot; /> with video\n    <input type=\&quot;checkbox\&quot; id=\&quot;make-with-video\&quot; checked />\n    <br />\n    <sub><i>Ex: janedoe@somedomain.com</i></sub>\n  </fieldset>\n\n  <fieldset>\n    <legend>Respond to a Call</legend>\n    <!-- User input for responding to an incoming call. -->\n    <input type=\&quot;button\&quot; value=\&quot;Answer Call\&quot; onclick=\&quot;answerCall();\&quot; />\n    with video <input type=\&quot;checkbox\&quot; id=\&quot;answer-with-video\&quot; checked />\n    <br />\n    <input type=\&quot;button\&quot; value=\&quot;Reject Call\&quot; onclick=\&quot;rejectCall();\&quot; />\n  </fieldset>\n\n  <fieldset>\n    <legend>End a Call</legend>\n    <!-- User input for ending an ongoing call. -->\n    <input type=\&quot;button\&quot; value=\&quot;End Call\&quot; onclick=\&quot;endCall();\&quot; />\n  </fieldset>\n\n  <fieldset>\n    <!-- Message output container. -->\n    <legend>Messages</legend>\n    <div id=\&quot;messages\&quot;></div>\n  </fieldset>\n</div>\n\n<!-- Media containers. -->\nRemote video:\n<div id=\&quot;remote-container\&quot;></div>\nLocal video:\n<div id=\&quot;local-container\&quot;></div>\n\n&quot;,&quot;css&quot;:&quot;video {\n  width: 50% !important;\n}\n\n&quot;,&quot;title&quot;:&quot;Javascript SDK Voice and Video Call Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@337/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
+
+_Note: You’ll be sent to an external website._
 

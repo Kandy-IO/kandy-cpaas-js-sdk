@@ -326,39 +326,6 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### SdpHandlerInfo
-
-Type: [Object][6]
-
-**Properties**
-
--   `type` **RTCSdpType** The session description's type.
--   `endpoint` **[string][7]** Which end of the connection created the SDP.
-
-### CallObject
-
-Information about a Call.
-
-Can be retrieved using the [call.getAll][20] or [call.getById][21] APIs.
-
-Type: [Object][6]
-
-**Properties**
-
--   `id` **[string][7]** The ID of the call.
--   `direction` **[string][7]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
--   `state` **[string][7]** The current state of the call. See [call.states][22] for possible states.
--   `localHold` **[boolean][10]** Indicates whether this call is currently being held locally.
--   `remoteHold` **[boolean][10]** Indicates whether this call is currently being held remotely.
--   `localTracks` **[Array][12]&lt;[string][7]>** A list of Track IDs that the call is sending to the remote participant.
--   `remoteTracks` **[Array][12]&lt;[string][7]>** A list of Track IDs that the call is receiving from the remote participant.
--   `remoteParticipant` **[Object][6]** Information about the other call participant.
-    -   `remoteParticipant.displayNumber` **[string][7]?** The User ID of the remote participant in the form "username@domain".
-    -   `remoteParticipant.displayName` **[string][7]?** The display name of the remote participant.
--   `bandwidth` **[call.BandwidthControls][23]** The bandwidth limitations set for the call.
--   `startTime` **[number][11]** The start time of the call in milliseconds since the epoch.
--   `endTime` **[number][11]?** The end time of the call in milliseconds since the epoch.
-
 ### MediaConstraint
 
 The MediaConstraint type defines the format for configuring media options.
@@ -424,22 +391,17 @@ Type: [Object][6]
 
 **Properties**
 
--   `urls` **([Array][12]&lt;[string][7]> | [string][7])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See [RTCIceServers.urls documentation][24] to learn more about the actual url format.
+-   `urls` **([Array][12]&lt;[string][7]> | [string][7])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See [RTCIceServers.urls documentation][20] to learn more about the actual url format.
 -   `credential` **[string][7]?** The credential needed by the ICE server.
 
-### SdpHandlerFunction
+### SdpHandlerInfo
 
-The form of an SDP handler function and the expected arguments that it receives.
+Type: [Object][6]
 
-Type: [Function][14]
+**Properties**
 
-**Parameters**
-
--   `newSdp` **[Object][6]** The SDP so far (could have been modified by previous handlers).
--   `info` **[call.SdpHandlerInfo][25]** Additional information that might be useful when making SDP modifications.
--   `originalSdp` **[Object][6]** The SDP in its initial state.
-
-Returns **[Object][6]** The resulting modified SDP based on the changes made by this function.
+-   `type` **RTCSdpType** The session description's type.
+-   `endpoint` **[string][7]** Which end of the connection created the SDP.
 
 ### MediaObject
 
@@ -452,7 +414,33 @@ Type: [Object][6]
 
 -   `id` **[string][7]** The ID of the Media object.
 -   `local` **[boolean][10]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][12]&lt;[call.TrackObject][26]>** A list of Track objects that are contained in this Media object.
+-   `tracks` **[Array][12]&lt;[call.TrackObject][21]>** A list of Track objects that are contained in this Media object.
+
+### CallObject
+
+Information about a Call.
+
+Can be retrieved using the [call.getAll][22] or [call.getById][23] APIs.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `id` **[string][7]** The ID of the call.
+-   `from` **[user.UserID][24]** A unique identifier (uri) of the person who made the call.
+-   `to` **[user.UserID][24]** A unique identifier (uri) of the person who receives the call.
+-   `direction` **[string][7]** The direction in which the call was created. Can be 'outgoing' or 'incoming'.
+-   `state` **[string][7]** The current state of the call. See [call.states][25] for possible states.
+-   `localHold` **[boolean][10]** Indicates whether this call is currently being held locally.
+-   `remoteHold` **[boolean][10]** Indicates whether this call is currently being held remotely.
+-   `localTracks` **[Array][12]&lt;[string][7]>** A list of Track IDs that the call is sending to the remote participant.
+-   `remoteTracks` **[Array][12]&lt;[string][7]>** A list of Track IDs that the call is receiving from the remote participant.
+-   `remoteParticipant` **[Object][6]** Information about the other call participant.
+    -   `remoteParticipant.displayNumber` **[string][7]?** The User ID of the remote participant in the form "username@domain".
+    -   `remoteParticipant.displayName` **[string][7]?** The display name of the remote participant.
+-   `bandwidth` **[call.BandwidthControls][26]** The bandwidth limitations set for the call.
+-   `startTime` **[number][11]** The start time of the call in milliseconds since the epoch.
+-   `endTime` **[number][11]?** The end time of the call in milliseconds since the epoch.
 
 ### TrackObject
 
@@ -497,24 +485,38 @@ Type: [Object][6]
 -   `kind` **[string][7]** The type of the device (audioinput, audiooutput, videoinput).
 -   `label` **[string][7]** The name of the device.
 
+### SdpHandlerFunction
+
+The form of an SDP handler function and the expected arguments that it receives.
+
+Type: [Function][14]
+
+**Parameters**
+
+-   `newSdp` **[Object][6]** The SDP so far (could have been modified by previous handlers).
+-   `info` **[call.SdpHandlerInfo][28]** Additional information that might be useful when making SDP modifications.
+-   `originalSdp` **[Object][6]** The SDP in its initial state.
+
+Returns **[Object][6]** The resulting modified SDP based on the changes made by this function.
+
 ### make
 
-Starts an outgoing call to a [UserID][28] or a
-   [PhoneNumber][29].
+Starts an outgoing call to a [UserID][29] or a
+   [PhoneNumber][30].
 
 The call will be tracked by a unique ID that is returned by the API. The
    application will use this ID to identify and control the call after it
    has been initiated.
 
-The [call.getById][21] API can be used to retrieve the
+The [call.getById][23] API can be used to retrieve the
    current information about the call.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:start][31] event
+The SDK will emit a [call:start][32] event
    locally when the operation completes. When the remote participant
-   receives the call, a [call:receive][32]
+   receives the call, a [call:receive][33]
    event will be emitted remotely for them.
 
 The SDK requires access to the machine's media devices (e.g. microphone)
@@ -524,19 +526,19 @@ The SDK requires access to the machine's media devices (e.g. microphone)
 
 **Parameters**
 
--   `destination` **([call.UserID][33] \| [call.PhoneNumber][34])** The desired destination.
+-   `destination` **([call.UserID][34] \| [call.PhoneNumber][35])** The desired destination.
 -   `media` **[Object][6]** The media options the call should be initialized with.
     -   `media.audio` **[boolean][10]** Whether the call should have audio on start. Currently, audio-less calls are not supported. (optional, default `false`)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the call's audio.
-        -   `media.audioOptions.deviceId` **[call.MediaConstraint][35]?** ID of the microphone to receive audio from.
+        -   `media.audioOptions.deviceId` **[call.MediaConstraint][36]?** ID of the microphone to receive audio from.
     -   `media.video` **[boolean][10]** Whether the call should have video on start. (optional, default `false`)
     -   `media.videoOptions` **[Object][6]?** Options for configuring the call's video.
-        -   `media.videoOptions.deviceId` **[call.MediaConstraint][35]?** ID of the camera to receive video from.
-        -   `media.videoOptions.height` **[call.MediaConstraint][35]?** The height of the video.
-        -   `media.videoOptions.width` **[call.MediaConstraint][35]?** The width of the video.
-        -   `media.videoOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the video.
+        -   `media.videoOptions.deviceId` **[call.MediaConstraint][36]?** ID of the camera to receive video from.
+        -   `media.videoOptions.height` **[call.MediaConstraint][36]?** The height of the video.
+        -   `media.videoOptions.width` **[call.MediaConstraint][36]?** The width of the video.
+        -   `media.videoOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the video.
 -   `options` **[Object][6]?** 
-    -   `options.bandwidth` **[call.BandwidthControls][23]?** Options for configuring media's bandwidth.
+    -   `options.bandwidth` **[call.BandwidthControls][26]?** Options for configuring media's bandwidth.
 
 **Examples**
 
@@ -564,12 +566,12 @@ The specified call to reject must be in a ringing state with an incoming
    direction. The call will be ended as a result of the operation.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. The remote participant
    will be notified, through their own
-   [call:stateChange][36] event, that the
+   [call:stateChange][37] event, that the
    call was rejected.
 
 **Parameters**
@@ -584,15 +586,15 @@ The specified call to answer must be in a ringing state with an incoming
    direction. The call will become connected as a result of the operation.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. This indicates that the
    call has connected with the remote participant. The
-   [call.getById][21] API can be used to retrieve the latest call state
+   [call.getById][23] API can be used to retrieve the latest call state
    after the change. Further events will be emitted to indicate that the
    call has received media from the remote participant. See the
-   [call:newTrack][37] event for more
+   [call:newTrack][38] event for more
    information about this.
 
 The SDK requires access to the system's media devices (eg. microphone)
@@ -606,20 +608,20 @@ The SDK requires access to the system's media devices (eg. microphone)
 -   `media` **[Object][6]** The media options the call should be initialized with.
     -   `media.audio` **[boolean][10]** Whether the call should have audio on start. Currently, audio-less calls are not supported. (optional, default `false`)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the call's audio.
-        -   `media.audioOptions.deviceId` **[call.MediaConstraint][35]?** ID of the microphone to receive audio from.
+        -   `media.audioOptions.deviceId` **[call.MediaConstraint][36]?** ID of the microphone to receive audio from.
     -   `media.video` **[boolean][10]** Whether the call should have video on start. (optional, default `false`)
     -   `media.screen` **[boolean][10]** Whether the call should have screenshare on start. (optional, default `false`)
     -   `media.videoOptions` **[Object][6]?** Options for configuring the call's video.
-        -   `media.videoOptions.deviceId` **[call.MediaConstraint][35]?** ID of the camera to receive video from.
-        -   `media.videoOptions.height` **[call.MediaConstraint][35]?** The height of the video.
-        -   `media.videoOptions.width` **[call.MediaConstraint][35]?** The width of the video.
-        -   `media.videoOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the video.
+        -   `media.videoOptions.deviceId` **[call.MediaConstraint][36]?** ID of the camera to receive video from.
+        -   `media.videoOptions.height` **[call.MediaConstraint][36]?** The height of the video.
+        -   `media.videoOptions.width` **[call.MediaConstraint][36]?** The width of the video.
+        -   `media.videoOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the video.
     -   `media.screenOptions` **[Object][6]?** Options for configuring the call's screenShare.
-        -   `media.screenOptions.height` **[call.MediaConstraint][35]?** The height of the screenShare.
-        -   `media.screenOptions.width` **[call.MediaConstraint][35]?** The width of the screenShare.
-        -   `media.screenOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the screenShare.
+        -   `media.screenOptions.height` **[call.MediaConstraint][36]?** The height of the screenShare.
+        -   `media.screenOptions.width` **[call.MediaConstraint][36]?** The width of the screenShare.
+        -   `media.screenOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the screenShare.
 -   `options` **[Object][6]?** 
-    -   `options.bandwidth` **[call.BandwidthControls][23]?** Options for configuring media's bandwidth.
+    -   `options.bandwidth` **[call.BandwidthControls][26]?** Options for configuring media's bandwidth.
 
 ### ignore
 
@@ -629,9 +631,9 @@ The specified call to ignore must be in a ringing state with an incoming
    direction. The call will be ended as a result of the operation.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. The remote participant
    will not be notified that the call was ignored.
 
@@ -649,15 +651,15 @@ The specified call to hold must not already be locally held. Any/all
    being sent.
 
 Some call operations cannot be performed while the call is on hold. The
-   call can be taken off hold with the [call.unhold][38] API.
+   call can be taken off hold with the [call.unhold][39] API.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. The remote participant
    will be notified of the operation through a
-   [call:stateChange][36] event as well.
+   [call:stateChange][37] event as well.
 
 **Parameters**
 
@@ -672,12 +674,12 @@ The specified call to unhold must be locally held. If the call is not
    the call was held.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. The remote participant
    will be notified of the operation through a
-   [call:stateChange][36] event as well.
+   [call:stateChange][37] event as well.
 
 **Parameters**
 
@@ -696,7 +698,7 @@ let currentCalls = calls.filter(call => {
 })
 ```
 
-Returns **[Array][12]&lt;[call.CallObject][39]>** Call objects.
+Returns **[Array][12]&lt;[call.CallObject][40]>** Call objects.
 
 ### getById
 
@@ -706,7 +708,7 @@ Retrieves the information of a single call with a specific call ID.
 
 -   `callId` **[string][7]** The ID of the call to retrieve.
 
-Returns **[call.CallObject][39]** A call object.
+Returns **[call.CallObject][40]** A call object.
 
 ### end
 
@@ -714,16 +716,16 @@ Ends an ongoing call.
 
 The SDK will stop any/all local media associated with the call. Events
    will be emitted to indicate which media tracks were stopped. See the
-   [call:trackEnded][40] event for more
+   [call:trackEnded][41] event for more
    information.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:stateChange][36]
+The SDK will emit a [call:stateChange][37]
    event locally when the operation completes. The remote participant
    will be notified, through their own
-   [call:stateChange][36] event, that the
+   [call:stateChange][37] event, that the
    call was ended.
 
 **Parameters**
@@ -736,9 +738,9 @@ Add new media tracks to an ongoing call.
 Will get new media tracks from the specific sources to add to the call.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:newTrack][37] event
+The SDK will emit a [call:newTrack][38] event
    both for the local and remote users to indicate a track has been
    added to the Call.
 
@@ -750,27 +752,27 @@ The SDK will emit a [call:newTrack][37] event
     -   `media.video` **[boolean][10]** Whether to add video to the call. (optional, default `false`)
     -   `media.screen` **[boolean][10]** Whether to add the screenshare to the call. (optional, default `false`)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the call's audio.
-        -   `media.audioOptions.deviceId` **[call.MediaConstraint][35]?** ID of the microphone to receive audio from.
+        -   `media.audioOptions.deviceId` **[call.MediaConstraint][36]?** ID of the microphone to receive audio from.
     -   `media.videoOptions` **[Object][6]?** Options for configuring the call's video.
-        -   `media.videoOptions.deviceId` **[call.MediaConstraint][35]?** ID of the camera to receive video from.
-        -   `media.videoOptions.height` **[call.MediaConstraint][35]?** The height of the video.
-        -   `media.videoOptions.width` **[call.MediaConstraint][35]?** The width of the video.
-        -   `media.videoOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the video.
+        -   `media.videoOptions.deviceId` **[call.MediaConstraint][36]?** ID of the camera to receive video from.
+        -   `media.videoOptions.height` **[call.MediaConstraint][36]?** The height of the video.
+        -   `media.videoOptions.width` **[call.MediaConstraint][36]?** The width of the video.
+        -   `media.videoOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the video.
     -   `media.screenOptions` **[Object][6]?** Options for configuring the call's screenShare.
-        -   `media.screenOptions.height` **[call.MediaConstraint][35]?** The height of the screenShare.
-        -   `media.screenOptions.width` **[call.MediaConstraint][35]?** The width of the screenShare.
-        -   `media.screenOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the screenShare.
+        -   `media.screenOptions.height` **[call.MediaConstraint][36]?** The height of the screenShare.
+        -   `media.screenOptions.width` **[call.MediaConstraint][36]?** The width of the screenShare.
+        -   `media.screenOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the screenShare.
 -   `options` **[Object][6]?**  (optional, default `{}`)
-    -   `options.bandwidth` **[call.BandwidthControls][23]?** Options for configuring media's bandwidth.
+    -   `options.bandwidth` **[call.BandwidthControls][26]?** Options for configuring media's bandwidth.
 
 ### removeMedia
 
 Remove tracks from an ongoing call.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:trackEnded][40]
+The SDK will emit a [call:trackEnded][41]
    event for both the local and remote users to indicate that a track
    has been removed.
 
@@ -779,7 +781,7 @@ The SDK will emit a [call:trackEnded][40]
 -   `callId` **[string][7]** The ID of the call to remove media from.
 -   `tracks` **[Array][12]** A list of track IDs to remove.
 -   `options` **[Object][6]?**  (optional, default `{}`)
-    -   `options.bandwidth` **[call.BandwidthControls][23]?** Options for configuring media's bandwidth.
+    -   `options.bandwidth` **[call.BandwidthControls][26]?** Options for configuring media's bandwidth.
 
 ### startVideo
 
@@ -788,12 +790,12 @@ Adds local video to an ongoing Call, to start sending to the remote
 
 Can only be used in a basic media scenario, where the Call does not
    already have video. For more advanced scenarios, the
-   [call.addMedia][41] API can be used.
+   [call.addMedia][42] API can be used.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:newTrack][37] event
+The SDK will emit a [call:newTrack][38] event
    both for the local and remote users to indicate a track has been
    added to the Call.
 
@@ -801,10 +803,10 @@ The SDK will emit a [call:newTrack][37] event
 
 -   `callId` **[string][7]** ID of the call being acted on.
 -   `options` **[Object][6]?** Options for configuring the call's video.
-    -   `options.deviceId` **[call.MediaConstraint][35]?** ID of the camera to receive video from.
-    -   `options.height` **[call.MediaConstraint][35]?** The height of the video.
-    -   `options.width` **[call.MediaConstraint][35]?** The width of the video.
-    -   `options.frameRate` **[call.MediaConstraint][35]?** The frame rate of the video.
+    -   `options.deviceId` **[call.MediaConstraint][36]?** ID of the camera to receive video from.
+    -   `options.height` **[call.MediaConstraint][36]?** The height of the video.
+    -   `options.width` **[call.MediaConstraint][36]?** The width of the video.
+    -   `options.frameRate` **[call.MediaConstraint][36]?** The frame rate of the video.
 
 ### stopVideo
 
@@ -813,58 +815,18 @@ Removes local video from an ongoing Call, stopping it from being sent
 
 Can only be used in a basic media scenario, where the Call has only one
    video track. For more advanced scenarios, the
-   [call.removeMedia][42] API can be used.
+   [call.removeMedia][43] API can be used.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
-The SDK will emit a [call:trackEnded][40]
+The SDK will emit a [call:trackEnded][41]
    event for both the local and remote users to indicate that a track
    has been removed.
 
 **Parameters**
 
 -   `callId` **[string][7]** ID of the call being acted on.
-
-### stopScreenshare
-
-Removes local screenshare from an ongoing Call, stopping it from being
-   sent to the remote participant.
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The [call.removeMedia][42] API can be used to perform the same
-   behaviour as `stopScreenshare`. [call.removeMedia][42] is a
-   general-purpose API for removing media from a call, which covers the
-   same functionality as `stopScreenshare`. Specifying only the screen
-   track when using [call.removeMedia][42] will perform the same
-   behaviour as using `stopScreenshare`.
-
-There is a caveat that if a Call has multiple video tracks (for example,
-   both a video and a screen track), the SDK itself cannot yet
-   differentiate one from the other. The application will need to know
-   which track was the screen track in this scenario.
-
-**Examples**
-
-```javascript
-const call = client.call.getById(callId)
-// Get the ID of any/all video tracks on the call.
-const videoTracks = call.localTracks.filter(trackId => {
-   const track = call.media.getTrackById(trackId)
-   // Both video and screen tracks have kind of 'video'.
-   return track.kind === 'video'
-})
-
-// Pick out the screen track.
-const screenTrack = videoTracks[0]
-
-// Remove screen from the call.
-client.call.removeMedia(callId, [ screenTrack ])
-```
 
 ### startScreenshare
 
@@ -876,11 +838,11 @@ The latest SDK release (v4.X+) has not yet implemented this API in the
    of this API, the SDK has a more general API that can be used for this
    same behaviour.
 
-The [call.addMedia][41] API can be used to perform the same behaviour
-   as `startScreenshare`. [call.addMedia][41] is a general-purpose API
+The [call.addMedia][42] API can be used to perform the same behaviour
+   as `startScreenshare`. [call.addMedia][42] is a general-purpose API
    for adding media to a call, which covers the same functionality as
    `startScreenshare`. Selecting only screen options when using
-   [call.addMedia][41] will perform the same behaviour as using
+   [call.addMedia][42] will perform the same behaviour as using
    `startScreenshare`.
 
 **Examples**
@@ -913,7 +875,7 @@ The tones will be sent as out-of-band tones if supported by the call,
    otherwise they will be added in-band to the call's audio.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
 **Parameters**
 
@@ -921,6 +883,46 @@ The progress of the operation will be tracked via the
 -   `tone` **[string][7]** DTMF tone(s) to send. Valid chracters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
 -   `duration` **[number][11]** The amount of time, in milliseconds, that each DTMF tone should last. (optional, default `100`)
 -   `intertoneGap` **[number][11]** The length of time, in milliseconds, to wait between tones. (optional, default `70`)
+
+### stopScreenshare
+
+Removes local screenshare from an ongoing Call, stopping it from being
+   sent to the remote participant.
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The [call.removeMedia][43] API can be used to perform the same
+   behaviour as `stopScreenshare`. [call.removeMedia][43] is a
+   general-purpose API for removing media from a call, which covers the
+   same functionality as `stopScreenshare`. Specifying only the screen
+   track when using [call.removeMedia][43] will perform the same
+   behaviour as using `stopScreenshare`.
+
+There is a caveat that if a Call has multiple video tracks (for example,
+   both a video and a screen track), the SDK itself cannot yet
+   differentiate one from the other. The application will need to know
+   which track was the screen track in this scenario.
+
+**Examples**
+
+```javascript
+const call = client.call.getById(callId)
+// Get the ID of any/all video tracks on the call.
+const videoTracks = call.localTracks.filter(trackId => {
+   const track = call.media.getTrackById(trackId)
+   // Both video and screen tracks have kind of 'video'.
+   return track.kind === 'video'
+})
+
+// Pick out the screen track.
+const screenTrack = videoTracks[0]
+
+// Remove screen from the call.
+client.call.removeMedia(callId, [ screenTrack ])
+```
 
 ### getStats
 
@@ -930,10 +932,10 @@ A Track ID can optionally be provided to get a report for a specific
    Track of the Call.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
 The SDK will emit a
-   [call:statsReceived][43] event, after
+   [call:statsReceived][44] event, after
    the operation completes, that has the report.
 
 **Parameters**
@@ -951,10 +953,10 @@ The operation will remove the old track from the call and add a
    track constraints (eg. device used) for an ongoing call.
 
 The progress of the operation will be tracked via the
-   [call:operation][30] event.
+   [call:operation][31] event.
 
 The SDK will emit a
-   [call:trackReplaced][44] event
+   [call:trackReplaced][45] event
    locally when the operation completes. The newly added track will need
    to be handled by the local application. The track will be replaced
    seamlessly for the remote application, which will not receive an event.
@@ -966,13 +968,13 @@ The SDK will emit a
 -   `media` **[Object][6]** The media options. (optional, default `{}`)
     -   `media.audio` **[boolean][10]** Whether to create an audio track. (optional, default `false`)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the audio track.
-        -   `media.audioOptions.deviceId` **[call.MediaConstraint][35]?** ID of the microphone to receive audio from.
+        -   `media.audioOptions.deviceId` **[call.MediaConstraint][36]?** ID of the microphone to receive audio from.
     -   `media.video` **[boolean][10]** Whether to create a video track. (optional, default `false`)
     -   `media.videoOptions` **[Object][6]?** Options for configuring the video track.
-        -   `media.videoOptions.deviceId` **[call.MediaConstraint][35]?** ID of the camera to receive video from.
-        -   `media.videoOptions.height` **[call.MediaConstraint][35]?** The height of the video.
-        -   `media.videoOptions.width` **[call.MediaConstraint][35]?** The width of the video.
-        -   `media.videoOptions.frameRate` **[call.MediaConstraint][35]?** The frame rate of the video.
+        -   `media.videoOptions.deviceId` **[call.MediaConstraint][36]?** ID of the camera to receive video from.
+        -   `media.videoOptions.height` **[call.MediaConstraint][36]?** The height of the video.
+        -   `media.videoOptions.width` **[call.MediaConstraint][36]?** The width of the video.
+        -   `media.videoOptions.frameRate` **[call.MediaConstraint][36]?** The frame rate of the video.
 
 **Examples**
 
@@ -1007,51 +1009,6 @@ client.call.replaceTrack(callId, videoTrack.id, {
   // Note that 'screenOptions' property is not mandatory, as API will use default values
   // for properties like: width, height, frameRate.
   screen: true
-})
-```
-
-### states
-
-Possible states that a Call can be in.
-
-A Call's state describes the current status of the Call. An application
-   should use the state to understand how the Call, and any media
-   associated with the Call, should be handled. Which state the Call is
-   in defines how it can be interacted with, as certain operations can
-   only be performed while in specific states, and tells an application
-   whether the Call currently has media flowing between users.
-
-The Call's state is a property of the [CallObject][45],
-   which can be retrieved using the [call.getById][21] or
-   [call.getAll][20] APIs.
-
-The SDK emits a [call:stateChange][36]
-   event when a Call's state changes from one state to another.
-
-**Properties**
-
--   `INITIATING` **[string][7]** The (outgoing) call is being started.
--   `INITIATED` **[string][7]** The (outgoing) call has been sent over the network, but has not been received.
--   `RINGING` **[string][7]** The call has been received by both parties, and is waiting to be answered.
--   `EARLY_MEDIA` **[string][7]** The call has not been answered, but media
-       is already being received. This may be network-ringing media, IVR
-       system media, or other pre-answer medias. When early media is
-       supported, this state may replace the Ringing state.
--   `CANCELLED` **[string][7]** The call was disconnected before it could be answered.
--   `CONNECTED` **[string][7]** Both parties are connected and media is flowing.
--   `ON_HOLD` **[string][7]** Both parties are connected but no media is flowing.
--   `ENDED` **[string][7]** The call has ended.
-
-**Examples**
-
-```javascript
-// Use the call states to know how to handle a change in the call.
-client.on('call:stateChange', function (params) {
-   const call = client.call.getById(params.callId)
-   // Check if the call now has media flowing.
-   if (call.state === client.call.states.CONNECTED) {
-     // The call is now active, and can perform midcall operations.
-   }
 })
 ```
 
@@ -1138,6 +1095,52 @@ client.media.removeTrack([ audioTrack ], audioContainer)
 // Re-render the audio track with a new speaker.
 client.media.renderTrack([ audioTrack ], audioContainer, {
    speakerId: 'speakerId'
+})
+```
+
+### states
+
+Possible states that a Call can be in.
+
+A Call's state describes the current status of the Call. An application
+   should use the state to understand how the Call, and any media
+   associated with the Call, should be handled. Which state the Call is
+   in defines how it can be interacted with, as certain operations can
+   only be performed while in specific states, and tells an application
+   whether the Call currently has media flowing between users.
+Unless stated otherwise, the Call's state pertains to both caller & callee.
+
+The Call's state is a property of the [CallObject][51],
+   which can be retrieved using the [call.getById][23] or
+   [call.getAll][22] APIs.
+
+The SDK emits a [call:stateChange][37]
+   event when a Call's state changes from one state to another.
+
+**Properties**
+
+-   `INITIATING` **[string][7]** The (outgoing) call is being started. While in this state, no Call operations can be performed until Call gets into Initiated state.
+-   `INITIATED` **[string][7]** The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.
+-   `RINGING` **[string][7]** The call has been received by both parties, and is waiting to be answered.
+-   `EARLY_MEDIA` **[string][7]** The call has not been answered, but media
+       is already being received. This may be network-ringing media, IVR
+       system media, or other pre-answer medias. When early media is
+       supported, this state may replace the Ringing state. This is a state valid only for caller's side.
+-   `CANCELLED` **[string][7]** The call was disconnected before it could be answered. This is a state valid only for callee's side.
+-   `CONNECTED` **[string][7]** Both parties are connected and media is flowing.
+-   `ON_HOLD` **[string][7]** Both parties are connected but no media is flowing.
+-   `ENDED` **[string][7]** The call has ended.
+
+**Examples**
+
+```javascript
+// Use the call states to know how to handle a change in the call.
+client.on('call:stateChange', function (params) {
+   const call = client.call.getById(params.callId)
+   // Check if the call now has media flowing.
+   if (call.state === client.call.states.CONNECTED) {
+     // The call is now active, and can perform midcall operations.
+   }
 })
 ```
 
@@ -1262,65 +1265,65 @@ and its messages, and returning conversation objects when requested.
 
 See the "Conversation" and "Message" sections of the documentation for more details.
 
-Available conversations can be retrieved using the [conversation.get][51]
-   or [conversation.getAll][52] APIs.
+Available conversations can be retrieved using the [conversation.get][52]
+   or [conversation.getAll][53] APIs.
 
-Messaging functions are all part of the 'conversation' namespace. Ex: [client.conversation.getAll][53]
+Messaging functions are all part of the 'conversation' namespace. Ex: [client.conversation.getAll][54]
 
 ### fetch
 
 Fetches chat conversations that the current user is part of. This will refresh
 the available information with any new information from the server.
 
-If successful, the event [conversations:change][54] will be emitted.
+If successful, the event [conversations:change][55] will be emitted.
 
 Available conversation information can be retrieved using the
-   [conversation.get][51] or [conversation.getAll][52] Messaging
+   [conversation.get][52] or [conversation.getAll][53] Messaging
    APIs.
 
 **Parameters**
 
 -   `options` **[Object][6]?** A configuration object to query for more specific results.
-    -   `options.type` **[string][7]** The type of conversation to fetch. See [conversation.chatTypes][55] for valid types. (optional, default `'chat-oneToOne'`)
+    -   `options.type` **[string][7]** The type of conversation to fetch. See [conversation.chatTypes][56] for valid types. (optional, default `'chat-oneToOne'`)
 
 ### get
 
 Retrieves a conversation object matching the User ID and Type provided if available.
 
-Conversations are made availble using the [conversation.fetch][56] or
-   [conversation.create][57] Messaging APIs.
+Conversations are made availble using the [conversation.fetch][57] or
+   [conversation.create][58] Messaging APIs.
 
 **Parameters**
 
 -   `recipient` **[string][7]** The User ID of the remote user with which the current user had a conversation.
 -   `options` **[Object][6]?** Options used to query for more specific results.
-    -   `options.type` **[string][7]** The type of conversation to get. See [conversation.chatTypes][55] for valid types. (optional, default `'chat-oneToOne'`)
+    -   `options.type` **[string][7]** The type of conversation to get. See [conversation.chatTypes][56] for valid types. (optional, default `'chat-oneToOne'`)
 
-Returns **[conversation.Conversation][58]** A Conversation object.
+Returns **[conversation.Conversation][59]** A Conversation object.
 
 ### create
 
 Creates and return a new conversation object. Any messages being sent through this Conversation
 object will be sent to the destination provided.
 
-If successful, the event [conversations:new][59] will be emitted.
+If successful, the event [conversations:new][60] will be emitted.
 
 **Parameters**
 
 -   `recipient` **[string][7]** The ID of the remote user to create a conversation with. The ID will be changed to lowercase.
 -   `options` **[Object][6]?** Options to use when creating a new conversation object.
-    -   `options.type` **[string][7]** The type of conversation to create. See [conversation.chatTypes][55] for valid types. (optional, default `'chat-oneToOne'`)
+    -   `options.type` **[string][7]** The type of conversation to create. See [conversation.chatTypes][56] for valid types. (optional, default `'chat-oneToOne'`)
 
-Returns **[conversation.Conversation][58]** A Conversation object.
+Returns **[conversation.Conversation][59]** A Conversation object.
 
 ### getAll
 
 Retrieves all available conversations for the current user.
 
-Conversations are made availble using the [conversation.fetch][56] or
-   [conversation.create][57] Messaging APIs.
+Conversations are made availble using the [conversation.fetch][57] or
+   [conversation.create][58] Messaging APIs.
 
-Returns **[Array][12]&lt;[conversation.Conversation][58]>** An array of Conversation objects.
+Returns **[Array][12]&lt;[conversation.Conversation][59]>** An array of Conversation objects.
 
 ### chatTypes
 
@@ -1341,13 +1344,78 @@ Type: [Object][6]
 client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
 ```
 
+### Message
+
+A Message object is a means by which a sender can deliver information to a recipient.
+
+Creating and sending a message:
+
+The message object can be obtained through the [Conversation.createMessage][61] API on an existing conversation.
+
+Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
+Once all the desired parts have been added to the message using the [Message.addPart][62] function,
+the message can then be sent using the [Message.send][63] function.
+
+Once the sender sends a message, this message is saved in sender's state as an object.
+Similarly, once the recipient gets a message, this message is saved in recipient's state.
+
+Retrieving a delivered message:
+
+Once a message is delivered successfully, it can be
+obtained through the [Conversation.getMessages][64] or [Conversation.getMessage][65] API on an existing conversation.
+
+Below are the properties pertaining to the message object, returned by Conversation.getMessage(s) APIs, for either sender or recipient.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `timestamp` **[number][11]** A Unix timestamp in seconds marking the time when the message was created by sender.
+-   `parts` **[Array][12]&lt;[conversation.Part][66]>** An array of Part Objects.
+-   `sender` **[string][7]** The primary contact address of the sender.
+-   `destination` **[Array][12]&lt;[string][7]>** An array of primary contact addresses associated with various destinations to which the message is meant to be delivered.
+-   `messageId` **[string][7]** The unique id of the message. The message object (stored in sender's state) has a different id
+    than the one associated with the message object stored in recipient's state.
+-   `type` **[string][7]** The type of message that was sent. See [conversation.chatTypes][56] for valid types.
+    This property applies only to message objects stored in sender's state.
+-   `isFetchingLinks` **[boolean][10]** Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
+
+#### send
+
+Sends the message.
+
+#### addPart
+
+Add an additional `Part` to a message.
+
+**Parameters**
+
+-   `part` **[conversation.Part][66]** The `Part` to add to the message.
+
+#### createImageLinks
+
+Creates a usable image link for the message in this `Message` instance.
+
+### Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `type` **[string][7]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][7]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][6]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
 ### Conversation
 
 A Conversation object represents a conversation either between two users, or between a
-user and a group. A user can create a Conversation using [conversation.create][57] Messaging API.
+user and a group. A user can create a Conversation using [conversation.create][58] Messaging API.
 
 A Conversation can be used to create messages to send using the Conversation and Messaging APIs
-[Conversation.createMessage][60] and [Message.send][61] functions.
+[Conversation.createMessage][61] and [Message.send][63] functions.
 
 Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender and recipient's state.
@@ -1360,20 +1428,20 @@ Type: [Object][6]
 -   `address` **[string][7]** The ID of the current user who is having a conversation.
 -   `lastReceived` **[number][11]** The timestamp (milliseconds since epoch) of when a message was last received in this conversation.
     This property applies only to conversation object stored in recipient's state.
--   `type` **[string][7]** The type of conversation. See [conversation.chatTypes][55] for valid types.
+-   `type` **[string][7]** The type of conversation. See [conversation.chatTypes][56] for valid types.
 -   `lastMessage` **[string][7]** The last message received.
--   `messages` **[Array][12]&lt;[conversation.Message][62]>** The array of message objects.
+-   `messages` **[Array][12]&lt;[conversation.Message][67]>** The array of message objects.
 -   `isTypingList` **[Array][12]&lt;[string][7]>** The array indentifying the User IDs of the users who are currently typing.
 
 #### createMessage
 
 Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
 
-If successful, the event [messages:change][63] will be emitted.
+If successful, the event [messages:change][68] will be emitted.
 
 **Parameters**
 
--   `part` **[conversation.Part][64]** The Part to add to the message.
+-   `part` **[conversation.Part][66]** The Part to add to the message.
 
 **Examples**
 
@@ -1381,19 +1449,19 @@ If successful, the event [messages:change][63] will be emitted.
 conversation.createMessage({type: 'text', text: 'This is the message'});
 ```
 
-Returns **[conversation.Message][62]** The newly created Message object.
+Returns **[conversation.Message][67]** The newly created Message object.
 
 #### clearMessages
 
 Clears all messages in this conversation from local state.
 
-If successful, the event [messages:change][63] will be emitted.
+If successful, the event [messages:change][68] will be emitted.
 
 #### getMessages
 
 Gets all messages from this conversation.
 
-Returns **[Array][12]&lt;[conversation.Message][62]>** An array of messages.
+Returns **[Array][12]&lt;[conversation.Message][67]>** An array of messages.
 
 #### getMessage
 
@@ -1403,14 +1471,14 @@ Gets a specific message from this conversation.
 
 -   `messageId` **[string][7]** The ID of the message to retrieve.
 
-Returns **[conversation.Message][62]** A message object.
+Returns **[conversation.Message][67]** A message object.
 
 #### deleteMessages
 
 Deletes specified messages from this conversation.
 Provide an array of message IDs for the messages to be deleted.
 
-If successful, the event [messages:change][63] will be emitted.
+If successful, the event [messages:change][68] will be emitted.
 
 **Parameters**
 
@@ -1420,7 +1488,7 @@ If successful, the event [messages:change][63] will be emitted.
 
 Delete the conversation.
 
-If successful, the event [messages:change][63] will be emitted.
+If successful, the event [messages:change][68] will be emitted.
 
 #### subscribe
 
@@ -1438,9 +1506,9 @@ Returns **[Function][14]** The unsubscribe function.
 
 Allows the user to fetch messages associated with a specific conversation to make them available.
 When the operation is complete, a `messages:change` event will be emitted.
-Messages can then be retrieved using [Conversation.getMessages][65].
+Messages can then be retrieved using [Conversation.getMessages][64].
 
-If successful, the event [messages:change][63] will be emitted.
+If successful, the event [messages:change][68] will be emitted.
 
 **Parameters**
 
@@ -1451,85 +1519,20 @@ If successful, the event [messages:change][63] will be emitted.
 Sets the typing status of the conversation for the current user.
 Other participants will be notified of changes to the conversation's typing status.
 
-If successful, the event [isTypingList:change][66] will be emitted.
+If successful, the event [isTypingList:change][69] will be emitted.
 
 **Parameters**
 
 -   `isTyping` **[boolean][10]** Whether the user is typing or not
 
-### Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-Type: [Object][6]
-
-**Properties**
-
--   `type` **[string][7]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][7]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][6]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
-
-### Message
-
-A Message object is a means by which a sender can deliver information to a recipient.
-
-Creating and sending a message:
-
-The message object can be obtained through the [Conversation.createMessage][60] API on an existing conversation.
-
-Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
-Once all the desired parts have been added to the message using the [Message.addPart][67] function,
-the message can then be sent using the [Message.send][61] function.
-
-Once the sender sends a message, this message is saved in sender's state as an object.
-Similarly, once the recipient gets a message, this message is saved in recipient's state.
-
-Retrieving a delivered message:
-
-Once a message is delivered successfully, it can be
-obtained through the [Conversation.getMessages][65] or [Conversation.getMessage][68] API on an existing conversation.
-
-Below are the properties pertaining to the message object, returned by Conversation.getMessage(s) APIs, for either sender or recipient.
-
-Type: [Object][6]
-
-**Properties**
-
--   `timestamp` **[number][11]** A Unix timestamp in seconds marking the time when the message was created by sender.
--   `parts` **[Array][12]&lt;[conversation.Part][64]>** An array of Part Objects.
--   `sender` **[string][7]** The primary contact address of the sender.
--   `destination` **[Array][12]&lt;[string][7]>** An array of primary contact addresses associated with various destinations to which the message is meant to be delivered.
--   `messageId` **[string][7]** The unique id of the message. The message object (stored in sender's state) has a different id
-    than the one associated with the message object stored in recipient's state.
--   `type` **[string][7]** The type of message that was sent. See [conversation.chatTypes][55] for valid types.
-    This property applies only to message objects stored in sender's state.
--   `isFetchingLinks` **[boolean][10]** Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
-
-#### send
-
-Sends the message.
-
-#### addPart
-
-Add an additional `Part` to a message.
-
-**Parameters**
-
--   `part` **[conversation.Part][64]** The `Part` to add to the message.
-
-#### createImageLinks
-
-Creates a usable image link for the message in this `Message` instance.
-
 ## groups
 
 The 'groups' namespace provides an interface for an application to create and
    manage Groups for a User. Groups are used in conjuction with the
-   [Messaging][69] feature to allow for group conversations.
+   [Messaging][70] feature to allow for group conversations.
 
 Groups are persisted by the server. When the SDK is initialized, there will
-   be no Group information available, but the [groups.fetch][70]
+   be no Group information available, but the [groups.fetch][71]
    API is used to make available any Groups that were created
    previously.
 
@@ -1539,18 +1542,18 @@ The creator of a Group is the Group's administrator.
 
 Creates a Group.
 
-The SDK will emit a [group:new][71] event locally
+The SDK will emit a [group:new][72] event locally
    when the operation completes. This event will include a Group ID that
    is used to uniquely identify the group.
 
 Remote users added to the Group during creation will receive a
    `group:invitation_received` event, which will include information
    about the Group. Group participants can be managed after creation
-   using the [groups.addParticipant][72] and
-   [groups.removeParticipant][73] APIs.
+   using the [groups.addParticipant][73] and
+   [groups.removeParticipant][74] APIs.
 
 Group information will become available after the operation completes
-   using the [groups.get][74] and [groups.getAll][75] APIs.
+   using the [groups.get][75] and [groups.getAll][76] APIs.
 
 **Parameters**
 
@@ -1571,11 +1574,11 @@ Fetches information about all Groups that the current user is a member
    of. This will refresh the available Groups with any new information
    from the server.
 
-The SDK will emit a [group:refresh][76] event
+The SDK will emit a [group:refresh][77] event
    when the operation completes.
 
 Information about an available Group can be retrieved using the
-   [groups.getAll][75] or [groups.get][74] APIs.
+   [groups.getAll][76] or [groups.get][75] APIs.
 
 ### getAll
 
@@ -1607,7 +1610,7 @@ Returns **[Array][12]&lt;[string][7]>** The list of Group participants.
 
 Retrieves information about all Group invitations available.
 
-The [group:invitation_received][77]
+The [group:invitation_received][78]
    event indicates that a new Group invitation is available.
 
 Returns **[Array][12]&lt;Invitations>** The list of Group invitations.
@@ -1616,7 +1619,7 @@ Returns **[Array][12]&lt;Invitations>** The list of Group invitations.
 
 Leaves a Group.
 
-The SDK will emit a [group:change][78] event
+The SDK will emit a [group:change][79] event
    when the operation completes.
 
 **Parameters**
@@ -1627,7 +1630,7 @@ The SDK will emit a [group:change][78] event
 
 Accepts an invitation to a Group.
 
-The SDK will emit a [group:change][78] event
+The SDK will emit a [group:change][79] event
    when the operation completes.
 
 **Parameters**
@@ -1638,7 +1641,7 @@ The SDK will emit a [group:change][78] event
 
 Rejects an invitation to a Group.
 
-The SDK will emit a [group:change][78] event
+The SDK will emit a [group:change][79] event
    when the operation completes.
 
 **Parameters**
@@ -1649,9 +1652,9 @@ The SDK will emit a [group:change][78] event
 
 Adds participant to a Group.
 
-The SDK will emit a [group:change][78] event
+The SDK will emit a [group:change][79] event
    when the operation completes. The participant being added will receive
-   a [group:invitation_received][77]
+   a [group:invitation_received][78]
    event.
 
 **Parameters**
@@ -1663,7 +1666,7 @@ The SDK will emit a [group:change][78] event
 
 Removes a participant from a Group.
 
-The SDK will emit a [group:change][78] event
+The SDK will emit a [group:change][79] event
    when the operation completes.
 
 **Parameters**
@@ -1675,10 +1678,10 @@ The SDK will emit a [group:change][78] event
 
 Deletes a Group.
 
-The Group will no longer be available using the [groups.get][74]
-   and [groups.getAll][75] APIs.
+The Group will no longer be available using the [groups.get][75]
+   and [groups.getAll][76] APIs.
 
-The SDK will emit a [group:delete][79] event
+The SDK will emit a [group:delete][80] event
    for all participants in the Group.
 
 **Parameters**
@@ -1693,7 +1696,7 @@ logs are simple lines of information about what the SDK is doing during operatio
 Action logs are complete information about a specific action that occurred
 within the SDK, providing debug information describing it.
 The amount of information logged can be configured as part of the SDK configuration.
-See [config.logs][80] .
+See [config.logs][81] .
 
 ### levels
 
@@ -1714,7 +1717,7 @@ A LogHandler can be used to customize how the SDK should log information. By
    be configured to change this behaviour.
 
 A LogHandler can be provided to the SDK as part of its configuration (see
-   [config.logs][80]). The SDK will then provide this
+   [config.logs][81]). The SDK will then provide this
    function with the logged information.
 
 Type: [Function][14]
@@ -1758,7 +1761,7 @@ A LogEntry object is the data that the SDK compiles when information is
    and who logged it.
 
 A [LogHandler][4] provided to the SDK (see
-   [config.logs][80]) will need to handle LogEntry
+   [config.logs][81]) will need to handle LogEntry
    objects.
 
 Type: [Object][6]
@@ -1803,7 +1806,7 @@ function defaultLogHandler (logEntry) {
 ## media
 
 The 'media' namespace provides an interface for interacting with Media that the
-   SDK has access to. Media is used in conjunction with the [Calls][81]
+   SDK has access to. Media is used in conjunction with the [Calls][82]
    feature to manipulate and render the Tracks sent and received from a Call.
 
 Media and Track objects are not created directly, but are created as part of
@@ -1814,13 +1817,13 @@ Media and Track objects are not created directly, but are created as part of
 The Media feature also keeps track of media devices that the user's machine
    can access. Any media device (eg. USB headset) connected to the machine
    can be used as a source for media. Available devices can be found using
-   the [media.getDevices][82] API.
+   the [media.getDevices][83] API.
 
 ### getDevices
 
 Retrieves the available media devices for use.
 
-The [devices:change][83] event will be
+The [devices:change][84] event will be
    emitted when the available media devices have changed.
 
 Returns **[Object][6]** The lists of camera, microphone, and speaker devices.
@@ -1833,7 +1836,7 @@ Retrieves an available Media object with a specific Media ID.
 
 -   `mediaId` **[string][7]** The ID of the Media to retrieve.
 
-Returns **[call.MediaObject][84]** A Media object.
+Returns **[call.MediaObject][85]** A Media object.
 
 ### getTrackById
 
@@ -1843,7 +1846,7 @@ Retrieve an available Track object with a specific Track ID.
 
 -   `trackId` **[string][7]** The ID of the Track to retrieve.
 
-Returns **[call.TrackObject][26]** A Track object.
+Returns **[call.TrackObject][21]** A Track object.
 
 ### renderTracks
 
@@ -1899,7 +1902,7 @@ If a local Track being sent in a Call is muted, the Track will be
    noticeably muted for the remote user. If a remote Track received in a
    call is muted, the result will only be noticeable locally.
 
-The SDK will emit a [media:muted][85] event
+The SDK will emit a [media:muted][86] event
    when a Track has been muted.
 
 **Parameters**
@@ -1912,7 +1915,7 @@ Unmutes the specified Tracks.
 
 Media will resume as normal for the Tracks.
 
-The SDK will emit a [media:unmuted][86] event
+The SDK will emit a [media:unmuted][87] event
    when a Track has been unmuted.
 
 **Parameters**
@@ -1927,11 +1930,11 @@ The 'presence' namespace provides an interface for an application to set the
 
 Presence information is persisted by the server. When the SDK is initialized,
    there will be no information available. Presence information will become
-   available either by using [presence.fetch][87] or by subscribing for
-   updates about other Users, using [presence.subscribe][88].
+   available either by using [presence.fetch][88] or by subscribing for
+   updates about other Users, using [presence.subscribe][89].
 
-Available presence information can be retrieved using [presence.get][89] or
-   [presence.getAll][90].
+Available presence information can be retrieved using [presence.get][90] or
+   [presence.getAll][91].
 
 ### statuses
 
@@ -1976,22 +1979,22 @@ client.presence.update(statuses.OPEN, activities.AVAILABLE)
 
 The PresenceStatus type defines the user's current status in terms of the user's availability to
 communicate/respond to other users in the network.
-An instance of this type can be obtained by invoking the [presence.get][89] function.
+An instance of this type can be obtained by invoking the [presence.get][90] function.
 
 Reporting when a user is on the phone is enabled (by default), which means that presence update notifications
 will be sent whenever a user is in a call, as well as when the call has ended.
 This is a user preference enabled or disabled on server side, and it can only be changed on the server side.
 
-The status is set to [open][91] as soon as a user subscribes for the presence service.
+The status is set to [open][92] as soon as a user subscribes for the presence service.
 
 Type: [Object][6]
 
 **Properties**
 
 -   `userId` **[string][7]** The unique identifier for the user associated with this presence status.
--   `status` **[string][7]** The current status the user has set for themselves. For supported values see [presence.statuses][91].
+-   `status` **[string][7]** The current status the user has set for themselves. For supported values see [presence.statuses][92].
 -   `activity` **[string][7]** The current activity of the user.
-         For supported values see [presence.activities][92].
+         For supported values see [presence.activities][93].
 -   `note` **[string][7]** Additional message acompanying the status & activity.
 -   `loading` **[boolean][10]** Whether the presence information has been loaded or is in the process of loading.
 
@@ -1999,16 +2002,16 @@ Type: [Object][6]
 
 Updates the presence information for the current user.
 
-See [presence.statuses][91] and [presence.activities][92] for valid
+See [presence.statuses][92] and [presence.activities][93] for valid
    values.
 
 The SDK will emit a
-   [presence:selfChange][93] event
+   [presence:selfChange][94] event
    when the operation completes. The updated presence information is
-   available and can be retrieved with [presence.getSelf][94].
+   available and can be retrieved with [presence.getSelf][95].
 
 Other users subscribed for this user's presence will receive a
-   [presence:change][95] event.
+   [presence:change][96] event.
 
 **Parameters**
 
@@ -2036,7 +2039,7 @@ Returns **[Array][12]&lt;[Object][6]>** List of user presence information.
 
 Retrieves the presence information for the current user.
 
-This information is set using the [presence.update][96] API.
+This information is set using the [presence.update][97] API.
 
 Returns **[Object][6]** Presence information for the current user.
 
@@ -2046,7 +2049,7 @@ Fetches presence information for the given users. This will refresh the
    available information with any new information from the server.
 
 Available presence information an be retrieved using the
-   [presence.get][89] or [presence.getAll][90] APIs.
+   [presence.get][90] or [presence.getAll][91] APIs.
 
 **Parameters**
 
@@ -2057,7 +2060,7 @@ Available presence information an be retrieved using the
 Subscribe to another User's presence updates.
 
 When the User updates their presence information, the SDK will emit a
-   [presence:change][95] event.
+   [presence:change][96] event.
 
 **Parameters**
 
@@ -2073,7 +2076,7 @@ Unsubscribe from another User's presence updates.
 
 ## sdpHandlers
 
-A set of [SdpHandlerFunction][97]s for manipulating SDP information.
+A set of [SdpHandlerFunction][98]s for manipulating SDP information.
 These handlers are used to customize low-level call behaviour for very specific
 environments and/or scenarios. They can be provided during SDK instantiation
 to be used for all calls.
@@ -2127,40 +2130,19 @@ The 'services' namespace allows an application to manage how they wish the SDK t
 
 The services an application can subscribe to are based on the features
    included in the SDK. The list of available services can be retrieved
-   using the [services.getSubscriptions][98] API. These values can be used
-   with the [services.subscribe][99] API.
+   using the [services.getSubscriptions][99] API. These values can be used
+   with the [services.subscribe][100] API.
 
 The channel used for subscriptions is the method for receiving the service
    updates. The recommended channel is `websocket`, where the SDK is able to
    handle receiving the updates internally. Alternate channel methods, if a
    websocket cannot be used, will be available in the future.
 
-### SmsInboundServiceParams
-
-The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
-This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][100] property.
-
-Type: [Object][6]
-
-**Properties**
-
--   `destinationAddress` **[string][7]** An E164 formatted DID number.
-        The subscription created will provide notifications for inbound SMS messages destined for this address.
-
-**Examples**
-
-```javascript
-// Subscribe to smsinbound service on a WebSocket channel.
-client.services.subscribe([
-   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}
-], 'websocket')
-```
-
 ### ServiceDescriptor
 
 The ServiceDescriptor type defines the format for specifying how to subscribe for a certain service.
 This is the service configuration object that needs to be passed (as part of an array of configuration objects) when calling
-the [services.subscribe][99] function.
+the [services.subscribe][100] function.
 Only some plugins (`call`, `messaging` and `presence`) support such configuration object that needs to be passed
 to the subscribe function.
 
@@ -2184,12 +2166,33 @@ client.services.subscribe([
 ], 'websocket')
 ```
 
+### SmsInboundServiceParams
+
+The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
+This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][101] property.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `destinationAddress` **[string][7]** An E164 formatted DID number.
+        The subscription created will provide notifications for inbound SMS messages destined for this address.
+
+**Examples**
+
+```javascript
+// Subscribe to smsinbound service on a WebSocket channel.
+client.services.subscribe([
+   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}
+], 'websocket')
+```
+
 ### subscribe
 
 Subscribes to platform notifications for an SDK service.
 
 Subscriptions can only be made for services available to the SDK. See
-   [services.getSubscriptions][98] for information about services.
+   [services.getSubscriptions][99] for information about services.
 
 Extra configurations can be provided for a subscription as part of its
    "service configurations" object (see the `services` parameter). This
@@ -2202,7 +2205,7 @@ The SDK currently only supports the `websocket` channel as a subscription
 
 **Parameters**
 
--   `services` **[Array][12]&lt;([string][7] \| [services.ServiceDescriptor][101])>** A list of service configurations.
+-   `services` **[Array][12]&lt;([string][7] \| [services.ServiceDescriptor][102])>** A list of service configurations.
 -   `type` **[string][7]** The method of how to receive service updates. (optional, default `'websocket'`)
 
 **Examples**
@@ -2223,7 +2226,7 @@ client.services.subscribe(services)
 Cancels existing subscriptions for platform notifications.
 
 Existing subscriptions can be retrieved using the
-   [services.getSubscriptions][98] API. The `subscribed` values are the
+   [services.getSubscriptions][99] API. The `subscribed` values are the
    services that can be unsubscribed from.
 
 **Parameters**
@@ -2251,7 +2254,7 @@ The `available` values are the SDK's services that an application can
 
 The `subscribed` values are the SDK's services that the application has
    an active subscription for. Services are subscribed to using the
-   [services.subscribe][99] API.
+   [services.subscribe][100] API.
 
 **Examples**
 
@@ -2282,7 +2285,7 @@ Type: [Object][6]
 
 **Properties**
 
--   `userId` **[user.UserID][102]** The User ID of the user.
+-   `userId` **[user.UserID][24]** The User ID of the user.
 -   `emailAddress` **[string][7]** The email address of the user.
 -   `firstName` **[string][7]** The first name of the user.
 -   `lastName` **[string][7]** The last name of the user.
@@ -2325,7 +2328,7 @@ See the [user.fetch][105] and [user.search][106] APIs for details about
 
 **Parameters**
 
--   `userId` **[user.UserID][102]** The User ID of the user.
+-   `userId` **[user.UserID][24]** The User ID of the user.
 
 Returns **[user.User][107]** The User object for the specified user.
 
@@ -2350,7 +2353,7 @@ The SDK will emit a [directory:change][108]
 **Parameters**
 
 -   `filters` **[Object][6]** The filter options for the search.
-    -   `filters.userId` **[user.UserID][102]?** Matches the User ID of the user.
+    -   `filters.userId` **[user.UserID][24]?** Matches the User ID of the user.
     -   `filters.name` **[string][7]?** Matches the firstName or lastName.
     -   `filters.firstName` **[string][7]?** Matches the firstName.
     -   `filters.lastName` **[string][7]?** Matches the lastName.
@@ -2406,57 +2409,57 @@ Type: [string][7]
 
 [19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[20]: #callgetall
+[20]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
 
-[21]: #callgetbyid
+[21]: #calltrackobject
 
-[22]: #callstates
+[22]: #callgetall
 
-[23]: #callbandwidthcontrols
+[23]: #callgetbyid
 
-[24]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
+[24]: #useruserid
 
-[25]: #callsdphandlerinfo
+[25]: #callstates
 
-[26]: #calltrackobject
+[26]: #callbandwidthcontrols
 
 [27]: #calldeviceinfo
 
-[28]: #calluserid
+[28]: #callsdphandlerinfo
 
-[29]: #callphonenumber
+[29]: #calluserid
 
-[30]: #calleventcalloperation
+[30]: #callphonenumber
 
-[31]: #calleventcallstart
+[31]: #calleventcalloperation
 
-[32]: #calleventcallreceive
+[32]: #calleventcallstart
 
-[33]: #calluserid
+[33]: #calleventcallreceive
 
-[34]: #callphonenumber
+[34]: #calluserid
 
-[35]: #callmediaconstraint
+[35]: #callphonenumber
 
-[36]: #calleventcallstatechange
+[36]: #callmediaconstraint
 
-[37]: #calleventcallnewtrack
+[37]: #calleventcallstatechange
 
-[38]: #callunhold
+[38]: #calleventcallnewtrack
 
-[39]: #callcallobject
+[39]: #callunhold
 
-[40]: #calleventcalltrackended
+[40]: #callcallobject
 
-[41]: #calladdmedia
+[41]: #calleventcalltrackended
 
-[42]: #callremovemedia
+[42]: #calladdmedia
 
-[43]: #calleventcallstatsreceived
+[43]: #callremovemedia
 
-[44]: #calleventcalltrackreplaced
+[44]: #calleventcallstatsreceived
 
-[45]: #callcallobject
+[45]: #calleventcalltrackreplaced
 
 [46]: #callmake
 
@@ -2468,109 +2471,109 @@ Type: [string][7]
 
 [50]: #mediaremovetracks
 
-[51]: #conversationget
+[51]: #callcallobject
 
-[52]: #conversationgetall
+[52]: #conversationget
 
-[53]: messaging.getAll
+[53]: #conversationgetall
 
-[54]: #conversationeventconversationschange
+[54]: messaging.getAll
 
-[55]: #conversationchattypes
+[55]: #conversationeventconversationschange
 
-[56]: #conversationfetch
+[56]: #conversationchattypes
 
-[57]: #conversationcreate
+[57]: #conversationfetch
 
-[58]: #conversationconversation
+[58]: #conversationcreate
 
-[59]: #conversationeventconversationsnew
+[59]: #conversationconversation
 
-[60]: #conversationconversationcreatemessage
+[60]: #conversationeventconversationsnew
 
-[61]: #conversationmessagesend
+[61]: #conversationconversationcreatemessage
 
-[62]: #conversationmessage
+[62]: #conversationmessageaddpart
 
-[63]: #conversationeventmessageschange
+[63]: #conversationmessagesend
 
-[64]: #conversationpart
+[64]: #conversationconversationgetmessages
 
-[65]: #conversationconversationgetmessages
+[65]: #conversationconversationgetmessage
 
-[66]: #conversationeventistypinglistchange
+[66]: #conversationpart
 
-[67]: #conversationmessageaddpart
+[67]: #conversationmessage
 
-[68]: #conversationconversationgetmessage
+[68]: #conversationeventmessageschange
 
-[69]: #conversation
+[69]: #conversationeventistypinglistchange
 
-[70]: #groupsfetch
+[70]: #conversation
 
-[71]: #groupseventgroupnew
+[71]: #groupsfetch
 
-[72]: #groupsaddparticipant
+[72]: #groupseventgroupnew
 
-[73]: #groupsremoveparticipant
+[73]: #groupsaddparticipant
 
-[74]: #groupsget
+[74]: #groupsremoveparticipant
 
-[75]: #groupsgetall
+[75]: #groupsget
 
-[76]: #groupseventgrouprefresh
+[76]: #groupsgetall
 
-[77]: #groupseventgroupinvitation_received
+[77]: #groupseventgrouprefresh
 
-[78]: #groupseventgroupchange
+[78]: #groupseventgroupinvitation_received
 
-[79]: #groupseventgroupdelete
+[79]: #groupseventgroupchange
 
-[80]: #configconfiglogs
+[80]: #groupseventgroupdelete
 
-[81]: #call
+[81]: #configconfiglogs
 
-[82]: #mediagetdevices
+[82]: #call
 
-[83]: #mediaeventdeviceschange
+[83]: #mediagetdevices
 
-[84]: #callmediaobject
+[84]: #mediaeventdeviceschange
 
-[85]: #mediaeventmediamuted
+[85]: #callmediaobject
 
-[86]: #mediaeventmediaunmuted
+[86]: #mediaeventmediamuted
 
-[87]: #presencefetch
+[87]: #mediaeventmediaunmuted
 
-[88]: #presencesubscribe
+[88]: #presencefetch
 
-[89]: #presenceget
+[89]: #presencesubscribe
 
-[90]: #presencegetall
+[90]: #presenceget
 
-[91]: #presencestatuses
+[91]: #presencegetall
 
-[92]: #presenceactivities
+[92]: #presencestatuses
 
-[93]: #presenceeventpresenceselfchange
+[93]: #presenceactivities
 
-[94]: #presencegetself
+[94]: #presenceeventpresenceselfchange
 
-[95]: #presenceeventpresencechange
+[95]: #presencegetself
 
-[96]: #presenceupdate
+[96]: #presenceeventpresencechange
 
-[97]: #callsdphandlerfunction
+[97]: #presenceupdate
 
-[98]: #servicesgetsubscriptions
+[98]: #callsdphandlerfunction
 
-[99]: #servicessubscribe
+[99]: #servicesgetsubscriptions
 
-[100]: #servicesservicedescriptor
+[100]: #servicessubscribe
 
 [101]: #servicesservicedescriptor
 
-[102]: #useruserid
+[102]: #servicesservicedescriptor
 
 [103]: #usereventuserschange
 

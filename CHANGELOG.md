@@ -14,6 +14,7 @@ Kandy.js change log.
 - Added a custom header (containing SDK name and version) which will be included in any REST request sent to server. This is based on configuration and its default value is set to false (i.e. don't send this custom header) `KAA-2103`
 - Added a destroy function to allow users to wipe the SDK state and render the SDK unusable. `KAA-2181`
   - This is useful when a user is finished with the SDK and wants their data to not be available to the next SDK consumer. After destroy is called, the SDK must be recreated for an application to continue working.
+- Added a new tutorial topic describing 'Call States' and few minor updates on API documentation. `KAA-2169`
 
 ### Fixed
 

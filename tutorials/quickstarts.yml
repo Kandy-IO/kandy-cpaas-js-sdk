@@ -13,6 +13,10 @@
   description: # Authentication
   link: /quickstarts/javascript/cpaas/Authentication
 
+- name: Call States
+  description: # Call States
+  link: /quickstarts/javascript/cpaas/Call%20States
+
 - name: Voice and Video Calls
   description: # Voice and Video Calls
   link: /quickstarts/javascript/cpaas/Voice%20and%20Video%20Calls

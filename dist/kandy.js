@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.336
+ * Version: 4.14.0-beta.337
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -24021,6 +24021,7 @@ function callAPI({ dispatch, getState }) {
      *    in defines how it can be interacted with, as certain operations can
      *    only be performed while in specific states, and tells an application
      *    whether the Call currently has media flowing between users.
+     * Unless stated otherwise, the Call's state pertains to both caller & callee.
      *
      * The Call's state is a property of the {@link call.CallObject CallObject},
      *    which can be retrieved using the {@link call.getById} or
@@ -24034,14 +24035,14 @@ function callAPI({ dispatch, getState }) {
      * @memberof call
      * @requires call
      * @type {Object}
-     * @property {string} INITIATING The (outgoing) call is being started.
-     * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received.
+     * @property {string} INITIATING The (outgoing) call is being started. While in this state, no Call operations can be performed until Call gets into Initiated state.
+     * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.
      * @property {string} RINGING The call has been received by both parties, and is waiting to be answered.
      * @property {string} EARLY_MEDIA The call has not been answered, but media
      *    is already being received. This may be network-ringing media, IVR
      *    system media, or other pre-answer medias. When early media is
-     *    supported, this state may replace the Ringing state.
-     * @property {string} CANCELLED The call was disconnected before it could be answered.
+     *    supported, this state may replace the Ringing state. This is a state valid only for caller's side.
+     * @property {string} CANCELLED The call was disconnected before it could be answered. This is a state valid only for callee's side.
      * @property {string} CONNECTED Both parties are connected and media is flowing.
      * @property {string} ON_HOLD Both parties are connected but no media is flowing.
      * @property {string} ENDED The call has ended.
@@ -24195,6 +24196,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @memberof call
  * @requires cpaas_call
  * @property {string} id The ID of the call.
+ * @property {user.UserID} from A unique identifier (uri) of the person who made the call.
+ * @property {user.UserID} to A unique identifier (uri) of the person who receives the call.
  * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
  * @property {string} state The current state of the call. See {@link call.states} for possible states.
  * @property {boolean} localHold Indicates whether this call is currently being held locally.
@@ -24222,6 +24225,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @requires link_call
  * @requires callMe
  * @property {string} id The ID of the call.
+ * @property {user.UserID} from A unique identifier (uri) of the person who made the call.
+ * @property {user.UserID} to A unique identifier (uri) of the person who receives the call.
  * @property {string} direction The direction in which the call was created. Can be 'outgoing' or 'incoming'.
  * @property {string} state The current state of the call. See {@link call.states} for possible states.
  * @property {boolean} localHold Indicates whether this call is currently being held locally.
@@ -32496,7 +32501,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.336';
+  return '4.14.0-beta.337';
 }
 
 /***/ }),
