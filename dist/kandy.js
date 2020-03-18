@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.337
+ * Version: 4.14.0-beta.338
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31962,7 +31962,7 @@ function* webRtcReplaceTrack(webRTC, params) {
   }
 
   // Replaces the track
-  const replaceTrackError = yield (0, _effects.call)([session, 'replaceTrack'], newTrack.track, { trackId });
+  const replaceTrackError = yield (0, _effects.call)([session, 'replaceTrack'], newTrack, { trackId });
   if (replaceTrackError) {
     // If cannot replace old track, cleanup the newly created track
     yield (0, _effects.call)([newTrack, 'cleanup']);
@@ -32501,7 +32501,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.337';
+  return '4.14.0-beta.338';
 }
 
 /***/ }),
@@ -56452,7 +56452,8 @@ function Session(id, managers, config = {}) {
    */
   function replaceTrack(newTrack, options) {
     const peer = peerManager.get(peerId);
-    return peer.replaceTrack(newTrack, options).then(() => {
+    const track = trackManager.get(newTrack.id);
+    return peer.replaceTrack(track.track, options).then(() => {
       emitter.emit('track:replaced', {
         oldTrackId: options.trackId,
         trackId: newTrack.id
