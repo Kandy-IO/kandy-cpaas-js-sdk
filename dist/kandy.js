@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.338
+ * Version: 4.14.0-beta.339
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30390,7 +30390,7 @@ function getOperation(mediaDiff) {
  * In terms of SDP changes, it is defined as:
  *    1) At least one media was 'flowing' before the SDP change.
  *    2) No media is 'flowing' after the SDP change.
- *    3) No media was added.
+ *    3) No active media was added.
  *    4) No media was removed.
  *    5) All media that changed was stopped.
  *        ie. is being "held".
@@ -30414,9 +30414,15 @@ function wasHold(mediaDiff) {
   const stoppedFlowing = hadMediaFlowing(mediaDiff) && !hasMediaFlowing(mediaDiff);
 
   /*
-   * 3 & 4) No media was added or removed.
+   * 3) No active media was added.
+   * For any added media we need to check if it's inactive to determine if this was a hold
    */
-  const sameMedia = added.length === 0 && removed.length === 0;
+  const noActiveMediaAdded = !added.some(media => media.willSend || media.willReceive);
+
+  /*
+   * 4) No media was removed
+   */
+  const noMediaRemoved = removed.length === 0;
 
   /*
    * 5a) Some media did change.
@@ -30444,7 +30450,7 @@ function wasHold(mediaDiff) {
     return !media.willSend && !media.willReceive;
   });
 
-  return stoppedFlowing && sameMedia && didChange && allStopped && stillStopped;
+  return stoppedFlowing && noActiveMediaAdded && noMediaRemoved && didChange && allStopped && stillStopped;
 }
 
 /**
@@ -30522,7 +30528,7 @@ function wasUnhold(mediaDiff) {
  *    1) At least one media was 'flowing' before the SDP change.
  *    2) All changed media is not 'sendonly'.
  *        ie. is being "v3.X held"
- *    3) No media was added.
+ *    3) No active media was added.
  *    4) No media was removed.
  *    5) All media that is unchanged is not sending/receiving.
  *        ie. was already "held".
@@ -30544,9 +30550,15 @@ function was3xHold(mediaDiff) {
   });
 
   /*
-   * 3) & 4) No media was added or removed.
+   * 3) No active media was added.
+   * For any added media we need to check if it's inactive to determine if this was a hold
    */
-  const sameMedia = added.length === 0 && removed.length === 0;
+  const noActiveMediaAdded = !added.some(media => media.willSend || media.willReceive);
+
+  /*
+   * 4) No media was removed
+   */
+  const noMediaRemoved = removed.length === 0;
 
   /*
    * 5) For all media that was not changed,
@@ -30556,7 +30568,7 @@ function was3xHold(mediaDiff) {
     return !media.willSend && !media.willReceive;
   });
 
-  return wasFlowing && allSendOnly && sameMedia && noUnchangedSend;
+  return wasFlowing && allSendOnly && noActiveMediaAdded && noMediaRemoved && noUnchangedSend;
 }
 
 /**
@@ -32501,7 +32513,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.338';
+  return '4.14.0-beta.339';
 }
 
 /***/ }),
