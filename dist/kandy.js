@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.341
+ * Version: 4.14.0-beta.342
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29654,7 +29654,7 @@ function* callStatusUpdateRinging(deps, params) {
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
  */
 function* callStatusUpdateFailed(deps, params) {
-  const { wrtcsSessionId } = params;
+  const { wrtcsSessionId, reasonText, statusCode } = params;
 
   const calls = yield (0, _effects.select)(_selectors.getCalls);
   // TODO: `find` --> IE11 support.
@@ -29674,22 +29674,22 @@ function* callStatusUpdateFailed(deps, params) {
         finishAction = _actions.callActions.directTransferFinish;
         // TODO: May or may not need this when generic operation event is setup.
         transition = {
-          reasonText: _constants.COMPLEX_OPERATION_MESSAGES.DIRECT_TRANSFER_FAILURE,
-          statusCode: _constants.STATUS_CODES.DIRECT_TRANSFER_FAILURE
+          reasonText: reasonText || _constants.COMPLEX_OPERATION_MESSAGES.DIRECT_TRANSFER_FAILURE,
+          statusCode: statusCode || _constants.STATUS_CODES.DIRECT_TRANSFER_FAILURE
         };
         break;
       case _constants2.OPERATIONS.CONSULTATIVE_TRANSFER:
         finishAction = _actions.callActions.consultativeTransferFinish;
         transition = {
-          reasonText: _constants.COMPLEX_OPERATION_MESSAGES.CONSULTATIVE_TRANSFER_FAILURE,
-          statusCode: _constants.STATUS_CODES.CONSULTATIVE_TRANSFER_FAILURE
+          reasonText: reasonText || _constants.COMPLEX_OPERATION_MESSAGES.CONSULTATIVE_TRANSFER_FAILURE,
+          statusCode: statusCode || _constants.STATUS_CODES.CONSULTATIVE_TRANSFER_FAILURE
         };
         break;
       case _constants2.OPERATIONS.JOIN:
         finishAction = _actions.callActions.joinFinish;
         transition = {
-          reasonText: _constants.COMPLEX_OPERATION_MESSAGES.JOIN_FAILURE,
-          statusCode: _constants.STATUS_CODES.JOIN_FAILURE
+          reasonText: reasonText || _constants.COMPLEX_OPERATION_MESSAGES.JOIN_FAILURE,
+          statusCode: statusCode || _constants.STATUS_CODES.JOIN_FAILURE
         };
         break;
     }
@@ -32513,7 +32513,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.341';
+  return '4.14.0-beta.342';
 }
 
 /***/ }),
