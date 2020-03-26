@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.347
+ * Version: 4.14.0-beta.348
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32631,7 +32631,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.347';
+  return '4.14.0-beta.348';
 }
 
 /***/ }),
@@ -38024,134 +38024,32 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.API_LOG_TAG = exports.logManager = undefined;
-
-var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
-
-var _values2 = _interopRequireDefault(_values);
-
-var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
-
-var _keys2 = _interopRequireDefault(_keys);
-
-exports.default = logPlugin;
-
-var _api = __webpack_require__("../../packages/kandy/src/logs/interface/api.js");
-
-var _api2 = _interopRequireDefault(_api);
-
-var _reducers = __webpack_require__("../../packages/kandy/src/logs/interface/reducers.js");
-
-var _reducers2 = _interopRequireDefault(_reducers);
-
-var _actions = __webpack_require__("../../packages/kandy/src/logs/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
-
-var _config = __webpack_require__("../../packages/kandy/src/logs/config.js");
-
-var _config2 = _interopRequireDefault(_config);
-
-var _sagas = __webpack_require__("../../packages/kandy/src/logs/sagas.js");
-
-var _actions2 = __webpack_require__("../../packages/kandy/src/logs/actions/index.js");
-
-var _actions3 = _interopRequireDefault(_actions2);
-
-var _actions4 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
-
-var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
-
-var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+exports.logManager = exports.API_LOG_TAG = undefined;
 
 var _kandyLogger = __webpack_require__("../../packages/logger/src/index.js");
 
 var _kandyLogger2 = _interopRequireDefault(_kandyLogger);
 
-__webpack_require__("../../packages/kandy/src/logs/docs.js");
+var _config = __webpack_require__("../../packages/kandy/src/logs/config.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _config2 = _interopRequireDefault(_config);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
 
 /**
  * Create the LogManager right away so that it is available. The SDK has not
  *    been instantiated yet, so we have to use the default options until we get
  *    the application's configs.
  */
+/**
+ * TODO: There is a technical debt associated with having a loggerManager along with it's
+ * loggers created at the global scope. Multiple instances of the SDK would end up sharing
+ * the log manager and therefore loggers.
+ */
 const manager = (0, _kandyLogger2.default)(_config2.default);
-
-// Include the extra JSDoc items.
-
-
-// Libraries.
-
-
-// Other plugins.
-// Logs plugin.
 const logManager = exports.logManager = manager;
-
-// Logs generated as a result of invoking the public API will contain this tag
-const API_LOG_TAG = exports.API_LOG_TAG = 'API invoked: ';
-
-function logPlugin(options = {}) {
-  const name = 'logs';
-
-  const logger = logManager.getLogger('LOGS');
-  // Make sure the configured log handler was a function.
-  if (typeof options.handler !== 'function') {
-    delete options.handler;
-    logger.warn('Invalid log handler configuration provided; using default instead.');
-  }
-
-  // Make sure configured log level is supported.
-  if (options.logLevel && !(0, _keys2.default)(_kandyLogger.logLevels).includes(options.logLevel.toUpperCase())) {
-    delete options.logLevel;
-    logger.warn('Invalid log level configuration provided; using default instead.');
-  }
-
-  options = (0, _utils.mergeValues)(_config2.default, options);
-  // Now that we have the application's log configs, update everything to
-  //    use those values instead of default values.
-  logManager.setLevel(options.logLevel);
-  if (options.handler) {
-    logManager.setHandler(options.handler);
-  }
-
-  (0, _values2.default)(logManager.getLoggers()).forEach(logger => {
-    logger.setLevel(options.logLevel);
-    if (options.handler) {
-      logger.setHandler(options.handler);
-    }
-  });
-
-  function* init() {
-    // Send the provided options to the store.
-    // This will be `state.config[name]`.
-    yield (0, _effects.put)((0, _actions4.update)(options, name));
-    // Update state with the initial Logger levels.
-    yield (0, _effects.put)(actions.levelsChanged((0, _sagas.getLevelMap)(logManager)));
-  }
-
-  const components = {
-    name,
-    capabilities: ['logs'],
-    init,
-    api: _api2.default,
-    reducer: _reducers2.default,
-    sagas: [_sagas.setLevelEntry, _sagas.setHandlerEntry]
-  };
-
-  options.logLevel = options.logLevel.toUpperCase();
-  const setLevel = _kandyLogger.logLevels[options.logLevel];
-  // Consider actions to be at the INFO log level.
-  // Only export a middleware (for actions) at the appropriate levels.
-  if (setLevel <= _kandyLogger.logLevels.INFO && options.logActions !== false) {
-    components.middleware = (0, _actions3.default)(options);
-  }
-
-  return components;
-}
 
 /***/ }),
 
@@ -38492,6 +38390,145 @@ function getTypes(state) {
   const clonedState = (0, _fp.cloneDeep)(state);
   return (0, _keys2.default)(clonedState.logs);
 }
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/logs/plugin.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
+var _keys = __webpack_require__("../../node_modules/babel-runtime/core-js/object/keys.js");
+
+var _keys2 = _interopRequireDefault(_keys);
+
+exports.default = logPlugin;
+
+var _api = __webpack_require__("../../packages/kandy/src/logs/interface/api.js");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _reducers = __webpack_require__("../../packages/kandy/src/logs/interface/reducers.js");
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+var _actions = __webpack_require__("../../packages/kandy/src/logs/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _config = __webpack_require__("../../packages/kandy/src/logs/config.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _sagas = __webpack_require__("../../packages/kandy/src/logs/sagas.js");
+
+var _actions2 = __webpack_require__("../../packages/kandy/src/logs/actions/index.js");
+
+var _actions3 = _interopRequireDefault(_actions2);
+
+var _actions4 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
+
+var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+var _kandyLogger = __webpack_require__("../../packages/logger/src/index.js");
+
+var _index = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+__webpack_require__("../../packages/kandy/src/logs/docs.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Logs generated as a result of invoking the public API will contain this tag
+
+// Libraries.
+
+
+// Other plugins.
+/**
+Note regarding this file's name:
+
+Usually plugins factories are in the index.js file of their corresponding folder.
+This used to be the case. However this file was also being used to host the logManager
+that is being used with the SDK.
+
+Since the logManager is being included in almost every file it was preferrable to rename this
+file rather than point 100s of files to a new place for the logManager.
+**/
+
+// Logs plugin.
+function logPlugin(options = {}) {
+  const name = 'logs';
+
+  const logger = _index.logManager.getLogger('LOGS');
+  // Make sure the configured log handler was a function.
+  if (typeof options.handler !== 'function') {
+    delete options.handler;
+    logger.warn('Invalid log handler configuration provided; using default instead.');
+  }
+
+  // Make sure configured log level is supported.
+  if (options.logLevel && !(0, _keys2.default)(_kandyLogger.logLevels).includes(options.logLevel.toUpperCase())) {
+    delete options.logLevel;
+    logger.warn('Invalid log level configuration provided; using default instead.');
+  }
+
+  options = (0, _utils.mergeValues)(_config2.default, options);
+  // Now that we have the application's log configs, update everything to
+  //    use those values instead of default values.
+  _index.logManager.setLevel(options.logLevel);
+  if (options.handler) {
+    _index.logManager.setHandler(options.handler);
+  }
+
+  (0, _values2.default)(_index.logManager.getLoggers()).forEach(logger => {
+    logger.setLevel(options.logLevel);
+    if (options.handler) {
+      logger.setHandler(options.handler);
+    }
+  });
+
+  function* init() {
+    // Send the provided options to the store.
+    // This will be `state.config[name]`.
+    yield (0, _effects.put)((0, _actions4.update)(options, name));
+    // Update state with the initial Logger levels.
+    yield (0, _effects.put)(actions.levelsChanged((0, _sagas.getLevelMap)(_index.logManager)));
+  }
+
+  const components = {
+    name,
+    capabilities: ['logs'],
+    init,
+    api: _api2.default,
+    reducer: _reducers2.default,
+    sagas: [_sagas.setLevelEntry, _sagas.setHandlerEntry]
+  };
+
+  options.logLevel = options.logLevel.toUpperCase();
+  const setLevel = _kandyLogger.logLevels[options.logLevel];
+  // Consider actions to be at the INFO log level.
+  // Only export a middleware (for actions) at the appropriate levels.
+  if (setLevel <= _kandyLogger.logLevels.INFO && options.logActions !== false) {
+    components.middleware = (0, _actions3.default)(options);
+  }
+
+  return components;
+}
+
+// Include the extra JSDoc items.
 
 /***/ }),
 
@@ -57769,9 +57806,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+var _plugin = __webpack_require__("../../packages/kandy/src/logs/plugin.js");
 
-var _logs2 = _interopRequireDefault(_logs);
+var _plugin2 = _interopRequireDefault(_plugin);
 
 var _config = __webpack_require__("../../packages/kandy/src/config/index.js");
 
@@ -57791,7 +57828,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
  * to the SDK.
  */
-exports.default = [{ name: 'logs', fn: _logs2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
+exports.default = [{ name: 'logs', fn: _plugin2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
 
 /***/ }),
 
