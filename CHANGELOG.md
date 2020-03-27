@@ -5,6 +5,18 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.14.0 - 2020-03-27
+
+### Added
+
+- Added a new tutorial topic describing 'Call States' and few minor updates on API documentation. `KAA-2169`
+
+### Fixed
+
+- Added checking for media willSend and willReceive when a Hold operation is received in case the remote side answered an audio only call with audio and video. `KAA-2209`
+- Fixed an issue where an existing local video track could not be replaced by a screen sharing track. `KAA-2144`
+- Fixed an issue where the `conversation.subscribe` listener not being triggered. `KAA-2200`
+
 ## 4.13.0 - 2020-02-28
 
 ### Added
