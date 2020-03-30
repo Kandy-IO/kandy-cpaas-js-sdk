@@ -5,9 +5,17 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.14.0 - beta
+## 4.14.0 - 2020-03-27
+
+### Added
+
+- Added a new tutorial topic describing 'Call States' and few minor updates on API documentation. `KAA-2169`
+
+### Fixed
 
 - Added checking for media willSend and willReceive when a Hold operation is received in case the remote side answered an audio only call with audio and video. `KAA-2209`
+- Fixed an issue where an existing local video track could not be replaced by a screen sharing track. `KAA-2144`
+- Fixed an issue where the `conversation.subscribe` listener not being triggered. `KAA-2200`
 
 ## 4.13.0 - 2020-02-28
 
@@ -16,15 +24,12 @@ Kandy.js change log.
 - Added a custom header (containing SDK name and version) which will be included in any REST request sent to server. This is based on configuration and its default value is set to false (i.e. don't send this custom header) `KAA-2103`
 - Added a destroy function to allow users to wipe the SDK state and render the SDK unusable. `KAA-2181`
   - This is useful when a user is finished with the SDK and wants their data to not be available to the next SDK consumer. After destroy is called, the SDK must be recreated for an application to continue working.
-- Added a new tutorial topic describing 'Call States' and few minor updates on API documentation. `KAA-2169`
 
 ### Fixed
 
 - Fixed the ICE servers documentation for the CPaaS SDK. `KAA-2194`
 - Fixed a Call issue where a slow-start, remote hold operation, when entering a "dual hold" state, was not being processed correctly. `KAA-2183`
 - Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
-- Fixed an issue where the `conversation.subscribe` listener not being triggered. `KAA-2200`
-- Fixed an issue where an existing local video track could not be replaced by a screen sharing track. `KAA-2144`
 
 ## 4.12.0 - 2020-01-31
 
