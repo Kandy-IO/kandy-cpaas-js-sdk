@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.14.0-beta.350
+ * Version: 4.15.0-beta.351
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19646,6 +19646,7 @@ function api({ dispatch, getState }) {
      * @param {string} [credentials.authname] The user's authorization name.
      * @param {Object} [options] The options object for non-credential options.
      * @param {boolean} [options.forceLogOut] Force the oldest connection to log out if too many simultaneous connections. Link only.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * client.connect({
      *   username: 'alfred@example.com',
@@ -19666,6 +19667,8 @@ function api({ dispatch, getState }) {
      * @param {string} credentials.domainApiKey The Api key for the application's domain.
      * @param {string} credentials.username The username without the application's domain.
      * @param {string} credentials.password The user's password.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * client.connect({
      *   domainApiKey: 'DAK1111111111111111111',
@@ -19686,6 +19689,8 @@ function api({ dispatch, getState }) {
      * @param {string} credentials.accessToken An access token for the user with the provided user Id.
      * @param {string} [credentials.refreshToken] A refresh token for the same user.
      * @param {number} [credentials.expires] The time in seconds until the access token will expire.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * client.connect({
      *   username: 'alfred@example.com',
@@ -19711,6 +19716,7 @@ function api({ dispatch, getState }) {
      * @param {string} credentials.hmacToken An HMAC token for the user with the provided user ID.
      * @param {Object} [options] The options object for non-credential options.
      * @param {boolean} [options.forceLogOut] Force the oldest connection to log out if too many simultaneous connections.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * const hmacToken = HmacSHA1Algorithm({
      *   authenticationTokenRequest: {
@@ -19737,6 +19743,8 @@ function api({ dispatch, getState }) {
      * @param {string} credentials.username The username without the application's domain.
      * @param {string} credentials.refreshToken A refresh token for the same user.
      * @param {number} [credentials.expires] The time in seconds until the access token will expire.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * client.connect({
      *   username: 'alfred@example.com',
@@ -19754,6 +19762,8 @@ function api({ dispatch, getState }) {
      * @param {Object} credentials The credentials object.
      * @param {string} credentials.username The username without the application's domain.
      * @param {string} credentials.oauthToken An OAuth token provided by an outside service.
+     * @param {Object} [options] The options object for non-credential options.
+     * @param {string} [options.clientCorrelator] Unique ID for the client. This is used by the platform to identify an instance of the application used by the specific device.
      * @example
      * client.connect({
      *   username: 'alfred@example.com',
@@ -27063,12 +27073,6 @@ var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
-// Other plugins.
-
-
-// Callstack plugin.
-const log = _logs.logManager.getLogger('CALL');
-
 /**
  * Starts a new outgoing call.
  *
@@ -27090,18 +27094,15 @@ const log = _logs.logManager.getLogger('CALL');
  */
 
 
-// Libraries.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
+// Other plugins.
 
-// Call plugin.
+
+// Callstack plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Initiating new outgoing call.');
 
   // Create a new local media object for this call.
   const mediaConstraints = {
@@ -27130,6 +27131,7 @@ function* makeCall(deps, action) {
   // An error occured while trying to setup the WebRTC portion of the call.
   //    Report the error and mark the call as ended.
   if (error) {
+    log.info(`Failed to initiate call. Changing to ${_constants.CALL_STATES.ENDED}.`);
     yield (0, _effects.put)(_actions.callActions.makeCallFinish(action.payload.id, {
       state: _constants.CALL_STATES.ENDED,
       error: error
@@ -27138,6 +27140,7 @@ function* makeCall(deps, action) {
   }
 
   const callInfo = {
+    id: action.payload.id,
     participantAddress: action.payload.participantAddress,
     isAnonymous: action.payload.isAnonymous,
     from: action.payload.from,
@@ -27148,9 +27151,9 @@ function* makeCall(deps, action) {
   };
 
   const response = yield (0, _effects.call)(requests.createSession, callInfo);
-  log.debug('Received session response:', response);
 
   if (!response.error) {
+    log.info(`Finished initiating call. Changing to ${_constants.CALL_STATES.INITIATED} and waiting on remote answer.`);
     yield (0, _effects.put)(_actions.callActions.pendingMakeCall(action.payload.id, {
       state: _constants.CALL_STATES.INITIATED,
       // The ID that the backend uses to track this webRTC session.
@@ -27167,6 +27170,7 @@ function* makeCall(deps, action) {
       customParameters: action.payload.customParameters
     }));
   } else {
+    log.info('Failed to initiate call. Ending call and cleaning up WebRTC portions.');
     // The call failed, so stop the Media object created for the call.
     // TODO: Update redux state that the Media object is stopped.
     //    Need an event from Media model to notify about the stop, and listener
@@ -27213,11 +27217,25 @@ function* makeCall(deps, action) {
  * @param {Array}    deps.sdpHandlers The list of SDP handlers to run.
  * @param {Object}   action        An "answer call" action.
  */
+
+
+// Libraries.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
+
+// Call plugin.
 function* answerCall(deps, action) {
   const requests = deps.requests;
-  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
-  const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Answering incoming call.');
+
+  const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
   if (!incomingCall) {
     // TODO: Should report an error.
     log.error(`Error: Call ${action.payload.id} not found.`);
@@ -27230,13 +27248,14 @@ function* answerCall(deps, action) {
     direction: 'incoming'
   });
   if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
+    log.debug(`Failed to answer call due to invalid call state: ${stateError.message}`);
     yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
       error: stateError
     }));
     return;
   }
 
+  const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
   const mediaConstraints = {
     audio: action.payload.mediaConstraints.audio,
     video: action.payload.mediaConstraints.video,
@@ -27250,7 +27269,7 @@ function* answerCall(deps, action) {
      *    yet. We need to setup the session and provide the signaling server
      *    with an SDP offer.
      */
-    log.debug('Answering slow start call.', action.payload.id);
+    log.debug('Answering call with slow start negotiation.');
 
     const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
     const callOptions = yield (0, _effects.select)(_selectors.getOptions);
@@ -27268,6 +27287,7 @@ function* answerCall(deps, action) {
     });
 
     if (webrtcInfo.error) {
+      log.info('Failed to answer incoming call.');
       yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
         error: webrtcInfo.error
       }, {
@@ -27288,13 +27308,13 @@ function* answerCall(deps, action) {
     /*
      * For a regular call scenario, we perform normal webRTC negotiation.
      */
-    log.debug('Answering call.', action.payload.id);
 
     // Update the existing webRTC session with an answer.
     const sessionOptions = { sessionId: incomingCall.webrtcSessionId, bandwidth, callId: incomingCall.id };
     webrtcInfo = yield (0, _effects.call)(_establish.answerWebrtcSession, deps, mediaConstraints, sessionOptions);
 
     if (webrtcInfo.error) {
+      log.info('Failed to incoming answer call.');
       yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
         error: webrtcInfo.error
       }, {
@@ -27304,6 +27324,7 @@ function* answerCall(deps, action) {
     }
 
     callInfo = {
+      id: incomingCall.id,
       answer: webrtcInfo.answerSDP,
       wrtcsSessionId: incomingCall.wrtcsSessionId,
       customParameters: action.payload.customParameters
@@ -27316,6 +27337,12 @@ function* answerCall(deps, action) {
   const response = yield (0, _effects.call)(requests.answerSession, callInfo);
 
   if (!response.error) {
+    if (incomingCall.isSlowStart) {
+      log.info(`Finished answering slow-start call. Changing to ${nextState} and waiting for remote slow-start answer.`);
+    } else {
+      log.info(`Finished answering call. Changing to ${nextState}.`);
+    }
+
     yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
       state: nextState,
       // TODO: Proper start time for slow-start calls.
@@ -27334,6 +27361,7 @@ function* answerCall(deps, action) {
       isSlowStart: incomingCall.isSlowStart
     }));
   } else {
+    log.info('Failed to answer call.');
     yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
       error: response.error
     }, {
@@ -27362,6 +27390,10 @@ function* answerCall(deps, action) {
  */
 function* rejectCall(deps, action) {
   const { webRTC, requests } = deps;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Rejecting incoming call.');
+
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
   // Ensure the call is in a valid state for this operation.
@@ -27371,7 +27403,7 @@ function* rejectCall(deps, action) {
   });
 
   if (stateError) {
-    log.debug(`Cannot reject call: ${stateError.message}`);
+    log.info(`Failed to reject call, caused by ${stateError.message}.`);
     // Report the operation failure.
     yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, { error: stateError }));
     return;
@@ -27386,8 +27418,10 @@ function* rejectCall(deps, action) {
   const response = yield (0, _effects.call)(requests.rejectSession, callInfo);
 
   if (!response.error) {
+    log.info('Failed to reject call.');
     yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id));
   } else {
+    log.info(`Finished rejecting call. Changing to ${_constants.CALL_STATES.ENDED}.`);
     yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, {
       error: response.error
     }));
@@ -27412,6 +27446,9 @@ function* rejectCall(deps, action) {
 function* ignoreCall(deps, action) {
   const { webRTC } = deps;
 
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Ignoring incoming call.');
+
   // Ensure the call is in a valid state for this operation.
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
     state: _constants.CALL_STATES.RINGING,
@@ -27419,7 +27456,7 @@ function* ignoreCall(deps, action) {
   });
 
   if (stateError) {
-    log.debug(`Cannot ignore call: ${stateError.message}`);
+    log.info(`Failed to ignore call, caused by ${stateError.message}.`);
     // Report the operation failure.
     yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(action.payload.id, { error: stateError }));
     return;
@@ -27431,6 +27468,7 @@ function* ignoreCall(deps, action) {
   //    call / session to be ended either way.
   yield (0, _effects.call)(_midcall.closeCall, webRTC, targetCall.webrtcSessionId);
 
+  log.info(`Finished ignoring call. Changing to ${_constants.CALL_STATES.ENDED}.`);
   // Report the operation complete.
   yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(targetCall.id));
 }
@@ -27455,6 +27493,9 @@ function* ignoreCall(deps, action) {
 function* forwardCall(deps, action) {
   const { webRTC, requests } = deps;
 
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Forwarding incoming call.');
+
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
   // Ensure the call is in a valid state for this operation.
@@ -27464,7 +27505,7 @@ function* forwardCall(deps, action) {
   });
 
   if (stateError) {
-    log.debug(`Cannot forward call: ${stateError.message}`);
+    log.info(`Failed to forward call, caused by ${stateError.message}.`);
     // Report the operation failure.
     yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, { error: stateError }));
     return;
@@ -27478,6 +27519,7 @@ function* forwardCall(deps, action) {
   const response = yield (0, _effects.call)(requests.forwardSession, callInfo);
 
   if (response.error) {
+    log.info('Failed to forward call.');
     yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, {
       error: response.error
     }));
@@ -27486,6 +27528,7 @@ function* forwardCall(deps, action) {
 
   yield (0, _effects.call)(_midcall.closeCall, webRTC, incomingCall.webrtcSessionId);
 
+  log.info(`Finished forwarding call. Changing to ${_constants.CALL_STATES.ENDED}.`);
   yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id));
 }
 
@@ -27586,6 +27629,9 @@ function* endCall(deps, action) {
   const { webRTC, requests } = deps;
   const { id } = action.payload;
 
+  const log = _logs.logManager.getLogger('CALL', id);
+  log.info('Ending call.');
+
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {});
   if (stateError) {
@@ -27605,6 +27651,7 @@ function* endCall(deps, action) {
   // Perform signalling to end the session
   const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
 
+  log.info(`Finished ending call. Changing to ${_constants.CALL_STATES.ENDED}.`);
   if (!response.error) {
     yield (0, _effects.put)(_actions.callActions.endCallFinish(id, { isLocal: true }));
   } else {
@@ -27640,6 +27687,9 @@ function* endCall(deps, action) {
  */
 function* offerInactiveMedia(deps, action) {
   const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Holding call.');
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: false });
@@ -27685,13 +27735,13 @@ function* offerInactiveMedia(deps, action) {
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send hold offer.');
+    log.info('Failed to hold call.');
     yield (0, _effects.put)(_actions.callActions.holdCallFinish(action.payload.id, {
       local: true,
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent hold offer.');
+    log.info('Finished local portion of holding call. Waiting on remote response.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
       operation: targetCall.localOp.operation
     }));
@@ -27723,6 +27773,9 @@ function* offerInactiveMedia(deps, action) {
  */
 function* offerFullMedia(deps, action) {
   const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Unholding call.');
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { localHold: true });
@@ -27768,13 +27821,13 @@ function* offerFullMedia(deps, action) {
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send unhold offer.');
+    log.info('Failed to unhold call.');
     yield (0, _effects.put)(_actions.callActions.unholdCallFinish(action.payload.id, {
       local: true,
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent unhold offer.');
+    log.info('Finished local portion of unholding call. Waiting on remote response.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
       operation: targetCall.localOp.operation
     }));
@@ -27792,6 +27845,9 @@ function* offerFullMedia(deps, action) {
  */
 function* sendCustomParameters(deps, action) {
   const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Sending custom parameters for call.');
 
   // Get the call.
   const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
@@ -27829,12 +27885,12 @@ function* sendCustomParameters(deps, action) {
   const response = yield (0, _effects.call)(requests.updateCustomParameters, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send custom parameters');
+    log.info('Failed to send custom parameters.');
     yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent custom parameters');
+    log.info('Finished sending custom parameters.');
     yield (0, _effects.put)(_actions.callActions.sendCustomParametersFinish(action.payload.id, {
       error: false
     }));
@@ -27863,6 +27919,9 @@ function* sendCustomParameters(deps, action) {
 function* getStats(deps, action) {
   const { webRTC } = deps;
 
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Getting call statistics.');
+
   // TODO: Actually check something other than "call exists"?
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {});
 
@@ -27886,8 +27945,8 @@ function* getStats(deps, action) {
   let result;
   try {
     result = yield (0, _effects.call)([session, 'getStats'], trackId);
-    log.debug('Successfully got RTCStatsReport.');
   } catch (error) {
+    log.info('Failed to get call statistics.');
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
       error: new _errors2.default({
         code: _errors.callCodes.GENERIC_ERROR,
@@ -27897,6 +27956,7 @@ function* getStats(deps, action) {
     }));
   }
   if (result) {
+    log.info('Finished getting call statistics.');
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { result, trackId }));
   }
 }
@@ -27924,6 +27984,9 @@ function* getStats(deps, action) {
 function* addMedia(deps, action) {
   const requests = deps.requests;
   const { bandwidth, mediaConstraints, id } = action.payload;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Adding media to call.');
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, id, { state: _constants.CALL_STATES.CONNECTED });
@@ -27975,7 +28038,7 @@ function* addMedia(deps, action) {
   };const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send add media offer.');
+    log.info('Failed to add media to call.');
     yield (0, _effects.put)(_actions.callActions.addMediaFinish(id, {
       local: true,
       error: response.error
@@ -27985,7 +28048,7 @@ function* addMedia(deps, action) {
     medias.forEach(media => {
       tracks = tracks.concat(media.tracks.map(track => track.id));
     });
-    log.debug('Successfully sent add media offer.', tracks);
+    log.info('Finished local portion of adding media. Waiting on remote response.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(id, {
       operation: localOp.operation,
       operationData: {
@@ -28020,6 +28083,9 @@ function* addMedia(deps, action) {
 function* removeMedia(deps, action) {
   const requests = deps.requests;
   const { id, tracks, bandwidth } = action.payload;
+
+  const log = _logs.logManager.getLogger('CALL', id);
+  log.info('Removing media from call.');
 
   // Handle scenario where no track ids are provided or not in an array.
   if (!(0, _fp.isArray)(tracks) || (0, _fp.isEmpty)(tracks)) {
@@ -28084,13 +28150,13 @@ function* removeMedia(deps, action) {
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send remove media offer.');
+    log.info('Failed to remove media from call.');
     yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent remove media offer.');
+    log.info('Finished local portion of removing media. Waiting on remote response.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(id, {
       operation: localOp.operation,
       operationData: {
@@ -28153,6 +28219,9 @@ function* renegotiate(deps, action) {
   const requests = deps.requests;
   const { id, trackId } = action.payload;
 
+  const log = _logs.logManager.getLogger('CALL', id);
+  log.info('Performing call renegotiation.');
+
   // Get some call data.
   const {
     id: callId,
@@ -28201,13 +28270,13 @@ function* renegotiate(deps, action) {
   const response = yield (0, _effects.call)(requests.updateSession, callInfo);
 
   if (response.error) {
-    log.debug('Failed to send renegotiation offer.');
+    log.info('Failed to renegotiate call.');
     yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
       local: true,
       error: response.error
     }));
   } else {
-    log.debug('Successfully sent renegotiation offer.');
+    log.info('Finished local portion of renegotiation. Waiting on remote response.');
     yield (0, _effects.put)(_actions.callActions.pendingOperation(callId, {
       operation: localOp.operation,
       operationData: {
@@ -28240,8 +28309,11 @@ function* renegotiate(deps, action) {
  */
 function* addBasicMedia(deps, action) {
   const { id, kind } = action.payload;
-  const tracks = yield getTracks(id, kind);
 
+  const log = _logs.logManager.getLogger('CALL', id);
+  log.debug(`Adding ${kind} media to call.`);
+
+  const tracks = yield getTracks(id, kind);
   if (tracks.length >= 1) {
     const message = `Too many ${kind} tracks for basic scenario!`;
     log.debug(message);
@@ -28278,8 +28350,11 @@ function* addBasicMedia(deps, action) {
  */
 function* removeBasicMedia(deps, action) {
   const { id, kind } = action.payload;
-  const tracks = yield getTracks(id, kind);
 
+  const log = _logs.logManager.getLogger('CALL', id);
+  log.debug(`Removing ${kind} media from call.`);
+
+  const tracks = yield getTracks(id, kind);
   if (tracks.length !== 1) {
     const message = `Must have only one ${kind} track for basic scenario!`;
     log.debug(message);
@@ -28335,6 +28410,9 @@ function* getTracks(id, kind) {
 function* directTransfer(deps, action) {
   const { requests } = deps;
 
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info(`Performing direct transfer on call.`);
+
   const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
   // Ensure the call is in a valid state for this operation.
@@ -28355,12 +28433,14 @@ function* directTransfer(deps, action) {
   const response = yield (0, _effects.call)(requests.directTransferSession, callInfo);
 
   if (response.error) {
+    log.info('Failed to direct transfer call.');
     yield (0, _effects.put)(_actions.callActions.directTransferFinish(action.payload.id, {
       error: response.error
     }));
     return;
   }
 
+  log.info('Finished local portion of direct transfer. Waiting on remote response.');
   yield (0, _effects.put)(_actions.callActions.pendingOperation(action.payload.id, {
     operation: currentCall.localOp.operation
   }));
@@ -28386,6 +28466,9 @@ function* directTransfer(deps, action) {
  */
 function* consultativeTransfer(deps, action) {
   const { requests } = deps;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info(`Performing consultative transfer on call.`);
 
   const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
   const otherCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.otherCallId);
@@ -28427,6 +28510,7 @@ function* consultativeTransfer(deps, action) {
   const response = yield (0, _effects.call)(requests.consultativeTransferSessions, callInfo);
 
   if (response.error) {
+    log.info('Failed to consultative transfer call.');
     yield (0, _effects.put)(_actions.callActions.consultativeTransferFinish(action.payload.id, {
       error: response.error,
       otherCallId: action.payload.otherCallId
@@ -28434,6 +28518,7 @@ function* consultativeTransfer(deps, action) {
     return;
   }
 
+  log.info('Finished local portion of consultative transfer. Waiting on remote response.');
   yield (0, _effects.put)(_actions.callActions.pendingConsultativeTransfer(currentCall.id, { otherCallId: otherCall.id }));
 }
 
@@ -28457,6 +28542,9 @@ function* consultativeTransfer(deps, action) {
  */
 function* join(deps, action) {
   const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info(`Performing join on call.`);
 
   const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
   const otherCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.otherCallId);
@@ -28514,6 +28602,7 @@ function* join(deps, action) {
   const response = yield (0, _effects.call)(requests.joinSessions, callInfo);
 
   if (response.error) {
+    log.info('Failed to join call.');
     yield (0, _effects.put)(_actions.callActions.joinFinish(action.payload.id, {
       error: response.error,
       usedCallIds: [action.payload.id, action.payload.otherCallId]
@@ -28538,6 +28627,7 @@ function* join(deps, action) {
   const otherCallRemoteAddress = otherCall.direction === _constants.CALL_DIRECTION.OUTGOING ? otherCall.to : currentCall.from;
   const participantAddress = `${currentCallRemoteAddress},${otherCallRemoteAddress}`;
 
+  log.info('Finished local portion of join. Waiting on remote response.');
   // Dispatch an action to do the following:
   //  - create a new "joined" call in state
   //  - update calls used in the join to have isPending property
@@ -28581,6 +28671,10 @@ function* join(deps, action) {
  */
 function* replaceTrack(deps, action) {
   const { webRTC } = deps;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info(`Replacing track on call.`);
+
   const { trackId, mediaConstraints } = action.payload;
 
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
@@ -28601,8 +28695,10 @@ function* replaceTrack(deps, action) {
   });
 
   if (error) {
+    log.info('Failed to replace track on call.');
     yield (0, _effects.put)(_actions.callActions.replaceTrackFinish(action.payload.id, { error }));
   } else {
+    log.info('Finished replacing track on call.');
     yield (0, _effects.put)(_actions.callActions.replaceTrackFinish(action.payload.id, { newTrackId, oldTrackState }));
   }
 }
@@ -28700,9 +28796,12 @@ const log = _logs.logManager.getLogger('CALL');
 // Callstack.
 function* handleUpdateRequest(deps, targetCall, params) {
   const { webRTC, requests } = deps;
+
+  const log = _logs.logManager.getLogger('CALL', targetCall.id);
+  log.info(`Processing regular update request from remote endpoint.`);
+
   let { sdp } = params;
   const { remoteNumber, remoteName } = params;
-  log.info(`Handling regular update request for call ${targetCall.id}.`);
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
   log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
@@ -28841,13 +28940,13 @@ function* handleUpdateRequest(deps, targetCall, params) {
     // Scenario: The offer was processed, but failed to respond with the answer.
     // The remote side needs the answer SDP before the call is "connected".
     // TODO: Handle this scenario (retry request or fail/revert operation?)
-    log.debug('Failed to respond to remote offer with an answer.');
+    log.info('Failed to respond to remote offer with an answer.');
     yield (0, _effects.put)(callAction(targetCall.id, {
       remote: true,
       error: response.error
     }));
   } else {
-    log.debug('Successfully responded to remote offer.');
+    log.info('Finished responding to remote update. Changing state based on the remote operation.');
     yield (0, _effects.put)(callAction(targetCall.id, {
       remote: true,
       remoteParticipant: {
@@ -28893,7 +28992,8 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
   const { webRTC, requests } = deps;
   const { remoteNumber, remoteName } = params;
 
-  log.info(`Handling slow start update request for call ${targetCall.id}.`);
+  const log = _logs.logManager.getLogger('CALL', targetCall.id);
+  log.info(`Processing slow-start update request from remote endpoint.`);
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
   log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
@@ -28948,11 +29048,11 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
 
   if (response.error) {
     // TODO: Handle this scenario (retry request or fail/revert operation?)
-    log.debug('Failed to respond to update.', response.error);
+    log.info('Failed to respond to slow-start remote update.', response.error);
     return;
   }
 
-  log.debug('Responded to remote slow start offer. Awaiting response.');
+  log.info('Finished responding to slow-start remote update. Waiting on remote response.');
   /*
    * The operation is not complete until we receive a response to our offer. The
    *    response will be handled by the `handleSlowUpdateResponse` saga.
@@ -28997,7 +29097,9 @@ function* handleSlowUpdateRequest(deps, targetCall, params) {
  */
 function* handleUpdateResponse(deps, targetCall, params) {
   const { sdp } = params;
-  log.info(`Handling regular update response for call ${targetCall.id}.`);
+
+  const log = _logs.logManager.getLogger('CALL', targetCall.id);
+  log.info('Processing remote response from regular, local update request.');
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
   log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
@@ -29020,7 +29122,7 @@ function* handleUpdateResponse(deps, targetCall, params) {
 
   // Update call state depending on what the current call state is.
   if ([_constants.CALL_STATES.RINGING, _constants.CALL_STATES.INITIATED, _constants.CALL_STATES.EARLY_MEDIA].includes(targetCall.state)) {
-    log.info(`Handling state change as remote answer operation.`);
+    log.info(`Handling state change as remote answer operation. Changing to ${_constants.CALL_STATES.CONNECTED}.`);
     // Scenario: The call was previously ringing, so this response is a "call
     //    accepted" notification. The call should now be established.
     // It's possible that the call never entered Ringing state (from Initiated).
@@ -29082,6 +29184,7 @@ function* handleUpdateResponse(deps, targetCall, params) {
           break;
       }
       if (finishAction) {
+        log.info(`Finished processing remote response to local ${localOp.operation}. Changing state based on operation.`);
         yield (0, _effects.put)(finishAction(targetCall.id, localOp.operationData));
         return;
       }
@@ -29090,10 +29193,12 @@ function* handleUpdateResponse(deps, targetCall, params) {
     // TODO: Leave this here for now to not break other operations. Need to update this as we convert the other operations.
     // Determine whether the SDP has active media.
     const mediaFlowing = yield (0, _effects.call)(_sdp.hasMediaFlowing, params.sdp);
+    const nextState = mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD;
 
     log.info(`Handling state change as local midcall operation ${mediaFlowing ? 'with' : 'without'} media flowing.`);
+    log.info(`Finished processing remote response. Changing to ${nextState}.`);
     yield (0, _effects.put)(_actions.callActions.updateCall(targetCall.id, {
-      state: mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD
+      state: nextState
     }));
   } else {
     // Scenario: The call is in an unexpected state for receiving a remote
@@ -29134,7 +29239,9 @@ function* handleUpdateResponse(deps, targetCall, params) {
  */
 function* handleSlowUpdateResponse(deps, targetCall, params) {
   let { sdp } = params;
-  log.info(`Handling slow start update response for call ${targetCall.id}.`);
+
+  const log = _logs.logManager.getLogger('CALL', targetCall.id);
+  log.info(`Processing remote response from slow-start remote update request.`);
 
   const mediaState = yield (0, _effects.call)(_state.getMediaState, targetCall);
   log.debug(`Current call info; State: ${targetCall.state}, MediaState: ${mediaState}.`);
@@ -29206,9 +29313,11 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
 
   if (targetCall.state === _constants.CALL_STATES.CONNECTED || targetCall.state === _constants.CALL_STATES.ON_HOLD) {
     let callAction = yield (0, _effects.call)(getCallAction, remoteOp);
+    const nextState = mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD;
 
+    log.info(`Finished processing remote slow-start response. Changing to ${nextState}.`);
     yield (0, _effects.put)(callAction(targetCall.id, {
-      state: mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD,
+      state: nextState,
       // Remote participant's information.
       remoteParticipant: {
         displayNumber: params.remoteNumber,
@@ -29310,8 +29419,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const log = _logs.logManager.getLogger('CALL');
-
 /**
  * A "call incoming" notification has been received and needs to be handled.
  *
@@ -29338,37 +29445,14 @@ const log = _logs.logManager.getLogger('CALL');
  * @param {string}   params.remoteName     Display name of the remote participant.
  * @param {string}   params.calleeNumber  Number of the intended call recipient
  */
-
-
-// Helpers
-// TODO: Move this to a shared location.
-
-
-// Libraries.
-
-
-// Other plugins
-
-
-// Callstack plugin.
-/**
- * "Notification sagas" handle received notifications.
- * Each saga handles a single websocket notification that may be received from
- *    the backend.
- *
- * There may not be an established webRTC session for these sagas. This may be
- *    because (1) the notification is a new incoming call, or (2) there is a
- *    de-sync between SDK state and server state. This may or may not be
- *    considered as an error scenario (eg. a "call ended" notification for a
- *    call the SDK doesn't know about may be safely ignored).
- */
-
-// Call plugin.
 function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
 
   const callId = yield (0, _effects.call)(_uuid.v4);
+
+  const log = _logs.logManager.getLogger('CALL', callId);
+  log.info('Received new incoming call; initiating.', { wrtcsSessionId });
 
   // Dispatch the action right away so the call is in state at this point.
   yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
@@ -29391,6 +29475,8 @@ function* incomingCall(deps, params) {
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
+    const customNames = customParameters.map(param => param.name);
+    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(callId, {
       customParameters
     }));
@@ -29422,23 +29508,25 @@ function* incomingCall(deps, params) {
       turnInfo,
       callId
     });
-  } else {}
-  // Slow start call.
-  /*
-   * We can't setup a webRTC session yet because generating an offer requires
-   *   media constraints. We need to wait until the application provides
-   *   media information before we can setup the call.
-   */
-
+  } else {
+    log.debug('Incoming call is a slow-start call.');
+    // Slow start call.
+    /*
+     * We can't setup a webRTC session yet because generating an offer requires
+     *   media constraints. We need to wait until the application provides
+     *   media information before we can setup the call.
+     */
+  }
 
   // Send update that the wrtcsSessionStatus is 'Ringing'
-  const callInfo = { wrtcsSessionId };
+  const callInfo = { wrtcsSessionId, id: callId };
   const updateStatusResponse = yield (0, _effects.call)(requests.updateCallRinging, callInfo);
 
   if (updateStatusResponse.error) {
     log.error(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
   }
 
+  log.info(`Finished initiating incoming call. Changing to ${_constants.CALL_STATES.RINGING} and waiting on local answer.`);
   yield (0, _effects.put)(_actions.callActions.callRinging(callId, {
     state: _constants.CALL_STATES.RINGING
   }));
@@ -29470,26 +29558,57 @@ function* incomingCall(deps, params) {
  * @param {string} params.remoteName   Name of the remote participant.
  * @param {string} params.remoteNumber Number of the remote participant.
  */
+
+
+// Helpers
+// TODO: Move this to a shared location.
+
+
+// Libraries.
+
+
+// Other plugins
+
+
+// Callstack plugin.
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
 function* parseCallRequest(deps, params) {
   const { wrtcsSessionId, sdp, remoteName, remoteNumber, customParameters } = params;
   const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
 
+  const log = _logs.logManager.getLogger('CALL', (targetCall || {}).id);
+  log.info('Received new update call request; handling.', { wrtcsSessionId });
+
   if (!targetCall) {
     // Scenario: No call is associated with the wrtcsSessionId.
-    log.debug(`Received request for unknown wrtcsSession: ${wrtcsSessionId}. Ignoring.`);
+    log.info('Update request is for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   } else if (targetCall.state === _constants.CALL_STATES.ENDED) {
     // Scenario: The associated call is ended, and should not have an active
     //    webRTC session.
-    log.debug(`Received request for ended call: ${targetCall.id}. Ignoring.`);
+    log.info('Update request is for ended call. Ignoring.', { wrtcsSessionId });
     return;
   }
   // TODO: Make sure the call is able to receive a `respondCallRequest`
   //    notification (ie. has no pending operation).
-  log.info(`Received update request ${sdp ? 'with' : 'without'} SDP for call: ${targetCall.id}. Processing.`);
+  log.debug(`Update request ${sdp ? 'with' : 'without'} SDP for call. Processing.`);
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
+    const customNames = customParameters.map(param => param.name);
+    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(targetCall.id, {
       customParameters
     }));
@@ -29536,24 +29655,29 @@ function* parseCallResponse(deps, params) {
   const { wrtcsSessionId, sdp, customParameters } = params;
   const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
 
+  const log = _logs.logManager.getLogger('CALL', (targetCall || {}).id);
+  log.info('Received new update call response; handling.', { wrtcsSessionId });
+
   if (!targetCall) {
     // Scenario: The notification is about a call that state does not know about.
     //    Ignore the notification.
-    log.debug(`Received response for unknown wrtcsSession: ${wrtcsSessionId}. Ignoring.`);
+    log.info('Update response for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   } else if (targetCall.state === _constants.CALL_STATES.ENDED) {
+    const log = _logs.logManager.getLogger('CALL', targetCall.id);
     // Scenario: The notification is about a call that state says is ended.
     //    Ignore the notification, since ended calls should not have an active
     //    webRTC Session.
-    log.debug(`Received response for ended call: ${targetCall.id}. Ignoring.`);
+    log.info('Update response for ended call. Ignoring.', { wrtcsSessionId });
     return;
   }
   // TODO: Make sure the call is expecting a `respondCallUpdate` notification.
   //    ie. has a pending operation.
-  log.info(`Received response for call: ${targetCall.id}. Processing.`);
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
+    const customNames = customParameters.map(param => param.name);
+    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(targetCall.id, {
       customParameters
     }));
@@ -29612,25 +29736,25 @@ function* parseCallResponse(deps, params) {
  */
 function* callStatusUpdateEnded(deps, params) {
   const { wrtcsSessionId, reasonText, statusCode } = params;
+  const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
 
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
+  const log = _logs.logManager.getLogger('CALL', (currentCall || {}).id);
+  log.info('Received call status ended notice; handling.', { wrtcsSessionId });
 
   if (!currentCall) {
-    log.debug(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    log.info('Call ended notice for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   }
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, currentCall.id, {});
   if (stateError) {
-    log.debug(`Error: call session not found: ${stateError.message}`);
+    log.info('Call ended notice for unknown Call. Ignoring.');
     return;
   }
 
   if (currentCall.state === _constants.CALL_STATES.ENDED) {
-    log.debug(`Error: wrtcs session call ${wrtcsSessionId} already in 'Ended' state.`);
+    log.info('Call ended notice for already Ended call. Ignoring.', { wrtcsSessionId });
     return;
   }
 
@@ -29664,6 +29788,7 @@ function* callStatusUpdateEnded(deps, params) {
       }
     }
     endParams.transition = { reasonText, statusCode: customStatusCode };
+    log.debug(`Call ended notice caused by ${reasonText} (${customStatusCode}).`);
   }
 
   yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
@@ -29701,6 +29826,7 @@ function* callStatusUpdateEnded(deps, params) {
     }
   }
 
+  log.info(`Finished handling call ended notice. Changing to ${_constants.CALL_STATES.ENDED}.`);
   // TODO: Don't expose these directly. Create our own convention so that transition data
   //       can be consistent across different operations.
   yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, endParams));
@@ -29725,30 +29851,33 @@ function* callStatusUpdateEnded(deps, params) {
  */
 function* callStatusUpdateRinging(deps, params) {
   const { wrtcsSessionId, customParameters } = params;
+  const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
 
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
+  const log = _logs.logManager.getLogger('CALL', (currentCall || {}).id);
+  log.info('Received call status ringing notice; handling.', { wrtcsSessionId });
 
   if (!currentCall) {
-    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    log.info('Call ringing notice for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   }
 
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, currentCall.id, { state: _constants.CALL_STATES.INITIATED });
   if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
+    log.info(`Call ringing notice for Call in an invalid state: ${stateError.message}. Ignoring.`);
     return;
   }
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
+    const customNames = customParameters.map(param => param.name);
+    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(currentCall.id, {
       customParameters
     }));
   }
 
+  log.info(`Finished handling call ringing notice. Changing to ${_constants.CALL_STATES.RINGING}.`);
   yield (0, _effects.put)(_actions.callActions.callRinging(currentCall.id, {
     // Remote participant's information.
     remoteParticipant: {
@@ -29773,13 +29902,13 @@ function* callStatusUpdateRinging(deps, params) {
  */
 function* callStatusUpdateFailed(deps, params) {
   const { wrtcsSessionId, reasonText, statusCode } = params;
+  const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
 
-  const calls = yield (0, _effects.select)(_selectors.getCalls);
-  // TODO: `find` --> IE11 support.
-  const currentCall = calls.find(call => call.wrtcsSessionId === wrtcsSessionId);
+  const log = _logs.logManager.getLogger('CALL', (currentCall || {}).id);
+  log.info('Received call operation failed notice; handling.', { wrtcsSessionId });
 
   if (!currentCall) {
-    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    log.info('Call operation failed notice for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   }
 
@@ -29811,7 +29940,10 @@ function* callStatusUpdateFailed(deps, params) {
         };
         break;
     }
+    log.debug(`Processing as a local ${localOp.operation} failure (${transition.statusCode}).`);
+
     if (finishAction) {
+      log.info('Finished handling call operation failed notice.');
       yield (0, _effects.put)(finishAction(currentCall.id, {
         error: new _errors2.default({
           message: `Operation ${localOp.operation} failed.`,
@@ -29843,19 +29975,24 @@ function* callStatusUpdateFailed(deps, params) {
  * @param {Object} params       Parameters describing the notification.
  */
 function* callCancelled(deps, params) {
-  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, params.wrtcsSessionId);
+  const { wrtcsSessionId } = params;
+  const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  const log = _logs.logManager.getLogger('CALL', (targetCall || {}).id);
+  log.info('Received call cancelled notice; handling.', { wrtcsSessionId });
 
   if (!targetCall) {
-    log.debug(`Call for session ${params.wrtcsSessionId} not found.`);
+    log.info('Call cancelled notice for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   } else if ([_constants.CALL_STATES.ENDED, _constants.CALL_STATES.CANCELLED].includes(targetCall.state)) {
-    log.debug(`Call ${targetCall.id} is already in ${targetCall.state} state`);
+    log.info(`Call cancelled notice for already ${targetCall.state} call. Ignoring.`, { wrtcsSessionId });
     return;
   }
 
   // Clean up the Webrtc portion of the Call.
   yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, targetCall.webrtcSessionId);
 
+  log.info(`Finished handling call cancelled notice. Changing to ${_constants.CALL_STATES.CANCELLED}.`);
   // Dispatch an action to handle the redux portion of the Call.
   yield (0, _effects.put)(_actions.callActions.callCancelled(targetCall.id));
 }
@@ -29883,8 +30020,12 @@ function* receiveEarlyMedia(deps, params) {
    * Get the call from state.
    */
   const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  const log = _logs.logManager.getLogger('CALL', (currentCall || {}).id);
+  log.info('Received early media notice; handling.', { wrtcsSessionId });
+
   if (!currentCall) {
-    log.error(`Error: wrtcs session call ${wrtcsSessionId} not found.`);
+    log.info('Early media notice for unknown wrtcsSession. Ignoring.', { wrtcsSessionId });
     return;
   }
 
@@ -29893,13 +30034,15 @@ function* receiveEarlyMedia(deps, params) {
    */
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], currentCall.webrtcSessionId);
   if (!session) {
-    log.debug(`webRTC session ${currentCall.webrtcSessionId} not found.`);
+    log.info('Early media notice for missing wrtcsSession. Ignoring.', { wrtcsSessionId });
     // TODO: Better error.
     return;
   }
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
+    const customNames = customParameters.map(param => param.name);
+    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(currentCall.id, {
       customParameters
     }));
@@ -29923,6 +30066,7 @@ function* receiveEarlyMedia(deps, params) {
     return;
   }
 
+  log.info(`Finished handling early media notice. Changing to ${_constants.CALL_STATES.EARLY_MEDIA}.`);
   yield (0, _effects.put)(_actions.callActions.sessionProgress(currentCall.id, {
     // Remote participant's information.
     remoteParticipant: {
@@ -29965,9 +30109,6 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// Other plugins.
-const log = _logs.logManager.getLogger('CALL');
-
 /**
  * Sends a call audit.
  *
@@ -29994,15 +30135,12 @@ const log = _logs.logManager.getLogger('CALL');
  */
 
 
-// Libraries.
-
-
-// Callstack plugin.
-// Call plugin.
+// Other plugins.
 function* sendCallAudit(deps, action) {
   const { webRTC, requests } = deps;
 
   const { error, id, status } = action.payload;
+  const log = _logs.logManager.getLogger('CALL', id);
   const delayMs = error ? 5000 : 25000;
 
   yield (0, _effects.delay)(delayMs);
@@ -30010,7 +30148,7 @@ function* sendCallAudit(deps, action) {
 
   // Some basic validation
   if (!currentCall) {
-    log.error(`Error: call id ${id} not found.`);
+    log.info('Call not found; stopping audit loop.');
     return;
   }
   // CALL_ACCEPTED actions should only trigger an audit loop if it is a joined call
@@ -30019,19 +30157,20 @@ function* sendCallAudit(deps, action) {
   }
 
   if (currentCall.state === _constants.CALL_STATES.ENDED) {
-    log.debug(`Call id ${id} has ended; stopping call audits`);
+    log.info('Call has ended; stopping audit loop.');
     return;
   }
 
   // If we get here, we know we have an active call. Just log our next intent...
   if (!status) {
     // If the action has no status, then the call starting triggered this audit.
-    log.debug(`Starting audits for call ${id}.`);
+    log.info(`Starting audit loop for new call.`);
   } else if (status === 'Retry') {
     // If the previous audit failed for an unknown reason, retry it.
-    log.debug(`Call status is "Unknown"; retrying failed audit for call ${id}.`);
+    log.debug('Call status is "Unknown"; retrying failed audit for call.');
   }
 
+  log.info('Sending call audit.');
   // Send our audit request
   const updateStatusResponse = yield (0, _effects.call)(requests.auditCall, {
     wrtcsSessionId: currentCall.wrtcsSessionId,
@@ -30042,19 +30181,20 @@ function* sendCallAudit(deps, action) {
   // Schedule for another audit request
   if (updateStatusResponse.error) {
     // We have an error but status is not Closed, so we continue sending audit request in hoping audit will recover
-    log.debug(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
+    const { message, code } = updateStatusResponse.error;
+    log.debug(`Call audit failed, caused by ${message} (${code}).`);
     yield (0, _effects.put)(_actions.callActions.sendCallAudit(id, {
       error: updateStatusResponse.error,
       status: updateStatusResponse.status
     }));
   } else {
-    log.debug(`Call audit for ${id}: Call is ${updateStatusResponse.status}.`);
+    log.debug(`Call audit status is ${updateStatusResponse.status}.`);
     yield (0, _effects.put)(_actions.callActions.sendCallAudit(id, { status: updateStatusResponse.status }));
   }
 
   if (updateStatusResponse.status === 'Closed') {
     // If this audit returned 'Closed', then the audit loop should stop right away.
-    log.debug(`Call status is "Closed"; Hanging up the active call & stopping associated call audits for id: ${id}.`);
+    log.info(`Ending audit loop and Call due to Closed status. Changing to ${_constants.CALL_STATES.ENDED}.`);
 
     // Also hangup call automatically (from webRTC perspective)
     yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
@@ -30078,6 +30218,13 @@ function* sendCallAudit(deps, action) {
  * @param {Object}   deps          Dependencies that the saga uses.
  * @param {Object}   action        The action that triggered the audit.
  */
+
+
+// Libraries.
+
+
+// Callstack plugin.
+// Call plugin.
 function* getSessions(deps, action) {
   const config = yield (0, _effects.select)(_selectors.getOptions);
   if (!config.resyncOnConnect) {
@@ -30111,6 +30258,7 @@ function* getSessions(deps, action) {
  */
 function* updateCallState(deps, activeCall) {
   const { webRTC, requests } = deps;
+  const log = _logs.logManager.getLogger('CALL', activeCall.id);
   const callStateAfterConnect = activeCall.state;
 
   // If there is an ongoing operation when the WS connects, the response to that operation will re-sync the state
@@ -30138,6 +30286,8 @@ function* updateCallState(deps, activeCall) {
         if (sessionStatusResponse.error && sessionStatusResponse.error.code === 47) {
           // End the call as the session does not exist on the server anymore (statusCode 47 response)
           yield (0, _effects.call)(_midcall.closeCall, webRTC, activeCall.webrtcSessionId);
+
+          log.info(`Call re-sync found that call is ended. Changing to ${_constants.CALL_STATES.ENDED}.`);
           yield (0, _effects.put)(_actions.callActions.endCallFinish(activeCall.id, {
             isLocal: true,
             error: sessionStatusResponse.error
@@ -30145,12 +30295,13 @@ function* updateCallState(deps, activeCall) {
 
           // GET response errors other than session not found
         } else if (sessionStatusResponse.error) {
-          log.info(`Unable to resync call: ${currentCall.id} due to error: ${sessionStatusResponse.error}`);
+          log.debug(`Call re-sync failure (${sessionStatusResponse.error.code}).`, sessionStatusResponse.error);
 
           // If the call is answered, but not by us
         } else if (sessionStatusResponse.state === 'ANSWERED' && currentCall.state !== _constants.CALL_STATES.CONNECTED && currentCall.state !== _constants.CALL_STATES.ON_HOLD) {
           // Report call as cancelled
           yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, activeCall.webrtcSessionId);
+          log.info(`Call re-sync found that call is cancelled. Changing to ${_constants.CALL_STATES.CANCELLED}.`);
           yield (0, _effects.put)(_actions.callActions.callCancelled(activeCall.id));
         }
       }
@@ -31101,9 +31252,7 @@ var _freeze2 = _interopRequireDefault(_freeze);
 
 exports.default = runPipeline;
 
-var _loglevel = __webpack_require__("../../node_modules/loglevel/lib/loglevel.js");
-
-var _loglevel2 = _interopRequireDefault(_loglevel);
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
 
@@ -31112,6 +31261,9 @@ var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Libraries.
+const log = _logs.logManager.getLogger('SDP');
 
 /**
  * Basic SDP pipeline runner.
@@ -31125,6 +31277,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param  {BandwidthControls} [info.bandwidth] Information about bandwidth controls.
  * @return {string}     The modified session description.
  */
+// Other plugins.
 function runPipeline(handlers, sdp, info) {
   let objectSdp = _sdpTransform2.default.parse(sdp);
 
@@ -31136,13 +31289,13 @@ function runPipeline(handlers, sdp, info) {
       if ((0, _fp.isFunction)(handler)) {
         newSdp = handler(newSdp, info, originalSdp);
       } else {
-        _loglevel2.default.error(`SDP handler not a function; skipping.`);
+        log.error(`SDP handler not a function; skipping.`);
       }
     });
   }
 
   return _sdpTransform2.default.write(newSdp);
-} // Libraries.
+}
 
 /***/ }),
 
@@ -31353,12 +31506,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// WebRTC operations.
-
-
-// Helpers
-const log = _logs.logManager.getLogger('CALLSTACK');
-
 /**
  * Performs the WebRTC portion necessary for establishing outgoing calls
  *
@@ -31385,10 +31532,16 @@ const log = _logs.logManager.getLogger('CALLSTACK');
  */
 
 
-// Libraries.
-// Call plugin.
+// WebRTC operations.
+
+
+// Helpers
 function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
+
+  const log = _logs.logManager.getLogger('CALL', sessionOptions.callId);
+  log.info('Setting up local WebRTC portions of call.');
+
   const {
     sdpSemantics,
     turnInfo,
@@ -31403,6 +31556,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
   if (error) {
+    log.debug('Failed to get media requested for the call.');
     return { error };
   }
 
@@ -31419,6 +31573,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
       maxIceTimeout
     }
   });
+  log.debug('Created WebRTC Session for Call.', { webrtcSessionId: session.id });
 
   // Trigger a new action specifying that the session has been created
   yield (0, _effects.put)(_actions.callActions.sessionCreated(callId, {
@@ -31447,6 +31602,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
   });
   offer = yield (0, _effects.call)([session, 'setLocalDescription'], offer);
 
+  log.info('Finished setting up local WebRTC portions of call.');
   return {
     error: false,
     offerSdp: offer.sdp,
@@ -31473,6 +31629,10 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
  * @param  {Object} sessionOptions.offer an offer containing an SDP
  * @return {string} sessionId an identifier for the session
  */
+
+
+// Libraries.
+// Call plugin.
 function* setupIncomingCall(deps, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
   const {
@@ -31485,6 +31645,9 @@ function* setupIncomingCall(deps, sessionOptions) {
     iceCollectionCheck
   } = sessionOptions;
   let offer = sessionOptions.offer;
+
+  const log = _logs.logManager.getLogger('CALL', callId);
+  log.info('Setting up remote WebRTC portions of call.');
 
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
     peer: {
@@ -31518,6 +31681,7 @@ function* setupIncomingCall(deps, sessionOptions) {
     webrtcSessionId: session.id
   }));
 
+  log.info('Finished setting up remote WebRTC portions of call.');
   return session.id;
 }
 
@@ -31543,6 +31707,9 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
   const { webRTC, sdpHandlers } = deps;
   const { sessionId, bandwidth } = sessionOptions;
 
+  const log = _logs.logManager.getLogger('CALL', sessionOptions.callId);
+  log.info('Setting up local WebRTC portions of call.');
+
   // Get the webRTC session that represents this call.
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
@@ -31554,6 +31721,7 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
   const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
 
   if (error) {
+    log.debug('Failed to get media requested for the call.');
     return { error };
   }
 
@@ -31578,6 +31746,7 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
   });
   answer = yield (0, _effects.call)([session, 'setLocalDescription'], answer);
 
+  log.info('Finished setting up local WebRTC portions of call.');
   return {
     error: false,
     answerSDP: answer.sdp,
@@ -32146,10 +32315,6 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Helpers.
-// Other Plugins
-const log = _logs.logManager.getLogger('CALLSTACK');
-
 /**
  * Compares whether a new remote SDP for a Session has the same SDP session ID
  *    of the previous remote SDP.
@@ -32161,7 +32326,8 @@ const log = _logs.logManager.getLogger('CALLSTACK');
  */
 
 
-// Libraries.
+// Helpers.
+// Other Plugins
 function* isSameSdpSessionId(webRTC, sessionId, sdp) {
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
   const currentDesc = session.peer.remoteDescription;
@@ -32199,8 +32365,12 @@ function* isSameSdpSessionId(webRTC, sessionId, sdp) {
  * @param {Object} targetCall Information about the call that this Session is associated with.
  * @returns {Object} Error object if any have occured. Undefined otherwise.
  */
+
+
+// Libraries.
 function* receivedAnswer(deps, sessionInfo, targetCall) {
   const { webRTC, sdpHandlers } = deps;
+  const log = _logs.logManager.getLogger('CALL', targetCall.id);
   log.debug(`Processing SDP answer for session ${sessionInfo.sessionId}.`);
 
   const sessionId = sessionInfo.sessionId;
@@ -32631,7 +32801,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.14.0-beta.350';
+  return '4.15.0-beta.351';
 }
 
 /***/ }),
@@ -38068,6 +38238,7 @@ const SET_LEVEL = exports.SET_LEVEL = prefix + 'SET_LEVEL';
 const LEVELS_CHANGE = exports.LEVELS_CHANGE = prefix + 'LEVELS_CHANGE';
 
 const SET_HANDLER = exports.SET_HANDLER = prefix + 'SET_HANDLER';
+const HANDLERS_CHANGE = exports.HANDLERS_CHANGE = prefix + 'HANDLERS_CHANGE';
 
 /***/ }),
 
@@ -38083,6 +38254,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setLevel = setLevel;
 exports.levelsChanged = levelsChanged;
 exports.setHandler = setHandler;
+exports.handlersChanged = handlersChanged;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/logs/interface/actionTypes.js");
 
@@ -38104,7 +38276,7 @@ function setLevel(level, type) {
 }
 
 /**
- * Action for a setting all of the Loggers' log level.
+ * Action for setting all of the Loggers' log level.
  * @method levelsChanged
  * @param  {Object} levelMap Mapping of logger type to level.
  * @return {Object}
@@ -38127,6 +38299,19 @@ function setHandler(handler, type) {
   return {
     type: actionTypes.SET_HANDLER,
     payload: { handler, type }
+  };
+}
+
+/**
+ * Action for setting all of the Loggers' log handler.
+ * @method handlersChanged
+ * @param  {Object} handlerMap Mapping of logger type to handler.
+ * @return {Object}
+ */
+function handlersChanged(handlerMap) {
+  return {
+    type: actionTypes.HANDLERS_CHANGE,
+    payload: handlerMap
   };
 }
 
@@ -38551,6 +38736,7 @@ exports.setHandlerEntry = setHandlerEntry;
 exports.setLogLevel = setLogLevel;
 exports.setLogHandler = setLogHandler;
 exports.getLevelMap = getLevelMap;
+exports.getHandlerMap = getHandlerMap;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/logs/interface/actionTypes.js");
 
@@ -38648,6 +38834,11 @@ function* setLogHandler(action) {
       _index.logManager.getLoggers().forEach(logger => {
         logger.setHandler(handler);
       });
+
+      // Notify that all Logger handlers [may] have changed (because changing
+      //    the default handler will affect all Loggers without their own
+      //    handler explicitly set).
+      yield (0, _effects.put)(actions.handlersChanged(getHandlerMap(_index.logManager)));
     } else {
       // Update the Manager's default handler for this type.
       _index.logManager.setHandler(type, handler);
@@ -38655,6 +38846,9 @@ function* setLogHandler(action) {
       _index.logManager.getLoggers(type).forEach(logger => {
         logger.setHandler(handler);
       });
+
+      // Notify that the one type's handler has changed.
+      yield (0, _effects.put)(actions.handlersChanged({ [type]: handler }));
     }
   } catch (err) {
     const log = _index.logManager.getLogger('LOGS');
@@ -38683,6 +38877,29 @@ function getLevelMap(logManager) {
   });
 
   return levels;
+}
+
+/**
+ * Helper function.
+ * Gets the log handler for every Logger type (and default).
+ * @method getHandlerMap
+ * @return {Object} Mapping of Logger type to its log handler.
+ */
+function getHandlerMap(logManager) {
+  // Get unique types from all Loggers.
+  const loggers = logManager.getLoggers();
+  const types = [...new _set2.default(loggers.map(logger => logger.type))];
+
+  const handlers = {};
+  // Add the default level to the beginning.
+  handlers[defaultType] = logManager.getHandler();
+
+  // Get the handler for each Logger type.
+  types.forEach(type => {
+    handlers[type] = logManager.getHandler(type);
+  });
+
+  return handlers;
 }
 
 /***/ }),
@@ -42995,10 +43212,10 @@ const log = _logs.logManager.getLogger('NOTIFICATIONS');
  * @returns The notification id if it finds one, undefined otherwise.
  */
 // Notification plugin.
-function findNotificationId(notification) {
+function findNotificationInfo(notification) {
   for (let key in notification) {
     if (notification[key].id) {
-      return notification[key].id;
+      return [notification[key].id, key];
     }
   }
 }
@@ -43030,6 +43247,7 @@ function* processNotifications() {
 
   while (true) {
     const { payload: notification, meta } = yield (0, _effects.take)(actionTypes.PROCESS_NOTIFICATION);
+    log.info(`Received notification on channel ${meta.channel}; handling.`);
 
     // Only process notifications from enabled channels, ie. "silence" the channel.
     let channel = yield (0, _effects.select)(_selectors.getNotificationsInfo, meta.channel);
@@ -43039,12 +43257,13 @@ function* processNotifications() {
     }
 
     // Find the unique ID of the received notification.
-    const notificationId = findNotificationId(notification);
+    const [notificationId, notificationType] = findNotificationInfo(notification) || [];
     if (!notificationId) {
       log.error('Received notification without a findable ID.', (0, _keys2.default)(notification));
       continue;
     }
 
+    log.debug(`The received notification is of type ${notificationType}.`);
     if (!isDuplicate(notificationId)) {
       // Notify others (plugins) that a new notification was receive.
       yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
@@ -43052,6 +43271,7 @@ function* processNotifications() {
       // Finish processing the notification.
       yield (0, _effects.put)(actions.processNotificationFinish(notification));
     } else {
+      log.info('Notification was a duplicate; ignoring.');
       const error = new Error(`Notification id ${notificationId} is duplicate.`);
       yield (0, _effects.put)(actions.processNotificationFinish(error));
     }
@@ -45682,20 +45902,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = _logs.logManager.getLogger('REQUEST');
-
 /**
  * Enum declaring the valid request response data types that are available to be handled
  */
-
-
-// State setters.
 const responseTypes = (0, _freeze2.default)({
   json: 'json',
   blob: 'blob',
   text: 'text',
   none: 'none'
 });
+
+// State setters.
+
 
 const contentTypes = (0, _freeze2.default)({
   jsonType: 'application/json',
@@ -45773,13 +45991,31 @@ function* handleRequest(action) {
  * @return {Promise} A promise that resolves with a custom response object.
  */
 async function makeRequest(options, requestId) {
-  // Extract and remove the url property.
+  const log = _logs.logManager.getLogger('REQUEST', requestId);
+
+  // Extract and remove the non-fetch API properties.
   const { url, queryParams, responseType = 'json' } = options,
         fetchOptions = (0, _objectWithoutProperties3.default)(options, ['url', 'queryParams', 'responseType']);
 
+  if (!url || typeof url !== 'string') {
+    const invalidUrlMessage = `Invalid request url; expected url of type string but received ${url} instead`;
+    log.error(invalidUrlMessage);
+    return {
+      body: undefined,
+      error: 'REQUEST_URL',
+      message: invalidUrlMessage
+    };
+  }
+
+  // Grab that last part of the URL (after the last /) to be logged.
+  let endUrl = url.match(/([^/]*)$/)[0];
+  // Cut it short if it's too long, since this should be human-readable.
+  endUrl = endUrl.length > 15 ? endUrl.substring(0, 15) + '...' : endUrl;
+  log.info(`Making ${fetchOptions.method} ${endUrl} request.`);
+
   if (!responseTypes.hasOwnProperty(responseType)) {
     // Invalid data type requested
-    log.debug('responseType value was invalid');
+    log.info('Cannot make request; responseType value was invalid.');
     return {
       body: undefined,
       error: 'RESPONSE_TYPE',
@@ -45791,7 +46027,7 @@ async function makeRequest(options, requestId) {
   try {
     response = await fetch(url + (0, _utils.toQueryString)(queryParams), fetchOptions);
   } catch (err) {
-    log.debug(`Fetch request ${requestId} failed: ${err.message}.`);
+    log.info(`Failed to make request, caused by ${err.message}`);
     return {
       body: false,
       error: 'FETCH',
@@ -45818,7 +46054,7 @@ async function makeRequest(options, requestId) {
     let error = !response.ok;
 
     if (error) {
-      log.debug(`Response indicates that request ${requestId} failed`);
+      log.info(`Received error response for request (status ${response.status}).`);
       /*
        * Handle a special-case error where the response body is a HTML page...
        * Throw away the body and so it is simply reported as 'Forbidden'.
@@ -45850,6 +46086,8 @@ async function makeRequest(options, requestId) {
        * Avoid parsing the response because there isn't one.
        */
       responseBody = {};
+
+      log.info(`Finished request with successful response (status ${response.status}).`);
       return {
         body: responseBody,
         error: false,
@@ -45903,6 +46141,7 @@ async function makeRequest(options, requestId) {
         }
       }
 
+      log.info(`Finished request with successful response (status ${response.status}).`);
       return {
         body: responseBody,
         error: false,
@@ -45910,7 +46149,7 @@ async function makeRequest(options, requestId) {
       };
     }
   } catch (err) {
-    log.debug(`Error parsing response. Response for request ${requestId}: "${err.message}"`);
+    log.info(`Failed to parse response, caused by ${err.message}`);
     return {
       body: false,
       error: 'REQUEST',
@@ -52218,14 +52457,25 @@ exports.renderTracks = renderTracks;
 exports.removeTracks = removeTracks;
 exports.muteTracks = muteTracks;
 exports.unmuteTracks = unmuteTracks;
+exports.updateLogLevelEntry = updateLogLevelEntry;
+exports.updateLogHandlerEntry = updateLogHandlerEntry;
+exports.initLogLevel = initLogLevel;
 
 var _media = __webpack_require__("../../packages/kandy/src/webrtc/sagas/media.js");
 
 var mediaSagas = _interopRequireWildcard(_media);
 
+var _logs = __webpack_require__("../../packages/kandy/src/webrtc/sagas/logs.js");
+
+var logSagas = _interopRequireWildcard(_logs);
+
 var _actionTypes = __webpack_require__("../../packages/kandy/src/webrtc/interface/actionTypes.js");
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actionTypes2 = __webpack_require__("../../packages/kandy/src/logs/interface/actionTypes.js");
+
+var _selectors = __webpack_require__("../../packages/kandy/src/logs/interface/selectors.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
@@ -52240,6 +52490,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @method renderTracks
  * @param  {Object} webRTC The webRTC stack.
  */
+// Webrtc plugin.
 function* renderTracks(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.RENDER_TRACKS, mediaSagas.renderTracks, webRTC);
 }
@@ -52252,7 +52503,9 @@ function* renderTracks(webRTC) {
 
 
 // Libraries.
-// Webrtc plugin.
+
+
+// Other plugins.
 function* removeTracks(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.REMOVE_TRACKS, mediaSagas.removeTracks, webRTC);
 }
@@ -52275,6 +52528,92 @@ function* unmuteTracks(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.UNMUTE_TRACKS, mediaSagas.unmuteTracks, webRTC);
 }
 
+/**
+ * Taker saga for "change webrtc log level" actions.
+ * @method updateLogLevelEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* updateLogLevelEntry(webRTC) {
+  yield (0, _effects.takeEvery)(_actionTypes2.LEVELS_CHANGE, logSagas.updateLogLevel, webRTC);
+}
+
+/**
+ * Taker saga for "change webrtc log handler" actions.
+ * @method updateLogHandlerEntry
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* updateLogHandlerEntry(webRTC) {
+  yield (0, _effects.takeEvery)(_actionTypes2.HANDLERS_CHANGE, logSagas.updateLogHandler, webRTC);
+}
+
+/**
+ * Configure the WebRTC stack's log level on SDK initialization.
+ *
+ * Special-case saga: This functionality needs to be run when the SDK is
+ *    initialized, but can't be part of the plugin's `init` saga. This is
+ *    because it needs the level state to have been set in state, but that isn't
+ *    guarenteed during the `init` saga. The order that plugins are loaded would
+ *    affect this (logs would need to be before webrtc).
+ * @method initLogLevel
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* initLogLevel(webRTC) {
+  // Get the WEBRTC logger's level.
+  const level = yield (0, _effects.select)(_selectors.getLevel, 'WEBRTC');
+  // Call the "set log level" saga for the WEBRTC logger, pretending that we
+  //    received an action updating its level.
+  yield (0, _effects.call)(logSagas.updateLogLevel, webRTC, { payload: { WEBRTC: level } });
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/webrtc/sagas/logs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateLogLevel = updateLogLevel;
+exports.updateLogHandler = updateLogHandler;
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
+
+/**
+ * Functionality saga for "update webrtc log level" actions.
+ * @method updateLogLevel
+ * @param  {Object} webRTC The WebRTC stack.
+ * @param  {Object} action A "log level change" action.
+ */
+function* updateLogLevel(webRTC, action) {
+  // If the WebRTC log level was changed, update the WebRTC stack's loggers.
+  if (action.payload.WEBRTC) {
+    yield (0, _effects.call)([webRTC.logs, 'setLevel'], action.payload.WEBRTC);
+    const loggers = yield (0, _effects.call)([webRTC.logs, 'getLoggers']);
+
+    yield (0, _effects.all)(loggers.map(logger => (0, _effects.call)([logger, 'setLevel'], action.payload.WEBRTC)));
+  }
+}
+
+/**
+ * Functionality saga for "update webrtc log handler" actions.
+ * @method updateLogHandler
+ * @param  {Object} webRTC The WebRTC stack.
+ * @param  {Object} action A "log handler change" action.
+ */
+// Libraries.
+function* updateLogHandler(webRTC, action) {
+  // If the WebRTC log handler was changed, update the WebRTC stack's loggers.
+  if (action.payload.WEBRTC) {
+    yield (0, _effects.call)([webRTC.logs, 'setHandler'], action.payload.WEBRTC);
+    const loggers = yield (0, _effects.call)([webRTC.logs, 'getLoggers']);
+
+    yield (0, _effects.all)(loggers.map(logger => (0, _effects.call)([logger, 'setHandler'], action.payload.WEBRTC)));
+  }
+}
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/webrtc/sagas/media.js":
@@ -52293,9 +52632,15 @@ exports.unmuteTracks = unmuteTracks;
 
 var _actions = __webpack_require__("../../packages/kandy/src/webrtc/interface/actions/index.js");
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+// Libraries.
+// Webrtc plugin.
+const log = _logs.logManager.getLogger('MEDIA');
 
 /**
  * Render Tracks in a specified container.
@@ -52304,9 +52649,10 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  */
 
 
-// Libraries.
+// Other plugins.
 function* renderTracks(webRTC, action) {
   const { trackIds, selector, speakerId } = action.payload;
+  log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
   // Get the tracks that are to be rendered.
   const tracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIds);
@@ -52315,6 +52661,7 @@ function* renderTracks(webRTC, action) {
   // Render the tracks.
   yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
 
+  log.info(`Finished rendering track(s).`, filteredTracks.map(track => track.id));
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
     selector
@@ -52326,9 +52673,9 @@ function* renderTracks(webRTC, action) {
  * @method removeTracks
  * @param  {Object} action A "remove tracks" action.
  */
-// Call plugin.
 function* removeTracks(webRTC, action) {
   const { trackIds, selector } = action.payload;
+  log.info(`Removing track(s) from element ${selector}.`, trackIds);
 
   // Get the tracks that are to be removed.
   const allTracks = yield (0, _effects.call)([webRTC.track, 'getTracks']);
@@ -52337,6 +52684,7 @@ function* removeTracks(webRTC, action) {
   // Remove the tracks.
   yield (0, _effects.all)(tracks.map(track => (0, _effects.call)([track, 'removeFrom'], selector)));
 
+  log.info(`Finished removing track(s).`, tracks.map(track => track.id));
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.removeTracksFinish(tracks.map(track => track.id), {
     selector
@@ -52350,6 +52698,7 @@ function* removeTracks(webRTC, action) {
  * @param  {Array} action.payload A list of track IDs.
  */
 function* muteTracks(webRTC, action) {
+  log.info(`Muting track(s).`, action.payload);
   // Get the tracks that are to be muted.
   const allTracks = yield (0, _effects.call)([webRTC.track, 'getTracks']);
   const tracks = allTracks.filter(track => action.payload.includes(track.id));
@@ -52357,6 +52706,7 @@ function* muteTracks(webRTC, action) {
   // Mute the tracks.
   yield (0, _effects.all)(tracks.map(track => (0, _effects.call)([track, 'mute'])));
 
+  log.info(`Finished muting track(s).`, tracks.map(track => track.id));
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.muteTracksFinish(tracks.map(track => track.id)));
 }
@@ -52368,6 +52718,8 @@ function* muteTracks(webRTC, action) {
  * @param  {Array} action.payload A list of track IDs.
  */
 function* unmuteTracks(webRTC, action) {
+  log.info(`Unmuting track(s).`, action.payload);
+
   // Get the tracks that are to be unmuted.
   const allTracks = yield (0, _effects.call)([webRTC.track, 'getTracks']);
   const tracks = allTracks.filter(track => action.payload.includes(track.id));
@@ -52375,6 +52727,7 @@ function* unmuteTracks(webRTC, action) {
   // Unmute the tracks.
   yield (0, _effects.all)(tracks.map(track => (0, _effects.call)([track, 'unmute'])));
 
+  log.info(`Finished unmuting track(s).`, tracks.map(track => track.id));
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.unmuteTracksFinish(tracks.map(track => track.id)));
 }
@@ -52494,7 +52847,13 @@ function defaultLogHandler(entry) {
   // Compile the meta info of the log for a prefix.
   const { timestamp, level, target } = entry;
   let { method } = entry;
-  const logInfo = `${timestamp} - ${target.type} - ${level}`;
+
+  // Find a short name to reference which Logger this log is from.
+  //    This is mostly to cut down the ID if it's too long for a human to read.
+  const shortId = target.id && target.id.length > 8 ? target.id.substring(0, 6) : target.id;
+  const shortName = shortId ? `${target.type}/${shortId}` : target.type;
+
+  const logInfo = `${timestamp} - ${shortName} - ${level}`;
 
   // Assume that the first message parameter is a string.
   const [log, ...extra] = entry.messages;
@@ -52588,7 +52947,9 @@ function createManager(options = {}) {
      * @param  {string} [id] A unique identifier for the logger.
      * @return {Logger}
      */
-  };function getLogger(type, id) {
+  };function getLogger(type, id = '') {
+    id = String(id);
+
     // Combine the name and ID to create the "full" logger name.
     const loggerName = id ? `${type}-${id}` : type;
 
@@ -53320,10 +53681,10 @@ exports.default = oniceconnectionstatechange;
  * @return {Boolean}  Whether the assignment succeeded or not.
  */
 function oniceconnectionstatechange(listener) {
-  const { nativePeer, id, log } = this;
+  const { nativePeer, log } = this;
 
   nativePeer.oniceconnectionstatechange = function (event) {
-    log.debug(`Peer ${id} received iceconnectionstatechange event: ${nativePeer.iceConnectionState}`);
+    log.debug(`Peer received iceconnectionstatechange event: ${nativePeer.iceConnectionState}`);
     listener(event);
   };
 
@@ -53353,7 +53714,7 @@ var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
  * @return {Boolean}  Whether the assignment succeeded or not.
  */
 function onicegatheringstatechange(listener) {
-  const { nativePeer, id, iceTimer, log } = this;
+  const { nativePeer, iceTimer, log } = this;
 
   /**
    * Intercept the PeerConnection onicegatheringstatechange event.
@@ -53362,7 +53723,7 @@ function onicegatheringstatechange(listener) {
    */
   nativePeer.onicegatheringstatechange = event => {
     const gatheringState = event.target.iceGatheringState;
-    log.debug(`Peer ${id} iceGatheringState changed to ${gatheringState}.`);
+    log.debug(`Peer iceGatheringState changed to ${gatheringState}.`);
 
     if (gatheringState === _constants.PEER.ICE_GATHERING_STATE.GATHERING) {
       iceTimer.start();
@@ -53445,10 +53806,10 @@ exports.default = onnegotiationneeded;
  * @return {Boolean}  Whether the assignment succeeded or not.
  */
 function onnegotiationneeded(listener) {
-  const { nativePeer, id, log } = this;
+  const { nativePeer, log } = this;
 
   nativePeer.onnegotiationneeded = function (event) {
-    log.debug(`Peer ${id} received negotiationneeded event.`);
+    log.debug(`Peer received negotiationneeded event.`);
     listener(event);
   };
 
@@ -53475,10 +53836,10 @@ exports.default = onsignalingstatechange;
  * @return {Boolean}  Whether the assignment succeeded or not.
  */
 function onsignalingstatechange(listener) {
-  const { nativePeer, id, log } = this;
+  const { nativePeer, log } = this;
 
   nativePeer.onsignalingstatechange = function (event) {
-    log.debug(`Peer ${id} received signalingstatechange event: ${nativePeer.signalingState}`);
+    log.debug(`Peer received signalingstatechange event: ${nativePeer.signalingState}`);
     listener(event);
   };
 
@@ -53505,7 +53866,7 @@ exports.default = ontrack;
  * @return {Boolean}  Whether the assignment succeeded or not.
  */
 function ontrack(listener) {
-  const { nativePeer, id, trackManager, log } = this;
+  const { nativePeer, trackManager, log } = this;
 
   nativePeer.ontrack = event => {
     /**
@@ -53532,7 +53893,7 @@ function ontrack(listener) {
     // Convert the native MediaStreamTrack into a Track object.
     const track = trackManager.add(nativeTrack, targetStream);
 
-    log.debug(`Peer ${id} received ${nativeTrack.kind} Track ${track.id}.`);
+    log.debug(`Peer received ${nativeTrack.kind} Track ${track.id}.`);
     listener(track);
   };
 
@@ -53614,12 +53975,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function peer(id, config = {}, trackManager) {
   const log = _logs.logManager.getLogger('Peer', id);
   config = (0, _utils.mergeValues)(_config2.default, config);
+  log.info(`Creating new Peer.`);
 
   const iceTimer = _timerMachine2.default.get(`ice-${id}`);
   const emitter = new _eventemitter2.default();
 
   // Create the native Peer.
-  log.info(`Creating peer connection with ID: ${id}.`, config);
+  log.debug(`Creating native PeerConnection.`, config.rtcConfig);
   const nativePeer = new RTCPeerConnection(config.rtcConfig);
 
   // Add the event emitter methods to the wrapped methods as well.
@@ -53791,13 +54153,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 function addIceCandidate(candidate) {
   const { nativePeer, proxyPeer, id, log } = this;
-  log.info(`Peer ${id} adding ICE candidate.`);
+  log.info(`Adding ICE candidate.`);
 
   return new _promise2.default((resolve, reject) => {
     if (proxyPeer.remoteDescription.type && proxyPeer.remoteDescription.sdp) {
       nativePeer.addIceCandidate(candidate).then(resolve).catch(reject);
     } else {
-      log.debug(`Peer ${id} cannot set remote ICE candidate without a remote description.`);
+      log.info(`Cannot set remote ICE candidate without a remote description.`);
       // TODO: Better error.
       reject(new Error(`Peer ${id} cannot set remote ICE candidate without a remote description.`));
     }
@@ -53823,16 +54185,15 @@ exports.default = addTrack;
  * @return {RTCRtpSender}
  */
 function addTrack(track) {
-  const { nativePeer, id, log } = this;
-
-  log.info(`Peer ${id} adding new track.`);
+  const { nativePeer, log } = this;
+  log.info(`Adding new ${track.track.kind} track.`);
 
   let sender;
   try {
     sender = nativePeer.addTrack(track.track, track.getStream());
   } catch (err) {
     // TODO: Better error handling.
-    log.debug(err.message);
+    log.info(`Failed to add track: ${err.message}`);
   }
   // TODO: What to return here? Probably shouldn't expose the rtpSender itself.
   return sender;
@@ -53856,7 +54217,7 @@ exports.default = close;
  */
 function close() {
   const { nativePeer, id, emitter, log } = this;
-  log.debug(`Peer ${id} closing.`);
+  log.info(`Closing Peer.`);
 
   nativePeer.close();
   emitter.emit('peer:closed', id);
@@ -53900,9 +54261,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {Promise} Resolves with the answer.
  */
 function createAnswer(options = {}) {
-  const { nativePeer, id, config, dtlsRole, log } = this;
-
-  log.info(`Peer ${id} creating local answer.`);
+  const { nativePeer, config, dtlsRole, log } = this;
+  log.info(`Creating local answer.`);
 
   // If using unified-plan, remove options.mediaDirections.
   // This is because directions are now set in transceivers.
@@ -53940,6 +54300,8 @@ function createAnswer(options = {}) {
           dtlsRole: dtlsRole
         });
       }
+
+      log.info(`Finished creating local answer.`);
       resolve(answer);
     }).catch(reject);
   });
@@ -53983,9 +54345,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {Promise} Resolves with the offer.
  */
 function createOffer(options = {}) {
-  const { nativePeer, id, config, log } = this;
-
-  log.info(`Peer ${id} creating local offer.`);
+  const { nativePeer, config, log } = this;
+  log.info(`Creating local offer.`);
 
   // If using unified-plan, remove options.mediaDirections.
   // This is because directions are now set in transceivers.
@@ -54015,6 +54376,8 @@ function createOffer(options = {}) {
           endpoint: _constants.PEER.ENDPOINT.LOCAL
         });
       }
+
+      log.info(`Finished creating local offer.`);
       resolve(offer);
     }).catch(reject);
   });
@@ -54046,15 +54409,12 @@ var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpS
  * @returns {Object} Transceiver object that matches kind, has no sender track, and has currentDirection. Otherwise undefined.
  */
 function findReusableTransceiver(kind) {
-  const { proxyPeer, config, id, log } = this;
-  log.info(`Peer ${id} finding reusable transceiver.`);
+  const { proxyPeer, config } = this;
 
   if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
     const transceivers = proxyPeer.getTransceivers();
     return transceivers.find(transceiver => transceiver.sender.track == null && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === kind && transceiver.currentDirection // If this has been set, then transceiver has been used before.
     );
-  } else {
-    log.info(`Transceivers are only available in unified-plan.`);
   }
 }
 
@@ -54116,8 +54476,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {Promise} Resolves with the RTCStatsReport
  */
 function getStats(trackId) {
-  const { nativePeer, proxyPeer, id, log } = this;
-  log.info(`Peer ${id} getting stats ${trackId ? 'for track.' : '.'}`);
+  const { nativePeer, proxyPeer, log } = this;
+  log.info(`Getting stats ${trackId ? 'for track.' : '.'}`);
   // If no trackId is supplied, get the stats from the RTCPeerConnection. Otherwise, find an RTCSender
   // associated with the trackId and get the stats from it.
 
@@ -54131,7 +54491,7 @@ function getStats(trackId) {
         sender.getStats().then(resolve).catch(reject);
       } else {
         const errMsg = `Cannot find sender with trackId: ${trackId}`;
-        log.debug(errMsg);
+        log.info(errMsg);
         reject(new Error(errMsg));
       }
     });
@@ -54248,15 +54608,15 @@ exports.default = removeTrack;
  * @param  {string} trackId An id for a Track object.
  */
 function removeTrack(trackId) {
-  const { nativePeer, proxyPeer, id, log } = this;
-  log.info(`Peer ${id} removing track ${trackId}.`);
+  const { nativePeer, proxyPeer, log } = this;
+  log.info(`Removing track ${trackId}.`);
 
   const track = proxyPeer.senderTracks.find(track => track.id === trackId);
   if (!track) {
-    log.debug(`Invalid track ID ${trackId}; cannot remove track.`);
+    log.info(`Invalid track ID ${trackId}; no such track found.`);
     return;
   } else if (proxyPeer.signalingState === ' closed') {
-    log.debug(`Peer ${id} is closed; cannot remove track.`);
+    log.info(`Peer is closed; cannot remove track.`);
     return;
   }
 
@@ -54296,8 +54656,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {Object} A Promise object which is fulfilled once the track has been replaced
  */
 function replaceTrack(newTrack, options) {
-  const { proxyPeer, id, config, log } = this;
-  log.info(`Peer ${id} replacing track ${options.trackId}.`);
+  const { proxyPeer, config, log } = this;
+  log.info(`Replacing track ${options.trackId} with new ${newTrack.kind} track.`);
 
   return new _promise2.default((resolve, reject) => {
     let sender;
@@ -54311,8 +54671,12 @@ function replaceTrack(newTrack, options) {
     }
 
     if (sender) {
-      sender.replaceTrack(newTrack).then(resolve).catch(reject);
+      sender.replaceTrack(newTrack).then(resolve).catch(error => {
+        log.info(`Failed to replace track; ${error.message}`);
+        reject(error);
+      });
     } else {
+      log.info(`Failed to replace track; could not find track ${options.trackId}.`);
       reject(new Error(`Sender for track ${options.trackId} not found.`));
     }
   });
@@ -54343,11 +54707,11 @@ exports.default = sendDTMF;
  * @return {Boolean} Whether the DTMF tones were inserted
  */
 function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, trackId }) {
-  const { proxyPeer, id, log } = this;
-  log.info(`Peer ${id} sending DTMF tones.`);
+  const { proxyPeer, log } = this;
+  log.info(`Sending DTMF tones.`, tone);
 
   if (!proxyPeer.getSenders) {
-    log.debug('RTCPeerConnection method getSenders() is required which is not support by this browser.');
+    log.info(`Failed to send tones; getSenders is not supported by this browser.`);
     return false;
   }
   const senders = proxyPeer.getSenders();
@@ -54355,7 +54719,7 @@ function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, track
   if (trackId) {
     let sender = senders.find(sender => sender.track.id === trackId);
     if (!sender) {
-      log.debug('No sender with that trackId');
+      log.info(`Failed to send tones; could not find track ${trackId}.`);
       return false;
     }
     insertDTMF(sender, tone, duration, intertoneGap, callback, log);
@@ -54368,7 +54732,8 @@ function sendDTMF({ tone, duration = 100, intertoneGap = 70 }, { callback, track
         return true;
       }
     }
-    log.debug('No appropriate senders were found');
+
+    log.info(`Failed to send tones; could not find an appropriate track.`);
     return false;
   }
 }
@@ -54456,7 +54821,8 @@ function setLocalDescription(desc) {
   const { nativePeer, proxyPeer, config, id, emitter, iceTimer, log } = this;
 
   // TODO: SDP pipeline here.
-  log.debug(`Peer ${id} setting local description ${desc.type}:`, desc.sdp);
+  log.info(`Setting local description ${desc.type} in ${proxyPeer.signalingState} state.`);
+  log.debug(`Setting local description ${desc.type}:`, desc.sdp);
 
   /**
    * Scenario: A local answer SDP is being applied to the Peer, but it does
@@ -54468,7 +54834,7 @@ function setLocalDescription(desc) {
   if (!this.dtlsRole && desc.type === 'answer') {
     const dtlsMatch = desc.sdp.match(/a=setup:(\w*?)[\r\n]/);
     if (dtlsMatch) {
-      log.debug(`Peer ${id} selecting DTLS role ${dtlsMatch[1]}.`);
+      log.debug(`Selecting DTLS role ${dtlsMatch[1]}.`);
       this.dtlsRole = dtlsMatch[1];
     }
   }
@@ -54481,18 +54847,18 @@ function setLocalDescription(desc) {
       if (iceTimer.isStarted()) {
         // In a HALF trickle scenario, the Peer will be ready for negotiation
         //    before ICE collection has completed. Log that timing.
-        log.debug(`Peer ${id} took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
+        log.debug(`Took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
       }
       resolve();
     });
 
     nativePeer.setLocalDescription(desc).then(() => {
-      log.info(`Peer ${id} set local description.`);
-      log.debug(`Peer ${id} state is now ${proxyPeer.signalingState}.`);
+      log.info(`Finished setting local description.`);
+      log.debug(`State is now ${proxyPeer.signalingState}.`);
 
       if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
         // Trickling ICE candidates means that we can begin negotiation immediately.
-        log.debug(`Peer ${id} ready for negotiation (full trickleICE).`);
+        log.debug(`Ready for negotiation (full trickleICE).`);
         emitter.emit('onnegotiationready');
       } else {
         // ICE candidates aren't always gathered (only initially and when something
@@ -54506,10 +54872,10 @@ function setLocalDescription(desc) {
         setTimeout(() => {
           if (proxyPeer.iceGatheringState === 'complete') {
             // Gathering is "complete", so we are ready for negotiation.
-            log.debug(`Peer ${id} ready for negotiation; ICE candidate collection not needed.`);
+            log.debug(`Ready for negotiation; ICE candidate collection not needed.`);
             emitter.emit('onnegotiationready');
           } else {
-            log.debug(`Peer ${id} waiting for ICE collection process (${config.trickleIceMode}).`);
+            log.debug(`Waiting for ICE collection process (${config.trickleIceMode}).`);
             // If ICE collection never finishes, we need to time it out at some point.
             //    Start the timeout-out loop after an initial delay.
             setTimeout(() => {
@@ -54519,7 +54885,7 @@ function setLocalDescription(desc) {
         }, 25);
       }
     }).catch(err => {
-      log.info(`Peer ${id} failed to set local description.`);
+      log.info(`Failed to set local description.`);
       log.debug(`Peer ${id}: ${err}`);
       // Parse native error. Make it more understand and/or
       //    provide a better log about what went wrong.
@@ -54558,6 +54924,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function setRemoteDescription(desc) {
   const { nativePeer, proxyPeer, id, log } = this;
 
+  // TODO: SDP pipeline here.
+  log.info(`Setting remote description ${desc.type} in ${proxyPeer.signalingState} state.`);
+  log.debug(`Setting remote description ${desc.type}:`, desc.sdp);
+
   /**
    * Scenario: A remote answer SDP is being applied to the Peer, but it does
    *    not have a selected DTLS role yet. This should occur only when the
@@ -54569,7 +54939,7 @@ function setRemoteDescription(desc) {
     const dtlsMatch = desc.sdp.match(/a=setup:(\w*?)[\r\n]/);
     if (dtlsMatch) {
       const localRole = dtlsMatch[1] === 'active' ? 'passive' : 'active';
-      log.debug(`Peer ${id} selecting DTLS role ${localRole}. Remote Peer selected ${dtlsMatch[1]} DTLS role.`);
+      log.debug(`Selecting DTLS role ${localRole}. Remote Peer selected ${dtlsMatch[1]} DTLS role.`);
       this.dtlsRole = localRole;
     }
   }
@@ -54577,13 +54947,12 @@ function setRemoteDescription(desc) {
   // TODO: Update `config.trickleIceMode` to either NONE or FULL (from HALF)
   //    depending on remote support, since HALF is only needed for initial.
   return new _promise2.default((resolve, reject) => {
-    log.debug(`Peer ${id} setting remote description ${desc.type}:`, desc.sdp);
     nativePeer.setRemoteDescription(desc).then(() => {
-      log.info(`Peer ${id} set remote description.`);
-      log.debug(`Peer ${id} state is now ${proxyPeer.signalingState}.`);
+      log.info(`Finished setting remote description.`);
+      log.debug(`State is now ${proxyPeer.signalingState}.`);
       resolve();
     }).catch(err => {
-      log.info(`Peer ${id} failed to set remote description.`);
+      log.info(`Failed to set remote description.`);
       log.debug(`Peer ${id}: ${err}`);
       // Parse native error. Make it more understand and/or
       //    provide a better log about what went wrong.
@@ -54618,8 +54987,8 @@ var _transceiverUtils = __webpack_require__("../../packages/webrtc/src/sdpUtils/
  * @return {Object} An object containing an `error` flag and  an array `failures` of transceivers whose directions weren't changed.
  */
 function setTransceiversDirection(targetDirection, options = {}) {
-  const { proxyPeer, config, id, log } = this;
-  log.info(`Peer ${id} setting transceiver direction to ${targetDirection}.`);
+  const { proxyPeer, config, log } = this;
+  log.info(`Setting transceiver direction to ${targetDirection}.`);
 
   if ((0, _sdpSemantics.isUnifiedPlan)(config.rtcConfig.sdpSemantics)) {
     let transceivers = proxyPeer.getTransceivers();
@@ -54699,8 +55068,8 @@ exports.default = getLocalDescription;
  * @method getLocalDescription
  */
 function getLocalDescription() {
-  const { nativePeer, id, log } = this;
-  log.debug(`Peer ${id} getting local description.`);
+  const { nativePeer, log } = this;
+  log.info(`Getting local description.`);
 
   const localDesc = nativePeer.localDescription;
   /*
@@ -54734,8 +55103,8 @@ exports.default = localTracks;
  * @return {Array} List of active Track objects added to the Peer locally.
  */
 function localTracks() {
-  const { proxyPeer, id, trackManager, log } = this;
-  log.info(`Peer ${id} getting local tracks.`);
+  const { proxyPeer, trackManager, log } = this;
+  log.info(`Getting local tracks.`);
 
   // Return the list of Tracks from active senders.
   return proxyPeer.getSenders()
@@ -54771,8 +55140,8 @@ exports.default = getRemoteDescription;
  * @method getRemoteDescription
  */
 function getRemoteDescription() {
-  const { nativePeer, id, log } = this;
-  log.debug(`Peer ${id} getting remote description.`);
+  const { nativePeer, log } = this;
+  log.info(`Getting remote description.`);
 
   const remoteDesc = nativePeer.remoteDescription;
   /*
@@ -54806,8 +55175,8 @@ exports.default = getRemoteTracks;
  * @return {Array} List of active Track objects the Peer has received remotely.
  */
 function getRemoteTracks() {
-  const { proxyPeer, id, trackManager, log } = this;
-  log.info(`Peer ${id} getting remote tracks.`);
+  const { proxyPeer, trackManager, log } = this;
+  log.info(`Getting remote tracks.`);
 
   // Return the list of Tracks from active receivers.
   return proxyPeer.getReceivers()
@@ -54846,8 +55215,8 @@ exports.default = senderTracks;
  * @return {Array} List of Track objects added to the Peer locally.
  */
 function senderTracks() {
-  const { proxyPeer, id, log } = this;
-  log.info(`Peer ${id} getting sender tracks.`);
+  const { proxyPeer, log } = this;
+  log.info(`Getting sender tracks.`);
 
   // Return the list of Tracks from senders.
   return proxyPeer.getSenders()
@@ -55064,7 +55433,11 @@ function initialize() {
       media: mediaManager,
       peerManager: peerManager,
       sessionManager,
-      track: trackManager
+      track: trackManager,
+      // Give access to the Log Manager.
+      // TODO: Don't include it under managers. It's here now because of
+      //    ProxyStack annoyingness.
+      logs: _logs.logManager
     },
     sdp: {
       pipeline: _pipeline2.default,
@@ -56023,6 +56396,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 function Media(nativeStream, isLocal) {
   const log = _logs.logManager.getLogger('Media', nativeStream.id);
+  log.info(`Creating new ${isLocal ? 'local' : 'remote'} Media.`);
 
   // Internal variables.
   const id = nativeStream.id;
@@ -56302,6 +56676,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // SDP Helpers.
 function Session(id, managers, config = {}) {
   const log = _logs.logManager.getLogger('Session', id);
+  log.info(`Creating new Session.`);
+  const sdpSemantics = config.peer && config.peer.rtcConfig && config.peer.rtcConfig.sdpSemantics;
+  log.debug(`Session configured for ${sdpSemantics || 'default'} SDP semantics.`);
 
   // Internal variables.
   const sessionId = id;
@@ -56773,6 +57150,7 @@ function Session(id, managers, config = {}) {
    * @method end
    */
   function end() {
+    log.info(`Ending Session.`);
     const peer = peerManager.get(peerId);
     if (peer) {
       peer.close();
@@ -56903,6 +57281,9 @@ function Session(id, managers, config = {}) {
           performRenegotiation: false
         });
       });
+
+      const { kind } = track.getState();
+      log.info(`Received new track (${kind} : ${track.id})`);
 
       // Indicate that the Session has a new Track.
       emitter.emit('new:track', {
@@ -57035,6 +57416,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Libraries.
 function Track(mediaTrack, mediaStream) {
   const log = _logs.logManager.getLogger('Track', mediaTrack.id);
+  log.info(`Creating new ${mediaTrack.kind} Track.`);
 
   // Internal variables.
   const id = mediaTrack.id;
@@ -57123,7 +57505,7 @@ function Track(mediaTrack, mediaStream) {
     let element;
     // If a string was provided, use it as a CSS selector to find the element.
     if (typeof container === 'string') {
-      log.debug(`Track ${id} rendering in element using selector: ${container}`);
+      log.info(`Rendering track in element using selector: ${container}`);
 
       element = document.querySelector(container);
       if (!element) {
@@ -57131,7 +57513,7 @@ function Track(mediaTrack, mediaStream) {
         return false;
       }
     } else {
-      log.debug(`Track ${id} rendering in provided HTMLElement.`);
+      log.info(`Rendering track in provided HTMLElement.`);
 
       element = container;
     }
@@ -57140,7 +57522,7 @@ function Track(mediaTrack, mediaStream) {
 
     if (containers.indexOf(element) > -1) {
       // Already rendered in element.
-      log.debug(`Track ${id} already rendered in element.`, element);
+      log.info(`Failed to render track; already rendered in element.`);
       return;
     }
 
@@ -57169,17 +57551,21 @@ function Track(mediaTrack, mediaStream) {
     if (type === 'video') {
       renderer.muted = 'true';
       // Needed for Android.
-      renderer.play().catch(err => log.error(`video tag (#${renderer.id}) - play() - ${err}`));
+      renderer.play().catch(err => {
+        log.debug(`Could not autoplay renderer #${renderer.id}: ${err.message}`);
+      });
     }
 
     // Set speaker if it was provided and it's supported.
     if (speakerId && typeof renderer.setSinkId !== 'undefined') {
       // TODO: Better then/catch handling.
       renderer.setSinkId(speakerId).then(() => {
-        log.debug('Set to use speaker: ', speakerId);
+        log.debug(`Set to use speaker: ${speakerId}.`);
       }).catch(error => {
-        log.debug('Could not set speaker to use. ' + speakerId, error);
+        log.debug(`Could not set speaker to use ${speakerId}: ${error.message}`);
       });
+    } else if (speakerId && typeof renderer.setSinkId === 'undefined') {
+      log.info(`Failed to set speaker; setSinkId not supported in this browser.`);
     }
 
     element.appendChild(renderer);
@@ -57198,7 +57584,7 @@ function Track(mediaTrack, mediaStream) {
     let element;
     // If a string was provided, use it as a CSS selector to find the element.
     if (typeof container === 'string') {
-      log.debug(`Track ${id} removing from element using selector: ${container}`);
+      log.info(`Removing track from element using selector: ${container}`);
 
       element = document.querySelector(container);
       if (!element) {
@@ -57206,7 +57592,7 @@ function Track(mediaTrack, mediaStream) {
         return false;
       }
     } else {
-      log.debug(`Track ${id} removing from provided HTMLElement.`);
+      log.info(`Removing track from provided HTMLElement.`);
 
       element = container;
     }
@@ -57214,7 +57600,7 @@ function Track(mediaTrack, mediaStream) {
     let index = containers.indexOf(element);
     if (index === -1) {
       // Not rendered in element.
-      log.debug(`Track ${id} not rendered in element.`, element);
+      log.info(`Failed to remove track; not rendered in element.`);
       return;
     }
     containers.splice(index, 1);
@@ -57257,6 +57643,7 @@ function Track(mediaTrack, mediaStream) {
    * @method cleanup
    */
   function cleanup() {
+    log.info(`Cleaning up track.`);
     // Iterate over the array backwards since `removeFrom` changes the length
     //    of the array. This ensures that indexes aren't skipped.
     for (let i = containers.length; i > 0; i--) {
@@ -57462,6 +57849,7 @@ function removeTrickleIce(sdp, info, originalSdp) {
  */
 function removeBundling(sdp, info, originalSdp) {
   if (sdp.groups) {
+    log.debug('Removing SDP bundling groups.');
     delete sdp.groups;
   }
 
