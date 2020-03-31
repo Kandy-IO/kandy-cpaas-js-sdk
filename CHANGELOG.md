@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.15.0 - beta
 
+### Added
+
+- Added the handling of mute/unmute events which are being generated when a media source is muted/unmuted by triggers that are outside of SDK's control. `KAA-1641`
+
 ### Changed
 
 - Improved logs for Calls. `KAA-2219`

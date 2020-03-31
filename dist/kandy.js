@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.352
+ * Version: 4.15.0-beta.353
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32801,7 +32801,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.352';
+  return '4.15.0-beta.353';
 }
 
 /***/ }),
@@ -50774,6 +50774,8 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/es/effects.js"
 
 var _reduxSaga = __webpack_require__("../../node_modules/redux-saga/es/index.js");
 
+var _actions = __webpack_require__("../../packages/kandy/src/webrtc/interface/actions/index.js");
+
 /**
  * Sets up event listeners for a Track's events.
  * The events are turned into actions and dispatched
@@ -50782,7 +50784,6 @@ var _reduxSaga = __webpack_require__("../../node_modules/redux-saga/es/index.js"
  * @param  {Object} track A Track object.
  * @param  {Object} webRTC The webRTC stack.
  */
-// Libraries.
 function* watchTrackEvents(track, webRTC) {
   /**
    * Create an event channel between the Track and redux-saga.
@@ -50805,6 +50806,7 @@ function* watchTrackEvents(track, webRTC) {
  * @param  {Any}      [END='END'] The "end of lifetime" symbol.
  * @return {Function} The unsubscribe function.
  */
+// Libraries.
 function setListeners(track, emit, END = 'END') {
   // Track ended
   const trackEnded = trackData => {
@@ -50815,10 +50817,26 @@ function setListeners(track, emit, END = 'END') {
     emit(END);
   };
 
+  // The track source (which affected the track identified by trackId) was muted.
+  // An example of a track source is a physical media device such as:
+  // microphone or camera.
+  const trackSourceMuted = trackData => {
+    emit(_actions.trackActions.trackSourceMuted([trackData.trackId]));
+  };
+
+  // The track source (which affected the track identified by trackId) was unmuted.
+  const trackSourceUnmuted = trackData => {
+    emit(_actions.trackActions.trackSourceUnmuted([trackData.trackId]));
+  };
+
   track.on('ended', trackEnded);
+  track.on('muted', trackSourceMuted);
+  track.on('unmuted', trackSourceUnmuted);
 
   const unsubscribe = () => {
     track.off('ended', trackEnded);
+    track.off('muted', trackSourceMuted);
+    track.off('unmuted', trackSourceUnmuted);
   };
   return unsubscribe;
 }
@@ -51077,6 +51095,9 @@ const MUTE_TRACKS = exports.MUTE_TRACKS = trackPrefix + 'MUTE';
 const MUTE_TRACKS_FINISH = exports.MUTE_TRACKS_FINISH = trackPrefix + 'MUTE_FINISH';
 const UNMUTE_TRACKS = exports.UNMUTE_TRACKS = trackPrefix + 'UNMUTE';
 const UNMUTE_TRACKS_FINISH = exports.UNMUTE_TRACKS_FINISH = trackPrefix + 'UNMUTE_FINISH';
+
+const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = trackPrefix + 'SOURCE_MUTED';
+const TRACK_SOURCE_UNMUTED = exports.TRACK_SOURCE_UNMUTED = trackPrefix + 'SOURCE_UNMUTED';
 
 /**
  * Session action types.
@@ -51388,6 +51409,8 @@ exports.muteTracks = muteTracks;
 exports.muteTracksFinish = muteTracksFinish;
 exports.unmuteTracks = unmuteTracks;
 exports.unmuteTracksFinish = unmuteTracksFinish;
+exports.trackSourceMuted = trackSourceMuted;
+exports.trackSourceUnmuted = trackSourceUnmuted;
 exports.renderTracks = renderTracks;
 exports.renderTracksFinish = renderTracksFinish;
 exports.removeTracks = removeTracks;
@@ -51431,7 +51454,7 @@ function muteTracks(trackIds) {
 }
 
 function muteTracksFinish(trackIds) {
-  return trackHelper(actionTypes.MUTE_TRACKS_FINISH, trackIds);
+  return trackHelper(actionTypes.MUTE_TRACKS_FINISH, { trackIds: trackIds });
 }
 
 function unmuteTracks(trackIds) {
@@ -51439,7 +51462,15 @@ function unmuteTracks(trackIds) {
 }
 
 function unmuteTracksFinish(trackIds) {
-  return trackHelper(actionTypes.UNMUTE_TRACKS_FINISH, trackIds);
+  return trackHelper(actionTypes.UNMUTE_TRACKS_FINISH, { trackIds: trackIds });
+}
+
+function trackSourceMuted(trackIds) {
+  return trackHelper(actionTypes.TRACK_SOURCE_MUTED, { trackIds: trackIds });
+}
+
+function trackSourceUnmuted(trackIds) {
+  return trackHelper(actionTypes.TRACK_SOURCE_UNMUTED, { trackIds: trackIds });
 }
 
 function renderTracks(trackIds, params) {
@@ -51754,6 +51785,32 @@ const TRACKS_MUTED = exports.TRACKS_MUTED = 'media:muted';
  */
 const TRACKS_UNMUTED = exports.TRACKS_UNMUTED = 'media:unmuted';
 
+/**
+ * The (media) source, associated with specified tracks, has been muted.
+ * This event is generated outside the control of the SDK when the media source,
+ * such as a microphone or camera, has been muted in a browser. As a result, all tracks
+ * associated with that media source will generate such event.
+ * @public
+ * @memberof media
+ * @event media:sourceMuted
+ * @param {Object} params
+ * @param {Array<string>} params.trackIds The track Ids that are affected as a result of media source being muted.
+ */
+const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
+
+/**
+ * The (media) source, associated with specified tracks, has been unmuted.
+ * This event is generated outside the control of the SDK when the media source,
+ * such as a microphone or camera, has been unmuted in a browser. As a result, all tracks
+ * associated with that media source will generate such event.
+ * @public
+ * @memberof media
+ * @event media:sourceUnmuted
+ * @param {Object} params
+ * @param {Array<string>} params.trackIds The track Ids that are affected as a result of media source being unmuted.
+ */
+const TRACK_SOURCE_UNMUTED = exports.TRACK_SOURCE_UNMUTED = 'media:sourceUnmuted';
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/webrtc/interface/events/devices.js":
@@ -51842,14 +51899,34 @@ const events = {};
 events[actionTypes.MUTE_TRACKS_FINISH] = action => {
   return {
     type: eventTypes.TRACKS_MUTED,
-    args: { tracks: action.payload }
+    args: {
+      trackIds: action.payload.trackIds,
+      tracks: action.payload.trackIds
+    }
   };
 };
 
 events[actionTypes.UNMUTE_TRACKS_FINISH] = action => {
   return {
     type: eventTypes.TRACKS_UNMUTED,
-    args: { tracks: action.payload }
+    args: {
+      trackIds: action.payload.trackIds,
+      tracks: action.payload.trackIds
+    }
+  };
+};
+
+events[actionTypes.TRACK_SOURCE_MUTED] = action => {
+  return {
+    type: eventTypes.TRACK_SOURCE_MUTED,
+    args: { trackIds: action.payload.trackIds }
+  };
+};
+
+events[actionTypes.TRACK_SOURCE_UNMUTED] = action => {
+  return {
+    type: eventTypes.TRACK_SOURCE_UNMUTED,
+    args: { trackIds: action.payload.trackIds }
   };
 };
 
@@ -52323,7 +52400,7 @@ reducers[actionTypes.REMOVE_TRACKS_FINISH] = {
 reducers[actionTypes.MUTE_TRACKS_FINISH] = {
   next(state, action) {
     return state.map(track => {
-      if (action.payload.includes(track.trackId)) {
+      if (action.payload.trackIds.includes(track.trackId)) {
         return (0, _extends3.default)({}, track, {
           muted: true
         });
@@ -52337,9 +52414,37 @@ reducers[actionTypes.MUTE_TRACKS_FINISH] = {
 reducers[actionTypes.UNMUTE_TRACKS_FINISH] = {
   next(state, action) {
     return state.map(track => {
-      if (action.payload.includes(track.trackId)) {
+      if (action.payload.trackIds.includes(track.trackId)) {
         return (0, _extends3.default)({}, track, {
           muted: false
+        });
+      } else {
+        return track;
+      }
+    });
+  }
+};
+
+reducers[actionTypes.TRACK_SOURCE_MUTED] = {
+  next(state, action) {
+    return state.map(track => {
+      if (action.payload.trackIds.includes(track.trackId)) {
+        return (0, _extends3.default)({}, track, {
+          sourceMuted: true
+        });
+      } else {
+        return track;
+      }
+    });
+  }
+};
+
+reducers[actionTypes.TRACK_SOURCE_UNMUTED] = {
+  next(state, action) {
+    return state.map(track => {
+      if (action.payload.trackIds.includes(track.trackId)) {
+        return (0, _extends3.default)({}, track, {
+          sourceMuted: false
         });
       } else {
         return track;
@@ -57487,8 +57592,8 @@ function Track(mediaTrack, mediaStream) {
       streamId: stream.id,
       kind: track.kind,
       label: track.label,
-      muted: !track.enabled,
-      disabled: track.muted,
+      muted: track.muted,
+      enabled: track.enabled,
       state: track.readyState,
       containers: containers.map(element => element.id)
     };
