@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.357
+ * Version: 4.15.0-beta.358
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32330,7 +32330,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Other Plugins
 function* isSameSdpSessionId(webRTC, sessionId, sdp) {
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
-  const currentDesc = session.peer.remoteDescription;
+  const currentDesc = yield (0, _effects.call)([session, 'getRemoteDescription']);
 
   // TODO: How to act when there isn't a remote SDP set?
   // Currently: Return falsy to cause a recreate. If there isn't a remote SDP
@@ -32801,7 +32801,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.357';
+  return '4.15.0-beta.358';
 }
 
 /***/ }),
