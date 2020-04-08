@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.358
+ * Version: 4.15.0-beta.359
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32801,7 +32801,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.358';
+  return '4.15.0-beta.359';
 }
 
 /***/ }),
@@ -43263,15 +43263,18 @@ function* processNotifications() {
       continue;
     }
 
-    log.debug(`The received notification is of type ${notificationType}.`);
+    log.debug(`Received notification of type ${notificationType} with ID ${notificationId}.`);
     if (!isDuplicate(notificationId)) {
+      log.info('Notifying other plugins about notification ...');
       // Notify others (plugins) that a new notification was receive.
       yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
+      log.debug(`Finished processing notification of type ${notificationType} with ID ${notificationId}`);
 
       // Finish processing the notification.
+      // TODO: Investigate if we need to add a handler for this action, as currently there is no handling of the action.
       yield (0, _effects.put)(actions.processNotificationFinish(notification));
     } else {
-      log.info('Notification was a duplicate; ignoring.');
+      log.info('Notification was a duplicate; ignoring ...');
       const error = new Error(`Notification id ${notificationId} is duplicate.`);
       yield (0, _effects.put)(actions.processNotificationFinish(error));
     }
