@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.376
+ * Version: 4.15.0-beta.377
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31213,7 +31213,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.376';
+  return '4.15.0-beta.377';
 }
 
 /***/ }),
@@ -31598,7 +31598,9 @@ const log = _logs.logManager.getLogger('CONNECTIVITY');
 
 // Libraries.
 function* wsConnectFlow() {
+  log.info('Creating channel for handling websocket actions ...');
   const chan = yield (0, _effects.actionChannel)(actionTypes.WS_ATTEMPT_CONNECT);
+  log.info('Channel successfuly created.');
   yield (0, _effects.takeEvery)(chan, websocketLifecycle);
 }
 
@@ -31611,6 +31613,7 @@ function* websocketLifecycle(wsConnectAction) {
   const wsInfo = wsConnectAction.payload;
   const { platform, isReconnect } = wsConnectAction.meta;
 
+  log.info(`Connecting to websocket on platform: ${platform} ...`);
   // Try to open the websocket.
   let websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
 
@@ -31640,8 +31643,10 @@ function* websocketLifecycle(wsConnectAction) {
   // determine which pingFlow is appropriate
   let pingFlow;
   if (websocket.kandy.method.responsibleParty === _constants.connCheckResponsibility.SERVER) {
+    log.debug(`Starting a serverPing flow on ${platform} ...`);
     pingFlow = yield (0, _effects.fork)(serverPingFlow, websocket, platform);
   } else {
+    log.debug(`Starting a clientPing flow on ${platform} ...`);
     pingFlow = yield (0, _effects.fork)(clientPingFlow, websocket, platform);
   }
 
@@ -31656,6 +31661,7 @@ function* websocketLifecycle(wsConnectAction) {
 
   // Wait for a disconnect or lost connection action.
   const action = yield (0, _effects.take)(closeWebsocketPattern);
+  log.debug(`Cancelling outstanding tasks upon receiving action: ${action.type}`);
 
   // Whether we're disconnecting or have lost connection,
   //      we want to cancel these tasks either way.
@@ -31663,12 +31669,15 @@ function* websocketLifecycle(wsConnectAction) {
 
   if (action.type === actionTypes.WS_DISCONNECT) {
     // If we're disconnecting, close the websocket to end it's lifecycle.
+    log.debug('Closing websocket connection ...');
     yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
     yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
+    log.info('Successfully closed websocket connection.');
   } else {
     // If this is a Link websocket, we need to ensure the URL is using the
     //     "latest" access token from state.
     if (wsConnectAction.meta.platform === _constants.platforms.UC) {
+      log.info('Updating access token ...');
       let { notificationChannel } = yield (0, _effects.select)(_selectors2.getSubscriptionInfo);
       let { accessToken, oauthToken } = yield (0, _effects.select)(_selectors2.getConnectionInfo);
       wsInfo.url = notificationChannel;
@@ -31685,6 +31694,7 @@ function* websocketLifecycle(wsConnectAction) {
 
     // If we've lost connection, re-dispatch the initial action, so that we can
     //      start the lifecycle over.
+    log.debug('Attempting to reconnect to websocket ...');
     yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
   }
 }
@@ -31704,6 +31714,7 @@ function* serverPingFlow(ws) {
     let pingInterval = yield (0, _effects.select)(_selectors.getPingInterval);
     pingInterval = typeof pingInterval !== 'undefined' ? pingInterval : 120000;
     const maxIdleDuration = pingInterval * maxMissedPings;
+    log.debug(`serverPing: Using ping interval: ${pingInterval} with maximum idle duration: ${maxIdleDuration}`);
 
     // wait for incoming server pings or disconnect actions on an interval
     const { serverPing, disconnect } = yield (0, _effects.race)({
@@ -31714,6 +31725,7 @@ function* serverPingFlow(ws) {
 
     // is disconnect action received then exit
     if (disconnect) {
+      log.debug('Got disconnect action. Exiting from serverPing flow ...');
       break;
     }
 
@@ -31729,21 +31741,25 @@ function* serverPingFlow(ws) {
       }
 
       const message = { connAck: {} };
+      log.debug(`Received a server ping which uses interval: ${pingIntervalMillis} ms. ${platform} is replying with message: ${message}`);
       const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
 
       // if the pong websocket message has an error then try to reconnect
       if (error) {
+        log.error(`Got error when attempting to reply: ${error.message}`);
         if (autoReconnect) {
+          log.info('Trying to auto reconnect ...');
           yield (0, _effects.put)(actions.lostConnection(undefined, platform));
         }
         break;
       }
     } else {
       if (Date.now() - timeOfLastPing >= maxIdleDuration) {
-        log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
+        log.warn('Closing websocket due to inactivity. (have not received pong from server)', platform);
 
         // try to reconnect or exit
         if (autoReconnect) {
+          log.debug(`${platform} is attempting to auto reconnect ...`);
           yield (0, _effects.put)(actions.lostConnection(undefined, platform));
         }
         break;
@@ -31785,22 +31801,23 @@ function* clientPingFlow(ws) {
       } else if (method.type === _constants.connCheckMethods.KEEP_ALIVE) {
         message = { message_type: 'ping' };
       } else {
-        log.error(`invalid connectivity method ${method}`);
+        log.error(`Invalid connectivity method: ${method}`);
         break;
       }
 
-      log.debug(`${platform} sending a ${method.type}.`);
+      log.debug(`${platform} is sending a ${method.type} every ${intervalInSeconds} sec.`);
 
       const error = _sendWSMessage(ws, (0, _stringify2.default)(message));
       if (error) {
-        log.error('Exception in pingFlow: ' + error.message);
+        log.error('Exception in clientPing flow: ' + error.message);
         if (autoReconnect) {
+          log.debug(`${platform} is attempting to auto reconnect ...`);
           yield (0, _effects.put)(actions.lostConnection(undefined, platform));
         }
         break;
       }
     } else {
-      log.debug('Set to not check websocket connectivity. Waiting for connectivity status change');
+      log.debug('Set to not check websocket connectivity. Waiting for connectivity status change ...');
 
       // If we shouldn't ping, wait until we receive a trigger to (maybe) ping.
       const shouldCheckConnectivity = yield (0, _effects.take)(action => action.type === 'CHANGE_CONNECTIVITY_CHECKING' && action.payload);
@@ -31823,6 +31840,7 @@ function* clientPingFlow(ws) {
 
     // If we received a disconnect action, stop the pings and exit.
     if (disconnect) {
+      log.debug('Got disconnect action. Exiting from clientPing flow ...');
       break;
     }
 
@@ -31838,11 +31856,12 @@ function* clientPingFlow(ws) {
         });
         // If we received a disconnect action, stop the pings and exit.
         if (disconnect) {
+          log.debug('Got disconnect action. Exiting from clientPing flow ...');
           break;
         }
       } else {
         if (Date.now() - timeOfLastPong >= maxIdleDuration) {
-          log.warn('closing websocket due to inactivity. (have not received pong from server)', platform);
+          log.warn('Closing websocket due to inactivity. (have not received pong from server)', platform);
 
           // its been too long since the last pong, attempt to reconnect or exit
           if (autoReconnect) {
@@ -31904,12 +31923,12 @@ function* connectWebsocket(wsInfo, platform) {
     try {
       // Try to open the websocket. Blocking call.
       websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
-      log.debug('Successfully connected to websocket.', platform);
+      log.info(`Successfully connected to websocket on: ${platform}`);
       break;
     } catch (err) {
       connectionAttempt++;
       websocket = err;
-      log.debug(`Failed websocket connection (#${connectionAttempt}): ${websocket.message}.`, platform);
+      log.debug(`Failed to connect to websocket on ${platform}. (Attempt #${connectionAttempt}). Message: ${websocket.message}.`);
 
       // If we want to try to reconnect, delay a certain about of time before trying.
       if (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
@@ -31918,7 +31937,7 @@ function* connectWebsocket(wsInfo, platform) {
           delayTime = configs.reconnectDelay * Math.pow(configs.reconnectTimeMultiplier, connectionAttempt - 1);
           delayTime = delayTime < configs.reconnectTimeLimit ? delayTime : configs.reconnectTimeLimit;
         }
-        log.debug(`Websocket reconnect attempt after ${delayTime}ms.`, platform);
+        log.debug(`Websocket reconnect attempt after ${delayTime} ms on ${platform}`);
 
         // Wait for either the delay period or a trigger to stop connection attempts.
         let { disconnect } = yield (0, _effects.race)({
@@ -31930,7 +31949,7 @@ function* connectWebsocket(wsInfo, platform) {
           break;
         }
       } else {
-        log.debug('Stopping websocket connection attempts.', platform);
+        log.debug(`Stopping websocket connection attempts on ${platform}.`);
       }
     }
   }
