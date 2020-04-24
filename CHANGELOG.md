@@ -18,6 +18,7 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed the broken links in the documentation. `KAA-2270`
 - Fixed tutorial's error logging (when subscribing for services) by generating better error messages in SDK. `KAA-2272`
 
 ## 4.14.0 - 2020-03-27

@@ -101,11 +101,11 @@ const client = create({
 })
 ```
 
-To learn more about configuring the SDK, please see the [Configuration Quickstart](Configurations).
+To learn more about configuring the SDK, please see the [Configuration Quickstart](configurations).
 
 ## Further Reading
 
-The best way to learn is usually by example. Our quickstarts will provided you with working examples and tutorials that you can easily follow. You can also use the Codepen button at the end of each quickstart to run these examples live. These examples are also a great resources with which to experiment and start your own code base. [Visit our quickstarts to learn more.](../)
+The best way to learn is usually by example. Our quickstarts will provided you with working examples and tutorials that you can easily follow. You can also use the Codepen button at the end of each quickstart to run these examples live. These examples are also a great resources with which to experiment and start your own code base. [Visit our quickstarts to learn more.](/developer/quickstarts)
 
 ## Browser Support
 
