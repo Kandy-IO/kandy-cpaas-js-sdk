@@ -16,6 +16,10 @@ Kandy.js change log.
 - Improved logs for Calls. `KAA-2219`
 - Improved behaviour when loading SDK into browser that doesn't support WebRTC. `KAA-2238` `KAA-2258`
 
+### Fixed
+
+- Fixed tutorial's error logging (when subscribing for services) by generating better error messages in SDK. `KAA-2272`
+
 ## 4.14.0 - 2020-03-27
 
 ### Added

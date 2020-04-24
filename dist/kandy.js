@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.383
+ * Version: 4.15.0-beta.384
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31213,7 +31213,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.383';
+  return '4.15.0-beta.384';
 }
 
 /***/ }),
@@ -45258,6 +45258,8 @@ var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
 
 var _constants = __webpack_require__("../../packages/kandy/src/auth/constants.js");
 
+var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
+
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 var _errors = __webpack_require__("../../packages/kandy/src/errors/index.js");
@@ -45277,16 +45279,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Helpers.
-
-
-// Other plugins
-// Subscription plugin.
 const platform = _constants2.platforms.CPAAS;
 
 // Constants
 
 
 // Libraries.
+
+
+// Other plugins
+// Subscription plugin.
 
 const log = _logs.logManager.getLogger('SUBSCRIPTION');
 
@@ -45304,6 +45306,10 @@ function* subscriptionFlow() {
   while (true) {
     const action = yield (0, _effects2.take)(subscriptionChannel);
 
+    // Get the channel information of the channel to be closed.
+    const { notificationChannels } = yield (0, _effects2.select)(_selectors.getNotificationChannels);
+    const channel = notificationChannels[action.payload.type];
+
     // Handle the action appropriately.
     if (action.type === actionTypes.SUBSCRIBE) {
       if (!action.payload.services || action.payload.services.length === 0) {
@@ -45318,6 +45324,33 @@ function* subscriptionFlow() {
       if (!result.success) {
         // Error scenario: Could not open channel.
         yield (0, _effects2.put)(actions.subscribeFinished({ error: result.error }));
+        continue;
+      }
+
+      // Ensure only one user credentials can be used at a time.
+      // If user of SDK instance triggers a subscribe for services
+      // using another set of credentials, then it needs to unsubscribe
+      // from currently subscribed services.
+      const currentUserInfo = yield (0, _effects2.select)(_selectors2.getUserInfo);
+      let currentSubscribedUsername;
+      if (channel && channel.resourceURL) {
+        currentSubscribedUsername = channel.resourceURL.split('/channels/')[0].split('/').pop();
+      }
+
+      if (currentSubscribedUsername && currentUserInfo.username !== currentSubscribedUsername) {
+        // See NOTE below, for the same yield delay(0)
+        yield (0, _effects2.delay)(0);
+
+        // Error scenario: When attempting to subscribe,
+        // if we detect that there was a previous subscribed user,
+        // then that currently subscribed user
+        // has to be the same as the currently authenticated user.
+        yield (0, _effects2.put)(actions.subscribeFinished({
+          error: new _errors2.default({
+            message: 'Previously subscribed username does not match the currently authenticated username. Unsubscribe previous user from service(s).',
+            code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
+          })
+        }));
         continue;
       }
 
@@ -45350,10 +45383,6 @@ function* subscriptionFlow() {
         }));
         continue;
       }
-
-      // Get the channel information of the channel to be closed.
-      const { notificationChannels } = yield (0, _effects2.select)(_selectors.getNotificationChannels);
-      const channel = notificationChannels[action.payload.type];
 
       // If there are no longer any subscribed services for this channel (and
       //    the channel is open), close it.
@@ -45413,11 +45442,14 @@ function* subscribeForServices(action) {
     return true;
   });
 
+  let reason;
   if (notRegistered.length > 0) {
-    log.debug(`Not registered for requested service(s): ${notRegistered}.`);
+    reason = 'Not registered for requested service(s): ' + notRegistered + '.';
+    log.debug(reason);
   }
   if (alreadySubscribed.length > 0) {
-    log.debug(`Already subscribed for requested service(s): ${alreadySubscribed}.`);
+    reason = 'Already subscribed for requested service(s): ' + alreadySubscribed + '.';
+    log.debug(reason);
   }
 
   if (validServices.length === 0) {
@@ -45433,7 +45465,7 @@ function* subscribeForServices(action) {
     // TODO: Proper error / return.
     return {
       error: new _errors2.default({
-        message: 'Failed to subscribe: No valid services provided.',
+        message: 'Failed to subscribe: No valid services provided. Reason: ' + reason,
         // TODO: Proper error code.
         code: 'BAD_INPUT'
       })
