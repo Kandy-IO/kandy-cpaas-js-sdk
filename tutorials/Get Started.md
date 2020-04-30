@@ -25,10 +25,13 @@ This is the HTTPS entry point that you will use for Javascript SDK authenticatio
 The Kandy SDK is available on NPM and can be added to your project using either npm or yarn.
 
 **NPM**
+
 ```
   > npm install @kandy-io/cpaas-sdk
 ```
+
 **Yarn**
+
 ```
   > yarn add @kandy-io/cpaas-sdk
 ```
@@ -41,13 +44,13 @@ To begin, you will need to include the javascript library in your application. T
 
 The library will expose the `Kandy` object to global scope. The `Kandy.create` function is used to create an instance of the SDK, as well as to configure that instance.
 
-``` html
+```html
 <!-- HTML -->
 
 <!-- Load the library. -->
-<script src='path/to/kandy.js'></script>
+<script src="path/to/kandy.js"></script>
 
-<script type='text/javascript'>
+<script type="text/javascript">
   // Instantiate the library.
   const client = Kandy.create(configs)
 
@@ -61,7 +64,7 @@ The library will expose the `Kandy` object to global scope. The `Kandy.create` f
 
 Different module bundlers can be used to bundle the library with your application. In your application, you simply need to import the library to be able to make use of it.
 
-``` javascript
+```javascript
 // ES6 import or...
 import { create } from '@kandy-io/cpaas-sdk'
 // CommonJS module.
@@ -76,7 +79,7 @@ client.on( ... )
 
 After you've created your instance of the SDK, you can begin playing around with it to learn its functionality and see how it fits in your application. The API reference documentation will help to explain the details of the available features.
 
-The examples that follow will assume that you are using bundling and that the Kandy library is accessible from the */node_modules/* folder and therefore required to be accessed by the name `@kandy-io/cpaas-sdk` only.
+The examples that follow will assume that you are using bundling and that the Kandy library is accessible from the _/node_modules/_ folder and therefore required to be accessed by the name `@kandy-io/cpaas-sdk` only.
 
 ## Configurations
 
@@ -101,17 +104,17 @@ const client = create({
 })
 ```
 
-To learn more about configuring the SDK, please see the [Configuration Quickstart](Configurations).
+To learn more about configuring the SDK, please see the [Configuration Quickstart](configurations).
 
 ## Further Reading
 
-The best way to learn is usually by example. Our quickstarts will provided you with working examples and tutorials that you can easily follow. You can also use the Codepen button at the end of each quickstart to run these examples live. These examples are also a great resources with which to experiment and start your own code base. [Visit our quickstarts to learn more.](../)
+The best way to learn is usually by example. Our quickstarts will provided you with working examples and tutorials that you can easily follow. You can also use the Codepen button at the end of each quickstart to run these examples live. These examples are also a great resources with which to experiment and start your own code base. [Visit our quickstarts to learn more.](/developer/quickstarts)
 
 ## Browser Support
 
-| Browser           |        Versions         |
-| ----------------- | ----------------------- |
-| Chrome            | Latest 3 Major Versions |
-| Firefox           | Latest 3 Major Versions |
-| Safari (Desktop)  |  Latest Major Version   |
+| Browser          | Versions                |
+| ---------------- | ----------------------- |
+| Chrome           | Latest 3 Major Versions |
+| Firefox          | Latest 3 Major Versions |
+| Safari (Desktop) | Latest Major Version    |
 

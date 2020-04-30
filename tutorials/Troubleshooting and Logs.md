@@ -49,7 +49,7 @@ If you're using Firefox Browser:
 
 ### Reporting a Bug
 
-You can report an issue with the SDK by going to our [contact us page](/contact-us) or, if you are logged in, you can create a support ticket [here](/portal/support/submit-ticket).
+You can report an issue with the SDK by going to our [contact us page](/contact-us) or, if you are logged in, you can create a support ticket [here](/portal/support/overview).
 
 ## User Interface
 
@@ -59,11 +59,9 @@ We will create a simple UI for demonstrating the effect that log levels have on 
 <div>
   <fieldset>
     <legend>Select a Log level</legend>
-    <input type="radio" name="log-level" value="silent">silent
-    <input type="radio" name="log-level" value="error" >error
-    <input type="radio" name="log-level" value="warn">warn
-    <input type="radio" name="log-level" value="info">info
-    <input type="radio" name="log-level" value="debug">debug
+    <input type="radio" name="log-level" value="silent" />silent
+    <input type="radio" name="log-level" value="error" />error <input type="radio" name="log-level" value="warn" />warn
+    <input type="radio" name="log-level" value="info" />info <input type="radio" name="log-level" value="debug" />debug
   </fieldset>
   <input type="button" value="Initialize SDK" onclick="initialize();" />
 </div>
@@ -100,5 +98,5 @@ The following demo shows how various log levels affect the logging output. Note:
 
 Do you want to try this example for yourself? Click the button below to get started.
 
-<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Logger Demo\n */\n\nfunction initialize() {\n  var logLevel = document.querySelector(&apos;input[name=\&quot;log-level\&quot;]:checked&apos;).value\n  console.log(&apos;log level:&apos;, logLevel)\n  var client = Kandy.create({\n    logs: {\n      logLevel: logLevel,\n      enableFcsLogs: true\n    },\n    authentication: {\n      server: {\n        base: &apos;$KANDYFQDN$&apos;\n      },\n      clientCorrelator: &apos;sampleCorrelator&apos;\n    }\n  })\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Select a Log level</legend>\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;silent\&quot;>silent\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;error\&quot; >error\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;warn\&quot;>warn\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;info\&quot;>info\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;debug\&quot;>debug\n  </fieldset>\n  <input type=\&quot;button\&quot; value=\&quot;Initialize SDK\&quot; onclick=\&quot;initialize();\&quot; />\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Logger Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://unpkg.com/@kandy-io/cpaas-sdk@4.14.0/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Logger Demo\n */\n\nfunction initialize() {\n  var logLevel = document.querySelector(&apos;input[name=\&quot;log-level\&quot;]:checked&apos;).value\n  console.log(&apos;log level:&apos;, logLevel)\n  var client = Kandy.create({\n    logs: {\n      logLevel: logLevel,\n      enableFcsLogs: true\n    },\n    authentication: {\n      server: {\n        base: &apos;$KANDYFQDN$&apos;\n      },\n      clientCorrelator: &apos;sampleCorrelator&apos;\n    }\n  })\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Select a Log level</legend>\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;silent\&quot; />silent\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;error\&quot; />error <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;warn\&quot; />warn\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;info\&quot; />info <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;debug\&quot; />debug\n  </fieldset>\n  <input type=\&quot;button\&quot; value=\&quot;Initialize SDK\&quot; onclick=\&quot;initialize();\&quot; />\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Logger Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://unpkg.com/@kandy-io/cpaas-sdk@4.15.0/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
 
