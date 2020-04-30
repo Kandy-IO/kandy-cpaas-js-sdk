@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.15.0 - beta
 
+### Fixed
+
+- Removed the need for remote party properties (callNotificationParams) to be present in a sessionProgress notification. `KAA-2271`
+
 ### Added
 
 - Added the handling of mute/unmute events which are being generated when a media source is muted/unmuted by triggers that are outside of SDK's control. `KAA-1641`
