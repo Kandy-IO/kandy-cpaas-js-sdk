@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.393
+ * Version: 4.15.0-beta.394
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31306,7 +31306,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.393';
+  return '4.15.0-beta.394';
 }
 
 /***/ }),
@@ -31758,7 +31758,7 @@ function* websocketLifecycle(wsConnectAction) {
 
   // Whether we're disconnecting or have lost connection,
   //      we want to cancel these tasks either way.
-  yield (0, _effects.cancel)([emitTask, pingFlow]);
+  yield (0, _effects.cancel)(emitTask, pingFlow);
 
   if (action.type === actionTypes.WS_DISCONNECT) {
     // If we're disconnecting, close the websocket to end it's lifecycle.
