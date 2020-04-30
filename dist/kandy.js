@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.15.0-beta.392
+ * Version: 4.15.0-beta.393
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -27790,6 +27790,7 @@ exports.incomingCall = incomingCall;
 exports.parseCallRequest = parseCallRequest;
 exports.parseCallResponse = parseCallResponse;
 exports.callStatusUpdateEnded = callStatusUpdateEnded;
+exports.sessionStatusUpdateEnded = sessionStatusUpdateEnded;
 exports.callStatusUpdateRinging = callStatusUpdateRinging;
 exports.callStatusUpdateFailed = callStatusUpdateFailed;
 exports.callCancelled = callCancelled;
@@ -27827,6 +27828,8 @@ var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.
 
 var _utils = __webpack_require__("../../packages/kandy/src/call/cpaas/utils/index.js");
 
+var _index = __webpack_require__("../../packages/kandy/src/callstack/utils/index.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -27857,6 +27860,32 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @param {string}   params.remoteName     Display name of the remote participant.
  * @param {string}   params.calleeNumber  Number of the intended call recipient
  */
+
+
+// Helpers
+// TODO: Move this to a shared location.
+
+
+// Libraries.
+
+
+// Other plugins
+
+
+// Callstack plugin.
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
 function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
@@ -27970,32 +27999,6 @@ function* incomingCall(deps, params) {
  * @param {string} params.remoteName   Name of the remote participant.
  * @param {string} params.remoteNumber Number of the remote participant.
  */
-
-
-// Helpers
-// TODO: Move this to a shared location.
-
-
-// Libraries.
-
-
-// Other plugins
-
-
-// Callstack plugin.
-/**
- * "Notification sagas" handle received notifications.
- * Each saga handles a single websocket notification that may be received from
- *    the backend.
- *
- * There may not be an established webRTC session for these sagas. This may be
- *    because (1) the notification is a new incoming call, or (2) there is a
- *    de-sync between SDK state and server state. This may or may not be
- *    considered as an error scenario (eg. a "call ended" notification for a
- *    call the SDK doesn't know about may be safely ignored).
- */
-
-// Call plugin.
 function* parseCallRequest(deps, params) {
   const { wrtcsSessionId, sdp, remoteName, remoteNumber, customParameters } = params;
   const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
@@ -28143,8 +28146,6 @@ function* parseCallResponse(deps, params) {
  * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
  * @param {string}   [params.reasonText]   Human-readable explanation for the call change.
  * @param {string}   [params.statusCode]     Code representing the reason for the call change.
- * @param {string}   params.remoteName   Name of the remote participant.
- * @param {string}   params.remoteNumber Number of the remote participant.
  */
 function* callStatusUpdateEnded(deps, params) {
   const { wrtcsSessionId, reasonText, statusCode } = params;
@@ -28170,23 +28171,65 @@ function* callStatusUpdateEnded(deps, params) {
     return;
   }
 
-  const endParams = {
-    isLocal: false, // end operation was caused by remote side.
-    // Remote participant's information.
-    remoteParticipant: {
-      displayNumber: params.remoteNumber,
-      displayName: params.remoteName
-    },
-    transition: {
-      prevState: currentCall.state
-    }
-  };
-  if (statusCode) {
-    endParams.transition.statusCode = statusCode;
+  log.debug(`Call ended notice caused by ${reasonText} (Status Code: ${statusCode}).`);
+
+  // Close the local webRTC session
+  yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
+
+  log.info(`Finished handling call ended notice. Changing to ${_constants.CALL_STATES.ENDED}.`);
+  // TODO: Don't expose these directly. Create our own convention so that transition data
+  //       can be consistent across different operations.
+  yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, (0, _index.generateEndParams)(currentCall.state, false, params)));
+}
+
+/**
+ * This saga is intended to handle the call status notifications that indicates a session has completed.
+ * A session has completed (in this context) means completing a midcall operation such as:
+ *
+ * - direct transfer
+ * - consultative transfer
+ * - join
+ * , where user A transfered user B to user C.
+ *
+ * For the direct & consultative transfer operations, the 'sessionComplete' notification
+ * will just refer to the original call between: A<->B, which has now completed.
+ * Therefore this saga will send a 'DELETE' REST request to inform backend to tear down
+ * this particular original call.
+ *
+ * Note that for the other original call, which is A<->C, server already knows
+ * that it has ended and callStatusUpdateEnded saga (above) already handles it by simply
+ * marking it locally as ended (i.e. in local Redux state). Therefore there is no need
+ * to send any 'DELETE' REST request for A<->C call.
+ *
+ * For the join operation, SDK will receive two separate 'sessionComplete' notifications from backend.
+ * Therefore this saga will send two 'DELETE' REST requests to inform backend to tear down those
+ * two original calls.
+ *
+ * @method sessionStatusUpdateEnded
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Object}   params        Parameters describing the incoming call.
+ * @param {string}   params.wrtcsSessionId ID that the server uses to identify the session.
+ * @param {string}   [params.reasonText]   Human-readable explanation for the call change.
+ * @param {string}   [params.statusCode]     Code representing the reason for the call change.
+ */
+function* sessionStatusUpdateEnded(deps, params) {
+  const { wrtcsSessionId, reasonText, statusCode } = params;
+  const requests = deps.requests;
+
+  const currentCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
+
+  const log = _logs.logManager.getLogger('CALL', (currentCall || {}).id);
+
+  // Make sure the call state is what we expect
+  const stateError = yield (0, _effects.call)(_utils.validateCallState, currentCall.id, {});
+  if (stateError) {
+    log.info('Session completed notice for unknown Call. Ignoring.');
+    return;
   }
-  if (reasonText) {
-    endParams.transition.reasonText = reasonText;
-  }
+
+  log.info('Received session status completed notice; handling.', { wrtcsSessionId });
 
   if (reasonText) {
     let customStatusCode = statusCode;
@@ -28199,10 +28242,12 @@ function* callStatusUpdateEnded(deps, params) {
         customStatusCode = _constants.STATUS_CODES.JOIN_SUCCESS;
       }
     }
-    endParams.transition = { reasonText, statusCode: customStatusCode };
-    log.debug(`Call ended notice caused by ${reasonText} (${customStatusCode}).`);
+    log.debug(`Session completed notice caused by ${reasonText} (${customStatusCode}).`);
   }
 
+  log.info(`Ending webRTC session with id: ${currentCall.webrtcSessionId}, locally ...`);
+
+  // Close the local webRTC session
   yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
 
   const localOp = currentCall.localOp;
@@ -28233,15 +28278,30 @@ function* callStatusUpdateEnded(deps, params) {
         break;
     }
     if (finishAction) {
+      log.debug('Marking call locally as ended. Call ID: ', currentCall.id);
+
       yield (0, _effects.put)(finishAction(currentCall.id, { transition }));
-      return;
+
+      // We also need to notify the backend that call with currentCall.id should be removed
+      // by sending a DELETE REST request.
+      // Perform signalling to end the session on server's side.
+      const isAnonymous = currentCall.isAnonymous;
+      const account = currentCall.account;
+      log.info('Ending call by requesting to be removed from backend ...');
+      const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
+
+      if (!response.error) {
+        log.info(`Finished ending call. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
+        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, (0, _index.generateEndParams)(currentCall.state, true, params)));
+      } else {
+        log.debug(`Error received when attempting to end the session: ${response.error}. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
+        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+          isLocal: true,
+          error: response.error
+        }));
+      }
     }
   }
-
-  log.info(`Finished handling call ended notice. Changing to ${_constants.CALL_STATES.ENDED}.`);
-  // TODO: Don't expose these directly. Create our own convention so that transition data
-  //       can be consistent across different operations.
-  yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, endParams));
 }
 
 /**
@@ -29762,6 +29822,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.sanitizeSdesFromSdp = sanitizeSdesFromSdp;
 exports.changeDtlsRoleTo = changeDtlsRoleTo;
 exports.modifySdpBandwidth = modifySdpBandwidth;
+exports.generateEndParams = generateEndParams;
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
@@ -29852,6 +29913,38 @@ function modifySdpBandwidth(newSdp, info, originalSdp) {
     }
   }
   return newSdp;
+}
+
+/**
+ * Generates extra informational parameters for ending a call.
+ *
+ * @method generateEndParams
+ * @param {string}  currentCallState The state of the current call, before it was ended.
+ * @param {boolean} isLocal Specifies if end operation was caused by the local side.
+ * @param {Object}  params Extra context information related to the call.
+ * @param {string}  [params.reasonText]  Human-readable explanation for the call change.
+ * @param {string}  [params.statusCode] Code representing the reason for the call change.
+ * @param {string}  params.remoteName   Name of the remote participant.
+ * @param {string}  params.remoteNumber Number of the remote participant.
+ */
+function generateEndParams(currentCallState, isLocal, params) {
+  const endParams = {
+    isLocal,
+    remoteParticipant: {
+      displayNumber: params.remoteNumber,
+      displayName: params.remoteName
+    },
+    transition: {
+      prevState: currentCallState
+    }
+  };
+  if (params.statusCode) {
+    endParams.transition.statusCode = params.statusCode;
+  }
+  if (params.reasonText) {
+    endParams.transition.reasonText = params.reasonText;
+  }
+  return endParams;
 }
 
 /***/ }),
@@ -31213,7 +31306,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.15.0-beta.392';
+  return '4.15.0-beta.393';
 }
 
 /***/ }),
