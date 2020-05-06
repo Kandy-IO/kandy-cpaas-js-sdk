@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.16.0 - beta
 
+### Fixed
+
+- Removed the need for remote party properties (callNotificationParams) to be present in notifications. `KAA-2271`
+
 ### Added
 
 - Added new call config option 'mediaBrokerOnly'. When set to true the SDK will
