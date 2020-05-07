@@ -10,7 +10,9 @@
     <div id="docute"></div>
     <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
     <script src="//cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
-    <script>
+    <script type="module">
+      import { configs } from './config.js'
+
       const sidebar = [{
         title: "Tutorials",
         links: [
@@ -88,8 +90,28 @@
         ]
       }]
 
+      // Get all query params (i.e. params that are provided as part of the URL address of a given Tutorial)
+      // These params come after '/?' in that URL.
       const queryParams = new URLSearchParams(window.location.search);
+      const configName = queryParams.get('config')
+      let configIdx
 
+      // Try to determine the index for the configuration we need to use
+      // for replacing all the templated variables in any of the Tutorial pages.
+      if (!configName) {
+        // If there was no 'config' query parameter, then by default we'll access
+        // the first configuration element in our 'configs' array.
+        configIdx = 0
+      } else {
+        let element = configs.find(x => x.name === configName)
+        if (!element) {
+          configIdx = 0
+        } else {
+          configIdx = configs.indexOf(element);
+        }
+      }
+
+      let useDefault = !configs || !configs[configIdx] || !configs[configIdx].data
       new Docute({
         target: '#docute',
         sidebar,
@@ -103,56 +125,56 @@
           {
             name: 'Convert KANDYFQDN',
             extend(api) {
-              const kandyFQDN = queryParams.get('KANDYFQDN') || '$KANDYFQDN$'
+              const kandyFQDN = useDefault ? '$KANDYFQDN$' : configs[configIdx].data.KANDYFQDN
               api.processMarkdown(md => md.replace(/\$KANDYFQDN\$/gm, kandyFQDN))
             }
           },
           {
             name: 'Convert KANDYTURN1',
             extend(api) {
-              const kandyTURN1 = queryParams.get('KANDYTURN1') || '$KANDYTURN1$'
+              const kandyTURN1 = useDefault ? '$KANDYTURN1$' : configs[configIdx].data.KANDYTURN1
               api.processMarkdown(md => md.replace(/\$KANDYTURN1\$/gm, kandyTURN1))
             }
           },
           {
             name: 'Convert KANDYTURN2',
             extend(api) {
-              const kandyTURN2 = queryParams.get('KANDYTURN2') || '$KANDYTURN2$'
+              const kandyTURN2 = useDefault ? '$KANDYTURN2$' : configs[configIdx].data.KANDYTURN2
               api.processMarkdown(md => md.replace(/\$KANDYTURN2\$/gm, kandyTURN2))
             }
           },
           {
             name: 'Convert KANDYSTUN1',
             extend(api) {
-              const kandySTUN1 = queryParams.get('KANDYSTUN1') || '$KANDYSTUN1$'
+              const kandySTUN1 = useDefault ? '$KANDYSTUN1$' : configs[configIdx].data.KANDYSTUN1
               api.processMarkdown(md => md.replace(/\$KANDYSTUN1\$/gm, kandySTUN1))
             }
           },
           {
             name: 'Convert KANDYSTUN2',
             extend(api) {
-              const kandySTUN2 = queryParams.get('KANDYSTUN2') || '$KANDYSTUN2$'
+              const kandySTUN2 = useDefault ? '$KANDYSTUN2$' : configs[configIdx].data.KANDYSTUN2
               api.processMarkdown(md => md.replace(/\$KANDYSTUN2\$/gm, kandySTUN2))
             }
           },
           {
             name: 'Convert KANDY',
             extend(api) {
-              const kandy = queryParams.get('KANDY') || '$KANDY$'
+              const kandy = useDefault ? '$KANDY$' : configs[configIdx].data.KANDY
               api.processMarkdown(md => md.replace(/\$KANDY\$/gm, kandy))
             }
           },
           {
             name: 'Convert SUBSCRIPTIONFQDN',
             extend(api) {
-              const subscriptionFQDN = queryParams.get('SUBSCRIPTIONFQDN') || '$SUBSCRIPTIONFQDN$'
+              const subscriptionFQDN = useDefault ? '$SUBSCRIPTIONFQDN$' : configs[configIdx].data.SUBSCRIPTIONFQDN
               api.processMarkdown(md => md.replace(/\$SUBSCRIPTIONFQDN\$/gm, subscriptionFQDN))
             }
           },
           {
             name: 'Convert WEBSOCKETFQDN',
             extend(api) {
-              const webSocketFQDN = queryParams.get('WEBSOCKETFQDN') || '$WEBSOCKETFQDN$'
+              const webSocketFQDN = useDefault ? '$WEBSOCKETFQDN$' : configs[configIdx].data.WEBSOCKETFQDN
               api.processMarkdown(md => md.replace(/\$WEBSOCKETFQDN\$/gm, webSocketFQDN))
             }
           },

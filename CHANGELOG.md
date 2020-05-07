@@ -24,6 +24,7 @@ Kandy.js change log.
 ### Changed
 
 - Improved the `call.startVideo` API to allow for configuring additional options such as bandwidth.
+- Changed the Tutorial's acccess URL so that it does not expose configuration parameters for a specific domain/server. `KAA-2320`
 
 ## 4.15.0 - 2020-04-30
 
