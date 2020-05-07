@@ -7,10 +7,6 @@ Kandy.js change log.
 
 ## 4.16.0 - beta
 
-### Fixed
-
-- Removed the need for remote party properties (callNotificationParams) to be present in notifications. `KAA-2271`
-
 ### Added
 
 - Added new call config option 'mediaBrokerOnly'. When set to true the SDK will
@@ -20,11 +16,18 @@ Kandy.js change log.
   supported by the browser. `KAA-2275`
 - Added new Call option for configuring DSCP markings on the media traffic. `KAA-2256`
   - DSCP controls can be configured with the `call.make`, `call.answer`, `call.addMedia`, and `call.startVideo` Call APIs.
+- Added `removeBundling` flag to the call config for users that want to turn it off. `KAA-2338`
+
+### Fixed
+
+- Removed the need for remote party properties (callNotificationParams) to be present in notifications. `KAA-2271`
+- Fixed Firefox calling Chrome issue related to media bundling. `KAA-2282`
 
 ### Changed
 
 - Improved the `call.startVideo` API to allow for configuring additional options such as bandwidth.
-- Changed the Tutorial's acccess URL so that it does not expose configuration parameters for a specific domain/server. `KAA-2320`
+- Changed the Tutorial's access URL so that it does not expose configuration parameters for a specific domain/server. `KAA-2320`
+- The default for `removeBundling` has been changed to be `false`, thereby enabling media bundling. `KAA-2338`
 
 ## 4.15.0 - 2020-04-30
 

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.16.0-beta.399
+ * Version: 4.16.0-beta.400
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18771,6 +18771,7 @@ const log = _logs.logManager.getLogger('CALL');
  * @param {boolean} [call.serverTurnCredentials=true] Whether server-provided TURN credentials should be used.
  * @param {Array<call.SdpHandlerFunction>} [call.sdpHandlers] List of SDP handler functions to modify SDP. Advanced usage.
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
+ * @param {boolean} [call.removeBundling=false] Whether to remove a=group attributes to stop media bundling from incoming and outgoing SDP messages.
  */
 
 /**
@@ -18797,6 +18798,8 @@ const defaultOptions = {
   sdpHandlers: [],
   // filter out H264 Codec
   removeH264Codecs: true,
+  // Remove a=group attributes to stop media bundling
+  removeBundling: false,
   // Trickle ICE method to use for calls.
   trickleIceMode: 'NONE',
   // Set this to false to bypass sip address normalization
@@ -18819,7 +18822,8 @@ const defaultOptions = {
   sdpHandlers: _validation.val.every.function(),
   removeH264Codecs: _validation.val.boolean(),
   trickleIceMode: (0, _validation.enums)('NONE'),
-  normalizeDestination: _validation.val.boolean()
+  normalizeDestination: _validation.val.boolean(),
+  removeBundling: _validation.val.boolean()
 });
 const parseOptions = (0, _validation.parse)('call', v8nValidation);
 
@@ -25192,7 +25196,8 @@ function* makeCall(deps, action) {
     trickleIceMode: callOptions.trickleIceMode,
     iceCollectionDelay: callOptions.iceCollectionDelay,
     iceCollectionCheck: callOptions.iceCollectionCheck,
-    maxIceTimeout: callOptions.maxIceTimeout
+    maxIceTimeout: callOptions.maxIceTimeout,
+    removeBundling: callOptions.removeBundling
   });
 
   // An error occured while trying to setup the WebRTC portion of the call.
@@ -25351,7 +25356,8 @@ function* answerCall(deps, action) {
       trickleIceMode: callOptions.trickleIceMode,
       iceCollectionDelay: callOptions.iceCollectionDelay,
       iceCollectionCheck: callOptions.iceCollectionCheck,
-      maxIceTimeout: callOptions.maxIceTimeout
+      maxIceTimeout: callOptions.maxIceTimeout,
+      removeBundling: callOptions.removeBundling
     });
 
     if (webrtcInfo.error) {
@@ -25909,7 +25915,7 @@ function* offerFullMedia(deps, action) {
 
 /**
  * Sends custom parameters for a call.
- * @param {Object}   deps                                   Dependences that the saga uses.
+ * @param {Object}   deps                                   Dependencies that the saga uses.
  * @param {Object}   deps.webRTC                            The WebRTC stack.
  * @param {Object}   deps.requests                          The set of platform-specific signalling functions.
  * @param {Function} deps.requests.updateCustomParameters   "Update call" signalling function.
@@ -26247,7 +26253,7 @@ function* removeMedia(deps, action) {
  * Checks whether a renegotiation is necessary depending on the flag
  *
  * Responsibilities:
- *    1. If renegotiation is necessary, dispatch a call action to start the renegotiation operaetion
+ *    1. If renegotiation is necessary, dispatch a call action to start the renegotiation operation
  * @method renegotiate
  * @param {Object}   deps          Dependencies that the saga uses.
  * @param {Object}   action An action of type `SESSION_TRACK_ENDED`.
@@ -26467,7 +26473,7 @@ function* getTracks(id, kind) {
  *
  * Direct Transfers an ongoing call.
  *
- * This saga handles the WebRTC and signalling portions of direct transfering an ongoing call
+ * This saga handles the WebRTC and signalling portions of direct transferring an ongoing call
  * Assumptions:
  *    1. The action contains a destination address
  *    2. The call is in the 'On Hold' state
@@ -26659,13 +26665,14 @@ function* join(deps, action) {
   const dscpControls = currentCall.dscpControls;
 
   const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-  const { trickleIceMode, sdpSemantics } = yield (0, _effects.select)(_selectors.getOptions);
+  const { trickleIceMode, sdpSemantics, removeBundling } = yield (0, _effects.select)(_selectors.getOptions);
 
   const { offerSdp, sessionId, mediaIds } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
     sdpSemantics,
     turnInfo,
     trickleIceMode,
-    dscpControls
+    dscpControls,
+    removeBundling
   });
 
   // Collect the information needed to make the request.
@@ -27614,13 +27621,14 @@ function* incomingCall(deps, params) {
       offer: {
         sdp
       },
-      trickleIceMode: callOptions.sdpSemantics,
+      trickleIceMode: callOptions.trickleIceMode,
       sdpSemantics: callOptions.sdpSemantics,
       iceCollectionDelay: callOptions.iceCollectionDelay,
       iceCollectionCheck: callOptions.iceCollectionCheck,
       maxIceTimeout: callOptions.maxIceTimeout,
       turnInfo,
-      callId
+      callId,
+      removeBundling: callOptions.removeBundling
     });
   } else {
     log.debug('Incoming call is a slow-start call.');
@@ -29829,7 +29837,8 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
     callId,
     iceCollectionCheck,
     iceCollectionDelay,
-    maxIceTimeout
+    maxIceTimeout,
+    removeBundling
   } = sessionOptions;
 
   const { medias, error } = yield (0, _effects.call)(mediaOps.createLocal, webRTC, mediaConstraints);
@@ -29849,7 +29858,8 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
       trickleIceMode,
       iceCollectionCheck,
       iceCollectionDelay,
-      maxIceTimeout
+      maxIceTimeout,
+      removeBundling
     }
   });
   log.debug('Created WebRTC Session for Call.', { webrtcSessionId: session.id });
@@ -29936,7 +29946,8 @@ function* setupIncomingCall(deps, sessionOptions) {
     callId,
     iceCollectionDelay,
     maxIceTimeout,
-    iceCollectionCheck
+    iceCollectionCheck,
+    removeBundling
   } = sessionOptions;
   let offer = sessionOptions.offer;
 
@@ -29952,7 +29963,8 @@ function* setupIncomingCall(deps, sessionOptions) {
       trickleIceMode,
       iceCollectionDelay,
       maxIceTimeout,
-      iceCollectionCheck
+      iceCollectionCheck,
+      removeBundling
     }
   });
 
@@ -31238,7 +31250,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.16.0-beta.399';
+  return '4.16.0-beta.400';
 }
 
 /***/ }),
@@ -52393,6 +52405,7 @@ var _constants = __webpack_require__("../../packages/webrtc/src/constants.js");
  * @typedef {Object} PeerConfig
  * @property {Object} [rtcConfig] Configuration for the native RTCPeerConnection.
  * @property {String} [trickleIceMode=FULL] The initial mode the Peer will use when receiving ICE candidates.
+ * @property {Boolean} [removeBundling=false] Remove the a=group attribute to stop media bundling
  * @property {Function} [halfTrickleThreshold] Function that determines whether the threshold has been met when in HALF trickle mode.
  * @property {Number} [iceCollectionDelay=1000] The time (in ms) between ICE collection checks.
  * @property {Number} [maxIceTimeout=3000] Duration (in ms) that the Peer should wait for ICE candidate collection.
@@ -52404,7 +52417,7 @@ exports.default = {
     sdpSemantics: _constants.PEER.SDP_SEMANTICS.PLAN_B
   },
   trickleIceMode: _constants.PEER.TRICKLE_ICE.FULL,
-  removeBundling: true,
+  removeBundling: false,
   halfTrickleThreshold: isPassedHalfTrickleThreshold,
   iceCollectionDelay: 1000,
   maxIceTimeout: 3000,
@@ -53135,7 +53148,7 @@ function createAnswer(options = {}) {
       sdpHandlers.push(_handlers.preventDtlsRoleChange);
 
       if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
-        // Modify the answer to claim the Peer doesn't suport trickle ICE.
+        // Modify the answer to claim the Peer doesn't support trickle ICE.
         sdpHandlers.push(_handlers.removeTrickleIce);
       }
       if (config.removeBundling) {
@@ -53212,7 +53225,7 @@ function createOffer(options = {}) {
     nativePeer.createOffer(options).then(offer => {
       const sdpHandlers = [];
       if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.NONE) {
-        // Modify the offer to claim the Peer doesn't suport trickle ICE.
+        // Modify the offer to claim the Peer doesn't support trickle ICE.
         sdpHandlers.push(_handlers.removeTrickleIce);
       }
       if (config.removeBundling) {
