@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.16.0-beta.404
+ * Version: 4.16.0-beta.405
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31250,7 +31250,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.16.0-beta.404';
+  return '4.16.0-beta.405';
 }
 
 /***/ }),
@@ -44998,6 +44998,7 @@ function* deleteChannel(channelId, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions, requestInfo.options);
 
   if (response.error) {
+    log.info('Failed to delete channel. Error: ', response.error);
     if (response.payload.body) {
       // Handle errors from the server.
       // TODO: Better error; more info.
@@ -45018,6 +45019,7 @@ function* deleteChannel(channelId, requestInfo) {
       };
     }
   } else {
+    log.info('Successfully deleted channel.');
     // Request was successful.
     return (0, _extends3.default)({
       error: false
@@ -45046,18 +45048,21 @@ function* revokeWebsocket(connection, subscriptionURL, credentials) {
     Accept: 'application/json',
     'Content-Type': 'application/json',
     Authorization: `Bearer ${credentials.accessToken}`
+  };
 
-    // Send the revokeWebsocket request.
-  };const response = yield (0, _effects2.default)(requestOptions);
+  log.info('Revoking websocket connection.');
+  // Send the revokeWebsocket request.
+  const response = yield (0, _effects2.default)(requestOptions);
 
   // Handle the response and any possible errors.
   if (response.error) {
+    log.info('Failed to revoke the websocket connection. Error: ', response.error);
     if (response.payload.body) {
       // Handle errors from the server.
       return {
         // TODO: Better error; more info.
         error: new _errors2.default({
-          message: 'Failed to revoke websocket.',
+          message: 'Failed to revoke websocket connection.',
           code: _errors.subscriptionCodes.CPAAS_WSREVOKE_FAIL
         })
       };
@@ -45073,6 +45078,7 @@ function* revokeWebsocket(connection, subscriptionURL, credentials) {
       };
     }
   } else {
+    log.info('Successfully revoked websocket connection.');
     // Request was successful.
     return {
       error: false
@@ -45111,6 +45117,7 @@ function* refreshWebsocket(connection, subscription, credentials) {
     }
   });
 
+  log.info('Refreshing websocket connection.');
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
@@ -45128,7 +45135,7 @@ function* refreshWebsocket(connection, subscription, credentials) {
       return {
         // TODO: Better error; more info.
         error: new _errors2.default({
-          message: 'Refresh websocket request failed.',
+          message: 'Refreshing websocket request failed.',
           // TODO: Shared error codes.
           code: _errors.subscriptionCodes.CPAAS_WSREFRESH_FAIL
         })
@@ -45137,7 +45144,7 @@ function* refreshWebsocket(connection, subscription, credentials) {
   } else {
     // Request was successful.
     const extendResponse = response.payload.body;
-    log.debug('Websocket lifetime extended.');
+    log.info("Successfully extended Websocket connection's lifetime.");
 
     // Success.
     return (0, _extends3.default)({
@@ -45227,6 +45234,7 @@ function* ensureChannelOpen(type) {
   if (!subInfo.notificationChannels[type]) {
     let channelResponse;
     if (type === _constants.notificationTypes.WEBSOCKET) {
+      log.info(`Opening websocket channel for platform ${platform}.`);
       channelResponse = yield (0, _effects2.call)(openWebsocketChannel, platform);
     } else if (type === _constants.notificationTypes.PUSH) {
       // TODO: CPaaS Push subscription here.
@@ -45235,6 +45243,7 @@ function* ensureChannelOpen(type) {
       }
 
     if (channelResponse.error) {
+      log.info('Failed to open websocket channel. Error: ', channelResponse.error);
       // Error scenario: Could not open websocket channel.
       return { success: false, error: channelResponse.error };
     }
@@ -45243,6 +45252,7 @@ function* ensureChannelOpen(type) {
     yield (0, _effects2.put)(actions.channelOpened((0, _extends3.default)({}, channelResponse.notificationChannel, {
       channelId: channelResponse.notificationChannel.resourceURL.split('/channels/')[1]
     }), type));
+    log.info('Successfully opened websocket channel.');
     return { success: true };
   } else {
     // If there is already a channel, use it.
@@ -45287,6 +45297,7 @@ function* openWebsocketChannel(platform) {
   };const wsOpenOrError = yield (0, _effects.connectWebsocket)(websocketInfo, platform);
 
   if (wsOpenOrError.error) {
+    log.info('Failed to connect to websocket. Error: ', wsOpenOrError.error);
     // TODO: the connectivity plugin should be creating (and passing on) the websocket errors.
     throw new _errors2.default({
       message: 'Failed to connect to the websocket.',
@@ -45317,16 +45328,18 @@ function* closeChannel(channel, platform) {
     // Ask the connectivity plugin to disconnect this platform's websocket if it exists
     const wsState = yield (0, _effects2.select)(_selectors3.getConnectionState, platform);
     if (wsState.connected) {
+      log.info(`Closing websocket channel for platform ${platform}.`);
       const closeAction = yield (0, _effects.disconnectWebsocket)(undefined, platform);
 
       if (closeAction.error) {
-        log.debug('Failed to close websocket. Continuing anyway.');
+        log.info(`Failed to close websocket. Error: ${closeAction.error} Continuing anyway.`);
       }
     }
 
     const requestInfo = yield (0, _effects2.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
 
     // Delete the notification channel resource.
+    log.info(`Deleting channel with id: ${channelId}`);
     const response = yield (0, _effects2.call)(_requests.deleteChannel, channelId, requestInfo);
     return response;
   } else {
@@ -45424,6 +45437,7 @@ function* subscriptionFlow() {
       if (!action.payload.services || action.payload.services.length === 0) {
         // Error scenario: No services specified.
         // TODO: Better error.
+        log.info('Failed subscription: No services specified.');
         yield (0, _effects2.put)(actions.subscribeFinished({ error: true }));
         continue;
       }
@@ -45431,6 +45445,7 @@ function* subscriptionFlow() {
       // Open the notification channel if it isn't already.
       const result = yield (0, _effects2.call)(_channels.ensureChannelOpen, action.payload.type);
       if (!result.success) {
+        log.info('Failed to open channel. Error: ', result.error);
         // Error scenario: Could not open channel.
         yield (0, _effects2.put)(actions.subscribeFinished({ error: result.error }));
         continue;
@@ -45463,16 +45478,19 @@ function* subscriptionFlow() {
         continue;
       }
 
+      log.info('Subscribing for services.');
       // Subscribe to the services and retrieve a list of their responses.
       const subResponses = yield (0, _effects2.call)(subscribeForServices, action);
 
       // Report that the subscription flow has finished.
       if (subResponses.error) {
+        log.info('Failed to subscribe for services. Error: ', subResponses.error);
         yield (0, _effects2.put)(actions.subscribeFinished({
           error: subResponses.error,
           type: action.payload.type
         }));
       } else {
+        log.info('Successfully subscribed for services.');
         yield (0, _effects2.put)(actions.subscribeFinished({
           type: action.payload.type
         }));
@@ -45485,12 +45503,14 @@ function* subscriptionFlow() {
       // Unsubscribe the services.
       const unsubResponses = yield (0, _effects2.call)(unsubscribeServices, action);
       if (unsubResponses.error) {
+        log.info('Failed to unsubscribe from services. Error: ', unsubResponses.error);
         yield (0, _effects2.put)(actions.unsubscribeFinished({
           error: unsubResponses.error,
           type: action.payload.type
         }));
         continue;
       }
+      log.info('Successfully unsubscribed from services.');
 
       // If there are no longer any subscribed services for this channel (and
       //    the channel is open), close it.
@@ -45500,6 +45520,7 @@ function* subscriptionFlow() {
 
         if (closeResponse.error) {
           // TODO: Error scenario?
+          log.info('Failed to close channel. Error: ', closeResponse.error);
         } else {
           // TODO: Parameters.
           yield (0, _effects2.put)(actions.channelClosed(action.payload.type));
