@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.16.0-beta.410
+ * Version: 4.16.0-beta.411
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22850,8 +22850,8 @@ const CALL_ADDED_MEDIA = exports.CALL_ADDED_MEDIA = 'call:newMedia';
  * @event call:removedMedia
  * @param {Object} params
  * @param {string} params.callId The ID of the call.
- * @param {boolean} params.local Whether the new media is local or not.
- * @param {Array} params.tracks The list of new Tracks.
+ * @param {boolean} params.local Whether the removed Media was local or not.
+ * @param {Array} params.tracks The list of removed Tracks.
  */
 const CALL_REMOVED_MEDIA = exports.CALL_REMOVED_MEDIA = 'call:removedMedia';
 
@@ -22886,10 +22886,10 @@ const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
  * @memberof call
  * @event call:trackEnded
  * @param {Object} params
- * @param {string} params.callId The ID of the call the track was added to.
- * @param {string} params.mediaId The ID of the media the track was added to.
- * @param {string} params.trackId The ID of the newly added track.
- * @param {boolean} params.local Whether the track is local or not (remote)
+ * @param {string} params.callId The ID of the call the track was removed from.
+ * @param {string} params.mediaId The ID of the media the track was removed from.
+ * @param {string} params.trackId The ID of the removed track.
+ * @param {boolean} params.local Whether the track was local or not (remote)
  */
 const CALL_TRACK_ENDED = exports.CALL_TRACK_ENDED = 'call:trackEnded';
 
@@ -31250,7 +31250,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.16.0-beta.410';
+  return '4.16.0-beta.411';
 }
 
 /***/ }),
