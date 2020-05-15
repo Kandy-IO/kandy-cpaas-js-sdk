@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.16.0-beta.412
+ * Version: 4.16.0-beta.413
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23329,6 +23329,23 @@ callEvents[webrtcActionTypes.SESSION_TRACK_REMOVED] = (action, context) => {
   const call = (0, _selectors.getCallByWebrtcSessionId)(state, action.payload.id);
 
   if (call) {
+    const callOptions = (0, _selectors.getOptions)(state);
+    if (callOptions.sdpSemantics === 'plan-b') {
+      // For plan-b we won't trigger another 'call:trackEnded' event because it
+      // is already triggered by the SESSION_TRACK_ENDED action.
+      return null;
+    }
+    return callEventHandler(eventTypes.CALL_TRACK_ENDED, action, (0, _extends3.default)({}, action.payload, {
+      callId: call.id
+    }));
+  }
+};
+
+callEvents[webrtcActionTypes.SESSION_TRACK_ENDED] = (action, context) => {
+  const state = context.state;
+  const call = (0, _selectors.getCallByWebrtcSessionId)(state, action.payload.id);
+
+  if (call) {
     return callEventHandler(eventTypes.CALL_TRACK_ENDED, action, (0, _extends3.default)({}, action.payload, {
       callId: call.id
     }));
@@ -31250,7 +31267,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.16.0-beta.412';
+  return '4.16.0-beta.413';
 }
 
 /***/ }),

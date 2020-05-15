@@ -22,6 +22,7 @@ Kandy.js change log.
 
 - Removed the need for remote party properties (callNotificationParams) to be present in notifications. `KAA-2271`
 - Fixed Firefox calling Chrome issue related to media bundling. `KAA-2282`
+- Fixed the triggering of call:trackEnded event (on caller's side) when a media track is removed as well as duplication of such event (on callee's side) when plan-b is used. `KAA-2343`
 
 ### Changed
 
