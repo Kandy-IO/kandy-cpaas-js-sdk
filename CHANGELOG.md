@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.16.0 - beta
+## 4.16.0 - 2020-05-29
 
 ### Added
 
@@ -25,12 +25,14 @@ Kandy.js change log.
 - Fixed the triggering of call:trackEnded event (on caller's side) when a media track is removed as well as duplication of such event (on callee's side) when plan-b is used. `KAA-2343`
 - Fixed the check for valid authentification tokens in tutorials. `KAA-2298`
 - Fixed an issue with removing media for a 'Connected' Call (after an earlier attempt was made while the Call was 'On Hold') `KAA-2353`
+- Fixed documentation for Conversation in messaging plugin. `KAA-2102`
 
 ### Changed
 
 - Improved the `call.startVideo` API to allow for configuring additional options such as bandwidth.
 - Changed the Tutorial's access URL so that it does not expose configuration parameters for a specific domain/server. `KAA-2320`
 - The default for `removeBundling` has been changed to be `false`, thereby enabling media bundling. `KAA-2338`
+- Updated the Voice and Video Calls tutorials with the proper way of handling media. `KAA-1929`
 
 ## 4.15.0 - 2020-04-30
 
