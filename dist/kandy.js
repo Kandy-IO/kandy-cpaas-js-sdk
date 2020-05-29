@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.16.0-beta.420
+ * Version: 4.16.0-beta.428
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23021,9 +23021,7 @@ function callEventHandler(type, action, params = {}) {
   if (!args.hasOwnProperty('callId') && action.payload.id) {
     args.callId = action.payload.id;
   }
-  if (action.error) {
-    args.error = action.error;
-  }
+
   return {
     type,
     args
@@ -26203,7 +26201,7 @@ function* removeMedia(deps, action) {
     log.debug(`Invalid call state:  ${stateError.message}`);
     yield (0, _effects.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
-      stateError
+      error: stateError
     }));
     return;
   }
@@ -26337,7 +26335,7 @@ function* renegotiate(deps, action) {
     log.debug(`Invalid call state:  ${stateError.message}`);
     yield (0, _effects.put)(_actions.callActions.renegotiateFinish(callId, {
       local: true,
-      stateError
+      error: stateError
     }));
     return;
   }
@@ -31267,7 +31265,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.16.0-beta.420';
+  return '4.16.0-beta.428';
 }
 
 /***/ }),
@@ -44541,6 +44539,13 @@ function* handleRequest(action) {
 async function makeRequest(options, requestId) {
   const log = _logs.logManager.getLogger('REQUEST', requestId);
 
+  // TODO This function sometimes returns `{ body : false , ...}` and also isn't consistent
+  // with providing `{ message }` or `{result : {message}}`. What's up with that?
+  // Make it so that it returns consistently and the same object.
+  // Make sure this behaviour is not relied upon by callers before changing this.
+
+  // TODO This functions is too complex. Consider refactoring.
+
   // Extract and remove the non-fetch API properties.
   const { url, queryParams, responseType = 'json' } = options,
         fetchOptions = (0, _objectWithoutProperties3.default)(options, ['url', 'queryParams', 'responseType']);
@@ -44586,6 +44591,7 @@ async function makeRequest(options, requestId) {
       }
     };
   }
+
   try {
     contentType = await response.headers.get('content-type');
   } catch (err) {
@@ -44645,8 +44651,6 @@ async function makeRequest(options, requestId) {
       /**
        * The SDK should only be parsing the responses as is expected without checking the content type of the response.
        * This is deterministic depending on the `responseType` passed in to the request through the request options.
-       * However, if parsing with the expected responseType does fail, attempt parsing using the response's content-type
-       * header before returning a parse error.
        */
       responseBody = {};
       try {
@@ -44664,29 +44668,28 @@ async function makeRequest(options, requestId) {
             // Do not parse the response
             break;
           default:
-            // Should never reach here
-            log.warn('Unexepected response type: ', responseType);
+            // This should be unreachable code.
+            throw Error('Assertion failed');
         }
       } catch (e) {
-        log.warn(`Failed to parse with response type: ${responseType}. Error: ${e}`);
+        log.error(`Failed to parse with response type: ${responseType}. Error: ${e}`);
 
-        // "Fallback" to try response parsing using the Content-Type header of the response
-        log.debug('Attempting to parse with the response content-type');
-        if (contentType) {
-          // Need to clone the response as the response body can only be read/attempted to be read once.
-          const responseClone = response.clone();
-          if (contentType.includes(contentTypes.jsonType) || contentType.includes(contentTypes.vdnJsonType)) {
-            responseBody = await responseClone.json();
-          } else if (contentType.includes(contentTypes.plainTextType) || contentType.includes(contentTypes.xmlTextType)) {
-            responseBody = await responseClone.text();
-          } else if (contentType.includes(contentTypes.octetStream)) {
-            responseBody = await responseClone.blob();
-          } else {
-            log.warn('Unexepected content-type of response: ', contentType);
+        // Note: We get here if we have a successful request but the server sent us unexpected data.
+        // We need to treat this as an error case because we can no longer enforce a contract with the
+        // code making the request.
+        //
+        // If the code gets here the issue is either with the server not sending us expected data, or with
+        // the calling code that told us to expect the wrong data.
+
+        return {
+          body: undefined,
+          error: 'REQUEST',
+          result: {
+            ok: false,
+            code: e.name,
+            message: e.message
           }
-        } else {
-          log.debug('No content-type set in response, returning an empty object as the body');
-        }
+        };
       }
 
       log.info(`Finished request with successful response (status ${response.status}).`);

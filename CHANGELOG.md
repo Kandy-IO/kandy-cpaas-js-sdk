@@ -24,6 +24,7 @@ Kandy.js change log.
 - Fixed Firefox calling Chrome issue related to media bundling. `KAA-2282`
 - Fixed the triggering of call:trackEnded event (on caller's side) when a media track is removed as well as duplication of such event (on callee's side) when plan-b is used. `KAA-2343`
 - Fixed the check for valid authentification tokens in tutorials. `KAA-2298`
+- Fixed an issue with removing media for a 'Connected' Call (after an earlier attempt was made while the Call was 'On Hold') `KAA-2353`
 
 ### Changed
 
