@@ -14,6 +14,7 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed a Call issue where the callee would not receive a `call:newTrack` event for the remote tracks when answering the call. `KAA-2380`
+- Fixed a Call issue where SDP Handlers were not given the opportunity to act on a local SDP before it was sent to the remote endpoint. `KAA-2136`
 
 ## 4.16.0 - 2020-05-29
 
@@ -87,6 +88,11 @@ Kandy.js change log.
 - Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
 
 ## 4.12.0 - 2020-01-31
+
+### Added
+
+- Added SDP Handler functionality to allow modifying a local SDP after it has been set locally but before sending it to the remote endpoint. `KAA-2136`
+  - A `step` property has been added to the `SdpHandlerInfo` parameter given to a `SdpHandlerFunction`. This indicates whether the next step is to `set` the SDP locally or `send` the SDP to the remote endpoint.
 
 ### Added
 
