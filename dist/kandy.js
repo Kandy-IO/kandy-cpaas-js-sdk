@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.446
+ * Version: 4.17.0-beta.447
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31373,7 +31373,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.446';
+  return '4.17.0-beta.447';
 }
 
 /***/ }),
@@ -39175,7 +39175,8 @@ const conversationBase = {
    * Conversation history stamp. Handles any functions that retrieve history from the server concerning conversations.
    */
 };const conversationHistory = {
-  initializers: [function () {
+  initializers: [function ({ lastMessage }) {
+    this.lastMessage = lastMessage;
     const features = (0, _selectors.getMessagingConfig)(this.context.getState()).features;
     if (!(0, _fp.includes)('history', features)) {
       const prototype = (0, _getPrototypeOf2.default)(this);

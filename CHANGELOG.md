@@ -14,6 +14,7 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed a Call issue where the callee would not receive a `call:newTrack` event for the remote tracks when answering the call. `KAA-2380`
+- Fixed the `conversation.getAll` Messaging API, so that it contains 'lastMessage' property for every conversation object returned to user. `KAA-2400`
 - Fixed a Call issue where SDP Handlers were not given the opportunity to act on a local SDP before it was sent to the remote endpoint. `KAA-2136`
 
 ## 4.16.0 - 2020-05-29
