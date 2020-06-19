@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.448
+ * Version: 4.17.0-beta.449
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31378,7 +31378,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.448';
+  return '4.17.0-beta.449';
 }
 
 /***/ }),
@@ -44581,7 +44581,11 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-sag
 
 var _selectors = __webpack_require__("../../packages/kandy/src/request/interface/selectors.js");
 
+var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
+
 var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
+var _constants = __webpack_require__("../../packages/kandy/src/constants.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -44607,6 +44611,9 @@ function request(options, commonOptions) {
  */
 
 
+// Constants
+
+
 // Libraries.
 // Requests plugin.
 function* requestSaga(options, commonOptions) {
@@ -44616,9 +44623,28 @@ function* requestSaga(options, commonOptions) {
 
   const useCustomHeader = yield (0, _effects.select)(_selectors.injectAgentVersionHeader);
   if (useCustomHeader) {
+    let platform = yield (0, _effects.select)(_selectors2.getPlatform);
+
+    // Assume request is for CPaaS platform, by default.
+    let headerValue = `cpaas-js-sdk/${(0, _version.getVersion)()}`;
+
+    // Check if request is for callMe service, otherwise determine the apropriate platform.
+    // (callMe service uses Link platform for call requests)
+    if (options.url && options.url.includes('/anonymous/')) {
+      headerValue = `callme-js-sdk/${(0, _version.getVersion)()}`;
+    } else {
+      // Check the actual platform used
+      if (platform === _constants.platforms.UC) {
+        headerValue = `uc-js-sdk/${(0, _version.getVersion)()}`;
+      } else if (platform === _constants.platforms.LINK) {
+        headerValue = `link-js-sdk/${(0, _version.getVersion)()}`;
+      }
+    }
+
+    // Note that the same headerName is used for all platforms & services.
     options = (0, _utils.mergeValues)(options, {
       headers: {
-        'X-Cpaas-Agent': `cpaas-js-sdk/${(0, _version.getVersion)()}`
+        'X-Cpaas-Agent': headerValue
       }
     });
   }
