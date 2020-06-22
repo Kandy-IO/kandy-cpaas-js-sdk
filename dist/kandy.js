@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.450
+ * Version: 4.17.0-beta.451
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -22171,6 +22171,7 @@ function callAPI({ dispatch, getState }) {
      * @public
      * @static
      * @memberof call
+     * @requires callMe
      * @requires call
      * @type {Object}
      * @property {string} INITIATING The (outgoing) call is being started. While in this state, no Call operations can be performed until Call gets into Initiated state.
@@ -31402,7 +31403,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.450';
+  return '4.17.0-beta.451';
 }
 
 /***/ }),
