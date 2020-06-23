@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.452
+ * Version: 4.17.0-beta.453
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -16392,12 +16392,12 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * const newSdp = codecRemover(<SDP Object>); // the incoming SDP object
  * console.log(newSdp)
  */
-function createCodecRemover(config) {
-    if (!config) {
-        config = [];
+function createCodecRemover(codecs) {
+    if (!codecs) {
+        codecs = [];
     }
-    // We allow the user to pass in a config of objects or strings, so here we format the strings into objects for uniformity.
-    config = config.map(function (item) {
+    // We allow the user to pass in a codecs of objects or strings, so here we format the strings into objects for uniformity.
+    codecs = codecs.map(function (item) {
         return typeof item === 'string' ? { name: item } : item;
     });
 
@@ -16424,14 +16424,14 @@ function createCodecRemover(config) {
         var newSdp = (0, _fp.cloneDeep)(currentSdp);
 
         // This is an array of strings representing codec names we want to remove.
-        var codecStringsToRemove = config.map(function (codec) {
+        var codecStringsToRemove = codecs.map(function (codec) {
             return codec.name;
         });
 
         newSdp.media.forEach(function (media) {
             // This is an array of just the codes (codec payloads) that we FOR SURE want to remove.
             var finalRemoveList = [];
-            // This is an array of RTP objects who have codecs that are the same as strings passed in via config.
+            // This is an array of RTP objects who have codecs that are the same as strings passed in via codecs.
             var filteredRtp = [];
 
             // If the current rtp.codec is in the codecStringsToRemove list, add the rtp to filteredRtp
@@ -16440,13 +16440,13 @@ function createCodecRemover(config) {
             });
 
             filteredRtp.forEach(function (rtp) {
-                // We grab the relevantCodec config object from the passed in config, based on the name string.
-                var relevantCodec = (0, _fp.find)(function (codec) {
+                // We grab the relevantCodec codecs object from the passed in codecs, based on the name string.
+                var relevantCodecs = codecs.filter(function (codec) {
                     return codec.name === rtp.codec;
-                }, config);
+                });
 
-                // We check the relevantCodec. If it is not present, then we have no config info for this specific rtp.
-                if (relevantCodec) {
+                // We check the relevantCodec. If it is not present, then we have no codecs info for this specific rtp.
+                relevantCodecs.forEach(function (relevantCodec) {
                     // If fmtpParams doesnt exist or is of length 0 then we assume we can remove all instances of this codec
                     if (!relevantCodec.fmtpParams || relevantCodec.fmtpParams && relevantCodec.fmtpParams.length === 0) {
                         // We want to delete this codec no matter what, since no fmtp params were included.
@@ -16466,7 +16466,7 @@ function createCodecRemover(config) {
                             }
                         });
                     }
-                }
+                });
             });
 
             // At this point we should have an array (finalRemoveList) that contains all ORIGINAL codec payloads that we need to remove.
@@ -31403,7 +31403,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.452';
+  return '4.17.0-beta.453';
 }
 
 /***/ }),
@@ -57714,24 +57714,43 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * client.call.setSdpHandlers([ codecRemover, <Your-SDP-Handler-Function>, ...])
  */
 
-// Disabling eslint for the next comment as we want to be able to use a disallowed word
-// eslint-disable-next-line no-warning-comments
 /**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to the remote party.
+ * An object that represents a selector to match codecs of an RTP map in SDP.
+ *
+ * @public
+ * @static
+ * @typedef {Object} CodecSelector
+ * @memberof sdpHandlers
+ * @property {string} name The name of the codec.
+ * @property {Array<string>} fmtpParams An array of strings to match against the "a=fmtp" format parameters for the corresponding codec.
+ *                                      All of the elements in the array must be contained in the "a=fmtp" attribute in order to be a match.
+ */
+
+/**
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to remote parties.
  * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
  *
- * To facilitate this common task, the SDK provides a codec removal handler creator that can be used for this purpose.
+ * To facilitate this common task, the createCodecRemover function creates a codec removal handler that can be used for this purpose.
  *
- * The SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+ * Note that SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
  *
  * @public
  * @memberof sdpHandlers
  * @method createCodecRemover
- * @param {Array<string>} codecs A list of codec names to remove from the SDP.
+ * @param {Array<CodecSelector> | Array<string>} codecs A list of codec selectors to remove from the SDP. If passing a list of strings, they will be converted into
+ *                                                      codec selectors that correspond to those names without any extra FMTP parameters.
  * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
  * @example
  * import { create, sdpHandlers } from 'kandy';
- * const codecRemover = sdpHandlers.createCodecRemover(['VP8', 'VP9'])
+ * const codecRemover = sdpHandlers.createCodecRemover([
+ *   'VP8',
+ *   'VP9',
+ *   {
+ *     name: 'H264',
+ *     fmtpParams: ['profile-level-id=4d0032', 'packetization-mode=1']
+ *   }
+ * ])
+ *
  * const client = create({
  *   call: {
  *     sdpHandlers: [codecRemover]
