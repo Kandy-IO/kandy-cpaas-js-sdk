@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.454
+ * Version: 4.17.0-beta.455
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31403,7 +31403,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.454';
+  return '4.17.0-beta.455';
 }
 
 /***/ }),
@@ -44693,6 +44693,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.__testonly__ = undefined;
 
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _objectWithoutProperties2 = __webpack_require__("../../node_modules/babel-runtime/helpers/objectWithoutProperties.js");
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
@@ -44826,12 +44830,33 @@ function* handleRequest(action) {
 async function makeRequest(options, requestId) {
   const log = _logs.logManager.getLogger('REQUEST', requestId);
 
-  // TODO This function sometimes returns `{ body : false , ...}` and also isn't consistent
-  // with providing `{ message }` or `{result : {message}}`. What's up with that?
-  // Make it so that it returns consistently and the same object.
-  // Make sure this behaviour is not relied upon by callers before changing this.
-
   // TODO This functions is too complex. Consider refactoring.
+
+  /**
+   * Make a response object that will  have the same structure every time
+   * regardless of the server response.
+   *
+   * @param {Object} apiResponse API related response data
+   * @param {string} apiResponse.error This should be a string indicating an error if the request fails due to an invalid request.
+   * @param {string} apiResponse.message This should be a string with more details about the api error.
+   * @param {Object} httpResponse This will contain the response data from the server.
+   * @param {Object} httpResponse.body The response body data from the server.
+   * @param {boolean} httpResponse.ok Indicates if the request was considered a success by the server.
+   * @param {Object} httpResponse.code The HTTP status code for the request.
+   * @param {Object} httpResponse.message A message describing the server response.
+   * @return {Object} An object containing API and/or server response details.
+   */
+  function makeResponse(apiResponse = {}, httpResponse = {}) {
+    return {
+      body: httpResponse.body,
+      error: apiResponse.error,
+      result: {
+        ok: Boolean(httpResponse.ok),
+        code: httpResponse.code,
+        message: apiResponse.message || httpResponse.message
+      }
+    };
+  }
 
   // Extract and remove the non-fetch API properties.
   const { url, queryParams, responseType = 'json' } = options,
@@ -44840,11 +44865,7 @@ async function makeRequest(options, requestId) {
   if (!url || typeof url !== 'string') {
     const invalidUrlMessage = `Invalid request url; expected url of type string but received ${url} instead`;
     log.error(invalidUrlMessage);
-    return {
-      body: undefined,
-      error: 'REQUEST_URL',
-      message: invalidUrlMessage
-    };
+    return makeResponse({ error: 'REQUEST_URL', message: invalidUrlMessage });
   }
 
   // Grab that last part of the URL (after the last /) to be logged.
@@ -44855,28 +44876,18 @@ async function makeRequest(options, requestId) {
 
   if (!responseTypes.hasOwnProperty(responseType)) {
     // Invalid data type requested
-    log.info('Cannot make request; responseType value was invalid.');
-    return {
-      body: undefined,
-      error: 'RESPONSE_TYPE',
-      message: 'Requested invalid data type for response'
-    };
+    const invalidResponseType = 'Cannot make request; responseType value was invalid.';
+    log.info(invalidResponseType);
+    return makeResponse({ error: 'RESPONSE_TYPE', message: invalidResponseType });
   }
+
   let response;
   let contentType;
   try {
     response = await fetch(url + (0, _utils.toQueryString)(queryParams), fetchOptions);
   } catch (err) {
     log.info(`Failed to make request, caused by ${err.message}`);
-    return {
-      body: false,
-      error: 'FETCH',
-      result: {
-        ok: false,
-        code: err.name,
-        message: err.message
-      }
-    };
+    return makeResponse({ error: 'FETCH' }, { code: err.name, message: err.message });
   }
 
   try {
@@ -44903,11 +44914,7 @@ async function makeRequest(options, requestId) {
        *    individual special cases...
        */
       if (response.status === 403 && contentType.includes('html')) {
-        return {
-          body: false,
-          error: 'REQUEST',
-          result
-        };
+        return makeResponse({ error: 'REQUEST' }, result);
       }
 
       /*
@@ -44916,11 +44923,7 @@ async function makeRequest(options, requestId) {
        */
       const isJson = contentType && contentType.includes(contentTypes.jsonType);
       responseBody = isJson ? await response.json() : {};
-      return {
-        body: responseBody,
-        error: 'REQUEST',
-        result
-      };
+      return makeResponse({ error: 'REQUEST' }, (0, _extends3.default)({ body: responseBody }, result));
     } else if (response.status === 204) {
       /*
        * A `204 (No Content)` response indicates a success, but with no content to return.
@@ -44929,11 +44932,7 @@ async function makeRequest(options, requestId) {
       responseBody = {};
 
       log.info(`Finished request with successful response (status ${response.status}).`);
-      return {
-        body: responseBody,
-        error: false,
-        result
-      };
+      return makeResponse(undefined, (0, _extends3.default)({ body: responseBody }, result));
     } else {
       /**
        * The SDK should only be parsing the responses as is expected without checking the content type of the response.
@@ -44968,35 +44967,15 @@ async function makeRequest(options, requestId) {
         // If the code gets here the issue is either with the server not sending us expected data, or with
         // the calling code that told us to expect the wrong data.
 
-        return {
-          body: undefined,
-          error: 'REQUEST',
-          result: {
-            ok: false,
-            code: e.name,
-            message: e.message
-          }
-        };
+        return makeResponse({ error: 'REQUEST' }, { code: e.name, message: e.message });
       }
 
       log.info(`Finished request with successful response (status ${response.status}).`);
-      return {
-        body: responseBody,
-        error: false,
-        result
-      };
+      return makeResponse(undefined, (0, _extends3.default)({ body: responseBody }, result));
     }
   } catch (err) {
     log.info(`Failed to parse response, caused by ${err.message}`);
-    return {
-      body: false,
-      error: 'REQUEST',
-      result: {
-        ok: false,
-        code: err.name,
-        message: err.message
-      }
-    };
+    return makeResponse({ error: 'REQUEST' }, { code: err.name, message: err.message });
   }
 }
 
