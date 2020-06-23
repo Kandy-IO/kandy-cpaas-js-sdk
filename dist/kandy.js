@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.453
+ * Version: 4.17.0-beta.454
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31403,7 +31403,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.453';
+  return '4.17.0-beta.454';
 }
 
 /***/ }),
@@ -57696,8 +57696,12 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 /**
  * A set of {@link call.SdpHandlerFunction SdpHandlerFunction}s for manipulating SDP information.
  * These handlers are used to customize low-level call behaviour for very specific
- * environments and/or scenarios. They can be provided during SDK instantiation
- * to be used for all calls, or with the {@link call.setSdpHandlers} Call API post-instantiation.
+ * environments and/or scenarios.
+ *
+ * Note that SDP handlers are exposed on the entry point of the SDK. They can be added during
+ * initialization of the SDK using the {@link #configconfigcall config.call.sdpHandlers} configuration
+ * parameter. They can also be set after the SDK's creation by using the
+ * {@link call.setSdpHandlers} function.
  *
  * @public
  * @namespace sdpHandlers
@@ -57727,12 +57731,16 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  */
 
 /**
- * In some scenarios it's necessary to remove certain codecs being offered by the SDK to remote parties.
+ * This function creates an SDP handler that will remove codecs matching the selectors specified for SDP offers and answers.
+ *
+ * In some scenarios it's necessary to remove certain codecs being offered by the SDK to remote parties. For example, some legacy call services limit the SDP
+ * length (usually to 4KB) and will reject calls that have SDP size above this amount.
+ *
  * While creating an SDP handler would allow a user to perform this type of manipulation, it is a non-trivial task that requires in-depth knowledge of WebRTC SDP.
  *
- * To facilitate this common task, the createCodecRemover function creates a codec removal handler that can be used for this purpose.
- *
- * Note that SDP handlers are exposed on the entry point of the SDK. They need to be added to the list of SDP handlers via configuration on creation of an instance of the SDK.
+ * To facilitate this common task, the createCodecRemover function creates a codec removal handler that can be used for this purpose. Applications can use this codec
+ * removal handler in combination with the {@link call.getAvailableCodecs call.getAvailableCodecs} function in order to build logic to determine the best codecs to use
+ * for their application.
  *
  * @public
  * @memberof sdpHandlers
@@ -57742,9 +57750,13 @@ var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
  * @returns {call.SdpHandlerFunction} The resulting SDP handler that will remove the codec.
  * @example
  * import { create, sdpHandlers } from 'kandy';
+ *
  * const codecRemover = sdpHandlers.createCodecRemover([
+ *   // Remove all VP8 and VP9 codecs.
  *   'VP8',
  *   'VP9',
+ *
+ *   // Remove all H264 codecs with the specified FMTP parameters.
  *   {
  *     name: 'H264',
  *     fmtpParams: ['profile-level-id=4d0032', 'packetization-mode=1']
