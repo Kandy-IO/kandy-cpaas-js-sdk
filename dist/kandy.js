@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.460
+ * Version: 4.17.0-beta.461
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20876,10 +20876,13 @@ function pendingOperation(id, params) {
   return callActionHelper(actionTypes.PENDING_OPERATION, id, params);
 }
 
-function getAvailableCodecs(params) {
+function getAvailableCodecs(params, deferred) {
   const action = {
     type: actionTypes.GET_AVAILABLE_CODECS,
-    payload: (0, _extends3.default)({}, params)
+    payload: (0, _extends3.default)({}, params),
+    meta: {
+      deferred
+    }
   };
   return action;
 }
@@ -21020,17 +21023,23 @@ var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+var _pDefer = __webpack_require__("../../node_modules/p-defer/index.js");
+
+var _pDefer2 = _interopRequireDefault(_pDefer);
+
 var _constants = __webpack_require__("../../packages/kandy/src/call/constants.js");
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Call plugin.
+const log = _logs.logManager.getLogger('CALL');
+
 // Libraries.
 
 
 // Other plugins.
-const log = _logs.logManager.getLogger('CALL'); // Call plugin.
 function callAPI({ dispatch, getState }) {
   return {
     /**
@@ -22108,8 +22117,9 @@ function callAPI({ dispatch, getState }) {
     /**
      * Retrieve the list of available and supported codecs based on the browser's capabilities for sending media.
      *
-     * The SDK emits a {@link call.event:call:availableCodecs call:availableCodecs} event
-     *  upon retrieving the list of available and supported codecs.
+     * This API will return a promise which, when resolved, it will contain the list of available and supported codecs.
+     * In addition, the SDK emits a {@link call.event:call:availableCodecs call:availableCodecs} event
+     *  upon retrieving that list of codecs.
      *
      * This API is a wrapper for the static method {@link https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender-getcapabilities RTCRtpSender.getCapabilities()}.
      *  Firefox browser does not currently support this method. Therefore, this API will not work on Firefox.
@@ -22124,12 +22134,13 @@ function callAPI({ dispatch, getState }) {
     getAvailableCodecs(kind) {
       log.debug(`${_logs.API_LOG_TAG}call.getAvailableCodecs, kind: ${kind}`);
 
-      // TODO: Remove this once parameter validation is available for APIs
-      if (kind !== 'audio' && kind !== 'video') {
-        log.info(`Cannot retrieve codecs for media kind ${kind}. Only 'audio' or 'video' kind supported.`);
-        return;
-      }
-      dispatch(_actions.callActions.getAvailableCodecs({ kind }));
+      const deferredResult = (0, _pDefer2.default)();
+
+      // Trigger the action, but include a defered result which caller can use when
+      // we actually obtain the data (i.e. list of codecs) from WebRTCManager.
+      dispatch(_actions.callActions.getAvailableCodecs({ kind }, deferredResult));
+
+      return deferredResult.promise;
     },
 
     /**
@@ -29753,12 +29764,31 @@ function* getAvailableCodecs(deps, action) {
 
   const { kind } = action.payload;
 
+  // TODO: Remove this once parameter validation is available for APIs
+  if (kind !== 'audio' && kind !== 'video') {
+    let errorMsg = `Cannot retrieve codecs for media kind ${kind}. Only 'audio' or 'video' kind supported.`;
+    log.info(errorMsg);
+    yield (0, _effects.call)([action.meta.deferred, 'reject'], {
+      error: errorMsg
+    });
+    return;
+  }
+
   log.info(`Retrieving list of available codecs for media kind '${kind}'.`);
 
   // Get the list of codecs from the general WebRTCManager
   const codecs = yield (0, _effects.call)([webRTC.webrtcManager, 'getAvailableCodecs'], kind);
   log.debug('Successfully retrieved codec list:', codecs);
 
+  // We got codecs, so 'resolve' the deferred result and respond with the list of codecs.
+  // NOTE: There does not seem to be a path for failure, as RTCRtpSender.getCapabilities(kind)
+  //       always returns something according to API doc
+  //       (including null, if there are simply no capabilities present),
+  //       so no need to handle 'reject' case.
+  yield (0, _effects.call)([action.meta.deferred, 'resolve'], codecs);
+
+  // Signal the completion of request by triggering an action complete, which
+  // in turn will issue an event at the application layer.
   yield (0, _effects.put)(callActions.availableCodecsRetrieved({
     kind,
     codecs
@@ -31435,7 +31465,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.460';
+  return '4.17.0-beta.461';
 }
 
 /***/ }),
