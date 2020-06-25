@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.17.0-beta.457
+ * Version: 4.17.0-beta.458
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23215,7 +23215,7 @@ callEvents[actionTypes.REMOVE_MEDIA_FINISH] = (action, params) => {
 };
 
 /*
- * Currently the RENEGOTIATE operation is only triggered after an unsolicted removal of media,
+ * Currently the RENEGOTIATE operation is only triggered after an unsolicited removal of media,
  *  hence the CALL_REMOVED_MEDIA event handler is used
  */
 callEvents[actionTypes.RENEGOTIATE_FINISH] = (action, params) => {
@@ -23224,7 +23224,7 @@ callEvents[actionTypes.RENEGOTIATE_FINISH] = (action, params) => {
     transition: _constants.OP_TRANSITIONS.FINISH,
     isLocal: action.payload.local
   })), callEventHandler(eventTypes.CALL_REMOVED_MEDIA, action, {
-    loca: action.payload.local,
+    local: action.payload.local,
     tracks: action.payload.tracks,
     error: action.payload.error
   })];
@@ -31426,7 +31426,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.17.0-beta.457';
+  return '4.17.0-beta.458';
 }
 
 /***/ }),
@@ -56352,6 +56352,35 @@ function Session(id, managers, config = {}) {
     const peer = peerManager.get(peerId);
     const track = trackManager.get(newTrack.id);
     return peer.replaceTrack(track.track, options).then(() => {
+      // Setup handlers for the replaced track, same as adding a new track
+      const media = mediaManager.get(track.getStream().id);
+      if (media) {
+        media.on('track:removed', trackId => {
+          emitter.emit('track:removed', {
+            local: true,
+            trackId: trackId
+          });
+        });
+      }
+
+      track.once('ended', ({ performRenegotiation }) => {
+        // If the PeerConnection is closed, we don't need to worry about
+        //    removing the track (and it would throw an error anyway).
+        if (peer.signalingState !== 'closed') {
+          peer.removeTrack(track.id);
+          emitter.emit('track:ended', {
+            local: true,
+            trackId: track.id,
+            performRenegotiation: performRenegotiation
+          });
+          // Remove track from session dscp settings
+          if (settings.dscpControls.hasOwnProperty(track.id)) {
+            log.debug(`Removing track ${track.id} from session dscp settings`);
+            delete settings.dscpControls[track.id];
+          }
+        }
+      });
+
       emitter.emit('track:replaced', {
         oldTrackId: options.trackId,
         trackId: newTrack.id
