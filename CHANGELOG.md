@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.17.0 - beta
+## 4.17.0 - 2020-06-26
 
 ### Added
 
@@ -30,11 +30,8 @@ Kandy.js change log.
 
 ### Added
 
-- Added new call config option 'mediaBrokerOnly'. When set to true the SDK will
-  not try to recreate a calls PeerConnection. This is intended for backends configured
-  to disallow peer to peer connections. `KAA-2259`
-- Added new Call API `call.getAvailableCodecs` which can be used to return a list of available codecs
-  supported by the browser. `KAA-2275`
+- Added new call config option 'mediaBrokerOnly'. When set to true the SDK will not try to recreate a calls PeerConnection. This is intended for backends configured to disallow peer to peer connections. `KAA-2259`
+- Added new Call API `call.getAvailableCodecs` which can be used to return a list of available codecs supported by the browser. `KAA-2275`
 - Added new Call option for configuring DSCP markings on the media traffic. `KAA-2256`
   - DSCP controls can be configured with the `call.make`, `call.answer`, `call.addMedia`, and `call.startVideo` Call APIs.
 - Added `removeBundling` flag to the call config for users that want to turn it off. `KAA-2338`
@@ -98,11 +95,6 @@ Kandy.js change log.
 - Fixed problems with Firefox Hold/Unhold under `plan-b` sdpSemantics by making it impossible to start the SDK in `plan-b` under any browser that is not Chrome. `KAA-2174`
 
 ## 4.12.0 - 2020-01-31
-
-### Added
-
-- Added SDP Handler functionality to allow modifying a local SDP after it has been set locally but before sending it to the remote endpoint. `KAA-2136`
-  - A `step` property has been added to the `SdpHandlerInfo` parameter given to a `SdpHandlerFunction`. This indicates whether the next step is to `set` the SDP locally or `send` the SDP to the remote endpoint.
 
 ### Added
 
@@ -340,9 +332,6 @@ Version 4.0.0 has many breaking changes for call APIs. Please see the API refere
 ### Changed
 
 - Refactored all of the WebRTC-related code.
-
-### Changed
-
 - Changed the callOptions parameter for the makeAnonymous API function of the CallMe SDK. It must now include a `from` property (callOptions.from), indicating the URI of the caller, as it no longer receives a default value of `anonymousUser@kandy.callMe`. `KAA-1350`
 
 ## 3.2.0 - 2019-03-01
