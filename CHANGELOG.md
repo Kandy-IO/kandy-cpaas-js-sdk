@@ -22,6 +22,7 @@ To see how to use these events, visit our tutorials.
 ### Added
 
 - Added new Call API `call.setSdpHandlers` for setting SDP Handlers after the SDK has been initialized. `KAA-2322`
+- Added step-by-step details (in Authentication tutorial) on how to obtain key credential information from portal site, in order to generate the authentication tokens. `KAA-2392`
 
 ### Changed
 
