@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.467
+ * Version: 4.18.0-beta.468
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31878,7 +31878,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.467';
+  return '4.18.0-beta.468';
 }
 
 /***/ }),
@@ -44021,6 +44021,13 @@ function* subscribePresence({ payload }) {
   var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
     return sub.service === 'presence';
   });
+  if (presenceSubscription.length === 0) {
+    yield (0, _effects.put)(actions.subscribePresenceFinish(new _errors2.default({
+      message: 'Found no subscription for presence service. Subcribe for presence first and then try again.',
+      code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
+    })));
+    return;
+  }
   const presenceListId = presenceSubscription[0].presenceListId;
   const response = yield (0, _effects.call)(_presence.addUser, userId, presenceListId, requestInfo);
   log.debug('Received response from addUser request:', response);
