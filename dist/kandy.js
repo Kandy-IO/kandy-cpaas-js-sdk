@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.468
+ * Version: 4.18.0-beta.469
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -16056,23 +16056,16 @@ function createCodecRemover(codecs) {
         codecs = [];
     }
     // We allow the user to pass in a codecs of objects or strings, so here we format the strings into objects for uniformity.
-    codecs = codecs.map(function (item) {
-        return typeof item === 'string' ? { name: item } : item;
-    });
+    codecs = codecs.map(item => typeof item === 'string' ? { name: item } : item);
 
-    return function () {
+    return function (...params) {
         // Adding support for new callstack sdp handlers
         // Old callstack sdp pipeline passes an object to each sdp
         // handler that contains the currentSdp
         // New callstack passes 3 arguments to each sdp handler
         // newSdp, info, originalSdp
-        var oldCallstack = true;
-        var currentSdp = void 0;
-
-        for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
-            params[_key] = arguments[_key];
-        }
-
+        let oldCallstack = true;
+        let currentSdp;
         if (params[0].currentSdp) {
             currentSdp = params[0].currentSdp;
         } else if (params.length === 3) {
@@ -16080,32 +16073,26 @@ function createCodecRemover(codecs) {
             currentSdp = params[0];
         }
 
-        var newSdp = (0, _fp.cloneDeep)(currentSdp);
+        let newSdp = (0, _fp.cloneDeep)(currentSdp);
 
         // This is an array of strings representing codec names we want to remove.
-        var codecStringsToRemove = codecs.map(function (codec) {
-            return codec.name;
-        });
+        let codecStringsToRemove = codecs.map(codec => codec.name);
 
-        newSdp.media.forEach(function (media) {
+        newSdp.media.forEach(media => {
             // This is an array of just the codes (codec payloads) that we FOR SURE want to remove.
-            var finalRemoveList = [];
+            let finalRemoveList = [];
             // This is an array of RTP objects who have codecs that are the same as strings passed in via codecs.
-            var filteredRtp = [];
+            let filteredRtp = [];
 
             // If the current rtp.codec is in the codecStringsToRemove list, add the rtp to filteredRtp
-            filteredRtp = media.rtp.filter(function (rtp) {
-                return codecStringsToRemove.includes(rtp.codec);
-            });
+            filteredRtp = media.rtp.filter(rtp => codecStringsToRemove.includes(rtp.codec));
 
-            filteredRtp.forEach(function (rtp) {
+            filteredRtp.forEach(rtp => {
                 // We grab the relevantCodec codecs object from the passed in codecs, based on the name string.
-                var relevantCodecs = codecs.filter(function (codec) {
-                    return codec.name === rtp.codec;
-                });
+                const relevantCodecs = codecs.filter(codec => codec.name === rtp.codec);
 
                 // We check the relevantCodec. If it is not present, then we have no codecs info for this specific rtp.
-                relevantCodecs.forEach(function (relevantCodec) {
+                relevantCodecs.forEach(relevantCodec => {
                     // If fmtpParams doesnt exist or is of length 0 then we assume we can remove all instances of this codec
                     if (!relevantCodec.fmtpParams || relevantCodec.fmtpParams && relevantCodec.fmtpParams.length === 0) {
                         // We want to delete this codec no matter what, since no fmtp params were included.
@@ -16113,13 +16100,11 @@ function createCodecRemover(codecs) {
                     } else {
                         // There are fmtp values for this codec. Therefore we have to check each media.fmtp object to see if it is the right one.
                         // Then when we find the right fmtp object, we check its config to see if it has the parameters specified in the input.
-                        media.fmtp.forEach(function (fmtp) {
+                        media.fmtp.forEach(fmtp => {
                             // We check each iteration to see if we found the right fmtp object.
                             if (fmtp.payload === rtp.payload) {
                                 // If we found the right fmtp object, we have to make sure each config param is in the fmtp.config.
-                                if (relevantCodec.fmtpParams.every(function (c) {
-                                    return fmtp.config.includes(c);
-                                })) {
+                                if (relevantCodec.fmtpParams.every(c => fmtp.config.includes(c))) {
                                     finalRemoveList.push(rtp.payload);
                                 }
                             }
@@ -16130,7 +16115,7 @@ function createCodecRemover(codecs) {
 
             // At this point we should have an array (finalRemoveList) that contains all ORIGINAL codec payloads that we need to remove.
             // We now need to check fmtp for all rtx payloads ASSOCIATED with the original codec payload.
-            media.fmtp.forEach(function (fmtp) {
+            media.fmtp.forEach(fmtp => {
                 // Check if the config contains apt=, which indicates this fmtp is associated with another.
                 if (fmtp.config.includes('apt=')) {
                     // If so, lets grab the whole string WITHOUT the apt= part, and convet it into an integer. This should be a payload number.
@@ -16146,15 +16131,13 @@ function createCodecRemover(codecs) {
 
             // We assume past this point that the finalRemoveList is all powerful.
             // For each codec in the media.payloads string, if it is in our finalRemoveList list, we remove it.
-            var isNumber = false;
+            let isNumber = false;
             if (typeof media.payloads === 'number') {
                 media.payloads = media.payloads.toString();
                 isNumber = true;
             }
             if (media.payloads) {
-                media.payloads = media.payloads.split(' ').filter(function (payload) {
-                    return !finalRemoveList.includes(parseInt(payload));
-                }).join(' ');
+                media.payloads = media.payloads.split(' ').filter(payload => !finalRemoveList.includes(parseInt(payload))).join(' ');
             }
             if (media.payloads && isNumber) {
                 media.payloads = parseInt(media.payloads);
@@ -16162,20 +16145,14 @@ function createCodecRemover(codecs) {
 
             // For each codec object, if the payload is in our filteredCodes list, we remove the object.
             if (media.rtp) {
-                media.rtp = media.rtp.filter(function (rtp) {
-                    return !finalRemoveList.includes(rtp.payload);
-                });
+                media.rtp = media.rtp.filter(rtp => !finalRemoveList.includes(rtp.payload));
             }
 
             if (media.fmtp) {
-                media.fmtp = media.fmtp.filter(function (fmtp) {
-                    return !finalRemoveList.includes(fmtp.payload);
-                });
+                media.fmtp = media.fmtp.filter(fmtp => !finalRemoveList.includes(fmtp.payload));
             }
             if (media.rtcpFb) {
-                media.rtcpFb = media.rtcpFb.filter(function (rtcpFb) {
-                    return !finalRemoveList.includes(rtcpFb.payload);
-                });
+                media.rtcpFb = media.rtcpFb.filter(rtcpFb => !finalRemoveList.includes(rtcpFb.payload));
             }
         });
 
@@ -31878,7 +31855,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.468';
+  return '4.18.0-beta.469';
 }
 
 /***/ }),
