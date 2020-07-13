@@ -26,6 +26,10 @@ To see how to use these events, visit our tutorials.
 - Added step-by-step details (in Authentication tutorial) on how to obtain key credential information from portal site, in order to generate the authentication tokens. `KAA-2392`
 - Added a validation check to handle lack of subscription for 'presence' service.
 
+### Fixed
+
+- Fixed an issue preventing the playing of video tracks during a call on iOS Safari. `KAA-2382`
+
 ### Changed
 
 - Removed the Call default values for BandwidthControls when adding media to a call. `KAA-2402`
