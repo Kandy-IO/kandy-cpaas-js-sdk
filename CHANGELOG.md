@@ -35,6 +35,7 @@ To see how to use these events, visit our tutorials.
 - Removed the Call default values for BandwidthControls when adding media to a call. `KAA-2402`
   - This affects the `make`, `answer`, `addMedia`, and `startVideo` Call APIs.
   - If the `options.bandwidth` parameter is not provided, the SDK will now default to the browser's behaviour instead of setting its own bandwidth limits for audio and video (of 5000 each).
+- Updated the `webrtc-adapter` package (6.4.4 -> 7.6.3). `KAA-2381`
 
 ## 4.17.0 - 2020-06-26
 
