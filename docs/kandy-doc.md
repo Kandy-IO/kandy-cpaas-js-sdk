@@ -351,19 +351,6 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
-### MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][6]
-
-**Properties**
-
--   `id` **[string][7]** The ID of the Media object.
--   `local` **[boolean][10]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][12]&lt;[call.TrackObject][20]>** A list of Track objects that are contained in this Media object.
-
 ### DeviceInfo
 
 Contains information about a device.
@@ -385,9 +372,9 @@ Type: [Object][6]
 
 **Properties**
 
--   `camera` **[Array][12]&lt;[call.DeviceInfo][21]>** A list of camera device information.
--   `microphone` **[Array][12]&lt;[call.DeviceInfo][21]>** A list of microphone device information.
--   `speaker` **[Array][12]&lt;[call.DeviceInfo][21]>** A list of speaker device information.
+-   `camera` **[Array][12]&lt;[call.DeviceInfo][20]>** A list of camera device information.
+-   `microphone` **[Array][12]&lt;[call.DeviceInfo][20]>** A list of microphone device information.
+-   `speaker` **[Array][12]&lt;[call.DeviceInfo][20]>** A list of speaker device information.
 
 ### TrackObject
 
@@ -410,6 +397,19 @@ Type: [Object][6]
        or the browser temporarily disabling the SDK's access to a local Track's source.
 -   `state` **[string][7]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][7]** The ID of the Media Stream that includes this Track.
+
+### MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `id` **[string][7]** The ID of the Media object.
+-   `local` **[boolean][10]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][12]&lt;[call.TrackObject][21]>** A list of Track objects that are contained in this Media object.
 
 ### SdpHandlerFunction
 
@@ -1133,6 +1133,43 @@ client.media.renderTrack([ audioTrack ], audioContainer, {
 })
 ```
 
+### changeInputDevices
+
+Changes the camera and/or microphone used for a Call's media input.
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The same behaviour as the `changeInputDevices` API can be implemented
+   using the general-purpose [call.replaceTrack][53] API. This API can
+   be used to replace an existing media track with a new track of the
+   same type, allowing an application to change certain aspects of the
+   media, such as input device.
+
+**Examples**
+
+```javascript
+const call = client.call.getById(callId)
+// Get the ID of the Call's video track.
+const videoTrack = call.localTracks.find(trackId => {
+   const track = client.media.getTrackById(trackId)
+   return track.kind === 'video'
+})
+
+// Select the new video options.
+const media = {
+   video: true,
+   videoOptions: {
+       deviceId: 'cameraId'
+   }
+}
+
+// Change the call's camera by replacing the video track.
+client.call.replaceTrack(callId, videoTrack, media)
+```
+
 ### setDefaultDevices
 
 The `setDefaultDevices` API from previous SDK releases (3.X) has been
@@ -1141,7 +1178,7 @@ The `setDefaultDevices` API from previous SDK releases (3.X) has been
 
 The devices used for a call can be selected as part of the APIs for
    starting the call. Microphone and/or camera can be chosen in the
-   [call.make][53] and [call.answer][54] APIs, and speaker can be
+   [call.make][54] and [call.answer][55] APIs, and speaker can be
    chosen when the audio track is rendered with the
    [media.renderTracks][52] API.
 
@@ -1157,7 +1194,7 @@ A Call's state describes the current status of the Call. An application
    whether the Call currently has media flowing between users.
 Unless stated otherwise, the Call's state pertains to both caller & callee.
 
-The Call's state is a property of the [CallObject][55],
+The Call's state is a property of the [CallObject][56],
    which can be retrieved using the [call.getById][26] or
    [call.getAll][25] APIs.
 
@@ -1189,43 +1226,6 @@ client.on('call:stateChange', function (params) {
      // The call is now active, and can perform midcall operations.
    }
 })
-```
-
-### changeInputDevices
-
-Changes the camera and/or microphone used for a Call's media input.
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The same behaviour as the `changeInputDevices` API can be implemented
-   using the general-purpose [call.replaceTrack][56] API. This API can
-   be used to replace an existing media track with a new track of the
-   same type, allowing an application to change certain aspects of the
-   media, such as input device.
-
-**Examples**
-
-```javascript
-const call = client.call.getById(callId)
-// Get the ID of the Call's video track.
-const videoTrack = call.localTracks.find(trackId => {
-   const track = client.media.getTrackById(trackId)
-   return track.kind === 'video'
-})
-
-// Select the new video options.
-const media = {
-   video: true,
-   videoOptions: {
-       deviceId: 'cameraId'
-   }
-}
-
-// Change the call's camera by replacing the video track.
-client.call.replaceTrack(callId, videoTrack, media)
 ```
 
 ### PhoneNumber
@@ -1794,50 +1794,6 @@ Possible levels for the SDK logger.
 -   `INFO` **[string][7]** Log useful information and messages to indicate the SDK's internal operations.
 -   `DEBUG` **[string][7]** Log information to help diagnose problematic behaviour.
 
-### LogHandler
-
-A LogHandler can be used to customize how the SDK should log information. By
-   default, the SDK will log information to the console, but a LogHandler can
-   be configured to change this behaviour.
-
-A LogHandler can be provided to the SDK as part of its configuration (see
-   [config.logs][86]). The SDK will then provide this
-   function with the logged information.
-
-Type: [Function][14]
-
-**Parameters**
-
--   `LogEntry` **[Object][6]** The LogEntry to be logged.
-
-**Examples**
-
-```javascript
-// Define a custom function to handle logs.
-function logHandler (logEntry) {
-  // Compile the meta info of the log for a prefix.
-  const { timestamp, level, target } = logEntry
-  let { method } = logEntry
-  const logInfo = `${timestamp} - ${target.type} - ${level}`
-
-  // Assume that the first message parameter is a string.
-  const [log, ...extra] = logEntry.messages
-
-  // For the timer methods, don't actually use the console methods.
-  //    The Logger already did the timing, so simply log out the info.
-  if (['time', 'timeLog', 'timeEnd'].includes(method)) {
-    method = 'debug'
-  }
-
-  console[method](`${logInfo} - ${log}`, ...extra)
-}
-
-// Provide the LogHandler as part of the SDK configurations.
-const configs = { ... }
-configs.logs.handler = logHandler
-const client = create(configs)
-```
-
 ### LogEntry
 
 A LogEntry object is the data that the SDK compiles when information is
@@ -1887,6 +1843,50 @@ function defaultLogHandler (logEntry) {
 }
 ```
 
+### LogHandler
+
+A LogHandler can be used to customize how the SDK should log information. By
+   default, the SDK will log information to the console, but a LogHandler can
+   be configured to change this behaviour.
+
+A LogHandler can be provided to the SDK as part of its configuration (see
+   [config.logs][86]). The SDK will then provide this
+   function with the logged information.
+
+Type: [Function][14]
+
+**Parameters**
+
+-   `LogEntry` **[Object][6]** The LogEntry to be logged.
+
+**Examples**
+
+```javascript
+// Define a custom function to handle logs.
+function logHandler (logEntry) {
+  // Compile the meta info of the log for a prefix.
+  const { timestamp, level, target } = logEntry
+  let { method } = logEntry
+  const logInfo = `${timestamp} - ${target.type} - ${level}`
+
+  // Assume that the first message parameter is a string.
+  const [log, ...extra] = logEntry.messages
+
+  // For the timer methods, don't actually use the console methods.
+  //    The Logger already did the timing, so simply log out the info.
+  if (['time', 'timeLog', 'timeEnd'].includes(method)) {
+    method = 'debug'
+  }
+
+  console[method](`${logInfo} - ${log}`, ...extra)
+}
+
+// Provide the LogHandler as part of the SDK configurations.
+const configs = { ... }
+configs.logs.handler = logHandler
+const client = create(configs)
+```
+
 ## media
 
 The 'media' namespace provides an interface for interacting with Media that the
@@ -1930,7 +1930,7 @@ Retrieve an available Track object with a specific Track ID.
 
 -   `trackId` **[string][7]** The ID of the Track to retrieve.
 
-Returns **[call.TrackObject][20]** A Track object.
+Returns **[call.TrackObject][21]** A Track object.
 
 ### renderTracks
 
@@ -2260,6 +2260,27 @@ The channel used for subscriptions is the method for receiving the service
    handle receiving the updates internally. Alternate channel methods, if a
    websocket cannot be used, will be available in the future.
 
+### SmsInboundServiceParams
+
+The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
+This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][108] property.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `destinationAddress` **[string][7]** An E164 formatted DID number.
+        The subscription created will provide notifications for inbound SMS messages destined for this address.
+
+**Examples**
+
+```javascript
+// Subscribe to smsinbound service on a WebSocket channel.
+client.services.subscribe([
+   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}
+], 'websocket')
+```
+
 ### ServiceDescriptor
 
 The ServiceDescriptor type defines the format for specifying how to subscribe for a certain service.
@@ -2285,27 +2306,6 @@ client.services.subscribe([
    {service: 'chat'},
    {service: 'presence'},
    {service: 'call'},
-], 'websocket')
-```
-
-### SmsInboundServiceParams
-
-The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
-This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][108] property.
-
-Type: [Object][6]
-
-**Properties**
-
--   `destinationAddress` **[string][7]** An E164 formatted DID number.
-        The subscription created will provide notifications for inbound SMS messages destined for this address.
-
-**Examples**
-
-```javascript
-// Subscribe to smsinbound service on a WebSocket channel.
-client.services.subscribe([
-   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}
 ], 'websocket')
 ```
 
@@ -2532,9 +2532,9 @@ Type: [string][7]
 
 [19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[20]: #calltrackobject
+[20]: #calldeviceinfo
 
-[21]: #calldeviceinfo
+[21]: #calltrackobject
 
 [22]: #callsdphandlerinfo
 
@@ -2598,13 +2598,13 @@ Type: [string][7]
 
 [52]: #mediarendertracks
 
-[53]: #callmake
+[53]: #callreplacetrack
 
-[54]: #callanswer
+[54]: #callmake
 
-[55]: #callcallobject
+[55]: #callanswer
 
-[56]: #callreplacetrack
+[56]: #callcallobject
 
 [57]: #conversationget
 

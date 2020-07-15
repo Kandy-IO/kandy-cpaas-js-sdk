@@ -15598,383 +15598,6 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 40,
-                        "offset": 83
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 40,
-                    "offset": 83
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 40,
-                "offset": 83
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 4,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 5
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "MediaObject"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 7
-            },
-            {
-              "title": "property",
-              "description": "The ID of the Media object.",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "id"
-            },
-            {
-              "title": "property",
-              "description": "Indicator on whether this media is local or remote.",
-              "lineNumber": 9,
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              },
-              "name": "local"
-            },
-            {
-              "title": "property",
-              "description": "A list of Track objects that are contained in this Media object.",
-              "lineNumber": 10,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "call.TrackObject"
-                  }
-                ]
-              },
-              "name": "tracks"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 189,
-              "column": 0
-            },
-            "end": {
-              "line": 200,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 298,
-                "column": 0
-              },
-              "end": {
-                "line": 302,
-                "column": 1
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "id",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The ID of the Media object.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 28,
-                            "offset": 27
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 28,
-                        "offset": 27
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 28,
-                    "offset": 27
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            },
-            {
-              "title": "property",
-              "name": "local",
-              "lineNumber": 9,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "Indicator on whether this media is local or remote.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 52,
-                            "offset": 51
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 52,
-                        "offset": 51
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 52,
-                    "offset": 51
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "boolean"
-              }
-            },
-            {
-              "title": "property",
-              "name": "tracks",
-              "lineNumber": 10,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A list of Track objects that are contained in this Media object.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 65,
-                            "offset": 64
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 65,
-                        "offset": 64
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 65,
-                    "offset": 64
-                  }
-                }
-              },
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "call.TrackObject"
-                  }
-                ]
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "scope": "static",
-          "kind": "typedef",
-          "name": "MediaObject",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "MediaObject",
-              "kind": "typedef",
-              "scope": "static"
-            }
-          ],
-          "namespace": "call.MediaObject"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
                     "value": "Contains information about a device.",
                     "position": {
                       "start": {
@@ -17679,6 +17302,383 @@
             }
           ],
           "namespace": "call.TrackObject"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The state representation of a Media object.\nMedia is a collection of Track objects.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 40,
+                        "offset": 83
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 40,
+                    "offset": 83
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 40,
+                "offset": 83
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 4,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 5
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "MediaObject"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 7
+            },
+            {
+              "title": "property",
+              "description": "The ID of the Media object.",
+              "lineNumber": 8,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "id"
+            },
+            {
+              "title": "property",
+              "description": "Indicator on whether this media is local or remote.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "local"
+            },
+            {
+              "title": "property",
+              "description": "A list of Track objects that are contained in this Media object.",
+              "lineNumber": 10,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "call.TrackObject"
+                  }
+                ]
+              },
+              "name": "tracks"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 189,
+              "column": 0
+            },
+            "end": {
+              "line": 200,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 298,
+                "column": 0
+              },
+              "end": {
+                "line": 302,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "id",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The ID of the Media object.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 28,
+                            "offset": 27
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 28,
+                        "offset": 27
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 28,
+                    "offset": 27
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "local",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Indicator on whether this media is local or remote.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 52,
+                    "offset": 51
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "tracks",
+              "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A list of Track objects that are contained in this Media object.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 65,
+                            "offset": 64
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 65,
+                        "offset": 64
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 65,
+                    "offset": 64
+                  }
+                }
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "call.TrackObject"
+                  }
+                ]
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "MediaObject",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "MediaObject",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.MediaObject"
         },
         {
           "description": {
@@ -36608,6 +36608,325 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "Changes the camera and/or microphone used for a Call's media input.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 68,
+                        "offset": 67
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 68,
+                    "offset": 67
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The latest SDK release (v4.X+) has not yet implemented this API in the\n   same way that it was available in previous releases (v3.X). In place\n   of this API, the SDK has a more general API that can be used for this\n   same behaviour.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 69
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 19,
+                        "offset": 303
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 69
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 19,
+                    "offset": 303
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The same behaviour as the ",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 1,
+                        "offset": 305
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 27,
+                        "offset": 331
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "changeInputDevices",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 27,
+                        "offset": 331
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 47,
+                        "offset": 351
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API can be implemented\n   using the general-purpose ",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 47,
+                        "offset": 351
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 30,
+                        "offset": 404
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callreplacetrack",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.replaceTrack"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 30,
+                        "offset": 404
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 55,
+                        "offset": 429
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API. This API can\n   be used to replace an existing media track with a new track of the\n   same type, allowing an application to change certain aspects of the\n   media, such as input device.",
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 55,
+                        "offset": 429
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 32,
+                        "offset": 620
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 305
+                  },
+                  "end": {
+                    "line": 12,
+                    "column": 32,
+                    "offset": 620
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 12,
+                "column": 32,
+                "offset": 620
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 13,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 14
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 15,
+              "name": "changeInputDevices"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 16
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 17,
+              "name": "call"
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 18,
+              "name": "callMe"
+            },
+            {
+              "title": "example",
+              "description": "const call = client.call.getById(callId)\n// Get the ID of the Call's video track.\nconst videoTrack = call.localTracks.find(trackId => {\n   const track = client.media.getTrackById(trackId)\n   return track.kind === 'video'\n})\n\n// Select the new video options.\nconst media = {\n   video: true,\n   videoOptions: {\n       deviceId: 'cameraId'\n   }\n}\n\n// Change the call's camera by replacing the video track.\nclient.call.replaceTrack(callId, videoTrack, media)",
+              "lineNumber": 19
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 1222,
+              "column": 4
+            },
+            "end": {
+              "line": 1259,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 1202,
+                "column": 4
+              },
+              "end": {
+                "line": 1202,
+                "column": 23
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "const call = client.call.getById(callId)\n// Get the ID of the Call's video track.\nconst videoTrack = call.localTracks.find(trackId => {\n   const track = client.media.getTrackById(trackId)\n   return track.kind === 'video'\n})\n\n// Select the new video options.\nconst media = {\n   video: true,\n   videoOptions: {\n       deviceId: 'cameraId'\n   }\n}\n\n// Change the call's camera by replacing the video track.\nclient.call.replaceTrack(callId, videoTrack, media)"
+            }
+          ],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "function",
+          "name": "changeInputDevices",
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "changeInputDevices",
+              "kind": "function",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.changeInputDevices"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "The ",
                     "position": {
                       "start": {
@@ -37985,325 +38304,6 @@
             }
           ],
           "namespace": "call.states"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Changes the camera and/or microphone used for a Call's media input.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 68,
-                        "offset": 67
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 68,
-                    "offset": 67
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The latest SDK release (v4.X+) has not yet implemented this API in the\n   same way that it was available in previous releases (v3.X). In place\n   of this API, the SDK has a more general API that can be used for this\n   same behaviour.",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 69
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 19,
-                        "offset": 303
-                      },
-                      "indent": [
-                        1,
-                        1,
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 69
-                  },
-                  "end": {
-                    "line": 6,
-                    "column": 19,
-                    "offset": 303
-                  },
-                  "indent": [
-                    1,
-                    1,
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The same behaviour as the ",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 1,
-                        "offset": 305
-                      },
-                      "end": {
-                        "line": 8,
-                        "column": 27,
-                        "offset": 331
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "inlineCode",
-                    "value": "changeInputDevices",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 27,
-                        "offset": 331
-                      },
-                      "end": {
-                        "line": 8,
-                        "column": 47,
-                        "offset": 351
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " API can be implemented\n   using the general-purpose ",
-                    "position": {
-                      "start": {
-                        "line": 8,
-                        "column": 47,
-                        "offset": 351
-                      },
-                      "end": {
-                        "line": 9,
-                        "column": 30,
-                        "offset": 404
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "#callreplacetrack",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call.replaceTrack"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 9,
-                        "column": 30,
-                        "offset": 404
-                      },
-                      "end": {
-                        "line": 9,
-                        "column": 55,
-                        "offset": 429
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " API. This API can\n   be used to replace an existing media track with a new track of the\n   same type, allowing an application to change certain aspects of the\n   media, such as input device.",
-                    "position": {
-                      "start": {
-                        "line": 9,
-                        "column": 55,
-                        "offset": 429
-                      },
-                      "end": {
-                        "line": 12,
-                        "column": 32,
-                        "offset": 620
-                      },
-                      "indent": [
-                        1,
-                        1,
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 8,
-                    "column": 1,
-                    "offset": 305
-                  },
-                  "end": {
-                    "line": 12,
-                    "column": 32,
-                    "offset": 620
-                  },
-                  "indent": [
-                    1,
-                    1,
-                    1,
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 12,
-                "column": 32,
-                "offset": 620
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 13,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 14
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 15,
-              "name": "changeInputDevices"
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 16
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 17,
-              "name": "call"
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 18,
-              "name": "callMe"
-            },
-            {
-              "title": "example",
-              "description": "const call = client.call.getById(callId)\n// Get the ID of the Call's video track.\nconst videoTrack = call.localTracks.find(trackId => {\n   const track = client.media.getTrackById(trackId)\n   return track.kind === 'video'\n})\n\n// Select the new video options.\nconst media = {\n   video: true,\n   videoOptions: {\n       deviceId: 'cameraId'\n   }\n}\n\n// Change the call's camera by replacing the video track.\nclient.call.replaceTrack(callId, videoTrack, media)",
-              "lineNumber": 19
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 1222,
-              "column": 4
-            },
-            "end": {
-              "line": 1259,
-              "column": 7
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 1202,
-                "column": 4
-              },
-              "end": {
-                "line": 1202,
-                "column": 23
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "const call = client.call.getById(callId)\n// Get the ID of the Call's video track.\nconst videoTrack = call.localTracks.find(trackId => {\n   const track = client.media.getTrackById(trackId)\n   return track.kind === 'video'\n})\n\n// Select the new video options.\nconst media = {\n   video: true,\n   videoOptions: {\n       deviceId: 'cameraId'\n   }\n}\n\n// Change the call's camera by replacing the video track.\nclient.call.replaceTrack(callId, videoTrack, media)"
-            }
-          ],
-          "params": [],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "scope": "static",
-          "kind": "function",
-          "name": "changeInputDevices",
-          "memberof": "call",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "changeInputDevices",
-              "kind": "function",
-              "scope": "static"
-            }
-          ],
-          "namespace": "call.changeInputDevices"
         },
         {
           "description": {
@@ -61528,324 +61528,6 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "A LogHandler can be used to customize how the SDK should log information. By\n   default, the SDK will log information to the console, but a LogHandler can\n   be configured to change this behaviour.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 3,
-                        "column": 43,
-                        "offset": 197
-                      },
-                      "indent": [
-                        1,
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 3,
-                    "column": 43,
-                    "offset": 197
-                  },
-                  "indent": [
-                    1,
-                    1
-                  ]
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A LogHandler can be provided to the SDK as part of its configuration (see\n   ",
-                    "position": {
-                      "start": {
-                        "line": 5,
-                        "column": 1,
-                        "offset": 199
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 4,
-                        "offset": 276
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "#configconfiglogs",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "config.logs"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 6,
-                        "column": 4,
-                        "offset": 276
-                      },
-                      "end": {
-                        "line": 6,
-                        "column": 41,
-                        "offset": 313
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": "). The SDK will then provide this\n   function with the logged information.",
-                    "position": {
-                      "start": {
-                        "line": 6,
-                        "column": 41,
-                        "offset": 313
-                      },
-                      "end": {
-                        "line": 7,
-                        "column": 41,
-                        "offset": 387
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 5,
-                    "column": 1,
-                    "offset": 199
-                  },
-                  "end": {
-                    "line": 7,
-                    "column": 41,
-                    "offset": 387
-                  },
-                  "indent": [
-                    1,
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 7,
-                "column": 41,
-                "offset": 387
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 9,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 10
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 11,
-              "type": {
-                "type": "NameExpression",
-                "name": "Function"
-              },
-              "name": "LogHandler"
-            },
-            {
-              "title": "memberof",
-              "description": "logger",
-              "lineNumber": 12
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 13,
-              "name": "logs"
-            },
-            {
-              "title": "param",
-              "description": "The LogEntry to be logged.",
-              "lineNumber": 14,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "LogEntry"
-            },
-            {
-              "title": "example",
-              "description": "// Define a custom function to handle logs.\nfunction logHandler (logEntry) {\n  // Compile the meta info of the log for a prefix.\n  const { timestamp, level, target } = logEntry\n  let { method } = logEntry\n  const logInfo = `${timestamp} - ${target.type} - ${level}`\n\n  // Assume that the first message parameter is a string.\n  const [log, ...extra] = logEntry.messages\n\n  // For the timer methods, don't actually use the console methods.\n  //    The Logger already did the timing, so simply log out the info.\n  if (['time', 'timeLog', 'timeEnd'].includes(method)) {\n    method = 'debug'\n  }\n\n  console[method](`${logInfo} - ${log}`, ...extra)\n}\n\n// Provide the LogHandler as part of the SDK configurations.\nconst configs = { ... }\nconfigs.logs.handler = logHandler\nconst client = create(configs)",
-              "lineNumber": 15
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 54,
-              "column": 0
-            },
-            "end": {
-              "line": 93,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 1,
-                "column": 0
-              },
-              "end": {
-                "line": 94,
-                "column": 0
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/logs/docs.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "// Define a custom function to handle logs.\nfunction logHandler (logEntry) {\n  // Compile the meta info of the log for a prefix.\n  const { timestamp, level, target } = logEntry\n  let { method } = logEntry\n  const logInfo = `${timestamp} - ${target.type} - ${level}`\n\n  // Assume that the first message parameter is a string.\n  const [log, ...extra] = logEntry.messages\n\n  // For the timer methods, don't actually use the console methods.\n  //    The Logger already did the timing, so simply log out the info.\n  if (['time', 'timeLog', 'timeEnd'].includes(method)) {\n    method = 'debug'\n  }\n\n  console[method](`${logInfo} - ${log}`, ...extra)\n}\n\n// Provide the LogHandler as part of the SDK configurations.\nconst configs = { ... }\nconfigs.logs.handler = logHandler\nconst client = create(configs)"
-            }
-          ],
-          "params": [
-            {
-              "title": "param",
-              "name": "LogEntry",
-              "lineNumber": 14,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "The LogEntry to be logged.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 27,
-                            "offset": 26
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 27,
-                        "offset": 26
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 27,
-                    "offset": 26
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "scope": "static",
-          "kind": "typedef",
-          "name": "LogHandler",
-          "type": {
-            "type": "NameExpression",
-            "name": "Function"
-          },
-          "memberof": "logger",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "logger",
-              "kind": "namespace"
-            },
-            {
-              "name": "LogHandler",
-              "kind": "typedef",
-              "scope": "static"
-            }
-          ],
-          "namespace": "logger.LogHandler"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
                     "value": "A LogEntry object is the data that the SDK compiles when information is\n   logged. It contains both the logged information and meta-info about when\n   and who logged it.",
                     "position": {
                       "start": {
@@ -62790,6 +62472,324 @@
             }
           ],
           "namespace": "logger.LogEntry"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A LogHandler can be used to customize how the SDK should log information. By\n   default, the SDK will log information to the console, but a LogHandler can\n   be configured to change this behaviour.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 43,
+                        "offset": 197
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 43,
+                    "offset": 197
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A LogHandler can be provided to the SDK as part of its configuration (see\n   ",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 199
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 4,
+                        "offset": 276
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#configconfiglogs",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "config.logs"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 4,
+                        "offset": 276
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 41,
+                        "offset": 313
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "). The SDK will then provide this\n   function with the logged information.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 41,
+                        "offset": 313
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 41,
+                        "offset": 387
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 199
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 41,
+                    "offset": 387
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 41,
+                "offset": 387
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 9,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 10
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "Function"
+              },
+              "name": "LogHandler"
+            },
+            {
+              "title": "memberof",
+              "description": "logger",
+              "lineNumber": 12
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 13,
+              "name": "logs"
+            },
+            {
+              "title": "param",
+              "description": "The LogEntry to be logged.",
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "LogEntry"
+            },
+            {
+              "title": "example",
+              "description": "// Define a custom function to handle logs.\nfunction logHandler (logEntry) {\n  // Compile the meta info of the log for a prefix.\n  const { timestamp, level, target } = logEntry\n  let { method } = logEntry\n  const logInfo = `${timestamp} - ${target.type} - ${level}`\n\n  // Assume that the first message parameter is a string.\n  const [log, ...extra] = logEntry.messages\n\n  // For the timer methods, don't actually use the console methods.\n  //    The Logger already did the timing, so simply log out the info.\n  if (['time', 'timeLog', 'timeEnd'].includes(method)) {\n    method = 'debug'\n  }\n\n  console[method](`${logInfo} - ${log}`, ...extra)\n}\n\n// Provide the LogHandler as part of the SDK configurations.\nconst configs = { ... }\nconfigs.logs.handler = logHandler\nconst client = create(configs)",
+              "lineNumber": 15
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 54,
+              "column": 0
+            },
+            "end": {
+              "line": 93,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 1,
+                "column": 0
+              },
+              "end": {
+                "line": 94,
+                "column": 0
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/logs/docs.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Define a custom function to handle logs.\nfunction logHandler (logEntry) {\n  // Compile the meta info of the log for a prefix.\n  const { timestamp, level, target } = logEntry\n  let { method } = logEntry\n  const logInfo = `${timestamp} - ${target.type} - ${level}`\n\n  // Assume that the first message parameter is a string.\n  const [log, ...extra] = logEntry.messages\n\n  // For the timer methods, don't actually use the console methods.\n  //    The Logger already did the timing, so simply log out the info.\n  if (['time', 'timeLog', 'timeEnd'].includes(method)) {\n    method = 'debug'\n  }\n\n  console[method](`${logInfo} - ${log}`, ...extra)\n}\n\n// Provide the LogHandler as part of the SDK configurations.\nconst configs = { ... }\nconfigs.logs.handler = logHandler\nconst client = create(configs)"
+            }
+          ],
+          "params": [
+            {
+              "title": "param",
+              "name": "LogEntry",
+              "lineNumber": 14,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The LogEntry to be logged.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 27,
+                            "offset": 26
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 27,
+                        "offset": 26
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 27,
+                    "offset": 26
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "LogHandler",
+          "type": {
+            "type": "NameExpression",
+            "name": "Function"
+          },
+          "memberof": "logger",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "logger",
+              "kind": "namespace"
+            },
+            {
+              "name": "LogHandler",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "logger.LogHandler"
         }
       ]
     },
@@ -75170,6 +75170,278 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.\nThis is the configuration object that needs to be passed as the value for the ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 79,
+                        "offset": 187
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#servicesservicedescriptor",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "ServiceDescriptor.params"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 79,
+                        "offset": 187
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 138,
+                        "offset": 246
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " property.",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 138,
+                        "offset": 246
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 148,
+                        "offset": 256
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 148,
+                    "offset": 256
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 148,
+                "offset": 256
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 4,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 5
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "SmsInboundServiceParams"
+            },
+            {
+              "title": "memberof",
+              "description": "services",
+              "lineNumber": 7
+            },
+            {
+              "title": "property",
+              "description": "An E164 formatted DID number.\n    The subscription created will provide notifications for inbound SMS messages destined for this address.",
+              "lineNumber": 8,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "destinationAddress"
+            },
+            {
+              "title": "example",
+              "description": "// Subscribe to smsinbound service on a WebSocket channel.\nclient.services.subscribe([\n   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}\n], 'websocket')",
+              "lineNumber": 10
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 47,
+              "column": 0
+            },
+            "end": {
+              "line": 62,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 65,
+                "column": 0
+              },
+              "end": {
+                "line": 65,
+                "column": 36
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/subscription/interface/api.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Subscribe to smsinbound service on a WebSocket channel.\nclient.services.subscribe([\n   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}\n], 'websocket')"
+            }
+          ],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "destinationAddress",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An E164 formatted DID number.\n    The subscription created will provide notifications for inbound SMS messages destined for this address.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 108,
+                            "offset": 137
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 108,
+                        "offset": 137
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 108,
+                    "offset": 137
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "SmsInboundServiceParams",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "services",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "services",
+              "kind": "namespace"
+            },
+            {
+              "name": "SmsInboundServiceParams",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "services.SmsInboundServiceParams"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "The ServiceDescriptor type defines the format for specifying how to subscribe for a certain service.\nThis is the service configuration object that needs to be passed (as part of an array of configuration objects) when calling\nthe ",
                     "position": {
                       "start": {
@@ -75759,278 +76031,6 @@
             }
           ],
           "namespace": "services.ServiceDescriptor"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.\nThis is the configuration object that needs to be passed as the value for the ",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 79,
-                        "offset": 187
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "#servicesservicedescriptor",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "ServiceDescriptor.params"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 79,
-                        "offset": 187
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 138,
-                        "offset": 246
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " property.",
-                    "position": {
-                      "start": {
-                        "line": 2,
-                        "column": 138,
-                        "offset": 246
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 148,
-                        "offset": 256
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 148,
-                    "offset": 256
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 2,
-                "column": 148,
-                "offset": 256
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 4,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 5
-            },
-            {
-              "title": "typedef",
-              "description": null,
-              "lineNumber": 6,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "SmsInboundServiceParams"
-            },
-            {
-              "title": "memberof",
-              "description": "services",
-              "lineNumber": 7
-            },
-            {
-              "title": "property",
-              "description": "An E164 formatted DID number.\n    The subscription created will provide notifications for inbound SMS messages destined for this address.",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "destinationAddress"
-            },
-            {
-              "title": "example",
-              "description": "// Subscribe to smsinbound service on a WebSocket channel.\nclient.services.subscribe([\n   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}\n], 'websocket')",
-              "lineNumber": 10
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 47,
-              "column": 0
-            },
-            "end": {
-              "line": 62,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 65,
-                "column": 0
-              },
-              "end": {
-                "line": 65,
-                "column": 36
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/subscription/interface/api.js"
-          },
-          "augments": [],
-          "examples": [
-            {
-              "description": "// Subscribe to smsinbound service on a WebSocket channel.\nclient.services.subscribe([\n   {service: 'smsinbound', params: {destinationAddress: '+18001234567'}}\n], 'websocket')"
-            }
-          ],
-          "params": [],
-          "properties": [
-            {
-              "title": "property",
-              "name": "destinationAddress",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "An E164 formatted DID number.\n    The subscription created will provide notifications for inbound SMS messages destined for this address.",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 2,
-                            "column": 108,
-                            "offset": 137
-                          },
-                          "indent": [
-                            1
-                          ]
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 108,
-                        "offset": 137
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 108,
-                    "offset": 137
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              }
-            }
-          ],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "scope": "static",
-          "kind": "typedef",
-          "name": "SmsInboundServiceParams",
-          "type": {
-            "type": "NameExpression",
-            "name": "Object"
-          },
-          "memberof": "services",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "services",
-              "kind": "namespace"
-            },
-            {
-              "name": "SmsInboundServiceParams",
-              "kind": "typedef",
-              "scope": "static"
-            }
-          ],
-          "namespace": "services.SmsInboundServiceParams"
         },
         {
           "description": {
