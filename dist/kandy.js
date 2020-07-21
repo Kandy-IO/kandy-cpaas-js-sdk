@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.475
+ * Version: 4.18.0-beta.476
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19174,7 +19174,7 @@ const defaultOptions = {
   normalizeDestination: true
 
   // config validation
-};const callSchema = _validation.validation.schema({
+};const v8nValidation = _validation.validation.schema({
   sdpSemantics: (0, _validation.enums)(['unified-plan', 'plan-b']),
   iceServers: _validation.validation.array(),
   iceCollectionDelay: _validation.validation.positive(),
@@ -19189,7 +19189,7 @@ const defaultOptions = {
   normalizeDestination: _validation.validation.boolean(),
   mediaBrokerOnly: _validation.validation.boolean()
 });
-const parseOptions = (0, _validation.parse)('call', callSchema);
+const parseOptions = (0, _validation.parse)('call', v8nValidation);
 
 function cpaasCalls(options = {}) {
   const { mediaDevices, peerConnection } = (0, _kandyWebrtc.getWebRTCSupportCapabilities)();
@@ -31855,7 +31855,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.475';
+  return '4.18.0-beta.476';
 }
 
 /***/ }),
