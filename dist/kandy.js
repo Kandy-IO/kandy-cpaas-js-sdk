@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.481
+ * Version: 4.18.0-beta.482
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -30631,7 +30631,7 @@ function* createLocal(webRTC, mediaConstraints) {
 
     // Clean up successfull media object when there is partial media failure.
     for (const eachMedia of result.medias) {
-      yield (0, _effects.call)([eachMedia, 'stop']);
+      yield (0, _effects.call)([eachMedia.media, 'stop']);
     }
 
     result.error = new _errors2.default({
@@ -31855,7 +31855,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.481';
+  return '4.18.0-beta.482';
 }
 
 /***/ }),
