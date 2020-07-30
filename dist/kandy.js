@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.485
+ * Version: 4.18.0-beta.486
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -23737,7 +23737,9 @@ callEvents[webrtcActionTypes.SESSION_TRACK_ENDED] = (action, context) => {
 };
 
 callEvents[actionTypes.MAKE_ANONYMOUS_CALL_FINISH] = (action, context) => {
-  return callEventHandler(eventTypes.CALL_STARTED, action);
+  return callEventHandler(eventTypes.CALL_STARTED, action, {
+    error: action.payload.error
+  });
 };
 
 exports.default = (0, _extends3.default)({}, callEvents);
@@ -31903,7 +31905,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.485';
+  return '4.18.0-beta.486';
 }
 
 /***/ }),
