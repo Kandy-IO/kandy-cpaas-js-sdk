@@ -30,6 +30,7 @@ To see how to use these events, visit our tutorials.
 
 - Fixed an issue preventing the playing of video tracks during a call on iOS Safari. `KAA-2382`
 - Fixed an issue preventing the proper termination of an audio+video outgoing call when camera was already in use. `KAA-2426`
+- Fixed issue where uncaught errors in `setLocalDescription` were crashing the saga. These events are now being properly handled. `KAA-2460`
 
 ### Changed
 
