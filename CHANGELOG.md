@@ -5,11 +5,50 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.18.0 - 2020-07-31
+
+### Important changes
+
+#### media:sourceMuted & media:sourceUnmuted (`KAA-2407`)
+
+The SDK has been updated to use `unified-plan` as the default value for
+'sdpSemantics'. `plan-b` only works in Chrome, and is being removed from Chrome
+very soon. You will need to handle `media:sourceMuted` and `media:sourceUnmuted` events to
+know when to render/unrender remote media.
+
+To see how to use these events, visit our tutorials.
+[Kandy tutorials](https://kandy-io.github.io/kandy-cpaas-js-sdk/tutorials/?config=us#/Get%20Started)
+
+### Added
+
+- Added new Call API `call.setSdpHandlers` for setting SDP Handlers after the SDK has been initialized. `KAA-2322`
+- Added an SDK requirement in the 'Voice and Video Calls' tutorial for making a call to a PSTN destination. `KAA-2384`
+- Added step-by-step details (in Authentication tutorial) on how to obtain key credential information from portal site, in order to generate the authentication tokens. `KAA-2392`
+- Added a validation check to handle lack of subscription for 'presence' service.
+
+### Fixed
+
+- Fixed an issue preventing the playing of video tracks during a call on iOS Safari. `KAA-2382`
+- Fixed an issue preventing the proper termination of an audio+video outgoing call when camera was already in use. `KAA-2426`
+- Fixed an issue where the screenshare options for the `call.make` Call API were not shown in the documentation.
+- Fixed issue where uncaught errors in `setLocalDescription` were crashing the saga. These events are now being properly handled. `KAA-2460`
+- Fixed `media:sourceMuted` and `media:sourceUnmuted` events by adding `trackId` data instead of passing it in a single element array. `KAA-2455`
+
+### Changed
+
+- Removed the Call default values for BandwidthControls when adding media to a call. `KAA-2402`
+  - This affects the `make`, `answer`, `addMedia`, and `startVideo` Call APIs.
+  - If the `options.bandwidth` parameter is not provided, the SDK will now default to the browser's behaviour instead of setting its own bandwidth limits for audio and video (of 5000 each).
+- Updated the `webrtc-adapter` package (6.4.4 -> 7.6.3). `KAA-2381`
+- Updated the tutorials with the right configuration for the Turn servers. `kAA-2441`
+- Added a small note to the documentation to inform that screensharing is not supported on iOS Safari. `KAA-2429`
+
 ## 4.17.0 - 2020-06-26
 
 ### Added
 
 - Added new parameter validation to all configs used with the `create` function. Incorrect parameters will log a `VALIDATION` message. `KAA-2223`
+- Added new session level bandwidth limit parameter to the call API. The parameter is `call` and should be passed in the same options object as `audio` and `video` bandwidth controls. `KAA-2108`
 - Added documentation about `CodecSelectors` for `sdpHandlers.createCodecRemover`.
 - Added callId parameter passed to SDP pipeline handlers `call.SdpHandlerFunction`. `KAA-2242`
 
@@ -24,7 +63,10 @@ Kandy.js change log.
 
 ### Changed
 
-- Changed `call.getAvailableCodecs` Call API to return a Promise, so that caller can get the list of codecs as part of invkoing this API, without the need to setup a separate event listener. This does not impact the existing use of API. `KAA-2423`
+- Changed `call.getAvailableCodecs` Call API to return a Promise, so that caller can get the list of codecs as part of invoking this API, without the need to setup a separate event listener. This does not impact the existing use of API. `KAA-2423`
+- Changed the default configuration value for 'sdpSemantics' to be 'unified-plan', instead of 'plan-b'. `KAA-2401`
+  - 'plan-b' is an option supported only by Chrome and it has been deprecated. Further details are [here](https://webrtc.org/getting-started/unified-plan-transition-guide).
+  - This should not be a breaking change since Kandy Link supports the interoperability between 'plan-b' and 'unified-plan', transparently.
 
 ## 4.16.0 - 2020-05-29
 
@@ -41,7 +83,7 @@ Kandy.js change log.
 - Removed the need for remote party properties (callNotificationParams) to be present in notifications. `KAA-2271`
 - Fixed Firefox calling Chrome issue related to media bundling. `KAA-2282`
 - Fixed the triggering of call:trackEnded event (on caller's side) when a media track is removed as well as duplication of such event (on callee's side) when plan-b is used. `KAA-2343`
-- Fixed the check for valid authentification tokens in tutorials. `KAA-2298`
+- Fixed the check for valid authentication tokens in tutorials. `KAA-2298`
 - Fixed an issue with removing media for a 'Connected' Call (after an earlier attempt was made while the Call was 'On Hold') `KAA-2353`
 - Fixed documentation for Conversation in messaging plugin. `KAA-2102`
 

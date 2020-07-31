@@ -88,7 +88,8 @@ Configuration options for the call feature.
 **Parameters**
 
 -   `call` **[Object][6]** The call configuration object.
-    -   `call.sdpSemantics` **[string][7]** The sdpSemantics to use (`'unified-plan'` or `'plan-b'`). (optional, default `'unified-plan'`)
+    -   `call.sdpSemantics` **[string][7]** The sdpSemantics to use (`'unified-plan'` or `'plan-b'`).
+           As 'plan-b' has become a deprecated option, it will therefore be removed in the future. (optional, default `'unified-plan'`)
     -   `call.iceServers` **[Array][12]&lt;[call.IceServer][13]>?** The list of ICE servers to be used for calls.
     -   `call.iceCollectionDelay` **[number][11]** Time, in milliseconds, to delay in between
            ICE candidate checks. If ICE collection does not complete normally, the SDK will check
@@ -376,18 +377,39 @@ Type: [Object][6]
 -   `startTime` **[number][11]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][11]?** The end time of the call in milliseconds since the epoch.
 
-### DeviceInfo
+### MediaConstraint
 
-Contains information about a device.
+The MediaConstraint type defines the format for configuring media options.
+Either the `exact` or `ideal` property should be provided. If both are present, the
+   `exact` value will be used.
+
+When the `exact` value is provided, it will be the only value considered for the option.
+   If it cannot be used, the constraint will be considered an error.
+
+When the `ideal` value is provided, it will be considered as the optimal value for the option.
+   If it cannot be used, the closest acceptable value will be used instead.
 
 Type: [Object][6]
 
 **Properties**
 
--   `deviceId` **[string][7]** The ID of the device.
--   `groupId` **[string][7]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][7]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][7]** The name of the device.
+-   `exact` **[string][7]?** The required value for the constraint. Other values will not be accepted.
+-   `ideal` **[string][7]?** The ideal value for the constraint. Other values will be considered if necessary.
+
+**Examples**
+
+```javascript
+// Specify video resolution when making a call.
+client.call.make(destination, {
+   audio: true,
+   video: true,
+   videoOptions: {
+     // Set height and width constraints to ideally be 1280x720.
+     height: { ideal: 720 },
+     width: { ideal: 1280 }
+   }
+})
+```
 
 ### BandwidthControls
 
@@ -398,6 +420,7 @@ Type: [Object][6]
 
 **Properties**
 
+-   `call` **[number][11]?** The desired combined bandwidth bitrate in kilobits per second for all media in the call.
 -   `audio` **[number][11]?** The desired bandwidth bitrate in kilobits per second for received remote audio.
 -   `video` **[number][11]?** The desired bandwidth bitrate in kilobits per second for received remote video.
 
@@ -450,6 +473,19 @@ Type: [Object][6]
        be sent to the remote endpoint).
 -   `endpoint` **[string][7]** Which end of the connection created the SDP.
 
+### DeviceInfo
+
+Contains information about a device.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `deviceId` **[string][7]** The ID of the device.
+-   `groupId` **[string][7]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][7]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][7]** The name of the device.
+
 ### SdpHandlerFunction
 
 The form of an SDP handler function and the expected arguments that it receives.
@@ -463,19 +499,6 @@ Type: [Function][14]
 -   `originalSdp` **[Object][6]** The SDP in its initial state.
 
 Returns **[Object][6]** The resulting modified SDP based on the changes made by this function.
-
-### MediaObject
-
-The state representation of a Media object.
-Media is a collection of Track objects.
-
-Type: [Object][6]
-
-**Properties**
-
--   `id` **[string][7]** The ID of the Media object.
--   `local` **[boolean][10]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][12]&lt;[call.TrackObject][28]>** A list of Track objects that are contained in this Media object.
 
 ### TrackObject
 
@@ -499,6 +522,19 @@ Type: [Object][6]
 -   `state` **[string][7]** The state of this Track. Can be 'live' or 'ended'.
 -   `streamId` **[string][7]** The ID of the Media Stream that includes this Track.
 
+### MediaObject
+
+The state representation of a Media object.
+Media is a collection of Track objects.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `id` **[string][7]** The ID of the Media object.
+-   `local` **[boolean][10]** Indicator on whether this media is local or remote.
+-   `tracks` **[Array][12]&lt;[call.TrackObject][28]>** A list of Track objects that are contained in this Media object.
+
 ### DevicesObject
 
 A collection of media devices and their information.
@@ -510,40 +546,6 @@ Type: [Object][6]
 -   `camera` **[Array][12]&lt;[call.DeviceInfo][29]>** A list of camera device information.
 -   `microphone` **[Array][12]&lt;[call.DeviceInfo][29]>** A list of microphone device information.
 -   `speaker` **[Array][12]&lt;[call.DeviceInfo][29]>** A list of speaker device information.
-
-### MediaConstraint
-
-The MediaConstraint type defines the format for configuring media options.
-Either the `exact` or `ideal` property should be provided. If both are present, the
-   `exact` value will be used.
-
-When the `exact` value is provided, it will be the only value considered for the option.
-   If it cannot be used, the constraint will be considered an error.
-
-When the `ideal` value is provided, it will be considered as the optimal value for the option.
-   If it cannot be used, the closest acceptable value will be used instead.
-
-Type: [Object][6]
-
-**Properties**
-
--   `exact` **[string][7]?** The required value for the constraint. Other values will not be accepted.
--   `ideal` **[string][7]?** The ideal value for the constraint. Other values will be considered if necessary.
-
-**Examples**
-
-```javascript
-// Specify video resolution when making a call.
-client.call.make(destination, {
-   audio: true,
-   video: true,
-   videoOptions: {
-     // Set height and width constraints to ideally be 1280x720.
-     height: { ideal: 720 },
-     width: { ideal: 1280 }
-   }
-})
-```
 
 ### make
 
@@ -583,6 +585,11 @@ The SDK requires access to the machine's media devices (e.g. microphone)
         -   `media.videoOptions.height` **[call.MediaConstraint][37]?** The height of the video.
         -   `media.videoOptions.width` **[call.MediaConstraint][37]?** The width of the video.
         -   `media.videoOptions.frameRate` **[call.MediaConstraint][37]?** The frame rate of the video.
+    -   `media.screen` **[boolean][10]** Whether the call should have screenshare on start. (Note: Screensharing is not supported on iOS Safari.) (optional, default `false`)
+    -   `media.screenOptions` **[Object][6]?** Options for configuring the call's screenShare.
+        -   `media.screenOptions.height` **[call.MediaConstraint][37]?** The height of the screenShare.
+        -   `media.screenOptions.width` **[call.MediaConstraint][37]?** The width of the screenShare.
+        -   `media.screenOptions.frameRate` **[call.MediaConstraint][37]?** The frame rate of the screenShare.
 -   `options` **[Object][6]?** 
     -   `options.bandwidth` **[call.BandwidthControls][24]?** Options for configuring media's bandwidth.
     -   `options.dscpControls` **[call.DSCPControls][38]?** Options for configuring DSCP markings on the media traffic
@@ -657,12 +664,12 @@ The SDK requires access to the system's media devices (eg. microphone)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the call's audio.
         -   `media.audioOptions.deviceId` **[call.MediaConstraint][37]?** ID of the microphone to receive audio from.
     -   `media.video` **[boolean][10]** Whether the call should have video on start. (optional, default `false`)
-    -   `media.screen` **[boolean][10]** Whether the call should have screenshare on start. (optional, default `false`)
     -   `media.videoOptions` **[Object][6]?** Options for configuring the call's video.
         -   `media.videoOptions.deviceId` **[call.MediaConstraint][37]?** ID of the camera to receive video from.
         -   `media.videoOptions.height` **[call.MediaConstraint][37]?** The height of the video.
         -   `media.videoOptions.width` **[call.MediaConstraint][37]?** The width of the video.
         -   `media.videoOptions.frameRate` **[call.MediaConstraint][37]?** The frame rate of the video.
+    -   `media.screen` **[boolean][10]** Whether the call should have screenshare on start. (Note: Screensharing is not supported on iOS Safari.) (optional, default `false`)
     -   `media.screenOptions` **[Object][6]?** Options for configuring the call's screenShare.
         -   `media.screenOptions.height` **[call.MediaConstraint][37]?** The height of the screenShare.
         -   `media.screenOptions.width` **[call.MediaConstraint][37]?** The width of the screenShare.
@@ -798,7 +805,7 @@ The SDK will emit a [call:newTrack][40] event
 -   `media` **[Object][6]** The media options to add to the call. (optional, default `{}`)
     -   `media.audio` **[boolean][10]** Whether to add audio to the call. (optional, default `false`)
     -   `media.video` **[boolean][10]** Whether to add video to the call. (optional, default `false`)
-    -   `media.screen` **[boolean][10]** Whether to add the screenshare to the call. (optional, default `false`)
+    -   `media.screen` **[boolean][10]** Whether to add the screenshare to the call. (Note: Screensharing is not supported on iOS Safari.) (optional, default `false`)
     -   `media.audioOptions` **[Object][6]?** Options for configuring the call's audio.
         -   `media.audioOptions.deviceId` **[call.MediaConstraint][37]?** ID of the microphone to receive audio from.
     -   `media.videoOptions` **[Object][6]?** Options for configuring the call's video.
@@ -904,38 +911,6 @@ The progress of the operation will be tracked via the
 -   `duration` **[number][11]** The amount of time, in milliseconds, that each DTMF tone should last. (optional, default `100`)
 -   `intertoneGap` **[number][11]** The length of time, in milliseconds, to wait between tones. (optional, default `70`)
 
-### startScreenshare
-
-Adds local screenshare to an ongoing Call, to start sending to the remote
-   participant.
-
-The latest SDK release (v4.X+) has not yet implemented this API in the
-   same way that it was available in previous releases (v3.X). In place
-   of this API, the SDK has a more general API that can be used for this
-   same behaviour.
-
-The [call.addMedia][44] API can be used to perform the same behaviour
-   as `startScreenshare`. [call.addMedia][44] is a general-purpose API
-   for adding media to a call, which covers the same functionality as
-   `startScreenshare`. Selecting only screen options when using
-   [call.addMedia][44] will perform the same behaviour as using
-   `startScreenshare`.
-
-**Examples**
-
-```javascript
-// Select media options for adding only screenshare.
-const media = {
-   audio: false,
-   video: false,
-   screen: true,
-   screenOptions: { ... }
-}
-
-// Add the selected media to the call.
-client.call.addMedia(callId, media)
-```
-
 ### stopScreenshare
 
 Removes local screenshare from an ongoing Call, stopping it from being
@@ -974,6 +949,38 @@ const screenTrack = videoTracks[0]
 
 // Remove screen from the call.
 client.call.removeMedia(callId, [ screenTrack ])
+```
+
+### startScreenshare
+
+Adds local screenshare to an ongoing Call, to start sending to the remote
+   participant.
+
+The latest SDK release (v4.X+) has not yet implemented this API in the
+   same way that it was available in previous releases (v3.X). In place
+   of this API, the SDK has a more general API that can be used for this
+   same behaviour.
+
+The [call.addMedia][44] API can be used to perform the same behaviour
+   as `startScreenshare`. [call.addMedia][44] is a general-purpose API
+   for adding media to a call, which covers the same functionality as
+   `startScreenshare`. Selecting only screen options when using
+   [call.addMedia][44] will perform the same behaviour as using
+   `startScreenshare`.
+
+**Examples**
+
+```javascript
+// Select media options for adding only screenshare.
+const media = {
+   audio: false,
+   video: false,
+   screen: true,
+   screenOptions: { ... }
+}
+
+// Add the selected media to the call.
+client.call.addMedia(callId, media)
 ```
 
 ### getStats
@@ -1094,42 +1101,54 @@ This is an advanced feature, changing the SDP handlers mid-call may cause
 
 -   `sdpHandlers` **[Array][12]&lt;[call.SdpHandlerFunction][15]>** The list of SDP handler functions to modify SDP.
 
-### changeSpeaker
+### changeInputDevices
 
-Changes the speaker used for a Call's audio output. Supported on
-   browser's that support HTMLMediaElement.setSinkId().
+Changes the camera and/or microphone used for a Call's media input.
 
 The latest SDK release (v4.X+) has not yet implemented this API in the
    same way that it was available in previous releases (v3.X). In place
    of this API, the SDK has a more general API that can be used for this
    same behaviour.
 
-The same behaviour as the `changeSpeaker` API can be implemented by
-   re-rendering the Call's audio track.  A speaker can be selected when
-   rendering an audio track, so changing a speaker can be simulated
-   by unrendering the track with [media.removeTracks][51], then
-   re-rendering it with a new speaker with [media.renderTracks][52].
+The same behaviour as the `changeInputDevices` API can be implemented
+   using the general-purpose [call.replaceTrack][51] API. This API can
+   be used to replace an existing media track with a new track of the
+   same type, allowing an application to change certain aspects of the
+   media, such as input device.
 
 **Examples**
 
 ```javascript
 const call = client.call.getById(callId)
-// Get the ID of the Call's audio track.
-const audioTrack = call.localTracks.find(trackId => {
+// Get the ID of the Call's video track.
+const videoTrack = call.localTracks.find(trackId => {
    const track = client.media.getTrackById(trackId)
-   return track.kind === 'audio'
+   return track.kind === 'video'
 })
 
-// Where the audio track was previously rendered.
-const audioContainer = ...
+// Select the new video options.
+const media = {
+   video: true,
+   videoOptions: {
+       deviceId: 'cameraId'
+   }
+}
 
-// Unrender the audio track we want to change speaker for.
-client.media.removeTrack([ audioTrack ], audioContainer)
-// Re-render the audio track with a new speaker.
-client.media.renderTrack([ audioTrack ], audioContainer, {
-   speakerId: 'speakerId'
-})
+// Change the call's camera by replacing the video track.
+client.call.replaceTrack(callId, videoTrack, media)
 ```
+
+### setDefaultDevices
+
+The `setDefaultDevices` API from previous SDK releases (3.X) has been
+   deprecated in the latest releases (4.X+). The SDK no longer keeps
+   track of "default devices" on behalf of the application.
+
+The devices used for a call can be selected as part of the APIs for
+   starting the call. Microphone and/or camera can be chosen in the
+   [call.make][52] and [call.answer][53] APIs, and speaker can be
+   chosen when the audio track is rendered with the
+   [media.renderTracks][54] API.
 
 ### states
 
@@ -1143,7 +1162,7 @@ A Call's state describes the current status of the Call. An application
    whether the Call currently has media flowing between users.
 Unless stated otherwise, the Call's state pertains to both caller & callee.
 
-The Call's state is a property of the [CallObject][53],
+The Call's state is a property of the [CallObject][55],
    which can be retrieved using the [call.getById][21] or
    [call.getAll][20] APIs.
 
@@ -1177,53 +1196,41 @@ client.on('call:stateChange', function (params) {
 })
 ```
 
-### setDefaultDevices
+### changeSpeaker
 
-The `setDefaultDevices` API from previous SDK releases (3.X) has been
-   deprecated in the latest releases (4.X+). The SDK no longer keeps
-   track of "default devices" on behalf of the application.
-
-The devices used for a call can be selected as part of the APIs for
-   starting the call. Microphone and/or camera can be chosen in the
-   [call.make][54] and [call.answer][55] APIs, and speaker can be
-   chosen when the audio track is rendered with the
-   [media.renderTracks][52] API.
-
-### changeInputDevices
-
-Changes the camera and/or microphone used for a Call's media input.
+Changes the speaker used for a Call's audio output. Supported on
+   browser's that support HTMLMediaElement.setSinkId().
 
 The latest SDK release (v4.X+) has not yet implemented this API in the
    same way that it was available in previous releases (v3.X). In place
    of this API, the SDK has a more general API that can be used for this
    same behaviour.
 
-The same behaviour as the `changeInputDevices` API can be implemented
-   using the general-purpose [call.replaceTrack][56] API. This API can
-   be used to replace an existing media track with a new track of the
-   same type, allowing an application to change certain aspects of the
-   media, such as input device.
+The same behaviour as the `changeSpeaker` API can be implemented by
+   re-rendering the Call's audio track.  A speaker can be selected when
+   rendering an audio track, so changing a speaker can be simulated
+   by unrendering the track with [media.removeTracks][56], then
+   re-rendering it with a new speaker with [media.renderTracks][54].
 
 **Examples**
 
 ```javascript
 const call = client.call.getById(callId)
-// Get the ID of the Call's video track.
-const videoTrack = call.localTracks.find(trackId => {
+// Get the ID of the Call's audio track.
+const audioTrack = call.localTracks.find(trackId => {
    const track = client.media.getTrackById(trackId)
-   return track.kind === 'video'
+   return track.kind === 'audio'
 })
 
-// Select the new video options.
-const media = {
-   video: true,
-   videoOptions: {
-       deviceId: 'cameraId'
-   }
-}
+// Where the audio track was previously rendered.
+const audioContainer = ...
 
-// Change the call's camera by replacing the video track.
-client.call.replaceTrack(callId, videoTrack, media)
+// Unrender the audio track we want to change speaker for.
+client.media.removeTrack([ audioTrack ], audioContainer)
+// Re-render the audio track with a new speaker.
+client.media.renderTrack([ audioTrack ], audioContainer, {
+   speakerId: 'speakerId'
+})
 ```
 
 ### PhoneNumber
@@ -1426,58 +1433,6 @@ Type: [Object][6]
 client.conversation.fetch({type: client.conversation.chatTypes.GROUP}) {
 ```
 
-### Message
-
-A Message object is a means by which a sender can deliver information to a recipient.
-
-Creating and sending a message:
-
-The message object can be obtained through the [Conversation.createMessage][66] API on an existing conversation.
-
-Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
-Once all the desired parts have been added to the message using the [Message.addPart][67] function,
-the message can then be sent using the [Message.send][68] function.
-
-Once the sender sends a message, this message is saved in sender's state as an object.
-Similarly, once the recipient gets a message, this message is saved in recipient's state.
-
-Retrieving a delivered message:
-
-Once a message is delivered successfully, it can be
-obtained through the [Conversation.getMessages][69] or [Conversation.getMessage][70] API on an existing conversation.
-
-Below are the properties pertaining to the message object, returned by Conversation.getMessage(s) APIs, for either sender or recipient.
-
-Type: [Object][6]
-
-**Properties**
-
--   `timestamp` **[number][11]** A Unix timestamp in seconds marking the time when the message was created by sender.
--   `parts` **[Array][12]&lt;[conversation.Part][71]>** An array of Part Objects.
--   `sender` **[string][7]** The primary contact address of the sender.
--   `destination` **[Array][12]&lt;[string][7]>** An array of primary contact addresses associated with various destinations to which the message is meant to be delivered.
--   `messageId` **[string][7]** The unique id of the message. The message object (stored in sender's state) has a different id
-    than the one associated with the message object stored in recipient's state.
--   `type` **[string][7]** The type of message that was sent. See [conversation.chatTypes][61] for valid types.
-    This property applies only to message objects stored in sender's state.
--   `isFetchingLinks` **[boolean][10]** Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
-
-#### send
-
-Sends the message.
-
-#### addPart
-
-Add an additional `Part` to a message.
-
-**Parameters**
-
--   `part` **[conversation.Part][71]** The `Part` to add to the message.
-
-#### createImageLinks
-
-Creates a usable image link for the message in this `Message` instance.
-
 ### Part
 
 A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
@@ -1497,7 +1452,7 @@ A Conversation object represents a conversation either between two users, or bet
 user and a group. A user can create a Conversation using [conversation.create][63] Messaging API.
 
 A Conversation can be used to create messages to send using the Conversation and Messaging APIs
-[Conversation.createMessage][66] and [Message.send][68] functions.
+[Conversation.createMessage][66] and [Message.send][67] functions.
 
 Once a sender sends the initial message (within a conversation) to a recipient, there will be a
 conversation object saved in both sender and recipient's state.
@@ -1512,18 +1467,18 @@ Type: [Object][6]
     This property applies only to conversation object stored in recipient's state.
 -   `type` **[string][7]** The type of conversation. See [conversation.chatTypes][61] for valid types.
 -   `lastMessage` **[string][7]** The last message received.
--   `messages` **[Array][12]&lt;[conversation.Message][72]>** The array of message objects.
+-   `messages` **[Array][12]&lt;[conversation.Message][68]>** The array of message objects.
 -   `isTypingList` **[Array][12]&lt;[string][7]>** The array indentifying the User IDs of the users who are currently typing.
 
 #### createMessage
 
 Creates and return a message object. You must specify a part. If this is a simple text message, provide a `text` part as demonstrated in the example below.
 
-If successful, the event [messages:change][73] will be emitted.
+If successful, the event [messages:change][69] will be emitted.
 
 **Parameters**
 
--   `part` **[conversation.Part][71]** The Part to add to the message.
+-   `part` **[conversation.Part][70]** The Part to add to the message.
 
 **Examples**
 
@@ -1531,19 +1486,19 @@ If successful, the event [messages:change][73] will be emitted.
 conversation.createMessage({type: 'text', text: 'This is the message'});
 ```
 
-Returns **[conversation.Message][72]** The newly created Message object.
+Returns **[conversation.Message][68]** The newly created Message object.
 
 #### clearMessages
 
 Clears all messages in this conversation from local state.
 
-If successful, the event [messages:change][73] will be emitted.
+If successful, the event [messages:change][69] will be emitted.
 
 #### getMessages
 
 Gets all messages from this conversation.
 
-Returns **[Array][12]&lt;[conversation.Message][72]>** An array of messages.
+Returns **[Array][12]&lt;[conversation.Message][68]>** An array of messages.
 
 #### getMessage
 
@@ -1553,14 +1508,14 @@ Gets a specific message from this conversation.
 
 -   `messageId` **[string][7]** The ID of the message to retrieve.
 
-Returns **[conversation.Message][72]** A message object.
+Returns **[conversation.Message][68]** A message object.
 
 #### deleteMessages
 
 Deletes specified messages from this conversation.
 Provide an array of message IDs for the messages to be deleted.
 
-If successful, the event [messages:change][73] will be emitted.
+If successful, the event [messages:change][69] will be emitted.
 
 **Parameters**
 
@@ -1570,7 +1525,7 @@ If successful, the event [messages:change][73] will be emitted.
 
 Delete the conversation.
 
-If successful, the event [messages:change][73] will be emitted.
+If successful, the event [messages:change][69] will be emitted.
 
 #### subscribe
 
@@ -1588,9 +1543,9 @@ Returns **[Function][14]** The unsubscribe function.
 
 Allows the user to fetch messages associated with a specific conversation to make them available.
 When the operation is complete, a `messages:change` event will be emitted.
-Messages can then be retrieved using [Conversation.getMessages][69].
+Messages can then be retrieved using [Conversation.getMessages][71].
 
-If successful, the event [messages:change][73] will be emitted.
+If successful, the event [messages:change][69] will be emitted.
 
 **Parameters**
 
@@ -1601,11 +1556,63 @@ If successful, the event [messages:change][73] will be emitted.
 Sets the typing status of the conversation for the current user.
 Other participants will be notified of changes to the conversation's typing status.
 
-If successful, the event [isTypingList:change][74] will be emitted.
+If successful, the event [isTypingList:change][72] will be emitted.
 
 **Parameters**
 
 -   `isTyping` **[boolean][10]** Whether the user is typing or not
+
+### Message
+
+A Message object is a means by which a sender can deliver information to a recipient.
+
+Creating and sending a message:
+
+The message object can be obtained through the [Conversation.createMessage][66] API on an existing conversation.
+
+Messages have Parts which represent pieces of a message, such as a text part, a json object part or a file part.
+Once all the desired parts have been added to the message using the [Message.addPart][73] function,
+the message can then be sent using the [Message.send][67] function.
+
+Once the sender sends a message, this message is saved in sender's state as an object.
+Similarly, once the recipient gets a message, this message is saved in recipient's state.
+
+Retrieving a delivered message:
+
+Once a message is delivered successfully, it can be
+obtained through the [Conversation.getMessages][71] or [Conversation.getMessage][74] API on an existing conversation.
+
+Below are the properties pertaining to the message object, returned by Conversation.getMessage(s) APIs, for either sender or recipient.
+
+Type: [Object][6]
+
+**Properties**
+
+-   `timestamp` **[number][11]** A Unix timestamp in seconds marking the time when the message was created by sender.
+-   `parts` **[Array][12]&lt;[conversation.Part][70]>** An array of Part Objects.
+-   `sender` **[string][7]** The primary contact address of the sender.
+-   `destination` **[Array][12]&lt;[string][7]>** An array of primary contact addresses associated with various destinations to which the message is meant to be delivered.
+-   `messageId` **[string][7]** The unique id of the message. The message object (stored in sender's state) has a different id
+    than the one associated with the message object stored in recipient's state.
+-   `type` **[string][7]** The type of message that was sent. See [conversation.chatTypes][61] for valid types.
+    This property applies only to message objects stored in sender's state.
+-   `isFetchingLinks` **[boolean][10]** Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
+
+#### send
+
+Sends the message.
+
+#### addPart
+
+Add an additional `Part` to a message.
+
+**Parameters**
+
+-   `part` **[conversation.Part][70]** The `Part` to add to the message.
+
+#### createImageLinks
+
+Creates a usable image link for the message in this `Message` instance.
 
 ## groups
 
@@ -2592,17 +2599,17 @@ Type: [string][7]
 
 [50]: #callsdphandlerfunction
 
-[51]: #mediaremovetracks
+[51]: #callreplacetrack
 
-[52]: #mediarendertracks
+[52]: #callmake
 
-[53]: #callcallobject
+[53]: #callanswer
 
-[54]: #callmake
+[54]: #mediarendertracks
 
-[55]: #callanswer
+[55]: #callcallobject
 
-[56]: #callreplacetrack
+[56]: #mediaremovetracks
 
 [57]: #conversationget
 
@@ -2624,21 +2631,21 @@ Type: [string][7]
 
 [66]: #conversationconversationcreatemessage
 
-[67]: #conversationmessageaddpart
+[67]: #conversationmessagesend
 
-[68]: #conversationmessagesend
+[68]: #conversationmessage
 
-[69]: #conversationconversationgetmessages
+[69]: #conversationeventmessageschange
 
-[70]: #conversationconversationgetmessage
+[70]: #conversationpart
 
-[71]: #conversationpart
+[71]: #conversationconversationgetmessages
 
-[72]: #conversationmessage
+[72]: #conversationeventistypinglistchange
 
-[73]: #conversationeventmessageschange
+[73]: #conversationmessageaddpart
 
-[74]: #conversationeventistypinglistchange
+[74]: #conversationconversationgetmessage
 
 [75]: #conversation
 

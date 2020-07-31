@@ -41,7 +41,29 @@ A possible way of generating a clientCorrelator would be to use a hashing algori
 
 $KANDY$ authentication is performed by using access tokens which are issued by an authentication server. Each user is provided with unique tokens which are included in each request for authentication. The REST API is used for this process. The [REST API Reference](/developer/references/rest-api/1.0.0#authentication-token) Authentication page describes the process for obtaining the Access Token and the Id Token. The access tokens provided establish what can be accessed by the SDK. The identity token represents who is authenticated.
 
-In this tutorial, we will be using 'Password Grant Flow' in order get the authentication tokens. This flow requires three pieces of information. ClientId, User Email and Password are available on your [projects page](/portal/projects/overview). See later in the tutorial for more information on this flow and the alternative, client credentials grant flow.
+In this tutorial, we will be using 'Password Grant Flow' in order get the authentication tokens. This flow requires three pieces of information.
+
+This information can be obtained from your CPaaS account, specifically from the Developer Portal.
+
+More exactly, if you are using CPaaS APIs with your CPaaS user, the three pieces of information (required to be authenticated) will be under:
+
+- `Home` -> `Personal Profile` (top right corner) -> `Details`
+  - `Email` should be mapped to `username`
+  - Your account password should be mapped to `password`
+  - `Account client ID` should be mapped to `client_id`
+    - Alternatively, a project's `Public Project Key` can be used as the `client_id` (see below)
+
+However, if you are building a server-side app where there is no user, the information required to be authenticated will be under:
+
+- `Projects` -> `{your project}` -> `Project info`/`Project secret`
+  - `Private Project key` should be mapped to `client_id`
+  - `Private Project secret` should be mapped to `client_secret`
+
+If your server-side app requires user authentication:
+
+- `Public project key` under your project is required when you develop public clients under your project that users are getting authenticated and utilizing the app.
+
+However, for the scope of this tutorial, we'll make use of the first described scenario, which means using information such as `username`, `password` and `client_id`.
 
 The following code sets up a simple UI that separates the steps involved in authentication.
 
@@ -63,7 +85,7 @@ First we define a helper to transform a simple javascript key-value dictionary o
 /**
  * Creates a form body from an dictionary
  */
-function createFormBody(paramsObject) {
+function createFormBody (paramsObject) {
   const keyValuePairs = Object.entries(paramsObject).map(
     ([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value)
   )
@@ -77,7 +99,7 @@ Then we define a function for retrieving the tokens from the authentication serv
 /**
  * Gets the tokens necessary for authentication to $KANDY$
  */
-async function getTokens({ clientId, username, password }) {
+async function getTokens ({ clientId, username, password }) {
   const formBody = createFormBody({
     client_id: clientId,
     username,
@@ -109,7 +131,7 @@ Finally, we have a function to populate the tokens into a field so that we can s
 /**
  * Populate the tokens into the "set tokens" step.
  */
-async function populateTokens() {
+async function populateTokens () {
   const clientId = document.getElementById('clientId').value
   const userEmail = document.getElementById('userEmail').value
   const password = document.getElementById('password').value
@@ -147,7 +169,7 @@ Password grant flow is useful when you do not need to do the activities above, a
 Now that the authentication tokens have been retrieved, the second step is to tell the Javascript SDK platform about the authentication tokens. This is performed with the following code. This sets the tokens in the store to be used for authentication purposes. The `client.setTokens({accessToken, idToken})` function does not return a value.
 
 ```javascript
-function setTokens() {
+function setTokens () {
   const accessToken = document.getElementById('accessToken').value
   const idToken = document.getElementById('idToken').value
 
@@ -162,7 +184,7 @@ At this point, you can call the subscribe function. The subscribe function takes
 
 ```javascript
 var servicesList = ['chat', 'call']
-function subscribe() {
+function subscribe () {
   log('Subscribing for ' + servicesList.toString() + ' services, using websocket channel...')
   client.services.subscribe(servicesList, 'websocket')
 }
@@ -177,7 +199,7 @@ In the above piece of code we subscribe an anonymous function to the `subscripti
 To unsubscribe, you simply call unsubscribe.
 
 ```javascript
-function unsubscribe() {
+function unsubscribe () {
   log('Unsubscribing from ' + servicesList.toString() + ' services, using websocket channel...')
   client.services.unsubscribe(servicesList, 'websocket')
 }
@@ -187,7 +209,7 @@ Calling this function will trigger a change in the connection state, which in tu
 
 ```javascript
 // Listen for subscription changes.
-client.on('subscription:change', function() {
+client.on('subscription:change', function () {
   if (!client.services.getSubscriptions().isPending) {
     if (client.services.getSubscriptions().subscribed.length > 0) {
       log('Successfully subscribed to following services: ' + client.services.getSubscriptions().subscribed.toString())
@@ -202,7 +224,7 @@ If something goes wrong when we try to subscribe (invalid services maybe), we wa
 
 ```javascript
 // Listen for subscription errors.
-client.on('subscription:error', function(params) {
+client.on('subscription:error', function (params) {
   log('Unable to subscribe. Error: ' + params.error.message)
 })
 ```
@@ -222,7 +244,7 @@ Do you want to try this example for yourself? Click the button below to get star
 - Click **Subscribe** to receive notifications from the server.
 - Click **Unsubscribe** to stop notifications from the server.
 
-<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Authentication Demo\n */\n\nconst client = Kandy.create({\n  subscription: {\n    expires: 3600\n  },\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: &apos;$KANDYFQDN$&apos;\n    },\n    clientCorrelator: &apos;sampleCorrelator&apos;\n  }\n})\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody(paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n\n  // POST a request to create a new authentication access token.\n  const cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n\n  return { accessToken: data.access_token, idToken: data.id_token }\n}\n\n/**\n * Populate the tokens into the \&quot;set tokens\&quot; step.\n */\nasync function populateTokens() {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;userEmail&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n\n  try {\n    const tokens = await getTokens({ clientId, username: userEmail, password })\n\n    if (!tokens.accessToken || !tokens.idToken) {\n      log(&apos;Error: Failed to get valid authentication tokens. Please check the credentials provided.&apos;)\n      return\n    }\n\n    document.getElementById(&apos;accessToken&apos;).value = tokens.accessToken\n    document.getElementById(&apos;idToken&apos;).value = tokens.idToken\n\n    log(&apos;Successfully populated token controls&apos;)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\nfunction setTokens() {\n  const accessToken = document.getElementById(&apos;accessToken&apos;).value\n  const idToken = document.getElementById(&apos;idToken&apos;).value\n\n  client.setTokens({ accessToken, idToken })\n  log(&apos;Successfully set tokens&apos;)\n}\n\nvar servicesList = [&apos;chat&apos;, &apos;call&apos;]\nfunction subscribe() {\n  log(&apos;Subscribing for &apos; + servicesList.toString() + &apos; services, using websocket channel...&apos;)\n  client.services.subscribe(servicesList, &apos;websocket&apos;)\n}\n\nfunction unsubscribe() {\n  log(&apos;Unsubscribing from &apos; + servicesList.toString() + &apos; services, using websocket channel...&apos;)\n  client.services.unsubscribe(servicesList, &apos;websocket&apos;)\n}\n\n// Listen for subscription changes.\nclient.on(&apos;subscription:change&apos;, function() {\n  if (!client.services.getSubscriptions().isPending) {\n    if (client.services.getSubscriptions().subscribed.length > 0) {\n      log(&apos;Successfully subscribed to following services: &apos; + client.services.getSubscriptions().subscribed.toString())\n    } else {\n      log(&apos;Successfully unsubscribed from service subscriptions.&apos;)\n    }\n  }\n})\n\n// Listen for subscription errors.\nclient.on(&apos;subscription:error&apos;, function(params) {\n  log(&apos;Unable to subscribe. Error: &apos; + params.error.message)\n})\n\n// Utility function for appending messages to the message div.\nfunction log(message) {\n  document.getElementById(&apos;messages&apos;).innerHTML += &apos;<div>&apos; + message + &apos;</div>&apos;\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Authenticate using your account information</legend>\n    Client ID: <input type=\&quot;text\&quot; id=\&quot;clientId\&quot; /> User Email: <input type=\&quot;text\&quot; id=\&quot;userEmail\&quot; /> Password:\n    <input type=\&quot;password\&quot; id=\&quot;password\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Get tokens\&quot; onclick=\&quot;populateTokens();\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Set tokens</legend>\n    Access token: <input type=\&quot;text\&quot; id=\&quot;accessToken\&quot; /> Id token: <input type=\&quot;text\&quot; id=\&quot;idToken\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Set Tokens\&quot; onclick=\&quot;setTokens(accessToken, idToken);\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Subscribe</legend>\n    <input type=\&quot;submit\&quot; value=\&quot;Subscribe\&quot; onclick=\&quot;subscribe();\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Unsubscribe\&quot; onclick=\&quot;unsubscribe();\&quot; />\n  </fieldset>\n  <div id=\&quot;messages\&quot;></div>\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Authentication Demo&quot;,&quot;editors&quot;:&quot;101&quot;,&quot;js_external&quot;:&quot;https://unpkg.com/@kandy-io/cpaas-sdk@4.17.0/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Authentication Demo\n */\n\nconst client = Kandy.create({\n  subscription: {\n    expires: 3600\n  },\n  // Required: Server connection configs.\n  authentication: {\n    server: {\n      base: &apos;$KANDYFQDN$&apos;\n    },\n    clientCorrelator: &apos;sampleCorrelator&apos;\n  }\n})\n\n/**\n * Creates a form body from an dictionary\n */\nfunction createFormBody (paramsObject) {\n  const keyValuePairs = Object.entries(paramsObject).map(\n    ([key, value]) => encodeURIComponent(key) + &apos;=&apos; + encodeURIComponent(value)\n  )\n  return keyValuePairs.join(&apos;&&apos;)\n}\n\n/**\n * Gets the tokens necessary for authentication to $KANDY$\n */\nasync function getTokens ({ clientId, username, password }) {\n  const formBody = createFormBody({\n    client_id: clientId,\n    username,\n    password,\n    grant_type: &apos;password&apos;,\n    scope: &apos;openid&apos;\n  })\n\n  // POST a request to create a new authentication access token.\n  const cpaasAuthUrl = &apos;https://$KANDYFQDN$/cpaas/auth/v1/token&apos;\n  const fetchResult = await fetch(cpaasAuthUrl, {\n    method: &apos;POST&apos;,\n    headers: {\n      &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;\n    },\n    body: formBody\n  })\n\n  // Parse the result of the fetch as a JSON format.\n  const data = await fetchResult.json()\n\n  return { accessToken: data.access_token, idToken: data.id_token }\n}\n\n/**\n * Populate the tokens into the \&quot;set tokens\&quot; step.\n */\nasync function populateTokens () {\n  const clientId = document.getElementById(&apos;clientId&apos;).value\n  const userEmail = document.getElementById(&apos;userEmail&apos;).value\n  const password = document.getElementById(&apos;password&apos;).value\n\n  try {\n    const tokens = await getTokens({ clientId, username: userEmail, password })\n\n    if (!tokens.accessToken || !tokens.idToken) {\n      log(&apos;Error: Failed to get valid authentication tokens. Please check the credentials provided.&apos;)\n      return\n    }\n\n    document.getElementById(&apos;accessToken&apos;).value = tokens.accessToken\n    document.getElementById(&apos;idToken&apos;).value = tokens.idToken\n\n    log(&apos;Successfully populated token controls&apos;)\n  } catch (error) {\n    log(&apos;Error: Failed to get authentication tokens. Error: &apos; + error)\n  }\n}\n\nfunction setTokens () {\n  const accessToken = document.getElementById(&apos;accessToken&apos;).value\n  const idToken = document.getElementById(&apos;idToken&apos;).value\n\n  client.setTokens({ accessToken, idToken })\n  log(&apos;Successfully set tokens&apos;)\n}\n\nvar servicesList = [&apos;chat&apos;, &apos;call&apos;]\nfunction subscribe () {\n  log(&apos;Subscribing for &apos; + servicesList.toString() + &apos; services, using websocket channel...&apos;)\n  client.services.subscribe(servicesList, &apos;websocket&apos;)\n}\n\nfunction unsubscribe () {\n  log(&apos;Unsubscribing from &apos; + servicesList.toString() + &apos; services, using websocket channel...&apos;)\n  client.services.unsubscribe(servicesList, &apos;websocket&apos;)\n}\n\n// Listen for subscription changes.\nclient.on(&apos;subscription:change&apos;, function () {\n  if (!client.services.getSubscriptions().isPending) {\n    if (client.services.getSubscriptions().subscribed.length > 0) {\n      log(&apos;Successfully subscribed to following services: &apos; + client.services.getSubscriptions().subscribed.toString())\n    } else {\n      log(&apos;Successfully unsubscribed from service subscriptions.&apos;)\n    }\n  }\n})\n\n// Listen for subscription errors.\nclient.on(&apos;subscription:error&apos;, function (params) {\n  log(&apos;Unable to subscribe. Error: &apos; + params.error.message)\n})\n\n// Utility function for appending messages to the message div.\nfunction log (message) {\n  document.getElementById(&apos;messages&apos;).innerHTML += &apos;<div>&apos; + message + &apos;</div>&apos;\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Authenticate using your account information</legend>\n    Client ID: <input type=\&quot;text\&quot; id=\&quot;clientId\&quot; /> User Email: <input type=\&quot;text\&quot; id=\&quot;userEmail\&quot; /> Password:\n    <input type=\&quot;password\&quot; id=\&quot;password\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Get tokens\&quot; onclick=\&quot;populateTokens();\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Set tokens</legend>\n    Access token: <input type=\&quot;text\&quot; id=\&quot;accessToken\&quot; /> Id token: <input type=\&quot;text\&quot; id=\&quot;idToken\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Set Tokens\&quot; onclick=\&quot;setTokens(accessToken, idToken);\&quot; />\n  </fieldset>\n  <fieldset>\n    <legend>Subscribe</legend>\n    <input type=\&quot;submit\&quot; value=\&quot;Subscribe\&quot; onclick=\&quot;subscribe();\&quot; />\n    <input type=\&quot;submit\&quot; value=\&quot;Unsubscribe\&quot; onclick=\&quot;unsubscribe();\&quot; />\n  </fieldset>\n  <div id=\&quot;messages\&quot;></div>\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Authentication Demo&quot;,&quot;editors&quot;:&quot;101&quot;,&quot;js_external&quot;:&quot;https://unpkg.com/@kandy-io/cpaas-sdk@4.18.0/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
 
 _Note: You’ll be sent to an external website._
 
