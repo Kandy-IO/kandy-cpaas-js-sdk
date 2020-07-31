@@ -30,6 +30,7 @@ To see how to use these events, visit our tutorials.
 
 - Fixed an issue preventing the playing of video tracks during a call on iOS Safari. `KAA-2382`
 - Fixed an issue preventing the proper termination of an audio+video outgoing call when camera was already in use. `KAA-2426`
+- Fixed an issue where the screenshare options for the `call.make` Call API were not shown in the documentation.
 - Fixed issue where uncaught errors in `setLocalDescription` were crashing the saga. These events are now being properly handled. `KAA-2460`
 
 ### Changed
@@ -39,6 +40,7 @@ To see how to use these events, visit our tutorials.
   - If the `options.bandwidth` parameter is not provided, the SDK will now default to the browser's behaviour instead of setting its own bandwidth limits for audio and video (of 5000 each).
 - Updated the `webrtc-adapter` package (6.4.4 -> 7.6.3). `KAA-2381`
 - Updated the tutorials with the right configuration for the Turn servers. `kAA-2441`
+- Added a small note to the documentation to inform that screensharing is not supported on iOS Safari. `KAA-2429`
 
 ## 4.17.0 - 2020-06-26
 
