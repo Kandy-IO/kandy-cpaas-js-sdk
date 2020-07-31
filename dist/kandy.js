@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.18.0-beta.487
+ * Version: 4.18.0-beta.488
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31910,7 +31910,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.18.0-beta.487';
+  return '4.18.0-beta.488';
 }
 
 /***/ }),
@@ -51389,7 +51389,7 @@ const TRACKS_UNMUTED = exports.TRACKS_UNMUTED = 'media:unmuted';
  * @memberof media
  * @event media:sourceMuted
  * @param {Object} params
- * @param {Array<string>} params.trackIds The track Ids that are affected as a result of media source being muted.
+ * @param {string} params.trackId The track that is affected as a result of media source being muted.
  */
 const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
 
@@ -51411,7 +51411,7 @@ const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
  * @memberof media
  * @event media:sourceUnmuted
  * @param {Object} params
- * @param {Array<string>} params.trackIds The track Ids that are affected as a result of media source being unmuted.
+ * @param {string} params.trackId The track that is affected as a result of media source being unmuted.
  */
 const TRACK_SOURCE_UNMUTED = exports.TRACK_SOURCE_UNMUTED = 'media:sourceUnmuted';
 
@@ -51523,14 +51523,20 @@ events[actionTypes.UNMUTE_TRACKS_FINISH] = action => {
 events[actionTypes.TRACK_SOURCE_MUTED] = action => {
   return {
     type: eventTypes.TRACK_SOURCE_MUTED,
-    args: { trackIds: action.payload.trackIds }
+    args: {
+      trackIds: action.payload.trackIds,
+      trackId: action.payload.trackIds[0]
+    }
   };
 };
 
 events[actionTypes.TRACK_SOURCE_UNMUTED] = action => {
   return {
     type: eventTypes.TRACK_SOURCE_UNMUTED,
-    args: { trackIds: action.payload.trackIds }
+    args: {
+      trackIds: action.payload.trackIds,
+      trackId: action.payload.trackIds[0]
+    }
   };
 };
 
