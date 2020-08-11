@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.19.0-beta.496
+ * Version: 4.19.0-beta.497
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31910,7 +31910,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.19.0-beta.496';
+  return '4.19.0-beta.497';
 }
 
 /***/ }),
@@ -48262,7 +48262,7 @@ function* searchDirectory(action) {
   if (res.error) {
     const error = new _errors2.default({
       code: _codes.usersCodes.DIRECTORY_REQUEST_FAIL,
-      message: 'Directory search request resulted in an error being returned from the server'
+      message: res.error.message
     });
     yield (0, _effects.put)(actions.searchDirectoryFinish({ error }));
   } else {

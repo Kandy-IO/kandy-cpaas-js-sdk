@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.19.0 - beta
 
+### Fixed
+
+- Fixed an issue where an empty directory search wasn't passing the servers error message in the `message` field. Now we pass whatever the server error response message was. `KAA-2030`
+
 ## 4.18.0 - 2020-07-31
 
 ### Important changes
