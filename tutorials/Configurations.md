@@ -49,12 +49,18 @@ authentication: {
 
 ### Logs
 
-The logs configs are used to change the severity of logging output from the SDK. This allows for more logged messages, such as debug information, warnings, and errors, which can help to explain what the library is doing.
+The Logs configs are used to change the SDK's internal logging behaviour. The SDK will generate logs that provide information about what it is doing, such as info and debug messages, warnings, and errors. These configurations allow an application to select which levels they would like to see logs for, and how those logs should be handled.
+
+By default, the SDK will include logs for all levels (the default `logLevel` is 'debug') and will print the logs to the browser's console (via the default `logHandler` function) at their appropriate level (for example, 'info' logs will use `console.info` and 'debug' logs will use `console.debug`).
+
+These defaults work well for development purposes, but may conflict with browser or other behaviours. For example, since the default `logHandler` function uses the browser's console, the browser may also filter logs based on its own settings. Many browsers do not show the 'debug' level by default, so it would be an extra step for a user to enable those logs in their browser. A custom `logHandler` can be used to avoid this behaviour conflict, by always using the same level for the browser's console. For this reason, it is recommended that all applications actively set the `logLevel` and `logHandler` configurations for logs, to ensure the SDK's logging behaviour is well suited for your application and its users.
 
 ```javascript
 logs: {
-  // Set the log level to 'debug' to output more detailed logs. Default is 'warn'.
-  logLevel: 'debug'
+  // Set the log level to 'debug' to output more detailed logs.
+  logLevel: 'debug',
+  // Provide a custom LogHandler function.
+  logHandler: function yourLogHandler (logEntry) { ... }
 }
 ```
 
