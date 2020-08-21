@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.19.0-beta.507
+ * Version: 4.19.0-beta.508
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33020,7 +33020,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.19.0-beta.507';
+  return '4.19.0-beta.508';
 }
 
 /***/ }),
@@ -48616,6 +48616,8 @@ exports.getNotificationChannels = getNotificationChannels;
 exports.getSubscribedServices = getSubscribedServices;
 exports.getSubscriptionInfo = getSubscriptionInfo;
 exports.getSubscriptions = getSubscriptions;
+exports.getSubscriptionExpiry = getSubscriptionExpiry;
+exports.getWebsocketConfig = getWebsocketConfig;
 
 var _fp = __webpack_require__("../../packages/kandy/node_modules/lodash/fp.js");
 
@@ -48720,6 +48722,42 @@ function getSubscriptions(state, service, type) {
   let subscriptions = state.subscription.subscriptions;
   subscriptions = subscriptions.filter(subscription => subscription.service === service && subscription.channelType === type);
   return (0, _fp.cloneDeep)(subscriptions);
+}
+
+/**
+ * Retrieve the subscription expiry time from config.
+ * @method getSubscriptionExpiry
+ * @return {number}
+ */
+function getSubscriptionExpiry(state) {
+  const subConfig = state.config.subscription;
+  const authConfig = state.config.authentication;
+
+  // In order to maintain backwards compability with the auth plugin config
+  // we need to first check if this setting is provided in the authentication plugin
+  // config, and if not use the one from subscription plugin.  We need to check
+  // authentication config first because if no value is provided in the subscription
+  // plugin, a default value will be used and we don't want that if one is provided in
+  // the authentication plugin.
+  return (0, _fp.cloneDeep)(authConfig.subscription.expires || subConfig.expires);
+}
+
+/**
+ * Retrieve the subscription expiry time from config.
+ * @method getSubscriptionExpiry
+ * @return {number}
+ */
+function getWebsocketConfig(state) {
+  const subConfig = state.config.subscription;
+  const authConfig = state.config.authentication;
+
+  // In order to maintain backwards compability with the auth plugin config
+  // we need to first check if this setting is provided in the authentication plugin
+  // config, and if not use the one from subscription plugin.  We need to check
+  // authentication config first because if no value is provided in the subscription
+  // plugin, a default value will be used and we don't want that if one is provided in
+  // the authentication plugin.
+  return (0, _fp.cloneDeep)(authConfig.websocket || subConfig.websocket);
 }
 
 /***/ }),
