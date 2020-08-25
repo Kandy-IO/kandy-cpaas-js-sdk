@@ -7,6 +7,11 @@ Kandy.js change log.
 
 ## 4.19.0 - beta
 
+### Added
+
+- Added a new Logging tutorial. `KAA-2464`
+  - Explains how the SDK's logging system works and how an application can customize its behaviour.
+
 ### Fixed
 
 - Fixed an issue where an empty directory search wasn't passing the servers error message in the `message` field. Now we pass whatever the server error response message was. `KAA-2030`

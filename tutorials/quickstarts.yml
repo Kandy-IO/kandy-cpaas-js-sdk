@@ -9,6 +9,10 @@
   description: # Configurations
   link: /quickstarts/javascript/cpaas/Configurations
 
+- name: Logging
+  description: # SDK Logs
+  link: /quickstarts/javascript/cpaas/Logging
+
 - name: Authentication
   description: # Authentication
   link: /quickstarts/javascript/cpaas/Authentication

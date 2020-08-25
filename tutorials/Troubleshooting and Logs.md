@@ -10,29 +10,15 @@ position: 13
 
 This quickstart covers the basics of how to gather log information from the SDK and troubleshooting problems. Code snippets will be shown that demonstrates using the logger. These snippets will come together to form a working demo application that you can modify and tinker with at the end.
 
-## Configuring the Logger
-
-When you create an instance of the SDK, you can supply configurations for the logger as part of the configuration object. The Configuration Documentation includes the full list of log configurations available for the logger.
-
-```javascript 
-// Log settings can be configured on SDK initialization.
-var client = Kandy.create({
-  logs: {
-    logLevel: 'debug',
-    enableFcsLogs: true
-  }
-  // Other configs.
-  // ...
-})
-```
-
 ## Using the Logger
 
-The logger outputs the logged information to the developer console in your browser. You can view it by opening your browser's Developer Tools and navigating to the Console tab.
+When you create an instance of the SDK, you can supply configurations for the logger as part of the configuration object. This allows you to set the SDK's log level and customize the behaviour of the logger. The [Logging tutorial](logging) explains in detail how to use and customize the logger.
+
+The logger's default behaviour is to output the logged information to the developer console in your browser. You can view it by opening your browser's Developer Tools and navigating to the Console tab.
 
 ### Saving Console Logs
 
-If you experience an issue with how the SDK is behaving, or require support, it can be beneficial to save the log output to a file. This currently will need to be done manually.
+If you experience an issue with how the SDK is behaving, or require support, it can be beneficial to save the log output to a file. This can be done manually by following the below steps.
 
 If you're using Chrome Browser:
 
@@ -46,6 +32,8 @@ If you're using Firefox Browser:
 - Navigate to the Console tab
 - Right-click and "Select All"
 - Copy paste all the text to a file and save
+
+Alternatively, saving the logs automatically can be done with custom logger behaviour. The ['Save to File'](logging#save-to-file) section of the Logging tutorial showcases an example of how to do this.
 
 ### Reporting a Bug
 
@@ -77,8 +65,7 @@ function initialize () {
   console.log('log level:', logLevel)
   var client = Kandy.create({
     logs: {
-      logLevel: logLevel,
-      enableFcsLogs: true
+      logLevel: logLevel
     },
     authentication: {
       server: {
@@ -98,5 +85,5 @@ The following demo shows how various log levels affect the logging output. Note:
 
 Do you want to try this example for yourself? Click the button below to get started.
 
-<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Logger Demo\n */\n\nfunction initialize () {\n  var logLevel = document.querySelector(&apos;input[name=\&quot;log-level\&quot;]:checked&apos;).value\n  console.log(&apos;log level:&apos;, logLevel)\n  var client = Kandy.create({\n    logs: {\n      logLevel: logLevel,\n      enableFcsLogs: true\n    },\n    authentication: {\n      server: {\n        base: &apos;$KANDYFQDN$&apos;\n      },\n      clientCorrelator: &apos;sampleCorrelator&apos;\n    }\n  })\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Select a Log level</legend>\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;silent\&quot; />silent\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;error\&quot; />error <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;warn\&quot; />warn\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;info\&quot; />info <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;debug\&quot; />debug\n  </fieldset>\n  <input type=\&quot;button\&quot; value=\&quot;Initialize SDK\&quot; onclick=\&quot;initialize();\&quot; />\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Logger Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@509/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
+<form action="https://codepen.io/pen/define" method="POST" target="_blank" class="codepen-form"><input type="hidden" name="data" value=' {&quot;js&quot;:&quot;/**\n * $KANDY$ Logger Demo\n */\n\nfunction initialize () {\n  var logLevel = document.querySelector(&apos;input[name=\&quot;log-level\&quot;]:checked&apos;).value\n  console.log(&apos;log level:&apos;, logLevel)\n  var client = Kandy.create({\n    logs: {\n      logLevel: logLevel\n    },\n    authentication: {\n      server: {\n        base: &apos;$KANDYFQDN$&apos;\n      },\n      clientCorrelator: &apos;sampleCorrelator&apos;\n    }\n  })\n}\n\n&quot;,&quot;html&quot;:&quot;<div>\n  <fieldset>\n    <legend>Select a Log level</legend>\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;silent\&quot; />silent\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;error\&quot; />error <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;warn\&quot; />warn\n    <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;info\&quot; />info <input type=\&quot;radio\&quot; name=\&quot;log-level\&quot; value=\&quot;debug\&quot; />debug\n  </fieldset>\n  <input type=\&quot;button\&quot; value=\&quot;Initialize SDK\&quot; onclick=\&quot;initialize();\&quot; />\n</div>\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;title&quot;:&quot;$KANDY$ Logger Demo&quot;,&quot;editors&quot;:101,&quot;js_external&quot;:&quot;https://cdn.jsdelivr.net/gh/Kandy-IO/kandy-cpaas-js-sdk@510/dist/kandy.js&quot;} '><input type="image" src="./TryItOn-CodePen.png"></form>
 
