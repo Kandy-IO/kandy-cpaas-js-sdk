@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.19.0-beta.514
+ * Version: 4.20.0-beta.515
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31914,7 +31914,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.19.0-beta.514';
+  return '4.20.0-beta.515';
 }
 
 /***/ }),
@@ -45121,6 +45121,38 @@ function getSelfPresence(state) {
 
 /***/ }),
 
+/***/ "../../packages/kandy/src/request/configs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parseOptions = exports.defaultOptions = undefined;
+
+var _validation = __webpack_require__("../../packages/kandy/src/common/validation/index.js");
+
+/**
+ * Configurable properties 'published' by this "Request" plugin.
+ *
+ * @property {boolean} [injectAgentVersionHeader=true] Option to automatically inject an agent version header to every REST request.
+ *            This header is used to help with diagnostics and analytics in a completely anonymous fashion.
+ *            TODO: Set it to 'true' after server side whitelists that actual custom header.
+ */
+const defaultOptions = exports.defaultOptions = {
+  injectAgentVersionHeader: true
+}; // Parse and/or Validate
+
+
+const v8nValidation = _validation.validation.schema({
+  injectAgentVersionHeader: _validation.validation.boolean()
+});
+const parseOptions = exports.parseOptions = (0, _validation.parse)('request', v8nValidation);
+
+/***/ }),
+
 /***/ "../../packages/kandy/src/request/effects.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -45144,14 +45176,6 @@ var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
-
-var _selectors = __webpack_require__("../../packages/kandy/src/request/interface/selectors.js");
-
-var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
-
-var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
-
-var _constants = __webpack_require__("../../packages/kandy/src/constants.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -45177,43 +45201,12 @@ function request(options, commonOptions) {
  */
 
 
-// Constants
-
-
 // Libraries.
 // Requests plugin.
 function* requestSaga(options, commonOptions) {
   // Merge any extra request options into the provided options
   //      for this request. Priority is for the passed-in options.
   options = (0, _utils.mergeValues)(commonOptions, options);
-
-  const useCustomHeader = yield (0, _effects.select)(_selectors.injectAgentVersionHeader);
-  if (useCustomHeader) {
-    const platform = yield (0, _effects.select)(_selectors2.getPlatform);
-
-    // Assume request is for CPaaS platform, by default.
-    let headerValue = `cpaas-js-sdk/${(0, _version.getVersion)()}`;
-
-    // Check if request is for callMe service, otherwise determine the apropriate platform.
-    // (callMe service uses Link platform for call requests)
-    if (options.url && options.url.includes('/anonymous/')) {
-      headerValue = `callme-js-sdk/${(0, _version.getVersion)()}`;
-    } else {
-      // Check the actual platform used
-      if (platform === _constants.platforms.UC) {
-        headerValue = `uc-js-sdk/${(0, _version.getVersion)()}`;
-      } else if (platform === _constants.platforms.LINK) {
-        headerValue = `link-js-sdk/${(0, _version.getVersion)()}`;
-      }
-    }
-
-    // Note that the same headerName is used for all platforms & services.
-    options = (0, _utils.mergeValues)(options, {
-      headers: {
-        'X-Cpaas-Agent': headerValue
-      }
-    });
-  }
 
   const requestAction = yield (0, _effects.put)(actions.request(options));
   const responseAction = yield (0, _effects.take)(action => action.type === _actionTypes.RESPONSE && (0, _fp.get)('meta.requestId', action) === requestAction.meta.requestId);
@@ -45233,19 +45226,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.__testonly__ = undefined;
-
-var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _objectWithoutProperties2 = __webpack_require__("../../node_modules/babel-runtime/helpers/objectWithoutProperties.js");
-
-var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
-
-var _freeze = __webpack_require__("../../node_modules/babel-runtime/core-js/object/freeze.js");
-
-var _freeze2 = _interopRequireDefault(_freeze);
-
 exports.default = request;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
@@ -45256,68 +45236,46 @@ var _actions = __webpack_require__("../../packages/kandy/src/request/interface/a
 
 var actions = _interopRequireWildcard(_actions);
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
+var _selectors = __webpack_require__("../../packages/kandy/src/request/interface/selectors.js");
 
-var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
+var _configs = __webpack_require__("../../packages/kandy/src/request/configs.js");
 
-var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+var _makeRequest = __webpack_require__("../../packages/kandy/src/request/makeRequest.js");
+
+var _makeRequest2 = _interopRequireDefault(_makeRequest);
+
+var _utils = __webpack_require__("../../packages/kandy/src/request/utils/index.js");
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
 
 var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
 
-var _validation = __webpack_require__("../../packages/kandy/src/common/validation/index.js");
+var _utils3 = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Enum declaring the valid request response data types that are available to be handled
- */
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// Utils.
 
 
-// State setters.
-const responseTypes = (0, _freeze2.default)({
-  json: 'json',
-  blob: 'blob',
-  text: 'text',
-  none: 'none'
-});
-
-// Parse and/or Validate
-
-
-const contentTypes = (0, _freeze2.default)({
-  jsonType: 'application/json',
-  vdnJsonType: 'application/vdn.kandy.json',
-  plainTextType: 'text/plain',
-  xmlTextType: 'text/xml',
-  octetStream: 'application/octet-stream'
-});
-
+// Other plugins.
+// Request plugin.
 const pluginName = 'requests';
-
-/**
- * Configurable properties 'published' by this "Request" plugin.
- *
- * @property {boolean} [injectAgentVersionHeader=true] Option to automatically inject an agent version header to every REST request.
- *            This header is used to help with diagnostics and analytics in a completely anonymous fashion.
- *            TODO: Set it to 'true' after server side whitelists that actual custom header.
- */
-const defaultOptions = {
-  injectAgentVersionHeader: true
-};
-
-const v8nValidation = _validation.validation.schema({
-  injectAgentVersionHeader: _validation.validation.boolean()
-});
-const parseOptions = (0, _validation.parse)('request', v8nValidation);
 
 /*
  * HTTP request plugin.
  */
+
+
+// Libraries.
 function request(options = {}) {
-  options = (0, _utils.mergeValues)(defaultOptions, options);
-  parseOptions(options);
+  options = (0, _utils3.mergeValues)(_configs.defaultOptions, options);
+  (0, _configs.parseOptions)(options);
 
   function* init() {
     yield (0, _effects.put)((0, _actions2.update)(options, pluginName));
@@ -45344,10 +45302,191 @@ function* watchRequests() {
  * @param {FluxStandardAction} action The action to handle.
  */
 function* handleRequest(action) {
+  const options = yield (0, _effects.call)(addVersionHeader, action.payload);
+
   // Make the request based on the action
-  var result = yield (0, _effects.call)(makeRequest, action.payload, action.meta.requestId);
+  var result = yield (0, _effects.call)(_makeRequest2.default, options, action.meta.requestId);
   yield (0, _effects.put)(actions.response(action.meta.requestId, result, !!result.error));
 }
+
+/**
+ * If enabled, adds the Agent Version header to the REST request's options.
+ * Relies on the "platform" being set in state to know which SDK is being used.
+ * @method addVersionHeader
+ * @param  {Object} options Request options.
+ * @return {Object} The same request options but with one extra header (maybe).
+ */
+function* addVersionHeader(options) {
+  const useCustomHeader = yield (0, _effects.select)(_selectors.injectAgentVersionHeader);
+  if (useCustomHeader) {
+    const platform = yield (0, _effects.select)(_selectors2.getPlatform);
+
+    // Assume request is for CPaaS platform, by default.
+    const headerValue = (0, _utils2.default)(platform, options.url);
+
+    // Note that the same headerName is used for all platforms & services.
+    options = (0, _utils3.mergeValues)(options, {
+      headers: {
+        'X-Cpaas-Agent': headerValue
+      }
+    });
+  }
+
+  return options;
+}
+
+// begin-test-code
+const __testonly__ = exports.__testonly__ = { addVersionHeader, watchRequests, handleRequest
+  // end-test-code
+
+};
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/actionTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const PREFIX = '@@KANDY/';
+
+const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
+const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/actions.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.request = request;
+exports.response = response;
+
+var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var nextRequestId = 0;
+function generateRequestId() {
+  return nextRequestId++;
+}
+
+/**
+ * Creates a request action.
+ * @param {Object} options
+ * @param {string} options.url The url for the request
+ * @param {Object} [options.queryParams] Query parameters to be added to the url string
+ * @param {string} [options.responseType] The data type assumed to be received in the response body
+ * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
+ */
+function request(options) {
+  return {
+    type: actionTypes.REQUEST,
+    payload: options,
+    meta: {
+      requestId: generateRequestId()
+    }
+  };
+}
+
+/**
+ * Creates a response action.
+ */
+function response(requestId, result, error = false) {
+  return {
+    type: actionTypes.RESPONSE,
+    payload: result,
+    error,
+    meta: {
+      requestId: requestId
+    }
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/selectors.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.injectAgentVersionHeader = injectAgentVersionHeader;
+/**
+ * Retrieves the flag which specifies wether or not this SDK should use a custom header as part of any requests being sent to server.
+ * This custom header refers to the current agent version.
+ * @param {Object} state  The current Redux state object.
+ * @return {boolean} True if custom header should be used, false otherwise.
+ */
+function injectAgentVersionHeader(state) {
+  return state.config.requests.injectAgentVersionHeader;
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/makeRequest.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/extends.js");
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__("../../node_modules/babel-runtime/helpers/objectWithoutProperties.js");
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _freeze = __webpack_require__("../../node_modules/babel-runtime/core-js/object/freeze.js");
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Enum declaring the valid request response data types that are available to be handled
+ */
+// Other plugins.
+const responseTypes = (0, _freeze2.default)({
+  json: 'json',
+  blob: 'blob',
+  text: 'text',
+  none: 'none'
+});
+
+// Utils.
+
+
+const contentTypes = (0, _freeze2.default)({
+  jsonType: 'application/json',
+  vdnJsonType: 'application/vdn.kandy.json',
+  plainTextType: 'text/plain',
+  xmlTextType: 'text/xml',
+  octetStream: 'application/octet-stream'
+});
 
 /**
  * Make a request with the specified options. The options is very similar to the options passed to the GlobalFetch
@@ -45368,7 +45507,8 @@ function* handleRequest(action) {
  * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
  * @return {Promise} A promise that resolves with a custom response object.
  */
-async function makeRequest(options, requestId) {
+
+exports.default = async function makeRequest(options, requestId) {
   const log = _logs.logManager.getLogger('REQUEST', requestId);
 
   // TODO This functions is too complex. Consider refactoring.
@@ -45518,17 +45658,11 @@ async function makeRequest(options, requestId) {
     log.info(`Failed to parse response, caused by ${err.message}`);
     return makeResponse({ error: 'REQUEST' }, { code: err.name, message: err.message });
   }
-}
-
-// begin-test-code
-const __testonly__ = exports.__testonly__ = { makeRequest, watchRequests, handleRequest
-  // end-test-code
-
 };
 
 /***/ }),
 
-/***/ "../../packages/kandy/src/request/interface/actionTypes.js":
+/***/ "../../packages/kandy/src/request/utils/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45537,89 +45671,40 @@ const __testonly__ = exports.__testonly__ = { makeRequest, watchRequests, handle
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const PREFIX = '@@KANDY/';
+exports.getCpaasAgentHeaderValue = getCpaasAgentHeaderValue;
 
-const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
-const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
 
-/***/ }),
-
-/***/ "../../packages/kandy/src/request/interface/actions.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.request = request;
-exports.response = response;
-
-var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-var nextRequestId = 0;
-function generateRequestId() {
-  return nextRequestId++;
-}
+var _constants = __webpack_require__("../../packages/kandy/src/constants.js");
 
 /**
- * Creates a request action.
- * @param {Object} options
- * @param {string} options.url The url for the request
- * @param {Object} [options.queryParams] Query parameters to be added to the url string
- * @param {string} [options.responseType] The data type assumed to be received in the response body
- * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
+ * Determine and return the current SDK platform and version string to be used
+ * with the x-Cpaas-Agent network request header field.
+ * @method getCpaasAgentHeaderValue
+ * @param  {string}  platform Which platform is currently being used.
+ * @param  {string}  url The url for the request being made.
+ * @return {string}  A string representation of the platform and version the SDK is using.
  */
-function request(options) {
-  return {
-    type: actionTypes.REQUEST,
-    payload: options,
-    meta: {
-      requestId: generateRequestId()
+function getCpaasAgentHeaderValue(platform, url) {
+  // Assume request is for CPaaS platform, by default.
+  let headerValue = `cpaas-js-sdk/${(0, _version.getVersion)()}`;
+
+  // Check if request is for callMe service, otherwise determine the apropriate platform.
+  // (callMe service uses Link platform for call requests)
+  if (url && url.includes('/anonymous/')) {
+    headerValue = `callme-js-sdk/${(0, _version.getVersion)()}`;
+  } else {
+    // Check the actual platform used
+    if (platform === _constants.platforms.UC) {
+      headerValue = `uc-js-sdk/${(0, _version.getVersion)()}`;
+    } else if (platform === _constants.platforms.LINK) {
+      headerValue = `link-js-sdk/${(0, _version.getVersion)()}`;
     }
-  };
+  }
+  return headerValue;
 }
 
-/**
- * Creates a response action.
- */
-function response(requestId, result, error = false) {
-  return {
-    type: actionTypes.RESPONSE,
-    payload: result,
-    error,
-    meta: {
-      requestId: requestId
-    }
-  };
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/src/request/interface/selectors.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.injectAgentVersionHeader = injectAgentVersionHeader;
-/**
- * Retrieves the flag which specifies wether or not this SDK should use a custom header as part of any requests being sent to server.
- * This custom header refers to the current agent version.
- * @param {Object} state  The current Redux state object.
- * @return {boolean} True if custom header should be used, false otherwise.
- */
-function injectAgentVersionHeader(state) {
-  return state.config.requests.injectAgentVersionHeader;
-}
+// Constants
 
 /***/ }),
 
@@ -50737,6 +50822,8 @@ const prefix = '@@KANDY/WEBRTC/';
  * Device action types.
  */
 const DEVICES_CHANGE = exports.DEVICES_CHANGE = prefix + 'DEVICES/CHANGE';
+const INITIALIZE_DEVICES = exports.INITIALIZE_DEVICES = prefix + 'INITIALIZE_DEVICES';
+const INITIALIZE_DEVICES_FINISH = exports.INITIALIZE_DEVICES_FINISH = prefix + 'INITIALIZE_DEVICES_FINISH';
 
 /**
  * Track action types.
@@ -50804,6 +50891,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.devicesChanged = devicesChanged;
+exports.initializeDevice = initializeDevice;
+exports.initializeDeviceFinish = initializeDeviceFinish;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/webrtc/interface/actionTypes.js");
 
@@ -50817,6 +50906,27 @@ function devicesChanged(devices) {
     payload: devices
   };
 } // Webrtc plugin.
+function initializeDevice(browserConstraints) {
+  return {
+    type: actionTypes.INITIALIZE_DEVICES,
+    payload: browserConstraints
+  };
+}
+
+/**
+ * The finishing action which follows the INITIALIZE_DEVICES action
+ * @param {Object} $0
+ * @param {Object} [$0.devices] The device object.
+ * @param {Object} [$0.error] An error object. Only present if an error occurred.
+ * @returns {Object} A flux standard action representing the INITIALIZE_DEVICES_FINISH action.
+ */
+function initializeDeviceFinish({ devices, error }) {
+  return {
+    payload: error || devices,
+    error: Boolean(error),
+    type: actionTypes.INITIALIZE_DEVICES_FINISH
+  };
+}
 
 /***/ }),
 
@@ -51299,6 +51409,63 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
+     * Requests permission to access media devices on the end-user's machine.
+     *
+     * This API will trigger the browser to ask the end-user for permission to
+     *    access their camera and/or microphone. These permissions are
+     *    needed for the SDK to read information about the devices (the label,
+     *    for example) and for using the devices for a call.
+     *
+     * If the browser does not yet have permission, it will prompt the end-user
+     *    with a small pop-up window, giving the user a chance to allow/deny the
+     *    permissions. The behaviour of this pop-up window differs slightly
+     *    based on the browser; it may automatically save the user's decision
+     *    (such as in Chrome and Safari) or it may require the user to choose
+     *    whether their decision should be saved (such as in Firefox).
+     *
+     * This API is not required for proper usage of media and/or calls, but
+     *    helps to prepare a user before a call is made or received. It allows
+     *    an application to prompt the user for device permissions when it is
+     *    convenient for them, rather than during call setup. If the user saves
+     *    their decision, they will not be prompted again when the SDK accesses
+     *    those devices for a call.
+     *
+     * For device information, the {@link media.getDevices} API will retrieve
+     *    the list of media devices available for the SDK to use. If this list
+     *    is empty, or is missing information, it is likely that the browser
+     *    does not have permission to access the device's information. We
+     *    recommend using the {@link media.initializeDevices} API in this
+     *    scenario if you would like to allow the end-user to select which
+     *    device(s) they would like to use when they make a call, rather than
+     *    using the system default.
+     *
+     * The SDK will emit a {@link media.event:devices:change devices:change}
+     *    event when the operation is successful or a
+     *    {@link media.event:devices:error devices:error} event if an error is
+     *    encountered.
+     * @public
+     * @static
+     * @memberof media
+     * @method initializeDevices
+     * @param {Object} [constraints]
+     * @param {boolean} [constraints.audio=true] Whether to ask for audio device permissions.
+     * @param {boolean} [constraints.video=true] Whether to ask for video device permissions.
+     * @example
+     * // The SDK will ask for both audio and video permissions by default.
+     * client.media.initializeDevices()
+     *
+     * // The SDK will only ask for audio permissions.
+     * client.media.initializeDevices({ audio: true, video: false })
+     */
+    initializeDevices(constraints) {
+      log.debug(_logs.API_LOG_TAG + 'media.initializeDevices: ', constraints);
+      const browserContraints = {
+        audio: constraints === undefined ? true : constraints.audio,
+        video: constraints === undefined ? true : constraints.video
+      };
+      dispatch(_actions.deviceActions.initializeDevice(browserContraints));
+    },
+    /**
      * Render Media Tracks in a container.
      *
      * The container is specified by providing a CSS selector string that
@@ -51410,6 +51577,7 @@ Object.defineProperty(exports, "__esModule", {
  *    {@link media.getDevices} API.
  *
  * @public
+ * @static
  * @memberof media
  * @event devices:change
  * @example
@@ -51420,6 +51588,23 @@ Object.defineProperty(exports, "__esModule", {
  * })
  */
 const DEVICES_CHANGED = exports.DEVICES_CHANGED = 'devices:change';
+
+/**
+ * An error occurred while trying to access media devices.
+ *
+ * The most common causes of this error are when the browser does not have
+ *    permission from the end-user to access the devices, or when the browser
+ *    cannot find a media device that fulfills the
+ *    {@link call.MediaConstraint MediaConstraint(s)} that was provided.
+ *
+ * @public
+ * @static
+ * @memberof media
+ * @event devices:error
+ * @param {Object} params
+ * @param {Error} params.error The Basic error object.
+ */
+const INITIALIZE_DEVICES_ERROR = exports.INITIALIZE_DEVICES_ERROR = 'devices:error';
 
 /**
  * The specified Tracks have been muted.
@@ -51523,6 +51708,19 @@ events[actionTypes.DEVICES_CHANGE] = action => {
   return {
     type: eventTypes.DEVICES_CHANGED
   };
+};
+
+events[actionTypes.INITIALIZE_DEVICES_FINISH] = action => {
+  if (action.error) {
+    return {
+      type: eventTypes.INITIALIZE_DEVICES_ERROR,
+      args: { error: action.payload }
+    };
+  } else {
+    return {
+      type: eventTypes.DEVICES_CHANGED
+    };
+  }
 };
 
 exports.default = events;
@@ -51719,6 +51917,13 @@ const reducers = {};
 
 // Libraries.
 reducers[actionTypes.DEVICES_CHANGE] = {
+  next(state, action) {
+    return action.payload;
+  }
+};
+
+// Replace with newly checked devices.
+reducers[actionTypes.INITIALIZE_DEVICES_FINISH] = {
   next(state, action) {
     return action.payload;
   }
@@ -52251,6 +52456,7 @@ exports.renderTracks = renderTracks;
 exports.removeTracks = removeTracks;
 exports.muteTracks = muteTracks;
 exports.unmuteTracks = unmuteTracks;
+exports.initializeDevices = initializeDevices;
 exports.updateLogLevelEntry = updateLogLevelEntry;
 exports.updateLogHandlerEntry = updateLogHandlerEntry;
 exports.initLogLevel = initLogLevel;
@@ -52320,6 +52526,15 @@ function* muteTracks(webRTC) {
  */
 function* unmuteTracks(webRTC) {
   yield (0, _effects.takeEvery)(actionTypes.UNMUTE_TRACKS, mediaSagas.unmuteTracks, webRTC);
+}
+
+/**
+ * Handle initialization of device(s).
+ * @method initializeDevices
+ * @param  {Object} webRTC The webRTC stack.
+ */
+function* initializeDevices(webRTC) {
+  yield (0, _effects.takeEvery)(actionTypes.INITIALIZE_DEVICES, mediaSagas.initializeDevices, webRTC);
 }
 
 /**
@@ -52423,6 +52638,7 @@ exports.renderTracks = renderTracks;
 exports.removeTracks = removeTracks;
 exports.muteTracks = muteTracks;
 exports.unmuteTracks = unmuteTracks;
+exports.initializeDevices = initializeDevices;
 
 var _actions = __webpack_require__("../../packages/kandy/src/webrtc/interface/actions/index.js");
 
@@ -52524,6 +52740,28 @@ function* unmuteTracks(webRTC, action) {
   log.info('Finished unmuting track(s).', tracks.map(track => track.id));
   // Report operation done.
   yield (0, _effects.put)(_actions.trackActions.unmuteTracksFinish(tracks.map(track => track.id)));
+}
+
+/* Initialize the media devices.
+ * @method initializeDevices
+ * @param  {Object} action
+ * @param  {Oject} action.payload The media constraints
+ */
+function* initializeDevices(webRTC, action) {
+  // Get the media devices available.
+  try {
+    const devices = yield (0, _effects.call)([webRTC.devices, 'setupDeviceInitialization'], action.payload);
+
+    if (devices.error) {
+      throw devices;
+    } else {
+      log.info('Successfully initialized devices.', devices);
+      yield (0, _effects.put)(_actions.deviceActions.initializeDeviceFinish({ devices }));
+    }
+  } catch (error) {
+    log.info(`Encountered error while initializing devices: ${error.message}.`);
+    yield (0, _effects.put)(_actions.deviceActions.initializeDeviceFinish({ error }));
+  }
 }
 
 /***/ }),
@@ -55478,6 +55716,25 @@ function DeviceManager() {
   }
 
   /**
+   * Ask for permission and gets the list of available device(s) available from the end-user's devices.
+   * @method setupDeviceInitialization
+   * @param browserContraints
+   * @return {Object}
+   */
+
+  function setupDeviceInitialization(browserContraints) {
+    return new _promise2.default((resolve, reject) => {
+      navigator.mediaDevices.getUserMedia(browserContraints).then(mediaStream => {
+        mediaStream.getTracks().forEach(track => {
+          track.stop();
+        });
+        const devices = checkDevices();
+        resolve(devices);
+      }).catch(reject);
+    });
+  }
+
+  /**
    * Retrieves the stored device lists.
    * @method get
    * @return {Object}
@@ -55507,6 +55764,7 @@ function DeviceManager() {
    */
   return {
     checkDevices,
+    setupDeviceInitialization,
     get,
     on,
     once,
