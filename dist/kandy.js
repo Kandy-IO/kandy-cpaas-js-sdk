@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.19.0-beta.512
+ * Version: 4.19.0-beta.513
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31914,7 +31914,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.19.0-beta.512';
+  return '4.19.0-beta.513';
 }
 
 /***/ }),
@@ -51461,8 +51461,8 @@ const TRACKS_UNMUTED = exports.TRACKS_UNMUTED = 'media:unmuted';
  *    for example.
  *
  * Handling this event is only required if you are using `unified-plan` as the
- *    `sdpSemantics` setting in the SDK's configuration. This setting will be
- *    the default as of SDK v4.19.0.
+ *    `sdpSemantics` setting in the SDK's configuration. This setting will become
+ *    the default in an upcoming release.
  * @public
  * @static
  * @memberof media
@@ -51483,8 +51483,8 @@ const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
  *    media source being muted had been undone.
  *
  * Handling this event is only required if you are using `unified-plan` as the
- *    `sdpSemantics` setting in the SDK's configuration. This setting will be
- *    the default as of SDK v4.19.0.
+ *    `sdpSemantics` setting in the SDK's configuration. This setting will become
+ *    the default in an upcoming release.
  * @public
  * @static
  * @memberof media
