@@ -5,6 +5,17 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.19.0 - 2020-08-28
+
+### Added
+
+- Added a new Logging tutorial. `KAA-2464`
+  - Explains how the SDK's logging system works and how an application can customize its behaviour.
+
+### Fixed
+
+- Fixed an issue where an empty directory search wasn't passing the servers error message in the `message` field. Now we pass whatever the server error response message was. `KAA-2030`
+
 ## 4.18.0 - 2020-07-31
 
 ### Important changes
