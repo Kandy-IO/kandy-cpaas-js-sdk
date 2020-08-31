@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.516
+ * Version: 4.20.0-beta.517
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31914,7 +31914,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.516';
+  return '4.20.0-beta.517';
 }
 
 /***/ }),
@@ -45246,13 +45246,11 @@ var _makeRequest2 = _interopRequireDefault(_makeRequest);
 
 var _utils = __webpack_require__("../../packages/kandy/src/request/utils/index.js");
 
-var _utils2 = _interopRequireDefault(_utils);
-
 var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
 
 var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
 
-var _utils3 = __webpack_require__("../../packages/kandy/src/common/utils.js");
+var _utils2 = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 
@@ -45274,7 +45272,7 @@ const pluginName = 'requests';
 
 // Libraries.
 function request(options = {}) {
-  options = (0, _utils3.mergeValues)(_configs.defaultOptions, options);
+  options = (0, _utils2.mergeValues)(_configs.defaultOptions, options);
   (0, _configs.parseOptions)(options);
 
   function* init() {
@@ -45322,10 +45320,10 @@ function* addVersionHeader(options) {
     const platform = yield (0, _effects.select)(_selectors2.getPlatform);
 
     // Assume request is for CPaaS platform, by default.
-    const headerValue = (0, _utils2.default)(platform, options.url);
+    const headerValue = (0, _utils.getCpaasAgentHeaderValue)(platform, options.url);
 
     // Note that the same headerName is used for all platforms & services.
-    options = (0, _utils3.mergeValues)(options, {
+    options = (0, _utils2.mergeValues)(options, {
       headers: {
         'X-Cpaas-Agent': headerValue
       }
