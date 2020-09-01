@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.517
+ * Version: 4.20.0-beta.518
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -24259,7 +24259,8 @@ reducers[actionTypes.PENDING_JOIN] = {
       wrtcsSessionId: action.payload.wrtcsSessionId,
       webrtcSessionId: action.payload.webrtcSessionId,
       isJoinedCall: true,
-      customParameters: action.payload.customParameters
+      customParameters: action.payload.customParameters,
+      bandwidth: action.payload.bandwidth
     };
 
     return (0, _fp.concat)(state.map(call => {
@@ -26057,6 +26058,8 @@ var _establish = __webpack_require__("../../packages/kandy/src/callstack/webrtc/
 
 var _midcall = __webpack_require__("../../packages/kandy/src/callstack/webrtc/midcall.js");
 
+var _bandwidth = __webpack_require__("../../packages/kandy/src/callstack/utils/bandwidth.js");
+
 var _actions = __webpack_require__("../../packages/kandy/src/call/interfaceNew/actions/index.js");
 
 var _selectors = __webpack_require__("../../packages/kandy/src/call/interfaceNew/selectors.js");
@@ -26083,6 +26086,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Helpers.
+/**
+ * "Midcall sagas" handle performing local mid-call operations.
+ *
+ * These sagas assume that there is an established session (webRTC and server-
+ *    side) to perform the operation on. Otherwise, it is considered an error.
+ */
+
+// Callstack plugin.
 const log = _logs.logManager.getLogger('CALL');
 
 /**
@@ -26106,14 +26117,6 @@ const log = _logs.logManager.getLogger('CALL');
 
 
 // Call plugin.
-/**
- * "Midcall sagas" handle performing local mid-call operations.
- *
- * These sagas assume that there is an established session (webRTC and server-
- *    side) to perform the operation on. Otherwise, it is considered an error.
- */
-
-// Callstack plugin.
 function* endCall(deps, action) {
   const { webRTC, requests } = deps;
   const { id } = action.payload;
@@ -27059,10 +27062,13 @@ function* join(deps, action) {
     return;
   }
 
+  // User the audio constraints from the current call and set video to false.
   const mediaConstraints = {
     video: false,
-    audio: true
-  };
+    audio: currentCall.mediaConstraints ? currentCall.mediaConstraints.audio || true : true
+
+    // Use the bandwidth constraints from the current call
+  };const bandwidth = (0, _bandwidth.checkBandwidthControls)(currentCall.bandwidth);
 
   const dscpControls = currentCall.dscpControls;
 
@@ -27074,7 +27080,8 @@ function* join(deps, action) {
     turnInfo,
     trickleIceMode,
     dscpControls,
-    removeBundling
+    removeBundling,
+    bandwidth
   });
 
   // Collect the information needed to make the request.
@@ -27135,7 +27142,9 @@ function* join(deps, action) {
     // The ids of the calls that were used for joining.
     usedCallIds: [currentCall.id, otherCall.id],
     // The custom parameters of the combined call
-    customParameters: currentCall.customParameters
+    customParameters: currentCall.customParameters,
+    // The bandwidth from the original call.
+    bandwidth
   }));
 }
 
@@ -31914,7 +31923,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.517';
+  return '4.20.0-beta.518';
 }
 
 /***/ }),
