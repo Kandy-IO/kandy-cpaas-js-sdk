@@ -11,6 +11,10 @@ Kandy.js change log.
 
 - Added a new media API `media.initializeDevices`to get the list of available media devices with permission from the users-end device. `KAA-2445`
 
+### Fixed
+
+- Fixed two related issues where null pointer errors were being thrown whenever messages or conversations were deleted. The notification handler now checks for events of type `SessionUpdated`. `KAA-2496` `KAA-1860`
+
 ## 4.19.0 - 2020-08-28
 
 ### Added

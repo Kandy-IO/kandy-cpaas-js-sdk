@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.519
+ * Version: 4.20.0-beta.520
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31923,7 +31923,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.519';
+  return '4.20.0-beta.520';
 }
 
 /***/ }),
@@ -35816,7 +35816,7 @@ function* receiveParticipantStatusNotification() {
  * @method receiveEventNotification
  */
 function* receiveEventNotification() {
-  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.chatEventNotification, groupSagas.handleEventNotification);
+  yield (0, _effects.takeEvery)(action => action.type === _actionTypes2.NOTIFICATION_RECEIVED && action.payload.chatEventNotification && action.payload.chatEventNotification.eventType === 'SessionUpdated', groupSagas.handleEventNotification);
 }
 
 /***/ }),

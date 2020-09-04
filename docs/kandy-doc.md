@@ -352,6 +352,20 @@ SIP users and PSTN phones.
 
 Call functions are all part of the 'call' namespace.
 
+### DSCPControls
+
+The DSCPControls type defines the format for configuring network priorities (DSCP marking) for the media traffic.
+
+If DSCPControls are not configured for a call the network priority of the traffic for all media kinds will be the default (i.e., "low").
+
+Type: [Object][7]
+
+**Properties**
+
+-   `audioNetworkPriority` **RTCPriorityType?** The desired network priority for audio traffic (see [RTCPriorityType Enum][21] for the list of possible values).
+-   `videoNetworkPriority` **RTCPriorityType?** The desired network priority for video traffic (see [RTCPriorityType Enum][21] for the list of possible values).
+-   `screenNetworkPriority` **RTCPriorityType?** The desired network priority for screen share traffic (see [RTCPriorityType Enum][21] for the list of possible values).
+
 ### DevicesObject
 
 A collection of media devices and their information.
@@ -360,22 +374,9 @@ Type: [Object][7]
 
 **Properties**
 
--   `camera` **[Array][13]&lt;[call.DeviceInfo][21]>** A list of camera device information.
--   `microphone` **[Array][13]&lt;[call.DeviceInfo][21]>** A list of microphone device information.
--   `speaker` **[Array][13]&lt;[call.DeviceInfo][21]>** A list of speaker device information.
-
-### DeviceInfo
-
-Contains information about a device.
-
-Type: [Object][7]
-
-**Properties**
-
--   `deviceId` **[string][8]** The ID of the device.
--   `groupId` **[string][8]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
--   `kind` **[string][8]** The type of the device (audioinput, audiooutput, videoinput).
--   `label` **[string][8]** The name of the device.
+-   `camera` **[Array][13]&lt;[call.DeviceInfo][22]>** A list of camera device information.
+-   `microphone` **[Array][13]&lt;[call.DeviceInfo][22]>** A list of microphone device information.
+-   `speaker` **[Array][13]&lt;[call.DeviceInfo][22]>** A list of speaker device information.
 
 ### TrackObject
 
@@ -410,7 +411,7 @@ Type: [Object][7]
 
 -   `id` **[string][8]** The ID of the Media object.
 -   `local` **[boolean][11]** Indicator on whether this media is local or remote.
--   `tracks` **[Array][13]&lt;[call.TrackObject][22]>** A list of Track objects that are contained in this Media object.
+-   `tracks` **[Array][13]&lt;[call.TrackObject][23]>** A list of Track objects that are contained in this Media object.
 
 ### SdpHandlerFunction
 
@@ -421,7 +422,7 @@ Type: [Function][15]
 **Parameters**
 
 -   `newSdp` **[Object][7]** The SDP so far (could have been modified by previous handlers).
--   `info` **[call.SdpHandlerInfo][23]** Additional information that might be useful when making SDP modifications.
+-   `info` **[call.SdpHandlerInfo][24]** Additional information that might be useful when making SDP modifications.
 -   `originalSdp` **[Object][7]** The SDP in its initial state.
 
 Returns **[Object][7]** The resulting modified SDP based on the changes made by this function.
@@ -445,22 +446,8 @@ Type: [Object][7]
 
 **Properties**
 
--   `urls` **([Array][13]&lt;[string][8]> | [string][8])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See [RTCIceServers.urls documentation][24] to learn more about the actual url format.
+-   `urls` **([Array][13]&lt;[string][8]> | [string][8])** Either an array of URLs for reaching out several ICE servers or a single URL for reaching one ICE server. See [RTCIceServers.urls documentation][25] to learn more about the actual url format.
 -   `credential` **[string][8]?** The credential needed by the ICE server.
-
-### DSCPControls
-
-The DSCPControls type defines the format for configuring network priorities (DSCP marking) for the media traffic.
-
-If DSCPControls are not configured for a call the network priority of the traffic for all media kinds will be the default (i.e., "low").
-
-Type: [Object][7]
-
-**Properties**
-
--   `audioNetworkPriority` **RTCPriorityType?** The desired network priority for audio traffic (see [RTCPriorityType Enum][25] for the list of possible values).
--   `videoNetworkPriority` **RTCPriorityType?** The desired network priority for video traffic (see [RTCPriorityType Enum][25] for the list of possible values).
--   `screenNetworkPriority` **RTCPriorityType?** The desired network priority for screen share traffic (see [RTCPriorityType Enum][25] for the list of possible values).
 
 ### BandwidthControls
 
@@ -547,6 +534,19 @@ Type: [Object][7]
 -   `bandwidth` **[call.BandwidthControls][30]** The bandwidth limitations set for the call.
 -   `startTime` **[number][12]** The start time of the call in milliseconds since the epoch.
 -   `endTime` **[number][12]?** The end time of the call in milliseconds since the epoch.
+
+### DeviceInfo
+
+Contains information about a device.
+
+Type: [Object][7]
+
+**Properties**
+
+-   `deviceId` **[string][8]** The ID of the device.
+-   `groupId` **[string][8]** The group ID of the device. Devices that share a `groupId` belong to the same physical device.
+-   `kind` **[string][8]** The type of the device (audioinput, audiooutput, videoinput).
+-   `label` **[string][8]** The name of the device.
 
 ### make
 
@@ -1139,6 +1139,18 @@ client.media.renderTrack([ audioTrack ], audioContainer, {
 })
 ```
 
+### setDefaultDevices
+
+The `setDefaultDevices` API from previous SDK releases (3.X) has been
+   deprecated in the latest releases (4.X+). The SDK no longer keeps
+   track of "default devices" on behalf of the application.
+
+The devices used for a call can be selected as part of the APIs for
+   starting the call. Microphone and/or camera can be chosen in the
+   [call.make][54] and [call.answer][55] APIs, and speaker can be
+   chosen when the audio track is rendered with the
+   [media.renderTracks][53] API.
+
 ### states
 
 Possible states that a Call can be in.
@@ -1151,7 +1163,7 @@ A Call's state describes the current status of the Call. An application
    whether the Call currently has media flowing between users.
 Unless stated otherwise, the Call's state pertains to both caller & callee.
 
-The Call's state is a property of the [CallObject][54],
+The Call's state is a property of the [CallObject][56],
    which can be retrieved using the [call.getById][27] or
    [call.getAll][26] APIs.
 
@@ -1184,18 +1196,6 @@ client.on('call:stateChange', function (params) {
    }
 })
 ```
-
-### setDefaultDevices
-
-The `setDefaultDevices` API from previous SDK releases (3.X) has been
-   deprecated in the latest releases (4.X+). The SDK no longer keeps
-   track of "default devices" on behalf of the application.
-
-The devices used for a call can be selected as part of the APIs for
-   starting the call. Microphone and/or camera can be chosen in the
-   [call.make][55] and [call.answer][56] APIs, and speaker can be
-   chosen when the audio track is rendered with the
-   [media.renderTracks][53] API.
 
 ### changeInputDevices
 
@@ -1550,6 +1550,19 @@ If successful, the event [isTypingList:change][73] will be emitted.
 
 -   `isTyping` **[boolean][11]** Whether the user is typing or not
 
+### Part
+
+A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
+
+Type: [Object][7]
+
+**Properties**
+
+-   `type` **[string][8]** The payload type. Can be `text`, `json`, or `file`.
+-   `text` **[string][8]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
+-   `json` **[Object][7]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
+-   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
+
 ### Message
 
 A Message object is a means by which a sender can deliver information to a recipient.
@@ -1601,19 +1614,6 @@ Add an additional `Part` to a message.
 #### createImageLinks
 
 Creates a usable image link for the message in this `Message` instance.
-
-### Part
-
-A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.
-
-Type: [Object][7]
-
-**Properties**
-
--   `type` **[string][8]** The payload type. Can be `text`, `json`, or `file`.
--   `text` **[string][8]** The text of the message. Messages with file or json attachments are still required to have text associated to it.
--   `json` **[Object][7]?** The object corresponding to a json object to attach to a message. A `Part` cannot have both json and a file.
--   `file` **File?** The file to attach to a message. A `Part` cannot have both json and a file.
 
 ## groups
 
@@ -1960,7 +1960,7 @@ Retrieve an available Track object with a specific Track ID.
 
 -   `trackId` **[string][8]** The ID of the Track to retrieve.
 
-Returns **[call.TrackObject][22]** A Track object.
+Returns **[call.TrackObject][23]** A Track object.
 
 ### initializeDevices
 
@@ -2269,18 +2269,6 @@ const client = create({
 client.call.setSdpHandlers([ codecRemover, <Your-SDP-Handler-Function>, ...])
 ```
 
-### CodecSelector
-
-An object that represents a selector to match codecs of an RTP map in SDP.
-
-Type: [Object][7]
-
-**Properties**
-
--   `name` **[string][8]** The name of the codec.
--   `fmtpParams` **[Array][13]&lt;[string][8]>** An array of strings to match against the "a=fmtp" format parameters for the corresponding codec.
-                                         All of the elements in the array must be contained in the "a=fmtp" attribute in order to be a match.
-
 ### createCodecRemover
 
 This function creates an SDP handler that will remove codecs matching the selectors specified for SDP offers and answers.
@@ -2324,6 +2312,18 @@ const client = create({
 ```
 
 Returns **[call.SdpHandlerFunction][16]** The resulting SDP handler that will remove the codec.
+
+### CodecSelector
+
+An object that represents a selector to match codecs of an RTP map in SDP.
+
+Type: [Object][7]
+
+**Properties**
+
+-   `name` **[string][8]** The name of the codec.
+-   `fmtpParams` **[Array][13]&lt;[string][8]>** An array of strings to match against the "a=fmtp" format parameters for the corresponding codec.
+                                         All of the elements in the array must be contained in the "a=fmtp" attribute in order to be a match.
 
 ## services
 
@@ -2617,15 +2617,15 @@ Type: [string][8]
 
 [20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
 
-[21]: #calldeviceinfo
+[21]: https://www.w3.org/TR/webrtc-priority/#rtc-priority-type
 
-[22]: #calltrackobject
+[22]: #calldeviceinfo
 
-[23]: #callsdphandlerinfo
+[23]: #calltrackobject
 
-[24]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
+[24]: #callsdphandlerinfo
 
-[25]: https://www.w3.org/TR/webrtc-priority/#rtc-priority-type
+[25]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
 
 [26]: #callgetall
 
@@ -2683,11 +2683,11 @@ Type: [string][8]
 
 [53]: #mediarendertracks
 
-[54]: #callcallobject
+[54]: #callmake
 
-[55]: #callmake
+[55]: #callanswer
 
-[56]: #callanswer
+[56]: #callcallobject
 
 [57]: #callreplacetrack
 
