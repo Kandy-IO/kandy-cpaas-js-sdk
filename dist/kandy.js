@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.521
+ * Version: 4.20.0-beta.522
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31923,7 +31923,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.521';
+  return '4.20.0-beta.522';
 }
 
 /***/ }),
@@ -34074,15 +34074,22 @@ var _eventEmitter = __webpack_require__("../../packages/kandy/src/events/eventEm
 
 var _eventEmitter2 = _interopRequireDefault(_eventEmitter);
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = _logs.logManager.getLogger('EVENTS');
 
 /**
  * Event Emitter Implementation.
  * Factory function to create the Event Emitter Implementation.
  * Defines the functionality exposed by an Event Emitter Interface.
  */
+
+
+// Logs
 // Events plugin.
 function eventsImplementation() {
   return {
@@ -34125,6 +34132,7 @@ function middleware(context) {
         emitter.alias(action.payload.eventType, action.payload.alias);
         break;
       case actionTypes.EVENTS_EMIT:
+        log.info(`Emitting event: ${action.payload.eventType}`, action.payload.args[0]);
         emitter.emit(action.payload.eventType, ...action.payload.args);
         break;
       case actionTypes.MAP_EVENTS:
