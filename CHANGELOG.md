@@ -10,6 +10,10 @@ Kandy.js change log.
 ### Added
 
 - Added a new media API `media.initializeDevices`to get the list of available media devices with permission from the users-end device. `KAA-2445`
+- Improved debugging logs for network operations. `KAA-2503`
+  - Added new debug level logs for REST request and response information.
+  - Added new debug level logs for messages sent and received on the websocket.
+  - Added new section to the Logging tutorial to better describe the log levels.
 
 ### Fixed
 

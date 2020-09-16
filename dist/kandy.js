@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.528
+ * Version: 4.20.0-beta.529
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31950,7 +31950,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.528';
+  return '4.20.0-beta.529';
 }
 
 /***/ }),
@@ -32379,9 +32379,9 @@ var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/s
 
 var _selectors3 = __webpack_require__("../../packages/kandy/src/subscription/interface/selectors.js");
 
-var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
-
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 
 var _constants = __webpack_require__("../../packages/kandy/src/constants.js");
 
@@ -32390,12 +32390,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Get the logger
-const log = _logs.logManager.getLogger('CONNECTIVITY');
-
-// Constants
 
 
 // Libraries.
+const log = _logs.logManager.getLogger('CONNECTIVITY');
+
+// Constants
 
 
 // Other plugins.
@@ -32693,6 +32693,7 @@ function* clientPingFlow(ws) {
 function _sendWSMessage(ws, message) {
   try {
     if (ws && ws.readyState === 1) {
+      log.debug('Sending message on websocket.', message);
       ws.send(message);
     } else {
       throw new Error('websocket was not in readyState');
@@ -32796,9 +32797,13 @@ var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _actions2 = __webpack_require__("../../packages/kandy/src/notifications/interface/actions.js");
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Other plugins.
 const INITIAL_BUFFER_SIZE = 50;
+const log = _logs.logManager.getLogger('CONNECTIVITY');
 
 /**
  * Create a new websocket.
@@ -32873,6 +32878,7 @@ function createWsChannel(ws, platform) {
       ws.kandy.lastContact = Date.now();
 
       var data = JSON.parse(message.data);
+      log.debug('Received message on websocket.', data);
       if (data.connCheck) {
         // Handle CPaaS server pings
         emit((0, _actions.receiveServerPing)(data, platform));
@@ -37711,11 +37717,25 @@ function api({ dispatch, getState }) {
      * @static
      * @memberof logger
      * @method levels
-     * @property {string} SILENT Log nothing.
-     * @property {string} ERROR Log only unhandled errors.
-     * @property {string} WARN Log issues that may cause problems or unexpected behaviour.
-     * @property {string} INFO Log useful information and messages to indicate the SDK's internal operations.
-     * @property {string} DEBUG Log information to help diagnose problematic behaviour.
+     * @property {string} SILENT Nothing will be logged.
+     * @property {string} ERROR Unhandled error information will be logged. If
+     *    the SDK encounters an issue it cannot resolve, the error will be included
+     *    in the logs. This likely points to an issue with the SDK itself or an
+     *    issue with how the SDK is being used.
+     * @property {string} WARN Warning messages for the application developer will
+     *    be logged. If the SDK encounters an issue that it can recover and continue,
+     *    a warning about the issue will be included in the logs. These logs point
+     *    to issues that need to be handled by the application. For example, providing
+     *    an invalid configuration to the SDK will cause a warning log that explains
+     *    the issue.
+     * @property {string} INFO General information about the SDK's operations will
+     *    be logged, outlining how the SDK is handling the operations. Reading through
+     *    these logs should provide a high-level view of what the SDK is doing,
+     *    and why it is doing it.
+     * @property {string} DEBUG Detailed information about the SDK's operations,
+     *    meant for debugging issues, will be logged. Specific information and relevant
+     *    operation data are provided for understanding the scenario that the SDK
+     *    was in during the operation.
      */
     levels: {
       SILENT: 'silent',
@@ -45294,27 +45314,32 @@ var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/s
 
 var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
 
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
 var _utils2 = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// Utils.
+// Libraries.
 
 
 // Other plugins.
 // Request plugin.
 const pluginName = 'requests';
 
+// Utils.
+
+const log = _logs.logManager.getLogger('REQUESTS');
+
 /*
  * HTTP request plugin.
  */
-
-
-// Libraries.
 function request(options = {}) {
   options = (0, _utils2.mergeValues)(_configs.defaultOptions, options);
   (0, _configs.parseOptions)(options);
@@ -45346,8 +45371,21 @@ function* watchRequests() {
 function* handleRequest(action) {
   const options = yield (0, _effects.call)(addVersionHeader, action.payload);
 
+  const logOptions = (0, _fp.cloneDeep)(options);
+  // When logging the Auth header, cut it off so that we can see the type of
+  //    token but not the token itself. Depending on the type, it can contain
+  //    a password.
+  const authHeader = logOptions.headers.Authorization;
+  if (authHeader) {
+    logOptions.headers.Authorization = authHeader.substring(0, 6) + '...';
+  }
+  log.debug(`Making REST request ${action.meta.requestId}.`, logOptions);
+
   // Make the request based on the action
   var result = yield (0, _effects.call)(_makeRequest2.default, options, action.meta.requestId);
+
+  log.debug(`Received REST response ${action.meta.requestId}.`, result);
+
   yield (0, _effects.put)(actions.response(action.meta.requestId, result, !!result.error));
 }
 
@@ -47768,7 +47806,9 @@ function getSubscriptionExpiry(state) {
   // authentication config first because if no value is provided in the subscription
   // plugin, a default value will be used and we don't want that if one is provided in
   // the authentication plugin.
-  return (0, _fp.cloneDeep)(authConfig.subscription.expires || subConfig.expires);
+  const expires = authConfig.subscription && authConfig.subscription.expires ? authConfig.subscription.expires : subConfig.expires;
+
+  return expires;
 }
 
 /**
