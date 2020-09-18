@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.533
+ * Version: 4.20.0-beta.534
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31950,7 +31950,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.533';
+  return '4.20.0-beta.534';
 }
 
 /***/ }),
@@ -33621,6 +33621,15 @@ const connCheckMethods = exports.connCheckMethods = {
  * @typedef {string} UserID
  * @memberof call
  * @requires cpaas_user_id
+ */
+
+/**
+ * The ID of a User (e.g. joe@test.3s5j.att.com)
+ * @public
+ * @static
+ * @typedef {string} UserID
+ * @memberof user
+ * @requires link_user_id
  */
 
 /**
