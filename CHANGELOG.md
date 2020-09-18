@@ -19,6 +19,8 @@ Kandy.js change log.
 
 - Fixed two related issues where null pointer errors were being thrown whenever messages or conversations were deleted. The notification handler now checks for events of type `SessionUpdated`. `KAA-2496` `KAA-1860`
 
+- Fixed documentation for `renderTracks` function to correctly use `track.trackId` instead of the incorrect `track.id`. `KAA-2502`
+
 ### Changed
 
 - Updated tutorial codepens to be more robust around authentication and subscription operations. `KAA-2491`

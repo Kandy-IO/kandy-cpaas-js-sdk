@@ -166,6 +166,12 @@
                           <li class='h5'><span>Types</span></li>
                           
                             <li><a
+                              href='#calldscpcontrols'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> DSCPControls
+                            </a></li>
+                          
+                            <li><a
                               href='#callcallobject'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> CallObject
@@ -202,15 +208,15 @@
                             </a></li>
                           
                             <li><a
-                              href='#calliceserver'
+                              href='#callsdphandlerinfo'
                               class='regular pre-open'>
-                              <span style="color:blue">ⓣ</span> IceServer
+                              <span style="color:blue">ⓣ</span> SdpHandlerInfo
                             </a></li>
                           
                             <li><a
-                              href='#calldscpcontrols'
+                              href='#calliceserver'
                               class='regular pre-open'>
-                              <span style="color:blue">ⓣ</span> DSCPControls
+                              <span style="color:blue">ⓣ</span> IceServer
                             </a></li>
                           
                             <li><a
@@ -226,21 +232,15 @@
                             </a></li>
                           
                             <li><a
-                              href='#callsdphandlerinfo'
+                              href='#calluserid'
                               class='regular pre-open'>
-                              <span style="color:blue">ⓣ</span> SdpHandlerInfo
+                              <span style="color:blue">ⓣ</span> UserID
                             </a></li>
                           
                             <li><a
                               href='#callphonenumber'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> PhoneNumber
-                            </a></li>
-                          
-                            <li><a
-                              href='#calluserid'
-                              class='regular pre-open'>
-                              <span style="color:blue">ⓣ</span> UserID
                             </a></li>
                           
                           </ul>
@@ -333,15 +333,15 @@
                             </a></li>
                           
                             <li><a
-                              href='#callstartscreenshare'
-                              class='regular pre-open'>
-                              <span style="color:green">ⓕ</span> .startScreenshare
-                            </a></li>
-                          
-                            <li><a
                               href='#callsenddtmf'
                               class='regular pre-open'>
                               <span style="color:green">ⓕ</span> .sendDTMF
+                            </a></li>
+                          
+                            <li><a
+                              href='#callstartscreenshare'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .startScreenshare
                             </a></li>
                           
                             <li><a
@@ -381,15 +381,15 @@
                             </a></li>
                           
                             <li><a
-                              href='#callchangeinputdevices'
-                              class='regular pre-open'>
-                              <span style="color:green">ⓕ</span> .changeInputDevices
-                            </a></li>
-                          
-                            <li><a
                               href='#callchangespeaker'
                               class='regular pre-open'>
                               <span style="color:green">ⓕ</span> .changeSpeaker
+                            </a></li>
+                          
+                            <li><a
+                              href='#callchangeinputdevices'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .changeInputDevices
                             </a></li>
                           
                           </ul>
@@ -591,6 +591,12 @@
                             </a></li>
                           
                             <li><a
+                              href='#conversationpart'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> Part
+                            </a></li>
+                          
+                            <li><a
                               href='#conversationconversation'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> Conversation
@@ -600,12 +606,6 @@
                               href='#conversationmessage'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> Message
-                            </a></li>
-                          
-                            <li><a
-                              href='#conversationpart'
-                              class='regular pre-open'>
-                              <span style="color:blue">ⓣ</span> Part
                             </a></li>
                           
                           </ul>
@@ -3362,6 +3362,114 @@ SIP users and PSTN phones.</p>
       <div class='py1 quiet mt1 prose-big'>Types</div>
       <div class="clearfix">
   
+    <div class='border-bottom' id='calldscpcontrols'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>DSCPControls</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The DSCPControls type defines the format for configuring network priorities (DSCP marking) for the media traffic.</p>
+<p>If DSCPControls are not configured for a call the network priority of the traffic for all media kinds will be the default (i.e., "low").</p>
+
+
+  <div class='pre p1 fill-light mt0'>DSCPControls</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>audioNetworkPriority</span> 
+          <code class='quiet'>
+            (RTCPriorityType?)
+          </code>
+
+          
+
+          
+             : The desired network priority for audio traffic (see 
+<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
+ for the list of possible values).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>videoNetworkPriority</span> 
+          <code class='quiet'>
+            (RTCPriorityType?)
+          </code>
+
+          
+
+          
+             : The desired network priority for video traffic (see 
+<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
+ for the list of possible values).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>screenNetworkPriority</span> 
+          <code class='quiet'>
+            (RTCPriorityType?)
+          </code>
+
+          
+
+          
+             : The desired network priority for screen share traffic (see 
+<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
+ for the list of possible values).
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='callcallobject'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4239,6 +4347,123 @@ Media is a collection of Track objects.</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='callsdphandlerinfo'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>SdpHandlerInfo</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>callId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The id corresponding to the call for which the handler is being run.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (RTCSdpType)
+          </code>
+
+          
+
+          
+             : The session description's type.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>step</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The step that will occur after the SDP Handlers are run.
+Will be either 'set' (the SDP will be set locally) or 'send' (the SDP will
+be sent to the remote endpoint).
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>endpoint</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : Which end of the connection created the SDP.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='calliceserver'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4302,114 +4527,6 @@ Media is a collection of Track objects.</p>
 
           
              : The credential needed by the ICE server.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='calldscpcontrols'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>DSCPControls</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>The DSCPControls type defines the format for configuring network priorities (DSCP marking) for the media traffic.</p>
-<p>If DSCPControls are not configured for a call the network priority of the traffic for all media kinds will be the default (i.e., "low").</p>
-
-
-  <div class='pre p1 fill-light mt0'>DSCPControls</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>audioNetworkPriority</span> 
-          <code class='quiet'>
-            (RTCPriorityType?)
-          </code>
-
-          
-
-          
-             : The desired network priority for audio traffic (see 
-<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
- for the list of possible values).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>videoNetworkPriority</span> 
-          <code class='quiet'>
-            (RTCPriorityType?)
-          </code>
-
-          
-
-          
-             : The desired network priority for video traffic (see 
-<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
- for the list of possible values).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>screenNetworkPriority</span> 
-          <code class='quiet'>
-            (RTCPriorityType?)
-          </code>
-
-          
-
-          
-             : The desired network priority for screen share traffic (see 
-<a href="https://www.w3.org/TR/webrtc-priority/#rtc-priority-type">RTCPriorityType Enum</a>
- for the list of possible values).
 
           
           
@@ -4656,11 +4773,11 @@ client.call.make(destination, {
       </div>
     </div>
   
-    <div class='border-bottom' id='callsdphandlerinfo'>
+    <div class='border-bottom' id='calluserid'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>SdpHandlerInfo</span>
+            <span class='code strong strong truncate'>UserID</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4668,127 +4785,10 @@ client.call.make(destination, {
 
   
 
-  
-
-  <div class='pre p1 fill-light mt0'>SdpHandlerInfo</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>callId</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The id corresponding to the call for which the handler is being run.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (RTCSdpType)
-          </code>
-
-          
-
-          
-             : The session description's type.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>step</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The step that will occur after the SDP Handlers are run.
-Will be either 'set' (the SDP will be set locally) or 'send' (the SDP will
-be sent to the remote endpoint).
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>endpoint</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : Which end of the connection created the SDP.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='callphonenumber'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>PhoneNumber</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>The Phone Numer ie: +18885559876</p>
+  <p>The User ID ie: joe@test.3s5j.att.com</p>
 
 
-  <div class='pre p1 fill-light mt0'>PhoneNumber</div>
+  <div class='pre p1 fill-light mt0'>UserID</div>
   
     <p>
       Type:
@@ -4824,11 +4824,11 @@ be sent to the remote endpoint).
       </div>
     </div>
   
-    <div class='border-bottom' id='calluserid'>
+    <div class='border-bottom' id='callphonenumber'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>UserID</span>
+            <span class='code strong strong truncate'>PhoneNumber</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4836,10 +4836,10 @@ be sent to the remote endpoint).
 
   
 
-  <p>The User ID ie: joe@test.3s5j.att.com</p>
+  <p>The Phone Numer ie: +18885559876</p>
 
 
-  <div class='pre p1 fill-light mt0'>UserID</div>
+  <div class='pre p1 fill-light mt0'>PhoneNumber</div>
   
     <p>
       Type:
@@ -6655,78 +6655,6 @@ client.call.removeMedia(callId, [ screenTrack ])</pre>
       </div>
     </div>
   
-    <div class='border-bottom' id='callstartscreenshare'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>startScreenshare()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Adds local screenshare to an ongoing Call, to start sending to the remote
-participant.</p>
-<p>The latest SDK release (v4.X+) has not yet implemented this API in the
-same way that it was available in previous releases (v3.X). In place
-of this API, the SDK has a more general API that can be used for this
-same behaviour.</p>
-<p>The <a href="#calladdmedia">call.addMedia</a> API can be used to perform the same behaviour
-as <code>startScreenshare</code>. <a href="#calladdmedia">call.addMedia</a> is a general-purpose API
-for adding media to a call, which covers the same functionality as
-<code>startScreenshare</code>. Selecting only screen options when using
-<a href="#calladdmedia">call.addMedia</a> will perform the same behaviour as using
-<code>startScreenshare</code>.</p>
-
-
-  <div class='pre p1 fill-light mt0'>startScreenshare()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Select media options for adding only screenshare.</span>
-<span class="hljs-keyword">const</span> media = {
-   <span class="hljs-attr">audio</span>: <span class="hljs-literal">false</span>,
-   <span class="hljs-attr">video</span>: <span class="hljs-literal">false</span>,
-   <span class="hljs-attr">screen</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">screenOptions</span>: { ... }
-}
-
-<span class="hljs-comment">// Add the selected media to the call.</span>
-client.call.addMedia(callId, media)</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='callsenddtmf'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -6815,6 +6743,78 @@ otherwise they will be added in-band to the call's audio.</p>
 
   
 
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callstartscreenshare'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>startScreenshare()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Adds local screenshare to an ongoing Call, to start sending to the remote
+participant.</p>
+<p>The latest SDK release (v4.X+) has not yet implemented this API in the
+same way that it was available in previous releases (v3.X). In place
+of this API, the SDK has a more general API that can be used for this
+same behaviour.</p>
+<p>The <a href="#calladdmedia">call.addMedia</a> API can be used to perform the same behaviour
+as <code>startScreenshare</code>. <a href="#calladdmedia">call.addMedia</a> is a general-purpose API
+for adding media to a call, which covers the same functionality as
+<code>startScreenshare</code>. Selecting only screen options when using
+<a href="#calladdmedia">call.addMedia</a> will perform the same behaviour as using
+<code>startScreenshare</code>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>startScreenshare()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Select media options for adding only screenshare.</span>
+<span class="hljs-keyword">const</span> media = {
+   <span class="hljs-attr">audio</span>: <span class="hljs-literal">false</span>,
+   <span class="hljs-attr">video</span>: <span class="hljs-literal">false</span>,
+   <span class="hljs-attr">screen</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">screenOptions</span>: { ... }
+}
+
+<span class="hljs-comment">// Add the selected media to the call.</span>
+client.call.addMedia(callId, media)</pre>
+    
   
 
   
@@ -7515,83 +7515,6 @@ chosen when the audio track is rendered with the
       </div>
     </div>
   
-    <div class='border-bottom' id='callchangeinputdevices'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>changeInputDevices()</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Changes the camera and/or microphone used for a Call's media input.</p>
-<p>The latest SDK release (v4.X+) has not yet implemented this API in the
-same way that it was available in previous releases (v3.X). In place
-of this API, the SDK has a more general API that can be used for this
-same behaviour.</p>
-<p>The same behaviour as the <code>changeInputDevices</code> API can be implemented
-using the general-purpose <a href="#callreplacetrack">call.replaceTrack</a> API. This API can
-be used to replace an existing media track with a new track of the
-same type, allowing an application to change certain aspects of the
-media, such as input device.</p>
-
-
-  <div class='pre p1 fill-light mt0'>changeInputDevices()</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
-<span class="hljs-comment">// Get the ID of the Call's video track.</span>
-<span class="hljs-keyword">const</span> videoTrack = call.localTracks.find(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
-   <span class="hljs-keyword">const</span> track = client.media.getTrackById(trackId)
-   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'video'</span>
-})
-
-<span class="hljs-comment">// Select the new video options.</span>
-<span class="hljs-keyword">const</span> media = {
-   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
-   <span class="hljs-attr">videoOptions</span>: {
-       <span class="hljs-attr">deviceId</span>: <span class="hljs-string">'cameraId'</span>
-   }
-}
-
-<span class="hljs-comment">// Change the call's camera by replacing the video track.</span>
-client.call.replaceTrack(callId, videoTrack, media)</pre>
-    
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='border-bottom' id='callchangespeaker'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -7656,6 +7579,83 @@ client.media.removeTrack([ audioTrack ], audioContainer)
 client.media.renderTrack([ audioTrack ], audioContainer, {
    <span class="hljs-attr">speakerId</span>: <span class="hljs-string">'speakerId'</span>
 })</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callchangeinputdevices'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>changeInputDevices()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Changes the camera and/or microphone used for a Call's media input.</p>
+<p>The latest SDK release (v4.X+) has not yet implemented this API in the
+same way that it was available in previous releases (v3.X). In place
+of this API, the SDK has a more general API that can be used for this
+same behaviour.</p>
+<p>The same behaviour as the <code>changeInputDevices</code> API can be implemented
+using the general-purpose <a href="#callreplacetrack">call.replaceTrack</a> API. This API can
+be used to replace an existing media track with a new track of the
+same type, allowing an application to change certain aspects of the
+media, such as input device.</p>
+
+
+  <div class='pre p1 fill-light mt0'>changeInputDevices()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> call = client.call.getById(callId)
+<span class="hljs-comment">// Get the ID of the Call's video track.</span>
+<span class="hljs-keyword">const</span> videoTrack = call.localTracks.find(<span class="hljs-function"><span class="hljs-params">trackId</span> =&gt;</span> {
+   <span class="hljs-keyword">const</span> track = client.media.getTrackById(trackId)
+   <span class="hljs-keyword">return</span> track.kind === <span class="hljs-string">'video'</span>
+})
+
+<span class="hljs-comment">// Select the new video options.</span>
+<span class="hljs-keyword">const</span> media = {
+   <span class="hljs-attr">video</span>: <span class="hljs-literal">true</span>,
+   <span class="hljs-attr">videoOptions</span>: {
+       <span class="hljs-attr">deviceId</span>: <span class="hljs-string">'cameraId'</span>
+   }
+}
+
+<span class="hljs-comment">// Change the call's camera by replacing the video track.</span>
+client.call.replaceTrack(callId, videoTrack, media)</pre>
     
   
 
@@ -10391,6 +10391,132 @@ client.conversation.fetch({<span class="hljs-attr">type</span>: client.conversat
       </div>
     </div>
   
+    <div class='border-bottom' id='conversationpart'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Part</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
+
+
+  <div class='pre p1 fill-light mt0'>Part</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The payload type. Can be 
+<code>text</code>
+, 
+<code>json</code>
+, or 
+<code>file</code>
+.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>text</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>json</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
+          </code>
+
+          
+
+          
+             : The object corresponding to a json object to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>file</span> 
+          <code class='quiet'>
+            (File?)
+          </code>
+
+          
+
+          
+             : The file to attach to a message. A 
+<code>Part</code>
+ cannot have both json and a file.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='conversationconversation'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -11488,132 +11614,6 @@ This property applies only to message objects stored in sender's state.
 </div>
 
     
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='conversationpart'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>Part</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>A Part is a custom object representing a section of the payload of a message. Messages can have one or many Parts.</p>
-
-
-  <div class='pre p1 fill-light mt0'>Part</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>type</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The payload type. Can be 
-<code>text</code>
-, 
-<code>json</code>
-, or 
-<code>file</code>
-.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>text</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
-          </code>
-
-          
-
-          
-             : The text of the message. Messages with file or json attachments are still required to have text associated to it.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>json</span> 
-          <code class='quiet'>
-            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)
-          </code>
-
-          
-
-          
-             : The object corresponding to a json object to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>file</span> 
-          <code class='quiet'>
-            (File?)
-          </code>
-
-          
-
-          
-             : The file to attach to a message. A 
-<code>Part</code>
- cannot have both json and a file.
-
-          
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
   
 
   
@@ -15004,7 +15004,7 @@ client.on(<span class="hljs-string">'call:newTrack'</span>, <span class="hljs-fu
    <span class="hljs-keyword">const</span> container = params.local ? localContainer : remoteContainer
 
    <span class="hljs-comment">// Render the Call's new track when it first becomes available.</span>
-   client.media.renderTracks([ track.id ], container)
+   client.media.renderTracks([ track.trackId ], container)
 })</pre>
     
   
