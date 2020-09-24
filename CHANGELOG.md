@@ -25,6 +25,8 @@ Kandy.js change log.
 
 - Updated tutorial codepens to be more robust around authentication and subscription operations. `KAA-2491`
 
+- Removed `Creating LogManager` debug log since it was only in place to work around a bug in Chrome that has been fixed. `KAA-2494`
+
 ## 4.19.0 - 2020-08-28
 
 ### Added
