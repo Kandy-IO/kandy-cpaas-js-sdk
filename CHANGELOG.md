@@ -14,6 +14,7 @@ Kandy.js change log.
   - Added new debug level logs for REST request and response information.
   - Added new debug level logs for messages sent and received on the websocket.
   - Added new section to the Logging tutorial to better describe the log levels.
+- Added the ability to name the redux store instance for debugging with redux devtools extension.
 
 ### Fixed
 

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.541
+ * Version: 4.20.0-beta.542
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31956,7 +31956,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.541';
+  return '4.20.0-beta.542';
 }
 
 /***/ }),
@@ -34644,11 +34644,13 @@ const log = _logs.logManager.getLogger('FACTORY');
 
 const factoryDefaults = {
   enableReduxDevTools: false,
+  reduxDevToolsName: 'WebRTC SDK',
   allowProxy: false
 
   // config validation
 };const v8nValidation = _validation.validation.schema({
   enableReduxDevTools: _validation.validation.boolean(),
+  reduxDevToolsName: _validation.validation.string(),
   allowProxy: _validation.validation.boolean()
 });
 const parseOptions = (0, _validation.parse)('common', v8nValidation);
@@ -34659,14 +34661,18 @@ const parseOptions = (0, _validation.parse)('common', v8nValidation);
  * @param {Plugin[]} plugins - The list of plugins to load into this instance of the SDK.
  * @param {Object} [options] - Factory options
  * @param {boolean} [options.enableReduxDevTools] - A flag to indicate whether or not to include Redux Dev Tools
+ * @param {string}  [options.reduxDevToolsName="WebRTC SDK"] - The name of the store that will show up in the Redux Dev tools.
+ *                                                This helps differentiate the SDK from other redux instances.
  * @param {boolean} [options.allowProxy] Whether the factory should allow the Proxy Plugin to be included.
  */
-function factory(plugins, options = factoryDefaults) {
+function factory(plugins, options = {}) {
   // Log the SDK's version (templated by webpack) on initialization.
   const version = (0, _version.getVersion)();
   log.info(`SDK version: ${version}`);
 
   parseOptions(options);
+
+  options = (0, _utils.mergeValues)(factoryDefaults, options);
 
   var sagas = [];
   var store;
@@ -34820,7 +34826,7 @@ function factory(plugins, options = factoryDefaults) {
   }
 
   // Alias our composeMiddleware to conditionally include devTools as per the provided configuration flag
-  const composeMiddleware = options.enableReduxDevTools ? _reduxDevtoolsExtension.composeWithDevTools : _redux.compose;
+  const composeMiddleware = options.enableReduxDevTools ? (0, _reduxDevtoolsExtension.composeWithDevTools)({ name: options.reduxDevToolsName }) : _redux.compose;
 
   // don't include saga stuff if there are no sagas.
   if (initSagas.length + sagas.length > 0) {
