@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.20.0-beta.542
+ * Version: 4.20.0-beta.543
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31956,7 +31956,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.20.0-beta.542';
+  return '4.20.0-beta.543';
 }
 
 /***/ }),
@@ -33630,7 +33630,7 @@ const connCheckMethods = exports.connCheckMethods = {
  */
 
 /**
- * The ID of a User (e.g. joe@test.3s5j.att.com)
+ * The ID of a User (e.g. joe@domain.com)
  * @public
  * @static
  * @typedef {string} UserID
@@ -50769,6 +50769,14 @@ function setListeners(manager, emit, END = 'END') {
   const trackAdded = id => {
     const track = manager.get(id);
     const state = track.getState();
+
+    // Translate the track state from native WebRTC to SDK style.
+    // This is to change the "muted" property to be what people generally know
+    //    "muted" to be.
+    state.sourceMuted = state.muted;
+    state.muted = !state.enabled;
+
+    delete state.enabled;
     delete state.id;
 
     /**
