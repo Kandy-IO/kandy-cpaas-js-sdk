@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.20.0 - beta
+## 4.20.0 - 2020-10-02
 
 ### Added
 
@@ -25,7 +25,6 @@ Kandy.js change log.
 ### Changed
 
 - Updated tutorial codepens to be more robust around authentication and subscription operations. `KAA-2491`
-
 - Removed `Creating LogManager` debug log since it was only in place to work around a bug in Chrome that has been fixed. `KAA-2494`
 
 ## 4.19.0 - 2020-08-28
