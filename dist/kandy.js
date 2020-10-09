@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.21.0-beta.553
+ * Version: 4.21.0-beta.554
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29429,12 +29429,23 @@ function was3xHold(mediaDiff) {
   const { added, removed, changed, unchanged } = mediaDiff;
 
   /*
-   * 1) Some media was flowing before the change.
+   * 1) Handles when some media was flowing before the change.
+   *  or a special case where media was flowing but assumes media wasnt flowing.
    * 2) All changed media is now "sendonly".
    */
   const wasFlowing = hadMediaFlowing(mediaDiff);
   const allSendOnly = changed.every(({ media, changes }) => {
-    return changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP;
+    /**
+     * This handles two scenerios
+     *
+     * 1)  When 3.X SDK holds and was not sending video previously, video media direction changes from recvonly --> sendonly.
+     * For this scenerio, 4.X sdk will think it just started sending media(video) and
+     * no video media was flowing initially, setting  MEDIA_TRANSITION for the video to "START".
+     *
+     * 2.) When 3.X SDK holds and a video was sent previously, 4.x knows some media was flowing before the change.
+     * Therefore setting  MEDIA_TRANSITION for the video to "SAME".
+     */
+    return (changes.sending === _compareMedia.MEDIA_TRANSITIONS.START || changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME) && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP;
   });
 
   /*
@@ -31978,7 +31989,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.21.0-beta.553';
+  return '4.21.0-beta.554';
 }
 
 /***/ }),
