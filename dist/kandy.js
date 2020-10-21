@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.21.0-beta.556
+ * Version: 4.21.0-beta.557
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -31989,7 +31989,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.21.0-beta.556';
+  return '4.21.0-beta.557';
 }
 
 /***/ }),
@@ -45421,17 +45421,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 // Libraries.
 const pluginName = 'requests';
 
+/*
+ * HTTP request plugin.
+ */
+
+
 // Utils.
 
 
 // Other plugins.
 // Request plugin.
-
-const log = _logs.logManager.getLogger('REQUESTS');
-
-/*
- * HTTP request plugin.
- */
 function request(options = {}) {
   options = (0, _utils.mergeValues)(_configs.defaultOptions, options);
   (0, _configs.parseOptions)(options);
@@ -45461,6 +45460,8 @@ function* watchRequests() {
  * @param {FluxStandardAction} action The action to handle.
  */
 function* handleRequest(action) {
+  const log = _logs.logManager.getLogger('REQUEST', action.meta.requestId);
+
   const logOptions = (0, _fp.cloneDeep)(action.payload);
   // When logging the Auth header, cut it off so that we can see the type of
   //    token but not the token itself. Depending on the type, it can contain
