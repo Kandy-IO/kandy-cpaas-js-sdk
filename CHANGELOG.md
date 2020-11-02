@@ -17,6 +17,8 @@ Kandy.js change log.
 
 - Action logs are now disabled by default. The client can provide either a boolean or an object with action log configuration details. If `logActions` is set to `true`, the default settings for action logs will be used. See [Config documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#config). `KAA-2504`
 
+- Changed the way we import Kandy.js dependency into CPaaS tutorials so that it is more visible to user. `KAA-2552`
+
 ## 4.20.0 - 2020-10-02
 
 ### Added
