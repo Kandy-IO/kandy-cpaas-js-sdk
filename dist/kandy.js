@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.22.0-beta.570
+ * Version: 4.22.0-beta.571
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -21364,8 +21364,18 @@ function sendDTMFFinish(id, params) {
   return callActionHelper(actionTypes.SEND_DTMF_FINISH, id, params);
 }
 
-function getStats(id, params) {
-  return callActionHelper(actionTypes.GET_STATS, id, params);
+function getStats(id, params, deferred) {
+  const action = {
+    type: actionTypes.GET_STATS,
+    payload: (0, _extends3.default)({}, params, {
+      id
+    }),
+    meta: {
+      deferred
+    }
+  };
+
+  return action;
 }
 
 function getStatsFinish(id, params) {
@@ -22336,6 +22346,7 @@ function callAPI({ dispatch, getState }) {
      * A Track ID can optionally be provided to get a report for a specific
      *    Track of the Call.
      *
+     * This API will return a promise which, when resolved, it will contain the report of the particlar call.
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event.
      *
@@ -22353,9 +22364,10 @@ function callAPI({ dispatch, getState }) {
      */
     getStats(callId, trackId) {
       log.debug(_logs.API_LOG_TAG + 'call.getStats: ', callId, trackId);
-      dispatch(_actions.callActions.getStats(callId, { trackId }));
+      const deferredResult = (0, _pDefer2.default)();
+      dispatch(_actions.callActions.getStats(callId, { trackId }, deferredResult));
+      return deferredResult.promise;
     },
-
     /**
      * Forwards an incoming call to another user.
      *
@@ -26585,6 +26597,12 @@ function* getStats(deps, action) {
 
   if (stateError) {
     log.debug(`Invalid call state: ${stateError.message}`);
+
+    yield (0, _effects.call)([action.meta.deferred, 'reject'], {
+      error: stateError,
+      trackId: action.payload.trackId
+    });
+
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
       error: stateError,
       trackId: action.payload.trackId
@@ -26605,16 +26623,24 @@ function* getStats(deps, action) {
     result = yield (0, _effects.call)([session, 'getStats'], trackId);
   } catch (error) {
     log.info('Failed to get call statistics.');
+    const basicError = new _errors2.default({
+      code: _errors.callCodes.GENERIC_ERROR,
+      message: error.message
+    });
+
+    yield (0, _effects.call)([action.meta.deferred, 'reject'], {
+      error: basicError
+    });
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, {
-      error: new _errors2.default({
-        code: _errors.callCodes.GENERIC_ERROR,
-        message: error.message
-      }),
+      error: basicError,
       trackId
     }));
   }
   if (result) {
     log.info('Finished getting call statistics.');
+
+    yield (0, _effects.call)([action.meta.deferred, 'resolve'], result);
+
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { result, trackId }));
   }
 }
@@ -32103,7 +32129,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.22.0-beta.570';
+  return '4.22.0-beta.571';
 }
 
 /***/ }),

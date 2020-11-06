@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 3.22.0 - beta
 
+## Changed
+
+- Changed `call.getStats` Call API to return a Promise, so that caller can get the report of the call as part of invoking this API. `KAA-2558`
+
 ## 4.21.0 - 2020-10-30
 
 ### Fixed

@@ -991,6 +991,7 @@ Get a report about low-level call statistical information.
 A Track ID can optionally be provided to get a report for a specific
    Track of the Call.
 
+This API will return a promise which, when resolved, it will contain the report of the particlar call.
 The progress of the operation will be tracked via the
    [call:operation][33] event.
 

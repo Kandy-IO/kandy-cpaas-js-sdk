@@ -6844,7 +6844,8 @@ otherwise they will be added in-band to the call's audio.</p>
   <p>Get a report about low-level call statistical information.</p>
 <p>A Track ID can optionally be provided to get a report for a specific
 Track of the Call.</p>
-<p>The progress of the operation will be tracked via the
+<p>This API will return a promise which, when resolved, it will contain the report of the particlar call.
+The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
 <a href="#calleventcallstatsreceived">call:statsReceived</a> event, after

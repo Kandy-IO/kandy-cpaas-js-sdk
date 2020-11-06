@@ -34239,7 +34239,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "The progress of the operation will be tracked via the\n   ",
+                    "value": "This API will return a promise which, when resolved, it will contain the report of the particlar call.\nThe progress of the operation will be tracked via the\n   ",
                     "position": {
                       "start": {
                         "line": 6,
@@ -34247,11 +34247,12 @@
                         "offset": 152
                       },
                       "end": {
-                        "line": 7,
+                        "line": 8,
                         "column": 4,
-                        "offset": 209
+                        "offset": 312
                       },
                       "indent": [
+                        1,
                         1
                       ]
                     }
@@ -34269,14 +34270,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 7,
+                        "line": 8,
                         "column": 4,
-                        "offset": 209
+                        "offset": 312
                       },
                       "end": {
-                        "line": 7,
+                        "line": 8,
                         "column": 52,
-                        "offset": 257
+                        "offset": 360
                       },
                       "indent": []
                     }
@@ -34286,14 +34287,14 @@
                     "value": " event.",
                     "position": {
                       "start": {
-                        "line": 7,
+                        "line": 8,
                         "column": 52,
-                        "offset": 257
+                        "offset": 360
                       },
                       "end": {
-                        "line": 7,
+                        "line": 8,
                         "column": 59,
-                        "offset": 264
+                        "offset": 367
                       },
                       "indent": []
                     }
@@ -34306,11 +34307,12 @@
                     "offset": 152
                   },
                   "end": {
-                    "line": 7,
+                    "line": 8,
                     "column": 59,
-                    "offset": 264
+                    "offset": 367
                   },
                   "indent": [
+                    1,
                     1
                   ]
                 }
@@ -34323,14 +34325,14 @@
                     "value": "The SDK will emit a\n   ",
                     "position": {
                       "start": {
-                        "line": 9,
+                        "line": 10,
                         "column": 1,
-                        "offset": 266
+                        "offset": 369
                       },
                       "end": {
-                        "line": 10,
+                        "line": 11,
                         "column": 4,
-                        "offset": 289
+                        "offset": 392
                       },
                       "indent": [
                         1
@@ -34350,14 +34352,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 10,
+                        "line": 11,
                         "column": 4,
-                        "offset": 289
+                        "offset": 392
                       },
                       "end": {
-                        "line": 10,
+                        "line": 11,
                         "column": 60,
-                        "offset": 345
+                        "offset": 448
                       },
                       "indent": []
                     }
@@ -34367,14 +34369,14 @@
                     "value": " event, after\n   the operation completes, that has the report.",
                     "position": {
                       "start": {
-                        "line": 10,
+                        "line": 11,
                         "column": 60,
-                        "offset": 345
+                        "offset": 448
                       },
                       "end": {
-                        "line": 11,
+                        "line": 12,
                         "column": 49,
-                        "offset": 407
+                        "offset": 510
                       },
                       "indent": [
                         1
@@ -34384,14 +34386,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 9,
+                    "line": 10,
                     "column": 1,
-                    "offset": 266
+                    "offset": 369
                   },
                   "end": {
-                    "line": 11,
+                    "line": 12,
                     "column": 49,
-                    "offset": 407
+                    "offset": 510
                   },
                   "indent": [
                     1,
@@ -34407,9 +34409,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 11,
+                "line": 12,
                 "column": 49,
-                "offset": 407
+                "offset": 510
               }
             }
           },
@@ -34417,35 +34419,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 12,
+              "lineNumber": 13,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 13
+              "lineNumber": 14
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 14
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 15,
-              "name": "call"
+              "lineNumber": 15
             },
             {
               "title": "requires",
               "description": null,
               "lineNumber": 16,
+              "name": "call"
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 17,
               "name": "callMe"
             },
             {
               "title": "param",
               "description": "The ID of the Call to retrieve the report.",
-              "lineNumber": 17,
+              "lineNumber": 18,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -34455,7 +34457,7 @@
             {
               "title": "param",
               "description": "ID of a Track being used by the Call. If not\n   provided, RTCStatsReport is generated for the Call itself.",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -34472,18 +34474,18 @@
               "column": 4
             },
             "end": {
-              "line": 789,
+              "line": 790,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 790,
+                "line": 791,
                 "column": 4
               },
               "end": {
-                "line": 793,
+                "line": 796,
                 "column": 5
               }
             },
@@ -34495,7 +34497,7 @@
             {
               "title": "param",
               "name": "callId",
-              "lineNumber": 17,
+              "lineNumber": 18,
               "description": {
                 "type": "root",
                 "children": [
@@ -34556,7 +34558,7 @@
             {
               "title": "param",
               "name": "trackId",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "description": {
                 "type": "root",
                 "children": [
@@ -35110,22 +35112,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1032,
+              "line": 1034,
               "column": 4
             },
             "end": {
-              "line": 1096,
+              "line": 1098,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1097,
+                "line": 1099,
                 "column": 4
               },
               "end": {
-                "line": 1104,
+                "line": 1106,
                 "column": 5
               }
             },
@@ -36194,22 +36196,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1106,
+              "line": 1108,
               "column": 4
             },
             "end": {
-              "line": 1122,
+              "line": 1124,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1123,
+                "line": 1125,
                 "column": 4
               },
               "end": {
-                "line": 1133,
+                "line": 1135,
                 "column": 5
               }
             },
@@ -36538,22 +36540,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1135,
+              "line": 1137,
               "column": 4
             },
             "end": {
-              "line": 1151,
+              "line": 1153,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1152,
+                "line": 1154,
                 "column": 4
               },
               "end": {
-                "line": 1160,
+                "line": 1162,
                 "column": 5
               }
             },
@@ -37140,22 +37142,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1162,
+              "line": 1164,
               "column": 4
             },
             "end": {
-              "line": 1206,
+              "line": 1208,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1207,
+                "line": 1209,
                 "column": 4
               },
               "end": {
-                "line": 1207,
+                "line": 1209,
                 "column": 23
               }
             },
@@ -37996,22 +37998,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1209,
+              "line": 1211,
               "column": 4
             },
             "end": {
-              "line": 1225,
+              "line": 1227,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1207,
+                "line": 1209,
                 "column": 4
               },
               "end": {
-                "line": 1207,
+                "line": 1209,
                 "column": 23
               }
             },
@@ -38311,22 +38313,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1227,
+              "line": 1229,
               "column": 4
             },
             "end": {
-              "line": 1264,
+              "line": 1266,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1207,
+                "line": 1209,
                 "column": 4
               },
               "end": {
-                "line": 1207,
+                "line": 1209,
                 "column": 23
               }
             },
@@ -38676,22 +38678,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1266,
+              "line": 1268,
               "column": 4
             },
             "end": {
-              "line": 1303,
+              "line": 1305,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1207,
+                "line": 1209,
                 "column": 4
               },
               "end": {
-                "line": 1207,
+                "line": 1209,
                 "column": 23
               }
             },
