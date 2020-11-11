@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 3.22.0 - beta
 
+### Fixed
+
+- Updated CPaaS Anonymous Calls tutorial to allow for manual token entry and setting. `KAA-2550`
+
 ## Changed
 
 - Changed `call.getStats` Call API to return a Promise, so that caller can get the report of the call as part of invoking this API. `KAA-2558`
