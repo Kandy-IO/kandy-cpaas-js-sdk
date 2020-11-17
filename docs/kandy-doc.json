@@ -9337,11 +9337,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 298,
+          "line": 304,
           "column": 0
         },
         "end": {
-          "line": 302,
+          "line": 308,
           "column": 1
         }
       },
@@ -16028,11 +16028,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -17355,6 +17355,154 @@
                     1
                   ]
                 }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A string value can be provided directly instead of using the MediaConstraint format.\n   Using a string directly is not recommended, since behaviour may differ depending\n   on browser and media property. For most properties, a direct string value will be\n   handled as ",
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 1,
+                        "offset": 522
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 15,
+                        "offset": 790
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "ideal",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 15,
+                        "offset": 790
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 22,
+                        "offset": 797
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " behaviour, but some properties may follow the ",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 22,
+                        "offset": 797
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 69,
+                        "offset": 844
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "exact",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 69,
+                        "offset": 844
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 76,
+                        "offset": 851
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " behaviour\n   (eg. ",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 76,
+                        "offset": 851
+                      },
+                      "end": {
+                        "line": 15,
+                        "column": 9,
+                        "offset": 870
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "deviceId",
+                    "position": {
+                      "start": {
+                        "line": 15,
+                        "column": 9,
+                        "offset": 870
+                      },
+                      "end": {
+                        "line": 15,
+                        "column": 19,
+                        "offset": 880
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ").",
+                    "position": {
+                      "start": {
+                        "line": 15,
+                        "column": 19,
+                        "offset": 880
+                      },
+                      "end": {
+                        "line": 15,
+                        "column": 21,
+                        "offset": 882
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 11,
+                    "column": 1,
+                    "offset": 522
+                  },
+                  "end": {
+                    "line": 15,
+                    "column": 21,
+                    "offset": 882
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
               }
             ],
             "position": {
@@ -17364,9 +17512,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 9,
-                "column": 76,
-                "offset": 520
+                "line": 15,
+                "column": 21,
+                "offset": 882
               }
             }
           },
@@ -17374,18 +17522,18 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 11,
+              "lineNumber": 17,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 12
+              "lineNumber": 18
             },
             {
               "title": "typedef",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 19,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -17395,12 +17543,12 @@
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 14
+              "lineNumber": 20
             },
             {
               "title": "property",
               "description": "The required value for the constraint. Other values will not be accepted.",
-              "lineNumber": 15,
+              "lineNumber": 21,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -17413,7 +17561,7 @@
             {
               "title": "property",
               "description": "The ideal value for the constraint. Other values will be considered if necessary.",
-              "lineNumber": 16,
+              "lineNumber": 22,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -17426,7 +17574,7 @@
             {
               "title": "example",
               "description": "// Specify video resolution when making a call.\nclient.call.make(destination, {\n   audio: true,\n   video: true,\n   videoOptions: {\n     // Set height and width constraints to ideally be 1280x720.\n     height: { ideal: 720 },\n     width: { ideal: 1280 }\n   }\n})",
-              "lineNumber": 17
+              "lineNumber": 23
             }
           ],
           "loc": {
@@ -17435,18 +17583,18 @@
               "column": 0
             },
             "end": {
-              "line": 117,
+              "line": 123,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -17463,7 +17611,7 @@
             {
               "title": "property",
               "name": "exact",
-              "lineNumber": 15,
+              "lineNumber": 21,
               "description": {
                 "type": "root",
                 "children": [
@@ -17527,7 +17675,7 @@
             {
               "title": "property",
               "name": "ideal",
-              "lineNumber": 16,
+              "lineNumber": 22,
               "description": {
                 "type": "root",
                 "children": [
@@ -17753,22 +17901,22 @@
           ],
           "loc": {
             "start": {
-              "line": 119,
+              "line": 125,
               "column": 0
             },
             "end": {
-              "line": 139,
+              "line": 145,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -18168,22 +18316,22 @@
           ],
           "loc": {
             "start": {
-              "line": 141,
+              "line": 147,
               "column": 0
             },
             "end": {
-              "line": 153,
+              "line": 159,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -18618,22 +18766,22 @@
           ],
           "loc": {
             "start": {
-              "line": 155,
+              "line": 161,
               "column": 0
             },
             "end": {
-              "line": 162,
+              "line": 168,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -18934,22 +19082,22 @@
           ],
           "loc": {
             "start": {
-              "line": 164,
+              "line": 170,
               "column": 0
             },
             "end": {
-              "line": 175,
+              "line": 181,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -19365,22 +19513,22 @@
           ],
           "loc": {
             "start": {
-              "line": 177,
+              "line": 183,
               "column": 0
             },
             "end": {
-              "line": 187,
+              "line": 193,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -19793,22 +19941,22 @@
           ],
           "loc": {
             "start": {
-              "line": 189,
+              "line": 195,
               "column": 0
             },
             "end": {
-              "line": 200,
+              "line": 206,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -20264,22 +20412,22 @@
           ],
           "loc": {
             "start": {
-              "line": 202,
+              "line": 208,
               "column": 0
             },
             "end": {
-              "line": 222,
+              "line": 228,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -21029,22 +21177,22 @@
           ],
           "loc": {
             "start": {
-              "line": 224,
+              "line": 230,
               "column": 0
             },
             "end": {
-              "line": 234,
+              "line": 240,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -21421,22 +21569,22 @@
           ],
           "loc": {
             "start": {
-              "line": 236,
+              "line": 242,
               "column": 0
             },
             "end": {
-              "line": 247,
+              "line": 253,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 298,
+                "line": 304,
                 "column": 0
               },
               "end": {
-                "line": 302,
+                "line": 308,
                 "column": 1
               }
             },
@@ -63933,11 +64081,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 298,
+          "line": 304,
           "column": 0
         },
         "end": {
-          "line": 302,
+          "line": 308,
           "column": 1
         }
       },

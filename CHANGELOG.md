@@ -9,10 +9,12 @@ Kandy.js change log.
 
 ### Fixed
 
+- Minor documentation fixes.
+  - Update the Call `MediaConstraint` format description to include the "direct value" approach. `KAA-2565`
+
+### Changed
+
 - Updated CPaaS Anonymous Calls tutorial to allow for manual token entry and setting. `KAA-2550`
-
-## Changed
-
 - Changed `call.getStats` Call API to return a Promise, so that caller can get the report of the call as part of invoking this API. `KAA-2558`
 
 ## 4.21.0 - 2020-10-30

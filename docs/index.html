@@ -3651,6 +3651,11 @@ Either the <code>exact</code> or <code>ideal</code> property should be provided.
 If it cannot be used, the constraint will be considered an error.</p>
 <p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
 If it cannot be used, the closest acceptable value will be used instead.</p>
+<p>A string value can be provided directly instead of using the MediaConstraint format.
+Using a string directly is not recommended, since behaviour may differ depending
+on browser and media property. For most properties, a direct string value will be
+handled as <code>ideal</code> behaviour, but some properties may follow the <code>exact</code> behaviour
+(eg. <code>deviceId</code>).</p>
 
 
   <div class='pre p1 fill-light mt0'>MediaConstraint</div>
