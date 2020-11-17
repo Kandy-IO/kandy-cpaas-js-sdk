@@ -9,8 +9,10 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed issue where call is not successfully put on hold if only one side is sharing video. `KAA-2555`
+- Updated CPaaS Anonymous Calls tutorial to allow for manual token entry and setting. `KAA-2550`
 - Minor documentation fixes.
-  - Update the Call `MediaConstraint` format description to include the "direct value" approach. `KAA-2565`
+- Update the Call `MediaConstraint` format description to include the "direct value" approach. `KAA-2565`
 
 ### Changed
 

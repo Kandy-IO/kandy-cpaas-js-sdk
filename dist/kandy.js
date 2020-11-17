@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.22.0-beta.579
+ * Version: 4.22.0-beta.580
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32135,7 +32135,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.22.0-beta.579';
+  return '4.22.0-beta.580';
 }
 
 /***/ }),
@@ -55989,6 +55989,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = setTransceiversDirection;
 
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
 var _sdpSemantics = __webpack_require__("../../packages/webrtc/src/sdpUtils/sdpSemantics.js");
 
 var _transceiverUtils = __webpack_require__("../../packages/webrtc/src/sdpUtils/transceiverUtils.js");
@@ -56009,7 +56011,9 @@ function setTransceiversDirection(targetDirection, options = {}) {
     let transceivers = proxyPeer.getTransceivers();
 
     if (options.trackIds) {
-      transceivers = transceivers.filter(transceiver => options.trackIds.includes(transceiver.sender.track.id));
+      transceivers = transceivers.filter(transceiver => {
+        return options.trackIds.includes((0, _fp.get)(['sender', 'track', 'id'], transceiver)) || options.trackIds.includes((0, _fp.get)(['receiver', 'track', 'id'], transceiver));
+      });
     }
 
     const failures = [];
@@ -56054,6 +56058,10 @@ var _remoteDescription = __webpack_require__("../../packages/webrtc/src/Peer/pro
 
 var _remoteDescription2 = _interopRequireDefault(_remoteDescription);
 
+var _remoteTracksActive = __webpack_require__("../../packages/webrtc/src/Peer/properties/remoteTracksActive.js");
+
+var _remoteTracksActive2 = _interopRequireDefault(_remoteTracksActive);
+
 var _remoteTracks = __webpack_require__("../../packages/webrtc/src/Peer/properties/remoteTracks.js");
 
 var _remoteTracks2 = _interopRequireDefault(_remoteTracks);
@@ -56064,7 +56072,7 @@ var _senderTracks2 = _interopRequireDefault(_senderTracks);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = { localDescription: _localDescription2.default, localTracks: _localTracks2.default, remoteDescription: _remoteDescription2.default, remoteTracks: _remoteTracks2.default, senderTracks: _senderTracks2.default };
+exports.default = { localDescription: _localDescription2.default, localTracks: _localTracks2.default, remoteDescription: _remoteDescription2.default, remoteTracks: _remoteTracksActive2.default, remoteTracksAll: _remoteTracks2.default, senderTracks: _senderTracks2.default };
 
 /***/ }),
 
@@ -56176,6 +56184,42 @@ function getRemoteDescription() {
 /***/ }),
 
 /***/ "../../packages/webrtc/src/Peer/properties/remoteTracks.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getRemoteTracks;
+/**
+ * @method getRemoteTracks
+ * @return {Array} List of active Track objects the Peer has received remotely.
+ */
+function getRemoteTracks() {
+  const { proxyPeer, trackManager, log } = this;
+  log.info('Getting remote tracks.');
+
+  // Return the list of Tracks from active receivers.
+  return proxyPeer.getReceivers()
+  /**
+   * Remove any Receivers that do not have an associated track.
+   * We only want to retrieve Receivers that do have tracks, because those are
+   *    the remote tracks that have been added to the Peer.
+   * Receivers without tracks are part of a Transceiver where the Sender has
+   *    a local track, but no remote track has been added to it. We don't
+   *    care about this for the "get remote tracks" operation.
+   */
+  .filter(receiver => Boolean(receiver.track)).map(receiver => trackManager.get(receiver.track.id)).filter(track => {
+    // Make sure the trackManager has the track
+    return track && track.getState().state === 'live';
+  });
+}
+
+/***/ }),
+
+/***/ "../../packages/webrtc/src/Peer/properties/remoteTracksActive.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -58050,16 +58094,22 @@ function Session(id, managers, config = {}) {
           const videoTransceiverTargetDir = options.mediaDirections.video;
 
           if (audioTransceiverTargetDir) {
+            const localTrackIds = peer.localTracks.filter(track => track.track.kind === 'audio').map(track => track.id);
+            const remoteTrackIds = peer.remoteTracksAll.filter(track => track.track.kind === 'audio').map(track => track.id);
+
             const result = peer.setTransceiversDirection(audioTransceiverTargetDir, {
-              trackIds: peer.localTracks.filter(track => track.track.kind === 'audio').map(track => track.id)
+              trackIds: [...localTrackIds, ...remoteTrackIds]
             });
             if (result.error) {
               log.info(`Failed to process the following transceivers: ${result.failures}`);
             }
           }
           if (videoTransceiverTargetDir) {
+            const localTrackIds = peer.localTracks.filter(track => track.track.kind === 'video').map(track => track.id);
+            const remoteTrackIds = peer.remoteTracksAll.filter(track => track.track.kind === 'video').map(track => track.id);
+
             const result = peer.setTransceiversDirection(videoTransceiverTargetDir, {
-              trackIds: peer.localTracks.filter(track => track.track.kind === 'video').map(track => track.id)
+              trackIds: [...localTrackIds, ...remoteTrackIds]
             });
             if (result.error) {
               log.info(`Failed to process the following transceivers: ${result.failures}`);
