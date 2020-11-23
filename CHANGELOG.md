@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 3.22.0 - beta
 
+### Added
+
+- Added SDK metadata to `call:statsReceived` event's payload. `KAA-2557`
+
 ### Fixed
 
 - Fixed issue where call is not successfully put on hold if only one side is sharing video. `KAA-2555`

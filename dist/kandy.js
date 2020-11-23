@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.22.0-beta.582
+ * Version: 4.22.0-beta.583
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -19394,7 +19394,8 @@ function cpaasCalls(options = {}) {
 
     // Dependencies to be provided to every call saga.
     const deps = {
-      webRTC: webRTC.managers
+      webRTC: webRTC.managers,
+      browserDetails: webRTC.getBrowserDetails
 
       // Wrap the call sagas in a function that provides them with the webRTC stack.
     };const wrappedSagas = (0, _fp.values)(sagas).map(saga => {
@@ -26225,6 +26226,10 @@ var _extends2 = __webpack_require__("../../node_modules/babel-runtime/helpers/ex
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+var _map = __webpack_require__("../../node_modules/babel-runtime/core-js/map.js");
+
+var _map2 = _interopRequireDefault(_map);
+
 exports.endCall = endCall;
 exports.offerInactiveMedia = offerInactiveMedia;
 exports.offerFullMedia = offerFullMedia;
@@ -26259,6 +26264,8 @@ var _errors2 = _interopRequireDefault(_errors);
 
 var _selectors2 = __webpack_require__("../../packages/kandy/src/webrtc/interface/selectors.js");
 
+var _selectors3 = __webpack_require__("../../packages/kandy/src/auth/interface/selectors.js");
+
 var _utils = __webpack_require__("../../packages/kandy/src/call/cpaas/utils/index.js");
 
 var _constants = __webpack_require__("../../packages/kandy/src/call/constants.js");
@@ -26267,12 +26274,16 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-sag
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
+var _constants2 = __webpack_require__("../../packages/kandy/src/constants.js");
+
+var _sdkId = __webpack_require__("../../packages/kandy/src/common/sdkId.js");
+
+var _sdkId2 = _interopRequireDefault(_sdkId);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Libraries.
-
-
-// Helpers.
 /**
  * "Midcall sagas" handle performing local mid-call operations.
  *
@@ -26298,6 +26309,15 @@ const log = _logs.logManager.getLogger('CALL');
  * @param {Function} deps.requests.endSession "End session" signalling function.
  * @param {Object}   action An action of type `END_CALL`.
  */
+
+
+// Utils
+
+
+// Libraries.
+
+
+// Helpers.
 
 
 // Other plugins.
@@ -26593,7 +26613,7 @@ function* sendCustomParameters(deps, action) {
  * @param {Object} action      A "get Stats" action.
  */
 function* getStats(deps, action) {
-  const { webRTC } = deps;
+  const { webRTC, browserDetails } = deps;
 
   const log = _logs.logManager.getLogger('CALL', action.payload.id);
   log.info('Getting call statistics.');
@@ -26624,9 +26644,9 @@ function* getStats(deps, action) {
 
   const trackId = action.payload.trackId;
   // Retrieve the RTCStatsReport from the session.
-  let result;
+  let rtcStatsReport;
   try {
-    result = yield (0, _effects.call)([session, 'getStats'], trackId);
+    rtcStatsReport = yield (0, _effects.call)([session, 'getStats'], trackId);
   } catch (error) {
     log.info('Failed to get call statistics.');
     const basicError = new _errors2.default({
@@ -26642,9 +26662,61 @@ function* getStats(deps, action) {
       trackId
     }));
   }
-  if (result) {
+  if (rtcStatsReport) {
     log.info('Finished getting call statistics.');
 
+    // Extract values for our own custom Statistics
+    const type = 'kandy_sdk_info';
+    const id = 'kandy-sdk-info_' + _sdkId2.default;
+    const version = (0, _version.getVersion)();
+    const platform = yield (0, _effects.select)(_selectors3.getPlatform);
+
+    let sdk;
+    if (platform === _constants2.platforms.CPAAS) {
+      sdk = '@kandy-io/cpaas-sdk';
+    } else if (platform === _constants2.platforms.UC) {
+      sdk = '@kandy-io/uc-sdk';
+    } else if (platform === _constants2.platforms.LINK) {
+      // callMe service also uses Link platform for call requests as well.
+      if (targetCall.isAnonymous) {
+        sdk = '@kandy-io/callme-sdk';
+      } else {
+        sdk = '@kandy-io/link-sdk';
+      }
+    }
+
+    // Note that getting browser details is only intended for local browser.
+    // For proxy mode this would return undefined. (see getBrowserDetails() on proxyStack)
+    const details = browserDetails();
+
+    // Define our custom Stats object
+    const sdkMetaData = {
+      id,
+      type,
+      sdk,
+      version,
+      callId: action.payload.id
+    };
+
+    if (details) {
+      sdkMetaData.platform = details.browser + '/' + details.version;
+    }
+
+    // Set the timestamp value of our custom report to be same value as
+    // the timestamp associated with any stat coming from original webRTC report.
+    const iter = rtcStatsReport.keys();
+    const rtcStatValue = rtcStatsReport.get(iter.next().value);
+    if (rtcStatValue) {
+      sdkMetaData.timestamp = rtcStatValue.timestamp;
+    }
+    // Add our custom stats to the ones reported by Web RTC.
+    // Since rtcStatsReport seems to be read-only Map, create a new Map
+    // which includes both our stat & the ones from webrtc.
+    const result = new _map2.default();
+    result.set(id, sdkMetaData);
+    rtcStatsReport.forEach(stat => {
+      result.set(stat.id, stat);
+    });
     yield (0, _effects.call)([action.meta.deferred, 'resolve'], result);
 
     yield (0, _effects.put)(_actions.callActions.getStatsFinish(action.payload.id, { result, trackId }));
@@ -31873,6 +31945,25 @@ Object.defineProperty(exports, 'handleRequestError', {
 
 /***/ }),
 
+/***/ "../../packages/kandy/src/common/sdkId.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _uuid = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/index.js");
+
+// Generate a unique SDK GUID for the running SDK instance.
+const sdkId = (0, _uuid.v4)();
+
+exports.default = sdkId;
+
+/***/ }),
+
 /***/ "../../packages/kandy/src/common/utils.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -32135,7 +32226,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.22.0-beta.582';
+  return '4.22.0-beta.583';
 }
 
 /***/ }),
