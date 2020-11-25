@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.22.0-beta.588
+ * Version: 4.22.0-beta.589
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18583,12 +18583,17 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
 
+var _constants = __webpack_require__("../../packages/kandy/src/auth/constants.js");
+
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Helpers
 const reducers = {};
 
 reducers[actionTypes.CONNECT] = {
@@ -18650,7 +18655,7 @@ reducers[actionTypes.CONNECTION_OCCURRED] = {
       subscription: (0, _extends3.default)({}, state.subscription, {
         [action.meta.platform]: action.payload.subscription
       }),
-      // Store platform connection information to be procided to other plugins.
+      // Store platform connection information to be provided to other plugins.
       connection: (0, _extends3.default)({}, state.connection, {
         [action.meta.platform]: action.payload.connection
       })
@@ -18669,11 +18674,19 @@ reducers[actionTypes.DISCONNECT] = {
 
 reducers[actionTypes.DISCONNECT_FINISHED] = {
   next(state, action) {
-    return {
+    const returnObj = {
       isConnected: false,
       isPending: false,
       error: undefined
-    };
+
+      // KAA-2538, we need to keep the userInfo even after disconnecting
+      //   but only for the 4.X new auth method
+    };const isLostConnection = action.payload.reason === _constants.DISCONNECT_REASONS.LOST_CONNECTION;
+    const isVersion4X = (0, _version.getVersion)().startsWith('4');
+    if (isLostConnection && isVersion4X) {
+      returnObj.userInfo = state.userInfo;
+    }
+    return returnObj;
   },
   throw(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -18738,7 +18751,7 @@ reducers[actionTypes.SET_CREDENTIALS_FINISH] = {
     return (0, _extends3.default)({}, state, {
       error: undefined,
       platform: action.meta.platform,
-      // Store platform connection information to be procided to other plugins.
+      // Store platform connection information to be provided to other plugins.
       connection: (0, _extends3.default)({}, state.connection, {
         [action.meta.platform]: action.payload.connection
       }),
@@ -32226,7 +32239,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.22.0-beta.588';
+  return '4.22.0-beta.589';
 }
 
 /***/ }),
