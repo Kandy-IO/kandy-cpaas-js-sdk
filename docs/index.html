@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.21.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.22.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.21.0</code></div>
+          <div class='mb1'><code>4.22.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -3651,6 +3651,11 @@ Either the <code>exact</code> or <code>ideal</code> property should be provided.
 If it cannot be used, the constraint will be considered an error.</p>
 <p>When the <code>ideal</code> value is provided, it will be considered as the optimal value for the option.
 If it cannot be used, the closest acceptable value will be used instead.</p>
+<p>A string value can be provided directly instead of using the MediaConstraint format.
+Using a string directly is not recommended, since behaviour may differ depending
+on browser and media property. For most properties, a direct string value will be
+handled as <code>ideal</code> behaviour, but some properties may follow the <code>exact</code> behaviour
+(eg. <code>deviceId</code>).</p>
 
 
   <div class='pre p1 fill-light mt0'>MediaConstraint</div>
@@ -6844,7 +6849,8 @@ otherwise they will be added in-band to the call's audio.</p>
   <p>Get a report about low-level call statistical information.</p>
 <p>A Track ID can optionally be provided to get a report for a specific
 Track of the Call.</p>
-<p>The progress of the operation will be tracked via the
+<p>This API will return a promise which, when resolved, it will contain the report of the particlar call.
+The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
 <a href="#calleventcallstatsreceived">call:statsReceived</a> event, after

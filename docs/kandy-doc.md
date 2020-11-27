@@ -390,6 +390,12 @@ When the `exact` value is provided, it will be the only value considered for the
 When the `ideal` value is provided, it will be considered as the optimal value for the option.
    If it cannot be used, the closest acceptable value will be used instead.
 
+A string value can be provided directly instead of using the MediaConstraint format.
+   Using a string directly is not recommended, since behaviour may differ depending
+   on browser and media property. For most properties, a direct string value will be
+   handled as `ideal` behaviour, but some properties may follow the `exact` behaviour
+   (eg. `deviceId`).
+
 Type: [Object][7]
 
 **Properties**
@@ -991,6 +997,7 @@ Get a report about low-level call statistical information.
 A Track ID can optionally be provided to get a report for a specific
    Track of the Call.
 
+This API will return a promise which, when resolved, it will contain the report of the particlar call.
 The progress of the operation will be tracked via the
    [call:operation][33] event.
 
