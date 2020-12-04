@@ -17,6 +17,8 @@ Kandy.js change log.
 ### Added
 
 - Added SDK metadata to `call:statsReceived` event's payload. `KAA-2557`
+- Added a new Call Statistics tutorial. `KAA-2559`
+  - Explains how to retrieve statistics for calls and what the statistics can be used for.
 
 ### Fixed
 
