@@ -12,6 +12,10 @@ Kandy.js change log.
 - Added a request authorization event: `request:error` `KAA-1076`
   - This event is specific for authorization issues when communicating with the server and notifies an application that the user's credentials should be updated/fixed. This event is emitted _in addition_ to any regular error event for an operation that may be emitted.
 
+### Fixed
+
+- Fixed an issue where log handlers set in the config were not being applied to WebRTC related logs. `KAA-2528`
+
 ## 4.22.0 - 2020-11-27
 
 ### Added
