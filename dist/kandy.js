@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.23.0-beta.595
+ * Version: 4.23.0-beta.596
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29331,9 +29331,23 @@ function summarizeMedia(sdp) {
       log.debug(`Media section contains multiple ssrc groups. Summary for ${sectionId} will be wrong.`);
     }
 
+    // If the media section doesn't have a direction, then use the session-level direction.
+    const mediaDirection = media.direction || sdp.direction;
+
     // Whether this media section is sending and/or receiving.
-    const willSend = media.direction.includes('send');
-    const willReceive = media.direction.includes('recv');
+    let willSend;
+    let willReceive;
+
+    if (mediaDirection) {
+      willSend = mediaDirection.includes('send');
+      willReceive = mediaDirection.includes('recv');
+    } else {
+      // If there is no media direction attribute at both the media-level and
+      //    session-level, then it is to be assumed the direction is "sendrecv".
+      // Ref: RFC 4566, page 26: https://tools.ietf.org/html/rfc4566
+      willSend = true;
+      willReceive = true;
+    }
 
     let mediaId, trackId;
     /*
@@ -32242,7 +32256,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.23.0-beta.595';
+  return '4.23.0-beta.596';
 }
 
 /***/ }),

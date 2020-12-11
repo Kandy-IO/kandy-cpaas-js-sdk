@@ -14,6 +14,7 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed a Call issue where a crash would occur when a remote SDP offer does not have a media-level direction attribute. `KAA-2585`
 - Fixed an issue where log handlers set in the config were not being applied to WebRTC related logs. `KAA-2528`
 
 ## 4.22.0 - 2020-11-27
