@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.23.0-beta.596
+ * Version: 4.23.0-beta.597
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32256,7 +32256,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.23.0-beta.596';
+  return '4.23.0-beta.597';
 }
 
 /***/ }),
@@ -44493,7 +44493,13 @@ function* fetchPresence({ payload }) {
   log.debug('Received response from retrievePresence request:', response);
 
   if (!response.error) {
-    yield (0, _effects.put)(actions.getPresenceFinish(response));
+    const presence = {};
+    const presenceContact = response.presenceContact[0];
+    presence.userId = presenceContact.presentityUserId;
+    presence.activity = presenceContact.presence.person.activities.activityValue;
+    presence.status = presenceContact.presence.person['overriding-willingness'].overridingWillingnessValue;
+    presence.note = presenceContact.presence.person.activities.other;
+    yield (0, _effects.put)(actions.getPresenceFinish(presence));
   } else {
     yield (0, _effects.put)(actions.getPresenceFinish(response.error));
   }
@@ -44563,7 +44569,6 @@ function* unsubscribePresence({ payload }) {
  */
 function* handleIncomingPresence(wsAction) {
   const notification = wsAction.payload.presenceNotification;
-  //
   if (notification.presence) {
     const presence = {};
     presence.userId = notification.presentityUserId;
