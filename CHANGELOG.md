@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.24.0 - beta
+
+### Changed
+
+- Updated Logging tutorial to download logs in NDJSON format. `KJS-25`
+
 ## 4.23.0 - 2020-12-21
 
 ### Added

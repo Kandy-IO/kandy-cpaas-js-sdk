@@ -151,7 +151,7 @@ function saveLogsLogHandler (entry) {
 }
 ```
 
-With the logs saved, the application can decide on a method for providing them directly to a user that best suits them. A simple method would be to create a `Blob` for the logs, and allow the user to download it as a file. See below for a sample implementation of this method.
+With the logs saved, the application can decide on a method for providing them directly to a user that best suits them. A simple method would be to create a `Blob` for the logs, and allow the user to download it as a file. See below for a sample implementation of this method. In this case we will also demonstrate formatting the logs in NDJSON format, which appends a new line after each log entry.
 
 ```html 
 <input type="submit" value="Download Logs" onclick="downloadLogs()" />
@@ -163,23 +163,21 @@ With the logs saved, the application can decide on a method for providing them d
  * @method downloadLogs
  */
 function downloadLogs () {
-  // Convert the saved logs into a JSON blob.
-  //    Since the logs were saved as raw JSON, saving them as a JSON file will
-  //    retain the data format best.
-  const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' })
+  // Convert the saved logs into a NDJSON blob.
+  const blob = new Blob([logs.map(JSON.stringify).join('\n')])
 
   // Create a button that will save the Blob as a file when clicked.
   const button = document.createElement('a')
   button.href = URL.createObjectURL(blob)
   // Give the file a name.
-  button.download = Date.now().toString() + '_sdk' + kandy.getVersion() + '_logs.json'
+  button.download = Date.now().toString() + '_sdk' + kandy.getVersion() + '_logs.ndjson'
 
   // Auto-click the button.
   button.click()
 }
 ```
 
-When saving Log Entries, we recommend saving them in their JSON format, rather than parsing them beforehand. It is possible to parse the Log Entries from the file afterwards, but impossible to reconstruct any data that is lost when they were parsed. This ensures that whoever is inspecting the log file has all of the data as it was provided by the SDK.
+When saving Log Entries, we recommend saving them in NDJSON format and retaining all of the data from each entry, rather than parsing them beforehand. It is possible to parse the Log Entries from the file afterwards, but impossible to reconstruct any data that is lost when they were parsed. This ensures that whoever is inspecting the log file has all of the data as it was provided by the SDK.
 
-**N.B.:** If you require support about an issue with the SDK itself, we will ask you to provide a log file with the raw JSON Log Entries and the SDK configured at the 'DEBUG' `logLevel`.
+**N.B.:** If you require support about an issue with the SDK itself, we will ask you to provide a log file with the raw NDJSON Log Entries and the SDK configured at the 'DEBUG' `logLevel`.
 
