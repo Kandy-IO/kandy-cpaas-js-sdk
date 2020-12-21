@@ -5,11 +5,26 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.23.0 - 2020-12-21
+
+### Added
+
+- Added a request authorization event: `request:error` `KAA-1076`
+  - This event is specific for authorization issues when communicating with the server and notifies an application that the user's credentials should be updated/fixed. This event is emitted _in addition_ to any regular error event for an operation that may be emitted.
+
+### Fixed
+
+- Fixed a Call issue where a crash would occur when a remote SDP offer does not have a media-level direction attribute. `KAA-2585`
+- Fixed an issue where log handlers set in the config were not being applied to WebRTC related logs. `KAA-2528`
+- Fixed the content of `presence:change` event for the case when user fetches presence for a given user. `KAA-2527`
+
 ## 4.22.0 - 2020-11-27
 
 ### Added
 
 - Added SDK metadata to `call:statsReceived` event's payload. `KAA-2557`
+- Added a new Call Statistics tutorial. `KAA-2559`
+  - Explains how to retrieve statistics for calls and what the statistics can be used for.
 
 ### Fixed
 

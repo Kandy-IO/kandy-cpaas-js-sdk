@@ -25,6 +25,10 @@
   description: # Voice and Video Calls
   link: /quickstarts/javascript/cpaas/Voice%20and%20Video%20Calls
 
+- name: Call Statistics
+  description: # Call Statistics
+  link: /quickstarts/javascript/cpaas/Call%20Statistics
+
 - name: Anonymous Calls
   description: # Anonymous Calls
   link: /quickstarts/javascript/cpaas/Anonymous%20Calls

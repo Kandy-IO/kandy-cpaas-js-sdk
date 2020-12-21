@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.22.0
+ * Version: 4.23.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -17512,6 +17512,8 @@ const SET_TOKEN = exports.SET_TOKEN = prefix + 'SET_TOKEN';
 const SET_CREDENTIALS = exports.SET_CREDENTIALS = prefix + 'SET_CREDENTIALS';
 const SET_CREDENTIALS_FINISH = exports.SET_CREDENTIALS_FINISH = prefix + 'SET_CREDENTIALS_FINISH';
 
+const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = prefix + 'AUTHORIZATION_ERROR';
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/auth/interface/actions.js":
@@ -29329,9 +29331,23 @@ function summarizeMedia(sdp) {
       log.debug(`Media section contains multiple ssrc groups. Summary for ${sectionId} will be wrong.`);
     }
 
+    // If the media section doesn't have a direction, then use the session-level direction.
+    const mediaDirection = media.direction || sdp.direction;
+
     // Whether this media section is sending and/or receiving.
-    const willSend = media.direction.includes('send');
-    const willReceive = media.direction.includes('recv');
+    let willSend;
+    let willReceive;
+
+    if (mediaDirection) {
+      willSend = mediaDirection.includes('send');
+      willReceive = mediaDirection.includes('recv');
+    } else {
+      // If there is no media direction attribute at both the media-level and
+      //    session-level, then it is to be assumed the direction is "sendrecv".
+      // Ref: RFC 4566, page 26: https://tools.ietf.org/html/rfc4566
+      willSend = true;
+      willReceive = true;
+    }
 
     let mediaId, trackId;
     /*
@@ -32240,7 +32256,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.22.0';
+  return '4.23.0';
 }
 
 /***/ }),
@@ -38347,6 +38363,7 @@ function logPlugin(options = {}) {
   const name = 'logs';
 
   const logger = _index.logManager.getLogger('LOGS');
+
   // Make sure the configured log handler was a function.
   if (options.handler && typeof options.handler !== 'function') {
     delete options.handler;
@@ -38384,12 +38401,24 @@ function logPlugin(options = {}) {
     }
   });
 
-  function* init() {
+  function* init({ webRTC }) {
     // Send the provided options to the store.
     // This will be `state.config[name]`.
     yield (0, _effects.put)((0, _actions4.update)(options, name));
     // Update state with the initial Logger levels.
     yield (0, _effects.put)(actions.levelsChanged((0, _sagas.getLevelMap)(_index.logManager)));
+    // Update everything to
+    //    use those values from the application configs instead of default values in the webrtc Stack.
+    const webRTCLogManager = webRTC.managers.logs;
+    if (options.handler) {
+      webRTCLogManager.setHandler(options.handler);
+    }
+    (0, _values2.default)(webRTCLogManager.getLoggers()).forEach(logger => {
+      logger.setLevel(options.logLevel);
+      if (options.handler) {
+        logger.setHandler(options.handler);
+      }
+    });
   }
 
   const components = {
@@ -44464,7 +44493,13 @@ function* fetchPresence({ payload }) {
   log.debug('Received response from retrievePresence request:', response);
 
   if (!response.error) {
-    yield (0, _effects.put)(actions.getPresenceFinish(response));
+    const presence = {};
+    const presenceContact = response.presenceContact[0];
+    presence.userId = presenceContact.presentityUserId;
+    presence.activity = presenceContact.presence.person.activities.activityValue;
+    presence.status = presenceContact.presence.person['overriding-willingness'].overridingWillingnessValue;
+    presence.note = presenceContact.presence.person.activities.other;
+    yield (0, _effects.put)(actions.getPresenceFinish(presence));
   } else {
     yield (0, _effects.put)(actions.getPresenceFinish(response.error));
   }
@@ -44534,7 +44569,6 @@ function* unsubscribePresence({ payload }) {
  */
 function* handleIncomingPresence(wsAction) {
   const notification = wsAction.payload.presenceNotification;
-  //
   if (notification.presence) {
     const presence = {};
     presence.userId = notification.presentityUserId;
@@ -45523,6 +45557,164 @@ function getSelfPresence(state) {
 
 /***/ }),
 
+/***/ "../../packages/kandy/src/request/authorization.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _values = __webpack_require__("../../node_modules/babel-runtime/core-js/object/values.js");
+
+var _values2 = _interopRequireDefault(_values);
+
+exports.linkAuthorization = linkAuthorization;
+exports.ucAuthorization = ucAuthorization;
+exports.cpaasAuthorization = cpaasAuthorization;
+
+var _errors = __webpack_require__("../../packages/kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Function that checks a REST response action for Link authorization issues.
+ * @param  {Object} response A REST response object.
+ * @return {BasicError|undefined}
+ */
+function linkAuthorization(response) {
+  if (!response.error) {
+    return;
+  }
+
+  /*
+   * A SPiDR REST request will return
+   *  - '403 Forbidden', with body 'statusCode: 4' for bad password,
+   *  - '403 Forbidden', with html body (which is thrown away) for bad username.
+   *
+   * The SPiDR REST API document (v4.7, May 2019) says it will return '403 Forbidden'
+   *    with other statusCodes for numerous untestable scenarios. Some of these are
+   *    for credential/auth issues, others are for unrelated issues.
+   * Authorization related:
+   *    - 27 (generic auth failure), 61 (credentials issue), 65 (token expired)
+   * Unrelated:
+   *    - 29 (device not authorized), 35 (service not enabled), 37 (invalid value),
+   *      45 (invalid app_name), 46 (invalid CallMe token), 62 (account is disabled),
+   *      63 (account is locked), 64 (invalid CallMe realm)
+   */
+  // Status codes considered to be "auth issues".
+  const authIssues = [4, 27, 61, 65];
+
+  const statusCode = getStatusCode(response);
+
+  /*
+   * Define a Link authorization issue to be:
+   *  - a '403 Forbidden', with no body or with a specific statusCode.
+   */
+  if (response.result.code === 403 && (response.body === undefined || authIssues.includes(statusCode))) {
+    let message = 'Authorization failed with server. Please check credentials.';
+    if (statusCode) {
+      message += ` Status code: ${statusCode}`;
+    }
+    return new _errors2.default({
+      code: _errors.authCodes.INVALID_CREDENTIALS,
+      message: message
+    });
+  }
+}
+
+/**
+ * Function that checks a REST response action for UC authorization issues.
+ *    UC includes both SPiDR and CIM REST requests.
+ * @param  {Object} response A REST response object.
+ * @return {BasicError|undefined}
+ */
+/**
+ * "Authorization" issues are REST errors caused by invalid user credentials.
+ *    These are issues that should be solvable by an end-user updating/fixing
+ *    the credentials that they have provided.
+ */
+function ucAuthorization(response) {
+  /*
+   * A CIM REST request will return
+   *    - '401 Login Please' (not 401 Unauthorized) with no body for credential issues.
+   *    - '401 Login Please', with body message "expired token" for token issues.
+   *
+   * SPiDR will return '401 Unauthorized' for non-auth issues though,
+   *    (statusCode 35 for "service not enabled").
+   */
+
+  /*
+   * Define a UC authorization issue to be:
+   *  - a '401 Login Please'.
+   */
+  const result = response.result;
+  if (result.code === 401 && result.message === 'Login Please') {
+    let message = 'Authorization failed with server. Please check credentials.';
+
+    const statusCode = getStatusCode(response);
+    if (statusCode) {
+      message += ` Status code: ${statusCode}`;
+    }
+
+    return new _errors2.default({
+      code: _errors.authCodes.INVALID_CREDENTIALS,
+      message
+    });
+  }
+}
+
+/**
+ * Function that checks a REST response action for CPaaS authorization issues.
+ * @param  {Object} response A REST response object.
+ * @return {BasicError|undefined}
+ */
+function cpaasAuthorization(response) {
+  /*
+   * A CPaaS REST request will return '401 Unauthorized' for authorization issues.
+   */
+  if (response.result.code === 401) {
+    return new _errors2.default({
+      code: _errors.authCodes.INVALID_CREDENTIALS,
+      message: 'Authorization failed with server. Please check credentials.'
+    });
+  }
+}
+
+/**
+ * Helper function for parsing a statusCode from a SPiDR REST response body.
+ * @param  {Object} response
+ * @return {number|undefined}
+ */
+function getStatusCode(response) {
+  let statusCode;
+  /*
+   * Parse the statusCode out from the body.
+   */
+  if (response.body) {
+    if (response.body.statusCode) {
+      // In some cases (eg. KAA-1937), the statusCode is at the top-level of the body.
+      statusCode = response.body.statusCode;
+    } else {
+      // In most cases, the statusCode is inside another object. The name of this
+      //    parameter is different depending which service the request was for,
+      //    so search for it.
+      (0, _values2.default)(response.body).forEach(value => {
+        if (value.statusCode) {
+          statusCode = value.statusCode;
+        }
+      });
+    }
+  }
+  return statusCode;
+}
+
+/***/ }),
+
 /***/ "../../packages/kandy/src/request/configs.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -45642,38 +45834,32 @@ function* requestSaga(options, manualOptions) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.__testonly__ = undefined;
-exports.default = request;
-
-var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
-
-var actionTypes = _interopRequireWildcard(_actionTypes);
-
-var _actions = __webpack_require__("../../packages/kandy/src/request/interface/actions.js");
-
-var actions = _interopRequireWildcard(_actions);
+exports.cpaasRequest = exports.ucRequest = exports.linkRequest = undefined;
 
 var _configs = __webpack_require__("../../packages/kandy/src/request/configs.js");
 
-var _makeRequest = __webpack_require__("../../packages/kandy/src/request/makeRequest.js");
+var _sagas = __webpack_require__("../../packages/kandy/src/request/sagas.js");
 
-var _makeRequest2 = _interopRequireDefault(_makeRequest);
+var _sagas2 = _interopRequireDefault(_sagas);
 
-var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
+var _events = __webpack_require__("../../packages/kandy/src/request/interface/events.js");
 
-var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+var _events2 = _interopRequireDefault(_events);
+
+var _actions = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
+
+var _actions2 = __webpack_require__("../../packages/kandy/src/events/interface/actions.js");
 
 var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 
-var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+// Utils.
 
-// Libraries.
+
+// Other plugins.
 const pluginName = 'requests';
 
 /*
@@ -45681,65 +45867,48 @@ const pluginName = 'requests';
  */
 
 
-// Utils.
-
-
-// Other plugins.
+// Libraries.
 // Request plugin.
-function request(options = {}) {
-  options = (0, _utils.mergeValues)(_configs.defaultOptions, options);
-  (0, _configs.parseOptions)(options);
+exports.default = pluginFactory();
 
-  function* init() {
-    yield (0, _effects.put)((0, _actions2.update)(options, pluginName));
-  }
+/*
+ * Platform-specific request plugins.
+ *    Same base REST behaviour as the generic request plugin, with some extra
+ *    handling of a response.
+ */
 
-  return {
-    sagas: [watchRequests],
-    name: pluginName,
-    init
+const linkRequest = exports.linkRequest = pluginFactory('link');
+const ucRequest = exports.ucRequest = pluginFactory('uc');
+const cpaasRequest = exports.cpaasRequest = pluginFactory('cpaas');
+
+/**
+ * Factory function for creating a Request Plugin.
+ *    Allows for specifying which platform the requests will be made to. This
+ *    adds special handling of responses to check for special-case issues.
+ * @param  {string} [platform] The platform this plugin is for.
+ * @return {Function} The actual Plugin creator function.
+ */
+function pluginFactory(platform) {
+  // Generate the saga for this platform, or a generic saga if platform is undefined.
+  const saga = (0, _sagas2.default)(platform);
+
+  return function request(options = {}) {
+    options = (0, _utils.mergeValues)(_configs.defaultOptions, options);
+    (0, _configs.parseOptions)(options);
+
+    function* init() {
+      yield (0, _effects.put)((0, _actions.update)(options, pluginName));
+      yield (0, _effects.put)((0, _actions2.mapEvents)(_events2.default));
+    }
+
+    return {
+      sagas: [saga],
+      name: pluginName,
+      init,
+      capabilities: platform ? ['restAuthorization'] : []
+    };
   };
 }
-
-/*
- * Saga to watch for every request action.
- */
-function* watchRequests() {
-  yield (0, _effects.takeEvery)(actionTypes.REQUEST, handleRequest);
-}
-
-/*
- * Generator that handles a request action with standard HTTP handling features and reports
- * a requestFinished action when the request is done.
- *
- * @param {FluxStandardAction} action The action to handle.
- */
-function* handleRequest(action) {
-  const log = _logs.logManager.getLogger('REQUEST', action.meta.requestId);
-
-  const logOptions = (0, _fp.cloneDeep)(action.payload);
-  // When logging the Auth header, cut it off so that we can see the type of
-  //    token but not the token itself. Depending on the type, it can contain
-  //    a password.
-  const authHeader = logOptions.headers.Authorization;
-  if (authHeader) {
-    logOptions.headers.Authorization = authHeader.substring(0, 6) + '...';
-  }
-  log.debug(`Making REST request ${action.meta.requestId}.`, logOptions);
-
-  // Make the request based on the action
-  var result = yield (0, _effects.call)(_makeRequest2.default, action.payload, action.meta.requestId);
-
-  log.debug(`Received REST response ${action.meta.requestId}.`, result);
-
-  yield (0, _effects.put)(actions.response(action.meta.requestId, result, !!result.error));
-}
-
-// begin-test-code
-const __testonly__ = exports.__testonly__ = { watchRequests, handleRequest
-  // end-test-code
-
-};
 
 /***/ }),
 
@@ -45757,6 +45926,8 @@ const PREFIX = '@@KANDY/';
 const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
 const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
 
+const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = PREFIX + 'AUTHORIZATION_ERROR';
+
 /***/ }),
 
 /***/ "../../packages/kandy/src/request/interface/actions.js":
@@ -45770,6 +45941,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.request = request;
 exports.response = response;
+exports.authorizationError = authorizationError;
 
 var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
 
@@ -45813,6 +45985,81 @@ function response(requestId, result, error = false) {
     }
   };
 }
+
+/**
+ * Action to signify a REST request has encountered an authorization error.
+ * @param  {BasicError} error
+ * @return {Action}
+ */
+function authorizationError(error) {
+  return {
+    error: true,
+    type: actionTypes.AUTHORIZATION_ERROR,
+    payload: error
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/eventTypes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * An error occurred with server authorization.
+ *
+ * This event will be emitted anytime a REST request to the server is rejected
+ *    due to an authorization issue. This may occur for invalid credentials or
+ *    expired tokens, depending on which form of authentication the application
+ *    has chosen to use.
+ * @public
+ * @memberof api
+ * @requires restAuthorization
+ * @event request:error
+ * @param {Object} params
+ * @param {api.BasicError} params.error The Basic error object.
+ */
+const REQUEST_ERROR = exports.REQUEST_ERROR = 'request:error';
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/interface/events.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _eventTypes = __webpack_require__("../../packages/kandy/src/request/interface/eventTypes.js");
+
+var eventTypes = _interopRequireWildcard(_eventTypes);
+
+var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const eventsMap = {};
+
+eventsMap[actionTypes.AUTHORIZATION_ERROR] = function (action) {
+  return {
+    type: eventTypes.REQUEST_ERROR,
+    args: {
+      error: action.payload
+    }
+  };
+};
+
+exports.default = eventsMap;
 
 /***/ }),
 
@@ -45867,7 +46114,7 @@ var _utils = __webpack_require__("../../packages/kandy/src/common/utils.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Enum declaring the valid request response data types that are available to be handled
+ * The possible response data types that can be handled.
  */
 // Other plugins.
 const responseTypes = (0, _freeze2.default)({
@@ -45877,9 +46124,12 @@ const responseTypes = (0, _freeze2.default)({
   none: 'none'
 });
 
+/**
+ * The possible Content-Type headers that we may receive in a response.
+ */
+
+
 // Utils.
-
-
 const contentTypes = (0, _freeze2.default)({
   jsonType: 'application/json',
   vdnJsonType: 'application/vdn.kandy.json',
@@ -45891,19 +46141,21 @@ const contentTypes = (0, _freeze2.default)({
 /**
  * Make a request with the specified options. The options is very similar to the options passed to the GlobalFetch
  * method except that is also accepts the url as part of the options.
+ * Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request
  *
  * Currently this processes the request and assumes nothing about the response.
  * - If the response has a body, it will always be parsed and forwarded on.
- *      - If no body, then an empty object in its place.
+ *      - If no body, then use an empty object in its place.
  * - If the fetch succeeded, the response "results" will always be forwarded on,
  *      even if the response is outside of the 200-299 range.
  *      - Because some backends provide more detailed error info (that a saga
  *        may need) as part of the body, rather than just the response status.
+ * - If the fetch fails, return with the fetch failure information.
  *
  * @param {Object} options Options to make the request with.
  * @param {string} options.url The URL to make the request to.
  * @param {Object} [options.queryParams] The parameters to be added to the query string
- * @param {string} [options.responseType] The data type assumed to be received in the response body
+ * @param {string} [options.responseType='json] The expected data type of the response body.
  * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
  * @return {Promise} A promise that resolves with a custom response object.
  */
@@ -45911,43 +46163,18 @@ const contentTypes = (0, _freeze2.default)({
 exports.default = async function makeRequest(options, requestId) {
   const log = _logs.logManager.getLogger('REQUEST', requestId);
 
-  // TODO This functions is too complex. Consider refactoring.
-
-  /**
-   * Make a response object that will  have the same structure every time
-   * regardless of the server response.
-   *
-   * @param {Object} apiResponse API related response data
-   * @param {string} apiResponse.error This should be a string indicating an error if the request fails due to an invalid request.
-   * @param {string} apiResponse.message This should be a string with more details about the api error.
-   * @param {Object} httpResponse This will contain the response data from the server.
-   * @param {Object} httpResponse.body The response body data from the server.
-   * @param {boolean} httpResponse.ok Indicates if the request was considered a success by the server.
-   * @param {Object} httpResponse.code The HTTP status code for the request.
-   * @param {Object} httpResponse.message A message describing the server response.
-   * @return {Object} An object containing API and/or server response details.
+  /*
+   * Check the provided options to ensure they are valid before making the request.
    */
-  function makeResponse(apiResponse = {}, httpResponse = {}) {
-    return {
-      body: httpResponse.body,
-      error: apiResponse.error,
-      result: {
-        ok: Boolean(httpResponse.ok),
-        code: httpResponse.code,
-        message: apiResponse.message || httpResponse.message
-      }
-    };
+  const error = validateOptions(options);
+  if (error) {
+    log.info(error.result.message);
+    return error;
   }
 
   // Extract and remove the non-fetch API properties.
   const { url, queryParams, responseType = 'json' } = options,
         fetchOptions = (0, _objectWithoutProperties3.default)(options, ['url', 'queryParams', 'responseType']);
-
-  if (!url || typeof url !== 'string') {
-    const invalidUrlMessage = `Invalid request url; expected url of type string but received ${url} instead`;
-    log.error(invalidUrlMessage);
-    return makeResponse({ error: 'REQUEST_URL', message: invalidUrlMessage });
-  }
 
   // Grab that last part of the URL (after the last /) to be logged.
   let endUrl = url.match(/([^/]*)$/)[0];
@@ -45955,109 +46182,282 @@ exports.default = async function makeRequest(options, requestId) {
   endUrl = endUrl.length > 15 ? endUrl.substring(0, 15) + '...' : endUrl;
   log.info(`Making ${fetchOptions.method} ${endUrl} request.`);
 
-  if (!responseTypes.hasOwnProperty(responseType)) {
-    // Invalid data type requested
-    const invalidResponseType = 'Cannot make request; responseType value was invalid.';
-    log.info(invalidResponseType);
-    return makeResponse({ error: 'RESPONSE_TYPE', message: invalidResponseType });
-  }
-
   let response;
-  let contentType;
+  /*
+   * Make the request. Scenarios to check for:
+   *  1. Fetch failed.
+   *  2. Fetch succeeded and is ok, with no response body.
+   *  3. Fetch succeeded and is ok, with expected response type.
+   *  4. Fetch succeeded and is ok, with unexpected response type.
+   *  5. Fetch succeeded but is not ok.
+   */
   try {
     response = await fetch(url + (0, _utils.toQueryString)(queryParams), fetchOptions);
   } catch (err) {
+    // Scenario 1: Fetch failed.
     log.info(`Failed to make request, caused by ${err.message}`);
     return makeResponse({ error: 'FETCH' }, { code: err.name, message: err.message });
   }
 
-  try {
-    contentType = await response.headers.get('content-type');
-  } catch (err) {
-    log.debug(`Failed to get content-type:${err.message}.`);
-  }
+  // Basic information for the request result.
+  const result = {
+    ok: response.ok,
+    code: response.status,
+    message: response.statusText
+  };
 
-  try {
-    const result = {
-      ok: response.ok,
-      code: response.status,
-      message: response.statusText
-    };
-    let responseBody;
-    const error = !response.ok;
-
-    if (error) {
-      log.info(`Received error response for request (status ${response.status}).`);
-      /*
-       * Handle a special-case error where the response body is a HTML page...
-       * Throw away the body and so it is simply reported as 'Forbidden'.
-       * TODO: Handle responses based on their type rather than checking for
-       *    individual special cases...
-       */
-      if (response.status === 403 && contentType.includes('html')) {
-        return makeResponse({ error: 'REQUEST' }, result);
-      }
-
-      /*
-       * If the response indicates an error and has a body, resolve the body as JSON
-       * but no body return an empty object then return a `REQUEST` error
-       */
-      const isJson = contentType && contentType.includes(contentTypes.jsonType);
-      responseBody = isJson ? await response.json() : {};
-      return makeResponse({ error: 'REQUEST' }, (0, _extends3.default)({ body: responseBody }, result));
-    } else if (response.status === 204) {
+  if (response.ok) {
+    if (response.status === 204) {
       /*
        * A `204 (No Content)` response indicates a success, but with no content to return.
        * Avoid parsing the response because there isn't one.
        */
-      responseBody = {};
-
+      // Scenario 2: Response is ok, with no response body.
       log.info(`Finished request with successful response (status ${response.status}).`);
-      return makeResponse(undefined, (0, _extends3.default)({ body: responseBody }, result));
-    } else {
-      /**
-       * The SDK should only be parsing the responses as is expected without checking the content type of the response.
-       * This is deterministic depending on the `responseType` passed in to the request through the request options.
-       */
-      responseBody = {};
-      try {
-        switch (responseType) {
-          case responseTypes.json:
-            responseBody = await response.json();
-            break;
-          case responseTypes.blob:
-            responseBody = await response.blob();
-            break;
-          case responseTypes.text:
-            responseBody = await response.text();
-            break;
-          case responseTypes.none:
-            // Do not parse the response
-            break;
-          default:
-            // This should be unreachable code.
-            throw Error('Assertion failed');
-        }
-      } catch (e) {
-        log.error(`Failed to parse with response type: ${responseType}. Error: ${e}`);
-
-        // Note: We get here if we have a successful request but the server sent us unexpected data.
-        // We need to treat this as an error case because we can no longer enforce a contract with the
-        // code making the request.
-        //
-        // If the code gets here the issue is either with the server not sending us expected data, or with
-        // the calling code that told us to expect the wrong data.
-
-        return makeResponse({ error: 'REQUEST' }, { code: e.name, message: e.message });
-      }
-
-      log.info(`Finished request with successful response (status ${response.status}).`);
-      return makeResponse(undefined, (0, _extends3.default)({ body: responseBody }, result));
+      return makeResponse(undefined, (0, _extends3.default)({ body: {} }, result));
     }
-  } catch (err) {
-    log.info(`Failed to parse response, caused by ${err.message}`);
-    return makeResponse({ error: 'REQUEST' }, { code: err.name, message: err.message });
+
+    const data = await parseBody(response, responseType);
+    if (data instanceof Error) {
+      // Scenario 4: Response is ok, with an unexpected type.
+      log.error(`Failed to parse with response type: ${responseType}. Error: ${data}`);
+      return makeResponse({ error: 'REQUEST' }, { code: data.name, message: data.message });
+    } else {
+      // Scenario 3: Response is ok, with an expected type.
+      log.info(`Finished request with successful response (status ${response.status}).`);
+      return makeResponse(undefined, (0, _extends3.default)({ body: data }, result));
+    }
+  } else {
+    // Scenario 5: Response is not ok.
+    let contentType;
+    // Check the Content-Type of the response.
+    try {
+      contentType = await response.headers.get('content-type');
+    } catch (err) {
+      log.debug(`Failed to get content-type:${err.message}.`);
+    }
+    /*
+     * Handle a SPiDR special-case error where the response body is a HTML page...
+     * Throw away the body and simply report it as 'Forbidden'.
+     */
+    if (response.status === 403 && contentType.includes('html')) {
+      return makeResponse({ error: 'REQUEST' }, result);
+    }
+
+    /*
+     * Check whether the response body is json. If it is, parse it and include
+     *    it in the returned error. Otherwise provide an empty object instead.
+     */
+    const isJson = contentType && contentType.includes(contentTypes.jsonType);
+    const responseBody = isJson ? await response.json() : {};
+    return makeResponse({ error: 'REQUEST' }, (0, _extends3.default)({ body: responseBody }, result));
   }
+};
+
+/**
+ * Checks for the provided options to be considered valid before making the
+ *    request. If an option is invalid, an error response will be returned.
+ * @param  {Object} options
+ * @return {Response|undefined}
+ */
+
+
+function validateOptions(options) {
+  const { url, responseType } = options;
+
+  if (!url || typeof url !== 'string') {
+    const invalidUrlMessage = `Invalid request url; expected url of type string but received ${url} instead`;
+    return makeResponse({ error: 'REQUEST_URL', message: invalidUrlMessage });
+  }
+
+  /*
+   * If an expected responseType was provided, it should be one of the types
+   *    that we know how to handle.
+   */
+  if (responseType && !responseTypes.hasOwnProperty(responseType)) {
+    const invalidResponseType = 'Cannot make request; responseType value was invalid.';
+    return makeResponse({ error: 'RESPONSE_TYPE', message: invalidResponseType });
+  }
+}
+
+/**
+ * Get the body from the response depending on our expected content-type.
+ * @return {Body|Error}
+ */
+async function parseBody(response, expectedType) {
+  /**
+   * The SDK should only be parsing the responses as is expected without checking the content type of the response.
+   * This is deterministic depending on the `responseType` passed in to the request through the request options.
+   */
+  let responseBody = {};
+  try {
+    switch (expectedType) {
+      case responseTypes.json:
+        responseBody = await response.json();
+        break;
+      case responseTypes.blob:
+        responseBody = await response.blob();
+        break;
+      case responseTypes.text:
+        responseBody = await response.text();
+        break;
+      case responseTypes.none:
+        // Do not parse the response
+        break;
+      default:
+        // This should be unreachable code.
+        throw Error('Assertion failed');
+    }
+  } catch (e) {
+    // Note: We get here if we have a successful request but the server sent us unexpected data.
+    // We need to treat this as an error case because we can no longer enforce a contract with the
+    // code making the request.
+    //
+    // If the code gets here the issue is either with the server not sending us expected data, or with
+    // the calling code that told us to expect the wrong data.
+
+    return e;
+  }
+
+  return responseBody;
+}
+
+/**
+ * Make a response object that will  have the same structure every time
+ * regardless of the server response.
+ *
+ * @param {Object} apiResponse API related response data
+ * @param {string} apiResponse.error This should be a string indicating an error if the request fails due to an invalid request.
+ * @param {string} apiResponse.message This should be a string with more details about the api error.
+ * @param {Object} httpResponse This will contain the response data from the server.
+ * @param {Object} httpResponse.body The response body data from the server.
+ * @param {boolean} httpResponse.ok Indicates if the request was considered a success by the server.
+ * @param {Object} httpResponse.code The HTTP status code for the request.
+ * @param {Object} httpResponse.message A message describing the server response.
+ * @return {Object} An object containing API and/or server response details.
+ */
+function makeResponse(apiResponse = {}, httpResponse = {}) {
+  return {
+    body: httpResponse.body,
+    error: apiResponse.error,
+    result: {
+      ok: Boolean(httpResponse.ok),
+      code: httpResponse.code,
+      message: apiResponse.message || httpResponse.message
+    }
+  };
+}
+
+/***/ }),
+
+/***/ "../../packages/kandy/src/request/sagas.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.__testonly__ = undefined;
+exports.default = watchRequests;
+
+var _actionTypes = __webpack_require__("../../packages/kandy/src/request/interface/actionTypes.js");
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
+var _actions = __webpack_require__("../../packages/kandy/src/request/interface/actions.js");
+
+var actions = _interopRequireWildcard(_actions);
+
+var _makeRequest = __webpack_require__("../../packages/kandy/src/request/makeRequest.js");
+
+var _makeRequest2 = _interopRequireDefault(_makeRequest);
+
+var _authorization = __webpack_require__("../../packages/kandy/src/request/authorization.js");
+
+var authorizations = _interopRequireWildcard(_authorization);
+
+var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
+
+var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
+
+var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
+
+var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/*
+ * Saga-factory for creating the `watchRequests` saga.
+ *    If `platform` is undefined, then no extra, platform-specific handling is done.
+ */
+
+
+// Libraries.
+
+
+// Other plugins.
+// Request plugin.
+function watchRequests(platform) {
+  // Only allow our known platforms or undefined (for base).
+  if (!['link', 'uc', 'cpaas', undefined].includes(platform)) {
+    throw Error('Invalid platform specific for requests.');
+  }
+  return function* watchRequests() {
+    yield (0, _effects.takeEvery)(actionTypes.REQUEST, handleRequest, platform);
+  };
+}
+
+/*
+ * Generator that handles a request action with standard HTTP handling features and reports
+ * a requestFinished action when the request is done.
+ *
+ * @param {string} [platform] The platform being used.
+ * @param {FluxStandardAction} action The action to handle.
+ */
+
+
+// Helpers.
+function* handleRequest(platform, action) {
+  const log = _logs.logManager.getLogger('REQUEST', action.meta.requestId);
+
+  const logOptions = (0, _fp.cloneDeep)(action.payload);
+  // When logging the Auth header, cut it off so that we can see the type of
+  //    token but not the token itself. Depending on the type, it can contain
+  //    a password.
+  const authHeader = logOptions.headers.Authorization;
+  if (authHeader) {
+    logOptions.headers.Authorization = authHeader.substring(0, 6) + '...';
+  }
+  log.debug(`Making REST request ${action.meta.requestId}.`, logOptions);
+
+  // Make the request based on the action
+  var result = yield (0, _effects.call)(_makeRequest2.default, action.payload, action.meta.requestId);
+
+  log.debug(`Received REST response ${action.meta.requestId}.`, result);
+
+  // If the platform was specified and this is not a 3.X build, perform the
+  //    authorization check side-effect.
+  if (platform && !(0, _version.getVersion)().startsWith('3')) {
+    // Call the 'authorization' function specific for this platform.
+    //    They're all named ${platform}Authorization so it's easier to call them.
+    const error = authorizations[`${platform}Authorization`](result);
+
+    if (error) {
+      yield (0, _effects.put)(actions.authorizationError(error));
+    }
+  }
+
+  yield (0, _effects.put)(actions.response(action.meta.requestId, result, !!result.error));
+}
+
+// begin-test-code
+const __testonly__ = exports.__testonly__ = { watchRequests, handleRequest
+  // end-test-code
+
 };
 
 /***/ }),
@@ -59648,17 +60048,13 @@ var _events = __webpack_require__("../../packages/kandy/src/events/index.js");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
-
-var _request2 = _interopRequireDefault(_request);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * This is a list of base plugins that most solutions will need. These plugins provide service-like capabilities
  * to the SDK.
  */
-exports.default = [{ name: 'logs', fn: _plugin2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }, { name: 'request', fn: _request2.default }];
+exports.default = [{ name: 'logs', fn: _plugin2.default }, { name: 'config', fn: _config2.default }, { name: 'events', fn: _events2.default }];
 
 /***/ }),
 
@@ -59867,16 +60263,16 @@ var _cpaas17 = __webpack_require__("../../packages/kandy/src/users/cpaas/index.j
 
 var _cpaas18 = _interopRequireDefault(_cpaas17);
 
+var _request = __webpack_require__("../../packages/kandy/src/request/index.js");
+
 __webpack_require__("../../packages/kandy/src/docs/docs.js");
 
 var _sdpHandlers = __webpack_require__("../../node_modules/@kandy-io/sdp-handlers/src/index.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }];
-
 // Plugins
-
+const defaultPlugins = [..._basePlugins2.default, { name: 'authentication', fn: _cpaas2.default }, { name: 'webrtc', fn: _webrtc2.default }, { name: 'call', fn: _cpaas4.default }, { name: 'connectivity', fn: _cpaas6.default }, { name: 'messaging', fn: _cpaas8.default }, { name: 'notifications', fn: _cpaas10.default }, { name: 'presence', fn: _cpaas12.default }, { name: 'groups', fn: _cpaas14.default }, { name: 'subscription', fn: _cpaas16.default }, { name: 'users', fn: _cpaas18.default }, { name: 'request', fn: _request.cpaasRequest }];
 
 function root(options = {}, plugins = []) {
   return (0, _core2.default)(options, [...defaultPlugins, ...plugins]);
