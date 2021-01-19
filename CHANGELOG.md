@@ -11,6 +11,10 @@ Kandy.js change log.
 
 - Updated Logging tutorial to download logs in NDJSON format. `KJS-25`
 
+### Fixed
+
+- Fixed issue where Kandy.js would ignore a new track if it had the same id as another track on another peer. `KAA-2599`
+
 ## 4.23.0 - 2020-12-21
 
 ### Added
