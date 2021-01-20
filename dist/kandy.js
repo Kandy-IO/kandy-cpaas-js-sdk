@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.24.0-beta.603
+ * Version: 4.24.0-beta.604
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32256,7 +32256,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.24.0-beta.603';
+  return '4.24.0-beta.604';
 }
 
 /***/ }),
@@ -57968,8 +57968,8 @@ function TrackManager() {
    * @param  {MediaStream} stream
    * @return {Track} The added/wrapped Track object.
    */
-  function add(id, track, stream) {
-    const targetTrack = tracks.get(id);
+  function add(trackId, track, stream) {
+    const targetTrack = tracks.get(trackId);
 
     // Chrome issue: track.stream is outdated and needs to be updated to newStream.
     // targetTrack.stream.active is false & targetTrack.stream.getTracks() gives us an empty array.
@@ -57984,8 +57984,8 @@ function TrackManager() {
       return targetTrack;
     } else {
       // Wrap the track as a Track object.
-      const wrappedTrack = new _track2.default(id, track, stream);
-      tracks.set(id, wrappedTrack);
+      const wrappedTrack = new _track2.default(trackId, track, stream);
+      tracks.set(wrappedTrack.id, wrappedTrack);
 
       // Remove the track from the manager when it ends.
       wrappedTrack.once('ended', remove);
@@ -59244,9 +59244,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Libraries.
-function Track(id, mediaTrack, mediaStream) {
+function Track(trackId, mediaTrack, mediaStream) {
   // Internal variables.
-  const trackId = id;
   const track = mediaTrack;
   let stream = mediaStream;
   const containers = [];
