@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.24.0-beta.604
+ * Version: 4.24.0-beta.605
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32256,7 +32256,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.24.0-beta.604';
+  return '4.24.0-beta.605';
 }
 
 /***/ }),
@@ -32819,8 +32819,18 @@ function* websocketLifecycle(wsConnectAction) {
 function* serverPingFlow(ws) {
   const { lastContact, platform, maxMissedPings, autoReconnect } = ws.kandy;
   let timeOfLastPing = Date.now();
+  const { pingInterval: configPingInterval } = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+  if (configPingInterval) {
+    log.warn('`connectivity.pingInterval` has been set, but `connectivity.method.responsibleParty` is set to `server`. ' + `The configured value of ${configPingInterval}ms will be ignored.`);
+  }
 
   while (true) {
+    /**
+     * //TODO: Get rid of this use of getPingInterval
+     * The server doesn't even use this interval, it uses whatever the server is set to
+     * It gets an undefined value, sets it to 120 seconds, and when the server responds switched to that timeout.
+     * See KJS-58 for a discussion of the problem, and KAA-2215 for a long-term solution
+     */
     let pingInterval = yield (0, _effects.select)(_selectors.getPingInterval);
     pingInterval = typeof pingInterval !== 'undefined' ? pingInterval : 120000;
     const maxIdleDuration = pingInterval * maxMissedPings;

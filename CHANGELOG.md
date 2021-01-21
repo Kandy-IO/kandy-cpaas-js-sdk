@@ -7,6 +7,11 @@ Kandy.js change log.
 
 ## 4.24.0 - beta
 
+### Added
+
+- Added explicit warning around the connectivity plugin when using `server` for the `responsibleParty` and a `pingInterval`. `KJS-58`
+  - `pingInterval` is ignored when the server is responsible for pings. This has been made more explicit now.
+
 ### Changed
 
 - Updated Logging tutorial to download logs in NDJSON format. `KJS-25`
