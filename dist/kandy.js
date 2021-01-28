@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.24.0-beta.608
+ * Version: 4.24.0-beta.609
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20914,9 +20914,14 @@ function* validateCallState(callId, expected) {
   if (differences.length === 0) {
     return false;
   } else {
+    const enumerateDiffs = source => differences.map(item => `${item}=${source[item]}`).join(', ');
+    const bad = enumerateDiffs(targetCall);
+    const good = enumerateDiffs(expected);
+    const message = `Call is in an invalid state: ${bad}. It should be: ${good}.`;
+
     return new _errors2.default({
       code: _errors.callCodes.INVALID_STATE,
-      message: `Call is in an invalid state (${differences}).`
+      message
     });
   }
 }
@@ -25932,10 +25937,10 @@ function* answerCall(deps, action) {
   // Make sure the call state is what we expect
   const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
     state: _constants.CALL_STATES.RINGING,
-    direction: 'incoming'
+    direction: _constants.CALL_DIRECTION.INCOMING
   });
   if (stateError) {
-    log.debug(`Failed to answer call due to invalid call state: ${stateError.message}`);
+    log.debug(`Failed to answer call - ${stateError.message}`);
     yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
       error: stateError
     }));
@@ -26150,7 +26155,7 @@ function* ignoreCall(deps, action) {
   });
 
   if (stateError) {
-    log.info(`Failed to ignore call, caused by ${stateError.message}.`);
+    log.info(`Failed to ignore call - ${stateError.message}.`);
     // Report the operation failure.
     yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(action.payload.id, { error: stateError }));
     return;
@@ -32256,7 +32261,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.24.0-beta.608';
+  return '4.24.0-beta.609';
 }
 
 /***/ }),

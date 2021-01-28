@@ -15,6 +15,7 @@ Kandy.js change log.
 ### Changed
 
 - Updated Logging tutorial to download logs in NDJSON format. `KJS-25`
+- Updated error messages when an action is performed on an invalid call state.
 
 ### Fixed
 
