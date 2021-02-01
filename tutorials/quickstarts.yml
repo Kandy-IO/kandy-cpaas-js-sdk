@@ -25,6 +25,10 @@
   description: # Voice and Video Calls
   link: /quickstarts/javascript/cpaas/Voice%20and%20Video%20Calls
 
+- name: Handling Media Tracks
+  description: # Handling Media Tracks
+  link: /quickstarts/javascript/cpaas/Handling%20Media%20Tracks
+
 - name: Call Statistics
   description: # Call Statistics
   link: /quickstarts/javascript/cpaas/Call%20Statistics

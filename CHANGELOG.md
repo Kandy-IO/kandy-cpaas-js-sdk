@@ -5,6 +5,16 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.25.0 - beta
+
+### Added
+
+- Added Call configuration for "ringing feedback" mode. `KAA-2553`
+  - Allows for setting 'auto' or 'manual' modes, to determine whether ringing feedback will be sent automatically when a call is received or when the application chooses to send it.
+  - See the `config.call.ringingFeedbackMode` configuration and the new `call.sendRingingFeedback` API for more information.
+- Added a new _Handling Media Tracks_ tutorial. `KJS-28`
+  - Explains how to manage the medias during an ongoing call.
+
 ## 4.24.0 - 2021-01-29
 
 ### Added

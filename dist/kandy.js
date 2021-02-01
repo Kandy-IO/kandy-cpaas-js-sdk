@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.24.0-beta.614
+ * Version: 4.25.0-beta.615
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18994,6 +18994,9 @@ const log = _logs.logManager.getLogger('CALL');
  * @param {boolean} [call.removeH264Codecs=true] Whether to remove "H264" codec lines from incoming and outgoing SDP messages.
  * @param {boolean} [call.removeBundling=false] Whether to remove a=group attributes to stop media bundling from incoming and outgoing SDP messages.
  * @param {boolean} [call.mediaBrokerOnly=false] Whether all Calls will be anchored on the MediaBroker instead of being peer-to-peer. Set to true if the backend is configured for broker only mode.
+ * @param {string} [call.ringingFeedbackMode='auto'] The mode for sending ringing feedback to the Caller ('auto', 'manual').
+ *    By default, feedback will be automatically sent when a call has been received. In 'manual' mode, the application
+ *    must initiate the feedback being sent. See the `call.sendRingingFeedback` API for more info.
  */
 
 /**
@@ -19025,7 +19028,8 @@ const defaultOptions = {
   // Trickle ICE method to use for calls.
   mediaBrokerOnly: false,
   trickleIceMode: 'NONE',
-  normalizeDestination: true
+  normalizeDestination: true,
+  ringingFeedbackMode: 'auto'
 
   // config validation
 };const v8nValidation = _validation.validation.schema({
@@ -19041,7 +19045,8 @@ const defaultOptions = {
   trickleIceMode: (0, _validation.enums)(['NONE']),
   removeBundling: _validation.validation.boolean(),
   normalizeDestination: _validation.validation.boolean(),
-  mediaBrokerOnly: _validation.validation.boolean()
+  mediaBrokerOnly: _validation.validation.boolean(),
+  ringingFeedbackMode: (0, _validation.enums)(['auto', 'manual'])
 });
 const parseOptions = (0, _validation.parse)('call', v8nValidation);
 
@@ -19050,6 +19055,11 @@ function cpaasCalls(options = {}) {
   if (!mediaDevices || !peerConnection) {
     log.warn('Calls are not supported on this platform due to lack of WebRTC support. Call APIs will not be available.');
     return;
+  }
+
+  if (options.ringingFeedbackMode && !['auto', 'manual'].includes(options.ringingFeedbackMode)) {
+    log.warn('Call configuration `ringingFeedbackMode` invalid. Switching to `auto`.');
+    options.ringingFeedbackMode = 'auto';
   }
 
   options = (0, _utils.mergeValues)(defaultOptions, options);
@@ -19677,6 +19687,7 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.registerCall = registerCall;
 exports.createCall = createCall;
+exports.sendRingingEntry = sendRingingEntry;
 exports.answerCallEntry = answerCallEntry;
 exports.forwardCallEntry = forwardCallEntry;
 exports.directTransferEntry = directTransferEntry;
@@ -19787,6 +19798,29 @@ function* registerCall() {
 // Call plugin.
 function* createCall(deps) {
   yield (0, _effects2.takeEvery)(actionTypes.MAKE_CALL, establishSagas.makeCall, (0, _extends3.default)({}, deps, { requests }));
+}
+
+/**
+ * Sending the "ringing feedback" notification to the server.
+ * @method sendRingingEntry
+ * @param {Object} deps             Dependencies to be injected.
+ * @param {Object} deps.webRTC      The WebRTC stack.
+ */
+function* sendRingingEntry(deps) {
+  // Curry the signaling function to specify the status.
+  function* updateSessionRinging(...args) {
+    return yield (0, _effects2.call)(requests.updateSessionStatus, ...args, 'Ringing');
+  }
+
+  // Dependencies provided to the Callstack saga.
+  const callDeps = (0, _extends3.default)({}, deps, {
+    requests: {
+      // Add the wrapped request to CPaaS's set of requests.
+      updateCallRinging: updateSessionRinging
+    }
+  });
+
+  yield (0, _effects2.takeEvery)(actionTypes.SEND_RINGING_FEEDBACK, establishSagas.sendRingingFeedback, callDeps);
 }
 
 /**
@@ -20640,6 +20674,9 @@ const MAKE_ANONYMOUS_CALL_FINISH = exports.MAKE_ANONYMOUS_CALL_FINISH = callPref
 
 const CALL_INCOMING = exports.CALL_INCOMING = callPrefix + 'INCOMING';
 
+const SEND_RINGING_FEEDBACK = exports.SEND_RINGING_FEEDBACK = callPrefix + 'SEND_RINGING_FEEDBACK';
+const SEND_RINGING_FEEDBACK_FINISH = exports.SEND_RINGING_FEEDBACK_FINISH = callPrefix + 'SEND_RINGING_FEEDBACK_FINISH';
+
 const CALL_RINGING = exports.CALL_RINGING = callPrefix + 'RINGING';
 const SESSION_PROGRESS = exports.SESSION_PROGRESS = callPrefix + 'SESSION_PROGRESS';
 const CALL_CANCELLED = exports.CALL_CANCELLED = callPrefix + 'CANCELLED';
@@ -20772,6 +20809,8 @@ exports.makeCallFinish = makeCallFinish;
 exports.makeAnonymousCall = makeAnonymousCall;
 exports.makeAnonymousCallFinish = makeAnonymousCallFinish;
 exports.callIncoming = callIncoming;
+exports.sendRingingFeedback = sendRingingFeedback;
+exports.sendRingingFeedbackFinish = sendRingingFeedbackFinish;
 exports.callRinging = callRinging;
 exports.sessionProgress = sessionProgress;
 exports.callCancelled = callCancelled;
@@ -20918,6 +20957,14 @@ function makeAnonymousCallFinish(id, params) {
 
 function callIncoming(id, params) {
   return callActionHelper(actionTypes.CALL_INCOMING, id, params);
+}
+
+function sendRingingFeedback(id) {
+  return callActionHelper(actionTypes.SEND_RINGING_FEEDBACK, id);
+}
+
+function sendRingingFeedbackFinish(id, params) {
+  return callActionHelper(actionTypes.SEND_RINGING_FEEDBACK_FINISH, id, params);
 }
 
 function callRinging(id, params) {
@@ -21469,7 +21516,7 @@ function callAPI({ dispatch, getState }) {
     /**
      * Answers an incoming call.
      *
-     * The specified call to answer must be in a ringing state with an incoming
+     * The specified call to answer must be in Initiated or Ringing state with an incoming
      *    direction. The call will become connected as a result of the operation.
      *
      * The progress of the operation will be tracked via the
@@ -21574,6 +21621,36 @@ function callAPI({ dispatch, getState }) {
       dispatch(_actions.callActions.answerCall(callId, (0, _extends3.default)({
         mediaConstraints
       }, options)));
+    },
+
+    /**
+     * Sends the "ringing feedback" notification to the remote participant of a call.
+     *
+     * When using the 'manual' `ringingFeedbackMode` configuration, the application
+     *    is responsible for transitioning the call into the `Ringing` state. This
+     *    API will notify both ends of the call to enter `Ringing` state at the same
+     *    time. The application may decide not to send the "ringing feedback"
+     *    notification by not using this API. The `ringingFeedbackMode` configuration
+     *    must be set to 'manual' to use this API.
+     *
+     * The specified call must be an incoming call in `Initiated` state. The call
+     *    will enter `Ringing` state as a result of the operation.
+     *
+     * The SDK will emit a {@link call.event:call:stateChange call:stateChange}
+     *    event locally when the operation completes. The remote participant will
+     *    be notified of the operation through a
+     *    {@link call.event:call:stateChange call:stateChange} event as well.
+     * @public
+     * @static
+     * @memberof call
+     * @requires call
+     * @method sendRingingFeedback
+     * @param {string} callId The ID of the call.
+     */
+    sendRingingFeedback(callId) {
+      log.debug(_logs.API_LOG_TAG + 'call.sendRingingFeedback: ', callId);
+
+      dispatch(_actions.callActions.sendRingingFeedback(callId));
     },
 
     /**
@@ -22917,6 +22994,7 @@ const OPERATIONS = exports.OPERATIONS = {
   REJECT: 'REJECT',
   IGNORE: 'IGNORE',
   END: 'END',
+  SEND_RINGING_FEEDBACK: 'SEND_RINGING_FEEDBACK',
   // TODO: Make sure these constants and actionTypes are in-sync with each
   //    other. Use one to build the other.
   FORWARD_CALL: 'FORWARD_CALL',
@@ -23362,7 +23440,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.SEND_RINGING_FEEDBACK, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -23429,7 +23507,7 @@ callEvents[actionTypes.PENDING_JOIN] = (action, params) => {
 };
 
 // FINISH actions
-const finishActionTypesAndData = [{ type: actionTypes.MAKE_CALL_FINISH, operation: _constants.OPERATIONS.MAKE, isLocal: true }, { type: actionTypes.CALL_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: true }, { type: actionTypes.CALL_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: true }, { type: actionTypes.CALL_REMOTE_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: false }, { type: actionTypes.CALL_REMOTE_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: false }, { type: actionTypes.REJECT_CALL_FINISH, operation: _constants.OPERATIONS.REJECT, isLocal: true }, { type: actionTypes.IGNORE_CALL_FINISH, operation: _constants.OPERATIONS.IGNORE, isLocal: true }, { type: actionTypes.DIRECT_TRANSFER_FINISH, operation: _constants.OPERATIONS.DIRECT_TRANSFER, isLocal: true }, { type: actionTypes.CONSULTATIVE_TRANSFER_FINISH, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER, isLocal: true }, { type: actionTypes.JOIN_FINISH, operation: _constants.OPERATIONS.JOIN, isLocal: true }, { type: actionTypes.FORWARD_CALL_FINISH, operation: _constants.OPERATIONS.FORWARD_CALL, isLocal: true }];
+const finishActionTypesAndData = [{ type: actionTypes.MAKE_CALL_FINISH, operation: _constants.OPERATIONS.MAKE, isLocal: true }, { type: actionTypes.SEND_RINGING_FEEDBACK_FINISH, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK, isLocal: true }, { type: actionTypes.CALL_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: true }, { type: actionTypes.CALL_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: true }, { type: actionTypes.CALL_REMOTE_HOLD_FINISH, operation: _constants.OPERATIONS.HOLD, isLocal: false }, { type: actionTypes.CALL_REMOTE_UNHOLD_FINISH, operation: _constants.OPERATIONS.UNHOLD, isLocal: false }, { type: actionTypes.REJECT_CALL_FINISH, operation: _constants.OPERATIONS.REJECT, isLocal: true }, { type: actionTypes.IGNORE_CALL_FINISH, operation: _constants.OPERATIONS.IGNORE, isLocal: true }, { type: actionTypes.DIRECT_TRANSFER_FINISH, operation: _constants.OPERATIONS.DIRECT_TRANSFER, isLocal: true }, { type: actionTypes.CONSULTATIVE_TRANSFER_FINISH, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER, isLocal: true }, { type: actionTypes.JOIN_FINISH, operation: _constants.OPERATIONS.JOIN, isLocal: true }, { type: actionTypes.FORWARD_CALL_FINISH, operation: _constants.OPERATIONS.FORWARD_CALL, isLocal: true }];
 finishActionTypesAndData.forEach(finishActionTypeAndData => {
   callEvents[finishActionTypeAndData.type] = (action, params) => {
     return [callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -23788,6 +23866,14 @@ reducers[actionTypes.CALL_INCOMING] = {
  * Receive a single call's state as state.
  */
 
+callReducers[actionTypes.SEND_RINGING_FEEDBACK_FINISH] = {
+  next(state, action) {
+    return (0, _extends3.default)({}, state, {
+      state: _constants.CALL_STATES.RINGING
+    });
+  }
+};
+
 callReducers[actionTypes.CALL_RINGING] = {
   next(state, action) {
     if (action.payload.remoteParticipant) {
@@ -23824,6 +23910,7 @@ callReducers[actionTypes.SESSION_PROGRESS] = {
  *    operations up-to-date.
  */
 callReducers[actionTypes.PENDING_OPERATION] = noop;
+callReducers[actionTypes.SEND_RINGING_FEEDBACK] = noop;
 callReducers[actionTypes.ANSWER_CALL] = noop;
 callReducers[actionTypes.CALL_HOLD] = noop;
 callReducers[actionTypes.CALL_UNHOLD] = noop;
@@ -24201,7 +24288,7 @@ callReducers[actionTypes.RENEGOTIATE_FINISH] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.SEND_RINGING_FEEDBACK, actionTypes.SEND_RINGING_FEEDBACK_FINISH, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 /*
  * Reducer to handle specific call actions.
@@ -24631,6 +24718,10 @@ function setOperationState(state, action) {
     } else if ((0, _fp.contains)(currentOp)(_constants.NO_FINISH_OPS)) {
       // Special case: If the current operation is one that doesn't have a finish
       //    operation, allow any 'finish' to unset it.
+      return unsetOperation;
+    } else if (metaOp === _constants.OPERATIONS.END) {
+      // Special-case: If the operation is an "end call" (but the on-going operation
+      //    doesn't match), then unset the current operation.
       return unsetOperation;
     } else {
       // ...but it wasn't tracked in state?
@@ -25407,6 +25498,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.makeCall = makeCall;
+exports.sendRingingFeedback = sendRingingFeedback;
 exports.answerCall = answerCall;
 exports.rejectCall = rejectCall;
 exports.ignoreCall = ignoreCall;
@@ -25428,7 +25520,13 @@ var _midcall = __webpack_require__("../../packages/kandy/src/callstack/webrtc/mi
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
+var _errors = __webpack_require__("../../packages/kandy/src/errors/index.js");
+
+var _errors2 = _interopRequireDefault(_errors);
+
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Starts a new outgoing call.
@@ -25448,12 +25546,15 @@ var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-sag
  * @param {Function} deps.requests.createSession "Make call" signalling function.
  * @param {Object}   action        An action of type `MAKE_CALL`.
  */
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
 
-
-// Other plugins.
-
-
-// Callstack plugin.
+// Call plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
 
@@ -25544,6 +25645,94 @@ function* makeCall(deps, action) {
 }
 
 /**
+ * Sends ringing feedback to the server for an incoming, Initiated call.
+ *
+ * This saga defines how/when a call can send ringing feedback to the remote user.
+ *    It performs signaling to send this notification to the server, which forwards
+ *    it to the remote side of the call.
+ * Assumptions:
+ *    1. The call is in Initiated state.
+ *    2. The call's direction is incoming.
+ *    3. The SDK is configured `ringingFeedbackMode: 'manual'`.
+ * Responsibilities:
+ *    1. Perform signaling.
+ *    2. Update call state (via redux action).
+ * @method sendRingingFeedback
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.updateCallRinging "Send ringing" signalling function.
+ * @param {Object}   action        An action of type `SEND_RINGING_FEEDBACK`.
+ */
+
+
+// Libraries.
+
+
+// Other plugins.
+
+
+// Callstack plugin.
+function* sendRingingFeedback(deps, action) {
+  const requests = deps.requests;
+
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+  log.info('Sending ringing feedback for incoming call.');
+
+  const options = yield (0, _effects.select)(_selectors.getOptions);
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  // Requirements:
+  //  - call must exist
+  //  - configuration must be 'manual'
+  //  - call must be in Initiated state.
+  //  - call must be incoming.
+  let errorInfo;
+  if (!targetCall) {
+    errorInfo = {
+      message: `Failed to send ringing feedback. Call ${action.payload.id} not found.`,
+      code: _errors.callCodes.INVALID_PARAM
+    };
+  } else if (options.ringingFeedbackMode !== 'manual') {
+    errorInfo = {
+      message: "Failed to send ringing feedback. Configuration must be set to 'manual' mode.",
+      code: _errors.callCodes.NOT_SUPPORTED
+    };
+  } else if (targetCall.state !== _constants.CALL_STATES.INITIATED) {
+    errorInfo = {
+      message: `Failed to send ringing feedback. Call must be in ${_constants.CALL_STATES.INITIATED} state.`,
+      code: _errors.callCodes.INVALID_STATE
+    };
+  } else if (targetCall.direction !== 'incoming') {
+    errorInfo = {
+      message: 'Failed to send ringing feedback. Call must be incoming.',
+      code: _errors.callCodes.INVALID_STATE
+    };
+  }
+
+  // If the operation isn't allowable, dispatch an error and return.
+  if (errorInfo) {
+    log.info(errorInfo.message);
+    yield (0, _effects.put)(_actions.callActions.sendRingingFeedbackFinish(action.payload.id, {
+      error: new _errors2.default(errorInfo)
+    }));
+    return;
+  }
+
+  const callInfo = { wrtcsSessionId: targetCall.wrtcsSessionId, id: targetCall.id };
+  const response = yield (0, _effects.call)(requests.updateCallRinging, callInfo);
+
+  if (response.error) {
+    log.info(`Failed to send ringing feedback: ${response.error.code}: ${response.error.message}`);
+    yield (0, _effects.put)(_actions.callActions.sendRingingFeedbackFinish(targetCall.id, {
+      error: response.error
+    }));
+  } else {
+    log.info(`Ringing feedback sent. Changing call to ${_constants.CALL_STATES.RINGING} state.`);
+    yield (0, _effects.put)(_actions.callActions.sendRingingFeedbackFinish(targetCall.id));
+  }
+}
+
+/**
  * Answers an incoming call.
  *
  * This saga defines how a call is answered. It performs the webRTC and
@@ -25558,7 +25747,7 @@ function* makeCall(deps, action) {
  *    slow start), but the call cannot be considered "Connected" until we
  *    receive a response to the offer SDP.
  * Assumptions:
- *    1. The call is in Ringing state.
+ *    1. The call is in Initiated or Ringing state.
  *    2. The call's direction is incoming.
  * Responsibilities:
  *    1. Determine whether Regular or Slow Start negotiation is to be used.
@@ -25575,18 +25764,6 @@ function* makeCall(deps, action) {
  * @param {Function} deps.requests.answerSession "Answer call" signalling function.
  * @param {Object}   action        An "answer call" action.
  */
-
-
-// Libraries.
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
-
-// Call plugin.
 function* answerCall(deps, action) {
   const requests = deps.requests;
 
@@ -25594,21 +25771,34 @@ function* answerCall(deps, action) {
   log.info('Answering incoming call.');
 
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+
+  let errorInfo;
+  // Make sure that we can perform this operation right now.
   if (!incomingCall) {
-    // TODO: Should report an error.
-    log.error(`Error: Call ${action.payload.id} not found.`);
-    return;
+    // Call must exist.
+    errorInfo = {
+      message: `Failed to answer call. Call ${action.payload.id} not found.`,
+      code: _errors.callCodes.INVALID_PARAM
+    };
+  } else if (![_constants.CALL_STATES.INITIATED, _constants.CALL_STATES.RINGING].includes(incomingCall.state)) {
+    // Call must be in Initiated or Ringing state.
+    errorInfo = {
+      message: `Failed to answer call. Call must be in ${_constants.CALL_STATES.INITIATED} or ${_constants.CALL_STATES.RINGING} state.`,
+      code: _errors.callCodes.INVALID_STATE
+    };
+  } else if (incomingCall.direction !== 'incoming') {
+    // Call must be incoming.
+    errorInfo = {
+      message: 'Failed to answer call. Call must be incoming.',
+      code: _errors.callCodes.INVALID_STATE
+    };
   }
 
-  // Make sure the call state is what we expect
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
-    state: _constants.CALL_STATES.RINGING,
-    direction: _constants.CALL_DIRECTION.INCOMING
-  });
-  if (stateError) {
-    log.debug(`Failed to answer call - ${stateError.message}`);
+  // If the operation isn't allowable, dispatch an error and return.
+  if (errorInfo) {
+    log.info(errorInfo.message);
     yield (0, _effects.put)(_actions.callActions.answerCallFinish(action.payload.id, {
-      error: stateError
+      error: new _errors2.default(errorInfo)
     }));
     return;
   }
@@ -27935,6 +28125,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
+  const callConfig = yield (0, _effects.select)(_selectors.getOptions);
 
   const callId = yield (0, _effects.call)(_uuid.v4);
 
@@ -27980,7 +28171,6 @@ function* incomingCall(deps, params) {
   if (sdp) {
     // Regular call.
     const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
-    const callOptions = yield (0, _effects.select)(_selectors.getOptions);
 
     // Since we have the remote offer SDP, we can setup a webRTC session.
     yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
@@ -27988,14 +28178,14 @@ function* incomingCall(deps, params) {
         sdp,
         type: 'offer'
       },
-      trickleIceMode: callOptions.trickleIceMode,
-      sdpSemantics: callOptions.sdpSemantics,
-      iceCollectionDelay: callOptions.iceCollectionDelay,
-      iceCollectionCheck: callOptions.iceCollectionCheck,
-      maxIceTimeout: callOptions.maxIceTimeout,
+      trickleIceMode: callConfig.trickleIceMode,
+      sdpSemantics: callConfig.sdpSemantics,
+      iceCollectionDelay: callConfig.iceCollectionDelay,
+      iceCollectionCheck: callConfig.iceCollectionCheck,
+      maxIceTimeout: callConfig.maxIceTimeout,
       turnInfo,
       callId,
-      removeBundling: callOptions.removeBundling
+      removeBundling: callConfig.removeBundling
     });
   } else {
     log.debug('Incoming call is a slow-start call.');
@@ -28007,17 +28197,26 @@ function* incomingCall(deps, params) {
      */
   }
 
-  // Send update that the wrtcsSessionStatus is 'Ringing'
-  const callInfo = { wrtcsSessionId, id: callId };
-  const updateStatusResponse = yield (0, _effects.call)(requests.updateCallRinging, callInfo);
+  // Next state will be Initiated normally, or Ringing if ringing feedback is sent.
+  let nextState = _constants.CALL_STATES.INITIATED;
 
-  if (updateStatusResponse.error) {
-    log.error(`Error: Update session status error - ${updateStatusResponse.error.code}: ${updateStatusResponse.error.message}.`);
+  // If in 'auto' mode for `ringingFeedbackMode`, send the feedback immediately.
+  if (callConfig.ringingFeedbackMode === 'auto') {
+    log.info('Sending ringing feedback automatically for incoming call.');
+    const callInfo = { wrtcsSessionId, id: callId };
+    const ringingResponse = yield (0, _effects.call)(requests.updateCallRinging, callInfo);
+
+    if (ringingResponse.error) {
+      log.info(`Failed to send ringing feedback - ${ringingResponse.error.code}: ${ringingResponse.error.message} `);
+    } else {
+      log.debug('Successfully sent ringing feedback.');
+      nextState = _constants.CALL_STATES.RINGING;
+    }
   }
 
-  log.info(`Finished initiating incoming call. Changing to ${_constants.CALL_STATES.RINGING} and waiting on local answer.`);
-  yield (0, _effects.put)(_actions.callActions.callRinging(callId, {
-    state: _constants.CALL_STATES.RINGING
+  log.info(`Finished initiating incoming call. Changing to ${nextState} and waiting on local answer.`);
+  yield (0, _effects.put)(_actions.callActions.updateCall(callId, {
+    state: nextState
   }));
 }
 
@@ -31927,7 +32126,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.24.0-beta.614';
+  return '4.25.0-beta.615';
 }
 
 /***/ }),
