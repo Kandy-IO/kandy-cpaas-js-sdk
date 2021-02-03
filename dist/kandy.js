@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.25.0-beta.615
+ * Version: 4.25.0-beta.616
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -25512,8 +25512,6 @@ var _constants = __webpack_require__("../../packages/kandy/src/call/constants.js
 
 var _bandwidth = __webpack_require__("../../packages/kandy/src/callstack/utils/bandwidth.js");
 
-var _utils = __webpack_require__("../../packages/kandy/src/call/cpaas/utils/index.js");
-
 var _establish = __webpack_require__("../../packages/kandy/src/callstack/webrtc/establish.js");
 
 var _midcall = __webpack_require__("../../packages/kandy/src/callstack/webrtc/midcall.js");
@@ -25546,15 +25544,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Function} deps.requests.createSession "Make call" signalling function.
  * @param {Object}   action        An action of type `MAKE_CALL`.
  */
-/**
- * "Establish sagas" handle establishing a call (ie. start or respond to a call).
- *
- * The sagas about starting a call locally assume there is no session established
- *    (since that's what it is doing). The sagas about responding to a call
- *    assume that there is a session (both webRTC and server).
- */
-
-// Call plugin.
 function* makeCall(deps, action) {
   const requests = deps.requests;
 
@@ -25673,6 +25662,15 @@ function* makeCall(deps, action) {
 
 
 // Callstack plugin.
+/**
+ * "Establish sagas" handle establishing a call (ie. start or respond to a call).
+ *
+ * The sagas about starting a call locally assume there is no session established
+ *    (since that's what it is doing). The sagas about responding to a call
+ *    assume that there is a session (both webRTC and server).
+ */
+
+// Call plugin.
 function* sendRingingFeedback(deps, action) {
   const requests = deps.requests;
 
@@ -25702,7 +25700,7 @@ function* sendRingingFeedback(deps, action) {
       message: `Failed to send ringing feedback. Call must be in ${_constants.CALL_STATES.INITIATED} state.`,
       code: _errors.callCodes.INVALID_STATE
     };
-  } else if (targetCall.direction !== 'incoming') {
+  } else if (targetCall.direction !== _constants.CALL_DIRECTION.INCOMING) {
     errorInfo = {
       message: 'Failed to send ringing feedback. Call must be incoming.',
       code: _errors.callCodes.INVALID_STATE
@@ -25786,7 +25784,7 @@ function* answerCall(deps, action) {
       message: `Failed to answer call. Call must be in ${_constants.CALL_STATES.INITIATED} or ${_constants.CALL_STATES.RINGING} state.`,
       code: _errors.callCodes.INVALID_STATE
     };
-  } else if (incomingCall.direction !== 'incoming') {
+  } else if (incomingCall.direction !== _constants.CALL_DIRECTION.INCOMING) {
     // Call must be incoming.
     errorInfo = {
       message: 'Failed to answer call. Call must be incoming.',
@@ -25951,16 +25949,34 @@ function* rejectCall(deps, action) {
 
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
+  let errorInfo;
   // Ensure the call is in a valid state for this operation.
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
-    state: _constants.CALL_STATES.RINGING,
-    direction: _constants.CALL_DIRECTION.INCOMING
-  });
+  if (!incomingCall) {
+    // Call must exist.
+    errorInfo = {
+      message: `Failed to reject call. Call ${action.payload.id} not found.`,
+      code: _errors.callCodes.INVALID_PARAM
+    };
+  } else if (![_constants.CALL_STATES.INITIATED, _constants.CALL_STATES.RINGING].includes(incomingCall.state)) {
+    // Call must be in Initiated or Ringing state.
+    errorInfo = {
+      message: `Failed to reject call. Call must be in ${_constants.CALL_STATES.INITIATED} or ${_constants.CALL_STATES.RINGING} state.`,
+      code: _errors.callCodes.INVALID_STATE
+    };
+  } else if (incomingCall.direction !== _constants.CALL_DIRECTION.INCOMING) {
+    // Call must be incoming.
+    errorInfo = {
+      message: 'Failed to reject call. Call must be incoming.',
+      code: _errors.callCodes.INVALID_STATE
+    };
+  }
 
-  if (stateError) {
-    log.info(`Failed to reject call, caused by ${stateError.message}.`);
-    // Report the operation failure.
-    yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, { error: stateError }));
+  // If the operation isn't allowable, dispatch an error and return.
+  if (errorInfo) {
+    log.info(errorInfo.message);
+    yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, {
+      error: new _errors2.default(errorInfo)
+    }));
     return;
   }
 
@@ -25973,10 +25989,10 @@ function* rejectCall(deps, action) {
   const response = yield (0, _effects.call)(requests.rejectSession, callInfo);
 
   if (!response.error) {
-    log.info('Failed to reject call.');
+    log.info(`Finished rejecting call. Changing to ${_constants.CALL_STATES.ENDED}.`);
     yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id));
   } else {
-    log.info(`Finished rejecting call. Changing to ${_constants.CALL_STATES.ENDED}.`);
+    log.info('Failed to reject call.');
     yield (0, _effects.put)(_actions.callActions.rejectCallFinish(action.payload.id, {
       error: response.error
     }));
@@ -26004,20 +26020,38 @@ function* ignoreCall(deps, action) {
   const log = _logs.logManager.getLogger('CALL', action.payload.id);
   log.info('Ignoring incoming call.');
 
-  // Ensure the call is in a valid state for this operation.
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
-    state: _constants.CALL_STATES.RINGING,
-    direction: _constants.CALL_DIRECTION.INCOMING
-  });
+  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
-  if (stateError) {
-    log.info(`Failed to ignore call - ${stateError.message}.`);
-    // Report the operation failure.
-    yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(action.payload.id, { error: stateError }));
-    return;
+  let errorInfo;
+  // Ensure the call is in a valid state for this operation.
+  if (!targetCall) {
+    // Call must exist.
+    errorInfo = {
+      message: `Failed to ignore call. Call ${action.payload.id} not found.`,
+      code: _errors.callCodes.INVALID_PARAM
+    };
+  } else if (![_constants.CALL_STATES.INITIATED, _constants.CALL_STATES.RINGING].includes(targetCall.state)) {
+    // Call must be in Initiated or Ringing state.
+    errorInfo = {
+      message: `Failed to ignore call. Call must be in ${_constants.CALL_STATES.INITIATED} or ${_constants.CALL_STATES.RINGING} state.`,
+      code: _errors.callCodes.INVALID_STATE
+    };
+  } else if (targetCall.direction !== _constants.CALL_DIRECTION.INCOMING) {
+    // Call must be incoming.
+    errorInfo = {
+      message: 'Failed to ignore call. Call must be incoming.',
+      code: _errors.callCodes.INVALID_STATE
+    };
   }
 
-  const targetCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  // If the operation isn't allowable, dispatch an error and return.
+  if (errorInfo) {
+    log.info(errorInfo.message);
+    yield (0, _effects.put)(_actions.callActions.ignoreCallFinish(action.payload.id, {
+      error: new _errors2.default(errorInfo)
+    }));
+    return;
+  }
 
   // Clean-up webRTC objects. Ignore any errors returned, since we want the
   //    call / session to be ended either way.
@@ -26053,16 +26087,34 @@ function* forwardCall(deps, action) {
 
   const incomingCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
 
+  let errorInfo;
   // Ensure the call is in a valid state for this operation.
-  const stateError = yield (0, _effects.call)(_utils.validateCallState, action.payload.id, {
-    state: _constants.CALL_STATES.RINGING,
-    direction: _constants.CALL_DIRECTION.INCOMING
-  });
+  if (!incomingCall) {
+    // Call must exist.
+    errorInfo = {
+      message: `Failed to forward call. Call ${action.payload.id} not found.`,
+      code: _errors.callCodes.INVALID_PARAM
+    };
+  } else if (![_constants.CALL_STATES.INITIATED, _constants.CALL_STATES.RINGING].includes(incomingCall.state)) {
+    // Call must be in Initiated or Ringing state.
+    errorInfo = {
+      message: `Failed to forward call. Call must be in ${_constants.CALL_STATES.INITIATED} or ${_constants.CALL_STATES.RINGING} state.`,
+      code: _errors.callCodes.INVALID_STATE
+    };
+  } else if (incomingCall.direction !== _constants.CALL_DIRECTION.INCOMING) {
+    // Call must be incoming.
+    errorInfo = {
+      message: 'Failed to forward call. Call must be incoming.',
+      code: _errors.callCodes.INVALID_STATE
+    };
+  }
 
-  if (stateError) {
-    log.info(`Failed to forward call, caused by ${stateError.message}.`);
-    // Report the operation failure.
-    yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, { error: stateError }));
+  // If the operation isn't allowable, dispatch an error and return.
+  if (errorInfo) {
+    log.info(errorInfo.message);
+    yield (0, _effects.put)(_actions.callActions.forwardCallFinish(action.payload.id, {
+      error: new _errors2.default(errorInfo)
+    }));
     return;
   }
 
@@ -32126,7 +32178,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.25.0-beta.615';
+  return '4.25.0-beta.616';
 }
 
 /***/ }),
