@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.25.0-beta.616
+ * Version: 4.25.0-beta.617
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -18251,17 +18251,12 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _reduxActions = __webpack_require__("../../node_modules/redux-actions/es/index.js");
 
-var _constants = __webpack_require__("../../packages/kandy/src/auth/constants.js");
-
-var _version = __webpack_require__("../../packages/kandy/src/common/version.js");
-
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Helpers
 const reducers = {};
 
 reducers[actionTypes.CONNECT] = {
@@ -18340,21 +18335,18 @@ reducers[actionTypes.DISCONNECT] = {
   }
 };
 
+/*
+ * Clear the authentication state when we disconnect.
+ * Note: This should only be for 3.X (and 4.X backwards-compatible connect API)
+ *    authentication.
+ */
 reducers[actionTypes.DISCONNECT_FINISHED] = {
   next(state, action) {
-    const returnObj = {
+    return {
       isConnected: false,
       isPending: false,
       error: undefined
-
-      // KAA-2538, we need to keep the userInfo even after disconnecting
-      //   but only for the 4.X new auth method
-    };const isLostConnection = action.payload.reason === _constants.DISCONNECT_REASONS.LOST_CONNECTION;
-    const isVersion4X = (0, _version.getVersion)().startsWith('4');
-    if (isLostConnection && isVersion4X) {
-      returnObj.userInfo = state.userInfo;
-    }
-    return returnObj;
+    };
   },
   throw(state, action) {
     return (0, _extends3.default)({}, state, {
@@ -32178,7 +32170,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.25.0-beta.616';
+  return '4.25.0-beta.617';
 }
 
 /***/ }),
@@ -38339,18 +38331,22 @@ function logPlugin(options = {}) {
     yield (0, _effects.put)((0, _actions4.update)(options, name));
     // Update state with the initial Logger levels.
     yield (0, _effects.put)(actions.levelsChanged((0, _sagas.getLevelMap)(_index.logManager)));
-    // Update everything to
-    //    use those values from the application configs instead of default values in the webrtc Stack.
-    const webRTCLogManager = webRTC.managers.logs;
-    if (options.handler) {
-      webRTCLogManager.setHandler(options.handler);
-    }
-    (0, _values2.default)(webRTCLogManager.getLoggers()).forEach(logger => {
-      logger.setLevel(options.logLevel);
+
+    // Ensure the webRTC object exists. It won't in 3.X.
+    if (webRTC) {
+      // Update everything to
+      //    use those values from the application configs instead of default values in the webrtc Stack.
+      const webRTCLogManager = webRTC.managers.logs;
       if (options.handler) {
-        logger.setHandler(options.handler);
+        webRTCLogManager.setHandler(options.handler);
       }
-    });
+      (0, _values2.default)(webRTCLogManager.getLoggers()).forEach(logger => {
+        logger.setLevel(options.logLevel);
+        if (options.handler) {
+          logger.setHandler(options.handler);
+        }
+      });
+    }
   }
 
   const components = {
