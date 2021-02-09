@@ -15,6 +15,10 @@ Kandy.js change log.
 - Added a new _Handling Media Tracks_ tutorial. `KJS-28`
   - Explains how to manage the medias during an ongoing call.
 
+### Fixed
+
+- Fixed a Call issue where there was no audio after an unhold operation. `KAA-2605`
+
 ## 4.24.0 - 2021-01-29
 
 ### Added

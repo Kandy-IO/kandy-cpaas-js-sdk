@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.25.0-beta.617
+ * Version: 4.25.0-beta.618
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32170,7 +32170,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.25.0-beta.617';
+  return '4.25.0-beta.618';
 }
 
 /***/ }),
@@ -58400,7 +58400,15 @@ function Media(nativeStream, isLocal) {
   const tracks = new _map2.default();
 
   stream.onremovetrack = event => {
-    tracks.delete(event.track.id);
+    // Given that the track IDs in the tracks map have a peer ID prefixed to the track,
+    //  we need to loop through the keys to see which one matches the track id from the event
+    for (const key of tracks.keys()) {
+      if (key.includes(event.track.id)) {
+        tracks.delete(key);
+        break;
+      }
+    }
+    // The `event.track.id` being emitted with this event is the actual ID of the Media Track
     emitter.emit('track:removed', event.track.id);
   };
 
@@ -59358,19 +59366,22 @@ function Session(id, managers, config = {}) {
         //  - the remote audio track's `ended` event fires when sdp comes in with `sendrecv` media (unhold).
         // Only do manual remote track cleanup when plan-b.
         // Doing so for unified-plan will make the new track in `ontrack` event come in an `ended` state.
+        // Also, the trackId received with the event is the actual ID of the track, however remote tracks IDs are
+        // manually prefixed with the peerId to avoid track collision, so we prefix the track ID here with the peer ID.
+        const fullTrackId = `${peerId}-${trackId}`;
         if (!(0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics)) {
-          const trackToCleanup = trackManager.get(trackId);
+          const trackToCleanup = trackManager.get(fullTrackId);
           if (trackToCleanup) {
             trackToCleanup.cleanup();
-            log.info(`Cleaning up track ${trackId}.`);
+            log.info(`Cleaning up track ${fullTrackId}.`);
           } else {
-            log.info(`Track ${trackId} not found.`);
+            log.info(`Track ${fullTrackId} not found.`);
           }
         }
 
         emitter.emit('track:removed', {
           local: false,
-          trackId: trackId
+          trackId: fullTrackId
         });
       });
 
