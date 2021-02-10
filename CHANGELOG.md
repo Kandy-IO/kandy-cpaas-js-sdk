@@ -5,7 +5,17 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.24.0 - 2021-01-29
+## 4.24.1 - 2021-02-10
+
+Version 4.24.1 is a hotfix release correcting a major regression discovered with calls in the 4.24.0 version of the SDK. We recommend not to use version 4.24.0 and instead upgrade to version 4.24.1.
+
+### Fixed
+
+- Fixed a Call issue where there was no audio after an unhold operation. `KAA-2605`
+
+## 4.24.0 - 2021-01-29 [YANKED]
+
+This version of the SDK revealed a major regression issue with call audio after hold/unhold call operations. The issue has been resolved in the latest 4.24.1 hotfix release, and it is strongly recommended to upgrade to version 4.24.1.
 
 ### Added
 
