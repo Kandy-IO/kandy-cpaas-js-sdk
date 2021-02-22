@@ -5,17 +5,33 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.24.1 - 2021-02-10
+## 4.24.2 - 2021-02-22
 
-Version 4.24.1 is a hotfix release correcting a major regression discovered with calls in the 4.24.0 version of the SDK. We recommend not to use version 4.24.0 and instead upgrade to version 4.24.1.
+This is a hotfix release, reverting some changes introduced in 4.24.0 and 4.24.1 causing regressions.
+
+As we've become aware, some of the changes we've done in an attempt to correct the issue `KAA-2599` have caused some regressions. We've attempted to correct those issues with 4.24.1 but there are still issues being discovered. In this release we are reverting to the behavior before this change was introduced.
+
+### Technical background on the issue
+
+In some configurations of Kandy, the SDK doesn't receive any SSRC attributes in SDP payloads. This causes a change in behavior in the Chrome browser where `MediaStreamTrack` and `MediaStream` ids take on a value that is no longer unique. This breaks a fundamental assumption that the SDK has about media tracks and streams. In 4.24.0 we attempted what seemed to be an innocuous workaround and our results were positive. However, shortly after we started receiving reports of issues in regular call scenarios (where SSRC is present). 4.24.1 was an attempt at fixing those issues, but after it's release we started noticing new cases that were not accounted for.
+
+Because of the core nature of the assumption of id uniqueness in the SDK we've decided to revert all the changes related to trying to cover for this case and will be addressing this more thoroughly in a future release.
+
+### Changed
+
+- Reverted all changes done for `KAA-2599` and `KAA-2605`.
+
+## 4.24.1 - 2021-02-10 [YANKED]
+
+⚠️ **Post-release note**: This version of the SDK continues to cause regressions with call audio after hold/un-hold call operations and has been yanked.
 
 ### Fixed
 
-- Fixed a Call issue where there was no audio after an unhold operation. `KAA-2605`
+- Fixed a Call issue where there was no audio after an un-hold operation. `KAA-2605`
 
 ## 4.24.0 - 2021-01-29 [YANKED]
 
-This version of the SDK revealed a major regression issue with call audio after hold/unhold call operations. The issue has been resolved in the latest 4.24.1 hotfix release, and it is strongly recommended to upgrade to version 4.24.1.
+⚠️ **Post-release note**: This version of the SDK revealed a major regression issue with call audio after hold/un-hold call operations and has been yanked.
 
 ### Added
 
