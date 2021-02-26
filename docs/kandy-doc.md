@@ -108,6 +108,9 @@ Configuration options for the call feature.
     -   `call.removeH264Codecs` **[boolean][11]** Whether to remove "H264" codec lines from incoming and outgoing SDP messages. (optional, default `true`)
     -   `call.removeBundling` **[boolean][11]** Whether to remove a=group attributes to stop media bundling from incoming and outgoing SDP messages. (optional, default `false`)
     -   `call.mediaBrokerOnly` **[boolean][11]** Whether all Calls will be anchored on the MediaBroker instead of being peer-to-peer. Set to true if the backend is configured for broker only mode. (optional, default `false`)
+    -   `call.ringingFeedbackMode` **[string][8]** The mode for sending ringing feedback to the Caller ('auto', 'manual').
+           By default, feedback will be automatically sent when a call has been received. In 'manual' mode, the application
+           must initiate the feedback being sent. See the `call.sendRingingFeedback` API for more info. (optional, default `'auto'`)
 
 ### config.connectivity
 
@@ -643,7 +646,7 @@ The SDK will emit a [call:stateChange][40]
 
 Answers an incoming call.
 
-The specified call to answer must be in a ringing state with an incoming
+The specified call to answer must be in Initiated or Ringing state with an incoming
    direction. The call will become connected as a result of the operation.
 
 The progress of the operation will be tracked via the
@@ -684,6 +687,29 @@ The SDK requires access to the system's media devices (eg. microphone)
 -   `options` **[Object][7]?** 
     -   `options.bandwidth` **[call.BandwidthControls][25]?** Options for configuring media's bandwidth.
     -   `options.dscpControls` **[call.DSCPControls][39]?** Options for configuring DSCP markings on the media traffic
+
+### sendRingingFeedback
+
+Sends the "ringing feedback" notification to the remote participant of a call.
+
+When using the 'manual' `ringingFeedbackMode` configuration, the application
+   is responsible for transitioning the call into the `Ringing` state. This
+   API will notify both ends of the call to enter `Ringing` state at the same
+   time. The application may decide not to send the "ringing feedback"
+   notification by not using this API. The `ringingFeedbackMode` configuration
+   must be set to 'manual' to use this API.
+
+The specified call must be an incoming call in `Initiated` state. The call
+   will enter `Ringing` state as a result of the operation.
+
+The SDK will emit a [call:stateChange][40]
+   event locally when the operation completes. The remote participant will
+   be notified of the operation through a
+   [call:stateChange][40] event as well.
+
+**Parameters**
+
+-   `callId` **[string][8]** The ID of the call.
 
 ### ignore
 

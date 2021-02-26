@@ -1,6 +1,6 @@
 {
     "name": "@kandy-io/cpaas-sdk",
-    "version": "4.24.2",
+    "version": "4.25.0",
     "license": "SEE LICENSE IN LICENSE.md",
     "main":"./dist/kandy.js",
     "repository": {
