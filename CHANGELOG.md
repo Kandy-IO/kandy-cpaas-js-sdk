@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.25.0 - beta
+## 4.25.0 - 2021-02-26
 
 ### Added
 
@@ -14,10 +14,6 @@ Kandy.js change log.
   - See the `config.call.ringingFeedbackMode` configuration and the new `call.sendRingingFeedback` API for more information.
 - Added a new _Handling Media Tracks_ tutorial. `KJS-28`
   - Explains how to manage the medias during an ongoing call.
-
-### Fixed
-
-- Fixed a Call issue where there was no audio after an unhold operation. `KAA-2605`
 
 ## 4.24.2 - 2021-02-22
 
