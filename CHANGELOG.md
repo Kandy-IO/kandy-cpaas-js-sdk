@@ -5,7 +5,11 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.26.0 - beta
+## 4.26.0 - 2021-03-26
+
+### Fixed
+
+- Updated the Handling Media Tracks tutorial for more clarity. `KJS-109`
 
 ## 4.25.0 - 2021-02-26
 
