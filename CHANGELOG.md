@@ -11,6 +11,10 @@ Kandy.js change log.
 
 - Updated the Handling Media Tracks tutorial for more clarity. `KJS-109`
 
+### Fixed
+
+- Added missing 'Call API:' logs to call, fcsBridge and groups plugin api interface. `KJS-124`
+
 ## 4.25.0 - 2021-02-26
 
 ### Added
