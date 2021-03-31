@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.26.0-beta.640
+ * Version: 4.26.0-beta.641
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32180,7 +32180,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.26.0-beta.640';
+  return '4.26.0-beta.641';
 }
 
 /***/ }),
@@ -35124,6 +35124,8 @@ function factory(plugins, options = {}) {
      * Destroys the SDK, and removes its state, rendering the SDK unusable.
      * Useful when a user logs out and their call data needs to be destroyed.
      * The SDK must be recreated to be usable again.
+     * The destroy command is async, and will happen on the next tick
+     *   so as not to interfere with any ongoing events.
      *
      * @public
      * @memberof api
@@ -35146,23 +35148,31 @@ function factory(plugins, options = {}) {
      * client.on( ... )
      */
     destroy() {
-      // TODO: Give plugins a chance to clean up, disconnect from WS, etc
-      // Needs to happen before the sagas are cancelled
       // TODO: Is it possible for the store to auto-unsubscribe any listeners
       //    (from client.state.subscribe API)? If not, may be easier to simply
       //    protect from issues.
 
-      // Cancel all the sagas
-      if (taskDescriptor) taskDescriptor.cancel();
+      const _destroy = () => {
+        if (destroyedSDK) return;
 
-      // Clear the state
-      function destroyStateReducer(state, action) {
-        return {};
-      }
-      store.replaceReducer(destroyStateReducer);
+        // Cancel all the sagas
+        if (taskDescriptor) taskDescriptor.cancel();
 
-      // Neuter all actions
-      destroyedSDK = true;
+        // Clear the state
+        function destroyStateReducer(state, action) {
+          return {};
+        }
+        store.replaceReducer(destroyStateReducer);
+
+        // Neuter all actions
+        destroyedSDK = true;
+      };
+
+      // setTimeout is necessary so that the destroy
+      //   happens at the start of the next tick for
+      //   when destroy is called inside an event handler
+      const immediately = 0;
+      setTimeout(_destroy, immediately);
     }
   });
 

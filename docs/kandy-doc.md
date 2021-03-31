@@ -179,6 +179,8 @@ Returns the current version of the API.
 Destroys the SDK, and removes its state, rendering the SDK unusable.
 Useful when a user logs out and their call data needs to be destroyed.
 The SDK must be recreated to be usable again.
+The destroy command is async, and will happen on the next tick
+  so as not to interfere with any ongoing events.
 
 **Examples**
 
