@@ -170,7 +170,7 @@ function downloadLogs () {
   const button = document.createElement('a')
   button.href = URL.createObjectURL(blob)
   // Give the file a name.
-  button.download = Date.now().toString() + '_sdk' + kandy.getVersion() + '_logs.ndjson'
+  button.download = Date.now().toString() + '_sdk' + client.getVersion() + '_logs.ndjson'
 
   // Auto-click the button.
   button.click()
