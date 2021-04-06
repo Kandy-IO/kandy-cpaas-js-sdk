@@ -7,6 +7,13 @@ Kandy.js change log.
 
 ## 4.27.0 - beta
 
+### Added
+
+- Improved the logging of [SDP handler functions](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callsdphandlerfunction). `KJS-99`
+  - In [`DEBUG` mode](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#loggerlevels) and lower, each SDP handler function applied to the SDP and the changes that may have resulted.
+  - The final SDP is logged with all of the changes that have been applied.
+  - The entire report is logged to the console in [YAML format](https://yaml.org/).
+
 ### Fixed
 
 - Changed how [`destroy`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#apidestroy) is used to prevent errors when destroying inside an event. `KJS-123`

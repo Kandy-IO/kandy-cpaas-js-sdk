@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.26.0-beta.644
+ * Version: 4.27.0-beta.645
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3549,6 +3549,1216 @@ module.exports = function isStamp(arg) {
 
 /***/ }),
 
+/***/ "../../node_modules/ansi-styles/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(module) {
+
+const wrapAnsi16 = (fn, offset) => (...args) => {
+	const code = fn(...args);
+	return `\u001B[${code + offset}m`;
+};
+
+const wrapAnsi256 = (fn, offset) => (...args) => {
+	const code = fn(...args);
+	return `\u001B[${38 + offset};5;${code}m`;
+};
+
+const wrapAnsi16m = (fn, offset) => (...args) => {
+	const rgb = fn(...args);
+	return `\u001B[${38 + offset};2;${rgb[0]};${rgb[1]};${rgb[2]}m`;
+};
+
+const ansi2ansi = n => n;
+const rgb2rgb = (r, g, b) => [r, g, b];
+
+const setLazyProperty = (object, property, get) => {
+	Object.defineProperty(object, property, {
+		get: () => {
+			const value = get();
+
+			Object.defineProperty(object, property, {
+				value,
+				enumerable: true,
+				configurable: true
+			});
+
+			return value;
+		},
+		enumerable: true,
+		configurable: true
+	});
+};
+
+/** @type {typeof import('color-convert')} */
+let colorConvert;
+const makeDynamicStyles = (wrap, targetSpace, identity, isBackground) => {
+	if (colorConvert === undefined) {
+		colorConvert = __webpack_require__("../../node_modules/ansi-styles/node_modules/color-convert/index.js");
+	}
+
+	const offset = isBackground ? 10 : 0;
+	const styles = {};
+
+	for (const [sourceSpace, suite] of Object.entries(colorConvert)) {
+		const name = sourceSpace === 'ansi16' ? 'ansi' : sourceSpace;
+		if (sourceSpace === targetSpace) {
+			styles[name] = wrap(identity, offset);
+		} else if (typeof suite === 'object') {
+			styles[name] = wrap(suite[targetSpace], offset);
+		}
+	}
+
+	return styles;
+};
+
+function assembleStyles() {
+	const codes = new Map();
+	const styles = {
+		modifier: {
+			reset: [0, 0],
+			// 21 isn't widely supported and 22 does the same thing
+			bold: [1, 22],
+			dim: [2, 22],
+			italic: [3, 23],
+			underline: [4, 24],
+			inverse: [7, 27],
+			hidden: [8, 28],
+			strikethrough: [9, 29]
+		},
+		color: {
+			black: [30, 39],
+			red: [31, 39],
+			green: [32, 39],
+			yellow: [33, 39],
+			blue: [34, 39],
+			magenta: [35, 39],
+			cyan: [36, 39],
+			white: [37, 39],
+
+			// Bright color
+			blackBright: [90, 39],
+			redBright: [91, 39],
+			greenBright: [92, 39],
+			yellowBright: [93, 39],
+			blueBright: [94, 39],
+			magentaBright: [95, 39],
+			cyanBright: [96, 39],
+			whiteBright: [97, 39]
+		},
+		bgColor: {
+			bgBlack: [40, 49],
+			bgRed: [41, 49],
+			bgGreen: [42, 49],
+			bgYellow: [43, 49],
+			bgBlue: [44, 49],
+			bgMagenta: [45, 49],
+			bgCyan: [46, 49],
+			bgWhite: [47, 49],
+
+			// Bright color
+			bgBlackBright: [100, 49],
+			bgRedBright: [101, 49],
+			bgGreenBright: [102, 49],
+			bgYellowBright: [103, 49],
+			bgBlueBright: [104, 49],
+			bgMagentaBright: [105, 49],
+			bgCyanBright: [106, 49],
+			bgWhiteBright: [107, 49]
+		}
+	};
+
+	// Alias bright black as gray (and grey)
+	styles.color.gray = styles.color.blackBright;
+	styles.bgColor.bgGray = styles.bgColor.bgBlackBright;
+	styles.color.grey = styles.color.blackBright;
+	styles.bgColor.bgGrey = styles.bgColor.bgBlackBright;
+
+	for (const [groupName, group] of Object.entries(styles)) {
+		for (const [styleName, style] of Object.entries(group)) {
+			styles[styleName] = {
+				open: `\u001B[${style[0]}m`,
+				close: `\u001B[${style[1]}m`
+			};
+
+			group[styleName] = styles[styleName];
+
+			codes.set(style[0], style[1]);
+		}
+
+		Object.defineProperty(styles, groupName, {
+			value: group,
+			enumerable: false
+		});
+	}
+
+	Object.defineProperty(styles, 'codes', {
+		value: codes,
+		enumerable: false
+	});
+
+	styles.color.close = '\u001B[39m';
+	styles.bgColor.close = '\u001B[49m';
+
+	setLazyProperty(styles.color, 'ansi', () => makeDynamicStyles(wrapAnsi16, 'ansi16', ansi2ansi, false));
+	setLazyProperty(styles.color, 'ansi256', () => makeDynamicStyles(wrapAnsi256, 'ansi256', ansi2ansi, false));
+	setLazyProperty(styles.color, 'ansi16m', () => makeDynamicStyles(wrapAnsi16m, 'rgb', rgb2rgb, false));
+	setLazyProperty(styles.bgColor, 'ansi', () => makeDynamicStyles(wrapAnsi16, 'ansi16', ansi2ansi, true));
+	setLazyProperty(styles.bgColor, 'ansi256', () => makeDynamicStyles(wrapAnsi256, 'ansi256', ansi2ansi, true));
+	setLazyProperty(styles.bgColor, 'ansi16m', () => makeDynamicStyles(wrapAnsi16m, 'rgb', rgb2rgb, true));
+
+	return styles;
+}
+
+// Make the export immutable
+Object.defineProperty(module, 'exports', {
+	enumerable: true,
+	get: assembleStyles
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__("../../node_modules/webpack/buildin/module.js")(module)))
+
+/***/ }),
+
+/***/ "../../node_modules/ansi-styles/node_modules/color-convert/conversions.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+/* MIT license */
+/* eslint-disable no-mixed-operators */
+const cssKeywords = __webpack_require__("../../node_modules/color-name/index.js");
+
+// NOTE: conversions should only return primitive values (i.e. arrays, or
+//       values that give correct `typeof` results).
+//       do not use box values types (i.e. Number(), String(), etc.)
+
+const reverseKeywords = {};
+for (const key of Object.keys(cssKeywords)) {
+	reverseKeywords[cssKeywords[key]] = key;
+}
+
+const convert = {
+	rgb: {channels: 3, labels: 'rgb'},
+	hsl: {channels: 3, labels: 'hsl'},
+	hsv: {channels: 3, labels: 'hsv'},
+	hwb: {channels: 3, labels: 'hwb'},
+	cmyk: {channels: 4, labels: 'cmyk'},
+	xyz: {channels: 3, labels: 'xyz'},
+	lab: {channels: 3, labels: 'lab'},
+	lch: {channels: 3, labels: 'lch'},
+	hex: {channels: 1, labels: ['hex']},
+	keyword: {channels: 1, labels: ['keyword']},
+	ansi16: {channels: 1, labels: ['ansi16']},
+	ansi256: {channels: 1, labels: ['ansi256']},
+	hcg: {channels: 3, labels: ['h', 'c', 'g']},
+	apple: {channels: 3, labels: ['r16', 'g16', 'b16']},
+	gray: {channels: 1, labels: ['gray']}
+};
+
+module.exports = convert;
+
+// Hide .channels and .labels properties
+for (const model of Object.keys(convert)) {
+	if (!('channels' in convert[model])) {
+		throw new Error('missing channels property: ' + model);
+	}
+
+	if (!('labels' in convert[model])) {
+		throw new Error('missing channel labels property: ' + model);
+	}
+
+	if (convert[model].labels.length !== convert[model].channels) {
+		throw new Error('channel and label counts mismatch: ' + model);
+	}
+
+	const {channels, labels} = convert[model];
+	delete convert[model].channels;
+	delete convert[model].labels;
+	Object.defineProperty(convert[model], 'channels', {value: channels});
+	Object.defineProperty(convert[model], 'labels', {value: labels});
+}
+
+convert.rgb.hsl = function (rgb) {
+	const r = rgb[0] / 255;
+	const g = rgb[1] / 255;
+	const b = rgb[2] / 255;
+	const min = Math.min(r, g, b);
+	const max = Math.max(r, g, b);
+	const delta = max - min;
+	let h;
+	let s;
+
+	if (max === min) {
+		h = 0;
+	} else if (r === max) {
+		h = (g - b) / delta;
+	} else if (g === max) {
+		h = 2 + (b - r) / delta;
+	} else if (b === max) {
+		h = 4 + (r - g) / delta;
+	}
+
+	h = Math.min(h * 60, 360);
+
+	if (h < 0) {
+		h += 360;
+	}
+
+	const l = (min + max) / 2;
+
+	if (max === min) {
+		s = 0;
+	} else if (l <= 0.5) {
+		s = delta / (max + min);
+	} else {
+		s = delta / (2 - max - min);
+	}
+
+	return [h, s * 100, l * 100];
+};
+
+convert.rgb.hsv = function (rgb) {
+	let rdif;
+	let gdif;
+	let bdif;
+	let h;
+	let s;
+
+	const r = rgb[0] / 255;
+	const g = rgb[1] / 255;
+	const b = rgb[2] / 255;
+	const v = Math.max(r, g, b);
+	const diff = v - Math.min(r, g, b);
+	const diffc = function (c) {
+		return (v - c) / 6 / diff + 1 / 2;
+	};
+
+	if (diff === 0) {
+		h = 0;
+		s = 0;
+	} else {
+		s = diff / v;
+		rdif = diffc(r);
+		gdif = diffc(g);
+		bdif = diffc(b);
+
+		if (r === v) {
+			h = bdif - gdif;
+		} else if (g === v) {
+			h = (1 / 3) + rdif - bdif;
+		} else if (b === v) {
+			h = (2 / 3) + gdif - rdif;
+		}
+
+		if (h < 0) {
+			h += 1;
+		} else if (h > 1) {
+			h -= 1;
+		}
+	}
+
+	return [
+		h * 360,
+		s * 100,
+		v * 100
+	];
+};
+
+convert.rgb.hwb = function (rgb) {
+	const r = rgb[0];
+	const g = rgb[1];
+	let b = rgb[2];
+	const h = convert.rgb.hsl(rgb)[0];
+	const w = 1 / 255 * Math.min(r, Math.min(g, b));
+
+	b = 1 - 1 / 255 * Math.max(r, Math.max(g, b));
+
+	return [h, w * 100, b * 100];
+};
+
+convert.rgb.cmyk = function (rgb) {
+	const r = rgb[0] / 255;
+	const g = rgb[1] / 255;
+	const b = rgb[2] / 255;
+
+	const k = Math.min(1 - r, 1 - g, 1 - b);
+	const c = (1 - r - k) / (1 - k) || 0;
+	const m = (1 - g - k) / (1 - k) || 0;
+	const y = (1 - b - k) / (1 - k) || 0;
+
+	return [c * 100, m * 100, y * 100, k * 100];
+};
+
+function comparativeDistance(x, y) {
+	/*
+		See https://en.m.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance
+	*/
+	return (
+		((x[0] - y[0]) ** 2) +
+		((x[1] - y[1]) ** 2) +
+		((x[2] - y[2]) ** 2)
+	);
+}
+
+convert.rgb.keyword = function (rgb) {
+	const reversed = reverseKeywords[rgb];
+	if (reversed) {
+		return reversed;
+	}
+
+	let currentClosestDistance = Infinity;
+	let currentClosestKeyword;
+
+	for (const keyword of Object.keys(cssKeywords)) {
+		const value = cssKeywords[keyword];
+
+		// Compute comparative distance
+		const distance = comparativeDistance(rgb, value);
+
+		// Check if its less, if so set as closest
+		if (distance < currentClosestDistance) {
+			currentClosestDistance = distance;
+			currentClosestKeyword = keyword;
+		}
+	}
+
+	return currentClosestKeyword;
+};
+
+convert.keyword.rgb = function (keyword) {
+	return cssKeywords[keyword];
+};
+
+convert.rgb.xyz = function (rgb) {
+	let r = rgb[0] / 255;
+	let g = rgb[1] / 255;
+	let b = rgb[2] / 255;
+
+	// Assume sRGB
+	r = r > 0.04045 ? (((r + 0.055) / 1.055) ** 2.4) : (r / 12.92);
+	g = g > 0.04045 ? (((g + 0.055) / 1.055) ** 2.4) : (g / 12.92);
+	b = b > 0.04045 ? (((b + 0.055) / 1.055) ** 2.4) : (b / 12.92);
+
+	const x = (r * 0.4124) + (g * 0.3576) + (b * 0.1805);
+	const y = (r * 0.2126) + (g * 0.7152) + (b * 0.0722);
+	const z = (r * 0.0193) + (g * 0.1192) + (b * 0.9505);
+
+	return [x * 100, y * 100, z * 100];
+};
+
+convert.rgb.lab = function (rgb) {
+	const xyz = convert.rgb.xyz(rgb);
+	let x = xyz[0];
+	let y = xyz[1];
+	let z = xyz[2];
+
+	x /= 95.047;
+	y /= 100;
+	z /= 108.883;
+
+	x = x > 0.008856 ? (x ** (1 / 3)) : (7.787 * x) + (16 / 116);
+	y = y > 0.008856 ? (y ** (1 / 3)) : (7.787 * y) + (16 / 116);
+	z = z > 0.008856 ? (z ** (1 / 3)) : (7.787 * z) + (16 / 116);
+
+	const l = (116 * y) - 16;
+	const a = 500 * (x - y);
+	const b = 200 * (y - z);
+
+	return [l, a, b];
+};
+
+convert.hsl.rgb = function (hsl) {
+	const h = hsl[0] / 360;
+	const s = hsl[1] / 100;
+	const l = hsl[2] / 100;
+	let t2;
+	let t3;
+	let val;
+
+	if (s === 0) {
+		val = l * 255;
+		return [val, val, val];
+	}
+
+	if (l < 0.5) {
+		t2 = l * (1 + s);
+	} else {
+		t2 = l + s - l * s;
+	}
+
+	const t1 = 2 * l - t2;
+
+	const rgb = [0, 0, 0];
+	for (let i = 0; i < 3; i++) {
+		t3 = h + 1 / 3 * -(i - 1);
+		if (t3 < 0) {
+			t3++;
+		}
+
+		if (t3 > 1) {
+			t3--;
+		}
+
+		if (6 * t3 < 1) {
+			val = t1 + (t2 - t1) * 6 * t3;
+		} else if (2 * t3 < 1) {
+			val = t2;
+		} else if (3 * t3 < 2) {
+			val = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
+		} else {
+			val = t1;
+		}
+
+		rgb[i] = val * 255;
+	}
+
+	return rgb;
+};
+
+convert.hsl.hsv = function (hsl) {
+	const h = hsl[0];
+	let s = hsl[1] / 100;
+	let l = hsl[2] / 100;
+	let smin = s;
+	const lmin = Math.max(l, 0.01);
+
+	l *= 2;
+	s *= (l <= 1) ? l : 2 - l;
+	smin *= lmin <= 1 ? lmin : 2 - lmin;
+	const v = (l + s) / 2;
+	const sv = l === 0 ? (2 * smin) / (lmin + smin) : (2 * s) / (l + s);
+
+	return [h, sv * 100, v * 100];
+};
+
+convert.hsv.rgb = function (hsv) {
+	const h = hsv[0] / 60;
+	const s = hsv[1] / 100;
+	let v = hsv[2] / 100;
+	const hi = Math.floor(h) % 6;
+
+	const f = h - Math.floor(h);
+	const p = 255 * v * (1 - s);
+	const q = 255 * v * (1 - (s * f));
+	const t = 255 * v * (1 - (s * (1 - f)));
+	v *= 255;
+
+	switch (hi) {
+		case 0:
+			return [v, t, p];
+		case 1:
+			return [q, v, p];
+		case 2:
+			return [p, v, t];
+		case 3:
+			return [p, q, v];
+		case 4:
+			return [t, p, v];
+		case 5:
+			return [v, p, q];
+	}
+};
+
+convert.hsv.hsl = function (hsv) {
+	const h = hsv[0];
+	const s = hsv[1] / 100;
+	const v = hsv[2] / 100;
+	const vmin = Math.max(v, 0.01);
+	let sl;
+	let l;
+
+	l = (2 - s) * v;
+	const lmin = (2 - s) * vmin;
+	sl = s * vmin;
+	sl /= (lmin <= 1) ? lmin : 2 - lmin;
+	sl = sl || 0;
+	l /= 2;
+
+	return [h, sl * 100, l * 100];
+};
+
+// http://dev.w3.org/csswg/css-color/#hwb-to-rgb
+convert.hwb.rgb = function (hwb) {
+	const h = hwb[0] / 360;
+	let wh = hwb[1] / 100;
+	let bl = hwb[2] / 100;
+	const ratio = wh + bl;
+	let f;
+
+	// Wh + bl cant be > 1
+	if (ratio > 1) {
+		wh /= ratio;
+		bl /= ratio;
+	}
+
+	const i = Math.floor(6 * h);
+	const v = 1 - bl;
+	f = 6 * h - i;
+
+	if ((i & 0x01) !== 0) {
+		f = 1 - f;
+	}
+
+	const n = wh + f * (v - wh); // Linear interpolation
+
+	let r;
+	let g;
+	let b;
+	/* eslint-disable max-statements-per-line,no-multi-spaces */
+	switch (i) {
+		default:
+		case 6:
+		case 0: r = v;  g = n;  b = wh; break;
+		case 1: r = n;  g = v;  b = wh; break;
+		case 2: r = wh; g = v;  b = n; break;
+		case 3: r = wh; g = n;  b = v; break;
+		case 4: r = n;  g = wh; b = v; break;
+		case 5: r = v;  g = wh; b = n; break;
+	}
+	/* eslint-enable max-statements-per-line,no-multi-spaces */
+
+	return [r * 255, g * 255, b * 255];
+};
+
+convert.cmyk.rgb = function (cmyk) {
+	const c = cmyk[0] / 100;
+	const m = cmyk[1] / 100;
+	const y = cmyk[2] / 100;
+	const k = cmyk[3] / 100;
+
+	const r = 1 - Math.min(1, c * (1 - k) + k);
+	const g = 1 - Math.min(1, m * (1 - k) + k);
+	const b = 1 - Math.min(1, y * (1 - k) + k);
+
+	return [r * 255, g * 255, b * 255];
+};
+
+convert.xyz.rgb = function (xyz) {
+	const x = xyz[0] / 100;
+	const y = xyz[1] / 100;
+	const z = xyz[2] / 100;
+	let r;
+	let g;
+	let b;
+
+	r = (x * 3.2406) + (y * -1.5372) + (z * -0.4986);
+	g = (x * -0.9689) + (y * 1.8758) + (z * 0.0415);
+	b = (x * 0.0557) + (y * -0.2040) + (z * 1.0570);
+
+	// Assume sRGB
+	r = r > 0.0031308
+		? ((1.055 * (r ** (1.0 / 2.4))) - 0.055)
+		: r * 12.92;
+
+	g = g > 0.0031308
+		? ((1.055 * (g ** (1.0 / 2.4))) - 0.055)
+		: g * 12.92;
+
+	b = b > 0.0031308
+		? ((1.055 * (b ** (1.0 / 2.4))) - 0.055)
+		: b * 12.92;
+
+	r = Math.min(Math.max(0, r), 1);
+	g = Math.min(Math.max(0, g), 1);
+	b = Math.min(Math.max(0, b), 1);
+
+	return [r * 255, g * 255, b * 255];
+};
+
+convert.xyz.lab = function (xyz) {
+	let x = xyz[0];
+	let y = xyz[1];
+	let z = xyz[2];
+
+	x /= 95.047;
+	y /= 100;
+	z /= 108.883;
+
+	x = x > 0.008856 ? (x ** (1 / 3)) : (7.787 * x) + (16 / 116);
+	y = y > 0.008856 ? (y ** (1 / 3)) : (7.787 * y) + (16 / 116);
+	z = z > 0.008856 ? (z ** (1 / 3)) : (7.787 * z) + (16 / 116);
+
+	const l = (116 * y) - 16;
+	const a = 500 * (x - y);
+	const b = 200 * (y - z);
+
+	return [l, a, b];
+};
+
+convert.lab.xyz = function (lab) {
+	const l = lab[0];
+	const a = lab[1];
+	const b = lab[2];
+	let x;
+	let y;
+	let z;
+
+	y = (l + 16) / 116;
+	x = a / 500 + y;
+	z = y - b / 200;
+
+	const y2 = y ** 3;
+	const x2 = x ** 3;
+	const z2 = z ** 3;
+	y = y2 > 0.008856 ? y2 : (y - 16 / 116) / 7.787;
+	x = x2 > 0.008856 ? x2 : (x - 16 / 116) / 7.787;
+	z = z2 > 0.008856 ? z2 : (z - 16 / 116) / 7.787;
+
+	x *= 95.047;
+	y *= 100;
+	z *= 108.883;
+
+	return [x, y, z];
+};
+
+convert.lab.lch = function (lab) {
+	const l = lab[0];
+	const a = lab[1];
+	const b = lab[2];
+	let h;
+
+	const hr = Math.atan2(b, a);
+	h = hr * 360 / 2 / Math.PI;
+
+	if (h < 0) {
+		h += 360;
+	}
+
+	const c = Math.sqrt(a * a + b * b);
+
+	return [l, c, h];
+};
+
+convert.lch.lab = function (lch) {
+	const l = lch[0];
+	const c = lch[1];
+	const h = lch[2];
+
+	const hr = h / 360 * 2 * Math.PI;
+	const a = c * Math.cos(hr);
+	const b = c * Math.sin(hr);
+
+	return [l, a, b];
+};
+
+convert.rgb.ansi16 = function (args, saturation = null) {
+	const [r, g, b] = args;
+	let value = saturation === null ? convert.rgb.hsv(args)[2] : saturation; // Hsv -> ansi16 optimization
+
+	value = Math.round(value / 50);
+
+	if (value === 0) {
+		return 30;
+	}
+
+	let ansi = 30
+		+ ((Math.round(b / 255) << 2)
+		| (Math.round(g / 255) << 1)
+		| Math.round(r / 255));
+
+	if (value === 2) {
+		ansi += 60;
+	}
+
+	return ansi;
+};
+
+convert.hsv.ansi16 = function (args) {
+	// Optimization here; we already know the value and don't need to get
+	// it converted for us.
+	return convert.rgb.ansi16(convert.hsv.rgb(args), args[2]);
+};
+
+convert.rgb.ansi256 = function (args) {
+	const r = args[0];
+	const g = args[1];
+	const b = args[2];
+
+	// We use the extended greyscale palette here, with the exception of
+	// black and white. normal palette only has 4 greyscale shades.
+	if (r === g && g === b) {
+		if (r < 8) {
+			return 16;
+		}
+
+		if (r > 248) {
+			return 231;
+		}
+
+		return Math.round(((r - 8) / 247) * 24) + 232;
+	}
+
+	const ansi = 16
+		+ (36 * Math.round(r / 255 * 5))
+		+ (6 * Math.round(g / 255 * 5))
+		+ Math.round(b / 255 * 5);
+
+	return ansi;
+};
+
+convert.ansi16.rgb = function (args) {
+	let color = args % 10;
+
+	// Handle greyscale
+	if (color === 0 || color === 7) {
+		if (args > 50) {
+			color += 3.5;
+		}
+
+		color = color / 10.5 * 255;
+
+		return [color, color, color];
+	}
+
+	const mult = (~~(args > 50) + 1) * 0.5;
+	const r = ((color & 1) * mult) * 255;
+	const g = (((color >> 1) & 1) * mult) * 255;
+	const b = (((color >> 2) & 1) * mult) * 255;
+
+	return [r, g, b];
+};
+
+convert.ansi256.rgb = function (args) {
+	// Handle greyscale
+	if (args >= 232) {
+		const c = (args - 232) * 10 + 8;
+		return [c, c, c];
+	}
+
+	args -= 16;
+
+	let rem;
+	const r = Math.floor(args / 36) / 5 * 255;
+	const g = Math.floor((rem = args % 36) / 6) / 5 * 255;
+	const b = (rem % 6) / 5 * 255;
+
+	return [r, g, b];
+};
+
+convert.rgb.hex = function (args) {
+	const integer = ((Math.round(args[0]) & 0xFF) << 16)
+		+ ((Math.round(args[1]) & 0xFF) << 8)
+		+ (Math.round(args[2]) & 0xFF);
+
+	const string = integer.toString(16).toUpperCase();
+	return '000000'.substring(string.length) + string;
+};
+
+convert.hex.rgb = function (args) {
+	const match = args.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);
+	if (!match) {
+		return [0, 0, 0];
+	}
+
+	let colorString = match[0];
+
+	if (match[0].length === 3) {
+		colorString = colorString.split('').map(char => {
+			return char + char;
+		}).join('');
+	}
+
+	const integer = parseInt(colorString, 16);
+	const r = (integer >> 16) & 0xFF;
+	const g = (integer >> 8) & 0xFF;
+	const b = integer & 0xFF;
+
+	return [r, g, b];
+};
+
+convert.rgb.hcg = function (rgb) {
+	const r = rgb[0] / 255;
+	const g = rgb[1] / 255;
+	const b = rgb[2] / 255;
+	const max = Math.max(Math.max(r, g), b);
+	const min = Math.min(Math.min(r, g), b);
+	const chroma = (max - min);
+	let grayscale;
+	let hue;
+
+	if (chroma < 1) {
+		grayscale = min / (1 - chroma);
+	} else {
+		grayscale = 0;
+	}
+
+	if (chroma <= 0) {
+		hue = 0;
+	} else
+	if (max === r) {
+		hue = ((g - b) / chroma) % 6;
+	} else
+	if (max === g) {
+		hue = 2 + (b - r) / chroma;
+	} else {
+		hue = 4 + (r - g) / chroma;
+	}
+
+	hue /= 6;
+	hue %= 1;
+
+	return [hue * 360, chroma * 100, grayscale * 100];
+};
+
+convert.hsl.hcg = function (hsl) {
+	const s = hsl[1] / 100;
+	const l = hsl[2] / 100;
+
+	const c = l < 0.5 ? (2.0 * s * l) : (2.0 * s * (1.0 - l));
+
+	let f = 0;
+	if (c < 1.0) {
+		f = (l - 0.5 * c) / (1.0 - c);
+	}
+
+	return [hsl[0], c * 100, f * 100];
+};
+
+convert.hsv.hcg = function (hsv) {
+	const s = hsv[1] / 100;
+	const v = hsv[2] / 100;
+
+	const c = s * v;
+	let f = 0;
+
+	if (c < 1.0) {
+		f = (v - c) / (1 - c);
+	}
+
+	return [hsv[0], c * 100, f * 100];
+};
+
+convert.hcg.rgb = function (hcg) {
+	const h = hcg[0] / 360;
+	const c = hcg[1] / 100;
+	const g = hcg[2] / 100;
+
+	if (c === 0.0) {
+		return [g * 255, g * 255, g * 255];
+	}
+
+	const pure = [0, 0, 0];
+	const hi = (h % 1) * 6;
+	const v = hi % 1;
+	const w = 1 - v;
+	let mg = 0;
+
+	/* eslint-disable max-statements-per-line */
+	switch (Math.floor(hi)) {
+		case 0:
+			pure[0] = 1; pure[1] = v; pure[2] = 0; break;
+		case 1:
+			pure[0] = w; pure[1] = 1; pure[2] = 0; break;
+		case 2:
+			pure[0] = 0; pure[1] = 1; pure[2] = v; break;
+		case 3:
+			pure[0] = 0; pure[1] = w; pure[2] = 1; break;
+		case 4:
+			pure[0] = v; pure[1] = 0; pure[2] = 1; break;
+		default:
+			pure[0] = 1; pure[1] = 0; pure[2] = w;
+	}
+	/* eslint-enable max-statements-per-line */
+
+	mg = (1.0 - c) * g;
+
+	return [
+		(c * pure[0] + mg) * 255,
+		(c * pure[1] + mg) * 255,
+		(c * pure[2] + mg) * 255
+	];
+};
+
+convert.hcg.hsv = function (hcg) {
+	const c = hcg[1] / 100;
+	const g = hcg[2] / 100;
+
+	const v = c + g * (1.0 - c);
+	let f = 0;
+
+	if (v > 0.0) {
+		f = c / v;
+	}
+
+	return [hcg[0], f * 100, v * 100];
+};
+
+convert.hcg.hsl = function (hcg) {
+	const c = hcg[1] / 100;
+	const g = hcg[2] / 100;
+
+	const l = g * (1.0 - c) + 0.5 * c;
+	let s = 0;
+
+	if (l > 0.0 && l < 0.5) {
+		s = c / (2 * l);
+	} else
+	if (l >= 0.5 && l < 1.0) {
+		s = c / (2 * (1 - l));
+	}
+
+	return [hcg[0], s * 100, l * 100];
+};
+
+convert.hcg.hwb = function (hcg) {
+	const c = hcg[1] / 100;
+	const g = hcg[2] / 100;
+	const v = c + g * (1.0 - c);
+	return [hcg[0], (v - c) * 100, (1 - v) * 100];
+};
+
+convert.hwb.hcg = function (hwb) {
+	const w = hwb[1] / 100;
+	const b = hwb[2] / 100;
+	const v = 1 - b;
+	const c = v - w;
+	let g = 0;
+
+	if (c < 1) {
+		g = (v - c) / (1 - c);
+	}
+
+	return [hwb[0], c * 100, g * 100];
+};
+
+convert.apple.rgb = function (apple) {
+	return [(apple[0] / 65535) * 255, (apple[1] / 65535) * 255, (apple[2] / 65535) * 255];
+};
+
+convert.rgb.apple = function (rgb) {
+	return [(rgb[0] / 255) * 65535, (rgb[1] / 255) * 65535, (rgb[2] / 255) * 65535];
+};
+
+convert.gray.rgb = function (args) {
+	return [args[0] / 100 * 255, args[0] / 100 * 255, args[0] / 100 * 255];
+};
+
+convert.gray.hsl = function (args) {
+	return [0, 0, args[0]];
+};
+
+convert.gray.hsv = convert.gray.hsl;
+
+convert.gray.hwb = function (gray) {
+	return [0, 100, gray[0]];
+};
+
+convert.gray.cmyk = function (gray) {
+	return [0, 0, 0, gray[0]];
+};
+
+convert.gray.lab = function (gray) {
+	return [gray[0], 0, 0];
+};
+
+convert.gray.hex = function (gray) {
+	const val = Math.round(gray[0] / 100 * 255) & 0xFF;
+	const integer = (val << 16) + (val << 8) + val;
+
+	const string = integer.toString(16).toUpperCase();
+	return '000000'.substring(string.length) + string;
+};
+
+convert.rgb.gray = function (rgb) {
+	const val = (rgb[0] + rgb[1] + rgb[2]) / 3;
+	return [val / 255 * 100];
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/ansi-styles/node_modules/color-convert/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+const conversions = __webpack_require__("../../node_modules/ansi-styles/node_modules/color-convert/conversions.js");
+const route = __webpack_require__("../../node_modules/ansi-styles/node_modules/color-convert/route.js");
+
+const convert = {};
+
+const models = Object.keys(conversions);
+
+function wrapRaw(fn) {
+	const wrappedFn = function (...args) {
+		const arg0 = args[0];
+		if (arg0 === undefined || arg0 === null) {
+			return arg0;
+		}
+
+		if (arg0.length > 1) {
+			args = arg0;
+		}
+
+		return fn(args);
+	};
+
+	// Preserve .conversion property if there is one
+	if ('conversion' in fn) {
+		wrappedFn.conversion = fn.conversion;
+	}
+
+	return wrappedFn;
+}
+
+function wrapRounded(fn) {
+	const wrappedFn = function (...args) {
+		const arg0 = args[0];
+
+		if (arg0 === undefined || arg0 === null) {
+			return arg0;
+		}
+
+		if (arg0.length > 1) {
+			args = arg0;
+		}
+
+		const result = fn(args);
+
+		// We're assuming the result is an array here.
+		// see notice in conversions.js; don't use box types
+		// in conversion functions.
+		if (typeof result === 'object') {
+			for (let len = result.length, i = 0; i < len; i++) {
+				result[i] = Math.round(result[i]);
+			}
+		}
+
+		return result;
+	};
+
+	// Preserve .conversion property if there is one
+	if ('conversion' in fn) {
+		wrappedFn.conversion = fn.conversion;
+	}
+
+	return wrappedFn;
+}
+
+models.forEach(fromModel => {
+	convert[fromModel] = {};
+
+	Object.defineProperty(convert[fromModel], 'channels', {value: conversions[fromModel].channels});
+	Object.defineProperty(convert[fromModel], 'labels', {value: conversions[fromModel].labels});
+
+	const routes = route(fromModel);
+	const routeModels = Object.keys(routes);
+
+	routeModels.forEach(toModel => {
+		const fn = routes[toModel];
+
+		convert[fromModel][toModel] = wrapRounded(fn);
+		convert[fromModel][toModel].raw = wrapRaw(fn);
+	});
+});
+
+module.exports = convert;
+
+
+/***/ }),
+
+/***/ "../../node_modules/ansi-styles/node_modules/color-convert/route.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+const conversions = __webpack_require__("../../node_modules/ansi-styles/node_modules/color-convert/conversions.js");
+
+/*
+	This function routes a model to all other models.
+
+	all functions that are routed have a property `.conversion` attached
+	to the returned synthetic function. This property is an array
+	of strings, each with the steps in between the 'from' and 'to'
+	color models (inclusive).
+
+	conversions that are not possible simply are not included.
+*/
+
+function buildGraph() {
+	const graph = {};
+	// https://jsperf.com/object-keys-vs-for-in-with-closure/3
+	const models = Object.keys(conversions);
+
+	for (let len = models.length, i = 0; i < len; i++) {
+		graph[models[i]] = {
+			// http://jsperf.com/1-vs-infinity
+			// micro-opt, but this is simple.
+			distance: -1,
+			parent: null
+		};
+	}
+
+	return graph;
+}
+
+// https://en.wikipedia.org/wiki/Breadth-first_search
+function deriveBFS(fromModel) {
+	const graph = buildGraph();
+	const queue = [fromModel]; // Unshift -> queue -> pop
+
+	graph[fromModel].distance = 0;
+
+	while (queue.length) {
+		const current = queue.pop();
+		const adjacents = Object.keys(conversions[current]);
+
+		for (let len = adjacents.length, i = 0; i < len; i++) {
+			const adjacent = adjacents[i];
+			const node = graph[adjacent];
+
+			if (node.distance === -1) {
+				node.distance = graph[current].distance + 1;
+				node.parent = current;
+				queue.unshift(adjacent);
+			}
+		}
+	}
+
+	return graph;
+}
+
+function link(from, to) {
+	return function (args) {
+		return to(from(args));
+	};
+}
+
+function wrapConversion(toModel, graph) {
+	const path = [graph[toModel].parent, toModel];
+	let fn = conversions[graph[toModel].parent][toModel];
+
+	let cur = graph[toModel].parent;
+	while (graph[cur].parent) {
+		path.unshift(graph[cur].parent);
+		fn = link(conversions[graph[cur].parent][cur], fn);
+		cur = graph[cur].parent;
+	}
+
+	fn.conversion = path;
+	return fn;
+}
+
+module.exports = function (fromModel) {
+	const graph = deriveBFS(fromModel);
+	const conversion = {};
+
+	const models = Object.keys(graph);
+	for (let len = models.length, i = 0; i < len; i++) {
+		const toModel = models[i];
+		const node = graph[toModel];
+
+		if (node.parent === null) {
+			// No possible conversion, or this node is the source model.
+			continue;
+		}
+
+		conversion[toModel] = wrapConversion(toModel, graph);
+	}
+
+	return conversion;
+};
+
+
+
+/***/ }),
+
 /***/ "../../node_modules/babel-runtime/core-js/array/from.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3710,6 +4920,166 @@ exports.default = function (obj, keys) {
 
   return target;
 };
+
+/***/ }),
+
+/***/ "../../node_modules/color-name/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+	"aliceblue": [240, 248, 255],
+	"antiquewhite": [250, 235, 215],
+	"aqua": [0, 255, 255],
+	"aquamarine": [127, 255, 212],
+	"azure": [240, 255, 255],
+	"beige": [245, 245, 220],
+	"bisque": [255, 228, 196],
+	"black": [0, 0, 0],
+	"blanchedalmond": [255, 235, 205],
+	"blue": [0, 0, 255],
+	"blueviolet": [138, 43, 226],
+	"brown": [165, 42, 42],
+	"burlywood": [222, 184, 135],
+	"cadetblue": [95, 158, 160],
+	"chartreuse": [127, 255, 0],
+	"chocolate": [210, 105, 30],
+	"coral": [255, 127, 80],
+	"cornflowerblue": [100, 149, 237],
+	"cornsilk": [255, 248, 220],
+	"crimson": [220, 20, 60],
+	"cyan": [0, 255, 255],
+	"darkblue": [0, 0, 139],
+	"darkcyan": [0, 139, 139],
+	"darkgoldenrod": [184, 134, 11],
+	"darkgray": [169, 169, 169],
+	"darkgreen": [0, 100, 0],
+	"darkgrey": [169, 169, 169],
+	"darkkhaki": [189, 183, 107],
+	"darkmagenta": [139, 0, 139],
+	"darkolivegreen": [85, 107, 47],
+	"darkorange": [255, 140, 0],
+	"darkorchid": [153, 50, 204],
+	"darkred": [139, 0, 0],
+	"darksalmon": [233, 150, 122],
+	"darkseagreen": [143, 188, 143],
+	"darkslateblue": [72, 61, 139],
+	"darkslategray": [47, 79, 79],
+	"darkslategrey": [47, 79, 79],
+	"darkturquoise": [0, 206, 209],
+	"darkviolet": [148, 0, 211],
+	"deeppink": [255, 20, 147],
+	"deepskyblue": [0, 191, 255],
+	"dimgray": [105, 105, 105],
+	"dimgrey": [105, 105, 105],
+	"dodgerblue": [30, 144, 255],
+	"firebrick": [178, 34, 34],
+	"floralwhite": [255, 250, 240],
+	"forestgreen": [34, 139, 34],
+	"fuchsia": [255, 0, 255],
+	"gainsboro": [220, 220, 220],
+	"ghostwhite": [248, 248, 255],
+	"gold": [255, 215, 0],
+	"goldenrod": [218, 165, 32],
+	"gray": [128, 128, 128],
+	"green": [0, 128, 0],
+	"greenyellow": [173, 255, 47],
+	"grey": [128, 128, 128],
+	"honeydew": [240, 255, 240],
+	"hotpink": [255, 105, 180],
+	"indianred": [205, 92, 92],
+	"indigo": [75, 0, 130],
+	"ivory": [255, 255, 240],
+	"khaki": [240, 230, 140],
+	"lavender": [230, 230, 250],
+	"lavenderblush": [255, 240, 245],
+	"lawngreen": [124, 252, 0],
+	"lemonchiffon": [255, 250, 205],
+	"lightblue": [173, 216, 230],
+	"lightcoral": [240, 128, 128],
+	"lightcyan": [224, 255, 255],
+	"lightgoldenrodyellow": [250, 250, 210],
+	"lightgray": [211, 211, 211],
+	"lightgreen": [144, 238, 144],
+	"lightgrey": [211, 211, 211],
+	"lightpink": [255, 182, 193],
+	"lightsalmon": [255, 160, 122],
+	"lightseagreen": [32, 178, 170],
+	"lightskyblue": [135, 206, 250],
+	"lightslategray": [119, 136, 153],
+	"lightslategrey": [119, 136, 153],
+	"lightsteelblue": [176, 196, 222],
+	"lightyellow": [255, 255, 224],
+	"lime": [0, 255, 0],
+	"limegreen": [50, 205, 50],
+	"linen": [250, 240, 230],
+	"magenta": [255, 0, 255],
+	"maroon": [128, 0, 0],
+	"mediumaquamarine": [102, 205, 170],
+	"mediumblue": [0, 0, 205],
+	"mediumorchid": [186, 85, 211],
+	"mediumpurple": [147, 112, 219],
+	"mediumseagreen": [60, 179, 113],
+	"mediumslateblue": [123, 104, 238],
+	"mediumspringgreen": [0, 250, 154],
+	"mediumturquoise": [72, 209, 204],
+	"mediumvioletred": [199, 21, 133],
+	"midnightblue": [25, 25, 112],
+	"mintcream": [245, 255, 250],
+	"mistyrose": [255, 228, 225],
+	"moccasin": [255, 228, 181],
+	"navajowhite": [255, 222, 173],
+	"navy": [0, 0, 128],
+	"oldlace": [253, 245, 230],
+	"olive": [128, 128, 0],
+	"olivedrab": [107, 142, 35],
+	"orange": [255, 165, 0],
+	"orangered": [255, 69, 0],
+	"orchid": [218, 112, 214],
+	"palegoldenrod": [238, 232, 170],
+	"palegreen": [152, 251, 152],
+	"paleturquoise": [175, 238, 238],
+	"palevioletred": [219, 112, 147],
+	"papayawhip": [255, 239, 213],
+	"peachpuff": [255, 218, 185],
+	"peru": [205, 133, 63],
+	"pink": [255, 192, 203],
+	"plum": [221, 160, 221],
+	"powderblue": [176, 224, 230],
+	"purple": [128, 0, 128],
+	"rebeccapurple": [102, 51, 153],
+	"red": [255, 0, 0],
+	"rosybrown": [188, 143, 143],
+	"royalblue": [65, 105, 225],
+	"saddlebrown": [139, 69, 19],
+	"salmon": [250, 128, 114],
+	"sandybrown": [244, 164, 96],
+	"seagreen": [46, 139, 87],
+	"seashell": [255, 245, 238],
+	"sienna": [160, 82, 45],
+	"silver": [192, 192, 192],
+	"skyblue": [135, 206, 235],
+	"slateblue": [106, 90, 205],
+	"slategray": [112, 128, 144],
+	"slategrey": [112, 128, 144],
+	"snow": [255, 250, 250],
+	"springgreen": [0, 255, 127],
+	"steelblue": [70, 130, 180],
+	"tan": [210, 180, 140],
+	"teal": [0, 128, 128],
+	"thistle": [216, 191, 216],
+	"tomato": [255, 99, 71],
+	"turquoise": [64, 224, 208],
+	"violet": [238, 130, 238],
+	"wheat": [245, 222, 179],
+	"white": [255, 255, 255],
+	"whitesmoke": [245, 245, 245],
+	"yellow": [255, 255, 0],
+	"yellowgreen": [154, 205, 50]
+};
+
 
 /***/ }),
 
@@ -11333,6 +12703,19 @@ module.exports = (string, separator) => {
 
 /***/ }),
 
+/***/ "../../node_modules/supports-color/browser.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = {
+	stdout: false,
+	stderr: false
+};
+
+
+/***/ }),
+
 /***/ "../../node_modules/symbol-observable/es/index.js":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11515,6 +12898,785 @@ function toSpaceCase(string) {
   }).trim()
 }
 
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/index.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _v1_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v1.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v1", function() { return _v1_js__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+/* harmony import */ var _v3_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v3.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v3", function() { return _v3_js__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+/* harmony import */ var _v4_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v4.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v4", function() { return _v4_js__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+
+/* harmony import */ var _v5_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v5.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v5", function() { return _v5_js__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+
+/* harmony import */ var _nil_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/nil.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NIL", function() { return _nil_js__WEBPACK_IMPORTED_MODULE_4__["default"]; });
+
+/* harmony import */ var _version_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/version.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _version_js__WEBPACK_IMPORTED_MODULE_5__["default"]; });
+
+/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/validate.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "validate", function() { return _validate_js__WEBPACK_IMPORTED_MODULE_6__["default"]; });
+
+/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/stringify.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "stringify", function() { return _stringify_js__WEBPACK_IMPORTED_MODULE_7__["default"]; });
+
+/* harmony import */ var _parse_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/parse.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "parse", function() { return _parse_js__WEBPACK_IMPORTED_MODULE_8__["default"]; });
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/md5.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/*
+ * Browser-compatible JavaScript MD5
+ *
+ * Modification of JavaScript MD5
+ * https://github.com/blueimp/JavaScript-MD5
+ *
+ * Copyright 2011, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * https://opensource.org/licenses/MIT
+ *
+ * Based on
+ * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
+ * Digest Algorithm, as defined in RFC 1321.
+ * Version 2.2 Copyright (C) Paul Johnston 1999 - 2009
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for more info.
+ */
+function md5(bytes) {
+  if (typeof bytes === 'string') {
+    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
+
+    bytes = new Uint8Array(msg.length);
+
+    for (var i = 0; i < msg.length; ++i) {
+      bytes[i] = msg.charCodeAt(i);
+    }
+  }
+
+  return md5ToHexEncodedArray(wordsToMd5(bytesToWords(bytes), bytes.length * 8));
+}
+/*
+ * Convert an array of little-endian words to an array of bytes
+ */
+
+
+function md5ToHexEncodedArray(input) {
+  var output = [];
+  var length32 = input.length * 32;
+  var hexTab = '0123456789abcdef';
+
+  for (var i = 0; i < length32; i += 8) {
+    var x = input[i >> 5] >>> i % 32 & 0xff;
+    var hex = parseInt(hexTab.charAt(x >>> 4 & 0x0f) + hexTab.charAt(x & 0x0f), 16);
+    output.push(hex);
+  }
+
+  return output;
+}
+/**
+ * Calculate output length with padding and bit length
+ */
+
+
+function getOutputLength(inputLength8) {
+  return (inputLength8 + 64 >>> 9 << 4) + 14 + 1;
+}
+/*
+ * Calculate the MD5 of an array of little-endian words, and a bit length.
+ */
+
+
+function wordsToMd5(x, len) {
+  /* append padding */
+  x[len >> 5] |= 0x80 << len % 32;
+  x[getOutputLength(len) - 1] = len;
+  var a = 1732584193;
+  var b = -271733879;
+  var c = -1732584194;
+  var d = 271733878;
+
+  for (var i = 0; i < x.length; i += 16) {
+    var olda = a;
+    var oldb = b;
+    var oldc = c;
+    var oldd = d;
+    a = md5ff(a, b, c, d, x[i], 7, -680876936);
+    d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
+    c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
+    b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
+    a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
+    d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
+    c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
+    b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
+    a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
+    d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
+    c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
+    b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
+    a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
+    d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
+    c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
+    b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
+    a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
+    d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
+    c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
+    b = md5gg(b, c, d, a, x[i], 20, -373897302);
+    a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
+    d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
+    c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
+    b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
+    a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
+    d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
+    c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
+    b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
+    a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
+    d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
+    c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
+    b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
+    a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
+    d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
+    c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
+    b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
+    a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
+    d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
+    c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
+    b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
+    a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
+    d = md5hh(d, a, b, c, x[i], 11, -358537222);
+    c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
+    b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
+    a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
+    d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
+    c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
+    b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
+    a = md5ii(a, b, c, d, x[i], 6, -198630844);
+    d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
+    c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
+    b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
+    a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
+    d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
+    c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
+    b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
+    a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
+    d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
+    c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
+    b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
+    a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
+    d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
+    c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
+    b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
+    a = safeAdd(a, olda);
+    b = safeAdd(b, oldb);
+    c = safeAdd(c, oldc);
+    d = safeAdd(d, oldd);
+  }
+
+  return [a, b, c, d];
+}
+/*
+ * Convert an array bytes to an array of little-endian words
+ * Characters >255 have their high-byte silently ignored.
+ */
+
+
+function bytesToWords(input) {
+  if (input.length === 0) {
+    return [];
+  }
+
+  var length8 = input.length * 8;
+  var output = new Uint32Array(getOutputLength(length8));
+
+  for (var i = 0; i < length8; i += 8) {
+    output[i >> 5] |= (input[i / 8] & 0xff) << i % 32;
+  }
+
+  return output;
+}
+/*
+ * Add integers, wrapping at 2^32. This uses 16-bit operations internally
+ * to work around bugs in some JS interpreters.
+ */
+
+
+function safeAdd(x, y) {
+  var lsw = (x & 0xffff) + (y & 0xffff);
+  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+  return msw << 16 | lsw & 0xffff;
+}
+/*
+ * Bitwise rotate a 32-bit number to the left.
+ */
+
+
+function bitRotateLeft(num, cnt) {
+  return num << cnt | num >>> 32 - cnt;
+}
+/*
+ * These functions implement the four basic operations the algorithm uses.
+ */
+
+
+function md5cmn(q, a, b, x, s, t) {
+  return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
+}
+
+function md5ff(a, b, c, d, x, s, t) {
+  return md5cmn(b & c | ~b & d, a, b, x, s, t);
+}
+
+function md5gg(a, b, c, d, x, s, t) {
+  return md5cmn(b & d | c & ~d, a, b, x, s, t);
+}
+
+function md5hh(a, b, c, d, x, s, t) {
+  return md5cmn(b ^ c ^ d, a, b, x, s, t);
+}
+
+function md5ii(a, b, c, d, x, s, t) {
+  return md5cmn(c ^ (b | ~d), a, b, x, s, t);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (md5);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/nil.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ('00000000-0000-0000-0000-000000000000');
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/parse.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/validate.js");
+
+
+function parse(uuid) {
+  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  var v;
+  var arr = new Uint8Array(16); // Parse ########-....-....-....-............
+
+  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
+  arr[1] = v >>> 16 & 0xff;
+  arr[2] = v >>> 8 & 0xff;
+  arr[3] = v & 0xff; // Parse ........-####-....-....-............
+
+  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
+  arr[5] = v & 0xff; // Parse ........-....-####-....-............
+
+  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
+  arr[7] = v & 0xff; // Parse ........-....-....-####-............
+
+  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
+  arr[9] = v & 0xff; // Parse ........-....-....-....-############
+  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
+
+  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
+  arr[11] = v / 0x100000000 & 0xff;
+  arr[12] = v >>> 24 & 0xff;
+  arr[13] = v >>> 16 & 0xff;
+  arr[14] = v >>> 8 & 0xff;
+  arr[15] = v & 0xff;
+  return arr;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (parse);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/regex.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/rng.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return rng; });
+// Unique ID creation requires a high quality random # generator. In the browser we therefore
+// require the crypto API and do not support built-in fallback to lower quality random number
+// generators (like Math.random()).
+var getRandomValues;
+var rnds8 = new Uint8Array(16);
+function rng() {
+  // lazy load so that environments that need to polyfill have a chance to do so
+  if (!getRandomValues) {
+    // getRandomValues needs to be invoked in a context where "this" is a Crypto implementation. Also,
+    // find the complete implementation of crypto (msCrypto) on IE11.
+    getRandomValues = typeof crypto !== 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto !== 'undefined' && typeof msCrypto.getRandomValues === 'function' && msCrypto.getRandomValues.bind(msCrypto);
+
+    if (!getRandomValues) {
+      throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
+    }
+  }
+
+  return getRandomValues(rnds8);
+}
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/sha1.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Adapted from Chris Veness' SHA1 code at
+// http://www.movable-type.co.uk/scripts/sha1.html
+function f(s, x, y, z) {
+  switch (s) {
+    case 0:
+      return x & y ^ ~x & z;
+
+    case 1:
+      return x ^ y ^ z;
+
+    case 2:
+      return x & y ^ x & z ^ y & z;
+
+    case 3:
+      return x ^ y ^ z;
+  }
+}
+
+function ROTL(x, n) {
+  return x << n | x >>> 32 - n;
+}
+
+function sha1(bytes) {
+  var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6];
+  var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
+
+  if (typeof bytes === 'string') {
+    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
+
+    bytes = [];
+
+    for (var i = 0; i < msg.length; ++i) {
+      bytes.push(msg.charCodeAt(i));
+    }
+  } else if (!Array.isArray(bytes)) {
+    // Convert Array-like to Array
+    bytes = Array.prototype.slice.call(bytes);
+  }
+
+  bytes.push(0x80);
+  var l = bytes.length / 4 + 2;
+  var N = Math.ceil(l / 16);
+  var M = new Array(N);
+
+  for (var _i = 0; _i < N; ++_i) {
+    var arr = new Uint32Array(16);
+
+    for (var j = 0; j < 16; ++j) {
+      arr[j] = bytes[_i * 64 + j * 4] << 24 | bytes[_i * 64 + j * 4 + 1] << 16 | bytes[_i * 64 + j * 4 + 2] << 8 | bytes[_i * 64 + j * 4 + 3];
+    }
+
+    M[_i] = arr;
+  }
+
+  M[N - 1][14] = (bytes.length - 1) * 8 / Math.pow(2, 32);
+  M[N - 1][14] = Math.floor(M[N - 1][14]);
+  M[N - 1][15] = (bytes.length - 1) * 8 & 0xffffffff;
+
+  for (var _i2 = 0; _i2 < N; ++_i2) {
+    var W = new Uint32Array(80);
+
+    for (var t = 0; t < 16; ++t) {
+      W[t] = M[_i2][t];
+    }
+
+    for (var _t = 16; _t < 80; ++_t) {
+      W[_t] = ROTL(W[_t - 3] ^ W[_t - 8] ^ W[_t - 14] ^ W[_t - 16], 1);
+    }
+
+    var a = H[0];
+    var b = H[1];
+    var c = H[2];
+    var d = H[3];
+    var e = H[4];
+
+    for (var _t2 = 0; _t2 < 80; ++_t2) {
+      var s = Math.floor(_t2 / 20);
+      var T = ROTL(a, 5) + f(s, b, c, d) + e + K[s] + W[_t2] >>> 0;
+      e = d;
+      d = c;
+      c = ROTL(b, 30) >>> 0;
+      b = a;
+      a = T;
+    }
+
+    H[0] = H[0] + a >>> 0;
+    H[1] = H[1] + b >>> 0;
+    H[2] = H[2] + c >>> 0;
+    H[3] = H[3] + d >>> 0;
+    H[4] = H[4] + e >>> 0;
+  }
+
+  return [H[0] >> 24 & 0xff, H[0] >> 16 & 0xff, H[0] >> 8 & 0xff, H[0] & 0xff, H[1] >> 24 & 0xff, H[1] >> 16 & 0xff, H[1] >> 8 & 0xff, H[1] & 0xff, H[2] >> 24 & 0xff, H[2] >> 16 & 0xff, H[2] >> 8 & 0xff, H[2] & 0xff, H[3] >> 24 & 0xff, H[3] >> 16 & 0xff, H[3] >> 8 & 0xff, H[3] & 0xff, H[4] >> 24 & 0xff, H[4] >> 16 & 0xff, H[4] >> 8 & 0xff, H[4] & 0xff];
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (sha1);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/stringify.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/validate.js");
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+
+var byteToHex = [];
+
+for (var i = 0; i < 256; ++i) {
+  byteToHex.push((i + 0x100).toString(16).substr(1));
+}
+
+function stringify(arr) {
+  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  // Note: Be careful editing this code!  It's been tuned for performance
+  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
+  var uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
+  // of the following:
+  // - One or more input array values don't map to a hex octet (leading to
+  // "undefined" in the uuid)
+  // - Invalid input values for the RFC `version` or `variant` fields
+
+  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
+    throw TypeError('Stringified UUID is invalid');
+  }
+
+  return uuid;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (stringify);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/v1.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/rng.js");
+/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/stringify.js");
+
+ // **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+
+var _clockseq; // Previous uuid creation time
+
+
+var _lastMSecs = 0;
+var _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
+
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || new Array(16);
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+
+  if (node == null || clockseq == null) {
+    var seedBytes = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])();
+
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
+    }
+
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+
+
+  var msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
+
+  var dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
+
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+
+
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  } // Per 4.2.1.2 Throw error if too many uuids are requested
+
+
+  if (nsecs >= 10000) {
+    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+
+  msecs += 12219292800000; // `time_low`
+
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff; // `time_mid`
+
+  var tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff; // `time_high_and_version`
+
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+
+  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+
+  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
+
+  b[i++] = clockseq & 0xff; // `node`
+
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf || Object(_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(b);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (v1);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/v3.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v35.js");
+/* harmony import */ var _md5_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/md5.js");
+
+
+var v3 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v3', 0x30, _md5_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
+/* harmony default export */ __webpack_exports__["default"] = (v3);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/v35.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DNS", function() { return DNS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "URL", function() { return URL; });
+/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/stringify.js");
+/* harmony import */ var _parse_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/parse.js");
+
+
+
+function stringToBytes(str) {
+  str = unescape(encodeURIComponent(str)); // UTF8 escape
+
+  var bytes = [];
+
+  for (var i = 0; i < str.length; ++i) {
+    bytes.push(str.charCodeAt(i));
+  }
+
+  return bytes;
+}
+
+var DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+var URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
+/* harmony default export */ __webpack_exports__["default"] = (function (name, version, hashfunc) {
+  function generateUUID(value, namespace, buf, offset) {
+    if (typeof value === 'string') {
+      value = stringToBytes(value);
+    }
+
+    if (typeof namespace === 'string') {
+      namespace = Object(_parse_js__WEBPACK_IMPORTED_MODULE_1__["default"])(namespace);
+    }
+
+    if (namespace.length !== 16) {
+      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
+    } // Compute hash of namespace and value, Per 4.3
+    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
+    // hashfunc([...namespace, ... value])`
+
+
+    var bytes = new Uint8Array(16 + value.length);
+    bytes.set(namespace);
+    bytes.set(value, namespace.length);
+    bytes = hashfunc(bytes);
+    bytes[6] = bytes[6] & 0x0f | version;
+    bytes[8] = bytes[8] & 0x3f | 0x80;
+
+    if (buf) {
+      offset = offset || 0;
+
+      for (var i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
+      }
+
+      return buf;
+    }
+
+    return Object(_stringify_js__WEBPACK_IMPORTED_MODULE_0__["default"])(bytes);
+  } // Function#name is not settable on some platforms (#270)
+
+
+  try {
+    generateUUID.name = name; // eslint-disable-next-line no-empty
+  } catch (err) {} // For CommonJS default export support
+
+
+  generateUUID.DNS = DNS;
+  generateUUID.URL = URL;
+  return generateUUID;
+});
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/v4.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/rng.js");
+/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/stringify.js");
+
+
+
+function v4(options, buf, offset) {
+  options = options || {};
+  var rnds = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+
+  rnds[6] = rnds[6] & 0x0f | 0x40;
+  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
+
+  if (buf) {
+    offset = offset || 0;
+
+    for (var i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
+    }
+
+    return buf;
+  }
+
+  return Object(_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (v4);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/v5.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/v35.js");
+/* harmony import */ var _sha1_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/sha1.js");
+
+
+var v5 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v5', 0x50, _sha1_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
+/* harmony default export */ __webpack_exports__["default"] = (v5);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/validate.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/regex.js");
+
+
+function validate(uuid) {
+  return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__["default"].test(uuid);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (validate);
+
+/***/ }),
+
+/***/ "../../node_modules/uuid/dist/esm-browser/version.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/uuid/dist/esm-browser/validate.js");
+
+
+function version(uuid) {
+  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  return parseInt(uuid.substr(14, 1), 16);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (version);
 
 /***/ }),
 
@@ -12192,6 +14354,579 @@ function testSchema(schema) {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (v8n);
+
+
+/***/ }),
+
+/***/ "../../node_modules/variable-diff/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var chalk = __webpack_require__("../../node_modules/variable-diff/node_modules/chalk/source/index.js");
+
+var typeColors = {
+  modified: 'yellow',
+  added: 'green',
+  removed: 'red'
+};
+
+var defaultOptions = {
+  indent: '  ',
+  newLine: '\n',
+  wrap: function wrap(type, text) {
+    return chalk[typeColors[type]](text);
+  },
+  color: true
+};
+
+function isObject(obj) {
+  return typeof obj === 'object' && obj && !Array.isArray(obj);
+}
+
+function printVar(variable) {
+  if (typeof variable === 'function') {
+    return variable.toString().replace(/\{.+\}/,'{}');
+  } else if((typeof variable === 'object' || typeof variable === 'string') && !(variable instanceof RegExp)) {
+    return JSON.stringify(variable);
+  }
+
+  return '' + variable;
+}
+
+function indentSubItem(text, options) {
+  return text.split(options.newLine).map(function onMap(line, index) {
+    if (index === 0) {
+      return line;
+    }
+    return options.indent + line;
+  }).join(options.newLine);
+}
+
+function keyChanged(key, text, options) {
+  return options.indent + key + ': ' + indentSubItem(text, options) + options.newLine
+}
+
+function keyRemoved(key, variable, options) {
+  return options.wrap('removed', '- ' + key + ': ' + printVar(variable)) + options.newLine;
+}
+
+function keyAdded(key, variable, options) {
+  return options.wrap('added', '+ ' + key + ': ' + printVar(variable)) + options.newLine;
+}
+
+function diffInternal(left, right, options) {
+  var text = '';
+  var changed = false;
+  var itemDiff;
+  var keys;
+  var subOutput = '';
+
+  if (Array.isArray(left) && Array.isArray(right)) {
+    for (var i = 0; i < left.length; i++) {
+      if (i < right.length) {
+        itemDiff = diffInternal(left[i], right[i], options);
+        if (itemDiff.changed) {
+          subOutput += keyChanged(i, itemDiff.text, options);
+          changed = true;
+        }
+      } else {
+        subOutput += keyRemoved(i, left[i], options);
+        changed = true;
+      }
+    }
+    if (right.length > left.length) {
+      for (; i < right.length; i++) {
+        subOutput +=  keyAdded(i, right[i], options);
+      }
+      changed = true;
+    }
+    if (changed) {
+      text = '[' + options.newLine + subOutput + ']';
+    }
+  } else if (isObject(left) && isObject(right)) {
+    keys = Object.keys(left);
+    var rightObj = Object.assign({}, right);
+    var key;
+    keys.sort();
+    for (var i = 0; i < keys.length; i++) {
+      key = keys[i];
+      if (right.hasOwnProperty(key)) {
+        itemDiff = diffInternal(left[key], right[key], options);
+        if (itemDiff.changed) {
+          subOutput += keyChanged(key, itemDiff.text, options);
+          changed = true;
+        }
+        delete rightObj[key];
+      } else {
+        subOutput += keyRemoved(key, left[key], options);
+        changed = true;
+      }
+    }
+
+    var addedKeys = Object.keys(rightObj);
+    for (var i = 0; i < addedKeys.length; i++) {
+      subOutput += keyAdded(addedKeys[i], right[addedKeys[i]], options);
+      changed = true;
+    }
+
+    if (changed) {
+      text = '{' + options.newLine + subOutput + '}';
+    }
+
+  } else if (left !== right) {
+    text = options.wrap('modified', printVar(left) + ' => ' + printVar(right));
+    changed = true;
+  }
+
+  return {
+    changed: changed,
+    text: text
+  };
+}
+
+function diff(left, right, options) {
+  options = options || {};
+  if (!options.color && options.wrap) {
+    throw new Error('Can\'t specify wrap and color options together.')
+  }
+
+  var combinedOptions = Object.assign({}, defaultOptions, options);
+  if (!combinedOptions.color) {
+    combinedOptions.wrap = function(type, text) { return text }
+  }
+
+  return diffInternal(left, right, combinedOptions)
+}
+
+
+module.exports = diff;
+
+/***/ }),
+
+/***/ "../../node_modules/variable-diff/node_modules/chalk/source/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const ansiStyles = __webpack_require__("../../node_modules/ansi-styles/index.js");
+const {stdout: stdoutColor, stderr: stderrColor} = __webpack_require__("../../node_modules/supports-color/browser.js");
+const {
+	stringReplaceAll,
+	stringEncaseCRLFWithFirstIndex
+} = __webpack_require__("../../node_modules/variable-diff/node_modules/chalk/source/util.js");
+
+const {isArray} = Array;
+
+// `supportsColor.level` → `ansiStyles.color[name]` mapping
+const levelMapping = [
+	'ansi',
+	'ansi',
+	'ansi256',
+	'ansi16m'
+];
+
+const styles = Object.create(null);
+
+const applyOptions = (object, options = {}) => {
+	if (options.level && !(Number.isInteger(options.level) && options.level >= 0 && options.level <= 3)) {
+		throw new Error('The `level` option should be an integer from 0 to 3');
+	}
+
+	// Detect level if not set manually
+	const colorLevel = stdoutColor ? stdoutColor.level : 0;
+	object.level = options.level === undefined ? colorLevel : options.level;
+};
+
+class ChalkClass {
+	constructor(options) {
+		// eslint-disable-next-line no-constructor-return
+		return chalkFactory(options);
+	}
+}
+
+const chalkFactory = options => {
+	const chalk = {};
+	applyOptions(chalk, options);
+
+	chalk.template = (...arguments_) => chalkTag(chalk.template, ...arguments_);
+
+	Object.setPrototypeOf(chalk, Chalk.prototype);
+	Object.setPrototypeOf(chalk.template, chalk);
+
+	chalk.template.constructor = () => {
+		throw new Error('`chalk.constructor()` is deprecated. Use `new chalk.Instance()` instead.');
+	};
+
+	chalk.template.Instance = ChalkClass;
+
+	return chalk.template;
+};
+
+function Chalk(options) {
+	return chalkFactory(options);
+}
+
+for (const [styleName, style] of Object.entries(ansiStyles)) {
+	styles[styleName] = {
+		get() {
+			const builder = createBuilder(this, createStyler(style.open, style.close, this._styler), this._isEmpty);
+			Object.defineProperty(this, styleName, {value: builder});
+			return builder;
+		}
+	};
+}
+
+styles.visible = {
+	get() {
+		const builder = createBuilder(this, this._styler, true);
+		Object.defineProperty(this, 'visible', {value: builder});
+		return builder;
+	}
+};
+
+const usedModels = ['rgb', 'hex', 'keyword', 'hsl', 'hsv', 'hwb', 'ansi', 'ansi256'];
+
+for (const model of usedModels) {
+	styles[model] = {
+		get() {
+			const {level} = this;
+			return function (...arguments_) {
+				const styler = createStyler(ansiStyles.color[levelMapping[level]][model](...arguments_), ansiStyles.color.close, this._styler);
+				return createBuilder(this, styler, this._isEmpty);
+			};
+		}
+	};
+}
+
+for (const model of usedModels) {
+	const bgModel = 'bg' + model[0].toUpperCase() + model.slice(1);
+	styles[bgModel] = {
+		get() {
+			const {level} = this;
+			return function (...arguments_) {
+				const styler = createStyler(ansiStyles.bgColor[levelMapping[level]][model](...arguments_), ansiStyles.bgColor.close, this._styler);
+				return createBuilder(this, styler, this._isEmpty);
+			};
+		}
+	};
+}
+
+const proto = Object.defineProperties(() => {}, {
+	...styles,
+	level: {
+		enumerable: true,
+		get() {
+			return this._generator.level;
+		},
+		set(level) {
+			this._generator.level = level;
+		}
+	}
+});
+
+const createStyler = (open, close, parent) => {
+	let openAll;
+	let closeAll;
+	if (parent === undefined) {
+		openAll = open;
+		closeAll = close;
+	} else {
+		openAll = parent.openAll + open;
+		closeAll = close + parent.closeAll;
+	}
+
+	return {
+		open,
+		close,
+		openAll,
+		closeAll,
+		parent
+	};
+};
+
+const createBuilder = (self, _styler, _isEmpty) => {
+	const builder = (...arguments_) => {
+		if (isArray(arguments_[0]) && isArray(arguments_[0].raw)) {
+			// Called as a template literal, for example: chalk.red`2 + 3 = {bold ${2+3}}`
+			return applyStyle(builder, chalkTag(builder, ...arguments_));
+		}
+
+		// Single argument is hot path, implicit coercion is faster than anything
+		// eslint-disable-next-line no-implicit-coercion
+		return applyStyle(builder, (arguments_.length === 1) ? ('' + arguments_[0]) : arguments_.join(' '));
+	};
+
+	// We alter the prototype because we must return a function, but there is
+	// no way to create a function with a different prototype
+	Object.setPrototypeOf(builder, proto);
+
+	builder._generator = self;
+	builder._styler = _styler;
+	builder._isEmpty = _isEmpty;
+
+	return builder;
+};
+
+const applyStyle = (self, string) => {
+	if (self.level <= 0 || !string) {
+		return self._isEmpty ? '' : string;
+	}
+
+	let styler = self._styler;
+
+	if (styler === undefined) {
+		return string;
+	}
+
+	const {openAll, closeAll} = styler;
+	if (string.indexOf('\u001B') !== -1) {
+		while (styler !== undefined) {
+			// Replace any instances already present with a re-opening code
+			// otherwise only the part of the string until said closing code
+			// will be colored, and the rest will simply be 'plain'.
+			string = stringReplaceAll(string, styler.close, styler.open);
+
+			styler = styler.parent;
+		}
+	}
+
+	// We can move both next actions out of loop, because remaining actions in loop won't have
+	// any/visible effect on parts we add here. Close the styling before a linebreak and reopen
+	// after next line to fix a bleed issue on macOS: https://github.com/chalk/chalk/pull/92
+	const lfIndex = string.indexOf('\n');
+	if (lfIndex !== -1) {
+		string = stringEncaseCRLFWithFirstIndex(string, closeAll, openAll, lfIndex);
+	}
+
+	return openAll + string + closeAll;
+};
+
+let template;
+const chalkTag = (chalk, ...strings) => {
+	const [firstString] = strings;
+
+	if (!isArray(firstString) || !isArray(firstString.raw)) {
+		// If chalk() was called by itself or with a string,
+		// return the string itself as a string.
+		return strings.join(' ');
+	}
+
+	const arguments_ = strings.slice(1);
+	const parts = [firstString.raw[0]];
+
+	for (let i = 1; i < firstString.length; i++) {
+		parts.push(
+			String(arguments_[i - 1]).replace(/[{}\\]/g, '\\$&'),
+			String(firstString.raw[i])
+		);
+	}
+
+	if (template === undefined) {
+		template = __webpack_require__("../../node_modules/variable-diff/node_modules/chalk/source/templates.js");
+	}
+
+	return template(chalk, parts.join(''));
+};
+
+Object.defineProperties(Chalk.prototype, styles);
+
+const chalk = Chalk(); // eslint-disable-line new-cap
+chalk.supportsColor = stdoutColor;
+chalk.stderr = Chalk({level: stderrColor ? stderrColor.level : 0}); // eslint-disable-line new-cap
+chalk.stderr.supportsColor = stderrColor;
+
+module.exports = chalk;
+
+
+/***/ }),
+
+/***/ "../../node_modules/variable-diff/node_modules/chalk/source/templates.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const TEMPLATE_REGEX = /(?:\\(u(?:[a-f\d]{4}|\{[a-f\d]{1,6}\})|x[a-f\d]{2}|.))|(?:\{(~)?(\w+(?:\([^)]*\))?(?:\.\w+(?:\([^)]*\))?)*)(?:[ \t]|(?=\r?\n)))|(\})|((?:.|[\r\n\f])+?)/gi;
+const STYLE_REGEX = /(?:^|\.)(\w+)(?:\(([^)]*)\))?/g;
+const STRING_REGEX = /^(['"])((?:\\.|(?!\1)[^\\])*)\1$/;
+const ESCAPE_REGEX = /\\(u(?:[a-f\d]{4}|{[a-f\d]{1,6}})|x[a-f\d]{2}|.)|([^\\])/gi;
+
+const ESCAPES = new Map([
+	['n', '\n'],
+	['r', '\r'],
+	['t', '\t'],
+	['b', '\b'],
+	['f', '\f'],
+	['v', '\v'],
+	['0', '\0'],
+	['\\', '\\'],
+	['e', '\u001B'],
+	['a', '\u0007']
+]);
+
+function unescape(c) {
+	const u = c[0] === 'u';
+	const bracket = c[1] === '{';
+
+	if ((u && !bracket && c.length === 5) || (c[0] === 'x' && c.length === 3)) {
+		return String.fromCharCode(parseInt(c.slice(1), 16));
+	}
+
+	if (u && bracket) {
+		return String.fromCodePoint(parseInt(c.slice(2, -1), 16));
+	}
+
+	return ESCAPES.get(c) || c;
+}
+
+function parseArguments(name, arguments_) {
+	const results = [];
+	const chunks = arguments_.trim().split(/\s*,\s*/g);
+	let matches;
+
+	for (const chunk of chunks) {
+		const number = Number(chunk);
+		if (!Number.isNaN(number)) {
+			results.push(number);
+		} else if ((matches = chunk.match(STRING_REGEX))) {
+			results.push(matches[2].replace(ESCAPE_REGEX, (m, escape, character) => escape ? unescape(escape) : character));
+		} else {
+			throw new Error(`Invalid Chalk template style argument: ${chunk} (in style '${name}')`);
+		}
+	}
+
+	return results;
+}
+
+function parseStyle(style) {
+	STYLE_REGEX.lastIndex = 0;
+
+	const results = [];
+	let matches;
+
+	while ((matches = STYLE_REGEX.exec(style)) !== null) {
+		const name = matches[1];
+
+		if (matches[2]) {
+			const args = parseArguments(name, matches[2]);
+			results.push([name].concat(args));
+		} else {
+			results.push([name]);
+		}
+	}
+
+	return results;
+}
+
+function buildStyle(chalk, styles) {
+	const enabled = {};
+
+	for (const layer of styles) {
+		for (const style of layer.styles) {
+			enabled[style[0]] = layer.inverse ? null : style.slice(1);
+		}
+	}
+
+	let current = chalk;
+	for (const [styleName, styles] of Object.entries(enabled)) {
+		if (!Array.isArray(styles)) {
+			continue;
+		}
+
+		if (!(styleName in current)) {
+			throw new Error(`Unknown Chalk style: ${styleName}`);
+		}
+
+		current = styles.length > 0 ? current[styleName](...styles) : current[styleName];
+	}
+
+	return current;
+}
+
+module.exports = (chalk, temporary) => {
+	const styles = [];
+	const chunks = [];
+	let chunk = [];
+
+	// eslint-disable-next-line max-params
+	temporary.replace(TEMPLATE_REGEX, (m, escapeCharacter, inverse, style, close, character) => {
+		if (escapeCharacter) {
+			chunk.push(unescape(escapeCharacter));
+		} else if (style) {
+			const string = chunk.join('');
+			chunk = [];
+			chunks.push(styles.length === 0 ? string : buildStyle(chalk, styles)(string));
+			styles.push({inverse, styles: parseStyle(style)});
+		} else if (close) {
+			if (styles.length === 0) {
+				throw new Error('Found extraneous } in Chalk template literal');
+			}
+
+			chunks.push(buildStyle(chalk, styles)(chunk.join('')));
+			chunk = [];
+			styles.pop();
+		} else {
+			chunk.push(character);
+		}
+	});
+
+	chunks.push(chunk.join(''));
+
+	if (styles.length > 0) {
+		const errMessage = `Chalk template literal is missing ${styles.length} closing bracket${styles.length === 1 ? '' : 's'} (\`}\`)`;
+		throw new Error(errMessage);
+	}
+
+	return chunks.join('');
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/variable-diff/node_modules/chalk/source/util.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const stringReplaceAll = (string, substring, replacer) => {
+	let index = string.indexOf(substring);
+	if (index === -1) {
+		return string;
+	}
+
+	const substringLength = substring.length;
+	let endIndex = 0;
+	let returnValue = '';
+	do {
+		returnValue += string.substr(endIndex, index - endIndex) + substring + replacer;
+		endIndex = index + substringLength;
+		index = string.indexOf(substring, endIndex);
+	} while (index !== -1);
+
+	returnValue += string.substr(endIndex);
+	return returnValue;
+};
+
+const stringEncaseCRLFWithFirstIndex = (string, prefix, postfix, index) => {
+	let endIndex = 0;
+	let returnValue = '';
+	do {
+		const gotCR = string[index - 1] === '\r';
+		returnValue += string.substr(endIndex, (gotCR ? index - 1 : index) - endIndex) + prefix + (gotCR ? '\r\n' : '\n') + postfix;
+		endIndex = index + 1;
+		index = string.indexOf('\n', endIndex);
+	} while (index !== -1);
+
+	returnValue += string.substr(endIndex);
+	return returnValue;
+};
+
+module.exports = {
+	stringReplaceAll,
+	stringEncaseCRLFWithFirstIndex
+};
 
 
 /***/ }),
@@ -16204,785 +18939,6 @@ exports.stringifyUrl = (object, options) => {
 
 module.exports = str => encodeURIComponent(str).replace(/[!'()*]/g, x => `%${x.charCodeAt(0).toString(16).toUpperCase()}`);
 
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/index.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v1_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v1.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v1", function() { return _v1_js__WEBPACK_IMPORTED_MODULE_0__["default"]; });
-
-/* harmony import */ var _v3_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v3.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v3", function() { return _v3_js__WEBPACK_IMPORTED_MODULE_1__["default"]; });
-
-/* harmony import */ var _v4_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v4.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v4", function() { return _v4_js__WEBPACK_IMPORTED_MODULE_2__["default"]; });
-
-/* harmony import */ var _v5_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v5.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v5", function() { return _v5_js__WEBPACK_IMPORTED_MODULE_3__["default"]; });
-
-/* harmony import */ var _nil_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/nil.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NIL", function() { return _nil_js__WEBPACK_IMPORTED_MODULE_4__["default"]; });
-
-/* harmony import */ var _version_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/version.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _version_js__WEBPACK_IMPORTED_MODULE_5__["default"]; });
-
-/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/validate.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "validate", function() { return _validate_js__WEBPACK_IMPORTED_MODULE_6__["default"]; });
-
-/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/stringify.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "stringify", function() { return _stringify_js__WEBPACK_IMPORTED_MODULE_7__["default"]; });
-
-/* harmony import */ var _parse_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/parse.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "parse", function() { return _parse_js__WEBPACK_IMPORTED_MODULE_8__["default"]; });
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/md5.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/*
- * Browser-compatible JavaScript MD5
- *
- * Modification of JavaScript MD5
- * https://github.com/blueimp/JavaScript-MD5
- *
- * Copyright 2011, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- *
- * Based on
- * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
- * Digest Algorithm, as defined in RFC 1321.
- * Version 2.2 Copyright (C) Paul Johnston 1999 - 2009
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- * Distributed under the BSD License
- * See http://pajhome.org.uk/crypt/md5 for more info.
- */
-function md5(bytes) {
-  if (typeof bytes === 'string') {
-    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
-
-    bytes = new Uint8Array(msg.length);
-
-    for (var i = 0; i < msg.length; ++i) {
-      bytes[i] = msg.charCodeAt(i);
-    }
-  }
-
-  return md5ToHexEncodedArray(wordsToMd5(bytesToWords(bytes), bytes.length * 8));
-}
-/*
- * Convert an array of little-endian words to an array of bytes
- */
-
-
-function md5ToHexEncodedArray(input) {
-  var output = [];
-  var length32 = input.length * 32;
-  var hexTab = '0123456789abcdef';
-
-  for (var i = 0; i < length32; i += 8) {
-    var x = input[i >> 5] >>> i % 32 & 0xff;
-    var hex = parseInt(hexTab.charAt(x >>> 4 & 0x0f) + hexTab.charAt(x & 0x0f), 16);
-    output.push(hex);
-  }
-
-  return output;
-}
-/**
- * Calculate output length with padding and bit length
- */
-
-
-function getOutputLength(inputLength8) {
-  return (inputLength8 + 64 >>> 9 << 4) + 14 + 1;
-}
-/*
- * Calculate the MD5 of an array of little-endian words, and a bit length.
- */
-
-
-function wordsToMd5(x, len) {
-  /* append padding */
-  x[len >> 5] |= 0x80 << len % 32;
-  x[getOutputLength(len) - 1] = len;
-  var a = 1732584193;
-  var b = -271733879;
-  var c = -1732584194;
-  var d = 271733878;
-
-  for (var i = 0; i < x.length; i += 16) {
-    var olda = a;
-    var oldb = b;
-    var oldc = c;
-    var oldd = d;
-    a = md5ff(a, b, c, d, x[i], 7, -680876936);
-    d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
-    c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
-    b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
-    a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
-    d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
-    c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
-    b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
-    a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
-    d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
-    c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
-    b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
-    a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
-    d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
-    c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
-    b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
-    a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
-    d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
-    c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
-    b = md5gg(b, c, d, a, x[i], 20, -373897302);
-    a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
-    d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
-    c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
-    b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
-    a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
-    d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
-    c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
-    b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
-    a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
-    d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
-    c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
-    b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
-    a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
-    d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
-    c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
-    b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
-    a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
-    d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
-    c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
-    b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
-    a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
-    d = md5hh(d, a, b, c, x[i], 11, -358537222);
-    c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
-    b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
-    a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
-    d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
-    c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
-    b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
-    a = md5ii(a, b, c, d, x[i], 6, -198630844);
-    d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
-    c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
-    b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
-    a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
-    d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
-    c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
-    b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
-    a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
-    d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
-    c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
-    b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
-    a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
-    d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
-    c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
-    b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
-    a = safeAdd(a, olda);
-    b = safeAdd(b, oldb);
-    c = safeAdd(c, oldc);
-    d = safeAdd(d, oldd);
-  }
-
-  return [a, b, c, d];
-}
-/*
- * Convert an array bytes to an array of little-endian words
- * Characters >255 have their high-byte silently ignored.
- */
-
-
-function bytesToWords(input) {
-  if (input.length === 0) {
-    return [];
-  }
-
-  var length8 = input.length * 8;
-  var output = new Uint32Array(getOutputLength(length8));
-
-  for (var i = 0; i < length8; i += 8) {
-    output[i >> 5] |= (input[i / 8] & 0xff) << i % 32;
-  }
-
-  return output;
-}
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- */
-
-
-function safeAdd(x, y) {
-  var lsw = (x & 0xffff) + (y & 0xffff);
-  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return msw << 16 | lsw & 0xffff;
-}
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-
-
-function bitRotateLeft(num, cnt) {
-  return num << cnt | num >>> 32 - cnt;
-}
-/*
- * These functions implement the four basic operations the algorithm uses.
- */
-
-
-function md5cmn(q, a, b, x, s, t) {
-  return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
-}
-
-function md5ff(a, b, c, d, x, s, t) {
-  return md5cmn(b & c | ~b & d, a, b, x, s, t);
-}
-
-function md5gg(a, b, c, d, x, s, t) {
-  return md5cmn(b & d | c & ~d, a, b, x, s, t);
-}
-
-function md5hh(a, b, c, d, x, s, t) {
-  return md5cmn(b ^ c ^ d, a, b, x, s, t);
-}
-
-function md5ii(a, b, c, d, x, s, t) {
-  return md5cmn(c ^ (b | ~d), a, b, x, s, t);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (md5);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/nil.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ('00000000-0000-0000-0000-000000000000');
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/parse.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/validate.js");
-
-
-function parse(uuid) {
-  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
-    throw TypeError('Invalid UUID');
-  }
-
-  var v;
-  var arr = new Uint8Array(16); // Parse ########-....-....-....-............
-
-  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
-  arr[1] = v >>> 16 & 0xff;
-  arr[2] = v >>> 8 & 0xff;
-  arr[3] = v & 0xff; // Parse ........-####-....-....-............
-
-  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
-  arr[5] = v & 0xff; // Parse ........-....-####-....-............
-
-  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
-  arr[7] = v & 0xff; // Parse ........-....-....-####-............
-
-  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
-  arr[9] = v & 0xff; // Parse ........-....-....-....-############
-  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
-
-  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
-  arr[11] = v / 0x100000000 & 0xff;
-  arr[12] = v >>> 24 & 0xff;
-  arr[13] = v >>> 16 & 0xff;
-  arr[14] = v >>> 8 & 0xff;
-  arr[15] = v & 0xff;
-  return arr;
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (parse);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/regex.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/rng.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return rng; });
-// Unique ID creation requires a high quality random # generator. In the browser we therefore
-// require the crypto API and do not support built-in fallback to lower quality random number
-// generators (like Math.random()).
-var getRandomValues;
-var rnds8 = new Uint8Array(16);
-function rng() {
-  // lazy load so that environments that need to polyfill have a chance to do so
-  if (!getRandomValues) {
-    // getRandomValues needs to be invoked in a context where "this" is a Crypto implementation. Also,
-    // find the complete implementation of crypto (msCrypto) on IE11.
-    getRandomValues = typeof crypto !== 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto !== 'undefined' && typeof msCrypto.getRandomValues === 'function' && msCrypto.getRandomValues.bind(msCrypto);
-
-    if (!getRandomValues) {
-      throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
-    }
-  }
-
-  return getRandomValues(rnds8);
-}
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/sha1.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// Adapted from Chris Veness' SHA1 code at
-// http://www.movable-type.co.uk/scripts/sha1.html
-function f(s, x, y, z) {
-  switch (s) {
-    case 0:
-      return x & y ^ ~x & z;
-
-    case 1:
-      return x ^ y ^ z;
-
-    case 2:
-      return x & y ^ x & z ^ y & z;
-
-    case 3:
-      return x ^ y ^ z;
-  }
-}
-
-function ROTL(x, n) {
-  return x << n | x >>> 32 - n;
-}
-
-function sha1(bytes) {
-  var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6];
-  var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
-
-  if (typeof bytes === 'string') {
-    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
-
-    bytes = [];
-
-    for (var i = 0; i < msg.length; ++i) {
-      bytes.push(msg.charCodeAt(i));
-    }
-  } else if (!Array.isArray(bytes)) {
-    // Convert Array-like to Array
-    bytes = Array.prototype.slice.call(bytes);
-  }
-
-  bytes.push(0x80);
-  var l = bytes.length / 4 + 2;
-  var N = Math.ceil(l / 16);
-  var M = new Array(N);
-
-  for (var _i = 0; _i < N; ++_i) {
-    var arr = new Uint32Array(16);
-
-    for (var j = 0; j < 16; ++j) {
-      arr[j] = bytes[_i * 64 + j * 4] << 24 | bytes[_i * 64 + j * 4 + 1] << 16 | bytes[_i * 64 + j * 4 + 2] << 8 | bytes[_i * 64 + j * 4 + 3];
-    }
-
-    M[_i] = arr;
-  }
-
-  M[N - 1][14] = (bytes.length - 1) * 8 / Math.pow(2, 32);
-  M[N - 1][14] = Math.floor(M[N - 1][14]);
-  M[N - 1][15] = (bytes.length - 1) * 8 & 0xffffffff;
-
-  for (var _i2 = 0; _i2 < N; ++_i2) {
-    var W = new Uint32Array(80);
-
-    for (var t = 0; t < 16; ++t) {
-      W[t] = M[_i2][t];
-    }
-
-    for (var _t = 16; _t < 80; ++_t) {
-      W[_t] = ROTL(W[_t - 3] ^ W[_t - 8] ^ W[_t - 14] ^ W[_t - 16], 1);
-    }
-
-    var a = H[0];
-    var b = H[1];
-    var c = H[2];
-    var d = H[3];
-    var e = H[4];
-
-    for (var _t2 = 0; _t2 < 80; ++_t2) {
-      var s = Math.floor(_t2 / 20);
-      var T = ROTL(a, 5) + f(s, b, c, d) + e + K[s] + W[_t2] >>> 0;
-      e = d;
-      d = c;
-      c = ROTL(b, 30) >>> 0;
-      b = a;
-      a = T;
-    }
-
-    H[0] = H[0] + a >>> 0;
-    H[1] = H[1] + b >>> 0;
-    H[2] = H[2] + c >>> 0;
-    H[3] = H[3] + d >>> 0;
-    H[4] = H[4] + e >>> 0;
-  }
-
-  return [H[0] >> 24 & 0xff, H[0] >> 16 & 0xff, H[0] >> 8 & 0xff, H[0] & 0xff, H[1] >> 24 & 0xff, H[1] >> 16 & 0xff, H[1] >> 8 & 0xff, H[1] & 0xff, H[2] >> 24 & 0xff, H[2] >> 16 & 0xff, H[2] >> 8 & 0xff, H[2] & 0xff, H[3] >> 24 & 0xff, H[3] >> 16 & 0xff, H[3] >> 8 & 0xff, H[3] & 0xff, H[4] >> 24 & 0xff, H[4] >> 16 & 0xff, H[4] >> 8 & 0xff, H[4] & 0xff];
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (sha1);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/stringify.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/validate.js");
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-
-var byteToHex = [];
-
-for (var i = 0; i < 256; ++i) {
-  byteToHex.push((i + 0x100).toString(16).substr(1));
-}
-
-function stringify(arr) {
-  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  // Note: Be careful editing this code!  It's been tuned for performance
-  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
-  var uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
-  // of the following:
-  // - One or more input array values don't map to a hex octet (leading to
-  // "undefined" in the uuid)
-  // - Invalid input values for the RFC `version` or `variant` fields
-
-  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
-    throw TypeError('Stringified UUID is invalid');
-  }
-
-  return uuid;
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (stringify);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/v1.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/rng.js");
-/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/stringify.js");
-
- // **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-var _nodeId;
-
-var _clockseq; // Previous uuid creation time
-
-
-var _lastMSecs = 0;
-var _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
-
-function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || new Array(16);
-  options = options || {};
-  var node = options.node || _nodeId;
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-
-  if (node == null || clockseq == null) {
-    var seedBytes = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])();
-
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
-    }
-
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-
-
-  var msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
-
-  var dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
-
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-
-
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  } // Per 4.2.1.2 Throw error if too many uuids are requested
-
-
-  if (nsecs >= 10000) {
-    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-
-  msecs += 12219292800000; // `time_low`
-
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff; // `time_mid`
-
-  var tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff; // `time_high_and_version`
-
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-
-  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-
-  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
-
-  b[i++] = clockseq & 0xff; // `node`
-
-  for (var n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf || Object(_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(b);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (v1);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/v3.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v35.js");
-/* harmony import */ var _md5_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/md5.js");
-
-
-var v3 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v3', 0x30, _md5_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
-/* harmony default export */ __webpack_exports__["default"] = (v3);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/v35.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DNS", function() { return DNS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "URL", function() { return URL; });
-/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/stringify.js");
-/* harmony import */ var _parse_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/parse.js");
-
-
-
-function stringToBytes(str) {
-  str = unescape(encodeURIComponent(str)); // UTF8 escape
-
-  var bytes = [];
-
-  for (var i = 0; i < str.length; ++i) {
-    bytes.push(str.charCodeAt(i));
-  }
-
-  return bytes;
-}
-
-var DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-var URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
-/* harmony default export */ __webpack_exports__["default"] = (function (name, version, hashfunc) {
-  function generateUUID(value, namespace, buf, offset) {
-    if (typeof value === 'string') {
-      value = stringToBytes(value);
-    }
-
-    if (typeof namespace === 'string') {
-      namespace = Object(_parse_js__WEBPACK_IMPORTED_MODULE_1__["default"])(namespace);
-    }
-
-    if (namespace.length !== 16) {
-      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
-    } // Compute hash of namespace and value, Per 4.3
-    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
-    // hashfunc([...namespace, ... value])`
-
-
-    var bytes = new Uint8Array(16 + value.length);
-    bytes.set(namespace);
-    bytes.set(value, namespace.length);
-    bytes = hashfunc(bytes);
-    bytes[6] = bytes[6] & 0x0f | version;
-    bytes[8] = bytes[8] & 0x3f | 0x80;
-
-    if (buf) {
-      offset = offset || 0;
-
-      for (var i = 0; i < 16; ++i) {
-        buf[offset + i] = bytes[i];
-      }
-
-      return buf;
-    }
-
-    return Object(_stringify_js__WEBPACK_IMPORTED_MODULE_0__["default"])(bytes);
-  } // Function#name is not settable on some platforms (#270)
-
-
-  try {
-    generateUUID.name = name; // eslint-disable-next-line no-empty
-  } catch (err) {} // For CommonJS default export support
-
-
-  generateUUID.DNS = DNS;
-  generateUUID.URL = URL;
-  return generateUUID;
-});
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/v4.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/rng.js");
-/* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/stringify.js");
-
-
-
-function v4(options, buf, offset) {
-  options = options || {};
-  var rnds = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-
-  rnds[6] = rnds[6] & 0x0f | 0x40;
-  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
-
-  if (buf) {
-    offset = offset || 0;
-
-    for (var i = 0; i < 16; ++i) {
-      buf[offset + i] = rnds[i];
-    }
-
-    return buf;
-  }
-
-  return Object(_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (v4);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/v5.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/v35.js");
-/* harmony import */ var _sha1_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/sha1.js");
-
-
-var v5 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v5', 0x50, _sha1_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
-/* harmony default export */ __webpack_exports__["default"] = (v5);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/validate.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/regex.js");
-
-
-function validate(uuid) {
-  return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__["default"].test(uuid);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (validate);
-
-/***/ }),
-
-/***/ "../../packages/kandy/node_modules/uuid/dist/esm-browser/version.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/validate.js");
-
-
-function version(uuid) {
-  if (!Object(_validate_js__WEBPACK_IMPORTED_MODULE_0__["default"])(uuid)) {
-    throw TypeError('Invalid UUID');
-  }
-
-  return parseInt(uuid.substr(14, 1), 16);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (version);
 
 /***/ }),
 
@@ -21303,7 +23259,7 @@ var _selectors2 = __webpack_require__("../../packages/kandy/src/auth/interface/s
 
 var _actions2 = __webpack_require__("../../packages/kandy/src/config/interface/actions.js");
 
-var _uuid = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/index.js");
+var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.js");
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
@@ -28115,7 +30071,7 @@ var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__("../../node_modules/redux-saga/dist/redux-saga-effects-npm-proxy.esm.js");
 
-var _uuid = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/index.js");
+var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.js");
 
 var _utils = __webpack_require__("../../packages/kandy/src/call/cpaas/utils/index.js");
 
@@ -30048,6 +32004,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _stringify = __webpack_require__("../../node_modules/babel-runtime/core-js/json/stringify.js");
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 var _freeze = __webpack_require__("../../node_modules/babel-runtime/core-js/object/freeze.js");
 
 var _freeze2 = _interopRequireDefault(_freeze);
@@ -30056,19 +32016,24 @@ exports.default = runPipeline;
 
 var _logs = __webpack_require__("../../packages/kandy/src/logs/index.js");
 
+var _kandyLogger = __webpack_require__("../../packages/logger/src/index.js");
+
 var _sdpTransform = __webpack_require__("../../node_modules/sdp-transform/lib/index.js");
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
 var _fp = __webpack_require__("../../node_modules/lodash/fp.js");
 
+var _variableDiff = __webpack_require__("../../node_modules/variable-diff/index.js");
+
+var _variableDiff2 = _interopRequireDefault(_variableDiff);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Libraries.
 const log = _logs.logManager.getLogger('SDP');
 
 /**
- * Basic SDP pipeline runner.
+ * Basic SDP pipeline runner that logs the functions in Yaml.
  * @method sdpPipeline
  * @param  {Array}      handlers       List of functions that transform the SDP.
  * @param  {string}     sdp            The session description.
@@ -30082,8 +32047,19 @@ const log = _logs.logManager.getLogger('SDP');
  * @param  {BandwidthControls} [info.bandwidth] Information about bandwidth controls.
  * @return {string}     The modified session description.
  */
+
+
+// Libraries.
 // Other plugins.
 function runPipeline(handlers, sdp, info) {
+  const logLevel = log.getLevel();
+  const isDebug = logLevel === _kandyLogger.logLevels.DEBUG || logLevel === _kandyLogger.logLevels.TRACE;
+  const pipelineFunc = isDebug ? runPipelineYaml : runPipelineDefault;
+
+  return pipelineFunc(handlers, sdp, info);
+}
+
+function runPipelineDefault(handlers, sdp, info) {
   const objectSdp = _sdpTransform2.default.parse(sdp);
 
   const originalSdp = (0, _freeze2.default)(objectSdp);
@@ -30092,7 +32068,6 @@ function runPipeline(handlers, sdp, info) {
   if ((0, _fp.isArray)(handlers)) {
     handlers.forEach(handler => {
       if ((0, _fp.isFunction)(handler)) {
-        log.debug(`Running SDP handler ${handler.name}.`);
         newSdp = handler(newSdp, info, originalSdp);
       } else {
         log.error('SDP handler not a function; skipping.');
@@ -30102,6 +32077,95 @@ function runPipeline(handlers, sdp, info) {
 
   return _sdpTransform2.default.write(newSdp);
 }
+
+function runPipelineYaml(handlers, sdp, info) {
+  const objectSdp = _sdpTransform2.default.parse(sdp);
+
+  if (!(0, _fp.isArray)(handlers)) {
+    return _sdpTransform2.default.write(objectSdp);
+  }
+
+  const originalSdp = (0, _freeze2.default)(objectSdp);
+  let newSdp = (0, _fp.cloneDeep)(originalSdp);
+
+  /**
+   * For each sdpHandler function we want to log the changes
+   * it makes to the SDP and present a yaml report of the diffs.
+   * So that each diff doesn't contain all previous changes
+   * we need to diff the sdp at it's current stage of transformation.
+   * Only perform this work if we're in debug logging mode.
+   */
+  let diffed;
+  let oldNewSdp;
+  const results = [];
+
+  handlers.forEach(handler => {
+    const name = formattedFunctionName(handler);
+
+    if ((0, _fp.isFunction)(handler)) {
+      log.debug(`Running SDP handler ${name}.`);
+
+      oldNewSdp = (0, _fp.cloneDeep)(newSdp);
+      newSdp = handler(newSdp, info, originalSdp);
+      diffed = (0, _variableDiff2.default)(oldNewSdp, newSdp);
+      results.push({ name, diff: diffed.text });
+    } else {
+      log.error('SDP handler not a function; skipping.');
+      results.push({ name, diff: 'No diff, not a function.' });
+    }
+  });
+
+  diffed = (0, _variableDiff2.default)(originalSdp, newSdp);
+  const yamlFormat = sdpToYaml(info)(originalSdp)(newSdp)(results)(diffed.text);
+  log.debug(`SDP Handler changes: ${yamlFormat}`);
+
+  return _sdpTransform2.default.write(newSdp);
+}
+
+const sdpToYaml = info => originalSdp => newSdp => results => finalDiff => `
+---
+sdp-pipeline-run:
+  info:
+    callId: ${info.callId}
+    type: ${info.type}
+    step: ${info.step}
+    endpoint: ${info.endpoint}
+    bandwidth: ${displayBandwidth(info.bandwidth)}
+  sdp: |
+    ${displaySdp(fourSpaces)(originalSdp)}
+  handlers:
+    ${displayHandlers(results)}
+  final:
+    diff: |
+      ${displayDiffs(sixSpaces)(finalDiff)}
+    sdp: |
+      ${displaySdp(sixSpaces)(newSdp)}
+...
+`;
+
+// Display helper functions
+const displayBandwidth = bandwidth => bandwidth && (0, _stringify2.default)(bandwidth, null, ' ').replaceAll('\n', ' ').replaceAll('  ', ' ');
+
+const displaySdp = indentation => sdp => _sdpTransform2.default.write(sdp).replaceAll('\n', `\n${indentation}`).trimEnd();
+
+const handlerToYaml = ({ name, diff }) =>
+// replacing newlines in case the name is the function.
+`${fourSpaces}- name: ${name.replaceAll('\n', '')}
+      diff: |
+        ${displayDiffs(eightSpaces)(diff)}
+`;
+
+const displayHandlers = (0, _fp.compose)([_fp.trimEnd, (0, _fp.trimCharsStart)(' \n'), (0, _fp.join)(''), (0, _fp.map)(handlerToYaml)]);
+
+const displayDiffs = indentation => diffed => diffed ? diffed.replaceAll('\n', `\n${indentation}`) : 'No changes found';
+
+// If the function is anonymous give the function body as the 'name'
+const formattedFunctionName = handler => handler.name || handler.toString().slice(0, 120).replaceAll('\n', '');
+
+// Space constants
+const fourSpaces = '    ';
+const sixSpaces = '      ';
+const eightSpaces = '        ';
 
 /***/ }),
 
@@ -31909,7 +33973,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _uuid = __webpack_require__("../../packages/kandy/node_modules/uuid/dist/esm-browser/index.js");
+var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.js");
 
 // Generate a unique SDK GUID for the running SDK instance.
 const sdkId = (0, _uuid.v4)();
@@ -32180,7 +34244,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.26.0-beta.644';
+  return '4.27.0-beta.645';
 }
 
 /***/ }),
@@ -46382,6 +48446,17 @@ function* handleRequest(platform, action) {
   if (authHeader) {
     logOptions.headers.Authorization = authHeader.substring(0, 6) + '...';
   }
+
+  // If the rest request body is a string, try to parse it as JSON and store
+  // it as an object so it can be interacted with in the console
+  const body = logOptions.body;
+  if (body) {
+    try {
+      logOptions.body = JSON.parse(body);
+    } catch (e) {
+      // Noop, leave the body in whatever format it was in.
+    }
+  }
   log.debug(`Making REST request ${action.meta.requestId}.`, logOptions);
 
   // Make the request based on the action
@@ -54738,642 +56813,6 @@ if (true) {
 
 /***/ }),
 
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/bytesToUuid.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex; // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-
-  return [bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]]].join('');
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (bytesToUuid);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/index.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v1_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v1.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v1", function() { return _v1_js__WEBPACK_IMPORTED_MODULE_0__["default"]; });
-
-/* harmony import */ var _v3_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v3.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v3", function() { return _v3_js__WEBPACK_IMPORTED_MODULE_1__["default"]; });
-
-/* harmony import */ var _v4_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v4.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v4", function() { return _v4_js__WEBPACK_IMPORTED_MODULE_2__["default"]; });
-
-/* harmony import */ var _v5_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v5.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "v5", function() { return _v5_js__WEBPACK_IMPORTED_MODULE_3__["default"]; });
-
-
-
-
-
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/md5.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/*
- * Browser-compatible JavaScript MD5
- *
- * Modification of JavaScript MD5
- * https://github.com/blueimp/JavaScript-MD5
- *
- * Copyright 2011, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- *
- * Based on
- * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
- * Digest Algorithm, as defined in RFC 1321.
- * Version 2.2 Copyright (C) Paul Johnston 1999 - 2009
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- * Distributed under the BSD License
- * See http://pajhome.org.uk/crypt/md5 for more info.
- */
-function md5(bytes) {
-  if (typeof bytes == 'string') {
-    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
-
-    bytes = new Array(msg.length);
-
-    for (var i = 0; i < msg.length; i++) {
-      bytes[i] = msg.charCodeAt(i);
-    }
-  }
-
-  return md5ToHexEncodedArray(wordsToMd5(bytesToWords(bytes), bytes.length * 8));
-}
-/*
- * Convert an array of little-endian words to an array of bytes
- */
-
-
-function md5ToHexEncodedArray(input) {
-  var i;
-  var x;
-  var output = [];
-  var length32 = input.length * 32;
-  var hexTab = '0123456789abcdef';
-  var hex;
-
-  for (i = 0; i < length32; i += 8) {
-    x = input[i >> 5] >>> i % 32 & 0xff;
-    hex = parseInt(hexTab.charAt(x >>> 4 & 0x0f) + hexTab.charAt(x & 0x0f), 16);
-    output.push(hex);
-  }
-
-  return output;
-}
-/*
- * Calculate the MD5 of an array of little-endian words, and a bit length.
- */
-
-
-function wordsToMd5(x, len) {
-  /* append padding */
-  x[len >> 5] |= 0x80 << len % 32;
-  x[(len + 64 >>> 9 << 4) + 14] = len;
-  var i;
-  var olda;
-  var oldb;
-  var oldc;
-  var oldd;
-  var a = 1732584193;
-  var b = -271733879;
-  var c = -1732584194;
-  var d = 271733878;
-
-  for (i = 0; i < x.length; i += 16) {
-    olda = a;
-    oldb = b;
-    oldc = c;
-    oldd = d;
-    a = md5ff(a, b, c, d, x[i], 7, -680876936);
-    d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
-    c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
-    b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
-    a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
-    d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
-    c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
-    b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
-    a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
-    d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
-    c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
-    b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
-    a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
-    d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
-    c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
-    b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
-    a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
-    d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
-    c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
-    b = md5gg(b, c, d, a, x[i], 20, -373897302);
-    a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
-    d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
-    c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
-    b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
-    a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
-    d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
-    c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
-    b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
-    a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
-    d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
-    c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
-    b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
-    a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
-    d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
-    c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
-    b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
-    a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
-    d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
-    c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
-    b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
-    a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
-    d = md5hh(d, a, b, c, x[i], 11, -358537222);
-    c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
-    b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
-    a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
-    d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
-    c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
-    b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
-    a = md5ii(a, b, c, d, x[i], 6, -198630844);
-    d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
-    c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
-    b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
-    a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
-    d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
-    c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
-    b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
-    a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
-    d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
-    c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
-    b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
-    a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
-    d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
-    c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
-    b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
-    a = safeAdd(a, olda);
-    b = safeAdd(b, oldb);
-    c = safeAdd(c, oldc);
-    d = safeAdd(d, oldd);
-  }
-
-  return [a, b, c, d];
-}
-/*
- * Convert an array bytes to an array of little-endian words
- * Characters >255 have their high-byte silently ignored.
- */
-
-
-function bytesToWords(input) {
-  var i;
-  var output = [];
-  output[(input.length >> 2) - 1] = undefined;
-
-  for (i = 0; i < output.length; i += 1) {
-    output[i] = 0;
-  }
-
-  var length8 = input.length * 8;
-
-  for (i = 0; i < length8; i += 8) {
-    output[i >> 5] |= (input[i / 8] & 0xff) << i % 32;
-  }
-
-  return output;
-}
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- */
-
-
-function safeAdd(x, y) {
-  var lsw = (x & 0xffff) + (y & 0xffff);
-  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return msw << 16 | lsw & 0xffff;
-}
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-
-
-function bitRotateLeft(num, cnt) {
-  return num << cnt | num >>> 32 - cnt;
-}
-/*
- * These functions implement the four basic operations the algorithm uses.
- */
-
-
-function md5cmn(q, a, b, x, s, t) {
-  return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
-}
-
-function md5ff(a, b, c, d, x, s, t) {
-  return md5cmn(b & c | ~b & d, a, b, x, s, t);
-}
-
-function md5gg(a, b, c, d, x, s, t) {
-  return md5cmn(b & d | c & ~d, a, b, x, s, t);
-}
-
-function md5hh(a, b, c, d, x, s, t) {
-  return md5cmn(b ^ c ^ d, a, b, x, s, t);
-}
-
-function md5ii(a, b, c, d, x, s, t) {
-  return md5cmn(c ^ (b | ~d), a, b, x, s, t);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (md5);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/rng.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return rng; });
-// Unique ID creation requires a high quality random # generator. In the browser we therefore
-// require the crypto API and do not support built-in fallback to lower quality random number
-// generators (like Math.random()).
-// getRandomValues needs to be invoked in a context where "this" is a Crypto implementation. Also,
-// find the complete implementation of crypto (msCrypto) on IE11.
-var getRandomValues = typeof crypto != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto != 'undefined' && typeof msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto);
-var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-
-function rng() {
-  if (!getRandomValues) {
-    throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
-  }
-
-  return getRandomValues(rnds8);
-}
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/sha1.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// Adapted from Chris Veness' SHA1 code at
-// http://www.movable-type.co.uk/scripts/sha1.html
-function f(s, x, y, z) {
-  switch (s) {
-    case 0:
-      return x & y ^ ~x & z;
-
-    case 1:
-      return x ^ y ^ z;
-
-    case 2:
-      return x & y ^ x & z ^ y & z;
-
-    case 3:
-      return x ^ y ^ z;
-  }
-}
-
-function ROTL(x, n) {
-  return x << n | x >>> 32 - n;
-}
-
-function sha1(bytes) {
-  var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6];
-  var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
-
-  if (typeof bytes == 'string') {
-    var msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
-
-    bytes = new Array(msg.length);
-
-    for (var i = 0; i < msg.length; i++) {
-      bytes[i] = msg.charCodeAt(i);
-    }
-  }
-
-  bytes.push(0x80);
-  var l = bytes.length / 4 + 2;
-  var N = Math.ceil(l / 16);
-  var M = new Array(N);
-
-  for (var i = 0; i < N; i++) {
-    M[i] = new Array(16);
-
-    for (var j = 0; j < 16; j++) {
-      M[i][j] = bytes[i * 64 + j * 4] << 24 | bytes[i * 64 + j * 4 + 1] << 16 | bytes[i * 64 + j * 4 + 2] << 8 | bytes[i * 64 + j * 4 + 3];
-    }
-  }
-
-  M[N - 1][14] = (bytes.length - 1) * 8 / Math.pow(2, 32);
-  M[N - 1][14] = Math.floor(M[N - 1][14]);
-  M[N - 1][15] = (bytes.length - 1) * 8 & 0xffffffff;
-
-  for (var i = 0; i < N; i++) {
-    var W = new Array(80);
-
-    for (var t = 0; t < 16; t++) {
-      W[t] = M[i][t];
-    }
-
-    for (var t = 16; t < 80; t++) {
-      W[t] = ROTL(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
-    }
-
-    var a = H[0];
-    var b = H[1];
-    var c = H[2];
-    var d = H[3];
-    var e = H[4];
-
-    for (var t = 0; t < 80; t++) {
-      var s = Math.floor(t / 20);
-      var T = ROTL(a, 5) + f(s, b, c, d) + e + K[s] + W[t] >>> 0;
-      e = d;
-      d = c;
-      c = ROTL(b, 30) >>> 0;
-      b = a;
-      a = T;
-    }
-
-    H[0] = H[0] + a >>> 0;
-    H[1] = H[1] + b >>> 0;
-    H[2] = H[2] + c >>> 0;
-    H[3] = H[3] + d >>> 0;
-    H[4] = H[4] + e >>> 0;
-  }
-
-  return [H[0] >> 24 & 0xff, H[0] >> 16 & 0xff, H[0] >> 8 & 0xff, H[0] & 0xff, H[1] >> 24 & 0xff, H[1] >> 16 & 0xff, H[1] >> 8 & 0xff, H[1] & 0xff, H[2] >> 24 & 0xff, H[2] >> 16 & 0xff, H[2] >> 8 & 0xff, H[2] & 0xff, H[3] >> 24 & 0xff, H[3] >> 16 & 0xff, H[3] >> 8 & 0xff, H[3] & 0xff, H[4] >> 24 & 0xff, H[4] >> 16 & 0xff, H[4] >> 8 & 0xff, H[4] & 0xff];
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (sha1);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/v1.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/rng.js");
-/* harmony import */ var _bytesToUuid_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/bytesToUuid.js");
-
- // **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-var _nodeId;
-
-var _clockseq; // Previous uuid creation time
-
-
-var _lastMSecs = 0;
-var _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
-
-function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || [];
-  options = options || {};
-  var node = options.node || _nodeId;
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-
-  if (node == null || clockseq == null) {
-    var seedBytes = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])();
-
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
-    }
-
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-
-
-  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime(); // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
-
-  var dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
-
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-
-
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  } // Per 4.2.1.2 Throw error if too many uuids are requested
-
-
-  if (nsecs >= 10000) {
-    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-
-  msecs += 12219292800000; // `time_low`
-
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff; // `time_mid`
-
-  var tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff; // `time_high_and_version`
-
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-
-  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-
-  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
-
-  b[i++] = clockseq & 0xff; // `node`
-
-  for (var n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf ? buf : Object(_bytesToUuid_js__WEBPACK_IMPORTED_MODULE_1__["default"])(b);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (v1);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/v3.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v35.js");
-/* harmony import */ var _md5_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/md5.js");
-
-
-var v3 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v3', 0x30, _md5_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
-/* harmony default export */ __webpack_exports__["default"] = (v3);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/v35.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DNS", function() { return DNS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "URL", function() { return URL; });
-/* harmony import */ var _bytesToUuid_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/bytesToUuid.js");
-
-
-function uuidToBytes(uuid) {
-  // Note: We assume we're being passed a valid uuid string
-  var bytes = [];
-  uuid.replace(/[a-fA-F0-9]{2}/g, function (hex) {
-    bytes.push(parseInt(hex, 16));
-  });
-  return bytes;
-}
-
-function stringToBytes(str) {
-  str = unescape(encodeURIComponent(str)); // UTF8 escape
-
-  var bytes = new Array(str.length);
-
-  for (var i = 0; i < str.length; i++) {
-    bytes[i] = str.charCodeAt(i);
-  }
-
-  return bytes;
-}
-
-var DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-var URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
-/* harmony default export */ __webpack_exports__["default"] = (function (name, version, hashfunc) {
-  var generateUUID = function generateUUID(value, namespace, buf, offset) {
-    var off = buf && offset || 0;
-    if (typeof value == 'string') value = stringToBytes(value);
-    if (typeof namespace == 'string') namespace = uuidToBytes(namespace);
-    if (!Array.isArray(value)) throw TypeError('value must be an array of bytes');
-    if (!Array.isArray(namespace) || namespace.length !== 16) throw TypeError('namespace must be uuid string or an Array of 16 byte values'); // Per 4.3
-
-    var bytes = hashfunc(namespace.concat(value));
-    bytes[6] = bytes[6] & 0x0f | version;
-    bytes[8] = bytes[8] & 0x3f | 0x80;
-
-    if (buf) {
-      for (var idx = 0; idx < 16; ++idx) {
-        buf[off + idx] = bytes[idx];
-      }
-    }
-
-    return buf || Object(_bytesToUuid_js__WEBPACK_IMPORTED_MODULE_0__["default"])(bytes);
-  }; // Function#name is not settable on some platforms (#270)
-
-
-  try {
-    generateUUID.name = name;
-  } catch (err) {} // For CommonJS default export support
-
-
-  generateUUID.DNS = DNS;
-  generateUUID.URL = URL;
-  return generateUUID;
-});
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/v4.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/rng.js");
-/* harmony import */ var _bytesToUuid_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/bytesToUuid.js");
-
-
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof options == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-
-  options = options || {};
-  var rnds = options.random || (options.rng || _rng_js__WEBPACK_IMPORTED_MODULE_0__["default"])(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-
-  rnds[6] = rnds[6] & 0x0f | 0x40;
-  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
-
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || Object(_bytesToUuid_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (v4);
-
-/***/ }),
-
-/***/ "../../packages/webrtc/node_modules/uuid/dist/esm-browser/v5.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _v35_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/v35.js");
-/* harmony import */ var _sha1_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/sha1.js");
-
-
-var v5 = Object(_v35_js__WEBPACK_IMPORTED_MODULE_0__["default"])('v5', 0x50, _sha1_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
-/* harmony default export */ __webpack_exports__["default"] = (v5);
-
-/***/ }),
-
 /***/ "../../packages/webrtc/src/Peer/config.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -58007,7 +59446,7 @@ var _Peer = __webpack_require__("../../packages/webrtc/src/Peer/index.js");
 
 var _Peer2 = _interopRequireDefault(_Peer);
 
-var _uuid = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/index.js");
+var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.js");
 
 var _eventemitter = __webpack_require__("../../packages/webrtc/node_modules/eventemitter3/index.js");
 
@@ -58132,7 +59571,7 @@ var _session = __webpack_require__("../../packages/webrtc/src/models/session.js"
 
 var _session2 = _interopRequireDefault(_session);
 
-var _uuid = __webpack_require__("../../packages/webrtc/node_modules/uuid/dist/esm-browser/index.js");
+var _uuid = __webpack_require__("../../node_modules/uuid/dist/esm-browser/index.js");
 
 var _eventemitter = __webpack_require__("../../packages/webrtc/node_modules/eventemitter3/index.js");
 
