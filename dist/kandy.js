@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.26.0
+ * Version: 4.26.1
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -32170,7 +32170,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.26.0';
+  return '4.26.1';
 }
 
 /***/ }),
@@ -32638,7 +32638,8 @@ function* websocketLifecycle(wsConnectAction) {
 
   // Append information to the websocket, so that its accessible elsewhere.
   // TODO: Remove this and replace with proper redux state storage.
-  websocket.kandy = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+  const connConfig = yield (0, _effects.select)(_selectors.getConnectivityConfig);
+  websocket.kandy = connConfig;
 
   websocket.kandy.wsInfo = wsInfo;
   websocket.kandy.platform = platform;
@@ -32711,9 +32712,13 @@ function* websocketLifecycle(wsConnectAction) {
       }
     } else if (wsConnectAction.meta.platform === _constants.platforms.LINK) {
       const { bearerAccessToken } = yield (0, _effects.select)(_selectors2.getConnectionInfo);
-      wsInfo.params = {
-        token: bearerAccessToken
-      };
+      // If using bearerAccessToken and WS query mode, set the token as part
+      //    of the WS reconnect query string.
+      if (bearerAccessToken && connConfig.webSocketOAuthMode === 'query') {
+        wsInfo.params = {
+          token: bearerAccessToken
+        };
+      }
     }
 
     // If we've lost connection, re-dispatch the initial action, so that we can
