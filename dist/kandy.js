@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.27.0-beta.653
+ * Version: 4.27.0-beta.654
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.27.0-beta.653';
+  return '4.27.0-beta.654';
 }
 
 /***/ }),
@@ -60355,20 +60355,6 @@ const responseTypes = (0, _freeze2.default)({
 });
 
 /**
- * The possible Content-Type headers that we may receive in a response.
- */
-
-
-// Utils.
-const contentTypes = (0, _freeze2.default)({
-  jsonType: 'application/json',
-  vdnJsonType: 'application/vdn.kandy.json',
-  plainTextType: 'text/plain',
-  xmlTextType: 'text/xml',
-  octetStream: 'application/octet-stream'
-});
-
-/**
  * Make a request with the specified options. The options is very similar to the options passed to the GlobalFetch
  * method except that is also accepts the url as part of the options.
  * Reference: https://developer.mozilla.org/en-US/docs/Web/API/Request
@@ -60389,6 +60375,9 @@ const contentTypes = (0, _freeze2.default)({
  * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] The request body
  * @return {Promise} A promise that resolves with a custom response object.
  */
+
+
+// Utils.
 
 exports.default = async function makeRequest(options, requestId) {
   const log = _logs.logManager.getLogger('REQUEST', requestId);
@@ -60475,11 +60464,16 @@ exports.default = async function makeRequest(options, requestId) {
     }
 
     /*
-     * Check whether the response body is json. If it is, parse it and include
-     *    it in the returned error. Otherwise provide an empty object instead.
+     * Try to parse the response as JSON, and if successful, include
+     * it in the returned error. otherwise, provide an empty object instaed.
      */
-    const isJson = contentType && contentType.includes(contentTypes.jsonType);
-    const responseBody = isJson ? await response.json() : {};
+    let responseBody;
+    try {
+      responseBody = await response.json();
+    } catch (err) {
+      responseBody = {};
+      log.debug('Failed to parse reponse:', err.message);
+    }
     return makeResponse({ error: 'REQUEST' }, (0, _extends3.default)({ body: responseBody }, result));
   }
 };
@@ -60634,6 +60628,16 @@ function linkAuthorization(response) {
   const statusCode = getStatusCode(response);
 
   /*
+   * A case where Link REST request will return '401 Unauthorized'
+   */
+  if (response.result.code === 401) {
+    return new _errors2.default({
+      code: _errors.authCodes.INVALID_CREDENTIALS,
+      message: 'Authorization failed with server. Please check credentials.'
+    });
+  }
+
+  /*
    * Define a Link authorization issue to be:
    *  - a '403 Forbidden', with no body or with a specific statusCode.
    */
@@ -60679,6 +60683,7 @@ function ucAuthorization(response) {
     let message = 'Authorization failed with server. Please check credentials.';
 
     const statusCode = getStatusCode(response);
+
     if (statusCode) {
       message += ` Status code: ${statusCode}`;
     }
