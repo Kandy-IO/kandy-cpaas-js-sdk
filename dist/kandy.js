@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.27.0-beta.655
+ * Version: 4.27.0-beta.656
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.27.0-beta.655';
+  return '4.27.0-beta.656';
 }
 
 /***/ }),
@@ -49497,7 +49497,7 @@ function* websocketLifecycle(wsConnectAction) {
   // Redux-saga take() pattern.
   // Take end of lifecycle WS actions for this platform.
   function closeWebsocketPattern(action) {
-    return (action.type === actionTypes.WS_DISCONNECT || action.type === actionTypes.LOST_CONNECTION) && action.meta.platform === platform;
+    return (action.type === actionTypes.WS_DISCONNECT || action.type === actionTypes.LOST_CONNECTION || action.type === actionTypes.WS_CLOSED || action.type === actionTypes.WS_ERROR) && action.meta.platform === platform;
   }
 
   // Wait for a disconnect or lost connection action.
@@ -49514,6 +49514,14 @@ function* websocketLifecycle(wsConnectAction) {
     yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
     yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
     log.info('Successfully closed websocket connection.');
+  } else if (action.type === actionTypes.WS_CLOSED && [1000, 1005].includes(action.payload.code === 1000)) {
+    // 1000 signifies a normal closure
+    // 1005 indicates a closure with no status code (this is the default if websocket.close() is called without passing a code)
+    // TESTING -- REMOVE BEFORE MERGING TO BETA
+    // } else if (action.type === actionTypes.WS_CLOSED && 1006 === 1000) {
+    // Normal websocket close, don't try to reconnect
+    log.debug('Websocket closed normally.');
+    yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
   } else {
     if (websocket.kandy.autoReconnect) {
       // If this is a Link websocket, we need to ensure the URL is using the
@@ -49788,6 +49796,9 @@ function* connectWebsocket(wsInfo, platform) {
       // Try to open the websocket. Blocking call.
       websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
       log.info(`Successfully connected to websocket on: ${platform}`);
+      // TESTING -- REMOVE BEFORE MERGING BACK TO BETA
+      // setTimeout(() => websocket.close(), 10000)
+      // setTimeout(() => websocket.onerror(), 10000)
       break;
     } catch (err) {
       connectionAttempt++;
@@ -49889,6 +49900,8 @@ function openWebsocket(options) {
       // TODO: Fix this?
       /* eslint-disable-next-line prefer-promise-reject-errors */
       reject({
+        // Websocket doesn't return error codes for security reasons and as such all websocket
+        // errors have to be handled the same.
         error: true,
         message: 'Could not connect to websocket. Received error on open.'
       });
