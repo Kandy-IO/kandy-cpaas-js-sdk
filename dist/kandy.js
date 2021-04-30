@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.27.0-beta.658
+ * Version: 4.27.0-beta.659
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.27.0-beta.658';
+  return '4.27.0-beta.659';
 }
 
 /***/ }),
@@ -49570,8 +49570,7 @@ function* websocketLifecycle(wsConnectAction) {
   } else if (action.type === actionTypes.WS_CLOSED && [1000, 1005].includes(action.payload.code === 1000)) {
     // 1000 signifies a normal closure
     // 1005 indicates a closure with no status code (this is the default if websocket.close() is called without passing a code)
-    // TESTING -- REMOVE BEFORE MERGING TO BETA
-    // } else if (action.type === actionTypes.WS_CLOSED && 1006 === 1000) {
+
     // Normal websocket close, don't try to reconnect
     log.debug('Websocket closed normally.');
     yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
@@ -49849,9 +49848,6 @@ function* connectWebsocket(wsInfo, platform) {
       // Try to open the websocket. Blocking call.
       websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
       log.info(`Successfully connected to websocket on: ${platform}`);
-      // TESTING -- REMOVE BEFORE MERGING BACK TO BETA
-      // setTimeout(() => websocket.close(), 10000)
-      // setTimeout(() => websocket.onerror(), 10000)
       break;
     } catch (err) {
       connectionAttempt++;
