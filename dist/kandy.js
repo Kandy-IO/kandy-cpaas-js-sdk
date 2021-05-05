@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.28.0-beta.660
+ * Version: 4.28.0-beta.662
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.28.0-beta.660';
+  return '4.28.0-beta.662';
 }
 
 /***/ }),
@@ -34613,23 +34613,29 @@ function ontrack(listener) {
      */
     // event object contains transceiver which already has track attached to its receiver
     const { track: nativeTrack, streams } = event;
+    log.debug(`Peer received ${nativeTrack.kind} Track ${nativeTrack.id}.`);
 
-    // When remote side adds track on a previously unused transceiver sender via `replaceTrack`,
-    //  a stream is not associated with it so we get no stream here.
-    // So we create our own stream here.
-    // In the future, support will be available for `sender.setStreams` on the remote side
-    //  so this is a temporary workaround.
+    /*
+     * When the remote side adds a track, it should have an associated MediaStream
+     *    which we get access to here. This allows us to listen for events on that
+     *    MediaStream (important for knowing when the track has ended).
+     * It's possible that the remote Sender does not have a Stream set, so we create
+     *    a Stream for it. This should be considered a problematic scenario, since
+     *    we rely on the remote Stream for certain events.
+     * Reference: KAA-2628
+     */
     let targetStream;
     if (streams.length === 0) {
       targetStream = new MediaStream([nativeTrack]);
+      log.debug('New Track is not associated with remote Stream.');
     } else {
       targetStream = streams[0];
+      log.debug(`New Track is associated with remote Stream ${targetStream.id}.`);
     }
 
     // Convert the native MediaStreamTrack into a Track object.
     const track = trackManager.add(nativeTrack, targetStream);
 
-    log.debug(`Peer received ${nativeTrack.kind} Track ${track.id}.`);
     listener(track);
   };
 
@@ -37029,17 +37035,26 @@ function Session(id, managers, config = {}) {
 
           // If we can find a reusable transceiver, reuse it.
           if ((0, _sdpSemantics.isUnifiedPlan)(config.peer.rtcConfig.sdpSemantics) && reusableTransceiver) {
-            // Current limitations of transceiver reuse method:
-            // - We cannot attach the track's associated stream to the sender (lack of `sender.setStreams` support atm)
-            // So the local transceiver's sender track & remote transceiver's receiver track must have been used before so that it already has a stream attached to the sender.
-            // If the local transceiver's sender has not been used before, we should ideally be able to do the following:
-            // transceiver.sender.setStreams([<someStream>]) <- Not yet supported
-            // transceiver.sender.replaceTrack(<someTrack>)
-            // However, because of lack of support for `setStreams`, if we just tried to do `replaceTrack` on a transceiver that has not been used before,
-            //  the sender will not have a stream and the SDP generated will have no associated stream which can cuase issues such as not triggering events on the local stream during renegotiation.
-            // Once `setStreams` is supported, we can use the transceiver reuse method above even on transceivers that have not been used to send data before.
-            reusableTransceiver.sender.replaceTrack(track.track).then(() => {
+            reusableTransceiver.sender
+            // Replace the dummy track on the Sender with the actual track we want to send.
+            .replaceTrack(track.track).then(() => {
+              // Set the correct direction on the Transceiver to include that we now want to send.
               reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+
+              // Ensure the track has an associated MediaStream. The remote endpoint will
+              //    get access to this MediaStream and be able to listen for events (for
+              //    example, when the track is removed from the MediaStream).
+              try {
+                reusableTransceiver.sender.setStreams(track.getStream());
+              } catch (err) {
+                /*
+                 * Known limitation: Firefox (v88) and Safari (v14) do not support this API.
+                 * Ref: https://developer.mozilla.org/en-US/docs/Web/API/RTCRtpSender/setStreams
+                 *    KAA-2628
+                 */
+                log.info('Browser does not support Sender.setStreams API. Issues may occur on the remote side when this Track is removed.');
+              }
+
               resolve(`Track (${track.track.kind} : ${track.id}) reused transceiver (mid: ${reusableTransceiver.mid}).`);
             }).catch(err => {
               log.error(err);
