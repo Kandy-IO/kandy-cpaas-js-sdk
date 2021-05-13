@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.28.0-beta.666
+ * Version: 4.28.0-beta.667
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.28.0-beta.666';
+  return '4.28.0-beta.667';
 }
 
 /***/ }),
@@ -38248,9 +38248,15 @@ function cpaasCalls(options = {}) {
   function* init({ webRTC }) {
     // Change sdpSemantics if not supported
     const isPlanB = options.sdpSemantics === 'plan-b';
-    const isNotChrome = webRTC.getBrowserDetails().browser !== 'chrome';
-    if (isPlanB && isNotChrome) {
-      log.warn('Only Chrome supports `plan-b` sdpSemantics. Switching to `unified-plan`.');
+    const browserDetails = webRTC.getBrowserDetails();
+
+    // SDP Semantic 'Plan-B' is only supported on Chrome and only prior to M93.
+    // If the configs say to use Plan-B, but the browser does not support it,
+    //    change to Unified-Plan automatically to prevent potential issues.
+    const noPlanBSupport = browserDetails.browser !== 'chrome' || browserDetails.browser === 'chrome' && browserDetails.version >= 93;
+
+    if (isPlanB && noPlanBSupport) {
+      log.warn('Only Chrome prior to M93 supports `plan-b` sdpSemantics. Switching to `unified-plan`.');
       options.sdpSemantics = 'unified-plan';
     }
 

@@ -7,6 +7,11 @@ Kandy.js change log.
 
 ## 4.28.0 - beta
 
+### Added
+
+- Added a Call configuration check to ensure the SDK is not configured to use SDP Semantic 'Plan-B' with a Chrome version that no longer supports it.
+  - Please be aware that SDP Semantic 'Plan-B' is being deprecated. It is only supported on Chrome and only prior to version M93.
+
 ### Fixed
 
 - Fixed a Call issue on Chrome where remote video tracks would not be ended when the remote participant removed them from the Call in certain scenarios. `KAA-2628`
