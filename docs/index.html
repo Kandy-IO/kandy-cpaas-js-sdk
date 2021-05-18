@@ -7046,10 +7046,19 @@ otherwise they will be added in-band to the call's audio.</p>
 
   
 
-  <p>Get a report about low-level call statistical information.</p>
+  <p>Retrieve a snapshot of the low-level information of the Call through statistical
+report.</p>
+<p>The data retrieved is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCStatsReport">RTCStatsReport</a>
+object, which contains many individual
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCStats">RTCStats</a>.
+These are advanced statistics gathered by the browser providing insights
+into the Call at a certain point in time. Aggregating reports over a
+period of time would allow a low-level analysis of the Call for that
+period. As an example, this could be done to determine the media quality
+during the Call.</p>
 <p>A Track ID can optionally be provided to get a report for a specific
 Track of the Call.</p>
-<p>This API will return a promise which, when resolved, it will contain the report of the particlar call.
+<p>This API will return a promise which, when resolved, will contain the report of the particlar call.
 The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
@@ -7100,6 +7109,23 @@ provided, RTCStatsReport is generated for the Call itself.
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">'call:statsReceived'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+   <span class="hljs-comment">// Iterate over each individual statistic inside the RTCPStatsReport.</span>
+   params.result.forEach(<span class="hljs-function"><span class="hljs-params">stats</span> =&gt;</span> {
+       <span class="hljs-comment">// Handle the data on its own or collate with previously gathered stats</span>
+       <span class="hljs-comment">//    for analysis.</span>
+       ...
+   })
+})
+
+<span class="hljs-comment">// Get a snapshot of the Call's stats.</span>
+<span class="hljs-comment">//   This may be done on a regular interval to collect data over time.</span>
+client.call.getStats(callId)</pre>
+    
   
 
   
@@ -8929,7 +8955,7 @@ automatically while the Call is on hold.</p>
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.result</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>params.result</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></code>
   </td>
   <td class='break-word'><span>The RTCStatsReport.
 </span></td>
@@ -8960,6 +8986,17 @@ automatically while the Call is on hold.</p>
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">'call:statsReceived'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+   <span class="hljs-comment">// Iterate over each individual statistic inside the RTCPStatsReport Map.</span>
+   params.result.forEach(<span class="hljs-function"><span class="hljs-params">stat</span> =&gt;</span> {
+     ...
+   })
+})</pre>
+    
   
 
   
@@ -9102,7 +9139,8 @@ Track that was replaced to help an application replace it seamlessly.</p>
   
 
   <p>Custom Parameters have been received for a Call.</p>
-<p>Please refer to <a href="call.CustomParameter">CustomParameter</a> for information on when this event may be emitted.</p>
+<p>These are parameters set by the remote endpoint of the Call. Please refer to
+<a href="call.CustomParameter">CustomParameter</a> for more information.</p>
 
 
   <div class='pre p1 fill-light mt0'>call:customParameters</div>

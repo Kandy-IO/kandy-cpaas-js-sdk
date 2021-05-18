@@ -16,6 +16,7 @@ Kandy.js change log.
 
 - Fixed a Call issue on Chrome where remote video tracks would not be ended when the remote participant removed them from the Call in certain scenarios. `KAA-2628`
   - This issue still exists on non-Chromium based browsers for the time being.
+- Fixed a Call documentation issue to clarify the information retrieved from the `call.getStats` API. `KAA-2281`
 
 ## 4.27.0 - 2021-04-30
 

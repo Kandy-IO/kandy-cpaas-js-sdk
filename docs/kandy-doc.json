@@ -9725,11 +9725,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 304,
+          "line": 306,
           "column": 0
         },
         "end": {
-          "line": 308,
+          "line": 310,
           "column": 1
         }
       },
@@ -14297,7 +14297,7 @@
               "lineNumber": 11,
               "type": {
                 "type": "NameExpression",
-                "name": "string"
+                "name": "Map"
               },
               "name": "params.result"
             },
@@ -14313,6 +14313,11 @@
                 }
               },
               "name": "params.error"
+            },
+            {
+              "title": "example",
+              "description": "client.on('call:statsReceived', function (params) {\n   // Iterate over each individual statistic inside the RTCPStatsReport Map.\n   params.result.forEach(stat => {\n     ...\n   })\n})",
+              "lineNumber": 13
             }
           ],
           "loc": {
@@ -14321,25 +14326,29 @@
               "column": 0
             },
             "end": {
-              "line": 194,
+              "line": 201,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 195,
+                "line": 202,
                 "column": 0
               },
               "end": {
-                "line": 195,
+                "line": 202,
                 "column": 50
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
-          "examples": [],
+          "examples": [
+            {
+              "description": "client.on('call:statsReceived', function (params) {\n   // Iterate over each individual statistic inside the RTCPStatsReport Map.\n   params.result.forEach(stat => {\n     ...\n   })\n})"
+            }
+          ],
           "params": [
             {
               "title": "param",
@@ -14533,7 +14542,7 @@
                   },
                   "type": {
                     "type": "NameExpression",
-                    "name": "string"
+                    "name": "Map"
                   }
                 },
                 {
@@ -14929,22 +14938,22 @@
           ],
           "loc": {
             "start": {
-              "line": 197,
+              "line": 204,
               "column": 0
             },
             "end": {
-              "line": 216,
+              "line": 223,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 217,
+                "line": 224,
                 "column": 0
               },
               "end": {
-                "line": 217,
+                "line": 224,
                 "column": 55
               }
             },
@@ -15290,7 +15299,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Please refer to ",
+                    "value": "These are parameters set by the remote endpoint of the Call. Please refer to\n   ",
                     "position": {
                       "start": {
                         "line": 3,
@@ -15298,11 +15307,13 @@
                         "offset": 50
                       },
                       "end": {
-                        "line": 3,
-                        "column": 17,
-                        "offset": 66
+                        "line": 4,
+                        "column": 4,
+                        "offset": 130
                       },
-                      "indent": []
+                      "indent": [
+                        1
+                      ]
                     }
                   },
                   {
@@ -15318,31 +15329,31 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 3,
-                        "column": 17,
-                        "offset": 66
+                        "line": 4,
+                        "column": 4,
+                        "offset": 130
                       },
                       "end": {
-                        "line": 3,
-                        "column": 61,
-                        "offset": 110
+                        "line": 4,
+                        "column": 48,
+                        "offset": 174
                       },
                       "indent": []
                     }
                   },
                   {
                     "type": "text",
-                    "value": " for information on when this event may be emitted.",
+                    "value": " for more information.",
                     "position": {
                       "start": {
-                        "line": 3,
-                        "column": 61,
-                        "offset": 110
+                        "line": 4,
+                        "column": 48,
+                        "offset": 174
                       },
                       "end": {
-                        "line": 3,
-                        "column": 112,
-                        "offset": 161
+                        "line": 4,
+                        "column": 70,
+                        "offset": 196
                       },
                       "indent": []
                     }
@@ -15355,11 +15366,13 @@
                     "offset": 50
                   },
                   "end": {
-                    "line": 3,
-                    "column": 112,
-                    "offset": 161
+                    "line": 4,
+                    "column": 70,
+                    "offset": 196
                   },
-                  "indent": []
+                  "indent": [
+                    1
+                  ]
                 }
               }
             ],
@@ -15370,9 +15383,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 3,
-                "column": 112,
-                "offset": 161
+                "line": 4,
+                "column": 70,
+                "offset": 196
               }
             }
           },
@@ -15380,23 +15393,23 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 4,
+              "lineNumber": 5,
               "type": null
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 5
+              "lineNumber": 6
             },
             {
               "title": "event",
               "description": "call:customParameters",
-              "lineNumber": 6
+              "lineNumber": 7
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -15406,7 +15419,7 @@
             {
               "title": "param",
               "description": "The ID of the Call in which custom parameters were received.",
-              "lineNumber": 8,
+              "lineNumber": 9,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -15416,7 +15429,7 @@
             {
               "title": "param",
               "description": "The custom parameters received.",
-              "lineNumber": 9,
+              "lineNumber": 10,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -15435,22 +15448,22 @@
           ],
           "loc": {
             "start": {
-              "line": 219,
+              "line": 226,
               "column": 0
             },
             "end": {
-              "line": 229,
+              "line": 237,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 230,
+                "line": 238,
                 "column": 0
               },
               "end": {
-                "line": 230,
+                "line": 238,
                 "column": 56
               }
             },
@@ -15462,7 +15475,7 @@
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -15471,7 +15484,7 @@
                 {
                   "title": "param",
                   "name": "params.callId",
-                  "lineNumber": 8,
+                  "lineNumber": 9,
                   "description": {
                     "type": "root",
                     "children": [
@@ -15532,7 +15545,7 @@
                 {
                   "title": "param",
                   "name": "params.customParameters",
-                  "lineNumber": 9,
+                  "lineNumber": 10,
                   "description": {
                     "type": "root",
                     "children": [
@@ -15823,22 +15836,22 @@
           ],
           "loc": {
             "start": {
-              "line": 232,
+              "line": 240,
               "column": 0
             },
             "end": {
-              "line": 243,
+              "line": 251,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 244,
+                "line": 252,
                 "column": 0
               },
               "end": {
-                "line": 244,
+                "line": 252,
                 "column": 54
               }
             },
@@ -16416,11 +16429,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -17978,11 +17991,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -18300,11 +18313,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -18715,11 +18728,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -19165,11 +19178,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -19481,11 +19494,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -19912,11 +19925,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -20340,11 +20353,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -20811,11 +20824,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -21576,11 +21589,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -21968,11 +21981,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 304,
+                "line": 306,
                 "column": 0
               },
               "end": {
-                "line": 308,
+                "line": 310,
                 "column": 1
               }
             },
@@ -35332,7 +35345,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Get a report about low-level call statistical information.",
+                    "value": "Retrieve a snapshot of the low-level information of the Call through statistical\n   report.",
                     "position": {
                       "start": {
                         "line": 1,
@@ -35340,11 +35353,13 @@
                         "offset": 0
                       },
                       "end": {
-                        "line": 1,
-                        "column": 59,
-                        "offset": 58
+                        "line": 2,
+                        "column": 11,
+                        "offset": 91
                       },
-                      "indent": []
+                      "indent": [
+                        1
+                      ]
                     }
                   }
                 ],
@@ -35355,46 +35370,9 @@
                     "offset": 0
                   },
                   "end": {
-                    "line": 1,
-                    "column": 59,
-                    "offset": 58
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A Track ID can optionally be provided to get a report for a specific\n   Track of the Call.",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 60
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 22,
-                        "offset": 150
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 60
-                  },
-                  "end": {
-                    "line": 4,
-                    "column": 22,
-                    "offset": 150
+                    "line": 2,
+                    "column": 11,
+                    "offset": 91
                   },
                   "indent": [
                     1
@@ -35406,17 +35384,216 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "This API will return a promise which, when resolved, it will contain the report of the particlar call.\nThe progress of the operation will be tracked via the\n   ",
+                    "value": "The data retrieved is a ",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 93
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 25,
+                        "offset": 117
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "title": null,
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/API/RTCStatsReport",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "RTCStatsReport",
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 26,
+                            "offset": 118
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 40,
+                            "offset": 132
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 25,
+                        "offset": 117
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 106,
+                        "offset": 198
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   object, which contains many individual\n   ",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 106,
+                        "offset": 198
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 4,
+                        "offset": 244
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "title": null,
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/API/RTCStats",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "RTCStats",
+                        "position": {
+                          "start": {
+                            "line": 6,
+                            "column": 5,
+                            "offset": 245
+                          },
+                          "end": {
+                            "line": 6,
+                            "column": 13,
+                            "offset": 253
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
                     "position": {
                       "start": {
                         "line": 6,
-                        "column": 1,
-                        "offset": 152
+                        "column": 4,
+                        "offset": 244
                       },
                       "end": {
-                        "line": 8,
+                        "line": 6,
+                        "column": 73,
+                        "offset": 313
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ".\n   These are advanced statistics gathered by the browser providing insights\n   into the Call at a certain point in time. Aggregating reports over a\n   period of time would allow a low-level analysis of the Call for that\n   period. As an example, this could be done to determine the media quality\n   during the Call.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 73,
+                        "offset": 313
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 20,
+                        "offset": 630
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 93
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 20,
+                    "offset": 630
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A Track ID can optionally be provided to get a report for a specific\n   Track of the Call.",
+                    "position": {
+                      "start": {
+                        "line": 13,
+                        "column": 1,
+                        "offset": 632
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 22,
+                        "offset": 722
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 13,
+                    "column": 1,
+                    "offset": 632
+                  },
+                  "end": {
+                    "line": 14,
+                    "column": 22,
+                    "offset": 722
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This API will return a promise which, when resolved, will contain the report of the particlar call.\nThe progress of the operation will be tracked via the\n   ",
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 1,
+                        "offset": 724
+                      },
+                      "end": {
+                        "line": 18,
                         "column": 4,
-                        "offset": 312
+                        "offset": 881
                       },
                       "indent": [
                         1,
@@ -35437,14 +35614,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 8,
+                        "line": 18,
                         "column": 4,
-                        "offset": 312
+                        "offset": 881
                       },
                       "end": {
-                        "line": 8,
+                        "line": 18,
                         "column": 52,
-                        "offset": 360
+                        "offset": 929
                       },
                       "indent": []
                     }
@@ -35454,14 +35631,14 @@
                     "value": " event.",
                     "position": {
                       "start": {
-                        "line": 8,
+                        "line": 18,
                         "column": 52,
-                        "offset": 360
+                        "offset": 929
                       },
                       "end": {
-                        "line": 8,
+                        "line": 18,
                         "column": 59,
-                        "offset": 367
+                        "offset": 936
                       },
                       "indent": []
                     }
@@ -35469,14 +35646,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 6,
+                    "line": 16,
                     "column": 1,
-                    "offset": 152
+                    "offset": 724
                   },
                   "end": {
-                    "line": 8,
+                    "line": 18,
                     "column": 59,
-                    "offset": 367
+                    "offset": 936
                   },
                   "indent": [
                     1,
@@ -35492,14 +35669,14 @@
                     "value": "The SDK will emit a\n   ",
                     "position": {
                       "start": {
-                        "line": 10,
+                        "line": 20,
                         "column": 1,
-                        "offset": 369
+                        "offset": 938
                       },
                       "end": {
-                        "line": 11,
+                        "line": 21,
                         "column": 4,
-                        "offset": 392
+                        "offset": 961
                       },
                       "indent": [
                         1
@@ -35519,14 +35696,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 11,
+                        "line": 21,
                         "column": 4,
-                        "offset": 392
+                        "offset": 961
                       },
                       "end": {
-                        "line": 11,
+                        "line": 21,
                         "column": 60,
-                        "offset": 448
+                        "offset": 1017
                       },
                       "indent": []
                     }
@@ -35536,14 +35713,14 @@
                     "value": " event, after\n   the operation completes, that has the report.",
                     "position": {
                       "start": {
-                        "line": 11,
+                        "line": 21,
                         "column": 60,
-                        "offset": 448
+                        "offset": 1017
                       },
                       "end": {
-                        "line": 12,
+                        "line": 22,
                         "column": 49,
-                        "offset": 510
+                        "offset": 1079
                       },
                       "indent": [
                         1
@@ -35553,14 +35730,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 10,
+                    "line": 20,
                     "column": 1,
-                    "offset": 369
+                    "offset": 938
                   },
                   "end": {
-                    "line": 12,
+                    "line": 22,
                     "column": 49,
-                    "offset": 510
+                    "offset": 1079
                   },
                   "indent": [
                     1,
@@ -35576,9 +35753,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 12,
+                "line": 22,
                 "column": 49,
-                "offset": 510
+                "offset": 1079
               }
             }
           },
@@ -35586,35 +35763,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 23,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 14
+              "lineNumber": 24
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 15
+              "lineNumber": 25
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 26,
               "name": "call"
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 17,
+              "lineNumber": 27,
               "name": "callMe"
             },
             {
               "title": "param",
               "description": "The ID of the Call to retrieve the report.",
-              "lineNumber": 18,
+              "lineNumber": 28,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -35624,7 +35801,7 @@
             {
               "title": "param",
               "description": "ID of a Track being used by the Call. If not\n   provided, RTCStatsReport is generated for the Call itself.",
-              "lineNumber": 19,
+              "lineNumber": 29,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -35633,6 +35810,11 @@
                 }
               },
               "name": "trackId"
+            },
+            {
+              "title": "example",
+              "description": "client.on('call:statsReceived', function (params) {\n   // Iterate over each individual statistic inside the RTCPStatsReport.\n   params.result.forEach(stats => {\n       // Handle the data on its own or collate with previously gathered stats\n       //    for analysis.\n       ...\n   })\n})\n\n// Get a snapshot of the Call's stats.\n//   This may be done on a regular interval to collect data over time.\nclient.call.getStats(callId)",
+              "lineNumber": 31
             }
           ],
           "loc": {
@@ -35641,30 +35823,34 @@
               "column": 4
             },
             "end": {
-              "line": 820,
+              "line": 843,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 821,
+                "line": 844,
                 "column": 4
               },
               "end": {
-                "line": 826,
+                "line": 849,
                 "column": 5
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
-          "examples": [],
+          "examples": [
+            {
+              "description": "client.on('call:statsReceived', function (params) {\n   // Iterate over each individual statistic inside the RTCPStatsReport.\n   params.result.forEach(stats => {\n       // Handle the data on its own or collate with previously gathered stats\n       //    for analysis.\n       ...\n   })\n})\n\n// Get a snapshot of the Call's stats.\n//   This may be done on a regular interval to collect data over time.\nclient.call.getStats(callId)"
+            }
+          ],
           "params": [
             {
               "title": "param",
               "name": "callId",
-              "lineNumber": 18,
+              "lineNumber": 28,
               "description": {
                 "type": "root",
                 "children": [
@@ -35725,7 +35911,7 @@
             {
               "title": "param",
               "name": "trackId",
-              "lineNumber": 19,
+              "lineNumber": 29,
               "description": {
                 "type": "root",
                 "children": [
@@ -36279,22 +36465,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1072,
+              "line": 1096,
               "column": 4
             },
             "end": {
-              "line": 1136,
+              "line": 1160,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1137,
+                "line": 1161,
                 "column": 4
               },
               "end": {
-                "line": 1146,
+                "line": 1170,
                 "column": 5
               }
             },
@@ -37363,22 +37549,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1148,
+              "line": 1172,
               "column": 4
             },
             "end": {
-              "line": 1164,
+              "line": 1188,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1165,
+                "line": 1189,
                 "column": 4
               },
               "end": {
-                "line": 1175,
+                "line": 1199,
                 "column": 5
               }
             },
@@ -37707,22 +37893,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1177,
+              "line": 1201,
               "column": 4
             },
             "end": {
-              "line": 1193,
+              "line": 1217,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1194,
+                "line": 1218,
                 "column": 4
               },
               "end": {
-                "line": 1202,
+                "line": 1226,
                 "column": 5
               }
             },
@@ -38309,22 +38495,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1204,
+              "line": 1228,
               "column": 4
             },
             "end": {
-              "line": 1248,
+              "line": 1272,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1249,
+                "line": 1273,
                 "column": 4
               },
               "end": {
-                "line": 1249,
+                "line": 1273,
                 "column": 23
               }
             },
@@ -39165,22 +39351,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1251,
+              "line": 1275,
               "column": 4
             },
             "end": {
-              "line": 1267,
+              "line": 1291,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1249,
+                "line": 1273,
                 "column": 4
               },
               "end": {
-                "line": 1249,
+                "line": 1273,
                 "column": 23
               }
             },
@@ -39480,22 +39666,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1269,
+              "line": 1293,
               "column": 4
             },
             "end": {
-              "line": 1306,
+              "line": 1330,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1249,
+                "line": 1273,
                 "column": 4
               },
               "end": {
-                "line": 1249,
+                "line": 1273,
                 "column": 23
               }
             },
@@ -39845,22 +40031,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1308,
+              "line": 1332,
               "column": 4
             },
             "end": {
-              "line": 1345,
+              "line": 1369,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1249,
+                "line": 1273,
                 "column": 4
               },
               "end": {
-                "line": 1249,
+                "line": 1273,
                 "column": 23
               }
             },
@@ -65100,11 +65286,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 304,
+          "line": 306,
           "column": 0
         },
         "end": {
-          "line": 308,
+          "line": 310,
           "column": 1
         }
       },

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.28.0-beta.668
+ * Version: 4.28.0-beta.669
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6462,7 +6462,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.28.0-beta.668';
+  return '4.28.0-beta.669';
 }
 
 /***/ }),
@@ -38409,7 +38409,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
  * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
  * @property {call.BandwidthControls} bandwidth The bandwidth limitations set for the call.
- * @property {Array<call.CustomParameter>} customParameters The custom parameters set for the call.
+ * @property {Array<call.CustomParameter>} customParameters The locally set Custom Parameters for the call.
  * @property {number} startTime The start time of the call in milliseconds since the epoch.
  * @property {number} [endTime] The end time of the call in milliseconds since the epoch.
  */
@@ -38602,19 +38602,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Custom SIP headers can be used to convey additional information to a SIP endpoint.
  *
- * These headers must be configured on the server prior to making a request, otherwise the request will fail when trying to set the headers.
+ * These parameters must be configured on the server prior to making a request, otherwise the request will fail when trying to include the parameters.
  *
- * These headers can be specified with the {@link call.make} and {@link call.answer} APIs.
- * They can also be set on a call using the {@link call.setCustomParameters}, and sent using the {@link call.sendCustomParameters} API.
+ * These parameters can be specified with the {@link call.make} and {@link call.answer} APIs.
+ * They can also be set after a Call is established using the {@link call.setCustomParameters} API, and sent using the {@link call.sendCustomParameters} API.
  *
  * Custom headers may be received anytime throughout the duration a call. A remote endpoint may send custom headers when starting a call,
  *  answering a call, or during call updates such as hold/unhold and addition/removal of media in the call.
  *  When these custom headers are received, the SDK will emit a {@link call.event:call:customParameters call:customParameters} event
  *  which will contain the custom parameters that were received.
  *
- * A Call's custom parameters are a property of the Call's {@link call.CallObject CallObject},
+ * A Call's custom parameters are stored on the Call's {@link call.CallObject CallObject},
  *  which can be retrieved using the {@link call.getById} or
- *  {@link call.getAll} APIs.
+ *  {@link call.getAll} APIs. These are the parameters that will be sent to the remote
+ *  endpoint of the Call. Parameters received from a Call are not stored as
+ *  part of the CallObject and are only provided via the {@link call.event:call:customParameters call:customParameters} event.
  *
  * @public
  * @static
@@ -39106,7 +39108,7 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Set the custom parameters of a call.
+     * Set the {@link call.CustomParameter Custom Parameters} of a Call, to be provided to the remote endpoint.
      *
      * The specified parameters will be saved as part of the call's information throughout the duration of the call.
      * All subsequent call operations will include these custom parameters.
@@ -39475,12 +39477,22 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
-     * Get a report about low-level call statistical information.
+     * Retrieve a snapshot of the low-level information of the Call through statistical
+     *    report.
+     *
+     * The data retrieved is a [RTCStatsReport](https://developer.mozilla.org/en-US/docs/Web/API/RTCStatsReport)
+     *    object, which contains many individual
+     *    [RTCStats](https://developer.mozilla.org/en-US/docs/Web/API/RTCStats).
+     *    These are advanced statistics gathered by the browser providing insights
+     *    into the Call at a certain point in time. Aggregating reports over a
+     *    period of time would allow a low-level analysis of the Call for that
+     *    period. As an example, this could be done to determine the media quality
+     *    during the Call.
      *
      * A Track ID can optionally be provided to get a report for a specific
      *    Track of the Call.
      *
-     * This API will return a promise which, when resolved, it will contain the report of the particlar call.
+     * This API will return a promise which, when resolved, will contain the report of the particlar call.
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event.
      *
@@ -39495,6 +39507,19 @@ function callAPI({ dispatch, getState }) {
      * @param {string} callId The ID of the Call to retrieve the report.
      * @param {string} [trackId] ID of a Track being used by the Call. If not
      *    provided, RTCStatsReport is generated for the Call itself.
+     * @example
+     * client.on('call:statsReceived', function (params) {
+     *    // Iterate over each individual statistic inside the RTCPStatsReport.
+     *    params.result.forEach(stats => {
+     *        // Handle the data on its own or collate with previously gathered stats
+     *        //    for analysis.
+     *        ...
+     *    })
+     * })
+     *
+     * // Get a snapshot of the Call's stats.
+     * //   This may be done on a regular interval to collect data over time.
+     * client.call.getStats(callId)
      */
     getStats(callId, trackId) {
       log.debug(_logs.API_LOG_TAG + 'call.getStats: ', callId, trackId);
@@ -39502,6 +39527,7 @@ function callAPI({ dispatch, getState }) {
       dispatch(_actions.callActions.getStats(callId, { trackId }, deferredResult));
       return deferredResult.promise;
     },
+
     /**
      * Forwards an incoming call to another user.
      *
@@ -48921,8 +48947,15 @@ const CALL_TRACK_ENDED = exports.CALL_TRACK_ENDED = 'call:trackEnded';
  * @param {Object} params
  * @param {string} params.callId The ID of the Call to retrieve stats for.
  * @param {string} [params.trackId] The ID of the Track to retrieve stats for.
- * @param {string} params.result The RTCStatsReport.
+ * @param {Map} params.result The RTCStatsReport.
  * @param {api.BasicError} [params.error] An error object, if the operation was not successful.
+ * @example
+ * client.on('call:statsReceived', function (params) {
+ *    // Iterate over each individual statistic inside the RTCPStatsReport Map.
+ *    params.result.forEach(stat => {
+ *      ...
+ *    })
+ * })
  */
 const STATS_RECEIVED = exports.STATS_RECEIVED = 'call:statsReceived';
 
@@ -48951,7 +48984,8 @@ const CALL_TRACK_REPLACED = exports.CALL_TRACK_REPLACED = 'call:trackReplaced';
 /**
  * Custom Parameters have been received for a Call.
  *
- * Please refer to {@link call.CustomParameter CustomParameter} for information on when this event may be emitted.
+ * These are parameters set by the remote endpoint of the Call. Please refer to
+ *    {@link call.CustomParameter CustomParameter} for more information.
  * @public
  * @memberof call
  * @event call:customParameters
