@@ -2541,6 +2541,20 @@
               },
               "name": "call.ringingFeedbackMode",
               "default": "'auto'"
+            },
+            {
+              "title": "param",
+              "description": "Time interval, in milliseconds between call audits.",
+              "lineNumber": 29,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              },
+              "name": "call.callAuditTimer",
+              "default": "25000"
             }
           ],
           "loc": {
@@ -2549,18 +2563,18 @@
               "column": 0
             },
             "end": {
-              "line": 53,
+              "line": 54,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 64,
+                "line": 65,
                 "column": 0
               },
               "end": {
-                "line": 81,
+                "line": 83,
                 "column": 1
               }
             },
@@ -3469,6 +3483,68 @@
                     "name": "string"
                   },
                   "default": "'auto'"
+                },
+                {
+                  "title": "param",
+                  "name": "call.callAuditTimer",
+                  "lineNumber": 29,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Time interval, in milliseconds between call audits.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 52,
+                                "offset": 51
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 52,
+                            "offset": 51
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "number"
+                  },
+                  "default": "25000"
                 }
               ]
             }
@@ -9725,11 +9801,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 306,
+          "line": 308,
           "column": 0
         },
         "end": {
-          "line": 310,
+          "line": 312,
           "column": 1
         }
       },
@@ -16030,6 +16106,423 @@
             }
           ],
           "namespace": "call.event:call:availableCodecs"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A Call's media connection state has been changed.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 50,
+                        "offset": 49
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 50,
+                    "offset": 49
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This event is emitted as a result of changes to the media connection of the Call.\nThese state changes occur during call establishment, connection loss/re-establishment, call completion, etc.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 51
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 109,
+                        "offset": 241
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 51
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 109,
+                    "offset": 241
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "To check the media connection state of a call, retrieve the call's information using the  ",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 243
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 91,
+                        "offset": 333
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callgetbyid",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.getById"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 91,
+                        "offset": 333
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 111,
+                        "offset": 353
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API,\n and check the ",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 111,
+                        "offset": 353
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 16,
+                        "offset": 374
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "mediaConnectionState",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 16,
+                        "offset": 374
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 38,
+                        "offset": 396
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " property of the call.\nSee ",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 38,
+                        "offset": 396
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 5,
+                        "offset": 423
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.mediaConnectionStates"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 5,
+                        "offset": 423
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 39,
+                        "offset": 457
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " for the list of possible values and descriptions.",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 39,
+                        "offset": 457
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 89,
+                        "offset": 507
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 243
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 89,
+                    "offset": 507
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 89,
+                "offset": 507
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 9,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 10
+            },
+            {
+              "title": "event",
+              "description": "call:mediaConnectionChange",
+              "lineNumber": 11
+            },
+            {
+              "title": "param",
+              "description": null,
+              "lineNumber": 12,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "params"
+            },
+            {
+              "title": "param",
+              "description": "The ID of the Call whose media connection state was changed.",
+              "lineNumber": 13,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.callId"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 254,
+              "column": 0
+            },
+            "end": {
+              "line": 268,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 269,
+                "column": 0
+              },
+              "end": {
+                "line": 269,
+                "column": 67
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/eventTypes.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "params",
+              "lineNumber": 12,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "params.callId",
+                  "lineNumber": 13,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the Call whose media connection state was changed.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 61,
+                                "offset": 60
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 61,
+                            "offset": 60
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 61,
+                        "offset": 60
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "memberof": "call",
+          "kind": "event",
+          "name": "call:mediaConnectionChange",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "call:mediaConnectionChange",
+              "kind": "event"
+            }
+          ],
+          "namespace": "call.event:call:mediaConnectionChange"
         }
       ],
       "static": [
@@ -16290,8 +16783,18 @@
             },
             {
               "title": "property",
-              "description": "Indicates whether this call is currently being held locally.",
+              "description": "The current status of the call's media connection. See {@link call.mediaConnectionStates} for possible states.",
               "lineNumber": 15,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "mediaConnectionState"
+            },
+            {
+              "title": "property",
+              "description": "Indicates whether this call is currently being held locally.",
+              "lineNumber": 16,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -16301,7 +16804,7 @@
             {
               "title": "property",
               "description": "Indicates whether this call is currently being held remotely.",
-              "lineNumber": 16,
+              "lineNumber": 17,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -16311,7 +16814,7 @@
             {
               "title": "property",
               "description": "A list of Track IDs that the call is sending to the remote participant.",
-              "lineNumber": 17,
+              "lineNumber": 18,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -16330,7 +16833,7 @@
             {
               "title": "property",
               "description": "A list of Track IDs that the call is receiving from the remote participant.",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -16349,7 +16852,7 @@
             {
               "title": "property",
               "description": "Information about the other call participant.",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -16359,7 +16862,7 @@
             {
               "title": "property",
               "description": "The User ID of the remote participant in the form \"username@domain\".",
-              "lineNumber": 20,
+              "lineNumber": 21,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -16372,7 +16875,7 @@
             {
               "title": "property",
               "description": "The display name of the remote participant.",
-              "lineNumber": 21,
+              "lineNumber": 22,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -16385,7 +16888,7 @@
             {
               "title": "property",
               "description": "The bandwidth limitations set for the call.",
-              "lineNumber": 22,
+              "lineNumber": 23,
               "type": {
                 "type": "NameExpression",
                 "name": "call.BandwidthControls"
@@ -16395,7 +16898,7 @@
             {
               "title": "property",
               "description": "The start time of the call in milliseconds since the epoch.",
-              "lineNumber": 23,
+              "lineNumber": 24,
               "type": {
                 "type": "NameExpression",
                 "name": "number"
@@ -16405,7 +16908,7 @@
             {
               "title": "property",
               "description": "The end time of the call in milliseconds since the epoch.",
-              "lineNumber": 24,
+              "lineNumber": 25,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -16422,18 +16925,18 @@
               "column": 0
             },
             "end": {
-              "line": 38,
+              "line": 39,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -16792,8 +17295,111 @@
             },
             {
               "title": "property",
-              "name": "localHold",
+              "name": "mediaConnectionState",
               "lineNumber": 15,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The current status of the call's media connection. See ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 56,
+                            "offset": 55
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "url": "#callmediaconnectionstates",
+                        "title": null,
+                        "jsdoc": true,
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "call.mediaConnectionStates"
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 56,
+                            "offset": 55
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 90,
+                            "offset": 89
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " for possible states.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 90,
+                            "offset": 89
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 111,
+                            "offset": 110
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 111,
+                        "offset": 110
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 111,
+                    "offset": 110
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "localHold",
+              "lineNumber": 16,
               "description": {
                 "type": "root",
                 "children": [
@@ -16854,7 +17460,7 @@
             {
               "title": "property",
               "name": "remoteHold",
-              "lineNumber": 16,
+              "lineNumber": 17,
               "description": {
                 "type": "root",
                 "children": [
@@ -16915,7 +17521,7 @@
             {
               "title": "property",
               "name": "localTracks",
-              "lineNumber": 17,
+              "lineNumber": 18,
               "description": {
                 "type": "root",
                 "children": [
@@ -16985,7 +17591,7 @@
             {
               "title": "property",
               "name": "remoteTracks",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "description": {
                 "type": "root",
                 "children": [
@@ -17055,7 +17661,7 @@
             {
               "title": "property",
               "name": "remoteParticipant",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "description": {
                 "type": "root",
                 "children": [
@@ -17116,7 +17722,7 @@
                 {
                   "title": "property",
                   "name": "remoteParticipant.displayNumber",
-                  "lineNumber": 20,
+                  "lineNumber": 21,
                   "description": {
                     "type": "root",
                     "children": [
@@ -17180,7 +17786,7 @@
                 {
                   "title": "property",
                   "name": "remoteParticipant.displayName",
-                  "lineNumber": 21,
+                  "lineNumber": 22,
                   "description": {
                     "type": "root",
                     "children": [
@@ -17246,7 +17852,7 @@
             {
               "title": "property",
               "name": "bandwidth",
-              "lineNumber": 22,
+              "lineNumber": 23,
               "description": {
                 "type": "root",
                 "children": [
@@ -17307,7 +17913,7 @@
             {
               "title": "property",
               "name": "startTime",
-              "lineNumber": 23,
+              "lineNumber": 24,
               "description": {
                 "type": "root",
                 "children": [
@@ -17368,7 +17974,7 @@
             {
               "title": "property",
               "name": "endTime",
-              "lineNumber": 24,
+              "lineNumber": 25,
               "description": {
                 "type": "root",
                 "children": [
@@ -17980,22 +18586,22 @@
           ],
           "loc": {
             "start": {
-              "line": 89,
+              "line": 91,
               "column": 0
             },
             "end": {
-              "line": 123,
+              "line": 125,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -18302,22 +18908,22 @@
           ],
           "loc": {
             "start": {
-              "line": 125,
+              "line": 127,
               "column": 0
             },
             "end": {
-              "line": 145,
+              "line": 147,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -18717,22 +19323,22 @@
           ],
           "loc": {
             "start": {
-              "line": 147,
+              "line": 149,
               "column": 0
             },
             "end": {
-              "line": 159,
+              "line": 161,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -19167,22 +19773,22 @@
           ],
           "loc": {
             "start": {
-              "line": 161,
+              "line": 163,
               "column": 0
             },
             "end": {
-              "line": 168,
+              "line": 170,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -19483,22 +20089,22 @@
           ],
           "loc": {
             "start": {
-              "line": 170,
+              "line": 172,
               "column": 0
             },
             "end": {
-              "line": 181,
+              "line": 183,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -19914,22 +20520,22 @@
           ],
           "loc": {
             "start": {
-              "line": 183,
+              "line": 185,
               "column": 0
             },
             "end": {
-              "line": 193,
+              "line": 195,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -20342,22 +20948,22 @@
           ],
           "loc": {
             "start": {
-              "line": 195,
+              "line": 197,
               "column": 0
             },
             "end": {
-              "line": 206,
+              "line": 208,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -20813,22 +21419,22 @@
           ],
           "loc": {
             "start": {
-              "line": 208,
+              "line": 210,
               "column": 0
             },
             "end": {
-              "line": 228,
+              "line": 230,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -21578,22 +22184,22 @@
           ],
           "loc": {
             "start": {
-              "line": 230,
+              "line": 232,
               "column": 0
             },
             "end": {
-              "line": 240,
+              "line": 242,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -21970,22 +22576,22 @@
           ],
           "loc": {
             "start": {
-              "line": 242,
+              "line": 244,
               "column": 0
             },
             "end": {
-              "line": 253,
+              "line": 255,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 306,
+                "line": 308,
                 "column": 0
               },
               "end": {
-                "line": 310,
+                "line": 312,
                 "column": 1
               }
             },
@@ -39057,6 +39663,1313 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "Possible states that a Call's media connection can be in.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 58,
+                        "offset": 57
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 58,
+                    "offset": 57
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A Call's media connection state describes the current status of media within the call.\n An application should use this state to understand whether the Call participants are\n able to see/hear each other or may be experiencing connection issues. The media connection\n state can be used alongside the ",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 59
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 34,
+                        "offset": 357
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Call state"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 34,
+                        "offset": 357
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 64,
+                        "offset": 387
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " to determine if media issues\n are occurring while the participants are expecting to be connected.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 64,
+                        "offset": 387
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 69,
+                        "offset": 485
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 59
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 69,
+                    "offset": 485
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "These states are direct reflections of the possible\n ",
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 1,
+                        "offset": 487
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 2,
+                        "offset": 540
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "title": null,
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceConnectionState",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "RTCPeerConnection.iceConnectionState",
+                        "position": {
+                          "start": {
+                            "line": 10,
+                            "column": 3,
+                            "offset": 541
+                          },
+                          "end": {
+                            "line": 10,
+                            "column": 39,
+                            "offset": 577
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 2,
+                        "offset": 540
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 127,
+                        "offset": 665
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " values.",
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 127,
+                        "offset": 665
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 135,
+                        "offset": 673
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 487
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 135,
+                    "offset": 673
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The Call's media connection state is a property of the ",
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 1,
+                        "offset": 675
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 56,
+                        "offset": 730
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callcallobject",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "CallObject"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 56,
+                        "offset": 730
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 90,
+                        "offset": 764
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ",\n   which can be retrieved using the ",
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 90,
+                        "offset": 764
+                      },
+                      "end": {
+                        "line": 13,
+                        "column": 37,
+                        "offset": 802
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callgetbyid",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.getById"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 13,
+                        "column": 37,
+                        "offset": 802
+                      },
+                      "end": {
+                        "line": 13,
+                        "column": 57,
+                        "offset": 822
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " or\n   ",
+                    "position": {
+                      "start": {
+                        "line": 13,
+                        "column": 57,
+                        "offset": 822
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 4,
+                        "offset": 829
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callgetall",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.getAll"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 4,
+                        "offset": 829
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 23,
+                        "offset": 848
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " APIs.",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 23,
+                        "offset": 848
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 29,
+                        "offset": 854
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 12,
+                    "column": 1,
+                    "offset": 675
+                  },
+                  "end": {
+                    "line": 14,
+                    "column": 29,
+                    "offset": 854
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The SDK emits a ",
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 1,
+                        "offset": 856
+                      },
+                      "end": {
+                        "line": 16,
+                        "column": 17,
+                        "offset": 872
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediaconnectionchange",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaConnectionChange"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 17,
+                        "offset": 872
+                      },
+                      "end": {
+                        "line": 16,
+                        "column": 89,
+                        "offset": 944
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   event when a Call's media connection state changes from one state to another.",
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 89,
+                        "offset": 944
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 81,
+                        "offset": 1025
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 16,
+                    "column": 1,
+                    "offset": 856
+                  },
+                  "end": {
+                    "line": 17,
+                    "column": 81,
+                    "offset": 1025
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 17,
+                "column": 81,
+                "offset": 1025
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 19,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 20
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 21
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 22,
+              "name": "callMe"
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 23,
+              "name": "call"
+            },
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 24,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            {
+              "title": "property",
+              "description": "The Call is initializing the local side of the connection and waiting on information from the remote side.\n When the information is received, the state will transition into `checking` as the Call automatically begins the connection process.",
+              "lineNumber": 25,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "NEW"
+            },
+            {
+              "title": "property",
+              "description": "The Call has received information from the remote endpoint and is working to establish the media connection.\n When finished, the state will transition to either `connected` or `failed`.",
+              "lineNumber": 27,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "CHECKING"
+            },
+            {
+              "title": "property",
+              "description": "A usable connection has been made and the Call will now have media.\n The connection may not be optimal, though, so the Call will continue establishment to improve the connection before going into the `completed` state.",
+              "lineNumber": 29,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "CONNECTED"
+            },
+            {
+              "title": "property",
+              "description": "The media connection process has fully completed and the optimal connection has been established. While in this state,\n the Call endpoints will receive each other's media.",
+              "lineNumber": 31,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "COMPLETED"
+            },
+            {
+              "title": "property",
+              "description": "Media has become disconnected and the Call endpoints have stopped receiving each other's media.\n The Call will automatically attempt to reconnect, transitioning back to `completed` if successful or to `failed` if not.",
+              "lineNumber": 33,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "DISCONNECTED"
+            },
+            {
+              "title": "property",
+              "description": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection.",
+              "lineNumber": 35,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "FAILED"
+            },
+            {
+              "title": "property",
+              "description": "The connection has been shut down and is no longer in use.",
+              "lineNumber": 36,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "CLOSED"
+            },
+            {
+              "title": "example",
+              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n    case mediaConnectionStates.CLOSED:\n      // Media ended: The Call's media is not connected. The Call has either ended (CLOSED)\n      //    or requires a media refresh to reestablish (FAILED).\n      // These states will occur after Call establishment.\n      ...\n      break\n  }\n}",
+              "lineNumber": 37
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 1275,
+              "column": 4
+            },
+            "end": {
+              "line": 1346,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 1347,
+                "column": 4
+              },
+              "end": {
+                "line": 1347,
+                "column": 55
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n    case mediaConnectionStates.CLOSED:\n      // Media ended: The Call's media is not connected. The Call has either ended (CLOSED)\n      //    or requires a media refresh to reestablish (FAILED).\n      // These states will occur after Call establishment.\n      ...\n      break\n  }\n}"
+            }
+          ],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "NEW",
+              "lineNumber": 25,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The Call is initializing the local side of the connection and waiting on information from the remote side.\n When the information is received, the state will transition into ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 67,
+                            "offset": 173
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "checking",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 67,
+                            "offset": 173
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 77,
+                            "offset": 183
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " as the Call automatically begins the connection process.",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 77,
+                            "offset": 183
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 134,
+                            "offset": 240
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 134,
+                        "offset": 240
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 134,
+                    "offset": 240
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "CHECKING",
+              "lineNumber": 27,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The Call has received information from the remote endpoint and is working to establish the media connection.\n When finished, the state will transition to either ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 53,
+                            "offset": 161
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "connected",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 53,
+                            "offset": 161
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 64,
+                            "offset": 172
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " or ",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 64,
+                            "offset": 172
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 68,
+                            "offset": 176
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "failed",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 68,
+                            "offset": 176
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 76,
+                            "offset": 184
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ".",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 76,
+                            "offset": 184
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 77,
+                            "offset": 185
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 77,
+                        "offset": 185
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 77,
+                    "offset": 185
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "CONNECTED",
+              "lineNumber": 29,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A usable connection has been made and the Call will now have media.\n The connection may not be optimal, though, so the Call will continue establishment to improve the connection before going into the ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 133,
+                            "offset": 200
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "completed",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 133,
+                            "offset": 200
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 144,
+                            "offset": 211
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " state.",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 144,
+                            "offset": 211
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 151,
+                            "offset": 218
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 151,
+                        "offset": 218
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 151,
+                    "offset": 218
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "COMPLETED",
+              "lineNumber": 31,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The media connection process has fully completed and the optimal connection has been established. While in this state,\n the Call endpoints will receive each other's media.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 53,
+                            "offset": 171
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 53,
+                        "offset": 171
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 53,
+                    "offset": 171
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "DISCONNECTED",
+              "lineNumber": 33,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Media has become disconnected and the Call endpoints have stopped receiving each other's media.\n The Call will automatically attempt to reconnect, transitioning back to ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 74,
+                            "offset": 169
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "completed",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 74,
+                            "offset": 169
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 85,
+                            "offset": 180
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " if successful or to ",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 85,
+                            "offset": 180
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 106,
+                            "offset": 201
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "failed",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 106,
+                            "offset": 201
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 114,
+                            "offset": 209
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " if not.",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 114,
+                            "offset": 209
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 122,
+                            "offset": 217
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 122,
+                        "offset": 217
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 122,
+                    "offset": 217
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "FAILED",
+              "lineNumber": 35,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 137,
+                            "offset": 136
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 137,
+                        "offset": 136
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 137,
+                    "offset": 136
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "CLOSED",
+              "lineNumber": 36,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The connection has been shut down and is no longer in use.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 59,
+                            "offset": 58
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 59,
+                        "offset": 58
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 59,
+                    "offset": 58
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "call",
+          "name": "mediaConnectionStates",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "mediaConnectionStates",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.mediaConnectionStates"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "The ",
                     "position": {
                       "start": {
@@ -39351,23 +41264,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1275,
+              "line": 1349,
               "column": 4
             },
             "end": {
-              "line": 1291,
+              "line": 1365,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1273,
+                "line": 1347,
                 "column": 4
               },
               "end": {
-                "line": 1273,
-                "column": 23
+                "line": 1347,
+                "column": 55
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
@@ -39666,23 +41579,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1293,
+              "line": 1367,
               "column": 4
             },
             "end": {
-              "line": 1330,
+              "line": 1404,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1273,
+                "line": 1347,
                 "column": 4
               },
               "end": {
-                "line": 1273,
-                "column": 23
+                "line": 1347,
+                "column": 55
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
@@ -40031,23 +41944,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1332,
+              "line": 1406,
               "column": 4
             },
             "end": {
-              "line": 1369,
+              "line": 1443,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1273,
+                "line": 1347,
                 "column": 4
               },
               "end": {
-                "line": 1273,
-                "column": 23
+                "line": 1347,
+                "column": 55
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/call.js"
@@ -65275,22 +67188,22 @@
     ],
     "loc": {
       "start": {
-        "line": 70,
+        "line": 72,
         "column": 0
       },
       "end": {
-        "line": 87,
+        "line": 89,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 306,
+          "line": 308,
           "column": 0
         },
         "end": {
-          "line": 310,
+          "line": 312,
           "column": 1
         }
       },

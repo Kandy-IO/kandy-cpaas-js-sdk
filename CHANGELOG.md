@@ -5,6 +5,19 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.29.0 - beta
+
+### Added
+
+- Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-120`
+  - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted everytime the media connection state is changed.
+- Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-150`
+- Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-162`
+
+### Fixed
+
+- Reworked Call audits so that the audits are performed with more consistency with respect to the interval. `KJS-149`
+
 ## 4.28.0 - 2021-05-28
 
 ### Added
