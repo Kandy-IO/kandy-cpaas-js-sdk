@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.29.0-beta.680
+ * Version: 4.29.0-beta.681
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.29.0-beta.680';
+  return '4.29.0-beta.681';
 }
 
 /***/ }),
@@ -16857,6 +16857,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.MEDIA_TRANSITIONS = undefined;
 exports.default = compareMedia;
 exports.summarizeMedia = summarizeMedia;
+exports.matchMedias = matchMedias;
 exports.compareSummary = compareSummary;
 
 var _logs = __webpack_require__(3);
@@ -16918,50 +16919,32 @@ const MEDIA_TRANSITIONS = exports.MEDIA_TRANSITIONS = {
   const prevMedia = summarizeMedia(prevSdp);
   const currMedia = summarizeMedia(sdp);
 
+  const sortedMedia = matchMedias(prevMedia, currMedia);
+
   // Media found in the previous SDP but not the latest SDP were removed.
-  const removed = [];
+  const removed = sortedMedia.prevUnmatched;
   // Media found in the latest SDP but not the previous SDP were added.
-  const added = [];
+  const added = sortedMedia.currUnmatched;
+
   // Media found in both SDPs may have been changed.
   const changed = [];
   const unchanged = [];
 
-  // For each media section in the previous SDP,
-  //    try to find a matching media section in the current SDP.
-  prevMedia.forEach(prevM => {
-    const currM = currMedia.find(media => media.sectionId === prevM.sectionId);
-    if (!currM) {
-      // If no match found, then the media section was removed from the SDP.
-      removed.push(prevM);
-    } else {
-      // If a match is found, compare the two sections.
-      const changes = compareSummary(prevM, currM);
+  sortedMedia.matched.forEach(({ previous, current }) => {
+    const changes = compareSummary(previous, current);
 
-      if (changes.sending === MEDIA_TRANSITIONS.SAME && changes.receiving === MEDIA_TRANSITIONS.SAME) {
-        // No changes.
-        unchanged.push(prevM);
-      } else {
-        // Changes. Include both the media summary and the changes found.
-        /**
-         * Description of how a media line changed, with the latest summary.
-         * @typedef  {Object}       ChangedMedia
-         * @property {MediaSummary} media        The new summary of the media section.
-         * @property {MediaChanges} changes      The changes that occurred to the media.
-         */
-        changed.push({ media: currM, changes });
-      }
-    }
-  });
-
-  // For each media section in the current SDP,
-  //    try to find a matching media section in the previous SDP.
-  currMedia.forEach(currM => {
-    const prevM = prevMedia.find(media => media.sectionId === currM.sectionId);
-    if (!prevM) {
-      // If no match found, then the media section was added to the current SDP.
-      added.push(currM);
+    if (changes.sending === MEDIA_TRANSITIONS.SAME && changes.receiving === MEDIA_TRANSITIONS.SAME) {
+      // No changes.
+      unchanged.push(previous);
     } else {
-      // Nothing else to check. Already found removed and (un)changed media.
+      // Changes. Include both the media summary and the changes found.
+      /**
+       * Description of how a media line changed, with the latest summary.
+       * @typedef  {Object}       ChangedMedia
+       * @property {MediaSummary} media        The new summary of the media section.
+       * @property {MediaChanges} changes      The changes that occurred to the media.
+       */
+      changed.push({ media: current, changes });
     }
   });
 
@@ -17081,6 +17064,100 @@ function summarizeMedia(sdp) {
     sdpMedia.push(summary);
   });
   return sdpMedia;
+}
+
+/**
+ * Matches MediaSummary objects between two lists of media.
+ *    Finds matches between the lists based on the media's sectionId.
+ *    If sectionId is undefined (rare cases), matches based on stream/track Ids.
+ * Returns a list of matching medias, and a list of unmatched medias for both
+ *    previous and current lists.
+ * @param  {Array<MediaSummary>} prev List of previous media summaries.
+ * @param  {Array<MediaSummary>} curr List of current media summaries.
+ * @return {Object} Three lists of matched, prevUnmmatched, and currUnmatched.
+ */
+function matchMedias(prev, curr) {
+  const prevUnmatched = [];
+  let currUnmatched = [];
+  const matched = [];
+
+  // Function for matching a single media object to another object from a list.
+  //    Matches by sectionId.
+  const findMatchingSectionId = function (prevM, mediaList) {
+    return mediaList.findIndex(media => media.sectionId === prevM.sectionId);
+  };
+  // Function for matching a single media object to another object from a list.
+  //    Matches by media/track ID.
+  const findMatchingMediaIds = function (prevM, mediaList) {
+    return mediaList.findIndex(media => {
+      return (
+        // One or both of the sectionIds should be undefined, otherwise we shouldn't
+        //    be matching with the media/track ID.
+        (typeof prevM.sectionId === 'undefined' || typeof media.sectionId === 'undefined') && prevM.mediaId === media.mediaId && prevM.trackId === media.trackId
+      );
+    });
+  };
+
+  /*
+   * Step 1:
+   * Iterate over previous medias that have a defined sectionId.
+   *    First try to find a matching current media with a sectionId.
+   *    If none, try to find a matching current media with the same media IDs.
+   *    If still none, then consider the prev media to be unmatched.
+   */
+  prev.filter(m => m.sectionId).forEach(prevM => {
+    const currIndex = findMatchingSectionId(prevM, curr);
+    if (currIndex >= 0) {
+      // If there's a matching sectionId, add the two medias to the matched list.
+      //    Remove currM from its list to ensure nothing else can match with it.
+      const [currM] = curr.splice(currIndex, 1);
+      matched.push({ previous: prevM, current: currM });
+    } else {
+      const currIndex = findMatchingMediaIds(prevM, curr);
+      if (currIndex >= 0) {
+        // If there's a matching media IDs, add the two medias to the matched list.
+        //    Remove currM from its list to ensure nothing else can match with it.
+        const [currM] = curr.splice(currIndex, 1);
+        matched.push({ previous: prevM, current: currM });
+      } else {
+        // If a match still wasn't found, then consider prevM unmatched.
+        prevUnmatched.push(prevM);
+      }
+    }
+  });
+
+  /*
+   * Step 2:
+   * Iterate over previous medias that do not have a defined sectionId.
+   * Media with sectionIds were given priority since that should be 99% of scenarios.
+   *    Try to find a matching current media with the same media IDs.
+   *    If none, then consider the prev media to be unmatched.
+   */
+  prev.filter(m => typeof m.sectionId === 'undefined').forEach(prevM => {
+    const currIndex = findMatchingMediaIds(prevM, curr);
+    if (currIndex >= 0) {
+      // If there's a matching media IDs, add the two medias to the matched list.
+      //    Remove currM from its list to ensure nothing else can match with it.
+      const [currM] = curr.splice(currIndex, 1);
+      matched.push({ previous: prevM, current: currM });
+    } else {
+      // If a match wasn't found, then consider prevM unmatched.
+      prevUnmatched.push(prevM);
+    }
+  });
+
+  /*
+   * Step 3:
+   * Consider all remaining medias in the current list to be unmatched.
+   *    All matched currMedia should have been removed from the list when it was matched.
+   */
+  currUnmatched = curr;
+
+  return {
+    prevUnmatched,
+    currUnmatched,
+    matched
+  };
 }
 
 /**
@@ -47099,7 +47176,14 @@ function was3xUnhold(mediaDiff) {
    */
   const isFlowing = hasMediaFlowing(mediaDiff);
   const allSending = changed.every(({ media, changes }) => {
-    return changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.START;
+    return changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.START ||
+    /*
+     * Special-case: If the media is video, it's possible to go from "inactive" to "sendrecv".
+     *    This can happen when the SDK is receiving MoH then is unheld immediately (without
+     *    going through a stop MoH operation).
+     * This behaviour was seen when the remote endpoint was a SIP device. See KAA-2593.
+     */
+    media.type === 'video' && changes.sending === _compareMedia.MEDIA_TRANSITIONS.START && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.START;
   });
 
   /*
