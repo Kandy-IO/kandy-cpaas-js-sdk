@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.29.0-beta.681
+ * Version: 4.29.0-beta.683
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.29.0-beta.681';
+  return '4.29.0-beta.683';
 }
 
 /***/ }),
@@ -17072,11 +17072,15 @@ function summarizeMedia(sdp) {
  *    If sectionId is undefined (rare cases), matches based on stream/track Ids.
  * Returns a list of matching medias, and a list of unmatched medias for both
  *    previous and current lists.
- * @param  {Array<MediaSummary>} prev List of previous media summaries.
- * @param  {Array<MediaSummary>} curr List of current media summaries.
+ * @param  {Array<MediaSummary>} prevList List of previous media summaries.
+ * @param  {Array<MediaSummary>} currList List of current media summaries.
  * @return {Object} Three lists of matched, prevUnmmatched, and currUnmatched.
  */
-function matchMedias(prev, curr) {
+function matchMedias(prevList, currList) {
+  // Redeclare these lists so we don't modify the originals.
+  const prev = [...prevList];
+  const curr = [...currList];
+
   const prevUnmatched = [];
   let currUnmatched = [];
   const matched = [];
@@ -17105,7 +17109,7 @@ function matchMedias(prev, curr) {
    *    If none, try to find a matching current media with the same media IDs.
    *    If still none, then consider the prev media to be unmatched.
    */
-  prev.filter(m => m.sectionId).forEach(prevM => {
+  prev.filter(m => ['number', 'string'].includes(typeof m.sectionId)).forEach(prevM => {
     const currIndex = findMatchingSectionId(prevM, curr);
     if (currIndex >= 0) {
       // If there's a matching sectionId, add the two medias to the matched list.
