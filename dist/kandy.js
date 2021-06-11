@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.29.0-beta.688
+ * Version: 4.29.0-beta.689
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.29.0-beta.688';
+  return '4.29.0-beta.689';
 }
 
 /***/ }),
@@ -8825,23 +8825,26 @@ sdp-pipeline-run:
 `;
 
 // Display helper functions
-const displayBandwidth = bandwidth => bandwidth && (0, _stringify2.default)(bandwidth, null, ' ').replaceAll('\n', ' ').replaceAll('  ', ' ');
+const displayBandwidth = bandwidth => bandwidth && (0, _stringify2.default)(bandwidth, null, ' ').replace(new RegExp('\n', 'g'), ' ') // eslint-disable-line no-control-regex
+.replace(new RegExp(' {2}', 'g'), ' ');
 
-const displaySdp = indentation => sdp => _sdpTransform2.default.write(sdp).replaceAll('\n', `\n${indentation}`).trimEnd();
+const displaySdp = indentation => sdp => _sdpTransform2.default.write(sdp).replace(new RegExp('\n', 'g'), `\n${indentation}`) // eslint-disable-line no-control-regex
+.trimEnd();
 
 const handlerToYaml = ({ name, diff }) =>
 // replacing newlines in case the name is the function.
-`${fourSpaces}- name: ${name.replaceAll('\n', '')}
+// eslint-disable-next-line no-control-regex
+`${fourSpaces}- name: ${name.replace(new RegExp('\n', 'g'), '')}
       diff: |
         ${displayDiffs(eightSpaces)(diff)}
 `;
 
 const displayHandlers = (0, _fp.compose)([_fp.trimEnd, (0, _fp.trimCharsStart)(' \n'), (0, _fp.join)(''), (0, _fp.map)(handlerToYaml)]);
 
-const displayDiffs = indentation => diffed => diffed ? diffed.replaceAll('\n', `\n${indentation}`) : 'No changes found';
+const displayDiffs = indentation => diffed => diffed ? diffed.replace(new RegExp('\n', 'g'), `\n${indentation}`) : 'No changes found'; // eslint-disable-line no-control-regex
 
 // If the function is anonymous give the function body as the 'name'
-const formattedFunctionName = handler => handler.name || handler.toString().slice(0, 120).replaceAll('\n', '');
+const formattedFunctionName = handler => handler.name || handler.toString().slice(0, 120).replace(new RegExp('\n', 'g'), ''); // eslint-disable-line no-control-regex
 
 // Space constants
 const fourSpaces = '    ';
