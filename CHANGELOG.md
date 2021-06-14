@@ -13,7 +13,6 @@ Kandy.js change log.
   - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted everytime the media connection state is changed.
 - Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-150`
 - Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-162`
-- Fixed a Call issue where a remote hold operation would not be processed correctly in some scenarios. `KAA-2639`
 
 ### Fixed
 
@@ -22,6 +21,7 @@ Kandy.js change log.
   - The SDK will now have better interop with remote endpoints that do not have `a=mid` lines in their initial offer.
 - Switched from using String.prototype.replaceAll to String.prototype.replace and using regex to do the correct string replacement. Some browsers don't yet
   support replaceAll. `KJS-164`
+- Fixed a Call issue where a remote hold operation would not be processed correctly in some scenarios. `KAA-2639`
 
 ## 4.28.0 - 2021-05-28
 
