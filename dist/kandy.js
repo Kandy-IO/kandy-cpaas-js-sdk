@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.29.0-beta.690
+ * Version: 4.29.0-beta.691
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.29.0-beta.690';
+  return '4.29.0-beta.691';
 }
 
 /***/ }),
@@ -46986,15 +46986,15 @@ function wasUnhold(mediaDiff) {
 }
 
 /**
- * A "3.X hold" opeation is when a v3.X SDK performs hold. This is for interop.
- *
- * This operation is the same as a "regular" hold, except that media changes to
- *    sendonly instead of inactive.
+ * A "3.X hold" opeation is when a hold operation changes media to `sendonly`
+ *    instead of `inactive`. This is what the 3.X SDK and Mobile SDK does. This
+ *    is for interop with remote endpoints other than the 4.X SDK.
  *
  * In terms of SDP changes, it is defined as:
  *    1) At least one media was 'flowing' before the SDP change.
- *    2) All changed media is not 'sendonly'.
+ *    2) All changed audio media is now 'sendonly'.
  *        ie. is being "v3.X held"
+ *       All changed video media is not receiving.
  *    3) No active media was added.
  *    4) No media was removed.
  *    5) All media that is unchanged is not sending/receiving.
@@ -47011,20 +47011,48 @@ function was3xHold(mediaDiff) {
    * 1) Handles when some media was flowing before the change.
    *  or a special case where media was flowing but assumes media wasnt flowing.
    * 2) All changed media is now "sendonly".
+   *    All changed video media is not receiving.
    */
   const wasFlowing = hadMediaFlowing(mediaDiff);
   const allSendOnly = changed.every(({ media, changes }) => {
     /**
-     * This handles two scenerios
+     * Possible scenerios:
      *
-     * 1)  When 3.X SDK holds and was not sending video previously, video media direction changes from recvonly --> sendonly.
-     * For this scenerio, 4.X sdk will think it just started sending media(video) and
-     * no video media was flowing initially, setting  MEDIA_TRANSITION for the video to "START".
+     *  1. Audio-only 3.X Hold:
+     *    - A sendrecv --> A sendonly
      *
-     * 2.) When 3.X SDK holds and a video was sent previously, 4.x knows some media was flowing before the change.
-     * Therefore setting  MEDIA_TRANSITION for the video to "SAME".
+     *  2. Two way Audio-Video (eg. KAA-2639):
+     *    - A/V sendrecv/sendrecv --> A/V sendonly/inactive
+     *  3. Two way Audio-Video (eg. KAA-2463):
+     *    - A/V sendrecv/sendrecv --> A/V sendonly/sendonly
+     *
+     *  4. Two way Audio, One way receive Video:
+     *    - A/V sendrecv/recvonly --> A/V sendonly/inactive
+     *  5. Two way Audio, One way receive Video:
+     *    - A/V sendrecv/recvonly --> A/V sendonly/sendonly
+     *
+     *  6. Two way Audio, One way send Video:
+     *    - A/V sendrecv/sendonly --> A/V sendonly/inactive
+     *  7. Two way Audio, One way send Video:
+     *    - A/V sendrecv/sendonly --> A/V sendonly/sendonly (video checked by 5) below)
+     *
+     * The summary of these senarios are:
+     *  - Audio always stops receiving.
+     *  - Audio always continues sending.
+     *  - Video is never receiving afterwards (stop, same).
+     *  - Video sending can be anything (same, start, stop).
      */
-    return (changes.sending === _compareMedia.MEDIA_TRANSITIONS.START || changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME) && changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP;
+    if (media.type === 'audio') {
+      // Changed audio always stops being received by the remote endpoint.
+      // Changed audio always continues being sent by the remote endpoint.
+      return changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP && changes.sending === _compareMedia.MEDIA_TRANSITIONS.SAME;
+    } else {
+      return (
+        // Changed video is never received afterwards.
+        //     Either stopped or stayed "not receiving".
+        changes.receiving === _compareMedia.MEDIA_TRANSITIONS.STOP || changes.receiving === _compareMedia.MEDIA_TRANSITIONS.SAME && media.willReceive === false
+      );
+    }
   });
 
   /*
@@ -47040,10 +47068,14 @@ function was3xHold(mediaDiff) {
 
   /*
    * 5) For all media that was not changed,
-   *    no media is being sent/received.
+   *      no media is being sent/received,
+   *      or video might still be sendonly.
    */
   const noUnchangedSend = unchanged.every(media => {
-    return !media.willSend && !media.willReceive;
+    return !media.willSend && !media.willReceive ||
+    // Edge-case: One-way video was being received, and the hold did not
+    //    change the direction but just stopped the video being sent.
+    media.type === 'video' && media.willSend && !media.willReceive;
   });
 
   return wasFlowing && allSendOnly && noActiveMediaAdded && noMediaRemoved && noUnchangedSend;
