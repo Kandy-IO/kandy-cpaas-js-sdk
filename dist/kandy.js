@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.29.0-beta.696
+ * Version: 4.29.0-beta.697
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.29.0-beta.696';
+  return '4.29.0-beta.697';
 }
 
 /***/ }),
@@ -58142,7 +58142,7 @@ function* subscribeForServices(action) {
      * While odd looking, delay(0) is needed to let the "subscribe action" finish its flow
      * before the "subscribe finish" action is dispatched.
      * For a very in-depth explanation, see comments on this PR:
-     * <https://github.com/Fring/Kandy.js/pull/2579#issuecomment-589670097>
+     * <https://github.com/Kandy-IO/Kandy.js/pull/2579#issuecomment-589670097>
      */
     yield (0, _effects2.delay)(0);
 
