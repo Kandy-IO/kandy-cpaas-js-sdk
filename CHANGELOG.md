@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.29.0 - beta
 
+### SDP Semantics Defaults
+
+With this release we're announcing the default SDP semantics are changing to the standard compliant `unified-plan` semantics. Only users on Chrome version `92` and earlier are impacted by this change. This is happening now that Google Chrome M91 is published and all interoperability work is finished. In subsequent releases `plan-b` support will be removed entirely. For more information see the release notes for SDK version `4.18.0`.
+
 ### Added
 
 - Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-120`
