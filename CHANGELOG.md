@@ -5,6 +5,28 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.29.0 - 2021-06-25
+
+### SDP Semantics Defaults
+
+With this release we're announcing the default SDP semantics are changing to the standard compliant `unified-plan` semantics. Only users on Chrome version `92` and earlier are impacted by this change. This is happening now that Google Chrome M91 is published and all interoperability work is finished. In subsequent releases `plan-b` support will be removed entirely. For more information see the release notes for SDK version `4.18.0`.
+
+### Added
+
+- Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-120`, `KJS-173`
+  - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted everytime the media connection state is changed.
+- Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-150`
+- Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-162`
+
+### Fixed
+
+- Reworked Call audits so that the audits are performed with more consistency with respect to the interval. `KJS-149`
+- Fixed a Call issue where the SDK incorrectly handled remote operations from SIP devices in specific scenarios. `KAA-2593`
+  - The SDK will now have better interop with remote endpoints that do not have `a=mid` lines in their initial offer.
+- Switched from using String.prototype.replaceAll to String.prototype.replace and using regex to do the correct string replacement. Some browsers don't yet
+  support replaceAll. `KJS-164`
+- Fixed a Call issue where a remote hold operation would not be processed correctly in some scenarios. `KAA-2639`
+
 ## 4.28.0 - 2021-05-28
 
 ### Added
