@@ -29,6 +29,10 @@
   description: # Handling Media Tracks
   link: /quickstarts/javascript/cpaas/Handling%20Media%20Tracks
 
+- name: Device Handling
+  description: # Device Handling
+  link: /quickstarts/javascript/cpaas/Device%20Handling
+
 - name: Call Statistics
   description: # Call Statistics
   link: /quickstarts/javascript/cpaas/Call%20Statistics
