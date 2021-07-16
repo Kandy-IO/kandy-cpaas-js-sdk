@@ -15,6 +15,10 @@ Kandy.js change log.
 
 - Changed the domain names used in configuration for all turn/stun servers to the newly public ones (for Kandy tutorials).
 
+## Fixed
+
+- Improved YAML SDP log output by not repeating the final SDP if there has been no changes from the `logHandlers`.
+
 ## 4.29.0 - 2021-06-25
 
 ### SDP Semantics Defaults

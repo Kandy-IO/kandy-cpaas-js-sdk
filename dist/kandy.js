@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.30.0-beta.713
+ * Version: 4.30.0-beta.714
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.30.0-beta.713';
+  return '4.30.0-beta.714';
 }
 
 /***/ }),
@@ -8797,13 +8797,13 @@ function runPipelineYaml(handlers, sdp, info) {
   });
 
   diffed = (0, _variableDiff2.default)(originalSdp, newSdp);
-  const yamlFormat = sdpToYaml(info)(originalSdp)(newSdp)(results)(diffed.text);
+  const yamlFormat = sdpToYaml(info)(originalSdp)(newSdp)(results)(diffed);
   log.debug(`SDP Handler changes: ${yamlFormat}`);
 
   return _sdpTransform2.default.write(newSdp);
 }
 
-const sdpToYaml = info => originalSdp => newSdp => results => finalDiff => `
+const sdpToYaml = info => originalSdp => newSdp => results => finalDiffObject => `
 ---
 sdp-pipeline-run:
   info:
@@ -8818,33 +8818,30 @@ sdp-pipeline-run:
     ${displayHandlers(results)}
   final:
     diff: |
-      ${displayDiffs(sixSpaces)(finalDiff)}
+      ${displayDiffs(sixSpaces)(finalDiffObject.text)}
     sdp: |
-      ${displaySdp(sixSpaces)(newSdp)}
+      ${finalDiffObject.changed ? displaySdp(sixSpaces)(newSdp) : 'No changes to the SDP'}
 ...
 `;
 
 // Display helper functions
-const displayBandwidth = bandwidth => bandwidth && (0, _stringify2.default)(bandwidth, null, ' ').replace(new RegExp('\n', 'g'), ' ') // eslint-disable-line no-control-regex
-.replace(new RegExp(' {2}', 'g'), ' ');
+const displayBandwidth = bandwidth => bandwidth && (0, _stringify2.default)(bandwidth, null, ' ').replace(/\n/g, ' ').replace(/ {2}/g, ' ');
 
-const displaySdp = indentation => sdp => _sdpTransform2.default.write(sdp).replace(new RegExp('\n', 'g'), `\n${indentation}`) // eslint-disable-line no-control-regex
-.trimEnd();
+const displaySdp = indentation => sdp => _sdpTransform2.default.write(sdp).replace(/\n/g, `\n${indentation}`).trimEnd();
 
 const handlerToYaml = ({ name, diff }) =>
 // replacing newlines in case the name is the function.
-// eslint-disable-next-line no-control-regex
-`${fourSpaces}- name: ${name.replace(new RegExp('\n', 'g'), '')}
+`${fourSpaces}- name: ${name.replace(/\n/g, '')}
       diff: |
         ${displayDiffs(eightSpaces)(diff)}
 `;
 
 const displayHandlers = (0, _fp.compose)([_fp.trimEnd, (0, _fp.trimCharsStart)(' \n'), (0, _fp.join)(''), (0, _fp.map)(handlerToYaml)]);
 
-const displayDiffs = indentation => diffed => diffed ? diffed.replace(new RegExp('\n', 'g'), `\n${indentation}`) : 'No changes found'; // eslint-disable-line no-control-regex
+const displayDiffs = indentation => diffed => diffed ? diffed.replace(/\n/g, `\n${indentation}`) : 'No changes found';
 
 // If the function is anonymous give the function body as the 'name'
-const formattedFunctionName = handler => handler.name || handler.toString().slice(0, 120).replace(new RegExp('\n', 'g'), ''); // eslint-disable-line no-control-regex
+const formattedFunctionName = handler => handler.name || handler.toString().slice(0, 120).replace(/\n/g, '');
 
 // Space constants
 const fourSpaces = '    ';
