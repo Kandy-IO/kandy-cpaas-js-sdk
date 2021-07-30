@@ -5,6 +5,20 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.30.0 - 2021-07-30
+
+### Added
+
+- Added new Call tutorial for Device Handling. `KJS-144`
+
+### Changed
+
+- Changed the domain names used in configuration for all turn/stun servers to the newly public ones (for Kandy tutorials).
+
+## Fixed
+
+- Improved YAML SDP log output by not repeating the final SDP if there has been no changes from the `logHandlers`.
+
 ## 4.29.0 - 2021-06-25
 
 ### SDP Semantics Defaults
