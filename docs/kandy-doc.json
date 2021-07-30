@@ -2439,7 +2439,7 @@
             },
             {
               "title": "param",
-              "description": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive an array of ICE\n   candidates and must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
+              "description": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive the following two parameters:\n   an array of ICE servers & an extra details object, to help in the decision making.\n   The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\n   the maximum ICE collection timeout (in milliseconds) and an array of offered media.\n   The function must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
               "lineNumber": 16,
               "type": {
                 "type": "OptionalType",
@@ -2453,7 +2453,7 @@
             {
               "title": "param",
               "description": "Whether server-provided TURN credentials should be used.",
-              "lineNumber": 21,
+              "lineNumber": 24,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2467,7 +2467,7 @@
             {
               "title": "param",
               "description": "List of SDP handler functions to modify SDP. Advanced usage.",
-              "lineNumber": 22,
+              "lineNumber": 25,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2489,7 +2489,7 @@
             {
               "title": "param",
               "description": "Whether to remove \"H264\" codec lines from incoming and outgoing SDP messages.",
-              "lineNumber": 23,
+              "lineNumber": 26,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2503,7 +2503,7 @@
             {
               "title": "param",
               "description": "Whether to remove a=group attributes to stop media bundling from incoming and outgoing SDP messages.",
-              "lineNumber": 24,
+              "lineNumber": 27,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2517,7 +2517,7 @@
             {
               "title": "param",
               "description": "Whether all Calls will be anchored on the MediaBroker instead of being peer-to-peer. Set to true if the backend is configured for broker only mode.",
-              "lineNumber": 25,
+              "lineNumber": 28,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2531,7 +2531,7 @@
             {
               "title": "param",
               "description": "The mode for sending ringing feedback to the Caller ('auto', 'manual').\n   By default, feedback will be automatically sent when a call has been received. In 'manual' mode, the application\n   must initiate the feedback being sent. See the `call.sendRingingFeedback` API for more info.",
-              "lineNumber": 26,
+              "lineNumber": 29,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2545,7 +2545,7 @@
             {
               "title": "param",
               "description": "Time interval, in milliseconds between call audits.",
-              "lineNumber": 29,
+              "lineNumber": 32,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2555,6 +2555,20 @@
               },
               "name": "call.callAuditTimer",
               "default": "25000"
+            },
+            {
+              "title": "param",
+              "description": "Delay, in milliseconds for the passive side of a call to wait before trying a media reconnection.",
+              "lineNumber": 33,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              },
+              "name": "call.mediaConnectionRetryDelay",
+              "default": "3000"
             }
           ],
           "loc": {
@@ -2563,18 +2577,18 @@
               "column": 0
             },
             "end": {
-              "line": 54,
+              "line": 58,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 69,
                 "column": 0
               },
               "end": {
-                "line": 83,
+                "line": 88,
                 "column": 1
               }
             },
@@ -2999,7 +3013,7 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive an array of ICE\n   candidates and must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
+                            "value": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive the following two parameters:\n   an array of ICE servers & an extra details object, to help in the decision making.\n   The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\n   the maximum ICE collection timeout (in milliseconds) and an array of offered media.\n   The function must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
                             "position": {
                               "start": {
                                 "line": 1,
@@ -3007,11 +3021,14 @@
                                 "offset": 0
                               },
                               "end": {
-                                "line": 5,
+                                "line": 8,
                                 "column": 14,
-                                "offset": 327
+                                "offset": 615
                               },
                               "indent": [
+                                1,
+                                1,
+                                1,
                                 1,
                                 1,
                                 1,
@@ -3027,11 +3044,14 @@
                             "offset": 0
                           },
                           "end": {
-                            "line": 5,
+                            "line": 8,
                             "column": 14,
-                            "offset": 327
+                            "offset": 615
                           },
                           "indent": [
+                            1,
+                            1,
+                            1,
                             1,
                             1,
                             1,
@@ -3047,9 +3067,9 @@
                         "offset": 0
                       },
                       "end": {
-                        "line": 5,
+                        "line": 8,
                         "column": 14,
-                        "offset": 327
+                        "offset": 615
                       }
                     }
                   },
@@ -3064,7 +3084,7 @@
                 {
                   "title": "param",
                   "name": "call.serverTurnCredentials",
-                  "lineNumber": 21,
+                  "lineNumber": 24,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3126,7 +3146,7 @@
                 {
                   "title": "param",
                   "name": "call.sdpHandlers",
-                  "lineNumber": 22,
+                  "lineNumber": 25,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3199,7 +3219,7 @@
                 {
                   "title": "param",
                   "name": "call.removeH264Codecs",
-                  "lineNumber": 23,
+                  "lineNumber": 26,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3261,7 +3281,7 @@
                 {
                   "title": "param",
                   "name": "call.removeBundling",
-                  "lineNumber": 24,
+                  "lineNumber": 27,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3323,7 +3343,7 @@
                 {
                   "title": "param",
                   "name": "call.mediaBrokerOnly",
-                  "lineNumber": 25,
+                  "lineNumber": 28,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3385,7 +3405,7 @@
                 {
                   "title": "param",
                   "name": "call.ringingFeedbackMode",
-                  "lineNumber": 26,
+                  "lineNumber": 29,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3487,7 +3507,7 @@
                 {
                   "title": "param",
                   "name": "call.callAuditTimer",
-                  "lineNumber": 29,
+                  "lineNumber": 32,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3545,6 +3565,68 @@
                     "name": "number"
                   },
                   "default": "25000"
+                },
+                {
+                  "title": "param",
+                  "name": "call.mediaConnectionRetryDelay",
+                  "lineNumber": 33,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Delay, in milliseconds for the passive side of a call to wait before trying a media reconnection.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 98,
+                                "offset": 97
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 98,
+                            "offset": 97
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 98,
+                        "offset": 97
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "number"
+                  },
+                  "default": "3000"
                 }
               ]
             }
@@ -16395,6 +16477,26 @@
                 "name": "string"
               },
               "name": "params.callId"
+            },
+            {
+              "title": "param",
+              "description": "The call's media connection properties before the operation changed it.",
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "params.previous"
+            },
+            {
+              "title": "param",
+              "description": "The previous state of the media connection.",
+              "lineNumber": 15,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.previous.state"
             }
           ],
           "loc": {
@@ -16403,18 +16505,18 @@
               "column": 0
             },
             "end": {
-              "line": 268,
+              "line": 270,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 269,
+                "line": 271,
                 "column": 0
               },
               "end": {
-                "line": 269,
+                "line": 271,
                 "column": 67
               }
             },
@@ -16492,6 +16594,130 @@
                     "type": "NameExpression",
                     "name": "string"
                   }
+                },
+                {
+                  "title": "param",
+                  "name": "params.previous",
+                  "lineNumber": 14,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The call's media connection properties before the operation changed it.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 72,
+                                "offset": 71
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 72,
+                            "offset": 71
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 72,
+                        "offset": 71
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "Object"
+                  },
+                  "properties": [
+                    {
+                      "title": "param",
+                      "name": "params.previous.state",
+                      "lineNumber": 15,
+                      "description": {
+                        "type": "root",
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "The previous state of the media connection.",
+                                "position": {
+                                  "start": {
+                                    "line": 1,
+                                    "column": 1,
+                                    "offset": 0
+                                  },
+                                  "end": {
+                                    "line": 1,
+                                    "column": 44,
+                                    "offset": 43
+                                  },
+                                  "indent": []
+                                }
+                              }
+                            ],
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 44,
+                                "offset": 43
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 44,
+                            "offset": 43
+                          }
+                        }
+                      },
+                      "type": {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    }
+                  ]
                 }
               ]
             }

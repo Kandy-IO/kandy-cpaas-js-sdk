@@ -99,8 +99,11 @@ Configuration options for the call feature.
            collection to complete normally. After this time, the process will timeout and the
            operation will attempt to continue no matter how many candidates have been collected. (optional, default `3000`)
     -   `call.iceCollectionCheck` **[Function][15]?** Function to check whether collected candidates
-           can be used to continue the operation. The function will receive an array of ICE
-           candidates and must return a boolean value of whether the SDK should attempt to continue
+           can be used to continue the operation. The function will receive the following two parameters:
+           an array of ICE servers & an extra details object, to help in the decision making.
+           The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),
+           the maximum ICE collection timeout (in milliseconds) and an array of offered media.
+           The function must return a boolean value of whether the SDK should attempt to continue
            the operation. By default, the check is to ensure at least one relay candidate has been
            collected.
     -   `call.serverTurnCredentials` **[boolean][11]** Whether server-provided TURN credentials should be used. (optional, default `true`)
@@ -112,6 +115,7 @@ Configuration options for the call feature.
            By default, feedback will be automatically sent when a call has been received. In 'manual' mode, the application
            must initiate the feedback being sent. See the `call.sendRingingFeedback` API for more info. (optional, default `'auto'`)
     -   `call.callAuditTimer` **[number][12]** Time interval, in milliseconds between call audits. (optional, default `25000`)
+    -   `call.mediaConnectionRetryDelay` **[number][12]** Delay, in milliseconds for the passive side of a call to wait before trying a media reconnection. (optional, default `3000`)
 
 ### config.connectivity
 
