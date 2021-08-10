@@ -19,6 +19,7 @@ Kandy.js change log.
 ### Changed
 
 - Changed the interval timing (used to determine how long ICE candidate collection has been taken so far) to use a more accurate value. The value is now provided by the PeerConnection's `iceTimer.timeFromStart()` function. `KJS-200`
+- Changed how we merge data when the `updateConfig()` API is called. For arrays, it will now replace the array instead of merging it's elements. All other types should update in the same way they previously updated. `KJS-239`
 
 ## 4.30.0 - 2021-07-30
 
