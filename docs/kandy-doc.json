@@ -15422,394 +15422,6 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Custom Parameters have been received for a Call.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 49,
-                        "offset": 48
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 49,
-                    "offset": 48
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "These are parameters set by the remote endpoint of the Call. Please refer to\n   ",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 50
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 4,
-                        "offset": 130
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "call.CustomParameter",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "CustomParameter"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 4,
-                        "offset": 130
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 48,
-                        "offset": 174
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " for more information.",
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 48,
-                        "offset": 174
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 70,
-                        "offset": 196
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 50
-                  },
-                  "end": {
-                    "line": 4,
-                    "column": 70,
-                    "offset": 196
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 4,
-                "column": 70,
-                "offset": 196
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 5,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 6
-            },
-            {
-              "title": "event",
-              "description": "call:customParameters",
-              "lineNumber": 7
-            },
-            {
-              "title": "param",
-              "description": null,
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "params"
-            },
-            {
-              "title": "param",
-              "description": "The ID of the Call in which custom parameters were received.",
-              "lineNumber": 9,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "params.callId"
-            },
-            {
-              "title": "param",
-              "description": "The custom parameters received.",
-              "lineNumber": 10,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "call.CustomParameter"
-                  }
-                ]
-              },
-              "name": "params.customParameters"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 226,
-              "column": 0
-            },
-            "end": {
-              "line": 237,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 238,
-                "column": 0
-              },
-              "end": {
-                "line": 238,
-                "column": 56
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/eventTypes.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "params",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "properties": [
-                {
-                  "title": "param",
-                  "name": "params.callId",
-                  "lineNumber": 9,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The ID of the Call in which custom parameters were received.",
-                            "position": {
-                              "start": {
-                                "line": 1,
-                                "column": 1,
-                                "offset": 0
-                              },
-                              "end": {
-                                "line": 1,
-                                "column": 61,
-                                "offset": 60
-                              },
-                              "indent": []
-                            }
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 61,
-                            "offset": 60
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 61,
-                        "offset": 60
-                      }
-                    }
-                  },
-                  "type": {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                },
-                {
-                  "title": "param",
-                  "name": "params.customParameters",
-                  "lineNumber": 10,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The custom parameters received.",
-                            "position": {
-                              "start": {
-                                "line": 1,
-                                "column": 1,
-                                "offset": 0
-                              },
-                              "end": {
-                                "line": 1,
-                                "column": 32,
-                                "offset": 31
-                              },
-                              "indent": []
-                            }
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 32,
-                        "offset": 31
-                      }
-                    }
-                  },
-                  "type": {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "call.CustomParameter"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "call",
-          "kind": "event",
-          "name": "call:customParameters",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "call:customParameters",
-              "kind": "event"
-            }
-          ],
-          "namespace": "call.event:call:customParameters"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
                     "value": "The list of available and supported codecs by the browser have been retrieved.",
                     "position": {
                       "start": {
@@ -15994,22 +15606,22 @@
           ],
           "loc": {
             "start": {
-              "line": 240,
+              "line": 241,
               "column": 0
             },
             "end": {
-              "line": 251,
+              "line": 252,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 252,
+                "line": 253,
                 "column": 0
               },
               "end": {
-                "line": 252,
+                "line": 253,
                 "column": 54
               }
             },
@@ -16501,22 +16113,22 @@
           ],
           "loc": {
             "start": {
-              "line": 254,
+              "line": 255,
               "column": 0
             },
             "end": {
-              "line": 270,
+              "line": 271,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 271,
+                "line": 272,
                 "column": 0
               },
               "end": {
-                "line": 271,
+                "line": 272,
                 "column": 67
               }
             },

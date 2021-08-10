@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.31.0-beta.720
+ * Version: 4.31.0-beta.722
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6496,7 +6496,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.31.0-beta.720';
+  return '4.31.0-beta.722';
 }
 
 /***/ }),
@@ -50011,6 +50011,7 @@ const CALL_TRACK_REPLACED = exports.CALL_TRACK_REPLACED = 'call:trackReplaced';
  *    {@link call.CustomParameter CustomParameter} for more information.
  * @public
  * @memberof call
+ * @requires link_call
  * @event call:customParameters
  * @param {Object} params
  * @param {string} params.callId The ID of the Call in which custom parameters were received.
