@@ -16,14 +16,16 @@ Kandy.js change log.
 - Added previous media connection state to `call:mediaConnectionChange` event data. `KJS-204`
 - Added improved Call handling for local network errors occurring during hold and unhold midcall operations. `KJS-183`
 
-### Fixed
-
-- Fixed a Call issue where a call would not enter 'On Hold' state when the remote endpoint holds the call in certain scenarios. `KAA-2654`
-
 ### Changed
 
 - Changed the interval timing (used to determine how long ICE candidate collection has been taken so far) to use a more accurate value. The value is now provided by the PeerConnection's `iceTimer.timeFromStart()` function. `KJS-200`
 - Changed how we merge data when the `updateConfig()` API is called. For arrays, it will now replace the array instead of merging it's elements. All other types should update in the same way they previously updated. `KJS-239`
+
+## 4.30.1 - 2021-08-11
+
+### Fixed
+
+- Fixed a Call issue where a call would not enter 'On Hold' state when the remote endpoint holds the call in certain scenarios. `KAA-2654`
 
 ## 4.30.0 - 2021-07-30
 
