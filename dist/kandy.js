@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.30.0
+ * Version: 4.30.1
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.30.0';
+  return '4.30.1';
 }
 
 /***/ }),
@@ -16860,6 +16860,7 @@ exports.MEDIA_TRANSITIONS = undefined;
 exports.default = compareMedia;
 exports.summarizeMedia = summarizeMedia;
 exports.matchMedias = matchMedias;
+exports.naiveMatchMedias = naiveMatchMedias;
 exports.compareSummary = compareSummary;
 
 var _logs = __webpack_require__(3);
@@ -16909,9 +16910,10 @@ const MEDIA_TRANSITIONS = exports.MEDIA_TRANSITIONS = {
    * @method compareSdp
    * @param  {string}  prevSdpString A previous SDP.
    * @param  {string}  sdpString     A new SDP.
+   * @param  {boolean} [isNaive=false] Whether to match media sections naively.
    * @return {MediaDiff}
    */
-};function compareMedia(prevSdpString, sdpString) {
+};function compareMedia(prevSdpString, sdpString, isNaive = false) {
   // Parse the SDP string into an SDP object for easier handling.
   const prevSdp = _sdpTransform2.default.parse(prevSdpString);
   const sdp = _sdpTransform2.default.parse(sdpString);
@@ -16921,7 +16923,14 @@ const MEDIA_TRANSITIONS = exports.MEDIA_TRANSITIONS = {
   const prevMedia = summarizeMedia(prevSdp);
   const currMedia = summarizeMedia(sdp);
 
-  const sortedMedia = matchMedias(prevMedia, currMedia);
+  let sortedMedia;
+  if (isNaive) {
+    // Match the medias naively, instead of guaranteeing they are
+    //    the same media section.
+    sortedMedia = naiveMatchMedias(prevMedia, currMedia);
+  } else {
+    sortedMedia = matchMedias(prevMedia, currMedia);
+  }
 
   // Media found in the previous SDP but not the latest SDP were removed.
   const removed = sortedMedia.prevUnmatched;
@@ -17158,6 +17167,53 @@ function matchMedias(prevList, currList) {
    *    All matched currMedia should have been removed from the list when it was matched.
    */
   currUnmatched = curr;
+
+  return {
+    prevUnmatched,
+    currUnmatched,
+    matched
+  };
+}
+
+/**
+ * Matches MediaSummary objects between two lists of media.
+ *
+ * Matches them based on their index in the lists. That's it.
+ * This works under the assumption that the order of the media sections
+ *    will never change, which is generally true. This may not be true
+ *    in "non-basic" media scenarios (ie. more than two media sections)
+ *    if a PeerConnection needs to be recreated.
+ * This will only work if only comparing SDPs, and not using the
+ *    Transceivers that represent the media sections.
+ * @param  {Array<MediaSummary>} prevList List of previous media summaries.
+ * @param  {Array<MediaSummary>} currList List of current media summaries.
+ * @return {Object} Three lists of matched, prevUnmmatched, and currUnmatched.
+ */
+function naiveMatchMedias(prevList, currList) {
+  // Redeclare these lists so we don't modify the originals.
+  const prev = [...prevList];
+  const curr = [...currList];
+
+  const prevUnmatched = [];
+  const currUnmatched = [];
+  const matched = [];
+
+  const longerLength = prev.length <= curr.length ? curr.length : prev.length;
+
+  // Loop enough times to cover which media list is longer.
+  for (let i = 0; i < longerLength; i++) {
+    if (prev[i] === undefined) {
+      // If the prev media at this index is undefined, then the curr
+      //    media at this index is currUnmatched.
+      currUnmatched.push(curr[i]);
+    } else if (curr[i] === undefined) {
+      // Same thing other way around.
+      prevUnmatched.push(prev[i]);
+    } else {
+      // Else both prev/curr have a media at this index. Match them.
+      matched.push({ previous: prev[i], current: curr[i] });
+    }
+  }
 
   return {
     prevUnmatched,
@@ -46300,6 +46356,12 @@ function* handleUpdateRequest(deps, targetCall, params) {
      */
     if (mediaState === _constants.CALL_MEDIA_STATES.REMOTE_HOLD && isMediaFlowing) {
       remoteOp = _constants2.OPERATIONS.UNHOLD;
+    } else {
+      log.debug('Could not determine remote operation; retrying.');
+      // Try it again, but this time match medias naively.
+      const mediaDiff = yield (0, _effects.call)(_compareMedia2.default, remoteDesc.sdp, sdp, true);
+      remoteOp = yield (0, _effects.call)(_operations2.default, mediaDiff);
+      log.debug(`Re-interpreted update request as a ${remoteOp} operation.`);
     }
   } else if (remoteOp === 'NO_CHANGE') {
     /*
