@@ -9059,6 +9059,10 @@ the <a href="#calladdmedia">call.addMedia</a> API.</p>
 <p>The Track may have been removed by either the local user or remote user using
 the <a href="#callremovemedia">call.removeMedia</a> API. Tracks are also removed from Calls
 automatically while the Call is on hold.</p>
+<p>Note that receiving this event is not an indication that a media operation
+has completed. Therefore the application should not assume it is safe to
+perform a new operation at this time. To be notified when a call has had
+its media removed, see <a href="#calleventcallremovedmedia">call:removedMedia</a></p>
 
 
   <div class='pre p1 fill-light mt0'>call:trackEnded</div>

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.31.0-beta.728
+ * Version: 4.31.0-beta.729
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6496,7 +6496,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.31.0-beta.728';
+  return '4.31.0-beta.729';
 }
 
 /***/ }),
@@ -50009,6 +50009,11 @@ const CALL_NEW_TRACK = exports.CALL_NEW_TRACK = 'call:newTrack';
  * The Track may have been removed by either the local user or remote user using
  *    the {@link call.removeMedia} API. Tracks are also removed from Calls
  *    automatically while the Call is on hold.
+ *
+ * Note that receiving this event is not an indication that a media operation
+ *    has completed. Therefore the application should not assume it is safe to
+ *    perform a new operation at this time. To be notified when a call has had
+ *    its media removed, see {@link call.event:call:removedMedia call:removedMedia}
  *
  * @public
  * @memberof call
