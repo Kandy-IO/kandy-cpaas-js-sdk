@@ -398,6 +398,12 @@
                             </a></li>
                           
                             <li><a
+                              href='#callrestartmedia'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .restartMedia
+                            </a></li>
+                          
+                            <li><a
                               href='#callsetdefaultdevices'
                               class='regular pre-open'>
                               <span style="color:green">ⓕ</span> .setDefaultDevices
@@ -490,6 +496,12 @@
                               href='#calleventcallmediaconnectionchange'
                               class='regular pre-open'>
                               <span style="color:orange">ⓔ</span> call:mediaConnectionChange
+                            </a></li>
+                          
+                            <li><a
+                              href='#calleventcallmediarestart'
+                              class='regular pre-open'>
+                              <span style="color:orange">ⓔ</span> call:mediaRestart
                             </a></li>
                           
                         </ul>
@@ -7762,6 +7774,10 @@ An application should use this state to understand whether the Call participants
 able to see/hear each other or may be experiencing connection issues. The media connection
 state can be used alongside the <a href="#callstates">Call state</a> to determine if media issues
 are occurring while the participants are expecting to be connected.</p>
+<p>An important state to check for is the <code>FAILED</code> state. This state signifies that there is no
+media connection between the call participants and an action must be taken to resolve the
+problem. Using the <a href="#callrestartmedia">call.restartMedia</a> API will attempt to reconnect the media. See
+the <a href="#callrestartmedia">call.restartMedia</a> API description for more information.</p>
 <p>These states are direct reflections of the possible
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceConnectionState">RTCPeerConnection.iceConnectionState</a> values.</p>
 <p>The Call's media connection state is a property of the <a href="#callcallobject">CallObject</a>,
@@ -7889,7 +7905,9 @@ The Call will automatically attempt to reconnect, transitioning back to
           
 
           
-             : The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection.
+             : The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection. See the 
+<a href="#callrestartmedia">call.restartMedia</a>
+ API.
 
           
           
@@ -7946,15 +7964,109 @@ client.on(<span class="hljs-string">'call:mediaConnectionChange'</span>, <span c
       ...
       break
     <span class="hljs-keyword">case</span> mediaConnectionStates.FAILED:
+     <span class="hljs-comment">// Media has failed. The call requires a media refresh to restablish.</span>
+     <span class="hljs-comment">// This state will occur after the `DISCONNECTED` state is encountered.</span>
+     ...
+      break
     <span class="hljs-keyword">case</span> mediaConnectionStates.CLOSED:
-      <span class="hljs-comment">// Media ended: The Call's media is not connected. The Call has either ended (CLOSED)</span>
-      <span class="hljs-comment">//    or requires a media refresh to reestablish (FAILED).</span>
-      <span class="hljs-comment">// These states will occur after Call establishment.</span>
+      <span class="hljs-comment">// Media ended due to the Call being ended.</span>
+      <span class="hljs-comment">// This state will occur after Call establishment.</span>
       ...
       break
   }
 }</pre>
     
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callrestartmedia'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>restartMedia(callId)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Attempt to re-establish a media connection for a call.</p>
+<p>This API will perform a "refresh" operation on the call with the intention
+of resolving media issues that may have been encountered. This API is only
+necessary after the Call's <a href="#callmediaconnectionstates">mediaConnectionState</a>
+has entered the <code>failed</code> state, but may be used in other scenarios.</p>
+<p>After the operation completes successfully, the Call will be re-establishing
+its media connection. By this time, or shortly after, the Call's
+<a href="#callmediaconnectionstates">mediaConnectionState</a> should have
+transitioned to <code>checking</code> (via a
+<a href="#calleventcallmediaconnectionchange">call:mediaConnectionChange</a>
+event) to signify the re-establishment. It will then transition to either
+<code>connected</code> or <code>failed</code> state, similar to during the initial Call establishment.</p>
+<p>If this operation fails, then the Call will not attempt the re-establishment
+and will remain in the <code>failed</code> <a href="#callmediaconnectionstates">mediaConnectionState</a>.</p>
+<p>Behaviour during the operation may differ slightly based on the browser.
+Notably, Firefox will always transition to the <code>checking</code>
+<a href="#callmediaconnectionstates">mediaConnectionState</a> no matter what
+the previous state was. Whereas Chrome will skip the <code>checking</code> state,
+transitioning directly to either <code>connected</code> or <code>failed</code>. This has the
+implication for Chrome that if the state does not change (for example,
+the Call is in the <code>failed</code> state before the media restart operation,
+and media re-establishment fails), then there will be no
+<a href="#calleventcallmediaconnectionchange">call:mediaConnectionChange</a>
+event emitted. For this reason, Chrome-based applications may need a
+short delay after receiving the <a href="#calleventcallmediarestart">call:mediaRestart</a>
+event before checking the Call's updated
+<a href="#callmediaconnectionstates">mediaConnectionState</a> to ensure the
+application is acting on the "latest" state.</p>
+<p>The SDK will emit a <a href="#calleventcallmediarestart">call:mediaRestart</a>
+event when the operation completes.</p>
+<p>The progress of the operation will be tracked via the
+<a href="#calleventcalloperation">call:operation</a> event.</p>
+
+
+  <div class='pre p1 fill-light mt0'>restartMedia(callId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>callId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The ID of the call to act on.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
   
 
   
@@ -9593,6 +9705,123 @@ See <a href="#callmediaconnectionstates">call.mediaConnectionStates</a> for the 
 
   
 
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='calleventcallmediarestart'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>call:mediaRestart</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A media restart operation for a Call has been attempted.</p>
+<p>This event is emitted as a result of the <a href="#callrestartmedia">call.restartMedia</a> API being called.
+See the description for <a href="#callrestartmedia">call.restartMedia</a> for information about its
+usage.</p>
+<p>The <a href="#calleventcallmediaconnectionchange">call:mediaConnectionChange</a> event
+will also be emitted alongside this event when the media restart operation is
+successful.</p>
+
+
+  <div class='pre p1 fill-light mt0'>call:mediaRestart</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The ID of the Call that was acted on.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'><a href="#apibasicerror">api.BasicError</a>?</code>
+  </td>
+  <td class='break-word'><span>An error object, if the operation was not successful.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">'call:mediaRestart'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+   <span class="hljs-keyword">if</span> (params.error) {
+     <span class="hljs-comment">// The operation failed. May want to determine whether to re-attempt the</span>
+     <span class="hljs-comment">//    operation (if the failure was simply a connectivity issue) or to</span>
+     <span class="hljs-comment">//    consider the call's media irrecoverable.</span>
+     ...
+   } <span class="hljs-keyword">else</span> {
+     <span class="hljs-comment">// The call should be re-establishing media, with the call's</span>
+     <span class="hljs-comment">//    `mediaConnectionState` being updated.</span>
+     <span class="hljs-keyword">const</span> mediaState = client.call.getById(params.callId).mediaConnectionState
+     ...
+   }
+})</pre>
+    
   
 
   

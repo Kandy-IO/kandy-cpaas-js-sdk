@@ -10,8 +10,9 @@ Kandy.js change log.
 ### Added
 
 - Added support for additional parameters that are passed into the `config.call.iceCollectionCheck` function, in order for application to better decide when it collected good enough ICE candidates for the media call. `KJS-202`
-- Added Call functionality to automatically attempt media restart when disconnected. `KJS-157`
-  - When the `call:mediaConnectionChange` event indicates media has `failed`, the SDK will attempt an ICE restart operation.
+- Added Call functionality to restart media after a connection failure. `KJS-86`, `KJS-68`
+  - A new `call.mediaRestart` API has been added to trigger the restart operation. Please see its description for more information.
+  - A new `call:mediaRestart` event has been added to signify the result of the operation.
 - Added exception handling to the SDP handler pipeline. If any handler throws an exception, it's now logged and execution continues with the next handler in the pipeline. `KJS-181`
 - Added previous media connection state to `call:mediaConnectionChange` event data. `KJS-204`
 - Added improved Call handling for local network errors occurring during hold and unhold midcall operations. `KJS-183`
