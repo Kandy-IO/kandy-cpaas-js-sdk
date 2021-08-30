@@ -2439,7 +2439,7 @@
             },
             {
               "title": "param",
-              "description": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive an array of ICE\n   candidates and must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
+              "description": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive the following two parameters:\n   an array of ICE servers & an extra details object, to help in the decision making.\n   The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\n   the maximum ICE collection timeout (in milliseconds) and an array of offered media.\n   The function must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
               "lineNumber": 16,
               "type": {
                 "type": "OptionalType",
@@ -2453,7 +2453,7 @@
             {
               "title": "param",
               "description": "Whether server-provided TURN credentials should be used.",
-              "lineNumber": 21,
+              "lineNumber": 24,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2467,7 +2467,7 @@
             {
               "title": "param",
               "description": "List of SDP handler functions to modify SDP. Advanced usage.",
-              "lineNumber": 22,
+              "lineNumber": 25,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2489,7 +2489,7 @@
             {
               "title": "param",
               "description": "Whether to remove \"H264\" codec lines from incoming and outgoing SDP messages.",
-              "lineNumber": 23,
+              "lineNumber": 26,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2503,7 +2503,7 @@
             {
               "title": "param",
               "description": "Whether to remove a=group attributes to stop media bundling from incoming and outgoing SDP messages.",
-              "lineNumber": 24,
+              "lineNumber": 27,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2517,7 +2517,7 @@
             {
               "title": "param",
               "description": "Whether all Calls will be anchored on the MediaBroker instead of being peer-to-peer. Set to true if the backend is configured for broker only mode.",
-              "lineNumber": 25,
+              "lineNumber": 28,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2531,7 +2531,7 @@
             {
               "title": "param",
               "description": "The mode for sending ringing feedback to the Caller ('auto', 'manual').\n   By default, feedback will be automatically sent when a call has been received. In 'manual' mode, the application\n   must initiate the feedback being sent. See the `call.sendRingingFeedback` API for more info.",
-              "lineNumber": 26,
+              "lineNumber": 29,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2545,7 +2545,7 @@
             {
               "title": "param",
               "description": "Time interval, in milliseconds between call audits.",
-              "lineNumber": 29,
+              "lineNumber": 32,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -2555,6 +2555,20 @@
               },
               "name": "call.callAuditTimer",
               "default": "25000"
+            },
+            {
+              "title": "param",
+              "description": "Delay, in milliseconds for the passive side of a call to wait before trying a media reconnection.",
+              "lineNumber": 33,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "number"
+                }
+              },
+              "name": "call.mediaConnectionRetryDelay",
+              "default": "3000"
             }
           ],
           "loc": {
@@ -2563,18 +2577,18 @@
               "column": 0
             },
             "end": {
-              "line": 54,
+              "line": 58,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 69,
                 "column": 0
               },
               "end": {
-                "line": 83,
+                "line": 88,
                 "column": 1
               }
             },
@@ -2999,7 +3013,7 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive an array of ICE\n   candidates and must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
+                            "value": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive the following two parameters:\n   an array of ICE servers & an extra details object, to help in the decision making.\n   The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\n   the maximum ICE collection timeout (in milliseconds) and an array of offered media.\n   The function must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
                             "position": {
                               "start": {
                                 "line": 1,
@@ -3007,11 +3021,14 @@
                                 "offset": 0
                               },
                               "end": {
-                                "line": 5,
+                                "line": 8,
                                 "column": 14,
-                                "offset": 327
+                                "offset": 615
                               },
                               "indent": [
+                                1,
+                                1,
+                                1,
                                 1,
                                 1,
                                 1,
@@ -3027,11 +3044,14 @@
                             "offset": 0
                           },
                           "end": {
-                            "line": 5,
+                            "line": 8,
                             "column": 14,
-                            "offset": 327
+                            "offset": 615
                           },
                           "indent": [
+                            1,
+                            1,
+                            1,
                             1,
                             1,
                             1,
@@ -3047,9 +3067,9 @@
                         "offset": 0
                       },
                       "end": {
-                        "line": 5,
+                        "line": 8,
                         "column": 14,
-                        "offset": 327
+                        "offset": 615
                       }
                     }
                   },
@@ -3064,7 +3084,7 @@
                 {
                   "title": "param",
                   "name": "call.serverTurnCredentials",
-                  "lineNumber": 21,
+                  "lineNumber": 24,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3126,7 +3146,7 @@
                 {
                   "title": "param",
                   "name": "call.sdpHandlers",
-                  "lineNumber": 22,
+                  "lineNumber": 25,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3199,7 +3219,7 @@
                 {
                   "title": "param",
                   "name": "call.removeH264Codecs",
-                  "lineNumber": 23,
+                  "lineNumber": 26,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3261,7 +3281,7 @@
                 {
                   "title": "param",
                   "name": "call.removeBundling",
-                  "lineNumber": 24,
+                  "lineNumber": 27,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3323,7 +3343,7 @@
                 {
                   "title": "param",
                   "name": "call.mediaBrokerOnly",
-                  "lineNumber": 25,
+                  "lineNumber": 28,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3385,7 +3405,7 @@
                 {
                   "title": "param",
                   "name": "call.ringingFeedbackMode",
-                  "lineNumber": 26,
+                  "lineNumber": 29,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3487,7 +3507,7 @@
                 {
                   "title": "param",
                   "name": "call.callAuditTimer",
-                  "lineNumber": 29,
+                  "lineNumber": 32,
                   "description": {
                     "type": "root",
                     "children": [
@@ -3545,6 +3565,68 @@
                     "name": "number"
                   },
                   "default": "25000"
+                },
+                {
+                  "title": "param",
+                  "name": "call.mediaConnectionRetryDelay",
+                  "lineNumber": 33,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Delay, in milliseconds for the passive side of a call to wait before trying a media reconnection.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 98,
+                                "offset": 97
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 98,
+                            "offset": 97
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 98,
+                        "offset": 97
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "number"
+                  },
+                  "default": "3000"
                 }
               ]
             }
@@ -13794,6 +13876,74 @@
                     1
                   ]
                 }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Note that receiving this event is not an indication that a media operation\n   has completed. Therefore the application should not assume it is safe to\n   perform a new operation at this time. To be notified when a call has had\n   its media removed, see ",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 234
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 27,
+                        "offset": 487
+                      },
+                      "indent": [
+                        1,
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallremovedmedia",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:removedMedia"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 27,
+                        "offset": 487
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 81,
+                        "offset": 541
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 234
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 81,
+                    "offset": 541
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1
+                  ]
+                }
               }
             ],
             "position": {
@@ -13803,9 +13953,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 5,
-                "column": 44,
-                "offset": 232
+                "line": 10,
+                "column": 81,
+                "offset": 541
               }
             }
           },
@@ -13813,23 +13963,23 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 7,
+              "lineNumber": 12,
               "type": null
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 8
+              "lineNumber": 13
             },
             {
               "title": "event",
               "description": "call:trackEnded",
-              "lineNumber": 9
+              "lineNumber": 14
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 10,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -13839,7 +13989,7 @@
             {
               "title": "param",
               "description": "The ID of the call the track was removed from.",
-              "lineNumber": 11,
+              "lineNumber": 16,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -13849,7 +13999,7 @@
             {
               "title": "param",
               "description": "The ID of the media the track was removed from.",
-              "lineNumber": 12,
+              "lineNumber": 17,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -13859,7 +14009,7 @@
             {
               "title": "param",
               "description": "The ID of the removed track.",
-              "lineNumber": 13,
+              "lineNumber": 18,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -13869,7 +14019,7 @@
             {
               "title": "param",
               "description": "Whether the track was local or not (remote)",
-              "lineNumber": 14,
+              "lineNumber": 19,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -13883,18 +14033,18 @@
               "column": 0
             },
             "end": {
-              "line": 178,
+              "line": 183,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 179,
+                "line": 184,
                 "column": 0
               },
               "end": {
-                "line": 179,
+                "line": 184,
                 "column": 49
               }
             },
@@ -13906,7 +14056,7 @@
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 10,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -13915,7 +14065,7 @@
                 {
                   "title": "param",
                   "name": "params.callId",
-                  "lineNumber": 11,
+                  "lineNumber": 16,
                   "description": {
                     "type": "root",
                     "children": [
@@ -13976,7 +14126,7 @@
                 {
                   "title": "param",
                   "name": "params.mediaId",
-                  "lineNumber": 12,
+                  "lineNumber": 17,
                   "description": {
                     "type": "root",
                     "children": [
@@ -14037,7 +14187,7 @@
                 {
                   "title": "param",
                   "name": "params.trackId",
-                  "lineNumber": 13,
+                  "lineNumber": 18,
                   "description": {
                     "type": "root",
                     "children": [
@@ -14098,7 +14248,7 @@
                 {
                   "title": "param",
                   "name": "params.local",
-                  "lineNumber": 14,
+                  "lineNumber": 19,
                   "description": {
                     "type": "root",
                     "children": [
@@ -14398,22 +14548,22 @@
           ],
           "loc": {
             "start": {
-              "line": 181,
+              "line": 186,
               "column": 0
             },
             "end": {
-              "line": 201,
+              "line": 206,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 202,
+                "line": 207,
                 "column": 0
               },
               "end": {
-                "line": 202,
+                "line": 207,
                 "column": 50
               }
             },
@@ -15014,22 +15164,22 @@
           ],
           "loc": {
             "start": {
-              "line": 204,
+              "line": 209,
               "column": 0
             },
             "end": {
-              "line": 223,
+              "line": 228,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 224,
+                "line": 229,
                 "column": 0
               },
               "end": {
-                "line": 224,
+                "line": 229,
                 "column": 55
               }
             },
@@ -15340,394 +15490,6 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Custom Parameters have been received for a Call.",
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 49,
-                        "offset": 48
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 1,
-                    "column": 49,
-                    "offset": 48
-                  },
-                  "indent": []
-                }
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "These are parameters set by the remote endpoint of the Call. Please refer to\n   ",
-                    "position": {
-                      "start": {
-                        "line": 3,
-                        "column": 1,
-                        "offset": 50
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 4,
-                        "offset": 130
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  },
-                  {
-                    "type": "link",
-                    "url": "call.CustomParameter",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "CustomParameter"
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 4,
-                        "offset": 130
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 48,
-                        "offset": 174
-                      },
-                      "indent": []
-                    }
-                  },
-                  {
-                    "type": "text",
-                    "value": " for more information.",
-                    "position": {
-                      "start": {
-                        "line": 4,
-                        "column": 48,
-                        "offset": 174
-                      },
-                      "end": {
-                        "line": 4,
-                        "column": 70,
-                        "offset": 196
-                      },
-                      "indent": []
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 3,
-                    "column": 1,
-                    "offset": 50
-                  },
-                  "end": {
-                    "line": 4,
-                    "column": 70,
-                    "offset": 196
-                  },
-                  "indent": [
-                    1
-                  ]
-                }
-              }
-            ],
-            "position": {
-              "start": {
-                "line": 1,
-                "column": 1,
-                "offset": 0
-              },
-              "end": {
-                "line": 4,
-                "column": 70,
-                "offset": 196
-              }
-            }
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 5,
-              "type": null
-            },
-            {
-              "title": "memberof",
-              "description": "call",
-              "lineNumber": 6
-            },
-            {
-              "title": "event",
-              "description": "call:customParameters",
-              "lineNumber": 7
-            },
-            {
-              "title": "param",
-              "description": null,
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "params"
-            },
-            {
-              "title": "param",
-              "description": "The ID of the Call in which custom parameters were received.",
-              "lineNumber": 9,
-              "type": {
-                "type": "NameExpression",
-                "name": "string"
-              },
-              "name": "params.callId"
-            },
-            {
-              "title": "param",
-              "description": "The custom parameters received.",
-              "lineNumber": 10,
-              "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "call.CustomParameter"
-                  }
-                ]
-              },
-              "name": "params.customParameters"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 226,
-              "column": 0
-            },
-            "end": {
-              "line": 237,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 238,
-                "column": 0
-              },
-              "end": {
-                "line": 238,
-                "column": 56
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
-          },
-          "augments": [],
-          "examples": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "params",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "properties": [
-                {
-                  "title": "param",
-                  "name": "params.callId",
-                  "lineNumber": 9,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The ID of the Call in which custom parameters were received.",
-                            "position": {
-                              "start": {
-                                "line": 1,
-                                "column": 1,
-                                "offset": 0
-                              },
-                              "end": {
-                                "line": 1,
-                                "column": 61,
-                                "offset": 60
-                              },
-                              "indent": []
-                            }
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 61,
-                            "offset": 60
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 61,
-                        "offset": 60
-                      }
-                    }
-                  },
-                  "type": {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                },
-                {
-                  "title": "param",
-                  "name": "params.customParameters",
-                  "lineNumber": 10,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The custom parameters received.",
-                            "position": {
-                              "start": {
-                                "line": 1,
-                                "column": 1,
-                                "offset": 0
-                              },
-                              "end": {
-                                "line": 1,
-                                "column": 32,
-                                "offset": 31
-                              },
-                              "indent": []
-                            }
-                          }
-                        ],
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 1,
-                            "column": 32,
-                            "offset": 31
-                          },
-                          "indent": []
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 1,
-                        "column": 32,
-                        "offset": 31
-                      }
-                    }
-                  },
-                  "type": {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "call.CustomParameter"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "access": "public",
-          "memberof": "call",
-          "kind": "event",
-          "name": "call:customParameters",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "call",
-              "kind": "namespace"
-            },
-            {
-              "name": "call:customParameters",
-              "kind": "event"
-            }
-          ],
-          "namespace": "call.event:call:customParameters"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
                     "value": "The list of available and supported codecs by the browser have been retrieved.",
                     "position": {
                       "start": {
@@ -15912,22 +15674,22 @@
           ],
           "loc": {
             "start": {
-              "line": 240,
+              "line": 246,
               "column": 0
             },
             "end": {
-              "line": 251,
+              "line": 257,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 252,
+                "line": 258,
                 "column": 0
               },
               "end": {
-                "line": 252,
+                "line": 258,
                 "column": 54
               }
             },
@@ -16395,26 +16157,46 @@
                 "name": "string"
               },
               "name": "params.callId"
+            },
+            {
+              "title": "param",
+              "description": "The call's media connection properties before the operation changed it.",
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "params.previous"
+            },
+            {
+              "title": "param",
+              "description": "The previous state of the media connection.",
+              "lineNumber": 15,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.previous.state"
             }
           ],
           "loc": {
             "start": {
-              "line": 254,
+              "line": 260,
               "column": 0
             },
             "end": {
-              "line": 268,
+              "line": 276,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 269,
+                "line": 277,
                 "column": 0
               },
               "end": {
-                "line": 269,
+                "line": 277,
                 "column": 67
               }
             },
@@ -16492,6 +16274,130 @@
                     "type": "NameExpression",
                     "name": "string"
                   }
+                },
+                {
+                  "title": "param",
+                  "name": "params.previous",
+                  "lineNumber": 14,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The call's media connection properties before the operation changed it.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 72,
+                                "offset": 71
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 72,
+                            "offset": 71
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 72,
+                        "offset": 71
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "Object"
+                  },
+                  "properties": [
+                    {
+                      "title": "param",
+                      "name": "params.previous.state",
+                      "lineNumber": 15,
+                      "description": {
+                        "type": "root",
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "The previous state of the media connection.",
+                                "position": {
+                                  "start": {
+                                    "line": 1,
+                                    "column": 1,
+                                    "offset": 0
+                                  },
+                                  "end": {
+                                    "line": 1,
+                                    "column": 44,
+                                    "offset": 43
+                                  },
+                                  "indent": []
+                                }
+                              }
+                            ],
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 44,
+                                "offset": 43
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 44,
+                            "offset": 43
+                          }
+                        }
+                      },
+                      "type": {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -16523,6 +16429,526 @@
             }
           ],
           "namespace": "call.event:call:mediaConnectionChange"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A media restart operation for a Call has been attempted.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 57,
+                        "offset": 56
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 57,
+                    "offset": 56
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This event is emitted as a result of the ",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 58
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 42,
+                        "offset": 99
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callrestartmedia",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.restartMedia"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 42,
+                        "offset": 99
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 67,
+                        "offset": 124
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API being called.\n   See the description for ",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 67,
+                        "offset": 124
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 28,
+                        "offset": 170
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callrestartmedia",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.restartMedia"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 28,
+                        "offset": 170
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 53,
+                        "offset": 195
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " for information about its\n   usage.",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 53,
+                        "offset": 195
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 10,
+                        "offset": 231
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 58
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 10,
+                    "offset": 231
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The ",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 233
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 5,
+                        "offset": 237
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediaconnectionchange",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaConnectionChange"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 5,
+                        "offset": 237
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 77,
+                        "offset": 309
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " event\n   will also be emitted alongside this event when the media restart operation is\n   successful.",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 77,
+                        "offset": 309
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 15,
+                        "offset": 411
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 233
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 15,
+                    "offset": 411
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 15,
+                "offset": 411
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 10,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 11
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 12
+            },
+            {
+              "title": "event",
+              "description": "call:mediaRestart",
+              "lineNumber": 13
+            },
+            {
+              "title": "param",
+              "description": null,
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "params"
+            },
+            {
+              "title": "param",
+              "description": "The ID of the Call that was acted on.",
+              "lineNumber": 15,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.callId"
+            },
+            {
+              "title": "param",
+              "description": "An error object, if the operation was not successful.",
+              "lineNumber": 16,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "api.BasicError"
+                }
+              },
+              "name": "params.error"
+            },
+            {
+              "title": "example",
+              "description": "client.on('call:mediaRestart', function (params) {\n   if (params.error) {\n     // The operation failed. May want to determine whether to re-attempt the\n     //    operation (if the failure was simply a connectivity issue) or to\n     //    consider the call's media irrecoverable.\n     ...\n   } else {\n     // The call should be re-establishing media, with the call's\n     //    `mediaConnectionState` being updated.\n     const mediaState = client.call.getById(params.callId).mediaConnectionState\n     ...\n   }\n})",
+              "lineNumber": 17
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 279,
+              "column": 0
+            },
+            "end": {
+              "line": 310,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 311,
+                "column": 0
+              },
+              "end": {
+                "line": 311,
+                "column": 48
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "client.on('call:mediaRestart', function (params) {\n   if (params.error) {\n     // The operation failed. May want to determine whether to re-attempt the\n     //    operation (if the failure was simply a connectivity issue) or to\n     //    consider the call's media irrecoverable.\n     ...\n   } else {\n     // The call should be re-establishing media, with the call's\n     //    `mediaConnectionState` being updated.\n     const mediaState = client.call.getById(params.callId).mediaConnectionState\n     ...\n   }\n})"
+            }
+          ],
+          "params": [
+            {
+              "title": "param",
+              "name": "params",
+              "lineNumber": 14,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "params.callId",
+                  "lineNumber": 15,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the Call that was acted on.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 38,
+                                "offset": 37
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 38,
+                            "offset": 37
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 38,
+                        "offset": 37
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.error",
+                  "lineNumber": 16,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "An error object, if the operation was not successful.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 54,
+                                "offset": 53
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 54,
+                            "offset": 53
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 54,
+                        "offset": 53
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "api.BasicError"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "call",
+          "kind": "event",
+          "name": "call:mediaRestart",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "call:mediaRestart",
+              "kind": "event",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.event:call:mediaRestart"
         }
       ],
       "static": [
@@ -39786,7 +40212,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "These states are direct reflections of the possible\n ",
+                    "value": "An important state to check for is the ",
                     "position": {
                       "start": {
                         "line": 9,
@@ -39794,9 +40220,171 @@
                         "offset": 487
                       },
                       "end": {
-                        "line": 10,
+                        "line": 9,
+                        "column": 40,
+                        "offset": 526
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "FAILED",
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 40,
+                        "offset": 526
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 48,
+                        "offset": 534
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " state. This state signifies that there is no\n   media connection between the call participants and an action must be taken to resolve the\n   problem. Using the ",
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 48,
+                        "offset": 534
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 23,
+                        "offset": 695
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callrestartmedia",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.restartMedia"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 23,
+                        "offset": 695
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 48,
+                        "offset": 720
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API will attempt to reconnect the media. See\n   the ",
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 48,
+                        "offset": 720
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 8,
+                        "offset": 773
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callrestartmedia",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.restartMedia"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 8,
+                        "offset": 773
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 33,
+                        "offset": 798
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " API description for more information.",
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 33,
+                        "offset": 798
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 71,
+                        "offset": 836
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 487
+                  },
+                  "end": {
+                    "line": 12,
+                    "column": 71,
+                    "offset": 836
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "These states are direct reflections of the possible\n ",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 1,
+                        "offset": 838
+                      },
+                      "end": {
+                        "line": 15,
                         "column": 2,
-                        "offset": 540
+                        "offset": 891
                       },
                       "indent": [
                         1
@@ -39813,14 +40401,14 @@
                         "value": "RTCPeerConnection.iceConnectionState",
                         "position": {
                           "start": {
-                            "line": 10,
+                            "line": 15,
                             "column": 3,
-                            "offset": 541
+                            "offset": 892
                           },
                           "end": {
-                            "line": 10,
+                            "line": 15,
                             "column": 39,
-                            "offset": 577
+                            "offset": 928
                           },
                           "indent": []
                         }
@@ -39828,14 +40416,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 10,
+                        "line": 15,
                         "column": 2,
-                        "offset": 540
+                        "offset": 891
                       },
                       "end": {
-                        "line": 10,
+                        "line": 15,
                         "column": 127,
-                        "offset": 665
+                        "offset": 1016
                       },
                       "indent": []
                     }
@@ -39845,14 +40433,14 @@
                     "value": " values.",
                     "position": {
                       "start": {
-                        "line": 10,
+                        "line": 15,
                         "column": 127,
-                        "offset": 665
+                        "offset": 1016
                       },
                       "end": {
-                        "line": 10,
+                        "line": 15,
                         "column": 135,
-                        "offset": 673
+                        "offset": 1024
                       },
                       "indent": []
                     }
@@ -39860,14 +40448,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 9,
+                    "line": 14,
                     "column": 1,
-                    "offset": 487
+                    "offset": 838
                   },
                   "end": {
-                    "line": 10,
+                    "line": 15,
                     "column": 135,
-                    "offset": 673
+                    "offset": 1024
                   },
                   "indent": [
                     1
@@ -39882,14 +40470,14 @@
                     "value": "The Call's media connection state is a property of the ",
                     "position": {
                       "start": {
-                        "line": 12,
+                        "line": 17,
                         "column": 1,
-                        "offset": 675
+                        "offset": 1026
                       },
                       "end": {
-                        "line": 12,
+                        "line": 17,
                         "column": 56,
-                        "offset": 730
+                        "offset": 1081
                       },
                       "indent": []
                     }
@@ -39907,14 +40495,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 12,
+                        "line": 17,
                         "column": 56,
-                        "offset": 730
+                        "offset": 1081
                       },
                       "end": {
-                        "line": 12,
+                        "line": 17,
                         "column": 90,
-                        "offset": 764
+                        "offset": 1115
                       },
                       "indent": []
                     }
@@ -39924,14 +40512,14 @@
                     "value": ",\n   which can be retrieved using the ",
                     "position": {
                       "start": {
-                        "line": 12,
+                        "line": 17,
                         "column": 90,
-                        "offset": 764
+                        "offset": 1115
                       },
                       "end": {
-                        "line": 13,
+                        "line": 18,
                         "column": 37,
-                        "offset": 802
+                        "offset": 1153
                       },
                       "indent": [
                         1
@@ -39951,14 +40539,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 13,
+                        "line": 18,
                         "column": 37,
-                        "offset": 802
+                        "offset": 1153
                       },
                       "end": {
-                        "line": 13,
+                        "line": 18,
                         "column": 57,
-                        "offset": 822
+                        "offset": 1173
                       },
                       "indent": []
                     }
@@ -39968,14 +40556,14 @@
                     "value": " or\n   ",
                     "position": {
                       "start": {
-                        "line": 13,
+                        "line": 18,
                         "column": 57,
-                        "offset": 822
+                        "offset": 1173
                       },
                       "end": {
-                        "line": 14,
+                        "line": 19,
                         "column": 4,
-                        "offset": 829
+                        "offset": 1180
                       },
                       "indent": [
                         1
@@ -39995,14 +40583,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 14,
+                        "line": 19,
                         "column": 4,
-                        "offset": 829
+                        "offset": 1180
                       },
                       "end": {
-                        "line": 14,
+                        "line": 19,
                         "column": 23,
-                        "offset": 848
+                        "offset": 1199
                       },
                       "indent": []
                     }
@@ -40012,14 +40600,14 @@
                     "value": " APIs.",
                     "position": {
                       "start": {
-                        "line": 14,
+                        "line": 19,
                         "column": 23,
-                        "offset": 848
+                        "offset": 1199
                       },
                       "end": {
-                        "line": 14,
+                        "line": 19,
                         "column": 29,
-                        "offset": 854
+                        "offset": 1205
                       },
                       "indent": []
                     }
@@ -40027,14 +40615,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 12,
+                    "line": 17,
                     "column": 1,
-                    "offset": 675
+                    "offset": 1026
                   },
                   "end": {
-                    "line": 14,
+                    "line": 19,
                     "column": 29,
-                    "offset": 854
+                    "offset": 1205
                   },
                   "indent": [
                     1,
@@ -40050,14 +40638,14 @@
                     "value": "The SDK emits a ",
                     "position": {
                       "start": {
-                        "line": 16,
+                        "line": 21,
                         "column": 1,
-                        "offset": 856
+                        "offset": 1207
                       },
                       "end": {
-                        "line": 16,
+                        "line": 21,
                         "column": 17,
-                        "offset": 872
+                        "offset": 1223
                       },
                       "indent": []
                     }
@@ -40075,14 +40663,14 @@
                     ],
                     "position": {
                       "start": {
-                        "line": 16,
+                        "line": 21,
                         "column": 17,
-                        "offset": 872
+                        "offset": 1223
                       },
                       "end": {
-                        "line": 16,
+                        "line": 21,
                         "column": 89,
-                        "offset": 944
+                        "offset": 1295
                       },
                       "indent": []
                     }
@@ -40092,14 +40680,14 @@
                     "value": "\n   event when a Call's media connection state changes from one state to another.",
                     "position": {
                       "start": {
-                        "line": 16,
+                        "line": 21,
                         "column": 89,
-                        "offset": 944
+                        "offset": 1295
                       },
                       "end": {
-                        "line": 17,
+                        "line": 22,
                         "column": 81,
-                        "offset": 1025
+                        "offset": 1376
                       },
                       "indent": [
                         1
@@ -40109,14 +40697,14 @@
                 ],
                 "position": {
                   "start": {
-                    "line": 16,
+                    "line": 21,
                     "column": 1,
-                    "offset": 856
+                    "offset": 1207
                   },
                   "end": {
-                    "line": 17,
+                    "line": 22,
                     "column": 81,
-                    "offset": 1025
+                    "offset": 1376
                   },
                   "indent": [
                     1
@@ -40131,9 +40719,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 17,
+                "line": 22,
                 "column": 81,
-                "offset": 1025
+                "offset": 1376
               }
             }
           },
@@ -40141,35 +40729,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 19,
+              "lineNumber": 24,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 20
+              "lineNumber": 25
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 21
+              "lineNumber": 26
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 22,
+              "lineNumber": 27,
               "name": "callMe"
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 23,
+              "lineNumber": 28,
               "name": "call"
             },
             {
               "title": "type",
               "description": null,
-              "lineNumber": 24,
+              "lineNumber": 29,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -40178,7 +40766,7 @@
             {
               "title": "property",
               "description": "The Call is initializing the local side of the connection and waiting on information from the remote side.\n When the information is received, the state will transition into `checking` as the Call automatically begins the connection process.",
-              "lineNumber": 25,
+              "lineNumber": 30,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40188,7 +40776,7 @@
             {
               "title": "property",
               "description": "The Call has received information from the remote endpoint and is working to establish the media connection.\n When finished, the state will transition to either `connected` or `failed`.",
-              "lineNumber": 27,
+              "lineNumber": 32,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40198,7 +40786,7 @@
             {
               "title": "property",
               "description": "A usable connection has been made and the Call will now have media.\n The connection may not be optimal, though, so the Call will continue establishment to improve the connection before going into the `completed` state.",
-              "lineNumber": 29,
+              "lineNumber": 34,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40208,7 +40796,7 @@
             {
               "title": "property",
               "description": "The media connection process has fully completed and the optimal connection has been established. While in this state,\n the Call endpoints will receive each other's media.",
-              "lineNumber": 31,
+              "lineNumber": 36,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40218,7 +40806,7 @@
             {
               "title": "property",
               "description": "Media has become disconnected and the Call endpoints have stopped receiving each other's media.\n The Call will automatically attempt to reconnect, transitioning back to `completed` if successful or to `failed` if not.",
-              "lineNumber": 33,
+              "lineNumber": 38,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40227,8 +40815,8 @@
             },
             {
               "title": "property",
-              "description": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection.",
-              "lineNumber": 35,
+              "description": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection. See the {@link call.restartMedia} API.",
+              "lineNumber": 40,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40238,7 +40826,7 @@
             {
               "title": "property",
               "description": "The connection has been shut down and is no longer in use.",
-              "lineNumber": 36,
+              "lineNumber": 41,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -40247,8 +40835,8 @@
             },
             {
               "title": "example",
-              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n    case mediaConnectionStates.CLOSED:\n      // Media ended: The Call's media is not connected. The Call has either ended (CLOSED)\n      //    or requires a media refresh to reestablish (FAILED).\n      // These states will occur after Call establishment.\n      ...\n      break\n  }\n}",
-              "lineNumber": 37
+              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n     // Media has failed. The call requires a media refresh to restablish.\n     // This state will occur after the `DISCONNECTED` state is encountered.\n     ...\n      break\n    case mediaConnectionStates.CLOSED:\n      // Media ended due to the Call being ended.\n      // This state will occur after Call establishment.\n      ...\n      break\n  }\n}",
+              "lineNumber": 42
             }
           ],
           "loc": {
@@ -40257,18 +40845,18 @@
               "column": 4
             },
             "end": {
-              "line": 1346,
+              "line": 1354,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1347,
+                "line": 1355,
                 "column": 4
               },
               "end": {
-                "line": 1347,
+                "line": 1355,
                 "column": 55
               }
             },
@@ -40277,7 +40865,7 @@
           "augments": [],
           "examples": [
             {
-              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n    case mediaConnectionStates.CLOSED:\n      // Media ended: The Call's media is not connected. The Call has either ended (CLOSED)\n      //    or requires a media refresh to reestablish (FAILED).\n      // These states will occur after Call establishment.\n      ...\n      break\n  }\n}"
+              "description": "// Use the media connection states to check the status of the media connection of the Call.\nclient.on('call:mediaConnectionChange', function (params) {\n  // Retrieve the state of the Call this event is for.\n  const call = client.call.getById(params.callId)\n  const mediaConnectionStates = client.call.mediaConnectionStates\n\n  // Check the mediaConnectionState to determine which scenario the call is in.\n  switch (call.mediaConnectionState) {\n    case mediaConnectionStates.CONNECTED:\n    case mediaConnectionStates.COMPLETED:\n      // Media established: The Call's media is connected. The Call's participants\n      //    are able to see/hear each other.\n      // These states will occur after Call establishment.\n      ...\n      break\n    case mediaConnectionStates.NEW:\n    case mediaConnectionStates.CHECKING:\n    case mediaConnectionStates.DISCONNECTED:\n      // Media pending: The Call's media is not connected. The Call is working\n      //    to connect media automatically.\n      // These states will occur during Call establishment and may occur midcall if there are\n      //    connection issues (eg. poor network quality) or a Call participant has changed (eg. transfer).\n      ...\n      break\n    case mediaConnectionStates.FAILED:\n     // Media has failed. The call requires a media refresh to restablish.\n     // This state will occur after the `DISCONNECTED` state is encountered.\n     ...\n      break\n    case mediaConnectionStates.CLOSED:\n      // Media ended due to the Call being ended.\n      // This state will occur after Call establishment.\n      ...\n      break\n  }\n}"
             }
           ],
           "params": [],
@@ -40285,7 +40873,7 @@
             {
               "title": "property",
               "name": "NEW",
-              "lineNumber": 25,
+              "lineNumber": 30,
               "description": {
                 "type": "root",
                 "children": [
@@ -40384,7 +40972,7 @@
             {
               "title": "property",
               "name": "CHECKING",
-              "lineNumber": 27,
+              "lineNumber": 32,
               "description": {
                 "type": "root",
                 "children": [
@@ -40517,7 +41105,7 @@
             {
               "title": "property",
               "name": "CONNECTED",
-              "lineNumber": 29,
+              "lineNumber": 34,
               "description": {
                 "type": "root",
                 "children": [
@@ -40616,7 +41204,7 @@
             {
               "title": "property",
               "name": "COMPLETED",
-              "lineNumber": 31,
+              "lineNumber": 36,
               "description": {
                 "type": "root",
                 "children": [
@@ -40681,7 +41269,7 @@
             {
               "title": "property",
               "name": "DISCONNECTED",
-              "lineNumber": 33,
+              "lineNumber": 38,
               "description": {
                 "type": "root",
                 "children": [
@@ -40814,7 +41402,7 @@
             {
               "title": "property",
               "name": "FAILED",
-              "lineNumber": 35,
+              "lineNumber": 40,
               "description": {
                 "type": "root",
                 "children": [
@@ -40823,7 +41411,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection.",
+                        "value": "The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection. See the ",
                         "position": {
                           "start": {
                             "line": 1,
@@ -40832,8 +41420,50 @@
                           },
                           "end": {
                             "line": 1,
-                            "column": 137,
-                            "offset": 136
+                            "column": 146,
+                            "offset": 145
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "url": "#callrestartmedia",
+                        "title": null,
+                        "jsdoc": true,
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "call.restartMedia"
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 146,
+                            "offset": 145
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 171,
+                            "offset": 170
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " API.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 171,
+                            "offset": 170
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 176,
+                            "offset": 175
                           },
                           "indent": []
                         }
@@ -40847,8 +41477,8 @@
                       },
                       "end": {
                         "line": 1,
-                        "column": 137,
-                        "offset": 136
+                        "column": 176,
+                        "offset": 175
                       },
                       "indent": []
                     }
@@ -40862,8 +41492,8 @@
                   },
                   "end": {
                     "line": 1,
-                    "column": 137,
-                    "offset": 136
+                    "column": 176,
+                    "offset": 175
                   }
                 }
               },
@@ -40875,7 +41505,7 @@
             {
               "title": "property",
               "name": "CLOSED",
-              "lineNumber": 36,
+              "lineNumber": 41,
               "description": {
                 "type": "root",
                 "children": [
@@ -40960,6 +41590,1255 @@
             }
           ],
           "namespace": "call.mediaConnectionStates"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Attempt to re-establish a media connection for a call.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 55,
+                        "offset": 54
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 55,
+                    "offset": 54
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This API will perform a \"refresh\" operation on the call with the intention\n   of resolving media issues that may have been encountered. This API is only\n   necessary after the Call's ",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 56
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 31,
+                        "offset": 239
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "mediaConnectionState"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 31,
+                        "offset": 239
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 86,
+                        "offset": 294
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   has entered the ",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 86,
+                        "offset": 294
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 20,
+                        "offset": 314
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "failed",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 20,
+                        "offset": 314
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 28,
+                        "offset": 322
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " state, but may be used in other scenarios.",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 28,
+                        "offset": 322
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 71,
+                        "offset": 365
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 56
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 71,
+                    "offset": 365
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "After the operation completes successfully, the Call will be re-establishing\n   its media connection. By this time, or shortly after, the Call's\n   ",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 1,
+                        "offset": 367
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 4,
+                        "offset": 515
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "mediaConnectionState"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 4,
+                        "offset": 515
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 59,
+                        "offset": 570
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " should have\n   transitioned to ",
+                    "position": {
+                      "start": {
+                        "line": 10,
+                        "column": 59,
+                        "offset": 570
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 20,
+                        "offset": 602
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "checking",
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 20,
+                        "offset": 602
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 30,
+                        "offset": 612
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " (via a\n   ",
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 30,
+                        "offset": 612
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 4,
+                        "offset": 623
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediaconnectionchange",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaConnectionChange"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 4,
+                        "offset": 623
+                      },
+                      "end": {
+                        "line": 12,
+                        "column": 76,
+                        "offset": 695
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   event) to signify the re-establishment. It will then transition to either\n   ",
+                    "position": {
+                      "start": {
+                        "line": 12,
+                        "column": 76,
+                        "offset": 695
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 4,
+                        "offset": 776
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "connected",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 4,
+                        "offset": 776
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 15,
+                        "offset": 787
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " or ",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 15,
+                        "offset": 787
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 19,
+                        "offset": 791
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "failed",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 19,
+                        "offset": 791
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 27,
+                        "offset": 799
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " state, similar to during the initial Call establishment.",
+                    "position": {
+                      "start": {
+                        "line": 14,
+                        "column": 27,
+                        "offset": 799
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 84,
+                        "offset": 856
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 367
+                  },
+                  "end": {
+                    "line": 14,
+                    "column": 84,
+                    "offset": 856
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "If this operation fails, then the Call will not attempt the re-establishment\n   and will remain in the ",
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 1,
+                        "offset": 858
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 27,
+                        "offset": 961
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "failed",
+                    "position": {
+                      "start": {
+                        "line": 17,
+                        "column": 27,
+                        "offset": 961
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 35,
+                        "offset": 969
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " ",
+                    "position": {
+                      "start": {
+                        "line": 17,
+                        "column": 35,
+                        "offset": 969
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 36,
+                        "offset": 970
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "mediaConnectionState"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 17,
+                        "column": 36,
+                        "offset": 970
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 91,
+                        "offset": 1025
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ".",
+                    "position": {
+                      "start": {
+                        "line": 17,
+                        "column": 91,
+                        "offset": 1025
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 92,
+                        "offset": 1026
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 16,
+                    "column": 1,
+                    "offset": 858
+                  },
+                  "end": {
+                    "line": 17,
+                    "column": 92,
+                    "offset": 1026
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Behaviour during the operation may differ slightly based on the browser.\n   Notably, Firefox will always transition to the ",
+                    "position": {
+                      "start": {
+                        "line": 19,
+                        "column": 1,
+                        "offset": 1028
+                      },
+                      "end": {
+                        "line": 20,
+                        "column": 51,
+                        "offset": 1151
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "checking",
+                    "position": {
+                      "start": {
+                        "line": 20,
+                        "column": 51,
+                        "offset": 1151
+                      },
+                      "end": {
+                        "line": 20,
+                        "column": 61,
+                        "offset": 1161
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   ",
+                    "position": {
+                      "start": {
+                        "line": 20,
+                        "column": 61,
+                        "offset": 1161
+                      },
+                      "end": {
+                        "line": 21,
+                        "column": 4,
+                        "offset": 1165
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "mediaConnectionState"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 21,
+                        "column": 4,
+                        "offset": 1165
+                      },
+                      "end": {
+                        "line": 21,
+                        "column": 59,
+                        "offset": 1220
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " no matter what\n   the previous state was. Whereas Chrome will skip the ",
+                    "position": {
+                      "start": {
+                        "line": 21,
+                        "column": 59,
+                        "offset": 1220
+                      },
+                      "end": {
+                        "line": 22,
+                        "column": 57,
+                        "offset": 1292
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "checking",
+                    "position": {
+                      "start": {
+                        "line": 22,
+                        "column": 57,
+                        "offset": 1292
+                      },
+                      "end": {
+                        "line": 22,
+                        "column": 67,
+                        "offset": 1302
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " state,\n   transitioning directly to either ",
+                    "position": {
+                      "start": {
+                        "line": 22,
+                        "column": 67,
+                        "offset": 1302
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 37,
+                        "offset": 1346
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "connected",
+                    "position": {
+                      "start": {
+                        "line": 23,
+                        "column": 37,
+                        "offset": 1346
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 48,
+                        "offset": 1357
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " or ",
+                    "position": {
+                      "start": {
+                        "line": 23,
+                        "column": 48,
+                        "offset": 1357
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 52,
+                        "offset": 1361
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "failed",
+                    "position": {
+                      "start": {
+                        "line": 23,
+                        "column": 52,
+                        "offset": 1361
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 60,
+                        "offset": 1369
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ". This has the\n   implication for Chrome that if the state does not change (for example,\n   the Call is in the ",
+                    "position": {
+                      "start": {
+                        "line": 23,
+                        "column": 60,
+                        "offset": 1369
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 23,
+                        "offset": 1480
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "failed",
+                    "position": {
+                      "start": {
+                        "line": 25,
+                        "column": 23,
+                        "offset": 1480
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 31,
+                        "offset": 1488
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " state before the media restart operation,\n   and media re-establishment fails), then there will be no\n   ",
+                    "position": {
+                      "start": {
+                        "line": 25,
+                        "column": 31,
+                        "offset": 1488
+                      },
+                      "end": {
+                        "line": 27,
+                        "column": 4,
+                        "offset": 1594
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediaconnectionchange",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaConnectionChange"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 27,
+                        "column": 4,
+                        "offset": 1594
+                      },
+                      "end": {
+                        "line": 27,
+                        "column": 76,
+                        "offset": 1666
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   event emitted. For this reason, Chrome-based applications may need a\n   short delay after receiving the ",
+                    "position": {
+                      "start": {
+                        "line": 27,
+                        "column": 76,
+                        "offset": 1666
+                      },
+                      "end": {
+                        "line": 29,
+                        "column": 36,
+                        "offset": 1774
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediarestart",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaRestart"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 29,
+                        "column": 36,
+                        "offset": 1774
+                      },
+                      "end": {
+                        "line": 29,
+                        "column": 90,
+                        "offset": 1828
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   event before checking the Call's updated\n   ",
+                    "position": {
+                      "start": {
+                        "line": 29,
+                        "column": 90,
+                        "offset": 1828
+                      },
+                      "end": {
+                        "line": 31,
+                        "column": 4,
+                        "offset": 1876
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callmediaconnectionstates",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "mediaConnectionState"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 31,
+                        "column": 4,
+                        "offset": 1876
+                      },
+                      "end": {
+                        "line": 31,
+                        "column": 59,
+                        "offset": 1931
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " to ensure the\n   application is acting on the \"latest\" state.",
+                    "position": {
+                      "start": {
+                        "line": 31,
+                        "column": 59,
+                        "offset": 1931
+                      },
+                      "end": {
+                        "line": 32,
+                        "column": 48,
+                        "offset": 1993
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 19,
+                    "column": 1,
+                    "offset": 1028
+                  },
+                  "end": {
+                    "line": 32,
+                    "column": 48,
+                    "offset": 1993
+                  },
+                  "indent": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The SDK will emit a ",
+                    "position": {
+                      "start": {
+                        "line": 34,
+                        "column": 1,
+                        "offset": 1995
+                      },
+                      "end": {
+                        "line": 34,
+                        "column": 21,
+                        "offset": 2015
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcallmediarestart",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:mediaRestart"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 34,
+                        "column": 21,
+                        "offset": 2015
+                      },
+                      "end": {
+                        "line": 34,
+                        "column": 75,
+                        "offset": 2069
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n   event when the operation completes.",
+                    "position": {
+                      "start": {
+                        "line": 34,
+                        "column": 75,
+                        "offset": 2069
+                      },
+                      "end": {
+                        "line": 35,
+                        "column": 39,
+                        "offset": 2108
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 34,
+                    "column": 1,
+                    "offset": 1995
+                  },
+                  "end": {
+                    "line": 35,
+                    "column": 39,
+                    "offset": 2108
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The progress of the operation will be tracked via the\n   ",
+                    "position": {
+                      "start": {
+                        "line": 37,
+                        "column": 1,
+                        "offset": 2110
+                      },
+                      "end": {
+                        "line": 38,
+                        "column": 4,
+                        "offset": 2167
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "link",
+                    "url": "#calleventcalloperation",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call:operation"
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 38,
+                        "column": 4,
+                        "offset": 2167
+                      },
+                      "end": {
+                        "line": 38,
+                        "column": 52,
+                        "offset": 2215
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " event.",
+                    "position": {
+                      "start": {
+                        "line": 38,
+                        "column": 52,
+                        "offset": 2215
+                      },
+                      "end": {
+                        "line": 38,
+                        "column": 59,
+                        "offset": 2222
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 37,
+                    "column": 1,
+                    "offset": 2110
+                  },
+                  "end": {
+                    "line": 38,
+                    "column": 59,
+                    "offset": 2222
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 38,
+                "column": 59,
+                "offset": 2222
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 39,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 40
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 41
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 42,
+              "name": "restartMedia"
+            },
+            {
+              "title": "param",
+              "description": "The ID of the call to act on.",
+              "lineNumber": 43,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "callId"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 1357,
+              "column": 4
+            },
+            "end": {
+              "line": 1401,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 1402,
+                "column": 4
+              },
+              "end": {
+                "line": 1405,
+                "column": 5
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "callId",
+              "lineNumber": 43,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The ID of the call to act on.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 30,
+                            "offset": 29
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 30,
+                        "offset": 29
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 30,
+                    "offset": 29
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "call",
+          "kind": "function",
+          "name": "restartMedia",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "restartMedia",
+              "kind": "function",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.restartMedia"
         },
         {
           "description": {
@@ -41264,23 +43143,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1349,
+              "line": 1407,
               "column": 4
             },
             "end": {
-              "line": 1365,
+              "line": 1423,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1347,
+                "line": 1402,
                 "column": 4
               },
               "end": {
-                "line": 1347,
-                "column": 55
+                "line": 1405,
+                "column": 5
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
@@ -41579,23 +43458,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1367,
+              "line": 1425,
               "column": 4
             },
             "end": {
-              "line": 1404,
+              "line": 1462,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1347,
+                "line": 1402,
                 "column": 4
               },
               "end": {
-                "line": 1347,
-                "column": 55
+                "line": 1405,
+                "column": 5
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
@@ -41944,23 +43823,23 @@
           ],
           "loc": {
             "start": {
-              "line": 1406,
+              "line": 1464,
               "column": 4
             },
             "end": {
-              "line": 1443,
+              "line": 1501,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1347,
+                "line": 1402,
                 "column": 4
               },
               "end": {
-                "line": 1347,
-                "column": 55
+                "line": 1405,
+                "column": 5
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"

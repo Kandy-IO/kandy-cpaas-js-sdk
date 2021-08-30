@@ -5,6 +5,25 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.31.0 - 2021-08-30
+
+### Added
+
+- Added support for additional parameters that are passed into the `config.call.iceCollectionCheck` function, in order for application to better decide when it collected good enough ICE candidates for the media call. `KJS-202`
+- Added Call functionality to restart media after a connection failure. `KJS-86`, `KJS-68`
+  - A new `call.mediaRestart` API has been added to trigger the restart operation. Please see its description for more information.
+  - A new `call:mediaRestart` event has been added to signify the result of the operation.
+- Added exception handling to the SDP handler pipeline. If any handler throws an exception, it's now logged and execution continues with the next handler in the pipeline. `KJS-46`
+- Added previous media connection state to `call:mediaConnectionChange` event data. `KJS-96`
+- Added improved Call handling for local network errors occurring during hold and unhold midcall operations. `KJS-127`
+
+### Fixed
+
+- Fixed a Call issue for slow-start operations where the call would not enter 'On Hold' state in certain scenarios. `KJS-259`
+- Fixed an issue with the `updateConfig()` API where it would merge arrays instead of replace them. `KJS-205`
+- Updated internal timing provided to the `call.iceCollectionCheck` configuration function to be more accurate. `KJS-123`
+  - The `elapsedTime` parameter will be the actual time rather than based on the `call.iceCollectionDelay` value.
+
 ## 4.30.1 - 2021-08-11
 
 ### Fixed
@@ -15,7 +34,7 @@ Kandy.js change log.
 
 ### Added
 
-- Added new Call tutorial for Device Handling. `KJS-144`
+- Added new Call tutorial for Device Handling. `KJS-152`
 
 ### Changed
 
@@ -33,18 +52,18 @@ With this release we're announcing the default SDP semantics are changing to the
 
 ### Added
 
-- Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-120`, `KJS-173`
+- Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-141`, `KJS-223`
   - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted everytime the media connection state is changed.
-- Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-150`
-- Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-162`
+- Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-106`
+- Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-159`
 
 ### Fixed
 
-- Reworked Call audits so that the audits are performed with more consistency with respect to the interval. `KJS-149`
+- Reworked Call audits so that the audits are performed with more consistency with respect to the interval. `KJS-105`
 - Fixed a Call issue where the SDK incorrectly handled remote operations from SIP devices in specific scenarios. `KAA-2593`
   - The SDK will now have better interop with remote endpoints that do not have `a=mid` lines in their initial offer.
 - Switched from using String.prototype.replaceAll to String.prototype.replace and using regex to do the correct string replacement. Some browsers don't yet
-  support replaceAll. `KJS-164`
+  support replaceAll. `KJS-82`
 - Fixed a Call issue where a remote hold operation would not be processed correctly in some scenarios. `KAA-2639`
 
 ## 4.28.0 - 2021-05-28
