@@ -511,6 +511,17 @@
                   </li>
                 <li><span style="color:magenta">ⓝ</span><a href='#connection' class=" toggle-sibling"> api.connection <span class='icon'>▸</span> </a><div class='toggle-target display-none'>
                           <ul class='list-reset py1-ul pl1'>
+                          <li class='h5'><span>Types</span></li>
+                          
+                            <li><a
+                              href='#connectionwsconnectionobject'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> WSConnectionObject
+                            </a></li>
+                          
+                          </ul>
+                        
+                          <ul class='list-reset py1-ul pl1'>
                           <li class='h5'><span>Functions</span></li>
                           
                             <li><a
@@ -9881,6 +9892,324 @@ the SDK and one or more backend servers.</p>
   
 
   
+      <div class='py1 quiet mt1 prose-big'>Types</div>
+      <div class="clearfix">
+  
+    <div class='border-bottom' id='connectionwsconnectionobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>WSConnectionObject</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Information about a websocket connection.</p>
+<p>Can be retrieved using the <a href="#connectiongetsocketstate">connection.getSocketState</a> API.</p>
+
+
+  <div class='pre p1 fill-light mt0'>WSConnectionObject</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>connected</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : The state of the websocket connection.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>pinging</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : True if the client has sent a ping to the server and is still waiting for a pong response.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>method</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)
+          </code>
+
+          
+
+          
+             : Information about how the websocket is being used.
+
+          
+          
+            <ul>
+              
+                <li><code>method.type</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>How the websocket is staying connected.</p>
+</li>
+              
+                <li><code>method.responsibleParty</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>Who is responsible for keeping the connection alive.</p>
+</li>
+              
+            </ul>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>platform</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The SDK platform being used.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>pingInterval</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : How often the client will ping the server to test for websocket connectivity.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>reconnectLimit</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : How many times the SDK will try to reconnect a disconnected websocket.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>reconnectDelay</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : How long the SDK will wait before retrying websocket reconnection.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>reconnectTimeMultiplier</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this after each failed reconnect attempt to increase the delay between attempts. eg. 5000ms then 10000ms then 20000ms delay if value is 2.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>reconnectTimeLimit</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with 
+<code>reconnectTimeMultiplier</code>
+ to prevent overly long delays between reconnection attempts.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>autoReconnect</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)
+          </code>
+
+          
+
+          
+             : Indicates if the SDK should automatically try reconnecting a disconnected websocket.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>maxMissedPings</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : How many missed pings before the SDK stops trying to reconnect a disconnected websocket.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>webSocketOAuthMode</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The mode used for authenticating with the server.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>wsInfo</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)
+          </code>
+
+          
+
+          
+             : Information required to connect a websocket to the server.
+
+          
+          
+            <ul>
+              
+                <li><code>wsInfo.protocol</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>The protocol to use to connect a websocket.</p>
+</li>
+              
+                <li><code>wsInfo.server</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>The domain name or IP address of the server to connect to.</p>
+</li>
+              
+                <li><code>wsInfo.port</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?
+                  
+                  <p>The port of the server to connect to.</p>
+</li>
+              
+                <li><code>wsInfo.url</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>The URL path to use to request a websocket connection.</p>
+</li>
+              
+                <li><code>wsInfo.params</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
+                  
+                  <p>Any additional params that might be required by the server to establish the websocket connection.</p>
+</li>
+              
+            </ul>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>lastContact</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : The date and time that the last known contact with the server was.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+    
 
     
       <div class='py1 quiet mt1 prose-big'>Functions</div>
@@ -9901,7 +10230,7 @@ the SDK and one or more backend servers.</p>
   <p>Get the state of the websocket.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getSocketState(platform: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  <div class='pre p1 fill-light mt0'>getSocketState(platform: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="#connectionwsconnectionobject">connection.WSConnectionObject</a></div>
   
   
 
@@ -9931,6 +10260,16 @@ the SDK and one or more backend servers.</p>
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="#connectionwsconnectionobject">connection.WSConnectionObject</a></code>:
+          Details about the current websocket connection, including state and configuration.
+
+        
+      </div>
+    
   
 
   
