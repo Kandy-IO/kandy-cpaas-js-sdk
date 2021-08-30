@@ -19,6 +19,7 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed a Call issue for slow-start operations where the call would not enter 'On Hold' state in certain scenarios. `KJS-259`
 - Fixed an issue with the `updateConfig()` API where it would merge arrays instead of replace them. `KJS-205`
 - Updated internal timing provided to the `call.iceCollectionCheck` configuration function to be more accurate. `KJS-123`
   - The `elapsedTime` parameter will be the actual time rather than based on the `call.iceCollectionDelay` value.
