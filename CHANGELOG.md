@@ -11,6 +11,10 @@ Kandy.js change log.
 
 - Added an extra property `iceCollectionDelay` as part of `extraInfo` parameter that is pased to `iceCollectionCheck` function. This will further improve the application's side in making a decision whether it has collected good enough ICE candidates. `KJS-253`
 
+### Fixed
+
+- Update notifications plugin state when a websocket connection is removed to indicate the websocket channel is no longer enabled. `KJS-209`
+
 ### Changed
 
 - Changed the logic for triggering the ICE collection loop, by also triggering this loop when a new ICE candidate is discovered on local PeerConnection. This will speed up the Peer negotiation process. `KJS-122`
