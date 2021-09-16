@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.32.0-beta.750
+ * Version: 4.32.0-beta.751
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6496,7 +6496,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.32.0-beta.750';
+  return '4.32.0-beta.751';
 }
 
 /***/ }),
@@ -34698,7 +34698,6 @@ function onicecandidate(listener) {
     // Keep track of all candidates gathered by this collection process.
     if (event.candidate !== null) {
       iceCandidates.push(event.candidate);
-      emitter.emit('onicecandidate');
     }
 
     if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.FULL) {
@@ -34735,6 +34734,7 @@ function onicecandidate(listener) {
       }
     }
   };
+
   return true;
 }
 
@@ -35928,38 +35928,17 @@ function setLocalDescription(desc) {
     });
   }
 
-  let negotiationReady = false;
-
   return new _promise2.default((resolve, reject) => {
     // We always want to wait for the PeerConnection to be ready for
     //    negotiation before resolving setLocalDescription.
     // Each trickle ICE option (FULL/HALF/NONE) emits "negotiation ready" event once.
     emitter.once('onnegotiationready', () => {
-      negotiationReady = true;
-      if (this.iceLoop) {
-        // Cleanup of the handler, so that if there is a pending invocation of iceCollectionLoop
-        // it will be cancelled by this code right away.
-        clearTimeout(this.iceLoop);
-      }
-
       if (iceTimer.isStarted()) {
         // In a HALF trickle scenario, the Peer will be ready for negotiation
         //    before ICE collection has completed. Log that timing.
         log.debug(`Took ${iceTimer.timeFromStart()}ms to collect ICE candidates before negotiation.`);
       }
       resolve();
-    });
-
-    // This listener function is called before we even start the
-    // ice collection loop, so this.iceLoop is not even set at that time.
-    emitter.on('onicecandidate', () => {
-      // Call iceCollectionLoop function every time we got a new ICE candidate,
-      // because this way, there is a good chance we'll gather good enough candidates faster, than
-      // waiting to trigger it as a result of a timeout dictated by the value of: config.iceCollectionDelay
-      if (!negotiationReady) {
-        log.debug('Got a new ice candidate. Triggering iceCollectionLoop to see if we have good enough candidates...');
-        (0, _iceCollectionLoop2.default)(this, offeredMedia, true);
-      }
     });
 
     nativePeer.setLocalDescription(desc).then(() => {
@@ -36031,10 +36010,8 @@ exports.default = iceCollectionLoop;
  * @method iceCollectionLoop
  * @param {Object} proxyBase The "base" of the Proxy Peer object.
  * @param {Array} offeredMedia The array of media that this Peer offers to the remote.
- * @param {Boolean} oneTimeCheck Flag to specify if the invocation of this function will result in a further recursive call or not.
- *    If is true, then this function will not retrigger itself.
  */
-function iceCollectionLoop(proxyBase, offeredMedia, oneTimeCheck) {
+function iceCollectionLoop(proxyBase, offeredMedia) {
   const { proxyPeer, iceTimer, iceCandidates, emitter, config, log } = proxyBase;
 
   // If gathering completed during the delay, we don't need to loop anymore.
@@ -36070,13 +36047,11 @@ function iceCollectionLoop(proxyBase, offeredMedia, oneTimeCheck) {
     iceCandidates.length = 0;
     emitter.emit('onnegotiationready');
   } else {
-    if (!oneTimeCheck) {
-      log.debug(`ICE candidates not sufficient for negotiation, delaying another ${config.iceCollectionDelay}ms.`);
-      // Add the timeout to the base so it can be cleared from elsewhere if needed.
-      proxyBase.iceLoop = setTimeout(function () {
-        iceCollectionLoop(proxyBase, offeredMedia);
-      }, config.iceCollectionDelay);
-    }
+    log.debug(`ICE candidates not sufficient for negotiation, delaying another ${config.iceCollectionDelay}ms.`);
+    // Add the timeout to the base so it can be cleared from elsewhere if needed.
+    proxyBase.iceLoop = setTimeout(function () {
+      iceCollectionLoop(proxyBase, offeredMedia);
+    }, config.iceCollectionDelay);
   }
 }
 
