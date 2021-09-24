@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.32.0 - beta
+## 4.32.0 - 2021-09-24
 
 ### Added
 
@@ -14,6 +14,7 @@ Kandy.js change log.
 ### Fixed
 
 - Update notifications plugin state when a websocket connection is removed to indicate the websocket channel is no longer enabled. `KJS-209`
+- Fixed a Call issue where receiving a compressed SDP would cause the operation to fail `KJS-328`
 
 ## 4.31.0 - 2021-08-30
 
