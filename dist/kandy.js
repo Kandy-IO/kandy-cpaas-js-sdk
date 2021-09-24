@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.31.0
+ * Version: 4.32.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6496,7 +6496,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.31.0';
+  return '4.32.0';
 }
 
 /***/ }),
@@ -36032,7 +36032,8 @@ function iceCollectionLoop(proxyBase, offeredMedia) {
     iceServerUrls: config.rtcConfig.iceServers.map(iceServer => iceServer.url),
     elapsedTime: elapsedTime,
     maxIceTimeout: config.maxIceTimeout,
-    offeredMedia: offeredMedia
+    offeredMedia: offeredMedia,
+    iceCollectionDelay: config.iceCollectionDelay
   });
 
   const hasReachedTimeout = elapsedTime >= config.maxIceTimeout;
@@ -36523,7 +36524,9 @@ function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
 
 /**
  * Default function to determine if the ice candidates is enough to negotiate.
+ *
  * We assume that: at least one relay candidate is good enough to try negotiation.
+ *
  * @method iceCollectionCheck
  * @param {Array<RTCIceCandidate>} iceCandidates List of collected ICE candidates.
  * @param {Object} extraInfo Additional information that can help in the decision making.
@@ -36531,9 +36534,12 @@ function isPassedHalfTrickleThreshold({ sdp, iceCandidate, time }) {
  * @param {Array} extraInfo.iceServerUrls The Urls for the provided ICE servers, as a list.
  *        (ICE server information is supplied in the configuration passed to SDK)
  *        The urls are of the form: ('stun'|'turn'):<ICE_server_domain_address>:<ICE_server_port_number>?transport:('udp'|'tcp')
- * @param {Number} extraInfo.elapsedTime The time, in milliseconds, that ICE collection has taken so far.
- * @param {Number} extraInfo.maxIceTimeout The time, in milliseconds, that ICE collection will be allowed to take.
+ * @param {number} extraInfo.elapsedTime The time, in milliseconds, that ICE collection has taken so far.
+ * @param {number} extraInfo.maxIceTimeout The time, in milliseconds, that ICE collection will be allowed to take.
  * @param {Array} extraInfo.offeredMedia List of media offered by the local Peer.
+ * @param {number} extraInfo.iceCollectionDelay Time, in milliseconds, to delay in between
+ *    ICE candidate checks. If ICE collection does not complete normally, the SDK will check
+ *    collected candidates at this interval to determine if the operation can continue.
  * @return {Boolean} Whether the ice Candidates is enough for negotiation.
  */
 function iceCollectionCheck(iceCandidates, extraInfo) {
@@ -50424,14 +50430,48 @@ const log = _logs.logManager.getLogger('CONNECTIVITY');
  * @namespace connection
  */
 
+/**
+ * Information about a websocket connection.
+ *
+ * Can be retrieved using the {@link connection.getSocketState} API.
+ *
+ * @public
+ * @static
+ * @typedef {Object} WSConnectionObject
+ * @memberof connection
+ * @property {boolean} connected The state of the websocket connection.
+ * @property {boolean} pinging True if the client has sent a ping to the server and is still waiting for a pong response.
+ * @property {Object} method Information about how the websocket is being used.
+ * @property {string} [method.type] How the websocket is staying connected.
+ * @property {string} [method.responsibleParty] Who is responsible for keeping the connection alive.
+ * @property {string} platform The SDK platform being used.
+ * @property {number} pingInterval How often the client will ping the server to test for websocket connectivity.
+ * @property {number} reconnectLimit How many times the SDK will try to reconnect a disconnected websocket.
+ * @property {number} reconnectDelay How long the SDK will wait before retrying websocket reconnection.
+ * @property {number} reconnectTimeMultiplier Reconnect delay multiplier for subsequent attempts. The reconnect delay time will be multiplied by this after each failed reconnect attempt to increase the delay between attempts. eg. 5000ms then 10000ms then 20000ms delay if value is 2.
+ * @property {number} reconnectTimeLimit Maximum time delay between reconnect attempts (milliseconds). Used in conjunction with `reconnectTimeMultiplier` to prevent overly long delays between reconnection attempts.
+ * @property {boolean} autoReconnect Indicates if the SDK should automatically try reconnecting a disconnected websocket.
+ * @property {number} maxMissedPings How many missed pings before the SDK stops trying to reconnect a disconnected websocket.
+ * @property {string} webSocketOAuthMode The mode used for authenticating with the server.
+ * @property {Object} wsInfo Information required to connect a websocket to the server.
+ * @property {string} [wsInfo.protocol] The protocol to use to connect a websocket.
+ * @property {string} [wsInfo.server] The domain name or IP address of the server to connect to.
+ * @property {number} [wsInfo.port] The port of the server to connect to.
+ * @property {string} [wsInfo.url] The URL path to use to request a websocket connection.
+ * @property {string} [wsInfo.params] Any additional params that might be required by the server to establish the websocket connection.
+ * @property {number} lastContact The date and time that the last known contact with the server was.
+ */
+
 function api({ dispatch, getState }) {
   const connectivityApi = {
     /**
      * Get the state of the websocket.
      * @public
+     * @static
      * @memberof connection
      * @method getSocketState
      * @param {string} [platform='link'] Backend platform for which to request the websocket's state.
+     * @return {connection.WSConnectionObject} Details about the current websocket connection, including state and configuration.
      */
     getSocketState(platform = _constants.platforms.LINK) {
       log.debug(_logs.API_LOG_TAG + 'connection.getSocketState: ', platform);
@@ -54611,6 +54651,21 @@ reducers[_actionTypes2.WS_CONNECT_FINISHED] = {
     return (0, _extends3.default)({}, state, {
       WEBSOCKET: (0, _extends3.default)({}, state.WEBSOCKET, {
         channelEnabled: true
+      })
+    });
+  }
+};
+
+/*
+ * The websocket channel is assumed to be disabled when the
+ *      websocket is closed.
+ */
+reducers[_actionTypes2.WS_DISCONNECT_FINISHED] = {
+  next(state) {
+    // TODO: Link WS only?
+    return (0, _extends3.default)({}, state, {
+      WEBSOCKET: (0, _extends3.default)({}, state.WEBSOCKET, {
+        channelEnabled: false
       })
     });
   }
