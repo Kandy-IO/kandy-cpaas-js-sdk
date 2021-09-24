@@ -9,6 +9,10 @@
   <body>
     <div id="docute"></div>
     <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
+    <!-- Load mermaid as per guidelines here: https://docute.org/guide/markdown-features#using-mermaid -->
+    <script src="https://unpkg.com/mermaid@8.11.5/dist/mermaid.min.js"></script>
+    <!-- Load the mermaid plugin -->
+    <script src="https://unpkg.com/docute-mermaid@1.1.0/dist/index.min.js"></script>
     <script src="//cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
     <script type="module">
       import { configs } from './config.js'
@@ -136,6 +140,7 @@
         target: '#docute',
         sidebar,
         plugins: [
+          docuteMermaid(),
           {
             name: 'Hide Front Matter',
             extend(api) {

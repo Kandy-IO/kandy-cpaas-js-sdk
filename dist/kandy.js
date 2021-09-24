@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.32.0-beta.758
+ * Version: 4.33.0-beta.759
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6496,7 +6496,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.32.0-beta.758';
+  return '4.33.0-beta.759';
 }
 
 /***/ }),
@@ -13309,6 +13309,7 @@ function Track(mediaTrack, mediaStream) {
   const id = mediaTrack.id;
   const track = mediaTrack;
   let stream = mediaStream;
+  let isLocalTrack;
   const containers = [];
   let constraints = {};
   const emitter = new _eventemitter2.default();
@@ -13340,7 +13341,9 @@ function Track(mediaTrack, mediaStream) {
   track.onmute = event => {
     log.debug('Event emitted: ', event);
     emitter.emit('muted', {
-      trackId: track.id
+      trackId: track.id,
+      mediaId: stream.id,
+      isLocal: isLocalTrack
     });
   };
 
@@ -13352,9 +13355,19 @@ function Track(mediaTrack, mediaStream) {
   track.onunmute = event => {
     log.debug('Event emitted: ', event);
     emitter.emit('unmuted', {
-      trackId: track.id
+      trackId: track.id,
+      mediaId: stream.id,
+      isLocal: isLocalTrack
     });
   };
+
+  function setIsLocal(isLocal) {
+    isLocalTrack = isLocal;
+  }
+
+  function isLocal() {
+    return isLocalTrack;
+  }
 
   function setStream(newStream) {
     stream = newStream;
@@ -13373,6 +13386,7 @@ function Track(mediaTrack, mediaStream) {
       id,
       streamId: stream.id,
       kind: track.kind,
+      isLocal: isLocalTrack,
       label: track.label,
       muted: track.muted,
       enabled: track.enabled,
@@ -13639,7 +13653,9 @@ function Track(mediaTrack, mediaStream) {
     // TODO: Find a better solution.
     track,
     setStream,
-    getStream
+    getStream,
+    setIsLocal,
+    isLocal
   };
 }
 
@@ -28985,12 +29001,12 @@ function unmuteTracksFinish(trackIds) {
   return trackHelper(actionTypes.UNMUTE_TRACKS_FINISH, { trackIds: trackIds });
 }
 
-function trackSourceMuted(trackIds) {
-  return trackHelper(actionTypes.TRACK_SOURCE_MUTED, { trackIds: trackIds });
+function trackSourceMuted(trackIds, params) {
+  return trackHelper(actionTypes.TRACK_SOURCE_MUTED, (0, _extends3.default)({ trackIds: trackIds }, params));
 }
 
-function trackSourceUnmuted(trackIds) {
-  return trackHelper(actionTypes.TRACK_SOURCE_UNMUTED, { trackIds: trackIds });
+function trackSourceUnmuted(trackIds, params) {
+  return trackHelper(actionTypes.TRACK_SOURCE_UNMUTED, (0, _extends3.default)({ trackIds: trackIds }, params));
 }
 
 function renderTracks(trackIds, params) {
@@ -29822,21 +29838,27 @@ events[actionTypes.UNMUTE_TRACKS_FINISH] = action => {
 };
 
 events[actionTypes.TRACK_SOURCE_MUTED] = action => {
+  // Issue an event containing parameters similar to what call:trackEnded event has.
   return {
     type: eventTypes.TRACK_SOURCE_MUTED,
     args: {
       trackIds: action.payload.trackIds,
-      trackId: action.payload.trackIds[0]
+      trackId: action.payload.trackIds[0],
+      isLocal: action.payload.isLocal,
+      id: action.payload.mediaId
     }
   };
 };
 
 events[actionTypes.TRACK_SOURCE_UNMUTED] = action => {
+  // Issue an event containing parameters similar to what call:trackEnded event has.
   return {
     type: eventTypes.TRACK_SOURCE_UNMUTED,
     args: {
       trackIds: action.payload.trackIds,
-      trackId: action.payload.trackIds[0]
+      trackId: action.payload.trackIds[0],
+      isLocal: action.payload.isLocal,
+      id: action.payload.mediaId
     }
   };
 };
@@ -30175,12 +30197,12 @@ function setListeners(track, emit, END = 'END') {
   // An example of a track source is a physical media device such as:
   // microphone or camera.
   const trackSourceMuted = trackData => {
-    emit(_actions.trackActions.trackSourceMuted([trackData.trackId]));
+    emit(_actions.trackActions.trackSourceMuted([trackData.trackId], { mediaId: trackData.mediaId, isLocal: trackData.isLocal }));
   };
 
   // The track source (which affected the track identified by trackId) was unmuted.
   const trackSourceUnmuted = trackData => {
-    emit(_actions.trackActions.trackSourceUnmuted([trackData.trackId]));
+    emit(_actions.trackActions.trackSourceUnmuted([trackData.trackId], { mediaId: trackData.mediaId, isLocal: trackData.isLocal }));
   };
 
   track.on('ended', trackEnded);
@@ -34923,7 +34945,8 @@ function ontrack(listener) {
     }
 
     // Convert the native MediaStreamTrack into a Track object.
-    const track = trackManager.add(nativeTrack, targetStream);
+    // Specify that this is not a local one (i.e. it's a remote track)
+    const track = trackManager.add(nativeTrack, targetStream, false);
 
     listener(track);
   };
@@ -36761,8 +36784,10 @@ function MediaManager(managers) {
     log.debug(`Creating Media with ID: ${media.id}.`);
 
     // Only add tracks to a Media objects using the `addTrack` method.
+    // Specify that this is a local track we're adding
     mediaStream.getTracks().forEach(nativeTrack => {
-      const wrappedTrack = trackManager.add(nativeTrack, mediaStream);
+      const wrappedTrack = trackManager.add(nativeTrack, mediaStream, true);
+
       media.addTrack(wrappedTrack);
     });
 
@@ -38370,9 +38395,10 @@ function TrackManager() {
    * @method add
    * @param  {MediaStreamTrack} track A native track object.
    * @param  {MediaStream} stream
+   * @param  {boolean} isLocalTrack Specifies if the track parameter is a local one or a remote one.
    * @return {Track} The added/wrapped Track object.
    */
-  function add(track, stream) {
+  function add(track, stream, isLocalTrack) {
     const targetTrack = tracks.get(track.id);
 
     // Chrome issue: track.stream is outdated and needs to be updated to newStream.
@@ -38389,6 +38415,10 @@ function TrackManager() {
     } else {
       // Wrap the track as a Track object.
       const wrappedTrack = new _track2.default(track, stream);
+
+      // Mark it as local (or remote) before we save it in the state
+      wrappedTrack.setIsLocal(isLocalTrack);
+
       tracks.set(track.id, wrappedTrack);
 
       // Remove the track from the manager when it ends.
@@ -38953,6 +38983,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @memberof call
  * @property {Array<string>} containers The list of CSS selectors that were used to render this Track.
  * @property {boolean} disabled Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+ * @property {boolean} isLocal Indicator of whether this Track is a locally created one or is a remote one.
  * @property {string} id The ID of the Track.
  * @property {string} kind The kind of Track this is (audio, video).
  * @property {string} label The label of the device this Track uses.
@@ -45184,6 +45215,33 @@ function* addMedia(deps, action) {
 
   if (response.error) {
     log.info('Failed to add media to call.');
+    // Rollback is not supported on safari or plan-b
+    const { sdpSemantics } = yield (0, _effects2.select)(_selectors.getOptions);
+    if (sdpSemantics === 'unified-plan') {
+      const result = yield (0, _effects2.call)(rollbackOps.rollbackLocalAddMedia, deps, webrtcSessionId, medias);
+      const browser = deps.browserDetails().browser;
+      // There is an issue on Chrome where the remote track is removed from the call when the SDP rolls back
+      //  leaving the call in an awkward state.
+      if (result.error || browser === 'chrome') {
+        // Although Safari can automatically rollback and set another local offer while in `have-local-offer`
+        //  signalling state, Safari does not perform an automatic rollback when a remote offer is
+        //  received while in that state. An InvalidStateError is thrown instead and call is in an awkward state.
+        if (browser === 'safari' || browser === 'chrome') {
+          log.info('Ending call due to unrecoverable state after call add media failure.');
+          // Hangup the call from WebRTC perspective
+          yield (0, _effects2.call)(_midcall.closeCall, deps.webRTC, webrtcSessionId);
+
+          // Cleanup Redux state by sending END_CALL_FINISH action
+          yield (0, _effects2.put)(_actions.callActions.endCallFinish(id, {
+            isLocal: true,
+            transition: { reasonText: 'Call has ended due to call add media failure.' }
+          }));
+          return;
+        }
+        log.info('Unable to reset state after add media operation failure, future operations may not work as intended.');
+      }
+    }
+
     yield (0, _effects2.put)(_actions.callActions.addMediaFinish(id, {
       local: true,
       error: response.error
@@ -45295,6 +45353,30 @@ function* removeMedia(deps, action) {
 
   if (response.error) {
     log.info('Failed to remove media from call.');
+    // Rollback is not supported on Safari or plan-b
+    const { sdpSemantics } = yield (0, _effects2.select)(_selectors.getOptions);
+    if (sdpSemantics === 'unified-plan') {
+      const result = yield (0, _effects2.call)(rollbackOps.rollbackLocalRemoveMedia, deps, webrtcSessionId);
+      if (result.error) {
+        // Although Safari can automatically rollback and set another local offer while in `have-local-offer`
+        //  signalling state, Safari does not perform an automatic rollback when a remote offer is
+        //  received while in that state. An InvalidStateError is thrown instead and call is in an awkward state.
+        if (deps.browserDetails().browser === 'safari') {
+          log.info('Ending call due to unrecoverable state after call hold failure.');
+          // Hangup the call from WebRTC perspective
+          yield (0, _effects2.call)(_midcall.closeCall, deps.webRTC, webrtcSessionId);
+
+          // Cleanup Redux state by sending END_CALL_FINISH action
+          yield (0, _effects2.put)(_actions.callActions.endCallFinish(id, {
+            isLocal: true,
+            transition: { reasonText: 'Call has ended due to call hold failure.' }
+          }));
+          return;
+        }
+        log.info('Unable to reset state after hold operation failure, future operations may not work as intended.');
+      }
+    }
+
     yield (0, _effects2.put)(_actions.callActions.removeMediaFinish(id, {
       local: true,
       error: response.error
@@ -45990,12 +46072,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.rollbackLocalHoldOperation = rollbackLocalHoldOperation;
 exports.rollbackLocalUnholdOperation = rollbackLocalUnholdOperation;
+exports.rollbackLocalAddMedia = rollbackLocalAddMedia;
+exports.rollbackLocalRemoveMedia = rollbackLocalRemoveMedia;
 
 var _logs = __webpack_require__(3);
 
 var _effects = __webpack_require__(1);
 
-// Other Plugins
+var _fp = __webpack_require__(2);
+
+// Libraries
 const log = _logs.logManager.getLogger('CALLSTACK');
 
 /**
@@ -46011,15 +46097,13 @@ const log = _logs.logManager.getLogger('CALLSTACK');
  * @param {string} sessionId the local webRTC session id, used to lookup the session object
  * @return {Object} offer object containing a Session Description Protocol
  */
-
-
-// Libraries
+// Other Plugins
 function* rollbackLocalHoldOperation(deps, sessionId) {
   const { webRTC } = deps;
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   if (!session) {
-    log.debug(`webRTC session ${sessionId} not found.`);
+    log.debug(`WebRTC session ${sessionId} not found.`);
     return;
   }
 
@@ -46061,7 +46145,7 @@ function* rollbackLocalUnholdOperation(deps, sessionId) {
   const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
 
   if (!session) {
-    log.debug(`webRTC session ${sessionId} not found.`);
+    log.debug(`WebRTC session ${sessionId} not found.`);
     return;
   }
 
@@ -46070,6 +46154,109 @@ function* rollbackLocalUnholdOperation(deps, sessionId) {
     audio: 'inactive',
     video: 'inactive'
   });
+
+  // Rollback the local offer
+  let offer;
+  try {
+    offer = yield (0, _effects.call)([session, 'rollbackLocalDescription']);
+  } catch (error) {
+    log.debug('Failed to rollback local description offer SDP:', error);
+    return {
+      error
+    };
+  }
+
+  return { offer };
+}
+
+/**
+ * Performs the webRTC session functions associated rolling back the local portion
+ *  of an "Add Media" offer
+ *
+ * Responsiblities:
+ *  1. Remove and cleanup the tracks added to the peer
+ *  2. Rollback the local description SDP offer
+ * @method rollbackLocalAddMedia
+ * @param {Object} deps
+ * @param {Object} deps.webRTC  The WebRTC stack.
+ * @param {string} sessionId    The local webRTC session id, used to lookup the session object
+ * @param {Array}  medias       A list of Media state objects
+ * @return {Object} offer object containing a Session Description Protocol
+ */
+function* rollbackLocalAddMedia(deps, sessionId, medias) {
+  const { webRTC } = deps;
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
+
+  if (!session) {
+    log.debug(`WebRTC session ${sessionId} not found.`);
+    return;
+  }
+
+  // Remove the new local media(s) that were added
+  let tracks = [];
+  medias.forEach(media => {
+    tracks = tracks.concat(media.tracks.map(track => track.id));
+  });
+
+  // Get the tracks that we want to remove
+  const localTracksToRemove = yield (0, _effects.call)([webRTC.track, 'getTracks'], tracks);
+  // Get the indexes of undefined tracks.
+  const invalidIndexes = localTracksToRemove.reduce((acc, cur, ind) => {
+    return (0, _fp.isUndefined)(cur) ? acc.concat(ind) : acc;
+  }, []);
+  // Get the track IDs of those indexes.
+  const invalidTracks = invalidIndexes.map(ind => tracks[ind]);
+
+  if (!(0, _fp.isEmpty)(invalidTracks)) {
+    const message = `The following tracks could not be found for rollback: ${invalidTracks.join(', ')}`;
+    log.debug(message);
+  }
+
+  // Removes tracks from peer (Will stop tracks from being sent to remote participant).
+  // Does NOT end the tracks.
+  yield (0, _effects.call)([session, 'removeTracks'], tracks);
+
+  // Ends the tracks.
+  // Clean-up the local tracks.
+  yield (0, _effects.all)(localTracksToRemove.map(track => (0, _effects.call)([track, 'cleanup'])));
+
+  // Rollback the local offer
+  let offer;
+  try {
+    offer = yield (0, _effects.call)([session, 'rollbackLocalDescription']);
+  } catch (error) {
+    log.debug('Failed to rollback local description offer SDP:', error);
+    return {
+      error
+    };
+  }
+
+  return { offer };
+}
+
+/**
+ * Performs the webRTC session functions associated rolling back the local portion
+ *  of a "Remove Media" offer.
+ *
+ * Unlike other rollback operations, for a remove media operation we will not try and re-add
+ *  the removed tracks since the application's intention was to stop the media.
+ *
+ * Responsiblities:
+ *  1. Rollback the local description SDP offer
+ * @method rollbackLocalRemoveMedia
+ * @param {Object} deps
+ * @param {Object} deps.webRTC  The WebRTC stack.
+ * @param {string} sessionId    The local webRTC session id, used to lookup the session object
+ * @return {Object} offer object containing a Session Description Protocol
+ */
+function* rollbackLocalRemoveMedia(deps, sessionId) {
+  const { webRTC } = deps;
+  const session = yield (0, _effects.call)([webRTC.sessionManager, 'get'], sessionId);
+
+  if (!session) {
+    log.debug(`WebRTC session ${sessionId} not found.`);
+    return;
+  }
 
   // Rollback the local offer
   let offer;
@@ -50793,12 +50980,24 @@ function* websocketLifecycle(wsConnectAction) {
   const wsInfo = wsConnectAction.payload;
   const { platform, isReconnect } = wsConnectAction.meta;
 
-  log.info(`Connecting to websocket on platform: ${platform} ...`);
-  // Try to open the websocket.
-  const websocket = yield (0, _effects.call)(connectWebsocket, wsInfo, platform);
+  // Redux-saga take() pattern.
+  // Take disconnect websocket action for this platform.
+  function disconnectWebsocketPattern(action) {
+    return action.type === actionTypes.WS_DISCONNECT && action.meta.platform === platform;
+  }
 
-  // If the websocket didn't open, dispatch the error and stop here.
-  if (websocket.error) {
+  log.info(`Connecting to websocket on platform: ${platform} ...`);
+  // Try to open the websocket, but cancel if we get a disconnect action.
+  const { websocket, disconnect } = yield (0, _effects.race)({
+    websocket: (0, _effects.call)(connectWebsocket, wsInfo, platform),
+    disconnect: (0, _effects.take)(disconnectWebsocketPattern)
+  });
+
+  // If the websocket didn't open, stop here. Dispatch the error if there was one.
+  if (disconnect) {
+    log.info('Received disconnect during websocket connection; stopping.');
+    return;
+  } else if (websocket.error) {
     if (isReconnect) {
       yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
       return;
@@ -51116,52 +51315,70 @@ function _sendWSMessage(ws, message) {
 function* connectWebsocket(wsInfo, platform) {
   const configs = yield (0, _effects.select)(_selectors.getConnectivityConfig);
   let connectionAttempt = 0;
-  let delayTime = 0;
+  // The delay between attempts should not be shorter than 2 seconds.
+  let delayTime = configs.reconnectDelay > 2000 ? configs.reconnectDelay : 2000;
   let websocket;
-
-  // Redux-saga take() pattern.
-  // Take disconnect websocket action for this platform.
-  function disconnectWebsocketPattern(action) {
-    return action.type === actionTypes.WS_DISCONNECT && action.meta.platform === platform;
-  }
 
   // If no limit is set, we will continually attempt to reconnect.
   if (!configs.reconnectLimit) {
     log.debug('No connectivity reconnect limit set.');
   }
 
-  while (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
+  function* safeOpenWs(wsInfo) {
+    let websocket;
     try {
-      // Try to open the websocket. Blocking call.
       websocket = yield (0, _effects.call)(_websocket.openWebsocket, wsInfo);
-      log.info(`Successfully connected to websocket on: ${platform}`);
-      break;
     } catch (err) {
-      connectionAttempt++;
       websocket = err;
-      log.debug(`Failed to connect to websocket on ${platform}. (Attempt #${connectionAttempt}). Message: ${websocket.message}.`);
+    }
+    return websocket;
+  }
+  while (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
+    const wsConnectStart = Date.now();
+    const { openWs, timeout } = yield (0, _effects.race)({
+      openWs: (0, _effects.call)(safeOpenWs, wsInfo),
+      timeout: (0, _effects.delay)(delayTime)
+    });
+    const attemptDuration = Date.now() - wsConnectStart;
 
-      // If we want to try to reconnect, delay a certain about of time before trying.
+    // Checking for both timeout and open websocket errors here since we need to calculate the next delay paramaters in
+    //  both scenarios
+    if (timeout || openWs && openWs.error) {
+      connectionAttempt++;
+      websocket = openWs;
+      log.debug(`Failed to connect to websocket on ${platform}. (Attempt #${connectionAttempt}). Message: ${timeout ? 'Timed out' : websocket.message}.`);
+
+      // If we are still under the reconnect attempt limit, calculate the next delay time and delay before retrying.
       if (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
-        // Increase the delay time if we're not at the limit.
+        // Calculate the remaining delay time by checking how long the previous connection attempt was.
+        // Do this before potentially lengthening the `delayTime` value.
+        const remainingDelay = timeout ? 0 : delayTime - attemptDuration;
+
+        // Increase the delay time for the next loop if we're not at the limit.
         if (delayTime !== configs.reconnectTimeLimit) {
-          delayTime = configs.reconnectDelay * Math.pow(configs.reconnectTimeMultiplier, connectionAttempt - 1);
+          delayTime = configs.reconnectDelay * Math.pow(configs.reconnectTimeMultiplier, connectionAttempt);
           delayTime = delayTime < configs.reconnectTimeLimit ? delayTime : configs.reconnectTimeLimit;
         }
-        log.debug(`Websocket reconnect attempt after ${delayTime} ms on ${platform}`);
 
-        // Wait for either the delay period or a trigger to stop connection attempts.
-        const { disconnect } = yield (0, _effects.race)({
-          delay: (0, _effects.delay)(delayTime),
-          disconnect: (0, _effects.take)(disconnectWebsocketPattern)
-        });
-
-        if (disconnect) {
-          break;
+        log.debug(`Websocket will attempt to reconnect after ${remainingDelay} ms on ${platform}`);
+        if (remainingDelay > 0) {
+          yield (0, _effects.delay)(remainingDelay);
         }
       } else {
         log.debug(`Stopping websocket connection attempts on ${platform}.`);
+        // We are at reconnect attempt limit; if it was due to a timeout we need to return an error. In case of
+        //  websocket error, that will be returned by the websocket.
+        if (timeout) {
+          return {
+            error: true,
+            message: 'Timed out.'
+          };
+        }
+        break;
       }
+    } else if (openWs) {
+      websocket = openWs;
+      break;
     }
   }
 

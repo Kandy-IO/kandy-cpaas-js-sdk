@@ -5,6 +5,14 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.33.0 - beta
+
+### Added
+
+- Added improved handling for local network errors occuring during add media and remove media operations for calls. `KJS-184`
+- Added two properties: `isLocal` & media `id` on the `media:sourceMuted` & `media:sourceUnmuted` events. These events are sent to application level. `KJS-78`
+- Added call state diagrams for both outgoing & incoming call and updated state transitions based on the supported `ringingFeedbackMode`. `KJS-104`
+
 ## 4.32.0 - 2021-09-24
 
 ### Added

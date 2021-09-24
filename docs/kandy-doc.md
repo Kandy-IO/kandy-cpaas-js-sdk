@@ -559,6 +559,7 @@ Type: [Object][7]
 
 *   `containers` **[Array][13]<[string][8]>** The list of CSS selectors that were used to render this Track.
 *   `disabled` **[boolean][11]** Indicator of whether this Track is disabled or not. If disabled, it cannot be re-enabled.
+*   `isLocal` **[boolean][11]** Indicator of whether this Track is a locally created one or is a remote one.
 *   `id` **[string][8]** The ID of the Track.
 *   `kind` **[string][8]** The kind of Track this is (audio, video).
 *   `label` **[string][8]** The label of the device this Track uses.

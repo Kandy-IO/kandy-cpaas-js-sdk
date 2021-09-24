@@ -5265,11 +5265,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 308,
+          "line": 309,
           "column": 0
         },
         "end": {
-          "line": 312,
+          "line": 313,
           "column": 1
         }
       },
@@ -9263,11 +9263,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -9920,11 +9920,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -10126,11 +10126,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -10365,11 +10365,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -10625,11 +10625,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -10841,11 +10841,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -11078,11 +11078,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -11314,11 +11314,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -11523,8 +11523,18 @@
             },
             {
               "title": "property",
-              "description": "The ID of the Track.",
+              "description": "Indicator of whether this Track is a locally created one or is a remote one.",
               "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "isLocal"
+            },
+            {
+              "title": "property",
+              "description": "The ID of the Track.",
+              "lineNumber": 11,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11534,7 +11544,7 @@
             {
               "title": "property",
               "description": "The kind of Track this is (audio, video).",
-              "lineNumber": 11,
+              "lineNumber": 12,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11544,7 +11554,7 @@
             {
               "title": "property",
               "description": "The label of the device this Track uses.",
-              "lineNumber": 12,
+              "lineNumber": 13,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11554,7 +11564,7 @@
             {
               "title": "property",
               "description": "Indicator on whether this Track is muted or not.",
-              "lineNumber": 13,
+              "lineNumber": 14,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -11564,7 +11574,7 @@
             {
               "title": "property",
               "description": "Indicator on whether this Track is receiving media from its source or not.\n   When true, the Track can be considered removed. This indicator is affected by actions outside the\n   control of the SDK, such as the remote endpoint of a Call stopping to send media for a remote Track,\n   or the browser temporarily disabling the SDK's access to a local Track's source.",
-              "lineNumber": 14,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -11574,7 +11584,7 @@
             {
               "title": "property",
               "description": "The state of this Track. Can be 'live' or 'ended'.",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11584,7 +11594,7 @@
             {
               "title": "property",
               "description": "The ID of the Media Stream that includes this Track.",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11598,18 +11608,18 @@
               "column": 0
             },
             "end": {
-              "line": 230,
+              "line": 231,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -11677,8 +11687,31 @@
             },
             {
               "title": "property",
-              "name": "id",
+              "name": "isLocal",
               "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Indicator of whether this Track is a locally created one or is a remote one."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "id",
+              "lineNumber": 11,
               "description": {
                 "type": "root",
                 "children": [
@@ -11701,7 +11734,7 @@
             {
               "title": "property",
               "name": "kind",
-              "lineNumber": 11,
+              "lineNumber": 12,
               "description": {
                 "type": "root",
                 "children": [
@@ -11724,7 +11757,7 @@
             {
               "title": "property",
               "name": "label",
-              "lineNumber": 12,
+              "lineNumber": 13,
               "description": {
                 "type": "root",
                 "children": [
@@ -11747,7 +11780,7 @@
             {
               "title": "property",
               "name": "muted",
-              "lineNumber": 13,
+              "lineNumber": 14,
               "description": {
                 "type": "root",
                 "children": [
@@ -11770,7 +11803,7 @@
             {
               "title": "property",
               "name": "sourceMuted",
-              "lineNumber": 14,
+              "lineNumber": 15,
               "description": {
                 "type": "root",
                 "children": [
@@ -11793,7 +11826,7 @@
             {
               "title": "property",
               "name": "state",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "description": {
                 "type": "root",
                 "children": [
@@ -11816,7 +11849,7 @@
             {
               "title": "property",
               "name": "streamId",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "description": {
                 "type": "root",
                 "children": [
@@ -11973,22 +12006,22 @@
           ],
           "loc": {
             "start": {
-              "line": 232,
+              "line": 233,
               "column": 0
             },
             "end": {
-              "line": 242,
+              "line": 243,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -12215,22 +12248,22 @@
           ],
           "loc": {
             "start": {
-              "line": 244,
+              "line": 245,
               "column": 0
             },
             "end": {
-              "line": 255,
+              "line": 256,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 309,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 313,
                 "column": 1
               }
             },
@@ -36342,11 +36375,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 308,
+          "line": 309,
           "column": 0
         },
         "end": {
-          "line": 312,
+          "line": 313,
           "column": 1
         }
       },
