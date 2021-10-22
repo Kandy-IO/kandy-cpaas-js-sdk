@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.33.0-beta.775
+ * Version: 4.33.0-beta.776
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.33.0-beta.775';
+  return '4.33.0-beta.776';
 }
 
 /***/ }),
@@ -50297,6 +50297,8 @@ exports.default = baseConnectivity;
 
 var _interface = __webpack_require__(432);
 
+var _interface2 = _interopRequireDefault(_interface);
+
 var _events = __webpack_require__(435);
 
 var _events2 = _interopRequireDefault(_events);
@@ -50338,16 +50340,16 @@ function baseConnectivity(options) {
   }
 
   function* init() {
-    yield (0, _effects.put)((0, _actions.update)(options, _interface.name));
+    yield (0, _effects.put)((0, _actions.update)(options, _interface2.default.name));
     yield (0, _effects.put)((0, _actions2.mapEvents)(_events2.default));
   }
 
   return {
     sagas: [_sagas.wsConnectFlow],
     init,
-    name: _interface.name,
-    reducer: _interface.reducer,
-    api: _interface.api
+    name: _interface2.default.name,
+    reducer: _interface2.default.reducer,
+    api: _interface2.default.api
   };
 } // Connectivity plugin.
 
@@ -50361,7 +50363,6 @@ function baseConnectivity(options) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reducer = exports.api = exports.name = undefined;
 
 var _name = __webpack_require__(184);
 
@@ -50377,9 +50378,7 @@ var _reducers2 = _interopRequireDefault(_reducers);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.name = _name2.default;
-exports.api = _api2.default;
-exports.reducer = _reducers2.default;
+exports.default = { name: _name2.default, api: _api2.default, reducer: _reducers2.default };
 
 /***/ }),
 /* 433 */
@@ -50399,10 +50398,9 @@ var _actions = __webpack_require__(91);
 
 var _selectors = __webpack_require__(72);
 
-var _logs = __webpack_require__(2);
+var _selectors2 = __webpack_require__(10);
 
-// Constants
-const log = _logs.logManager.getLogger('CONNECTIVITY');
+var _logs = __webpack_require__(2);
 
 /**
  * The 'connection' namespace is used to connect and maintain connections between
@@ -50444,6 +50442,10 @@ const log = _logs.logManager.getLogger('CONNECTIVITY');
  * @property {number} lastContact The date and time that the last known contact with the server was.
  */
 
+const log = _logs.logManager.getLogger('CONNECTIVITY');
+
+// Selectors
+// Constants
 function api({ dispatch, getState }) {
   const connectivityApi = {
     /**
@@ -50470,6 +50472,35 @@ function api({ dispatch, getState }) {
     enableConnectivityChecking(enable) {
       log.debug(_logs.API_LOG_TAG + 'connection.enableConnectivityChecking: ', enable);
       dispatch((0, _actions.changeConnectivityChecking)(enable));
+    },
+
+    /**
+     * Triggers a reset in the connection to the WebSocket being used for notifications.
+     * This can be used in scenarios where a network issue (undetectable by the SDK)
+     * is detected by an application.
+     *
+     * If there is no WebSocket currently connected, this function has no effect.
+     * Calling this function will trigger all the normal WebSocket and connectivity lifecycle
+     * events as well as trigger re-connection processing that follows the configuration of the SDK.
+     * Calling this function always has the potential of causing some events being lost by the
+     * SDK and preventing proper operation.
+     * @public
+     * @memberof connection
+     * @method resetConnection
+     */
+    resetConnection() {
+      const state = getState();
+      const platform = (0, _selectors2.getPlatform)(state);
+      log.debug(_logs.API_LOG_TAG + 'connection.resetConnection: ', platform);
+
+      const wsState = (0, _selectors.getConnectionState)(state, platform);
+      if (!wsState.connected) {
+        log.debug(_logs.API_LOG_TAG + 'connection.resetConnection: No active websocket connection. Ignoring request.');
+        return;
+      }
+      // Dispatching this action would close/cleanup existing ws connection
+      // However, we'll re-connect after that.
+      dispatch((0, _actions.lostConnection)(undefined, platform));
     }
   };
   return { connection: connectivityApi };

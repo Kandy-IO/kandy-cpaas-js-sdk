@@ -1847,6 +1847,18 @@ Enables or disables connectivity checking.
 
 *   `enable` **[boolean][11]** Enable connectivity checking.
 
+### resetConnection
+
+Triggers a reset in the connection to the WebSocket being used for notifications.
+This can be used in scenarios where a network issue (undetectable by the SDK)
+is detected by an application.
+
+If there is no WebSocket currently connected, this function has no effect.
+Calling this function will trigger all the normal WebSocket and connectivity lifecycle
+events as well as trigger re-connection processing that follows the configuration of the SDK.
+Calling this function always has the potential of causing some events being lost by the
+SDK and preventing proper operation.
+
 ### ws:change
 
 The websocket to the server has changed state.

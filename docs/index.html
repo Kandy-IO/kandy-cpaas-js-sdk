@@ -536,6 +536,12 @@
                               <span style="color:green">ⓕ</span> .enableConnectivityChecking
                             </a></li>
                           
+                            <li><a
+                              href='#connectionresetconnection'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .resetConnection
+                            </a></li>
+                          
                           </ul>
                         
                         <ul class='list-reset py1-ul pl1'>
@@ -10349,6 +10355,59 @@ the SDK and one or more backend servers.</p>
         </div>
       
     </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='connectionresetconnection'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>resetConnection()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Triggers a reset in the connection to the WebSocket being used for notifications.
+This can be used in scenarios where a network issue (undetectable by the SDK)
+is detected by an application.</p>
+<p>If there is no WebSocket currently connected, this function has no effect.
+Calling this function will trigger all the normal WebSocket and connectivity lifecycle
+events as well as trigger re-connection processing that follows the configuration of the SDK.
+Calling this function always has the potential of causing some events being lost by the
+SDK and preventing proper operation.</p>
+
+
+  <div class='pre p1 fill-light mt0'>resetConnection()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
   
 
   

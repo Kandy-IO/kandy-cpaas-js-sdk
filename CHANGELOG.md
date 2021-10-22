@@ -9,15 +9,16 @@ Kandy.js change log.
 
 ### Added
 
-- Added improved handling for local network errors occuring during add media and remove media operations for calls. `KJS-184`
+- Added improved handling for local network errors occurring during add media and remove media operations for calls. `KJS-184`
 - Added two properties: `isLocal` & media `id` on the `media:sourceMuted` & `media:sourceUnmuted` events. These events are sent to application level. `KJS-78`
 - Added call state diagrams for both outgoing & incoming call and updated state transitions based on the supported `ringingFeedbackMode`. `KJS-104`
+- A new `connectivity.resetConnection` API to allow for a reset of websocket connection. This can be invoked by the application when it detects unstable network conditions. `KJS-373`
 
 ## 4.32.0 - 2021-09-24
 
 ### Added
 
-- Added an extra property `iceCollectionDelay` as part of `extraInfo` parameter that is pased to `iceCollectionCheck` function. This will further improve the application's side in making a decision whether it has collected good enough ICE candidates. `KJS-253`
+- Added an extra property `iceCollectionDelay` as part of `extraInfo` parameter that is passed to `iceCollectionCheck` function. This will further improve the application's side in making a decision whether it has collected good enough ICE candidates. `KJS-253`
 
 ### Fixed
 
