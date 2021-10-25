@@ -20111,7 +20111,7 @@
             },
             {
               "title": "property",
-              "description": "The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.",
+              "description": "A call has been started and both the callee and caller may now perform further operations on the call object.",
               "lineNumber": 25,
               "type": {
                 "type": "NameExpression",
@@ -20252,7 +20252,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side."
+                        "value": "A call has been started and both the callee and caller may now perform further operations on the call object."
                       }
                     ]
                   }

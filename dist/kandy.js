@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.33.0-beta.777
+ * Version: 4.33.0-beta.778
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.33.0-beta.777';
+  return '4.33.0-beta.778';
 }
 
 /***/ }),
@@ -40133,7 +40133,7 @@ function callAPI({ dispatch, getState }) {
      * @requires call
      * @type {Object}
      * @property {string} INITIATING The (outgoing) call is being started. While in this state, no Call operations can be performed until Call gets into Initiated state.
-     * @property {string} INITIATED The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.
+     * @property {string} INITIATED A call has been started and both the callee and caller may now perform further operations on the call object.
      * @property {string} RINGING The call has been received by both parties, and is waiting to be answered.
      * @property {string} EARLY_MEDIA The call has not been answered, but media
      *    is already being received. This may be network-ringing media, IVR

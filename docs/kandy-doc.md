@@ -1246,7 +1246,7 @@ Type: [Object][7]
 #### Properties
 
 *   `INITIATING` **[string][8]** The (outgoing) call is being started. While in this state, no Call operations can be performed until Call gets into Initiated state.
-*   `INITIATED` **[string][8]** The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.
+*   `INITIATED` **[string][8]** A call has been started and both the callee and caller may now perform further operations on the call object.
 *   `RINGING` **[string][8]** The call has been received by both parties, and is waiting to be answered.
 *   `EARLY_MEDIA` **[string][8]** The call has not been answered, but media
     is already being received. This may be network-ringing media, IVR
