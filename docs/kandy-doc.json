@@ -5202,6 +5202,266 @@
             }
           ],
           "namespace": "api.BasicError"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Send a request to the underlying REST service with the appropriate configuration and authentication.\nThis is a wrapper on top of the browser's "
+                  },
+                  {
+                    "type": "link",
+                    "title": null,
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/API/fetch",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "fetch API"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\nand behaves very similarly but using SDK configuration for the base URL and authentication as well\nas SDK logging."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 6,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "api",
+              "lineNumber": 7
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 8,
+              "name": "fetch"
+            },
+            {
+              "title": "param",
+              "description": "The full path of the resource to fetch from the underlying service. This should include any REST version\n                         or user information. This path will be appended to the base URL according to SDK configuration.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "resource"
+            },
+            {
+              "title": "param",
+              "description": "An object containing any custom settings that you want to apply to the request. See [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\n                          for a full description and defaults.",
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "RequestInit"
+              },
+              "name": "init"
+            },
+            {
+              "title": "return",
+              "description": "A promise for a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.",
+              "lineNumber": 13,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Promise"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Response"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "example",
+              "description": "// Send a REST request to the server\n// Create a request options object following [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\nconst requestOptions = {\n  method: 'POST',\n  body: JSON.stringify({\n    test: 123\n  })\n}\n\n// Note that you will need to subscribe for the `custom` service in order to\n// receive notifications from the `externalnotification` service.\nconst response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)",
+              "lineNumber": 14
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 20,
+              "column": 6
+            },
+            "end": {
+              "line": 47,
+              "column": 9
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 48,
+                "column": 6
+              },
+              "end": {
+                "line": 58,
+                "column": 7
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/request/interface/api.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Send a REST request to the server\n// Create a request options object following [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\nconst requestOptions = {\n  method: 'POST',\n  body: JSON.stringify({\n    test: 123\n  })\n}\n\n// Note that you will need to subscribe for the `custom` service in order to\n// receive notifications from the `externalnotification` service.\nconst response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)"
+            }
+          ],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "resource",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The full path of the resource to fetch from the underlying service. This should include any REST version\nor user information. This path will be appended to the base URL according to SDK configuration."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "param",
+              "name": "init",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An object containing any custom settings that you want to apply to the request. See "
+                      },
+                      {
+                        "type": "link",
+                        "title": null,
+                        "url": "https://developer.mozilla.org/en-US/docs/Web/API/fetch",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "fetch API"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "\nfor a full description and defaults."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "RequestInit"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A promise for a "
+                      },
+                      {
+                        "type": "link",
+                        "title": null,
+                        "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Response"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": " object."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "title": "returns",
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Promise"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Response"
+                  }
+                ]
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "memberof": "api",
+          "kind": "function",
+          "name": "fetch",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "api",
+              "kind": "module"
+            },
+            {
+              "name": "fetch",
+              "kind": "function"
+            }
+          ],
+          "namespace": "apifetch"
         }
       ]
     },

@@ -156,6 +156,12 @@
                               <span style="color:green">ⓕ</span> .getBrowserDetails
                             </a></li>
                           
+                            <li><a
+                              href='#apifetch'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .fetch
+                            </a></li>
+                          
                           </ul>
                         
                         <ul class='list-reset py1-ul pl1'>
@@ -3389,6 +3395,111 @@ basic webRTC scenarios.</p>
       <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> details = client.getBrowserDetails()
 
 log(<span class="hljs-string">`Browser in use: <span class="hljs-subst">${details.browser}</span>, version <span class="hljs-subst">${details.version}</span>.`</span>)</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='apifetch'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fetch(resource, init)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Send a request to the underlying REST service with the appropriate configuration and authentication.
+This is a wrapper on top of the browser's <a href="https://developer.mozilla.org/en-US/docs/Web/API/fetch">fetch API</a>
+and behaves very similarly but using SDK configuration for the base URL and authentication as well
+as SDK logging.</p>
+
+
+  <div class='pre p1 fill-light mt0'>fetch(resource: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, init: RequestInit): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5">Response</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>resource</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The full path of the resource to fetch from the underlying service. This should include any REST version
+or user information. This path will be appended to the base URL according to SDK configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>init</span> <code class='quiet'>(RequestInit)</code>
+	    An object containing any custom settings that you want to apply to the request. See 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/fetch">fetch API</a>
+
+for a full description and defaults.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5">Response</a>></code>:
+          A promise for a 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">Response</a>
+ object.
+
+        
+      </div>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Send a REST request to the server</span>
+<span class="hljs-comment">// Create a request options object following [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)</span>
+<span class="hljs-keyword">const</span> requestOptions = {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">test</span>: <span class="hljs-number">123</span>
+  })
+}
+
+<span class="hljs-comment">// Note that you will need to subscribe for the `custom` service in order to</span>
+<span class="hljs-comment">// receive notifications from the `externalnotification` service.</span>
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> client.fetch(<span class="hljs-string">&#x27;/rest/version/1/user/xyz@test.com/externalnotification&#x27;</span>, requestOptions)</pre>
     
   
 
