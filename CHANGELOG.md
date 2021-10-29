@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.34.0 - beta
+
+### Added
+
+- Added a new object property `mediaOffered` to `CallObject` (for an incoming call) to reflect what caller has offered in terms of media. `KJS-334`
+
 ## 4.33.0 - 2021-10-29
 
 ### Added
