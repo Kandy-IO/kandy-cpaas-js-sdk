@@ -974,22 +974,22 @@
           ],
           "loc": {
             "start": {
-              "line": 28,
+              "line": 23,
               "column": 0
             },
             "end": {
-              "line": 40,
+              "line": 35,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 41,
+                "line": 36,
                 "column": 0
               },
               "end": {
-                "line": 49,
+                "line": 44,
                 "column": 1
               }
             },
@@ -3157,22 +3157,22 @@
           ],
           "loc": {
             "start": {
-              "line": 266,
+              "line": 264,
               "column": 4
             },
             "end": {
-              "line": 272,
+              "line": 270,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 273,
+                "line": 271,
                 "column": 4
               },
               "end": {
-                "line": 275,
+                "line": 273,
                 "column": 5
               }
             },
@@ -3252,22 +3252,22 @@
           ],
           "loc": {
             "start": {
-              "line": 278,
+              "line": 276,
               "column": 4
             },
             "end": {
-              "line": 304,
+              "line": 302,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 305,
+                "line": 303,
                 "column": 4
               },
               "end": {
-                "line": 331,
+                "line": 329,
                 "column": 5
               }
             },
@@ -5202,6 +5202,266 @@
             }
           ],
           "namespace": "api.BasicError"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Send a request to the underlying REST service with the appropriate configuration and authentication.\nThis is a wrapper on top of the browser's "
+                  },
+                  {
+                    "type": "link",
+                    "title": null,
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/API/fetch",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "fetch API"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\nand behaves very similarly but using SDK configuration for the base URL and authentication as well\nas SDK logging."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 6,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "api",
+              "lineNumber": 7
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 8,
+              "name": "fetch"
+            },
+            {
+              "title": "param",
+              "description": "The full path of the resource to fetch from the underlying service. This should include any REST version\n                         or user information. This path will be appended to the base URL according to SDK configuration.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "resource"
+            },
+            {
+              "title": "param",
+              "description": "An object containing any custom settings that you want to apply to the request. See [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\n                          for a full description and defaults.",
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "RequestInit"
+              },
+              "name": "init"
+            },
+            {
+              "title": "return",
+              "description": "A promise for a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object.",
+              "lineNumber": 13,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Promise"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Response"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "example",
+              "description": "// Send a REST request to the server\n// Create a request options object following [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\nconst requestOptions = {\n  method: 'POST',\n  body: JSON.stringify({\n    test: 123\n  })\n}\n\n// Note that you will need to subscribe for the `custom` service in order to\n// receive notifications from the `externalnotification` service.\nconst response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)",
+              "lineNumber": 14
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 20,
+              "column": 6
+            },
+            "end": {
+              "line": 47,
+              "column": 9
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 48,
+                "column": 6
+              },
+              "end": {
+                "line": 58,
+                "column": 7
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/request/interface/api.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "// Send a REST request to the server\n// Create a request options object following [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)\nconst requestOptions = {\n  method: 'POST',\n  body: JSON.stringify({\n    test: 123\n  })\n}\n\n// Note that you will need to subscribe for the `custom` service in order to\n// receive notifications from the `externalnotification` service.\nconst response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)"
+            }
+          ],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "resource",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The full path of the resource to fetch from the underlying service. This should include any REST version\nor user information. This path will be appended to the base URL according to SDK configuration."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "param",
+              "name": "init",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An object containing any custom settings that you want to apply to the request. See "
+                      },
+                      {
+                        "type": "link",
+                        "title": null,
+                        "url": "https://developer.mozilla.org/en-US/docs/Web/API/fetch",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "fetch API"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "\nfor a full description and defaults."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "RequestInit"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A promise for a "
+                      },
+                      {
+                        "type": "link",
+                        "title": null,
+                        "url": "https://developer.mozilla.org/en-US/docs/Web/API/Response",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Response"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": " object."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "title": "returns",
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Promise"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "Response"
+                  }
+                ]
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "memberof": "api",
+          "kind": "function",
+          "name": "fetch",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "api",
+              "kind": "module"
+            },
+            {
+              "name": "fetch",
+              "kind": "function"
+            }
+          ],
+          "namespace": "apifetch"
         }
       ]
     },
@@ -5265,11 +5525,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 308,
+          "line": 351,
           "column": 0
         },
         "end": {
-          "line": 312,
+          "line": 355,
           "column": 1
         }
       },
@@ -9263,11 +9523,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -9920,11 +10180,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -10126,11 +10386,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -10365,11 +10625,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -10625,11 +10885,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -10841,11 +11101,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -11078,11 +11338,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -11314,11 +11574,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -11523,8 +11783,18 @@
             },
             {
               "title": "property",
-              "description": "The ID of the Track.",
+              "description": "Indicator of whether this Track is a locally created one or is a remote one.",
               "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "isLocal"
+            },
+            {
+              "title": "property",
+              "description": "The ID of the Track.",
+              "lineNumber": 11,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11534,7 +11804,7 @@
             {
               "title": "property",
               "description": "The kind of Track this is (audio, video).",
-              "lineNumber": 11,
+              "lineNumber": 12,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11544,7 +11814,7 @@
             {
               "title": "property",
               "description": "The label of the device this Track uses.",
-              "lineNumber": 12,
+              "lineNumber": 13,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11554,7 +11824,7 @@
             {
               "title": "property",
               "description": "Indicator on whether this Track is muted or not.",
-              "lineNumber": 13,
+              "lineNumber": 14,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -11564,7 +11834,7 @@
             {
               "title": "property",
               "description": "Indicator on whether this Track is receiving media from its source or not.\n   When true, the Track can be considered removed. This indicator is affected by actions outside the\n   control of the SDK, such as the remote endpoint of a Call stopping to send media for a remote Track,\n   or the browser temporarily disabling the SDK's access to a local Track's source.",
-              "lineNumber": 14,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "boolean"
@@ -11574,7 +11844,7 @@
             {
               "title": "property",
               "description": "The state of this Track. Can be 'live' or 'ended'.",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11584,7 +11854,7 @@
             {
               "title": "property",
               "description": "The ID of the Media Stream that includes this Track.",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -11598,18 +11868,18 @@
               "column": 0
             },
             "end": {
-              "line": 230,
+              "line": 231,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -11677,8 +11947,31 @@
             },
             {
               "title": "property",
-              "name": "id",
+              "name": "isLocal",
               "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Indicator of whether this Track is a locally created one or is a remote one."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              }
+            },
+            {
+              "title": "property",
+              "name": "id",
+              "lineNumber": 11,
               "description": {
                 "type": "root",
                 "children": [
@@ -11701,7 +11994,7 @@
             {
               "title": "property",
               "name": "kind",
-              "lineNumber": 11,
+              "lineNumber": 12,
               "description": {
                 "type": "root",
                 "children": [
@@ -11724,7 +12017,7 @@
             {
               "title": "property",
               "name": "label",
-              "lineNumber": 12,
+              "lineNumber": 13,
               "description": {
                 "type": "root",
                 "children": [
@@ -11747,7 +12040,7 @@
             {
               "title": "property",
               "name": "muted",
-              "lineNumber": 13,
+              "lineNumber": 14,
               "description": {
                 "type": "root",
                 "children": [
@@ -11770,7 +12063,7 @@
             {
               "title": "property",
               "name": "sourceMuted",
-              "lineNumber": 14,
+              "lineNumber": 15,
               "description": {
                 "type": "root",
                 "children": [
@@ -11793,7 +12086,7 @@
             {
               "title": "property",
               "name": "state",
-              "lineNumber": 18,
+              "lineNumber": 19,
               "description": {
                 "type": "root",
                 "children": [
@@ -11816,7 +12109,7 @@
             {
               "title": "property",
               "name": "streamId",
-              "lineNumber": 19,
+              "lineNumber": 20,
               "description": {
                 "type": "root",
                 "children": [
@@ -11973,22 +12266,22 @@
           ],
           "loc": {
             "start": {
-              "line": 232,
+              "line": 233,
               "column": 0
             },
             "end": {
-              "line": 242,
+              "line": 243,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -12215,22 +12508,22 @@
           ],
           "loc": {
             "start": {
-              "line": 244,
+              "line": 245,
               "column": 0
             },
             "end": {
-              "line": 255,
+              "line": 256,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 308,
+                "line": 351,
                 "column": 0
               },
               "end": {
-                "line": 312,
+                "line": 355,
                 "column": 1
               }
             },
@@ -12842,11 +13135,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 148,
+                "line": 159,
                 "column": 4
               },
               "end": {
-                "line": 177,
+                "line": 188,
                 "column": 5
               }
             },
@@ -13533,22 +13826,22 @@
           ],
           "loc": {
             "start": {
-              "line": 179,
+              "line": 190,
               "column": 4
             },
             "end": {
-              "line": 199,
+              "line": 210,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 200,
+                "line": 211,
                 "column": 4
               },
               "end": {
-                "line": 203,
+                "line": 214,
                 "column": 5
               }
             },
@@ -14004,22 +14297,22 @@
           ],
           "loc": {
             "start": {
-              "line": 205,
+              "line": 216,
               "column": 4
             },
             "end": {
-              "line": 251,
+              "line": 262,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 301,
+                "line": 323,
                 "column": 4
               },
               "end": {
-                "line": 316,
+                "line": 338,
                 "column": 5
               }
             },
@@ -14703,22 +14996,22 @@
           ],
           "loc": {
             "start": {
-              "line": 318,
+              "line": 340,
               "column": 4
             },
             "end": {
-              "line": 341,
+              "line": 363,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 342,
+                "line": 364,
                 "column": 4
               },
               "end": {
-                "line": 346,
+                "line": 368,
                 "column": 5
               }
             },
@@ -14899,22 +15192,22 @@
           ],
           "loc": {
             "start": {
-              "line": 348,
+              "line": 370,
               "column": 4
             },
             "end": {
-              "line": 366,
+              "line": 388,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 367,
+                "line": 389,
                 "column": 4
               },
               "end": {
-                "line": 370,
+                "line": 392,
                 "column": 5
               }
             },
@@ -15142,22 +15435,22 @@
           ],
           "loc": {
             "start": {
-              "line": 372,
+              "line": 394,
               "column": 4
             },
             "end": {
-              "line": 397,
+              "line": 419,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 398,
+                "line": 420,
                 "column": 4
               },
               "end": {
-                "line": 401,
+                "line": 423,
                 "column": 5
               }
             },
@@ -15360,22 +15653,22 @@
           ],
           "loc": {
             "start": {
-              "line": 403,
+              "line": 425,
               "column": 4
             },
             "end": {
-              "line": 424,
+              "line": 446,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 425,
+                "line": 447,
                 "column": 4
               },
               "end": {
-                "line": 428,
+                "line": 450,
                 "column": 5
               }
             },
@@ -15516,22 +15809,22 @@
           ],
           "loc": {
             "start": {
-              "line": 481,
+              "line": 523,
               "column": 4
             },
             "end": {
-              "line": 495,
+              "line": 537,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 496,
+                "line": 538,
                 "column": 4
               },
               "end": {
-                "line": 499,
+                "line": 541,
                 "column": 5
               }
             },
@@ -15684,22 +15977,22 @@
           ],
           "loc": {
             "start": {
-              "line": 501,
+              "line": 543,
               "column": 4
             },
             "end": {
-              "line": 512,
+              "line": 554,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 513,
+                "line": 555,
                 "column": 4
               },
               "end": {
-                "line": 516,
+                "line": 558,
                 "column": 5
               }
             },
@@ -15940,22 +16233,22 @@
           ],
           "loc": {
             "start": {
-              "line": 518,
+              "line": 560,
               "column": 4
             },
             "end": {
-              "line": 541,
+              "line": 583,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 542,
+                "line": 584,
                 "column": 4
               },
               "end": {
-                "line": 545,
+                "line": 587,
                 "column": 5
               }
             },
@@ -16365,22 +16658,22 @@
           ],
           "loc": {
             "start": {
-              "line": 547,
+              "line": 589,
               "column": 4
             },
             "end": {
-              "line": 582,
+              "line": 624,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 583,
+                "line": 625,
                 "column": 4
               },
               "end": {
-                "line": 592,
+                "line": 634,
                 "column": 5
               }
             },
@@ -17045,22 +17338,22 @@
           ],
           "loc": {
             "start": {
-              "line": 594,
+              "line": 636,
               "column": 4
             },
             "end": {
-              "line": 613,
+              "line": 655,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 614,
+                "line": 656,
                 "column": 4
               },
               "end": {
-                "line": 617,
+                "line": 659,
                 "column": 5
               }
             },
@@ -17431,22 +17724,22 @@
           ],
           "loc": {
             "start": {
-              "line": 619,
+              "line": 661,
               "column": 4
             },
             "end": {
-              "line": 649,
+              "line": 691,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 650,
+                "line": 692,
                 "column": 4
               },
               "end": {
-                "line": 659,
+                "line": 701,
                 "column": 5
               }
             },
@@ -17847,22 +18140,22 @@
           ],
           "loc": {
             "start": {
-              "line": 661,
+              "line": 703,
               "column": 4
             },
             "end": {
-              "line": 683,
+              "line": 725,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 684,
+                "line": 726,
                 "column": 4
               },
               "end": {
-                "line": 687,
+                "line": 729,
                 "column": 5
               }
             },
@@ -18059,22 +18352,22 @@
           ],
           "loc": {
             "start": {
-              "line": 689,
+              "line": 731,
               "column": 4
             },
             "end": {
-              "line": 722,
+              "line": 764,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 794,
+                "line": 836,
                 "column": 4
               },
               "end": {
-                "line": 797,
+                "line": 839,
                 "column": 5
               }
             },
@@ -18260,22 +18553,22 @@
           ],
           "loc": {
             "start": {
-              "line": 724,
+              "line": 766,
               "column": 4
             },
             "end": {
-              "line": 764,
+              "line": 806,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 794,
+                "line": 836,
                 "column": 4
               },
               "end": {
-                "line": 797,
+                "line": 839,
                 "column": 5
               }
             },
@@ -18473,22 +18766,22 @@
           ],
           "loc": {
             "start": {
-              "line": 766,
+              "line": 808,
               "column": 4
             },
             "end": {
-              "line": 793,
+              "line": 835,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 794,
+                "line": 836,
                 "column": 4
               },
               "end": {
-                "line": 797,
+                "line": 839,
                 "column": 5
               }
             },
@@ -18797,22 +19090,22 @@
           ],
           "loc": {
             "start": {
-              "line": 799,
+              "line": 841,
               "column": 4
             },
             "end": {
-              "line": 843,
+              "line": 885,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 844,
+                "line": 886,
                 "column": 4
               },
               "end": {
-                "line": 849,
+                "line": 891,
                 "column": 5
               }
             },
@@ -19176,22 +19469,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1096,
+              "line": 1138,
               "column": 4
             },
             "end": {
-              "line": 1160,
+              "line": 1202,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1161,
+                "line": 1203,
                 "column": 4
               },
               "end": {
-                "line": 1170,
+                "line": 1212,
                 "column": 5
               }
             },
@@ -19653,22 +19946,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1172,
+              "line": 1214,
               "column": 4
             },
             "end": {
-              "line": 1188,
+              "line": 1230,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1189,
+                "line": 1231,
                 "column": 4
               },
               "end": {
-                "line": 1199,
+                "line": 1241,
                 "column": 5
               }
             },
@@ -19833,22 +20126,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1201,
+              "line": 1243,
               "column": 4
             },
             "end": {
-              "line": 1217,
+              "line": 1259,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1218,
+                "line": 1260,
                 "column": 4
               },
               "end": {
-                "line": 1226,
+                "line": 1268,
                 "column": 5
               }
             },
@@ -20078,7 +20371,7 @@
             },
             {
               "title": "property",
-              "description": "The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side.",
+              "description": "A call has been started and both the callee and caller may now perform further operations on the call object.",
               "lineNumber": 25,
               "type": {
                 "type": "NameExpression",
@@ -20154,22 +20447,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1228,
+              "line": 1270,
               "column": 4
             },
             "end": {
-              "line": 1272,
+              "line": 1314,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1273,
+                "line": 1315,
                 "column": 4
               },
               "end": {
-                "line": 1273,
+                "line": 1315,
                 "column": 23
               }
             },
@@ -20219,7 +20512,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "The (outgoing) call has been sent over the network, but has not been received. This is a state valid only for caller's side."
+                        "value": "A call has been started and both the callee and caller may now perform further operations on the call object."
                       }
                     ]
                   }
@@ -20712,22 +21005,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1275,
+              "line": 1317,
               "column": 4
             },
             "end": {
-              "line": 1354,
+              "line": 1396,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1355,
+                "line": 1397,
                 "column": 4
               },
               "end": {
-                "line": 1355,
+                "line": 1397,
                 "column": 55
               }
             },
@@ -21329,22 +21622,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1357,
+              "line": 1399,
               "column": 4
             },
             "end": {
-              "line": 1401,
+              "line": 1443,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1402,
+                "line": 1444,
                 "column": 4
               },
               "end": {
-                "line": 1405,
+                "line": 1447,
                 "column": 5
               }
             },
@@ -21527,22 +21820,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1407,
+              "line": 1449,
               "column": 4
             },
             "end": {
-              "line": 1423,
+              "line": 1465,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1402,
+                "line": 1444,
                 "column": 4
               },
               "end": {
-                "line": 1405,
+                "line": 1447,
                 "column": 5
               }
             },
@@ -21683,22 +21976,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1425,
+              "line": 1467,
               "column": 4
             },
             "end": {
-              "line": 1462,
+              "line": 1504,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1402,
+                "line": 1444,
                 "column": 4
               },
               "end": {
-                "line": 1405,
+                "line": 1447,
                 "column": 5
               }
             },
@@ -21859,22 +22152,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1464,
+              "line": 1506,
               "column": 4
             },
             "end": {
-              "line": 1501,
+              "line": 1543,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1402,
+                "line": 1444,
                 "column": 4
               },
               "end": {
-                "line": 1405,
+                "line": 1447,
                 "column": 5
               }
             },
@@ -22199,7 +22492,7 @@
         },
         "end": {
           "line": 44,
-          "column": 54
+          "column": 70
         }
       },
       "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
@@ -22685,7 +22978,7 @@
               },
               "end": {
                 "line": 44,
-                "column": 54
+                "column": 70
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
@@ -23310,22 +23603,22 @@
           ],
           "loc": {
             "start": {
-              "line": 53,
+              "line": 56,
               "column": 4
             },
             "end": {
-              "line": 61,
+              "line": 64,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 62,
+                "line": 65,
                 "column": 4
               },
               "end": {
-                "line": 65,
+                "line": 68,
                 "column": 5
               }
             },
@@ -23459,22 +23752,22 @@
           ],
           "loc": {
             "start": {
-              "line": 67,
+              "line": 70,
               "column": 4
             },
             "end": {
-              "line": 73,
+              "line": 76,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 74,
+                "line": 77,
                 "column": 4
               },
               "end": {
-                "line": 77,
+                "line": 80,
                 "column": 5
               }
             },
@@ -23536,6 +23829,105 @@
             }
           ],
           "namespace": "connectionenableConnectivityChecking"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Triggers a reset in the connection to the WebSocket being used for notifications.\nThis can be used in scenarios where a network issue (undetectable by the SDK)\nis detected by an application."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "If there is no WebSocket currently connected, this function has no effect.\nCalling this function will trigger all the normal WebSocket and connectivity lifecycle\nevents as well as trigger re-connection processing that follows the configuration of the SDK.\nCalling this function always has the potential of causing some events being lost by the\nSDK and preventing proper operation."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 10,
+              "type": null
+            },
+            {
+              "title": "memberof",
+              "description": "connection",
+              "lineNumber": 11
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 12,
+              "name": "resetConnection"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 82,
+              "column": 4
+            },
+            "end": {
+              "line": 95,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 96,
+                "column": 4
+              },
+              "end": {
+                "line": 109,
+                "column": 5
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "memberof": "connection",
+          "kind": "function",
+          "name": "resetConnection",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "connection",
+              "kind": "namespace"
+            },
+            {
+              "name": "resetConnection",
+              "kind": "function"
+            }
+          ],
+          "namespace": "connectionresetConnection"
         }
       ]
     },
@@ -36342,11 +36734,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 308,
+          "line": 351,
           "column": 0
         },
         "end": {
-          "line": 312,
+          "line": 355,
           "column": 1
         }
       },
