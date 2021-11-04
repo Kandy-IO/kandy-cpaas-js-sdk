@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.783
+ * Version: 4.34.0-beta.784
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.783';
+  return '4.34.0-beta.784';
 }
 
 /***/ }),
@@ -17775,7 +17775,7 @@ function* chatUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from chat notifications.',
@@ -17897,7 +17897,7 @@ function* smsInboundUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from inbound SMS notifications.',
@@ -17965,7 +17965,7 @@ function* smsOutboundUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from outbound SMS notifications.',
@@ -42510,7 +42510,7 @@ function* callUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from call notifications.',
@@ -56146,7 +56146,7 @@ function* unsubscribe(presenceListId, subscriptionId, requestInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Unsubscribe from presence list')
     };

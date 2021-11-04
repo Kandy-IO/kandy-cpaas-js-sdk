@@ -11,6 +11,11 @@ Kandy.js change log.
 
 - Added a new object property `mediaOffered` to `CallObject` (for an incoming call) to reflect what caller has offered in terms of media. `KJS-334`
 
+### Fixed
+
+- If a client unsubscribes from services and gets a 404 Not Found network response, it is treated as a successful unsubscribe operation
+  and removes subscription information from state. `KJS-266`
+
 ## 4.33.0 - 2021-10-29
 
 ### Added
