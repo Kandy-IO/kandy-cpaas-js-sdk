@@ -1303,7 +1303,7 @@
   
 
   <p>The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
-The SDK instance will be refered as 'api' throughout the rest of the documentation content.</p>
+The SDK instance will be referred as 'api' throughout the rest of the documentation content.</p>
 
 
   <div class='pre p1 fill-light mt0'>create(config: <a href="#config">config</a>): <a href="#api">api</a></div>
@@ -5282,7 +5282,7 @@ or the browser temporarily disabling the SDK's access to a local Track's source.
 
   
 
-  <p>The Phone Numer ie: +18885559876</p>
+  <p>The Phone Number ie: +18885559876</p>
 
 
   <div class='pre p1 fill-light mt0'>PhoneNumber</div>
@@ -7296,7 +7296,7 @@ otherwise they will be added in-band to the call's audio.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>tone</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    DTMF tone(s) to send. Valid chracters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
+	    DTMF tone(s) to send. Valid characters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
 
           </div>
           
@@ -7367,7 +7367,7 @@ period. As an example, this could be done to determine the media quality
 during the Call.</p>
 <p>A Track ID can optionally be provided to get a report for a specific
 Track of the Call.</p>
-<p>This API will return a promise which, when resolved, will contain the report of the particlar call.
+<p>This API will return a promise which, when resolved, will contain the report of the particular call.
 The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
@@ -8164,7 +8164,7 @@ The Call will automatically attempt to reconnect, transitioning back to
           
 
           
-             : The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection. See the 
+             : The connection has failed and cannot be recovered automatically. A full media connection refresh is required to reestablish a connection. See the 
 <a href="#callrestartmedia">call.restartMedia</a>
  API.
 
@@ -8223,7 +8223,7 @@ client.on(<span class="hljs-string">&#x27;call:mediaConnectionChange&#x27;</span
       ...
       <span class="hljs-keyword">break</span>
     <span class="hljs-keyword">case</span> mediaConnectionStates.FAILED:
-     <span class="hljs-comment">// Media has failed. The call requires a media refresh to restablish.</span>
+     <span class="hljs-comment">// Media has failed. The call requires a media refresh to reestablish.</span>
      <span class="hljs-comment">// This state will occur after the `DISCONNECTED` state is encountered.</span>
      ...
       <span class="hljs-keyword">break</span>
@@ -11939,7 +11939,7 @@ This property applies only to conversation object stored in recipient's state.
           
 
           
-             : The array indentifying the User IDs of the users who are currently typing.
+             : The array identifying the User IDs of the users who are currently typing.
 
           
           
@@ -13143,7 +13143,7 @@ APIs.</p>
   
 
   <p>Retrieves a conversation object matching the User ID and Type provided if available.</p>
-<p>Conversations are made availble using the <a href="#conversationfetch">conversation.fetch</a> or
+<p>Conversations are made available using the <a href="#conversationfetch">conversation.fetch</a> or
 <a href="#conversationcreate">conversation.create</a> Messaging APIs.</p>
 
 
@@ -13363,7 +13363,7 @@ object will be sent to the destination provided.</p>
   
 
   <p>Retrieves all available conversations for the current user.</p>
-<p>Conversations are made availble using the <a href="#conversationfetch">conversation.fetch</a> or
+<p>Conversations are made available using the <a href="#conversationfetch">conversation.fetch</a> or
 <a href="#conversationcreate">conversation.create</a> Messaging APIs.</p>
 
 
@@ -13944,7 +13944,7 @@ If a single message was created/edited, <code>messageId</code> will be present.<
   
 
   <p>The 'groups' namespace provides an interface for an application to create and
-manage Groups for a User. Groups are used in conjuction with the
+manage Groups for a User. Groups are used in conjunction with the
 <a href="#conversation">Messaging</a> feature to allow for group conversations.</p>
 <p>Groups are persisted by the server. When the SDK is initialized, there will
 be no Group information available, but the <a href="#groupsfetch">groups.fetch</a>
@@ -14304,7 +14304,7 @@ when the operation completes.</p>
 
   
 
-  <p>Retrieves the list of particpants from an available Group.</p>
+  <p>Retrieves the list of participants from an available Group.</p>
 
 
   <div class='pre p1 fill-light mt0'>getParticipants(groupId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
@@ -15566,7 +15566,7 @@ used as part of the name of the Logger.</p>
               
                 <li><code>target.id</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?
                   
-                  <p>A unique identifer for the target.</p>
+                  <p>A unique identifier for the target.</p>
 </li>
               
                 <li><code>target.name</code> <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
@@ -17301,7 +17301,7 @@ For supported values see
           
 
           
-             : Additional message acompanying the status &#x26; activity.
+             : Additional message accompanying the status &#x26; activity.
 
           
           
