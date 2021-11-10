@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.786
+ * Version: 4.34.0-beta.787
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.786';
+  return '4.34.0-beta.787';
 }
 
 /***/ }),
@@ -62312,13 +62312,20 @@ function api({ dispatch, getState }) {
   return {
     request: {
       /**
+       * The 'request' namespace (within the 'api' type) is used to make network requests to the server.
+       *
+       * @public
+       * @namespace request
+       */
+
+      /**
        * Send a request to the underlying REST service with the appropriate configuration and authentication.
        * This is a wrapper on top of the browser's [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
        * and behaves very similarly but using SDK configuration for the base URL and authentication as well
        * as SDK logging.
        *
        * @public
-       * @memberof api
+       * @memberof request
        * @method fetch
        * @param {string} resource The full path of the resource to fetch from the underlying service. This should include any REST version
        *                          or user information. This path will be appended to the base URL according to SDK configuration.
@@ -62337,7 +62344,7 @@ function api({ dispatch, getState }) {
        *
        * // Note that you will need to subscribe for the `custom` service in order to
        * // receive notifications from the `externalnotification` service.
-       * const response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)
+       * const response = await client.request.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)
        */
       async fetch(resource, init = {}) {
         log.debug(_logs.API_LOG_TAG + 'fetch: ', resource);
