@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.787
+ * Version: 4.34.0-beta.788
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.787';
+  return '4.34.0-beta.788';
 }
 
 /***/ }),
@@ -37274,8 +37274,14 @@ function Session(id, managers, config = {}) {
             reusableTransceiver.sender
             // Replace the dummy track on the Sender with the actual track we want to send.
             .replaceTrack(track.track).then(() => {
-              // Set the correct direction on the Transceiver to include that we now want to send.
-              reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              /*
+               * Set the correct direction on the Transceiver to include that we now want to send:
+               *   - sendrecv --> sendrecv
+               *   - sendonly --> sendonly
+               *   - recvonly --> sendrecv
+               *   - inactive --> sendonly
+               */
+              reusableTransceiver.direction = ['sendrecv', 'recvonly'].includes(reusableTransceiver.direction) ? 'sendrecv' : 'sendonly';
 
               // Ensure the track has an associated MediaStream. The remote endpoint will
               //    get access to this MediaStream and be able to listen for events (for

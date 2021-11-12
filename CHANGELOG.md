@@ -15,6 +15,8 @@ Kandy.js change log.
 
 - If a client unsubscribes from services and gets a 404 Not Found network response, it is treated as a successful unsubscribe operation
   and removes subscription information from state. `KJS-266`
+- Fixed an issue where the media direction wasn't being set correctly when adding video to a transceiver that we are reusing, this resulted in
+  the call losing remote video when local video is added. `KJS-396`
 
 ## 4.33.0 - 2021-10-29
 
