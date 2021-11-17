@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.789
+ * Version: 4.34.0-beta.790
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6475,7 +6475,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.789';
+  return '4.34.0-beta.790';
 }
 
 /***/ }),
@@ -50987,16 +50987,15 @@ function* websocketLifecycle(wsConnectAction) {
   //      we want to cancel these tasks either way.
   yield (0, _effects.cancel)([emitTask, pingFlow]);
 
+  log.debug('Cleaning up websocket connection ...');
+  yield (0, _effects.call)(_websocket.cleanupWebSocket, websocket);
+
   if (action.type === actionTypes.WS_DISCONNECT) {
     // If we're disconnecting, close the websocket to end it's lifecycle.
-    log.debug('Closing websocket connection ...');
-    yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
     yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
-    log.info('Successfully closed websocket connection.');
-  } else if (action.type === actionTypes.WS_CLOSED && [1000, 1005].includes(action.payload.code === 1000)) {
+    log.info('Successfully disconnected websocket connection.');
+  } else if (action.type === actionTypes.WS_CLOSED && action.payload.code === 1000) {
     // 1000 signifies a normal closure
-    // 1005 indicates a closure with no status code (this is the default if websocket.close() is called without passing a code)
-
     // Normal websocket close, don't try to reconnect
     log.debug('Websocket closed normally.');
     yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
@@ -51031,7 +51030,7 @@ function* websocketLifecycle(wsConnectAction) {
 
       // If we've lost connection, re-dispatch the initial action, so that we can
       //      start the lifecycle over.
-      log.debug('Attempting to reconnect to websocket ...');
+      log.debug('Attempting to reconnect using a new websocket ...');
       yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
     } else {
       log.debug('Not attempting to reconnect to websocket autoReconnect is false.');
@@ -51342,7 +51341,7 @@ var _promise = __webpack_require__(21);
 var _promise2 = _interopRequireDefault(_promise);
 
 exports.openWebsocket = openWebsocket;
-exports.closeWebsocket = closeWebsocket;
+exports.cleanupWebSocket = cleanupWebSocket;
 exports.wsEmitter = wsEmitter;
 
 var _actions = __webpack_require__(91);
@@ -51407,17 +51406,15 @@ function openWebsocket(options) {
 
 /**
  * Clean-up a provided websocket.
- * @method closeWebsocket
+ * @method cleanupWebSocket
  * @param  {Websocket} ws Websocket to be cleaned-up.
  * @return {Websocket} ws The websocket after being cleaned.
  */
-function closeWebsocket(ws) {
+function cleanupWebSocket(ws) {
   if (ws.close) {
     ws.close();
-  } else {
-    ws.onclose = null;
   }
-
+  ws.onclose = null;
   ws.onmessage = null;
   ws.onopen = null;
   ws.onerror = null;
@@ -51458,7 +51455,7 @@ function createWsChannel(ws, platform) {
       emit(_reduxSaga.END);
     };
 
-    return () => closeWebsocket(ws);
+    return () => cleanupWebSocket(ws);
   }, _reduxSaga.buffers.expanding(INITIAL_BUFFER_SIZE));
 }
 

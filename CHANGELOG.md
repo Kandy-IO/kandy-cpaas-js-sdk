@@ -17,6 +17,7 @@ Kandy.js change log.
   and removes subscription information from state. `KJS-266`
 - Fixed an issue where the media direction wasn't being set correctly when adding video to a transceiver that we are reusing, this resulted in
   the call losing remote video when local video is added. `KJS-396`
+- Fixed the issue where the websocket cleanup was not triggered when a lost connection was detected. `KJS-424`
 
 ## 4.33.0 - 2021-10-29
 
