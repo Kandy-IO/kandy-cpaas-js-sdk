@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.791
+ * Version: 4.34.0-beta.792
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1519,6 +1519,106 @@ const connCheckMethods = exports.connCheckMethods = {
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _codes = __webpack_require__(86);
+
+Object.defineProperty(exports, 'authCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.authCodes;
+  }
+});
+Object.defineProperty(exports, 'callCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.callCodes;
+  }
+});
+Object.defineProperty(exports, 'callHistoryCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.callHistoryCodes;
+  }
+});
+Object.defineProperty(exports, 'groupsCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.groupsCodes;
+  }
+});
+Object.defineProperty(exports, 'messagingCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.messagingCodes;
+  }
+});
+Object.defineProperty(exports, 'mwiCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.mwiCodes;
+  }
+});
+Object.defineProperty(exports, 'sipEventCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.sipEventCodes;
+  }
+});
+Object.defineProperty(exports, 'clickToCallCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.clickToCallCodes;
+  }
+});
+Object.defineProperty(exports, 'bridgeCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.bridgeCodes;
+  }
+});
+Object.defineProperty(exports, 'subscriptionCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.subscriptionCodes;
+  }
+});
+Object.defineProperty(exports, 'presenceCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.presenceCodes;
+  }
+});
+Object.defineProperty(exports, 'usersCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.usersCodes;
+  }
+});
+Object.defineProperty(exports, 'webrtcCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.webrtcCodes;
+  }
+});
+class BasicError {
+  constructor({ message, code }) {
+    this.name = 'BasicError';
+    this.code = code || 'NO_CODE';
+    this.message = message ? `${message}` : 'An error occurred.';
+  }
+}
+exports.default = BasicError;
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 var core = module.exports = { version: '2.6.12' };
@@ -1526,7 +1626,7 @@ if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1777,100 +1877,6 @@ function getRequestInfo(state, platform) {
 }
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _codes = __webpack_require__(89);
-
-Object.defineProperty(exports, 'authCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.authCodes;
-  }
-});
-Object.defineProperty(exports, 'callCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.callCodes;
-  }
-});
-Object.defineProperty(exports, 'callHistoryCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.callHistoryCodes;
-  }
-});
-Object.defineProperty(exports, 'groupsCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.groupsCodes;
-  }
-});
-Object.defineProperty(exports, 'messagingCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.messagingCodes;
-  }
-});
-Object.defineProperty(exports, 'mwiCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.mwiCodes;
-  }
-});
-Object.defineProperty(exports, 'sipEventCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.sipEventCodes;
-  }
-});
-Object.defineProperty(exports, 'clickToCallCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.clickToCallCodes;
-  }
-});
-Object.defineProperty(exports, 'bridgeCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.bridgeCodes;
-  }
-});
-Object.defineProperty(exports, 'subscriptionCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.subscriptionCodes;
-  }
-});
-Object.defineProperty(exports, 'presenceCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.presenceCodes;
-  }
-});
-Object.defineProperty(exports, 'usersCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.usersCodes;
-  }
-});
-class BasicError {
-  constructor({ message, code }) {
-    this.name = 'BasicError';
-    this.code = code || 'NO_CODE';
-    this.message = message ? `${message}` : 'An error occurred.';
-  }
-}
-exports.default = BasicError;
-
-/***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1950,7 +1956,7 @@ const SET_BROWSER_DETAILS = exports.SET_BROWSER_DETAILS = prefix + 'SET_BROWSER_
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var ctx = __webpack_require__(36);
 var hide = __webpack_require__(37);
 var has = __webpack_require__(38);
@@ -3853,7 +3859,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = request;
 exports.requestSaga = requestSaga;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var _actions = __webpack_require__(178);
 
@@ -3938,7 +3944,7 @@ exports.getWebsocketConfig = getWebsocketConfig;
 
 var _fp = __webpack_require__(3);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _utils = __webpack_require__(13);
 
@@ -6475,7 +6481,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.791';
+  return '4.34.0-beta.792';
 }
 
 /***/ }),
@@ -6743,7 +6749,7 @@ var _dscp = __webpack_require__(182);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -8403,200 +8409,6 @@ function getBrowserDetails(state) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mergeValues = mergeValues;
-exports.makeSafeForCSS = makeSafeForCSS;
-exports.getBrowserDetails = getBrowserDetails;
-
-var _adapter_no_edge = __webpack_require__(335);
-
-var _adapter_no_edge2 = _interopRequireDefault(_adapter_no_edge);
-
-var _fp = __webpack_require__(3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// TODO: This function was copied from Kandy, we should eventually create a common project that
-// can contain all of these utils that are useful in multiple packages.
-
-/**
- * Deeply merges the values of multiple objects. Objects on the left receive the values from objects on their right.
- * Unlike lodash's default merge behavior this doesn't merge arrays.
- *
- * @name mergeValues
- * @param {...Object} objects - Objects to merge
- * @return {Object} A new object containing the merged values.
- */
-function mergeValues(...objects) {
-  return (0, _fp.mergeAllWith)((leftValue, rightValue) => {
-    // Overwrite the default behavior of lodash's merge for arrays and simply
-    // clobber what's on the left so we don't end up with merged arrays.
-    if ((0, _fp.isArray)(leftValue)) {
-      return rightValue;
-    }
-  }, objects);
-}
-
-function makeSafeForCSS(name) {
-  if (!name) {
-    return name;
-  } else {
-    return name.replace(/[^a-z0-9]/g, '');
-  }
-}
-
-/**
- * @returns The browser details as provided by webrtc-adapter
- */
-function getBrowserDetails() {
-  return _adapter_no_edge2.default.browserDetails;
-}
-
-/***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _freeze = __webpack_require__(124);
-
-var _freeze2 = _interopRequireDefault(_freeze);
-
-exports.runPipeline = runPipeline;
-
-var _sdpTransform = __webpack_require__(46);
-
-var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
-
-var _fp = __webpack_require__(3);
-
-var _logs = __webpack_require__(22);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const log = _logs.logManager.getLogger('SdpPipeline');
-
-/**
- * Basic SDP pipeline runner.
- * Does not include any default handlers.
- * @method sdpPipeline
- * @param  {Array}      handlers       List of functions that transform the SDP.
- * @param  {String}     sdp            The session description.
- * @param  {RTCSdpType} info           Information about the session description.
- * @param  {RTCSdpType} info.type      The session description's type.
- * @param  {String}     info.endpoint  Which end of the connection created the SDP.
- * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
- * @return {String}     The modified session description.
-
- */
-// Libraries.
-function runPipeline(handlers, sdp, info) {
-  const objectSdp = _sdpTransform2.default.parse(sdp);
-
-  const originalSdp = (0, _freeze2.default)(objectSdp);
-  let newSdp = (0, _fp.cloneDeep)(originalSdp);
-
-  if ((0, _fp.isArray)(handlers)) {
-    handlers.forEach(handler => {
-      if ((0, _fp.isFunction)(handler)) {
-        newSdp = handler(newSdp, info, originalSdp);
-      } else {
-        log.error('SDP handler not a function; skipping.');
-      }
-    });
-  }
-
-  return _sdpTransform2.default.write(newSdp);
-}
-
-/**
- * Create an instance of the SDP pipeline.
- * Allows for persistent SDP handlers to be set and implicitly used.
- * @method createPipeline
- * @return {Object} An SDP pipeline.
- */
-function createPipeline() {
-  /**
-   * SDP handlers that should be included with every pipeline run.
-   * @type {Array}
-   */
-  let defaultHandlers = [];
-
-  /**
-   * Use the pipeline to process an SDP.
-   * @method run
-   * @param  {Array}      handlers      List of functions that transform the SDP.
-   * @param  {String}     sdp           The session description.
-   * @param  {RTCSdpType} info          Information about the session description.
-   * @param  {RTCSdpType} info.type     The session description's type.
-   * @param  {String}     info.endpoint Which end of the connection created the SDP.
-   * @return {String}     The modified session description.
-   */
-  function run(handlers = [], sdp, info) {
-    return runPipeline(handlers.concat(defaultHandlers), sdp, info);
-  }
-
-  /**
-   * Set the SDP handlers that should be included with every pipeline run.
-   * @method setHandlers
-   * @param  {Array} handlers List of SDP handler functions.
-   */
-  function setHandlers(handlers) {
-    if ((0, _fp.isArray)(handlers)) {
-      defaultHandlers = defaultHandlers.concat(handlers);
-    }
-  }
-
-  /**
-   * Get the SDP handlers that are included with every pipeline run.
-   * @method getHandlers
-   * @return {Array} List of SDP handler functions.
-   */
-  function getHandlers() {
-    return defaultHandlers;
-  }
-
-  return {
-    run,
-    setHandlers,
-    getHandlers
-  };
-}
-
-// Export an instance of the pipeline to be used by everything.
-exports.default = createPipeline();
-
-/***/ }),
-/* 88 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const PREFIX = '@@KANDY/';
-
-const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
-const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
-
-const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = PREFIX + 'AUTHORIZATION_ERROR';
-
-/***/ }),
-/* 89 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 /**
  * Error codes for the Auth plugin.
  * @name authCodes
@@ -8737,7 +8549,208 @@ const authCodes = exports.authCodes = {
   REFRESH_CONTACTS_FAIL: 'users:2',
   DIRECTORY_REQUEST_FAIL: 'users:3',
   INVALID_PARAM: 'users:4'
+
+  /**
+   * Error codes for the Webrtc plugin
+   * @name webrtcCodes
+   */
+};const webrtcCodes = exports.webrtcCodes = {
+  INVALID_PARAM: 'webrtc:1'
 };
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.mergeValues = mergeValues;
+exports.makeSafeForCSS = makeSafeForCSS;
+exports.getBrowserDetails = getBrowserDetails;
+
+var _adapter_no_edge = __webpack_require__(335);
+
+var _adapter_no_edge2 = _interopRequireDefault(_adapter_no_edge);
+
+var _fp = __webpack_require__(3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// TODO: This function was copied from Kandy, we should eventually create a common project that
+// can contain all of these utils that are useful in multiple packages.
+
+/**
+ * Deeply merges the values of multiple objects. Objects on the left receive the values from objects on their right.
+ * Unlike lodash's default merge behavior this doesn't merge arrays.
+ *
+ * @name mergeValues
+ * @param {...Object} objects - Objects to merge
+ * @return {Object} A new object containing the merged values.
+ */
+function mergeValues(...objects) {
+  return (0, _fp.mergeAllWith)((leftValue, rightValue) => {
+    // Overwrite the default behavior of lodash's merge for arrays and simply
+    // clobber what's on the left so we don't end up with merged arrays.
+    if ((0, _fp.isArray)(leftValue)) {
+      return rightValue;
+    }
+  }, objects);
+}
+
+function makeSafeForCSS(name) {
+  if (!name) {
+    return name;
+  } else {
+    return name.replace(/[^a-z0-9]/g, '');
+  }
+}
+
+/**
+ * @returns The browser details as provided by webrtc-adapter
+ */
+function getBrowserDetails() {
+  return _adapter_no_edge2.default.browserDetails;
+}
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _freeze = __webpack_require__(124);
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+exports.runPipeline = runPipeline;
+
+var _sdpTransform = __webpack_require__(46);
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+var _fp = __webpack_require__(3);
+
+var _logs = __webpack_require__(22);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = _logs.logManager.getLogger('SdpPipeline');
+
+/**
+ * Basic SDP pipeline runner.
+ * Does not include any default handlers.
+ * @method sdpPipeline
+ * @param  {Array}      handlers       List of functions that transform the SDP.
+ * @param  {String}     sdp            The session description.
+ * @param  {RTCSdpType} info           Information about the session description.
+ * @param  {RTCSdpType} info.type      The session description's type.
+ * @param  {String}     info.endpoint  Which end of the connection created the SDP.
+ * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
+ * @return {String}     The modified session description.
+
+ */
+// Libraries.
+function runPipeline(handlers, sdp, info) {
+  const objectSdp = _sdpTransform2.default.parse(sdp);
+
+  const originalSdp = (0, _freeze2.default)(objectSdp);
+  let newSdp = (0, _fp.cloneDeep)(originalSdp);
+
+  if ((0, _fp.isArray)(handlers)) {
+    handlers.forEach(handler => {
+      if ((0, _fp.isFunction)(handler)) {
+        newSdp = handler(newSdp, info, originalSdp);
+      } else {
+        log.error('SDP handler not a function; skipping.');
+      }
+    });
+  }
+
+  return _sdpTransform2.default.write(newSdp);
+}
+
+/**
+ * Create an instance of the SDP pipeline.
+ * Allows for persistent SDP handlers to be set and implicitly used.
+ * @method createPipeline
+ * @return {Object} An SDP pipeline.
+ */
+function createPipeline() {
+  /**
+   * SDP handlers that should be included with every pipeline run.
+   * @type {Array}
+   */
+  let defaultHandlers = [];
+
+  /**
+   * Use the pipeline to process an SDP.
+   * @method run
+   * @param  {Array}      handlers      List of functions that transform the SDP.
+   * @param  {String}     sdp           The session description.
+   * @param  {RTCSdpType} info          Information about the session description.
+   * @param  {RTCSdpType} info.type     The session description's type.
+   * @param  {String}     info.endpoint Which end of the connection created the SDP.
+   * @return {String}     The modified session description.
+   */
+  function run(handlers = [], sdp, info) {
+    return runPipeline(handlers.concat(defaultHandlers), sdp, info);
+  }
+
+  /**
+   * Set the SDP handlers that should be included with every pipeline run.
+   * @method setHandlers
+   * @param  {Array} handlers List of SDP handler functions.
+   */
+  function setHandlers(handlers) {
+    if ((0, _fp.isArray)(handlers)) {
+      defaultHandlers = defaultHandlers.concat(handlers);
+    }
+  }
+
+  /**
+   * Get the SDP handlers that are included with every pipeline run.
+   * @method getHandlers
+   * @return {Array} List of SDP handler functions.
+   */
+  function getHandlers() {
+    return defaultHandlers;
+  }
+
+  return {
+    run,
+    setHandlers,
+    getHandlers
+  };
+}
+
+// Export an instance of the pipeline to be used by everything.
+exports.default = createPipeline();
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const PREFIX = '@@KANDY/';
+
+const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
+const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
+
+const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = PREFIX + 'AUTHORIZATION_ERROR';
 
 /***/ }),
 /* 90 */
@@ -9919,7 +9932,7 @@ module.exports = function (key) {
 /* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var global = __webpack_require__(15);
 var SHARED = '__core-js_shared__';
 var store = global[SHARED] || (global[SHARED] = {});
@@ -9992,7 +10005,7 @@ module.exports = function isObject(arg) {
 
 // most Object methods by ES6 should accept primitives
 var $export = __webpack_require__(12);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var fails = __webpack_require__(42);
 module.exports = function (KEY, exec) {
   var fn = (core.Object || {})[KEY] || Object[KEY];
@@ -10014,7 +10027,7 @@ exports.f = __webpack_require__(16);
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var LIBRARY = __webpack_require__(61);
 var wksExt = __webpack_require__(110);
 var defineProperty = __webpack_require__(25).f;
@@ -10710,7 +10723,7 @@ exports.fetchResource = fetchResource;
 
 var _selectors = __webpack_require__(401);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -10883,7 +10896,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.handleRequestError = handleRequestError;
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -12548,7 +12561,7 @@ module.exports = function (it) {
 var classof = __webpack_require__(118);
 var ITERATOR = __webpack_require__(16)('iterator');
 var Iterators = __webpack_require__(67);
-module.exports = __webpack_require__(8).getIteratorMethod = function (it) {
+module.exports = __webpack_require__(9).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
     || it['@@iterator']
     || Iterators[classof(it)];
@@ -12562,7 +12575,7 @@ module.exports = __webpack_require__(8).getIteratorMethod = function (it) {
 "use strict";
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var dP = __webpack_require__(25);
 var DESCRIPTORS = __webpack_require__(20);
 var SPECIES = __webpack_require__(16)('species');
@@ -13016,6 +13029,20 @@ const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
  */
 const TRACK_SOURCE_UNMUTED = exports.TRACK_SOURCE_UNMUTED = 'media:sourceUnmuted';
 
+/**
+ * The specified Track has been rendered into an element.
+ *
+ * @public
+ * @static
+ * @memberof media
+ * @event media:trackRendered
+ * @param {Object} params
+ * @param {Array<string>} params.trackIds The list of track id's that were rendered.
+ * @param {string} params.selector The css selector used to identify the element the track is rendered into.
+ * @param {api.BasicError} [params.error] An error object, if the operation was not successful.
+ */
+const TRACK_RENDERED = exports.TRACK_RENDERED = 'media:trackRendered';
+
 /***/ }),
 /* 170 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -13067,7 +13094,7 @@ var _webrtcManager2 = _interopRequireDefault(_webrtcManager);
 
 var _logs = __webpack_require__(22);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
@@ -13075,7 +13102,7 @@ var _handlers = __webpack_require__(125);
 
 var sdpHandlers = _interopRequireWildcard(_handlers);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -13166,7 +13193,7 @@ var _eventemitter = __webpack_require__(31);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13839,7 +13866,7 @@ var _properties = __webpack_require__(372);
 
 var _properties2 = _interopRequireDefault(_properties);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 var _config = __webpack_require__(379);
 
@@ -15029,7 +15056,7 @@ exports.request = request;
 exports.response = response;
 exports.authorizationError = authorizationError;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -15111,7 +15138,7 @@ exports.updateSessionStatus = updateSessionStatus;
 exports.endSession = endSession;
 exports.rejectSession = rejectSession;
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _effects = __webpack_require__(33);
 
@@ -16485,7 +16512,7 @@ exports.createLocal = createLocal;
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -16608,7 +16635,7 @@ var _actionTypes = __webpack_require__(50);
 
 var _selectors = __webpack_require__(72);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _actionTypes2 = __webpack_require__(49);
 
@@ -16713,7 +16740,7 @@ var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(23);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -17431,7 +17458,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -18184,7 +18211,7 @@ var _actionTypes = __webpack_require__(93);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -20262,7 +20289,7 @@ function factory(pluginFactories, sdkOptions = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(207);
-module.exports = __webpack_require__(8).Object.assign;
+module.exports = __webpack_require__(9).Object.assign;
 
 
 /***/ }),
@@ -21619,7 +21646,7 @@ module.exports = function isPlainObject(value) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(223);
-module.exports = __webpack_require__(8).Object.keys;
+module.exports = __webpack_require__(9).Object.keys;
 
 
 /***/ }),
@@ -22548,7 +22575,7 @@ function createManager(options = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(231);
-module.exports = __webpack_require__(8).Object.values;
+module.exports = __webpack_require__(9).Object.values;
 
 
 /***/ }),
@@ -22574,7 +22601,7 @@ __webpack_require__(233);
 __webpack_require__(81);
 __webpack_require__(236);
 __webpack_require__(237);
-module.exports = __webpack_require__(8).Symbol;
+module.exports = __webpack_require__(9).Symbol;
 
 
 /***/ }),
@@ -23304,7 +23331,7 @@ function defaultActionHandler(entry) {
 /* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
 module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
   return $JSON.stringify.apply($JSON, arguments);
@@ -24733,7 +24760,7 @@ __webpack_require__(257);
 __webpack_require__(261);
 __webpack_require__(263);
 __webpack_require__(264);
-module.exports = __webpack_require__(8).Set;
+module.exports = __webpack_require__(9).Set;
 
 
 /***/ }),
@@ -25485,7 +25512,7 @@ module.exports = { "default": __webpack_require__(270), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(271);
-var $Object = __webpack_require__(8).Object;
+var $Object = __webpack_require__(9).Object;
 module.exports = function defineProperties(T, D) {
   return $Object.defineProperties(T, D);
 };
@@ -25506,7 +25533,7 @@ $export($export.S + $export.F * !__webpack_require__(20), 'Object', { defineProp
 
 __webpack_require__(66);
 __webpack_require__(273);
-module.exports = __webpack_require__(8).Array.from;
+module.exports = __webpack_require__(9).Array.from;
 
 
 /***/ }),
@@ -25588,7 +25615,7 @@ module.exports = __webpack_require__(110).f('iterator');
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(278);
-var $Object = __webpack_require__(8).Object;
+var $Object = __webpack_require__(9).Object;
 module.exports = function create(P, D) {
   return $Object.create(P, D);
 };
@@ -26066,7 +26093,7 @@ __webpack_require__(83);
 __webpack_require__(287);
 __webpack_require__(291);
 __webpack_require__(292);
-module.exports = __webpack_require__(8).Promise;
+module.exports = __webpack_require__(9).Promise;
 
 
 /***/ }),
@@ -26298,7 +26325,7 @@ if (!USE_NATIVE) {
 $export($export.G + $export.W + $export.F * !USE_NATIVE, { Promise: $Promise });
 __webpack_require__(64)($Promise, PROMISE);
 __webpack_require__(157)(PROMISE);
-Wrapper = __webpack_require__(8)[PROMISE];
+Wrapper = __webpack_require__(9)[PROMISE];
 
 // statics
 $export($export.S + $export.F * !USE_NATIVE, PROMISE, {
@@ -26477,7 +26504,7 @@ module.exports = navigator && navigator.userAgent || '';
 // https://github.com/tc39/proposal-promise-finally
 
 var $export = __webpack_require__(12);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var global = __webpack_require__(15);
 var speciesConstructor = __webpack_require__(165);
 var promiseResolve = __webpack_require__(168);
@@ -27456,7 +27483,7 @@ var _actions = __webpack_require__(304);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _constants = __webpack_require__(84);
 
@@ -28853,11 +28880,17 @@ function trackRemoved(trackId, params) {
 }
 
 function trackHelper(type, payload = {}, meta = {}) {
-  return {
+  const action = {
     type,
     payload,
     meta
   };
+
+  if (payload.error) {
+    action.error = true;
+  }
+
+  return action;
 }
 
 function muteTracks(trackIds) {
@@ -29734,6 +29767,17 @@ events[actionTypes.TRACK_SOURCE_UNMUTED] = action => {
       trackId: action.payload.trackIds[0],
       isLocal: action.payload.isLocal,
       id: action.payload.mediaId
+    }
+  };
+};
+
+events[actionTypes.RENDER_TRACKS_FINISH] = action => {
+  return {
+    type: eventTypes.TRACK_RENDERED,
+    args: {
+      trackIds: action.payload.trackIds,
+      selector: action.payload.selector,
+      error: action.payload.error
     }
   };
 };
@@ -30702,8 +30746,13 @@ var _effects = __webpack_require__(1);
 
 var _fp = __webpack_require__(3);
 
-// Libraries.
-// Webrtc plugin.
+var _errors = __webpack_require__(8);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Other plugins.
 const log = _logs.logManager.getLogger('MEDIA');
 
 /**
@@ -30713,23 +30762,47 @@ const log = _logs.logManager.getLogger('MEDIA');
  */
 
 
-// Other plugins.
+// Libraries.
+// Webrtc plugin.
 function* renderTracks(webRTC, action) {
   const { trackIds, selector, speakerId } = action.payload;
-  log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
   // Get the tracks that are to be rendered.
   const tracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIds);
   const filteredTracks = tracks.filter(track => !(0, _fp.isUndefined)(track));
+  let payload = {};
 
-  // Render the tracks.
-  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
+  // Each of trackIds, selector and speakerId must be present in order to render a track
+  if (trackIds &&
+  // trackIds is an array
+  trackIds instanceof Array &&
+  // trackIds is not empty
+  trackIds.length > 0 && selector &&
+  // selector is a string
+  (0, _fp.isString)(selector) &&
+  // selector is not empty
+  selector.length > 0) {
+    log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
-  log.info('Finished rendering track(s).', filteredTracks.map(track => track.id));
+    // Render the tracks.
+    yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
+
+    log.info('Finished rendering track(s).', filteredTracks.map(track => track.id));
+
+    payload = { selector };
+  } else {
+    const message = 'Failed to render tracks. One of trackIds or cssSelector is missing from request.';
+
+    log.info(message, filteredTracks.map(track => track.id));
+
+    payload.error = new _errors2.default({
+      message,
+      code: _errors.webrtcCodes.INVALID_PARAM
+    });
+  }
+
   // Report operation done.
-  yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
-    selector
-  }));
+  yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), payload));
 }
 
 /**
@@ -34402,7 +34475,7 @@ __webpack_require__(337);
 __webpack_require__(338);
 __webpack_require__(339);
 __webpack_require__(340);
-module.exports = __webpack_require__(8).Map;
+module.exports = __webpack_require__(9).Map;
 
 
 /***/ }),
@@ -34468,7 +34541,7 @@ module.exports = { "default": __webpack_require__(342), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(343);
-module.exports = __webpack_require__(8).Reflect.set;
+module.exports = __webpack_require__(9).Reflect.set;
 
 
 /***/ }),
@@ -35038,7 +35111,7 @@ var _constants = __webpack_require__(29);
 
 var _sdpSemantics = __webpack_require__(57);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _handlers = __webpack_require__(125);
 
@@ -35105,7 +35178,7 @@ function createAnswer(options = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(357);
-module.exports = __webpack_require__(8).Object.freeze;
+module.exports = __webpack_require__(9).Object.freeze;
 
 
 /***/ }),
@@ -35394,7 +35467,7 @@ var _constants = __webpack_require__(29);
 
 var _sdpSemantics = __webpack_require__(57);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _handlers = __webpack_require__(125);
 
@@ -37129,7 +37202,7 @@ var _logs = __webpack_require__(22);
 
 var _constants = __webpack_require__(29);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
@@ -37137,7 +37210,7 @@ var _sdpSemantics = __webpack_require__(57);
 
 var _extractors = __webpack_require__(175);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -39038,7 +39111,7 @@ var _selectors = __webpack_require__(18);
 
 var _normalization = __webpack_require__(393);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _actions2 = __webpack_require__(28);
 
@@ -42358,7 +42431,7 @@ var _actions = __webpack_require__(48);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -42455,7 +42528,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -42581,7 +42654,7 @@ var _actions = __webpack_require__(32);
 
 var _selectors = __webpack_require__(18);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -42687,7 +42760,7 @@ var _midcall = __webpack_require__(71);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -44420,7 +44493,7 @@ module.exports = (chalk, temporary) => {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(414);
-module.exports = __webpack_require__(8).Object.entries;
+module.exports = __webpack_require__(9).Object.entries;
 
 
 /***/ }),
@@ -44490,13 +44563,13 @@ var _selectors = __webpack_require__(18);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
 var _selectors2 = __webpack_require__(85);
 
-var _selectors3 = __webpack_require__(9);
+var _selectors3 = __webpack_require__(10);
 
 var _selectors4 = __webpack_require__(72);
 
@@ -46220,7 +46293,7 @@ var _establish = __webpack_require__(128);
 
 var _midcall = __webpack_require__(71);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -48528,7 +48601,7 @@ exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -48732,7 +48805,7 @@ var _constants = __webpack_require__(23);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -50512,7 +50585,7 @@ var _actions = __webpack_require__(91);
 
 var _selectors = __webpack_require__(72);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -50879,7 +50952,7 @@ var _actions = __webpack_require__(91);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _selectors3 = __webpack_require__(34);
 
@@ -52713,7 +52786,7 @@ var _mappings = __webpack_require__(51);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _compose = __webpack_require__(138);
 
@@ -53254,7 +53327,7 @@ module.exports = { "default": __webpack_require__(447), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(448);
-module.exports = __webpack_require__(8).Object.getPrototypeOf;
+module.exports = __webpack_require__(9).Object.getPrototypeOf;
 
 
 /***/ }),
@@ -53555,7 +53628,7 @@ var _requests = __webpack_require__(190);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _constants = __webpack_require__(7);
 
@@ -53565,7 +53638,7 @@ var _effects = __webpack_require__(1);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -54233,7 +54306,7 @@ var _requests = __webpack_require__(190);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _selectors3 = __webpack_require__(34);
 
@@ -54241,7 +54314,7 @@ var _actions = __webpack_require__(48);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -55934,7 +56007,7 @@ var _actions = __webpack_require__(48);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _selectors2 = __webpack_require__(34);
 
@@ -56182,7 +56255,7 @@ var actions = _interopRequireWildcard(_actions);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _selectors2 = __webpack_require__(34);
 
@@ -56190,7 +56263,7 @@ var _constants = __webpack_require__(7);
 
 var _constants2 = __webpack_require__(132);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -57366,9 +57439,9 @@ var _actions = __webpack_require__(193);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -58661,7 +58734,7 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _constants = __webpack_require__(7);
 
@@ -59064,11 +59137,11 @@ var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
 
 var _constants = __webpack_require__(84);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -59401,7 +59474,7 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _effects = __webpack_require__(186);
 
@@ -59409,7 +59482,7 @@ var _logs = __webpack_require__(2);
 
 var _selectors3 = __webpack_require__(72);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -59595,7 +59668,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -60900,15 +60973,15 @@ var actions = _interopRequireWildcard(_contacts);
 
 var _contacts2 = __webpack_require__(504);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _utils = __webpack_require__(198);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 var _effects = __webpack_require__(1);
 
@@ -61042,11 +61115,11 @@ var _effects2 = _interopRequireDefault(_effects);
 
 var _handleRequestError = __webpack_require__(127);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61221,15 +61294,15 @@ var actions = _interopRequireWildcard(_users);
 
 var _users2 = __webpack_require__(506);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 var _effects = __webpack_require__(1);
 
@@ -61661,7 +61734,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.__testonly__ = undefined;
 exports.default = watchRequests;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -62029,7 +62102,7 @@ exports.linkAuthorization = linkAuthorization;
 exports.ucAuthorization = ucAuthorization;
 exports.cpaasAuthorization = cpaasAuthorization;
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -62193,7 +62266,7 @@ var _eventTypes = __webpack_require__(515);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -62296,7 +62369,7 @@ var _utils = __webpack_require__(126);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _fp = __webpack_require__(3);
 

@@ -5111,7 +5111,7 @@
                 "column": 0
               },
               "end": {
-                "line": 24,
+                "line": 25,
                 "column": 16
               }
             },
@@ -37812,6 +37812,247 @@
             }
           ],
           "namespace": "media.event:media:sourceUnmuted"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The specified Track has been rendered into an element."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 3,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 4
+            },
+            {
+              "title": "memberof",
+              "description": "media",
+              "lineNumber": 5
+            },
+            {
+              "title": "event",
+              "description": "media:trackRendered",
+              "lineNumber": 6
+            },
+            {
+              "title": "param",
+              "description": null,
+              "lineNumber": 7,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "params"
+            },
+            {
+              "title": "param",
+              "description": "The list of track id's that were rendered.",
+              "lineNumber": 8,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "params.trackIds"
+            },
+            {
+              "title": "param",
+              "description": "The css selector used to identify the element the track is rendered into.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.selector"
+            },
+            {
+              "title": "param",
+              "description": "An error object, if the operation was not successful.",
+              "lineNumber": 10,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "api.BasicError"
+                }
+              },
+              "name": "params.error"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 110,
+              "column": 0
+            },
+            "end": {
+              "line": 121,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 122,
+                "column": 0
+              },
+              "end": {
+                "line": 122,
+                "column": 51
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/webrtc/interface/eventTypes.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "params",
+              "lineNumber": 7,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "params.trackIds",
+                  "lineNumber": 8,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The list of track id's that were rendered."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.selector",
+                  "lineNumber": 9,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The css selector used to identify the element the track is rendered into."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.error",
+                  "lineNumber": 10,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "An error object, if the operation was not successful."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "api.BasicError"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "media",
+          "kind": "event",
+          "name": "media:trackRendered",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "media",
+              "kind": "namespace"
+            },
+            {
+              "name": "media:trackRendered",
+              "kind": "event",
+              "scope": "static"
+            }
+          ],
+          "namespace": "media.event:media:trackRendered"
         }
       ],
       "static": [

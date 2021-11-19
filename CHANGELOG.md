@@ -18,6 +18,8 @@ Kandy.js change log.
 - Fixed an issue where the media direction wasn't being set correctly when adding video to a transceiver that we are reusing, this resulted in
   the call losing remote video when local video is added. `KJS-396`
 - Fixed the issue where the websocket cleanup was not triggered when a lost connection was detected. `KJS-424`
+- Fixed an issue where if no css selector is passed when calling `client.media.renderTracks` API, it would result in an exception. Now it is
+  handled as an error and logged accordingly. `KJS-419`
 
 ## 4.33.0 - 2021-10-29
 

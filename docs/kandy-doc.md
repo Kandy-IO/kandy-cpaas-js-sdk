@@ -3010,6 +3010,18 @@ the default in an upcoming release.
 
     *   `params.trackId` **[string][8]** The track that is affected as a result of media source being unmuted.
 
+### media:trackRendered
+
+The specified Track has been rendered into an element.
+
+#### Parameters
+
+*   `params` **[Object][7]** 
+
+    *   `params.trackIds` **[Array][13]<[string][8]>** The list of track id's that were rendered.
+    *   `params.selector` **[string][8]** The css selector used to identify the element the track is rendered into.
+    *   `params.error` **[api.BasicError][19]?** An error object, if the operation was not successful.
+
 ## presence
 
 The 'presence' namespace provides an interface for an application to set the
