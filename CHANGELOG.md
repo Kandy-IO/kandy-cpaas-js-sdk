@@ -20,6 +20,7 @@ Kandy.js change log.
 - Fixed the issue where the websocket cleanup was not triggered when a lost connection was detected. `KJS-424`
 - Fixed an issue where if no css selector is passed when calling `client.media.renderTracks` API, it would result in an exception. Now it is
   handled as an error and logged accordingly. `KJS-419`
+- Fixed an issue where calls would occasionally get stuck in `Initiating` state if no user info was provided. `KJS-421`
 
 ## 4.33.0 - 2021-10-29
 

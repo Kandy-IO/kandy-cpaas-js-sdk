@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.792
+ * Version: 4.34.0-beta.793
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1802,7 +1802,7 @@ function getRequestInfo(state, platform) {
 
   const { subscription, clientCorrelator } = getAuthConfig(state);
   let { server } = getAuthConfig(state);
-  const { userInfo } = (0, _fp.cloneDeep)(state.authentication);
+  let { userInfo } = (0, _fp.cloneDeep)(state.authentication);
 
   // For backwards compatibility, we need to fall back to
   // subscription for the server connection details
@@ -1813,6 +1813,11 @@ function getRequestInfo(state, platform) {
       port: subscription.port,
       version: subscription.version
     };
+  }
+
+  // If user info does not exist yet, use an empty object. Requests will still fail, but they will be handled.
+  if (!userInfo) {
+    userInfo = {};
   }
 
   let requestInfo;
@@ -6481,7 +6486,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.792';
+  return '4.34.0-beta.793';
 }
 
 /***/ }),
