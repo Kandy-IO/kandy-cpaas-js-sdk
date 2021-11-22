@@ -10,6 +10,8 @@ Kandy.js change log.
 ### Added
 
 - Added a new object property `mediaOffered` to `CallObject` (for an incoming call) to reflect what caller has offered in terms of media. `KJS-334`
+- Added the ability to use the `call.replaceTrack` API on a call as long as it is on-going. `KJS-334`
+  - Previously the operation required the call to be in the 'Connected' state only.
 
 ### Fixed
 

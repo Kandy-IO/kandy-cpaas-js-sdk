@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.794
+ * Version: 4.34.0-beta.795
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6486,7 +6486,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.794';
+  return '4.34.0-beta.795';
 }
 
 /***/ }),
@@ -45875,16 +45875,28 @@ function* replaceTrack(deps, action) {
 
   const { trackId, mediaConstraints } = action.payload;
 
-  const stateError = yield (0, _effects2.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
-  if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
+  const currentCall = yield (0, _effects2.select)(_selectors.getCallById, action.payload.id);
+  if (!currentCall) {
+    log.debug(`Call ${action.payload.id} not found.`);
     yield (0, _effects2.put)(_actions.callActions.replaceTrackFinish(action.payload.id, {
-      error: stateError
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'Call state not found; invalid call ID.'
+      })
     }));
     return;
   }
 
-  const currentCall = yield (0, _effects2.select)(_selectors.getCallById, action.payload.id);
+  if ([_constants.CALL_STATES.CANCELLED, _constants.CALL_STATES.ENDED, _constants.CALL_STATES.INITIATING].includes(currentCall.state)) {
+    log.debug(`Invalid call state: ${currentCall.state}`);
+    yield (0, _effects2.put)(_actions.callActions.replaceTrackFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_STATE,
+        message: `Call is in an invalid state: ${currentCall.state}.`
+      })
+    }));
+    return;
+  }
 
   const { error, newTrackId, oldTrackState } = yield (0, _effects2.call)(_midcall.webRtcReplaceTrack, webRTC, {
     sessionId: currentCall.webrtcSessionId,
