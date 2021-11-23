@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.34.0-beta.795
+ * Version: 4.34.0-beta.796
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6486,7 +6486,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.34.0-beta.795';
+  return '4.34.0-beta.796';
 }
 
 /***/ }),
@@ -55287,7 +55287,6 @@ function findNotificationInfo(notification) {
 }
 
 function* processNotifications() {
-  const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
   const idCache = [];
 
   /**
@@ -55295,15 +55294,21 @@ function* processNotifications() {
    *      judging by its event ID.
    * @method isDuplicate
    * @param  {string} id
+   * @param {Object} config
    * @return {boolean}
    */
-  function isDuplicate(id) {
-    if (idCache.indexOf(id) !== -1) {
+  function isDuplicate(id, config) {
+    // Get the list of "relevant" IDs in the queue ("relevant" being the latest X elements).
+    // This covers edge-cases where the cache length config is changed (to a smaller number)
+    //    after the queue has begun to be populated.
+    const ids = config.idCacheLength === 0 ? [] : idCache.slice(config.idCacheLength * -1);
+    // If the notification ID is part of the list, then it's a duplicate.
+    if (ids.indexOf(id) !== -1) {
       return true; // duplicate.
     } else {
       // Not a duplicate.
       idCache.push(id);
-      if (idCache.length > config.idCacheLength) {
+      while (idCache.length > config.idCacheLength) {
         idCache.shift();
       }
 
@@ -55313,6 +55318,7 @@ function* processNotifications() {
 
   while (true) {
     const { payload: notification, meta } = yield (0, _effects.take)(actionTypes.PROCESS_NOTIFICATION);
+    const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
     log.info(`Received notification on channel ${meta.channel}; handling.`);
 
     // Only process notifications from enabled channels, ie. "silence" the channel.
@@ -55330,7 +55336,7 @@ function* processNotifications() {
     }
 
     log.debug(`Received notification of type ${notificationType} with ID ${notificationId}.`);
-    if (!isDuplicate(notificationId)) {
+    if (!isDuplicate(notificationId, config)) {
       log.info('Notifying other plugins about notification ...');
       // Notify others (plugins) that a new notification was receive.
       yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));

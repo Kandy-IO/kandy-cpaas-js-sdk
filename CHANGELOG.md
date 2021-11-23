@@ -23,6 +23,8 @@ Kandy.js change log.
 - Fixed an issue where if no css selector is passed when calling `client.media.renderTracks` API, it would result in an exception. Now it is
   handled as an error and logged accordingly. `KJS-419`
 - Fixed an issue where calls would occasionally get stuck in `Initiating` state if no user info was provided. `KJS-421`
+- Fixed an issue where if the client updated the notifications config and set idCacheLength to 0 (disable duplicate checking) it wouldn't be
+  used by the SDK and it would continue to check for duplicate notifications. `KJS-419`
 
 ## 4.33.0 - 2021-10-29
 
