@@ -5,12 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.34.0 - beta
+## 4.34.0 - 2021-11-26
 
 ### Added
 
 - Added a new object property `mediaOffered` to `CallObject` (for an incoming call) to reflect what caller has offered in terms of media. `KJS-334`
-- Added the ability to use the `call.replaceTrack` API on a call as long as it is on-going. `KJS-334`
+- Added the ability to use the `call.replaceTrack` API on a call as long as it is on-going. `KJS-347`
   - Previously the operation required the call to be in the 'Connected' state only.
 
 ### Fixed
@@ -24,7 +24,7 @@ Kandy.js change log.
   handled as an error and logged accordingly. `KJS-419`
 - Fixed an issue where calls would occasionally get stuck in `Initiating` state if no user info was provided. `KJS-421`
 - Fixed an issue where if the client updated the notifications config and set idCacheLength to 0 (disable duplicate checking) it wouldn't be
-  used by the SDK and it would continue to check for duplicate notifications. `KJS-419`
+  used by the SDK and it would continue to check for duplicate notifications. `KJS-427`
 
 ## 4.33.0 - 2021-10-29
 
