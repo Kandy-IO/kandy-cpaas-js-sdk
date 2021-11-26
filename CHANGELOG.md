@@ -5,6 +5,27 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.34.0 - 2021-11-26
+
+### Added
+
+- Added a new object property `mediaOffered` to `CallObject` (for an incoming call) to reflect what caller has offered in terms of media. `KJS-334`
+- Added the ability to use the `call.replaceTrack` API on a call as long as it is on-going. `KJS-347`
+  - Previously the operation required the call to be in the 'Connected' state only.
+
+### Fixed
+
+- If a client unsubscribes from services and gets a 404 Not Found network response, it is treated as a successful unsubscribe operation
+  and removes subscription information from state. `KJS-266`
+- Fixed an issue where the media direction wasn't being set correctly when adding video to a transceiver that we are reusing, this resulted in
+  the call losing remote video when local video is added. `KJS-396`
+- Fixed the issue where the websocket cleanup was not triggered when a lost connection was detected. `KJS-424`
+- Fixed an issue where if no css selector is passed when calling `client.media.renderTracks` API, it would result in an exception. Now it is
+  handled as an error and logged accordingly. `KJS-419`
+- Fixed an issue where calls would occasionally get stuck in `Initiating` state if no user info was provided. `KJS-421`
+- Fixed an issue where if the client updated the notifications config and set idCacheLength to 0 (disable duplicate checking) it wouldn't be
+  used by the SDK and it would continue to check for duplicate notifications. `KJS-427`
+
 ## 4.33.0 - 2021-10-29
 
 ### Added
@@ -74,7 +95,7 @@ With this release we're announcing the default SDP semantics are changing to the
 ### Added
 
 - Added a new property to the `CallObject` called `mediaConnectionState`, which tracks the underlying media connection state of a call. `KJS-141`, `KJS-223`
-  - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted everytime the media connection state is changed.
+  - A new call event [`call:mediaConnectionChange`](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#calleventcallmediaconnectionchange) is also emitted every time the media connection state is changed.
 - Added a new property to the call config called `callAuditTimer`, which sets the time interval to follow when auditing a call. If not specified in the call config object, the default of 25000 milliseconds will be used. `KJS-106`
 - Added the ability to customize the `X-CPaaS-Agent` header's value by appending any custom string to its value. `KJS-159`
 

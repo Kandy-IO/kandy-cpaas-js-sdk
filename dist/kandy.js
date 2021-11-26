@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.33.0
+ * Version: 4.34.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1519,6 +1519,106 @@ const connCheckMethods = exports.connCheckMethods = {
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _codes = __webpack_require__(86);
+
+Object.defineProperty(exports, 'authCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.authCodes;
+  }
+});
+Object.defineProperty(exports, 'callCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.callCodes;
+  }
+});
+Object.defineProperty(exports, 'callHistoryCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.callHistoryCodes;
+  }
+});
+Object.defineProperty(exports, 'groupsCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.groupsCodes;
+  }
+});
+Object.defineProperty(exports, 'messagingCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.messagingCodes;
+  }
+});
+Object.defineProperty(exports, 'mwiCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.mwiCodes;
+  }
+});
+Object.defineProperty(exports, 'sipEventCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.sipEventCodes;
+  }
+});
+Object.defineProperty(exports, 'clickToCallCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.clickToCallCodes;
+  }
+});
+Object.defineProperty(exports, 'bridgeCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.bridgeCodes;
+  }
+});
+Object.defineProperty(exports, 'subscriptionCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.subscriptionCodes;
+  }
+});
+Object.defineProperty(exports, 'presenceCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.presenceCodes;
+  }
+});
+Object.defineProperty(exports, 'usersCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.usersCodes;
+  }
+});
+Object.defineProperty(exports, 'webrtcCodes', {
+  enumerable: true,
+  get: function () {
+    return _codes.webrtcCodes;
+  }
+});
+class BasicError {
+  constructor({ message, code }) {
+    this.name = 'BasicError';
+    this.code = code || 'NO_CODE';
+    this.message = message ? `${message}` : 'An error occurred.';
+  }
+}
+exports.default = BasicError;
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 var core = module.exports = { version: '2.6.12' };
@@ -1526,7 +1626,7 @@ if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1702,9 +1802,9 @@ function getRequestInfo(state, platform) {
 
   const { subscription, clientCorrelator } = getAuthConfig(state);
   let { server } = getAuthConfig(state);
-  const { userInfo } = (0, _fp.cloneDeep)(state.authentication);
+  let { userInfo } = (0, _fp.cloneDeep)(state.authentication);
 
-  // For backwards compatability, we need to fall back to
+  // For backwards compatibility, we need to fall back to
   // subscription for the server connection details
   if (!server) {
     server = {
@@ -1713,6 +1813,11 @@ function getRequestInfo(state, platform) {
       port: subscription.port,
       version: subscription.version
     };
+  }
+
+  // If user info does not exist yet, use an empty object. Requests will still fail, but they will be handled.
+  if (!userInfo) {
+    userInfo = {};
   }
 
   let requestInfo;
@@ -1775,100 +1880,6 @@ function getRequestInfo(state, platform) {
 
   return requestInfo;
 }
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _codes = __webpack_require__(89);
-
-Object.defineProperty(exports, 'authCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.authCodes;
-  }
-});
-Object.defineProperty(exports, 'callCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.callCodes;
-  }
-});
-Object.defineProperty(exports, 'callHistoryCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.callHistoryCodes;
-  }
-});
-Object.defineProperty(exports, 'groupsCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.groupsCodes;
-  }
-});
-Object.defineProperty(exports, 'messagingCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.messagingCodes;
-  }
-});
-Object.defineProperty(exports, 'mwiCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.mwiCodes;
-  }
-});
-Object.defineProperty(exports, 'sipEventCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.sipEventCodes;
-  }
-});
-Object.defineProperty(exports, 'clickToCallCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.clickToCallCodes;
-  }
-});
-Object.defineProperty(exports, 'bridgeCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.bridgeCodes;
-  }
-});
-Object.defineProperty(exports, 'subscriptionCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.subscriptionCodes;
-  }
-});
-Object.defineProperty(exports, 'presenceCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.presenceCodes;
-  }
-});
-Object.defineProperty(exports, 'usersCodes', {
-  enumerable: true,
-  get: function () {
-    return _codes.usersCodes;
-  }
-});
-class BasicError {
-  constructor({ message, code }) {
-    this.name = 'BasicError';
-    this.code = code || 'NO_CODE';
-    this.message = message ? `${message}` : 'An error occurred.';
-  }
-}
-exports.default = BasicError;
 
 /***/ }),
 /* 11 */
@@ -1950,7 +1961,7 @@ const SET_BROWSER_DETAILS = exports.SET_BROWSER_DETAILS = prefix + 'SET_BROWSER_
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var ctx = __webpack_require__(36);
 var hide = __webpack_require__(37);
 var has = __webpack_require__(38);
@@ -2024,7 +2035,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -2669,7 +2680,7 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 /***/ (function(module, exports, __webpack_require__) {
 
 var store = __webpack_require__(104)('wks');
-var uid = __webpack_require__(76);
+var uid = __webpack_require__(75);
 var Symbol = __webpack_require__(15).Symbol;
 var USE_SYMBOL = typeof Symbol == 'function';
 
@@ -3147,7 +3158,7 @@ const CALL_STATES = exports.CALL_STATES = {
   JOIN_FAILURE: 'Join Failed'
 
   /**
-   * Status codes that match success messsages.
+   * Status codes that match success messages.
    * @name STATUS_CODES
    * @type {Object}
    * @property {number} DIRECT_TRANSFER_SUCCESS Status code for successful direct transfer.
@@ -3853,7 +3864,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = request;
 exports.requestSaga = requestSaga;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var _actions = __webpack_require__(178);
 
@@ -3880,7 +3891,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @param {Object} [options.queryParams] The parameters to be added to the query string
  * @param {string} [options.responseType] The data type assumed to be received in the response body
  * @param {Blob|BufferSource|FormData|UrlSearchParams|string} [options.body] Any body that you want to add to your request.
- * @return A blocking redux-saga effect that will instruct the middleware to wait for the request to be fullfilled or until it fails.
+ * @return A blocking redux-saga effect that will instruct the middleware to wait for the request to be fulfilled or until it fails.
  */
 // Requests plugin.
 function request(options, commonOptions) {
@@ -3938,7 +3949,7 @@ exports.getWebsocketConfig = getWebsocketConfig;
 
 var _fp = __webpack_require__(3);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _utils = __webpack_require__(13);
 
@@ -3952,7 +3963,7 @@ var _utils = __webpack_require__(13);
  */
 
 
-// Auth selectors for backwards compatability.
+// Auth selectors for backwards compatibility.
 function getSubscriptionConfig(state) {
   return (0, _fp.cloneDeep)(state.config.subscription);
 }
@@ -3990,7 +4001,7 @@ function getNotificationChannels(state) {
  */
 function getSubscribedServices(state, type) {
   const info = getSubscriptionInfo(state);
-  // For backwards compability, make sure that this is an array. It isn't when
+  // For backwards compatibility, make sure that this is an array. It isn't when
   //    the old Auth plugin is being used (eg. Link v3.X).
   let subscriptions = Array.isArray(info) ? info : [info];
 
@@ -4019,7 +4030,7 @@ function getSubscriptionInfo(state) {
   if (state.subscription) {
     return (0, _fp.cloneDeep)(state.subscription.subscriptions);
   } else {
-    // For backwards compatability, also check if the authentication substate
+    // For backwards compatibility, also check if the authentication substate
     //    has subscription info. It will have the info when the oldAuth plugin
     //    is being used (eg. Link v3.X).
     // Warning: This returns an object, unlike the above which returns an array.
@@ -4049,7 +4060,7 @@ function getSubscriptionExpiry(state) {
   const subConfig = state.config.subscription;
   const authConfig = state.config.authentication;
 
-  // In order to maintain backwards compability with the auth plugin config
+  // In order to maintain backwards compatibility with the auth plugin config
   // we need to first check if this setting is provided in the authentication plugin
   // config, and if not use the one from subscription plugin.  We need to check
   // authentication config first because if no value is provided in the subscription
@@ -4062,8 +4073,8 @@ function getSubscriptionExpiry(state) {
 
 /**
  * Retrieve the websocket info from config. We merge the websocket config
- * from auth plugin with the one from subscription plugin giving precidence to
- * the websocket config in auth plugin since we need to maintain backwards compability
+ * from auth plugin with the one from subscription plugin giving precedence to
+ * the websocket config in auth plugin since we need to maintain backwards compatibility
  * with the old format config.
  * @method getSubscriptionExpiry
  * @return {number}
@@ -4077,7 +4088,7 @@ function getWebsocketConfig(state) {
   // that any client provided values from the authentication config.  All keys existing
   // in authentication config will overwrite those from subscription config.  However,
   // since defaults are not set for websocket in the authentication plugin, only client
-  // provided values for websocket will be used from authentication config and defualts
+  // provided values for websocket will be used from authentication config and defaults
   // will come from the subscription plugin.
   return (0, _utils.mergeValues)(subConfig.websocket, authConfig.websocket);
 }
@@ -5584,7 +5595,7 @@ module.exports = function (fn, that, length) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var dP = __webpack_require__(25);
-var createDesc = __webpack_require__(52);
+var createDesc = __webpack_require__(53);
 module.exports = __webpack_require__(20) ? function (object, key, value) {
   return dP.f(object, key, createDesc(1, value));
 } : function (object, key, value) {
@@ -5802,6 +5813,23 @@ module.exports = { "default": __webpack_require__(336), __esModule: true };
 /* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var parser = __webpack_require__(358);
+var writer = __webpack_require__(359);
+
+exports.write = writer;
+exports.parse = parser.parse;
+exports.parseParams = parser.parseParams;
+exports.parseFmtpConfig = parser.parseFmtpConfig; // Alias of parseParams().
+exports.parsePayloads = parser.parsePayloads;
+exports.parseRemoteCandidates = parser.parseRemoteCandidates;
+exports.parseImageAttributes = parser.parseImageAttributes;
+exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -5936,7 +5964,7 @@ const TRACK_ADDED = exports.TRACK_ADDED = trackPrefix + 'ADDED';
 const TRACK_REMOVED = exports.TRACK_REMOVED = trackPrefix + 'REMOVED';
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5963,7 +5991,7 @@ exports.reportUnsubscriptionFinished = reportUnsubscriptionFinished;
 exports.channelOpened = channelOpened;
 exports.channelClosed = channelClosed;
 
-var _actionTypes = __webpack_require__(48);
+var _actionTypes = __webpack_require__(49);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -6006,7 +6034,7 @@ function subscribe(services = [], options) {
  * Indicates that the subscription process has finished.
  * @method subscribeFinished
  * @param  {Object}  subscriptions  An object representing the subscriptions.
- * @param  {string}  type                 The type of notificaitonChannel for this subscription.
+ * @param  {string}  type                 The type of notificationChannel for this subscription.
  * @param  {Object}  error                An error object.
  * @param  {Object}  platform             The platform being used.
  * @return {Object}                       A flux standard action.
@@ -6163,7 +6191,7 @@ function channelClosed(type) {
 }
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6192,7 +6220,7 @@ const CHANNEL_OPENED = exports.CHANNEL_OPENED = prefix + 'CHANNEL_OPENED';
 const CHANNEL_CLOSED = exports.CHANNEL_CLOSED = prefix + 'CHANNEL_CLOSED';
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6223,7 +6251,7 @@ const CHANGE_CONNECTIVITY_CHECKING = exports.CHANGE_CONNECTIVITY_CHECKING = pref
 const CHANGE_PING_INTERVAL = exports.CHANGE_PING_INTERVAL = prefix + 'CHANGE_PING_INTERVAL';
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6260,7 +6288,7 @@ const DeliveryStatuses = exports.DeliveryStatuses = {
 };
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6306,7 +6334,7 @@ const SEARCH_DIRECTORY = exports.SEARCH_DIRECTORY = prefix + 'SEARCH_DIRECTORY';
 const SEARCH_DIRECTORY_FINISH = exports.SEARCH_DIRECTORY_FINISH = prefix + 'SEARCH_DIRECTORY_FINISH';
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = function (bitmap, value) {
@@ -6320,7 +6348,7 @@ module.exports = function (bitmap, value) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
@@ -6333,19 +6361,19 @@ module.exports = Object.keys || function keys(O) {
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__(222), __esModule: true };
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__(272), __esModule: true };
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6379,23 +6407,6 @@ function isUnifiedPlan(sdpSemantics) {
 function getSdpSemanticsList() {
   return (0, _fp.values)(_constants.PEER.SDP_SEMANTICS);
 }
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var parser = __webpack_require__(358);
-var writer = __webpack_require__(359);
-
-exports.write = writer;
-exports.parse = parser.parse;
-exports.parseParams = parser.parseParams;
-exports.parseFmtpConfig = parser.parseFmtpConfig; // Alias of parseParams().
-exports.parsePayloads = parser.parsePayloads;
-exports.parseRemoteCandidates = parser.parseRemoteCandidates;
-exports.parseImageAttributes = parser.parseImageAttributes;
-exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
-
 
 /***/ }),
 /* 58 */
@@ -6460,28 +6471,6 @@ exports.f = {}.propertyIsEnumerable;
 /* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getVersion = getVersion;
-/**
- * Returns the version of the currently running SDK.
- *
- * It must be used by any plugins (including the factory) as the unique source of truth when it comes to determine the current SDK version.
- * The actual version value is provided by the build process scripts (aka webpack.config.***.js) which simply do a string substitution
- * for the @@ tag below with actual version value.
- */
-function getVersion() {
-  return '4.33.0';
-}
-
-/***/ }),
-/* 64 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var def = __webpack_require__(25).f;
 var has = __webpack_require__(38);
 var TAG = __webpack_require__(16)('toStringTag');
@@ -6492,7 +6481,7 @@ module.exports = function (it, tag, stat) {
 
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6552,7 +6541,7 @@ const logLevels = exports.logLevels = {
 };const timeLevel = exports.timeLevel = logLevels.DEBUG;
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6576,21 +6565,21 @@ __webpack_require__(114)(String, 'String', function (iterated) {
 
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = {};
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx = __webpack_require__(36);
 var call = __webpack_require__(154);
 var isArrayIter = __webpack_require__(155);
 var anObject = __webpack_require__(30);
-var toLength = __webpack_require__(75);
+var toLength = __webpack_require__(74);
 var getIterFn = __webpack_require__(156);
 var BREAK = {};
 var RETURN = {};
@@ -6614,7 +6603,7 @@ exports.RETURN = RETURN;
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6625,7 +6614,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 /**
  * Blocking operations that can be performed on a call.
- * ie. no two of thes operations, either local or remote,
+ * ie. no two of these operations, either local or remote,
  *    can be performed at the same time.
  * TODO: Should all operations just be listed here? Probably.
  */
@@ -6693,7 +6682,7 @@ const OPERATIONS = exports.OPERATIONS = {
 };const NO_FINISH_OPS = exports.NO_FINISH_OPS = [OPERATIONS.ADD_BASIC_MEDIA, OPERATIONS.REMOVE_BASIC_MEDIA];
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6713,7 +6702,7 @@ Object.defineProperty(exports, 'handleRequestError', {
 });
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6743,7 +6732,7 @@ var _dscp = __webpack_require__(182);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -7284,7 +7273,7 @@ function* webRtcReplaceTrack(webRTC, params) {
 }
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7344,7 +7333,7 @@ function getCheckConnectivity(state) {
 }
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7391,7 +7380,7 @@ const GET_IMAGE_LINKS = exports.GET_IMAGE_LINKS = PREFIX + 'GET_IMAGE_LINKS';
 const GET_IMAGE_LINKS_FINISH = exports.GET_IMAGE_LINKS_FINISH = PREFIX + 'GET_IMAGE_LINKS_FINISH';
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8041,7 +8030,7 @@ function version_version(uuid) {
 
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.15 ToLength
@@ -8053,7 +8042,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports) {
 
 var id = 0;
@@ -8064,7 +8053,7 @@ module.exports = function (key) {
 
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8083,6 +8072,28 @@ exports.default = function (obj, keys) {
 
   return target;
 };
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getVersion = getVersion;
+/**
+ * Returns the version of the currently running SDK.
+ *
+ * It must be used by any plugins (including the factory) as the unique source of truth when it comes to determine the current SDK version.
+ * The actual version value is provided by the build process scripts (aka webpack.config.***.js) which simply do a string substitution
+ * for the @@ tag below with actual version value.
+ */
+function getVersion() {
+  return '4.34.0';
+}
 
 /***/ }),
 /* 78 */
@@ -8104,7 +8115,7 @@ var _logFormatter = __webpack_require__(149);
 
 var _logFormatter2 = _interopRequireDefault(_logFormatter);
 
-var _constants = __webpack_require__(65);
+var _constants = __webpack_require__(64);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8126,7 +8137,7 @@ const logFormatter = exports.logFormatter = _logFormatter2.default;
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var META = __webpack_require__(76)('meta');
+var META = __webpack_require__(75)('meta');
 var isObject = __webpack_require__(19);
 var has = __webpack_require__(38);
 var setDesc = __webpack_require__(25).f;
@@ -8259,7 +8270,7 @@ const HANDLERS_CHANGE = exports.HANDLERS_CHANGE = prefix + 'HANDLERS_CHANGE';
 __webpack_require__(255);
 var global = __webpack_require__(15);
 var hide = __webpack_require__(37);
-var Iterators = __webpack_require__(67);
+var Iterators = __webpack_require__(66);
 var TO_STRING_TAG = __webpack_require__(16)('toStringTag');
 
 var DOMIterables = ('CSSRuleList,CSSStyleDeclaration,CSSValueList,ClientRectList,DOMRectList,DOMStringList,' +
@@ -8395,200 +8406,6 @@ function getBrowserDetails(state) {
 
 /***/ }),
 /* 86 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.mergeValues = mergeValues;
-exports.makeSafeForCSS = makeSafeForCSS;
-exports.getBrowserDetails = getBrowserDetails;
-
-var _adapter_no_edge = __webpack_require__(335);
-
-var _adapter_no_edge2 = _interopRequireDefault(_adapter_no_edge);
-
-var _fp = __webpack_require__(3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// TODO: This function was copied from Kandy, we should eventually create a common project that
-// can contain all of these utils that are useful in multiple packages.
-
-/**
- * Deeply merges the values of multiple objects. Objects on the left receive the values from objects on their right.
- * Unlike lodash's default merge behavior this doesn't merge arrays.
- *
- * @name mergeValues
- * @param {...Object} objects - Objects to merge
- * @return {Object} A new object containing the merged values.
- */
-function mergeValues(...objects) {
-  return (0, _fp.mergeAllWith)((leftValue, rightValue) => {
-    // Overwrite the default behavior of lodash's merge for arrays and simply
-    // clobber what's on the left so we don't end up with merged arrays.
-    if ((0, _fp.isArray)(leftValue)) {
-      return rightValue;
-    }
-  }, objects);
-}
-
-function makeSafeForCSS(name) {
-  if (!name) {
-    return name;
-  } else {
-    return name.replace(/[^a-z0-9]/g, '');
-  }
-}
-
-/**
- * @returns The browser details as provided by webrtc-adapter
- */
-function getBrowserDetails() {
-  return _adapter_no_edge2.default.browserDetails;
-}
-
-/***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _freeze = __webpack_require__(124);
-
-var _freeze2 = _interopRequireDefault(_freeze);
-
-exports.runPipeline = runPipeline;
-
-var _sdpTransform = __webpack_require__(57);
-
-var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
-
-var _fp = __webpack_require__(3);
-
-var _logs = __webpack_require__(22);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const log = _logs.logManager.getLogger('SdpPipeline');
-
-/**
- * Basic SDP pipeline runner.
- * Does not include any default handlers.
- * @method sdpPipeline
- * @param  {Array}      handlers       List of functions that transform the SDP.
- * @param  {String}     sdp            The session description.
- * @param  {RTCSdpType} info           Information about the session description.
- * @param  {RTCSdpType} info.type      The session description's type.
- * @param  {String}     info.endpoint  Which end of the connection created the SDP.
- * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
- * @return {String}     The modified session description.
-
- */
-// Libraries.
-function runPipeline(handlers, sdp, info) {
-  const objectSdp = _sdpTransform2.default.parse(sdp);
-
-  const originalSdp = (0, _freeze2.default)(objectSdp);
-  let newSdp = (0, _fp.cloneDeep)(originalSdp);
-
-  if ((0, _fp.isArray)(handlers)) {
-    handlers.forEach(handler => {
-      if ((0, _fp.isFunction)(handler)) {
-        newSdp = handler(newSdp, info, originalSdp);
-      } else {
-        log.error('SDP handler not a function; skipping.');
-      }
-    });
-  }
-
-  return _sdpTransform2.default.write(newSdp);
-}
-
-/**
- * Create an instance of the SDP pipeline.
- * Allows for persistent SDP handlers to be set and implictly used.
- * @method createPipeline
- * @return {Object} An SDP pipeline.
- */
-function createPipeline() {
-  /**
-   * SDP handlers that should be included with every pipeline run.
-   * @type {Array}
-   */
-  let defaultHandlers = [];
-
-  /**
-   * Use the pipeline to process an SDP.
-   * @method run
-   * @param  {Array}      handlers      List of functions that transform the SDP.
-   * @param  {String}     sdp           The session description.
-   * @param  {RTCSdpType} info          Information about the session description.
-   * @param  {RTCSdpType} info.type     The session description's type.
-   * @param  {String}     info.endpoint Which end of the connection created the SDP.
-   * @return {String}     The modified session description.
-   */
-  function run(handlers = [], sdp, info) {
-    return runPipeline(handlers.concat(defaultHandlers), sdp, info);
-  }
-
-  /**
-   * Set the SDP handlers that should be included with every pipeline run.
-   * @method setHandlers
-   * @param  {Array} handlers List of SDP handler functions.
-   */
-  function setHandlers(handlers) {
-    if ((0, _fp.isArray)(handlers)) {
-      defaultHandlers = defaultHandlers.concat(handlers);
-    }
-  }
-
-  /**
-   * Get the SDP handlers that are included with every pipeline run.
-   * @method getHandlers
-   * @return {Array} List of SDP handler functions.
-   */
-  function getHandlers() {
-    return defaultHandlers;
-  }
-
-  return {
-    run,
-    setHandlers,
-    getHandlers
-  };
-}
-
-// Export an instance of the pipeline to be used by everything.
-exports.default = createPipeline();
-
-/***/ }),
-/* 88 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const PREFIX = '@@KANDY/';
-
-const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
-const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
-
-const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = PREFIX + 'AUTHORIZATION_ERROR';
-
-/***/ }),
-/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8737,7 +8554,208 @@ const authCodes = exports.authCodes = {
   REFRESH_CONTACTS_FAIL: 'users:2',
   DIRECTORY_REQUEST_FAIL: 'users:3',
   INVALID_PARAM: 'users:4'
+
+  /**
+   * Error codes for the Webrtc plugin
+   * @name webrtcCodes
+   */
+};const webrtcCodes = exports.webrtcCodes = {
+  INVALID_PARAM: 'webrtc:1'
 };
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.mergeValues = mergeValues;
+exports.makeSafeForCSS = makeSafeForCSS;
+exports.getBrowserDetails = getBrowserDetails;
+
+var _adapter_no_edge = __webpack_require__(335);
+
+var _adapter_no_edge2 = _interopRequireDefault(_adapter_no_edge);
+
+var _fp = __webpack_require__(3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// TODO: This function was copied from Kandy, we should eventually create a common project that
+// can contain all of these utils that are useful in multiple packages.
+
+/**
+ * Deeply merges the values of multiple objects. Objects on the left receive the values from objects on their right.
+ * Unlike lodash's default merge behavior this doesn't merge arrays.
+ *
+ * @name mergeValues
+ * @param {...Object} objects - Objects to merge
+ * @return {Object} A new object containing the merged values.
+ */
+function mergeValues(...objects) {
+  return (0, _fp.mergeAllWith)((leftValue, rightValue) => {
+    // Overwrite the default behavior of lodash's merge for arrays and simply
+    // clobber what's on the left so we don't end up with merged arrays.
+    if ((0, _fp.isArray)(leftValue)) {
+      return rightValue;
+    }
+  }, objects);
+}
+
+function makeSafeForCSS(name) {
+  if (!name) {
+    return name;
+  } else {
+    return name.replace(/[^a-z0-9]/g, '');
+  }
+}
+
+/**
+ * @returns The browser details as provided by webrtc-adapter
+ */
+function getBrowserDetails() {
+  return _adapter_no_edge2.default.browserDetails;
+}
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _freeze = __webpack_require__(124);
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+exports.runPipeline = runPipeline;
+
+var _sdpTransform = __webpack_require__(46);
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
+
+var _fp = __webpack_require__(3);
+
+var _logs = __webpack_require__(22);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const log = _logs.logManager.getLogger('SdpPipeline');
+
+/**
+ * Basic SDP pipeline runner.
+ * Does not include any default handlers.
+ * @method sdpPipeline
+ * @param  {Array}      handlers       List of functions that transform the SDP.
+ * @param  {String}     sdp            The session description.
+ * @param  {RTCSdpType} info           Information about the session description.
+ * @param  {RTCSdpType} info.type      The session description's type.
+ * @param  {String}     info.endpoint  Which end of the connection created the SDP.
+ * @param  {Boolean}    info.isInitiator Whether this session initiated the connection or not.
+ * @return {String}     The modified session description.
+
+ */
+// Libraries.
+function runPipeline(handlers, sdp, info) {
+  const objectSdp = _sdpTransform2.default.parse(sdp);
+
+  const originalSdp = (0, _freeze2.default)(objectSdp);
+  let newSdp = (0, _fp.cloneDeep)(originalSdp);
+
+  if ((0, _fp.isArray)(handlers)) {
+    handlers.forEach(handler => {
+      if ((0, _fp.isFunction)(handler)) {
+        newSdp = handler(newSdp, info, originalSdp);
+      } else {
+        log.error('SDP handler not a function; skipping.');
+      }
+    });
+  }
+
+  return _sdpTransform2.default.write(newSdp);
+}
+
+/**
+ * Create an instance of the SDP pipeline.
+ * Allows for persistent SDP handlers to be set and implicitly used.
+ * @method createPipeline
+ * @return {Object} An SDP pipeline.
+ */
+function createPipeline() {
+  /**
+   * SDP handlers that should be included with every pipeline run.
+   * @type {Array}
+   */
+  let defaultHandlers = [];
+
+  /**
+   * Use the pipeline to process an SDP.
+   * @method run
+   * @param  {Array}      handlers      List of functions that transform the SDP.
+   * @param  {String}     sdp           The session description.
+   * @param  {RTCSdpType} info          Information about the session description.
+   * @param  {RTCSdpType} info.type     The session description's type.
+   * @param  {String}     info.endpoint Which end of the connection created the SDP.
+   * @return {String}     The modified session description.
+   */
+  function run(handlers = [], sdp, info) {
+    return runPipeline(handlers.concat(defaultHandlers), sdp, info);
+  }
+
+  /**
+   * Set the SDP handlers that should be included with every pipeline run.
+   * @method setHandlers
+   * @param  {Array} handlers List of SDP handler functions.
+   */
+  function setHandlers(handlers) {
+    if ((0, _fp.isArray)(handlers)) {
+      defaultHandlers = defaultHandlers.concat(handlers);
+    }
+  }
+
+  /**
+   * Get the SDP handlers that are included with every pipeline run.
+   * @method getHandlers
+   * @return {Array} List of SDP handler functions.
+   */
+  function getHandlers() {
+    return defaultHandlers;
+  }
+
+  return {
+    run,
+    setHandlers,
+    getHandlers
+  };
+}
+
+// Export an instance of the pipeline to be used by everything.
+exports.default = createPipeline();
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const PREFIX = '@@KANDY/';
+
+const REQUEST = exports.REQUEST = PREFIX + 'REQUEST';
+const RESPONSE = exports.RESPONSE = PREFIX + 'RESPONSE';
+
+const AUTHORIZATION_ERROR = exports.AUTHORIZATION_ERROR = PREFIX + 'AUTHORIZATION_ERROR';
 
 /***/ }),
 /* 90 */
@@ -8764,7 +8782,7 @@ var _logs = __webpack_require__(2);
 
 var _kandyLogger = __webpack_require__(78);
 
-var _sdpTransform = __webpack_require__(57);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -8937,7 +8955,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.changePingInterval = exports.changeConnectivityChecking = exports.receiveServerPong = exports.receiveServerPing = exports.lostConnection = exports.wsError = exports.wsClosed = exports.wsReconnectFailed = exports.wsDisconnectFinished = exports.wsConnectFinished = exports.wsDisconnect = exports.wsAttemptConnect = undefined;
 
-var _actionTypes = __webpack_require__(49);
+var _actionTypes = __webpack_require__(50);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -9001,7 +9019,7 @@ exports.findMember = findMember;
 
 var _fp = __webpack_require__(3);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 /*
  * Redux-saga selector functions.
@@ -9909,7 +9927,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var shared = __webpack_require__(104)('keys');
-var uid = __webpack_require__(76);
+var uid = __webpack_require__(75);
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
@@ -9919,7 +9937,7 @@ module.exports = function (key) {
 /* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var global = __webpack_require__(15);
 var SHARED = '__core-js_shared__';
 var store = global[SHARED] || (global[SHARED] = {});
@@ -9992,7 +10010,7 @@ module.exports = function isObject(arg) {
 
 // most Object methods by ES6 should accept primitives
 var $export = __webpack_require__(12);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var fails = __webpack_require__(42);
 module.exports = function (KEY, exec) {
   var fn = (core.Object || {})[KEY] || Object[KEY];
@@ -10014,7 +10032,7 @@ exports.f = __webpack_require__(16);
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var LIBRARY = __webpack_require__(61);
 var wksExt = __webpack_require__(110);
 var defineProperty = __webpack_require__(25).f;
@@ -10037,7 +10055,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.checkLevel = checkLevel;
 exports.checkHandler = checkHandler;
 
-var _constants = __webpack_require__(65);
+var _constants = __webpack_require__(64);
 
 /**
  * Helper function to validate a "log level" string before its used in the library.
@@ -10158,9 +10176,9 @@ var LIBRARY = __webpack_require__(61);
 var $export = __webpack_require__(12);
 var redefine = __webpack_require__(143);
 var hide = __webpack_require__(37);
-var Iterators = __webpack_require__(67);
+var Iterators = __webpack_require__(66);
 var $iterCreate = __webpack_require__(254);
-var setToStringTag = __webpack_require__(64);
+var setToStringTag = __webpack_require__(63);
 var getPrototypeOf = __webpack_require__(115);
 var ITERATOR = __webpack_require__(16)('iterator');
 var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
@@ -10710,11 +10728,11 @@ exports.fetchResource = fetchResource;
 
 var _selectors = __webpack_require__(401);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
-var _version = __webpack_require__(63);
+var _version = __webpack_require__(77);
 
 var _utils = __webpack_require__(13);
 
@@ -10789,7 +10807,7 @@ function getCpaasAgentHeaderValue(platform, url) {
   // Assume request is for CPaaS platform, by default.
   let headerValue = `cpaas-js-sdk/${(0, _version.getVersion)()}`;
 
-  // Check if request is for callMe service, otherwise determine the apropriate platform.
+  // Check if request is for callMe service, otherwise determine the appropriate platform.
   // (callMe service uses Link platform for call requests)
   if (url && url.includes('/anonymous/')) {
     headerValue = `callme-js-sdk/${(0, _version.getVersion)()}`;
@@ -10806,7 +10824,7 @@ function getCpaasAgentHeaderValue(platform, url) {
 
 /**
  * Prepares a REST request options object for logging by removing passwords
- * and parses the body string into an object that can be intereacted with in console.
+ * and parses the body string into an object that can be interacted with in console.
  * @method sanitizeRequest
  * @param {Object} options An object containing any custom settings that you want to
  *                         apply to the request. See [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
@@ -10883,7 +10901,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.handleRequestError = handleRequestError;
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -11355,9 +11373,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.registerService = registerService;
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
-var _actionTypes = __webpack_require__(48);
+var _actionTypes = __webpack_require__(49);
 
 var _logs = __webpack_require__(2);
 
@@ -12054,7 +12072,7 @@ module.exports = function isFunction(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var DESCRIPTORS = __webpack_require__(20);
-var getKeys = __webpack_require__(53);
+var getKeys = __webpack_require__(54);
 var toIObject = __webpack_require__(43);
 var isEnum = __webpack_require__(62).f;
 module.exports = function (isEntries) {
@@ -12106,7 +12124,7 @@ module.exports = Array.isArray || function isArray(arg) {
 
 var dP = __webpack_require__(25);
 var anObject = __webpack_require__(30);
-var getKeys = __webpack_require__(53);
+var getKeys = __webpack_require__(54);
 
 module.exports = __webpack_require__(20) ? Object.defineProperties : function defineProperties(O, Properties) {
   anObject(O);
@@ -12145,7 +12163,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var pIE = __webpack_require__(62);
-var createDesc = __webpack_require__(52);
+var createDesc = __webpack_require__(53);
 var toIObject = __webpack_require__(43);
 var toPrimitive = __webpack_require__(99);
 var has = __webpack_require__(38);
@@ -12314,7 +12332,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -12326,7 +12344,7 @@ var _fp = __webpack_require__(3);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Retrieves the log level for a specifie logger type, or the default level.
+ * Retrieves the log level for a specified logger type, or the default level.
  * @method getLevel
  * @param  {Object} state            SDK redux state.
  * @param  {String} [type='DEFAULT'] A type of Logger.
@@ -12369,7 +12387,7 @@ var create = __webpack_require__(80);
 var redefineAll = __webpack_require__(116);
 var ctx = __webpack_require__(36);
 var anInstance = __webpack_require__(117);
-var forOf = __webpack_require__(68);
+var forOf = __webpack_require__(67);
 var $iterDefine = __webpack_require__(114);
 var step = __webpack_require__(152);
 var setSpecies = __webpack_require__(157);
@@ -12532,7 +12550,7 @@ module.exports = function (iterator, fn, value, entries) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // check on default Array iterator
-var Iterators = __webpack_require__(67);
+var Iterators = __webpack_require__(66);
 var ITERATOR = __webpack_require__(16)('iterator');
 var ArrayProto = Array.prototype;
 
@@ -12547,8 +12565,8 @@ module.exports = function (it) {
 
 var classof = __webpack_require__(118);
 var ITERATOR = __webpack_require__(16)('iterator');
-var Iterators = __webpack_require__(67);
-module.exports = __webpack_require__(8).getIteratorMethod = function (it) {
+var Iterators = __webpack_require__(66);
+module.exports = __webpack_require__(9).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
     || it['@@iterator']
     || Iterators[classof(it)];
@@ -12562,7 +12580,7 @@ module.exports = __webpack_require__(8).getIteratorMethod = function (it) {
 "use strict";
 
 var global = __webpack_require__(15);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var dP = __webpack_require__(25);
 var DESCRIPTORS = __webpack_require__(20);
 var SPECIES = __webpack_require__(16)('species');
@@ -12588,10 +12606,10 @@ var meta = __webpack_require__(79);
 var fails = __webpack_require__(42);
 var hide = __webpack_require__(37);
 var redefineAll = __webpack_require__(116);
-var forOf = __webpack_require__(68);
+var forOf = __webpack_require__(67);
 var anInstance = __webpack_require__(117);
 var isObject = __webpack_require__(19);
-var setToStringTag = __webpack_require__(64);
+var setToStringTag = __webpack_require__(63);
 var dP = __webpack_require__(25).f;
 var each = __webpack_require__(258)(0);
 var DESCRIPTORS = __webpack_require__(20);
@@ -12686,7 +12704,7 @@ module.exports = function (COLLECTION) {
 var $export = __webpack_require__(12);
 var aFunction = __webpack_require__(59);
 var ctx = __webpack_require__(36);
-var forOf = __webpack_require__(68);
+var forOf = __webpack_require__(67);
 
 module.exports = function (COLLECTION) {
   $export($export.S, COLLECTION, { from: function from(source /* , mapFn, thisArg */) {
@@ -13016,6 +13034,20 @@ const TRACK_SOURCE_MUTED = exports.TRACK_SOURCE_MUTED = 'media:sourceMuted';
  */
 const TRACK_SOURCE_UNMUTED = exports.TRACK_SOURCE_UNMUTED = 'media:sourceUnmuted';
 
+/**
+ * The specified Track has been rendered into an element.
+ *
+ * @public
+ * @static
+ * @memberof media
+ * @event media:trackRendered
+ * @param {Object} params
+ * @param {Array<string>} params.trackIds The list of track id's that were rendered.
+ * @param {string} params.selector The css selector used to identify the element the track is rendered into.
+ * @param {api.BasicError} [params.error] An error object, if the operation was not successful.
+ */
+const TRACK_RENDERED = exports.TRACK_RENDERED = 'media:trackRendered';
+
 /***/ }),
 /* 170 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -13067,7 +13099,7 @@ var _webrtcManager2 = _interopRequireDefault(_webrtcManager);
 
 var _logs = __webpack_require__(22);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
@@ -13075,7 +13107,7 @@ var _handlers = __webpack_require__(125);
 
 var sdpHandlers = _interopRequireWildcard(_handlers);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -13166,7 +13198,7 @@ var _eventemitter = __webpack_require__(31);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13212,7 +13244,7 @@ function Track(mediaTrack, mediaStream) {
 
   /**
    * When a track is muted, we forward this to any listener.
-   * This handler is tipically invoked by actions triggered outside the
+   * This handler is typically invoked by actions triggered outside the
    * direct control of the webrtc SDK.
    */
   track.onmute = event => {
@@ -13226,7 +13258,7 @@ function Track(mediaTrack, mediaStream) {
 
   /**
    * When a track is unmuted, we forward this to any listener.
-   * This handler is tipically invoked by actions triggered outside the
+   * This handler is typically invoked by actions triggered outside the
    * direct control of the webrtc SDK.
    */
   track.onunmute = event => {
@@ -13459,7 +13491,7 @@ function Track(mediaTrack, mediaStream) {
     track.stop();
     /**
      * Treat stopping the track the same as it being ended.
-     * Noramlly, onended is not triggered when `stop` is called, only when it is
+     * Normally, onended is not triggered when `stop` is called, only when it is
      *    "remotely ended".
      */
     track.onended();
@@ -13547,7 +13579,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -13817,7 +13849,7 @@ var _set = __webpack_require__(341);
 
 var _set2 = _interopRequireDefault(_set);
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -13839,7 +13871,7 @@ var _properties = __webpack_require__(372);
 
 var _properties2 = _interopRequireDefault(_properties);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 var _config = __webpack_require__(379);
 
@@ -14636,7 +14668,7 @@ exports.restartMedia = restartMedia;
 exports.restartMediaFinish = restartMediaFinish;
 exports.updateCall = updateCall;
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -15029,7 +15061,7 @@ exports.request = request;
 exports.response = response;
 exports.authorizationError = authorizationError;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -15111,13 +15143,13 @@ exports.updateSessionStatus = updateSessionStatus;
 exports.endSession = endSession;
 exports.rejectSession = rejectSession;
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(70);
+var _helpers = __webpack_require__(69);
 
 var _constants = __webpack_require__(7);
 
@@ -15573,7 +15605,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function checkBandwidthControls(bandwidthControls) {
   const finalBandwidthControls = (0, _extends3.default)({}, bandwidthControls);
 
-  // If there are no bandwiwdth limits set or the bandwidth limits provided are not numbers, set them to undefined
+  // If there are no bandwidth limits set or the bandwidth limits provided are not numbers, set them to undefined
   if (!bandwidthControls || !(bandwidthControls.audio && typeof bandwidthControls.audio === 'number')) {
     finalBandwidthControls.audio = null;
   }
@@ -16446,7 +16478,7 @@ exports.getTrackDscpMapping = getTrackDscpMapping;
  * @param {Array<Track>} videoTracks The list of video tracks
  * @param {Array<Track>} screenTracks The list of screen tracks
  * @param {Object} dscpControls The DSCP controls provided
- * @return {Object} An object map of track: dscpSetting for all applicate tracks
+ * @return {Object} An object map of track: dscpSetting for all applicable tracks
  */
 function getTrackDscpMapping(audioTracks, videoTracks, screenTracks, dscpControls) {
   const dscpTrackMapping = {};
@@ -16485,7 +16517,7 @@ exports.createLocal = createLocal;
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -16513,11 +16545,11 @@ function* createLocal(webRTC, mediaConstraints) {
 
   try {
     if (mediaConstraints.screenShare) {
-      const screenShareContraints = {
+      const screenShareConstraints = {
         video: mediaConstraints.screenShare
       };
 
-      const screenShareMedia = yield (0, _effects.call)([webRTC.media, 'createLocalScreen'], screenShareContraints);
+      const screenShareMedia = yield (0, _effects.call)([webRTC.media, 'createLocalScreen'], screenShareConstraints);
       result.medias.push({
         type: 'screen',
         media: screenShareMedia
@@ -16555,7 +16587,7 @@ function* createLocal(webRTC, mediaConstraints) {
 
     log.info(errMessage);
 
-    // Clean up successfull media object when there is partial media failure.
+    // Clean up successful media object when there is partial media failure.
     for (const eachMedia of result.medias) {
       yield (0, _effects.call)([eachMedia.media, 'stop']);
     }
@@ -16604,13 +16636,13 @@ exports.waitForReconnect = waitForReconnect;
 
 var _actions = __webpack_require__(91);
 
-var _actionTypes = __webpack_require__(49);
+var _actionTypes = __webpack_require__(50);
 
-var _selectors = __webpack_require__(72);
+var _selectors = __webpack_require__(71);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
-var _actionTypes2 = __webpack_require__(48);
+var _actionTypes2 = __webpack_require__(49);
 
 var _effects = __webpack_require__(1);
 
@@ -16671,7 +16703,7 @@ function* disconnectWebsocket(payload, platform) {
 /**
  * Effect for waiting for the websocket / subscription to reconnect.
  * Assumption is that the websocket is in the middle of reconnect attempts. This
- *    is why the timeout is so long; one of the two scenarios should be guarenteed
+ *    is why the timeout is so long; one of the two scenarios should be guaranteed
  *    to happen before then.
  * @param {number} timeout The time, in milliseconds, to wait before timing out.
  * @return {boolean} Whether the websocket has reconnected or not.
@@ -16713,7 +16745,7 @@ var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(23);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -16907,7 +16939,7 @@ exports.compareSummary = compareSummary;
 
 var _logs = __webpack_require__(2);
 
-var _sdpTransform = __webpack_require__(57);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -17268,7 +17300,7 @@ function naiveMatchMedias(prevList, currList) {
  * Compare two summarized Media section objects to determine how it changed.
  * @method compareSummary
  * @param  {MediaSummary} prevMedia The previous media summary.
- * @param  {MediaSummary} currMedia The current meduia summary.
+ * @param  {MediaSummary} currMedia The current media summary.
  * @return {MediaChanges} How the media directions changed from prevMedia to currMedia.
  */
 function compareSummary(prevMedia, currMedia) {
@@ -17431,13 +17463,13 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _helpers = __webpack_require__(70);
+var _helpers = __webpack_require__(69);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 var _fp = __webpack_require__(3);
 
@@ -17775,7 +17807,7 @@ function* chatUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from chat notifications.',
@@ -17897,7 +17929,7 @@ function* smsInboundUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from inbound SMS notifications.',
@@ -17965,7 +17997,7 @@ function* smsOutboundUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from outbound SMS notifications.',
@@ -18184,7 +18216,7 @@ var _actionTypes = __webpack_require__(93);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -18370,7 +18402,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(70);
+var _helpers = __webpack_require__(69);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18866,7 +18898,7 @@ function deleteGroupFinish({ groupId, error }) {
   */
 
 /**
- * A notice that a 'groupChatSessionInvitationNotification' has been recieved.
+ * A notice that a 'groupChatSessionInvitationNotification' has been received.
  * @method invitationReceived
  * @param {Object} params
  * @param  {Object} params.invitation Invitation.
@@ -18878,7 +18910,7 @@ function invitationReceived({ invitation, error }) {
 }
 
 /**
- * A notice that a 'chatParticipantStatusNotification' has been recieved.
+ * A notice that a 'chatParticipantStatusNotification' has been received.
  * @method statusNotificationReceived
  * @param {Object} params
  * @param  {Object} params.groupId Id of the group that the notification is for.
@@ -18978,7 +19010,7 @@ exports.fetchUserFinish = fetchUserFinish;
 exports.searchDirectory = searchDirectory;
 exports.searchDirectoryFinish = searchDirectoryFinish;
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -19045,7 +19077,7 @@ function fetchUserFinish(user, error) {
  * @param {Object} [options] Sorting options
  * @param {string} [options.sortBy] The attribute upon which to sort results. This can be any of the above listed filters which describe a user attribute.
  * @param {string} [options.order] Order by which to return results. Can be one of "asc" or "desc".
- * @param {number} [options.max] The maximmum number of results to return.
+ * @param {number} [options.max] The maximum number of results to return.
  * @param {string} [options.next] The pointer for a chunk of results, which may be returned from other a previous query.
  * @returns {Object} A flux standard action representing the SEARCH_DIRECTORY action.
  */
@@ -19160,7 +19192,7 @@ exports.removeContactFinish = removeContactFinish;
 exports.updateContact = updateContact;
 exports.updateContactFinish = updateContactFinish;
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -19771,7 +19803,7 @@ var _fp = __webpack_require__(3);
 // eslint-disable-next-line no-warning-comments
 /**
  * The SDK creation factory. Create an instance of the SDK by calling this factory with the desired configurations.
- * The SDK instance will be refered as 'api' throughout the rest of the documentation content.
+ * The SDK instance will be referred as 'api' throughout the rest of the documentation content.
  * @public
  * @method create
  * @param {config} config The configuration object.
@@ -19908,7 +19940,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _objectWithoutProperties2 = __webpack_require__(77);
+var _objectWithoutProperties2 = __webpack_require__(76);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
@@ -19932,7 +19964,7 @@ var _compose2 = _interopRequireDefault(_compose);
 
 var _utils = __webpack_require__(13);
 
-var _version = __webpack_require__(63);
+var _version = __webpack_require__(77);
 
 var _logs = __webpack_require__(2);
 
@@ -20262,7 +20294,7 @@ function factory(pluginFactories, sdkOptions = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(207);
-module.exports = __webpack_require__(8).Object.assign;
+module.exports = __webpack_require__(9).Object.assign;
 
 
 /***/ }),
@@ -20283,7 +20315,7 @@ $export($export.S + $export.F, 'Object', { assign: __webpack_require__(208) });
 
 // 19.1.2.1 Object.assign(target, source, ...)
 var DESCRIPTORS = __webpack_require__(20);
-var getKeys = __webpack_require__(53);
+var getKeys = __webpack_require__(54);
 var gOPS = __webpack_require__(106);
 var pIE = __webpack_require__(62);
 var toObject = __webpack_require__(44);
@@ -20327,7 +20359,7 @@ module.exports = !$assign || __webpack_require__(42)(function () {
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = __webpack_require__(43);
-var toLength = __webpack_require__(75);
+var toLength = __webpack_require__(74);
 var toAbsoluteIndex = __webpack_require__(210);
 module.exports = function (IS_INCLUDES) {
   return function ($this, el, fromIndex) {
@@ -21619,7 +21651,7 @@ module.exports = function isPlainObject(value) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(223);
-module.exports = __webpack_require__(8).Object.keys;
+module.exports = __webpack_require__(9).Object.keys;
 
 
 /***/ }),
@@ -21628,7 +21660,7 @@ module.exports = __webpack_require__(8).Object.keys;
 
 // 19.1.2.14 Object.keys(O)
 var toObject = __webpack_require__(44);
-var $keys = __webpack_require__(53);
+var $keys = __webpack_require__(54);
 
 __webpack_require__(109)('keys', function () {
   return function keys(it) {
@@ -22283,7 +22315,7 @@ var _logHandler = __webpack_require__(240);
 
 var _logHandler2 = _interopRequireDefault(_logHandler);
 
-var _constants = __webpack_require__(65);
+var _constants = __webpack_require__(64);
 
 var _validation = __webpack_require__(112);
 
@@ -22342,7 +22374,7 @@ function createManager(options = {}) {
 
       logger = (0, _logger2.default)(target, options);
 
-      // Save the new logger to be returned by future getter cals.
+      // Save the new logger to be returned by future getter calls.
       loggers[loggerName] = logger;
     }
 
@@ -22548,7 +22580,7 @@ function createManager(options = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(231);
-module.exports = __webpack_require__(8).Object.values;
+module.exports = __webpack_require__(9).Object.values;
 
 
 /***/ }),
@@ -22574,7 +22606,7 @@ __webpack_require__(233);
 __webpack_require__(81);
 __webpack_require__(236);
 __webpack_require__(237);
-module.exports = __webpack_require__(8).Symbol;
+module.exports = __webpack_require__(9).Symbol;
 
 
 /***/ }),
@@ -22592,8 +22624,8 @@ var redefine = __webpack_require__(143);
 var META = __webpack_require__(79).KEY;
 var $fails = __webpack_require__(42);
 var shared = __webpack_require__(104);
-var setToStringTag = __webpack_require__(64);
-var uid = __webpack_require__(76);
+var setToStringTag = __webpack_require__(63);
+var uid = __webpack_require__(75);
 var wks = __webpack_require__(16);
 var wksExt = __webpack_require__(110);
 var wksDefine = __webpack_require__(111);
@@ -22604,13 +22636,13 @@ var isObject = __webpack_require__(19);
 var toObject = __webpack_require__(44);
 var toIObject = __webpack_require__(43);
 var toPrimitive = __webpack_require__(99);
-var createDesc = __webpack_require__(52);
+var createDesc = __webpack_require__(53);
 var _create = __webpack_require__(80);
 var gOPNExt = __webpack_require__(235);
 var $GOPD = __webpack_require__(148);
 var $GOPS = __webpack_require__(106);
 var $DP = __webpack_require__(25);
-var $keys = __webpack_require__(53);
+var $keys = __webpack_require__(54);
 var gOPD = $GOPD.f;
 var dP = $DP.f;
 var gOPN = gOPNExt.f;
@@ -22835,7 +22867,7 @@ setToStringTag(global.JSON, 'JSON', true);
 /***/ (function(module, exports, __webpack_require__) {
 
 // all enumerable object keys, includes symbols
-var getKeys = __webpack_require__(53);
+var getKeys = __webpack_require__(54);
 var gOPS = __webpack_require__(106);
 var pIE = __webpack_require__(62);
 module.exports = function (it) {
@@ -22907,7 +22939,7 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.default = createLogger;
 
-var _constants = __webpack_require__(65);
+var _constants = __webpack_require__(64);
 
 var _validation = __webpack_require__(112);
 
@@ -23091,7 +23123,7 @@ var _validation = __webpack_require__(112);
  */
 function createTimer(log, warn) {
   // Validate that params are a function.
-  //    Uses funtions as `log(message, data)`.
+  //    Uses functions as `log(message, data)`.
   (0, _validation.checkHandler)(log);
   (0, _validation.checkHandler)(warn);
 
@@ -23304,7 +23336,7 @@ function defaultActionHandler(entry) {
 /* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
 module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
   return $JSON.stringify.apply($JSON, arguments);
@@ -24034,7 +24066,7 @@ var _values = __webpack_require__(39);
 
 var _values2 = _interopRequireDefault(_values);
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -24727,13 +24759,13 @@ module.exports = { "default": __webpack_require__(252), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(81);
-__webpack_require__(66);
+__webpack_require__(65);
 __webpack_require__(83);
 __webpack_require__(257);
 __webpack_require__(261);
 __webpack_require__(263);
 __webpack_require__(264);
-module.exports = __webpack_require__(8).Set;
+module.exports = __webpack_require__(9).Set;
 
 
 /***/ }),
@@ -24766,8 +24798,8 @@ module.exports = function (TO_STRING) {
 "use strict";
 
 var create = __webpack_require__(80);
-var descriptor = __webpack_require__(52);
-var setToStringTag = __webpack_require__(64);
+var descriptor = __webpack_require__(53);
+var setToStringTag = __webpack_require__(63);
 var IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
@@ -24787,7 +24819,7 @@ module.exports = function (Constructor, NAME, next) {
 
 var addToUnscopables = __webpack_require__(256);
 var step = __webpack_require__(152);
-var Iterators = __webpack_require__(67);
+var Iterators = __webpack_require__(66);
 var toIObject = __webpack_require__(43);
 
 // 22.1.3.4 Array.prototype.entries()
@@ -24862,7 +24894,7 @@ module.exports = __webpack_require__(158)(SET, function (get) {
 var ctx = __webpack_require__(36);
 var IObject = __webpack_require__(100);
 var toObject = __webpack_require__(44);
-var toLength = __webpack_require__(75);
+var toLength = __webpack_require__(74);
 var asc = __webpack_require__(259);
 module.exports = function (TYPE, $create) {
   var IS_MAP = TYPE == 1;
@@ -24946,7 +24978,7 @@ $export($export.P + $export.R, 'Set', { toJSON: __webpack_require__(159)('Set') 
 /* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var forOf = __webpack_require__(68);
+var forOf = __webpack_require__(67);
 
 module.exports = function (iter, ITERATOR) {
   var result = [];
@@ -24990,7 +25022,7 @@ exports.default = createActionLogger;
 
 var _index = __webpack_require__(2);
 
-var _constants = __webpack_require__(65);
+var _constants = __webpack_require__(64);
 
 var _transformers = __webpack_require__(266);
 
@@ -25179,7 +25211,7 @@ var _defineProperties = __webpack_require__(269);
 
 var _defineProperties2 = _interopRequireDefault(_defineProperties);
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -25195,7 +25227,7 @@ var _assign = __webpack_require__(97);
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -25485,7 +25517,7 @@ module.exports = { "default": __webpack_require__(270), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(271);
-var $Object = __webpack_require__(8).Object;
+var $Object = __webpack_require__(9).Object;
 module.exports = function defineProperties(T, D) {
   return $Object.defineProperties(T, D);
 };
@@ -25504,9 +25536,9 @@ $export($export.S + $export.F * !__webpack_require__(20), 'Object', { defineProp
 /* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(66);
+__webpack_require__(65);
 __webpack_require__(273);
-module.exports = __webpack_require__(8).Array.from;
+module.exports = __webpack_require__(9).Array.from;
 
 
 /***/ }),
@@ -25520,7 +25552,7 @@ var $export = __webpack_require__(12);
 var toObject = __webpack_require__(44);
 var call = __webpack_require__(154);
 var isArrayIter = __webpack_require__(155);
-var toLength = __webpack_require__(75);
+var toLength = __webpack_require__(74);
 var createProperty = __webpack_require__(274);
 var getIterFn = __webpack_require__(156);
 
@@ -25560,7 +25592,7 @@ $export($export.S + $export.F * !__webpack_require__(162)(function (iter) { Arra
 "use strict";
 
 var $defineProperty = __webpack_require__(25);
-var createDesc = __webpack_require__(52);
+var createDesc = __webpack_require__(53);
 
 module.exports = function (object, index, value) {
   if (index in object) $defineProperty.f(object, index, createDesc(0, value));
@@ -25578,7 +25610,7 @@ module.exports = { "default": __webpack_require__(276), __esModule: true };
 /* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(66);
+__webpack_require__(65);
 __webpack_require__(83);
 module.exports = __webpack_require__(110).f('iterator');
 
@@ -25588,7 +25620,7 @@ module.exports = __webpack_require__(110).f('iterator');
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(278);
-var $Object = __webpack_require__(8).Object;
+var $Object = __webpack_require__(9).Object;
 module.exports = function create(P, D) {
   return $Object.create(P, D);
 };
@@ -25635,7 +25667,7 @@ $export($export.S, 'Object', { create: __webpack_require__(80) });
  * @property {Object} target The subject that the log is about.
  * @property {string} target.type The type of the target. This is also
  *    used as part of the name of the Logger.
- * @property {string} [target.id] A unique identifer for the target.
+ * @property {string} [target.id] A unique identifier for the target.
  * @property {string} target.name A combination of the target type and ID. If no
  *    id was provided, this will be the same as the type.
  * @property {Array} messages The logged information, given to the Logger
@@ -26061,12 +26093,12 @@ function middleware(context) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(81);
-__webpack_require__(66);
+__webpack_require__(65);
 __webpack_require__(83);
 __webpack_require__(287);
 __webpack_require__(291);
 __webpack_require__(292);
-module.exports = __webpack_require__(8).Promise;
+module.exports = __webpack_require__(9).Promise;
 
 
 /***/ }),
@@ -26083,7 +26115,7 @@ var $export = __webpack_require__(12);
 var isObject = __webpack_require__(19);
 var aFunction = __webpack_require__(59);
 var anInstance = __webpack_require__(117);
-var forOf = __webpack_require__(68);
+var forOf = __webpack_require__(67);
 var speciesConstructor = __webpack_require__(165);
 var task = __webpack_require__(166).set;
 var microtask = __webpack_require__(289)();
@@ -26296,9 +26328,9 @@ if (!USE_NATIVE) {
 }
 
 $export($export.G + $export.W + $export.F * !USE_NATIVE, { Promise: $Promise });
-__webpack_require__(64)($Promise, PROMISE);
+__webpack_require__(63)($Promise, PROMISE);
 __webpack_require__(157)(PROMISE);
-Wrapper = __webpack_require__(8)[PROMISE];
+Wrapper = __webpack_require__(9)[PROMISE];
 
 // statics
 $export($export.S + $export.F * !USE_NATIVE, PROMISE, {
@@ -26477,7 +26509,7 @@ module.exports = navigator && navigator.userAgent || '';
 // https://github.com/tc39/proposal-promise-finally
 
 var $export = __webpack_require__(12);
-var core = __webpack_require__(8);
+var core = __webpack_require__(9);
 var global = __webpack_require__(15);
 var speciesConstructor = __webpack_require__(165);
 var promiseResolve = __webpack_require__(168);
@@ -27017,8 +27049,6 @@ var _actionTypes = __webpack_require__(123);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _version = __webpack_require__(63);
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function authChangedEvent(action) {
@@ -27027,9 +27057,6 @@ function authChangedEvent(action) {
     args: action.error ? { error: action.payload } : {}
   };
 }
-
-// Helpers
-
 
 const eventsMap = {};
 
@@ -27070,14 +27097,9 @@ eventsMap[actionTypes.RESUBSCRIPTION_FINISHED] = function (action) {
 };
 
 eventsMap[actionTypes.SET_CONNECTION_INFO] = function (action) {
-  const version = (0, _version.getVersion)();
-  const matchedVersion = version.startsWith('3');
-
-  if (matchedVersion) {
-    return {
-      type: eventTypes.AUTH_CREDENTIALS_SET
-    };
-  }
+  return {
+    type: eventTypes.AUTH_CREDENTIALS_SET
+  };
 };
 
 exports.default = eventsMap;
@@ -27135,8 +27157,7 @@ const AUTH_ERROR = exports.AUTH_ERROR = 'auth:error';
 const AUTH_RESUB = exports.AUTH_RESUB = 'auth:resub';
 
 /**
- * The information needed for connecting has been set.
- * This event would only occur when the credentials for 3.x SDk as been set.
+ * The information (credentials) needed for connecting have been set.
  *
  * @public
  * @memberof api
@@ -27186,7 +27207,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _objectWithoutProperties2 = __webpack_require__(77);
+var _objectWithoutProperties2 = __webpack_require__(76);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
@@ -27376,7 +27397,7 @@ reducers[actionTypes.SET_CREDENTIALS_FINISH] = {
 };
 
 /*
- * Remove the x-token from the request header after subscription is successfull.
+ * Remove the x-token from the request header after subscription is successful.
  */
 reducers[actionTypes.UPDATE_HMAC_TOKEN] = {
   next(state, action) {
@@ -27456,7 +27477,7 @@ var _actions = __webpack_require__(304);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _constants = __webpack_require__(84);
 
@@ -27895,7 +27916,7 @@ function api({ dispatch, getState }) {
     setCredentials({ username, password, authname, hmacToken, bearerAccessToken, idToken }) {
       log.debug(_logs.API_LOG_TAG + 'setCredentials: ', username);
       // TODO: Refactor into multiple actions for each credential mode
-      // TODO: Validation of two authentication possibility scenerio
+      // TODO: Validation of two authentication possibility scenario
       dispatch(actions.setCredentials({
         username,
         password,
@@ -28302,7 +28323,7 @@ function setCredentialsFinished({ userInfo, connection, error }, platform) {
  * Creates an updateToken action with connection and platform information.
  *
  * @method updateToken
- * @param {string} token A session id retrieved after a sucsessful subscription on the platform.
+ * @param {string} token A session id retrieved after a successful subscription on the platform.
  * @param {string} platform The backend platform we are currently on.
  * @return {Object} A flux standard action.
  */
@@ -28651,11 +28672,11 @@ function mediaAPI({ dispatch, getState }) {
      */
     initializeDevices(constraints) {
       log.debug(_logs.API_LOG_TAG + 'media.initializeDevices: ', constraints);
-      const browserContraints = {
+      const browserConstraints = {
         audio: constraints === undefined ? true : constraints.audio,
         video: constraints === undefined ? true : constraints.video
       };
-      dispatch(_actions.deviceActions.initializeDevice(browserContraints));
+      dispatch(_actions.deviceActions.initializeDevice(browserConstraints));
     },
     /**
      * Render Media Tracks in a container.
@@ -28853,11 +28874,17 @@ function trackRemoved(trackId, params) {
 }
 
 function trackHelper(type, payload = {}, meta = {}) {
-  return {
+  const action = {
     type,
     payload,
     meta
   };
+
+  if (payload.error) {
+    action.error = true;
+  }
+
+  return action;
 }
 
 function muteTracks(trackIds) {
@@ -29738,6 +29765,17 @@ events[actionTypes.TRACK_SOURCE_UNMUTED] = action => {
   };
 };
 
+events[actionTypes.RENDER_TRACKS_FINISH] = action => {
+  return {
+    type: eventTypes.TRACK_RENDERED,
+    args: {
+      trackIds: action.payload.trackIds,
+      selector: action.payload.selector,
+      error: action.payload.error
+    }
+  };
+};
+
 exports.default = events;
 
 /***/ }),
@@ -29952,7 +29990,7 @@ function* trackManagerEventsHandler({ track, action }) {
 /**
  * Sets up listeners for the Track Manager events.
  * Contains logic for how specific webRTC events should be
- *    parsed before being sent elsewhere. Splut into a
+ *    parsed before being sent elsewhere. Split into a
  *    stand-alone function in order to be re-usable.
  * @method setListeners
  * @param  {Object}   manager The Track Manager.
@@ -30665,7 +30703,7 @@ function* updateLogHandlerEntry(webRTC) {
  * Special-case saga: This functionality needs to be run when the SDK is
  *    initialized, but can't be part of the plugin's `init` saga. This is
  *    because it needs the level state to have been set in state, but that isn't
- *    guarenteed during the `init` saga. The order that plugins are loaded would
+ *    guaranteed during the `init` saga. The order that plugins are loaded would
  *    affect this (logs would need to be before webrtc).
  * @method initLogLevel
  * @param  {Object} webRTC The webRTC stack.
@@ -30702,8 +30740,13 @@ var _effects = __webpack_require__(1);
 
 var _fp = __webpack_require__(3);
 
-// Libraries.
-// Webrtc plugin.
+var _errors = __webpack_require__(8);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Other plugins.
 const log = _logs.logManager.getLogger('MEDIA');
 
 /**
@@ -30713,23 +30756,47 @@ const log = _logs.logManager.getLogger('MEDIA');
  */
 
 
-// Other plugins.
+// Libraries.
+// Webrtc plugin.
 function* renderTracks(webRTC, action) {
   const { trackIds, selector, speakerId } = action.payload;
-  log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
   // Get the tracks that are to be rendered.
   const tracks = yield (0, _effects.call)([webRTC.track, 'getTracks'], trackIds);
   const filteredTracks = tracks.filter(track => !(0, _fp.isUndefined)(track));
+  let payload = {};
 
-  // Render the tracks.
-  yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
+  // Each of trackIds, selector and speakerId must be present in order to render a track
+  if (trackIds &&
+  // trackIds is an array
+  trackIds instanceof Array &&
+  // trackIds is not empty
+  trackIds.length > 0 && selector &&
+  // selector is a string
+  (0, _fp.isString)(selector) &&
+  // selector is not empty
+  selector.length > 0) {
+    log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
-  log.info('Finished rendering track(s).', filteredTracks.map(track => track.id));
+    // Render the tracks.
+    yield (0, _effects.all)(filteredTracks.map(track => (0, _effects.call)([track, 'renderIn'], selector, speakerId)));
+
+    log.info('Finished rendering track(s).', filteredTracks.map(track => track.id));
+
+    payload = { selector };
+  } else {
+    const message = 'Failed to render tracks. One of trackIds or cssSelector is missing from request.';
+
+    log.info(message, filteredTracks.map(track => track.id));
+
+    payload.error = new _errors2.default({
+      message,
+      code: _errors.webrtcCodes.INVALID_PARAM
+    });
+  }
+
   // Report operation done.
-  yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), {
-    selector
-  }));
+  yield (0, _effects.put)(_actions.trackActions.renderTracksFinish(filteredTracks.map(track => track.id), payload));
 }
 
 /**
@@ -34396,13 +34463,13 @@ if (typeof module === 'object') {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(81);
-__webpack_require__(66);
+__webpack_require__(65);
 __webpack_require__(83);
 __webpack_require__(337);
 __webpack_require__(338);
 __webpack_require__(339);
 __webpack_require__(340);
-module.exports = __webpack_require__(8).Map;
+module.exports = __webpack_require__(9).Map;
 
 
 /***/ }),
@@ -34468,7 +34535,7 @@ module.exports = { "default": __webpack_require__(342), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(343);
-module.exports = __webpack_require__(8).Reflect.set;
+module.exports = __webpack_require__(9).Reflect.set;
 
 
 /***/ }),
@@ -34481,7 +34548,7 @@ var gOPD = __webpack_require__(148);
 var getPrototypeOf = __webpack_require__(115);
 var has = __webpack_require__(38);
 var $export = __webpack_require__(12);
-var createDesc = __webpack_require__(52);
+var createDesc = __webpack_require__(53);
 var anObject = __webpack_require__(30);
 var isObject = __webpack_require__(19);
 
@@ -35036,9 +35103,9 @@ exports.default = createAnswer;
 
 var _constants = __webpack_require__(29);
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _handlers = __webpack_require__(125);
 
@@ -35105,7 +35172,7 @@ function createAnswer(options = {}) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(357);
-module.exports = __webpack_require__(8).Object.freeze;
+module.exports = __webpack_require__(9).Object.freeze;
 
 
 /***/ }),
@@ -35392,9 +35459,9 @@ exports.default = createOffer;
 
 var _constants = __webpack_require__(29);
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _handlers = __webpack_require__(125);
 
@@ -35460,7 +35527,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = findReusableTransceiver;
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
 /**
  * Finds a transceiver that can be reused.
@@ -35614,7 +35681,7 @@ var _promise2 = _interopRequireDefault(_promise);
 
 exports.default = replaceTrack;
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35776,7 +35843,7 @@ var _iceCollectionLoop = __webpack_require__(368);
 
 var _iceCollectionLoop2 = _interopRequireDefault(_iceCollectionLoop);
 
-var _sdpTransform = __webpack_require__(57);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -36031,7 +36098,7 @@ exports.default = setTransceiversDirection;
 
 var _fp = __webpack_require__(3);
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
 var _transceiverUtils = __webpack_require__(371);
 
@@ -36223,7 +36290,7 @@ function localTracks() {
    */
   .filter(sender => Boolean(sender.track)).map(sender => trackManager.get(sender.track.id)).filter(track => {
     // Make sure the trackManager has the track and that its active.
-    // It's possble that Peer has the sender but not the actual track yet.
+    // It's possible that Peer has the sender but not the actual track yet.
     return track && track.getState().state === 'live' && track.getStream().active;
   });
 }
@@ -36293,7 +36360,7 @@ function getRemoteTracks() {
    */
   .filter(receiver => Boolean(receiver.track)).map(receiver => trackManager.get(receiver.track.id)).filter(track => {
     // Make sure the trackManager has the track and that its active.
-    // It's possble that Peer has the receiver but not the actual track yet.
+    // It's possible that Peer has the receiver but not the actual track yet.
     return track && track.getState().state === 'live' && track.getStream().active;
   });
 }
@@ -36515,7 +36582,7 @@ function now() {
 }
 
 /**
- * Create a new timer object. Timers are not started when created and need to be started manualy.
+ * Create a new timer object. Timers are not started when created and need to be started manually.
  *
  * @returns {Object} The timer object that supports the timer interface.
  */
@@ -36534,7 +36601,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -36587,12 +36654,12 @@ function MediaManager(managers) {
 
   /**
    * Workaround to get Firefox to behave similarly to Chrome regarding device permission prompts.
-   * @method browserContraintsWorkaround
+   * @method browserConstraintsWorkaround
    * @param  {MediaStreamConstraints}  constraints
-   * @return {Object}  media contraints
+   * @return {Object}  media constraints
    */
 
-  function browserContraintsWorkaround(constraints) {
+  function browserConstraintsWorkaround(constraints) {
     /**
      * Firefox workaround.
      *
@@ -36610,7 +36677,7 @@ function MediaManager(managers) {
      * See: https://developer.mozilla.org/en-US/docs/Web/API/ConstrainDOMString
      *
      *  - When the "ideal" behaviour is followed and the user has not given
-     *      permission (and not disallowed), the browswer will prompt the user
+     *      permission (and not disallowed), the browser will prompt the user
      *      for permission.
      *  - [Issue] When the "ideal" behaviour is followed and the user has given
      *      permission previously, the browser will not prompt the user for
@@ -36697,7 +36764,7 @@ function MediaManager(managers) {
    * @return {Promise}
    */
   function createLocal(constraints) {
-    const constraintsWorkaround = browserContraintsWorkaround(constraints);
+    const constraintsWorkaround = browserConstraintsWorkaround(constraints);
 
     // Get user media, ...
     return new _promise2.default((resolve, reject) => {
@@ -36724,7 +36791,7 @@ function MediaManager(managers) {
    */
 
   function createLocalScreen(constraints) {
-    const constraintsWorkaround = browserContraintsWorkaround(constraints);
+    const constraintsWorkaround = browserConstraintsWorkaround(constraints);
 
     return new _promise2.default((resolve, reject) => {
       navigator.mediaDevices.getDisplayMedia(constraintsWorkaround).then(mediaStream => {
@@ -36876,7 +36943,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -36892,7 +36959,7 @@ var _Peer = __webpack_require__(173);
 
 var _Peer2 = _interopRequireDefault(_Peer);
 
-var _uuid = __webpack_require__(74);
+var _uuid = __webpack_require__(73);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -37000,7 +37067,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -37016,7 +37083,7 @@ var _session = __webpack_require__(384);
 
 var _session2 = _interopRequireDefault(_session);
 
-var _uuid = __webpack_require__(74);
+var _uuid = __webpack_require__(73);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -37129,15 +37196,15 @@ var _logs = __webpack_require__(22);
 
 var _constants = __webpack_require__(29);
 
-var _pipeline = __webpack_require__(87);
+var _pipeline = __webpack_require__(88);
 
 var _pipeline2 = _interopRequireDefault(_pipeline);
 
-var _sdpSemantics = __webpack_require__(56);
+var _sdpSemantics = __webpack_require__(57);
 
 var _extractors = __webpack_require__(175);
 
-var _utils = __webpack_require__(86);
+var _utils = __webpack_require__(87);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -37274,8 +37341,14 @@ function Session(id, managers, config = {}) {
             reusableTransceiver.sender
             // Replace the dummy track on the Sender with the actual track we want to send.
             .replaceTrack(track.track).then(() => {
-              // Set the correct direction on the Transceiver to include that we now want to send.
-              reusableTransceiver.direction = reusableTransceiver.direction === 'recvonly' ? 'sendrecv' : 'sendonly';
+              /*
+               * Set the correct direction on the Transceiver to include that we now want to send:
+               *   - sendrecv --> sendrecv
+               *   - sendonly --> sendonly
+               *   - recvonly --> sendrecv
+               *   - inactive --> sendonly
+               */
+              reusableTransceiver.direction = ['sendrecv', 'recvonly'].includes(reusableTransceiver.direction) ? 'sendrecv' : 'sendonly';
 
               // Ensure the track has an associated MediaStream. The remote endpoint will
               //    get access to this MediaStream and be able to listen for events (for
@@ -37440,7 +37513,7 @@ function Session(id, managers, config = {}) {
    * @param {Object} mediaConstraints
    */
   function setParameters(mediaConstraints) {
-    // RTCRtpSender.setParameters is currently unsupported on Firefox (or atleast not supported as it should be)
+    // RTCRtpSender.setParameters is currently unsupported on Firefox (or at least not supported as it should be)
     if ((0, _utils.getBrowserDetails)().browser === 'firefox') {
       log.debug('Setting sender parameters not supported on Firefox; skipping.');
       return;
@@ -38142,13 +38215,13 @@ function DeviceManager() {
   /**
    * Ask for permission and gets the list of available device(s) available from the end-user's devices.
    * @method setupDeviceInitialization
-   * @param browserContraints
+   * @param browserConstraints
    * @return {Object}
    */
 
-  function setupDeviceInitialization(browserContraints) {
+  function setupDeviceInitialization(browserConstraints) {
     return new _promise2.default((resolve, reject) => {
-      navigator.mediaDevices.getUserMedia(browserContraints).then(mediaStream => {
+      navigator.mediaDevices.getUserMedia(browserConstraints).then(mediaStream => {
         mediaStream.getTracks().forEach(track => {
           track.stop();
         });
@@ -38207,7 +38280,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _from = __webpack_require__(55);
+var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -38671,6 +38744,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {boolean} remoteHold Indicates whether this call is currently being held remotely.
  * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
  * @property {Array<string>} remoteTracks A list of Track IDs that the call is receiving from the remote participant.
+ * @property {call.MediaOffered} [mediaOffered] Information about what media was offered by the person who made the call.
  * @property {Object} remoteParticipant Information about the other call participant.
  * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
  * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
@@ -38701,6 +38775,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {boolean} remoteHold Indicates whether this call is currently being held remotely.
  * @property {Array<string>} localTracks A list of Track IDs that the call is sending to the remote participant.
  * @property {Array<string>} remoteTracks A list of Track IDs that the call is receiving from the remote participant.
+ * @property {call.MediaOffered} [mediaOffered] Information about what media was offered by the person who made the call.
  * @property {Object} remoteParticipant Information about the other call participant.
  * @property {string} [remoteParticipant.displayNumber] The User ID of the remote participant in the form "username@domain".
  * @property {string} [remoteParticipant.displayName] The display name of the remote participant.
@@ -38763,6 +38838,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *      width: { ideal: 1280 }
  *    }
  * })
+ */
+
+/**
+ * The MediaOffered type defines what media capabilities are offered by the person making a call.
+ * This is an optional property and therefore may be null if it is not known or if it's associated with caller's side of the call.
+ *
+ * @public
+ * @static
+ * @typedef {Object} MediaOffered
+ * @memberof call
+ * @property {boolean} audio Specifies if any audio capability has been offered by the caller. If set to true, then the caller is capable of supporting at least one audio stream in the current call.
+ * @property {boolean} video Specifies if any video capability has been offered by the caller. If set to true, then the caller is capable of supporting at least one video stream in the current call.
  */
 
 /**
@@ -39018,11 +39105,11 @@ var _selectors = __webpack_require__(18);
 
 var _normalization = __webpack_require__(393);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _actions2 = __webpack_require__(28);
 
-var _uuid = __webpack_require__(74);
+var _uuid = __webpack_require__(73);
 
 var _fp = __webpack_require__(3);
 
@@ -39847,7 +39934,7 @@ function callAPI({ dispatch, getState }) {
      * @requires callMe
      * @method sendDTMF
      * @param {string} callId ID of the call being acted on.
-     * @param {string} tone DTMF tone(s) to send. Valid chracters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
+     * @param {string} tone DTMF tone(s) to send. Valid characters are ['0','1','2','3','4','5','6','7','8','9','#','*' and ','].
      * @param {number} [duration=100] The amount of time, in milliseconds, that each DTMF tone should last.
      * @param {number} [intertoneGap=70] The length of time, in milliseconds, to wait between tones.
      *
@@ -39873,7 +39960,7 @@ function callAPI({ dispatch, getState }) {
      * A Track ID can optionally be provided to get a report for a specific
      *    Track of the Call.
      *
-     * This API will return a promise which, when resolved, will contain the report of the particlar call.
+     * This API will return a promise which, when resolved, will contain the report of the particular call.
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event.
      *
@@ -40252,7 +40339,7 @@ function callAPI({ dispatch, getState }) {
 
       const deferredResult = (0, _pDefer2.default)();
 
-      // Trigger the action, but include a defered result which caller can use when
+      // Trigger the action, but include a deferred result which caller can use when
       // we actually obtain the data (i.e. list of codecs) from WebRTCManager.
       dispatch(_actions.callActions.getAvailableCodecs({ kind }, deferredResult));
 
@@ -40373,7 +40460,7 @@ function callAPI({ dispatch, getState }) {
      *  the Call endpoints will receive each other's media.
      * @property {string} DISCONNECTED Media has become disconnected and the Call endpoints have stopped receiving each other's media.
      *  The Call will automatically attempt to reconnect, transitioning back to `completed` if successful or to `failed` if not.
-     * @property {string} FAILED The connection has failed and cannot be recovered automatically. A full media connection refresh is required to restablish a connection. See the {@link call.restartMedia} API.
+     * @property {string} FAILED The connection has failed and cannot be recovered automatically. A full media connection refresh is required to reestablish a connection. See the {@link call.restartMedia} API.
      * @property {string} CLOSED The connection has been shut down and is no longer in use.
      * @example
      * // Use the media connection states to check the status of the media connection of the Call.
@@ -40401,7 +40488,7 @@ function callAPI({ dispatch, getState }) {
      *       ...
      *       break
      *     case mediaConnectionStates.FAILED:
-     *      // Media has failed. The call requires a media refresh to restablish.
+     *      // Media has failed. The call requires a media refresh to reestablish.
      *      // This state will occur after the `DISCONNECTED` state is encountered.
      *      ...
      *       break
@@ -40575,7 +40662,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.turnChanged = turnChanged;
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -40804,7 +40891,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _objectWithoutProperties2 = __webpack_require__(77);
+var _objectWithoutProperties2 = __webpack_require__(76);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
@@ -40812,7 +40899,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -41461,7 +41548,7 @@ var _extends3 = _interopRequireDefault(_extends2);
 exports.getOperationMeta = getOperationMeta;
 exports.setOperationState = setOperationState;
 
-var _constants = __webpack_require__(69);
+var _constants = __webpack_require__(68);
 
 var _fp = __webpack_require__(3);
 
@@ -41659,7 +41746,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -41746,7 +41833,7 @@ var _support = __webpack_require__(402);
 
 var supportSagas = _interopRequireWildcard(_support);
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -41778,7 +41865,7 @@ var _support2 = __webpack_require__(426);
 
 var _effects = __webpack_require__(129);
 
-var _actionTypes3 = __webpack_require__(48);
+var _actionTypes3 = __webpack_require__(49);
 
 var _actionTypes4 = __webpack_require__(41);
 
@@ -41967,7 +42054,7 @@ function* checkRenegotiationFlagEntry(deps) {
 }
 
 /**
- * Peform a call renegotitation.
+ * Perform a call renegotiation.
  * @method renegotiationEntry
  * @param {Object} deps             Dependencies to be injected.
  * @param {Object} deps.webRTC      The WebRTC stack.
@@ -42334,11 +42421,11 @@ exports.unsubscribe = unsubscribe;
 
 var _subscriptions = __webpack_require__(400);
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -42435,7 +42522,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -42496,7 +42583,7 @@ function* callUnsubscribe(requestInfo, subInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: new _errors2.default({
         message: 'Failed to unsubscribe from call notifications.',
@@ -42561,7 +42648,7 @@ var _actions = __webpack_require__(32);
 
 var _selectors = __webpack_require__(18);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -42663,11 +42750,11 @@ var _bandwidth = __webpack_require__(180);
 
 var _establish = __webpack_require__(128);
 
-var _midcall = __webpack_require__(71);
+var _midcall = __webpack_require__(70);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -44400,7 +44487,7 @@ module.exports = (chalk, temporary) => {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(414);
-module.exports = __webpack_require__(8).Object.entries;
+module.exports = __webpack_require__(9).Object.entries;
 
 
 /***/ }),
@@ -44456,7 +44543,7 @@ exports.iceRestart = iceRestart;
 
 var _establish = __webpack_require__(128);
 
-var _midcall = __webpack_require__(71);
+var _midcall = __webpack_require__(70);
 
 var _rollback = __webpack_require__(416);
 
@@ -44470,15 +44557,15 @@ var _selectors = __webpack_require__(18);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
 var _selectors2 = __webpack_require__(85);
 
-var _selectors3 = __webpack_require__(9);
+var _selectors3 = __webpack_require__(10);
 
-var _selectors4 = __webpack_require__(72);
+var _selectors4 = __webpack_require__(71);
 
 var _effects = __webpack_require__(186);
 
@@ -44490,7 +44577,7 @@ var _effects2 = __webpack_require__(1);
 
 var _fp = __webpack_require__(3);
 
-var _version = __webpack_require__(63);
+var _version = __webpack_require__(77);
 
 var _constants2 = __webpack_require__(7);
 
@@ -45777,16 +45864,28 @@ function* replaceTrack(deps, action) {
 
   const { trackId, mediaConstraints } = action.payload;
 
-  const stateError = yield (0, _effects2.call)(_utils.validateCallState, action.payload.id, { state: _constants.CALL_STATES.CONNECTED });
-  if (stateError) {
-    log.debug(`Invalid call state: ${stateError.message}`);
+  const currentCall = yield (0, _effects2.select)(_selectors.getCallById, action.payload.id);
+  if (!currentCall) {
+    log.debug(`Call ${action.payload.id} not found.`);
     yield (0, _effects2.put)(_actions.callActions.replaceTrackFinish(action.payload.id, {
-      error: stateError
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'Call state not found; invalid call ID.'
+      })
     }));
     return;
   }
 
-  const currentCall = yield (0, _effects2.select)(_selectors.getCallById, action.payload.id);
+  if ([_constants.CALL_STATES.CANCELLED, _constants.CALL_STATES.ENDED, _constants.CALL_STATES.INITIATING].includes(currentCall.state)) {
+    log.debug(`Invalid call state: ${currentCall.state}`);
+    yield (0, _effects2.put)(_actions.callActions.replaceTrackFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_STATE,
+        message: `Call is in an invalid state: ${currentCall.state}.`
+      })
+    }));
+    return;
+  }
 
   const { error, newTrackId, oldTrackState } = yield (0, _effects2.call)(_midcall.webRtcReplaceTrack, webRTC, {
     sessionId: currentCall.webrtcSessionId,
@@ -45956,7 +46055,7 @@ const log = _logs.logManager.getLogger('CALLSTACK');
  * Performs the webRTC session functions associated rolling back the local portion
  *  of a "hold" (inactive media) offer
  *
- * Responsiblities:
+ * Responsibilities:
  *  1. Revert the direction of the local and remote transceivers to "sendrecv"
  *  2. Rollback the local description SDP offer
  * @method rollbackLocalHoldOperation
@@ -45999,7 +46098,7 @@ function* rollbackLocalHoldOperation(deps, sessionId) {
  * Performs the webRTC session functions associated rolling back the local portion
  *  of an "unhold" (full media) offer
  *
- * Responsiblities:
+ * Responsibilities:
  *  1. Revert the direction of the local and remote transceivers to "inactive"
  *  2. Rollback the local description SDP offer
  * @method rollbackLocalUnholdOperation
@@ -46041,7 +46140,7 @@ function* rollbackLocalUnholdOperation(deps, sessionId) {
  * Performs the webRTC session functions associated rolling back the local portion
  *  of an "Add Media" offer
  *
- * Responsiblities:
+ * Responsibilities:
  *  1. Remove and cleanup the tracks added to the peer
  *  2. Rollback the local description SDP offer
  * @method rollbackLocalAddMedia
@@ -46109,7 +46208,7 @@ function* rollbackLocalAddMedia(deps, sessionId, medias) {
  * Unlike other rollback operations, for a remove media operation we will not try and re-add
  *  the removed tracks since the application's intention was to stop the media.
  *
- * Responsiblities:
+ * Responsibilities:
  *  1. Rollback the local description SDP offer
  * @method rollbackLocalRemoveMedia
  * @param {Object} deps
@@ -46151,7 +46250,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _uuid = __webpack_require__(74);
+var _uuid = __webpack_require__(73);
 
 // Generate a unique SDK GUID for the running SDK instance.
 const sdkId = (0, _uuid.v4)();
@@ -46184,7 +46283,7 @@ var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(23);
 
-var _constants2 = __webpack_require__(69);
+var _constants2 = __webpack_require__(68);
 
 var _negotiation = __webpack_require__(419);
 
@@ -46198,15 +46297,19 @@ var _logs = __webpack_require__(2);
 
 var _establish = __webpack_require__(128);
 
-var _midcall = __webpack_require__(71);
+var _midcall = __webpack_require__(70);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
-var _uuid = __webpack_require__(74);
+var _uuid = __webpack_require__(73);
+
+var _sdpTransform = __webpack_require__(46);
+
+var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
 var _utils = __webpack_require__(187);
 
@@ -46245,28 +46348,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 // Helpers
 // TODO: Move this to a shared location.
-
-
-// Libraries.
-
-
-// Other plugins
-
-
-// Callstack plugin.
-/**
- * "Notification sagas" handle received notifications.
- * Each saga handles a single websocket notification that may be received from
- *    the backend.
- *
- * There may not be an established webRTC session for these sagas. This may be
- *    because (1) the notification is a new incoming call, or (2) there is a
- *    de-sync between SDK state and server state. This may or may not be
- *    considered as an error scenario (eg. a "call ended" notification for a
- *    call the SDK doesn't know about may be safely ignored).
- */
-
-// Call plugin.
 function* incomingCall(deps, params) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
@@ -46276,6 +46357,16 @@ function* incomingCall(deps, params) {
 
   const log = _logs.logManager.getLogger('CALL', callId);
   log.info('Received new incoming call; initiating.', { wrtcsSessionId });
+
+  let mediaOffered = null;
+  if (sdp) {
+    // For a regular call, parse the SDP & collect what media has been offered by the caller:
+    // We only support two types
+    mediaOffered = { audio: false, video: false };
+    _sdpTransform2.default.parse(sdp).media.forEach(aMedia => {
+      mediaOffered[aMedia.type] = true;
+    });
+  }
 
   // Dispatch the action right away so the call is in state at this point.
   yield (0, _effects.put)(_actions.callActions.callIncoming(callId, {
@@ -46293,13 +46384,17 @@ function* incomingCall(deps, params) {
     wrtcsSessionId,
 
     // Whether the call was received as a slow start call or not.
-    isSlowStart: !sdp
+    isSlowStart: !sdp,
+
+    // Capture what the caller offered in terms of media
+    // For a slow-start call, this will be null.
+    mediaOffered
   }));
 
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
     const customNames = customParameters.map(param => param.name);
-    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
+    log.debug(`Received custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(callId, {
       customParameters
     }));
@@ -46391,6 +46486,28 @@ function* incomingCall(deps, params) {
  * @param {string} params.remoteName   Name of the remote participant.
  * @param {string} params.remoteNumber Number of the remote participant.
  */
+
+
+// Libraries.
+
+
+// Other plugins
+
+
+// Callstack plugin.
+/**
+ * "Notification sagas" handle received notifications.
+ * Each saga handles a single websocket notification that may be received from
+ *    the backend.
+ *
+ * There may not be an established webRTC session for these sagas. This may be
+ *    because (1) the notification is a new incoming call, or (2) there is a
+ *    de-sync between SDK state and server state. This may or may not be
+ *    considered as an error scenario (eg. a "call ended" notification for a
+ *    call the SDK doesn't know about may be safely ignored).
+ */
+
+// Call plugin.
 function* parseCallRequest(deps, params) {
   const { wrtcsSessionId, sdp, remoteName, remoteNumber, customParameters } = params;
   const targetCall = yield (0, _effects.select)(_selectors.getCallByWrtcsSessionId, wrtcsSessionId);
@@ -46415,7 +46532,7 @@ function* parseCallRequest(deps, params) {
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
     const customNames = customParameters.map(param => param.name);
-    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
+    log.debug(`Received custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(targetCall.id, {
       customParameters
     }));
@@ -46484,7 +46601,7 @@ function* parseCallResponse(deps, params) {
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
     const customNames = customParameters.map(param => param.name);
-    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
+    log.debug(`Received custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(targetCall.id, {
       customParameters
     }));
@@ -46581,7 +46698,7 @@ function* callStatusUpdateEnded(deps, params) {
  * - direct transfer
  * - consultative transfer
  * - join
- * , where user A transfered user B to user C.
+ * , where user A transferred user B to user C.
  *
  * For the direct & consultative transfer operations, the 'sessionComplete' notification
  * will just refer to the original call between: A<->B, which has now completed.
@@ -46735,7 +46852,7 @@ function* callStatusUpdateRinging(deps, params) {
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
     const customNames = customParameters.map(param => param.name);
-    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
+    log.debug(`Received custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(currentCall.id, {
       customParameters
     }));
@@ -46906,7 +47023,7 @@ function* receiveEarlyMedia(deps, params) {
   // Dispatch a custom parameters received action/event if any custom parameters were received as part of the notification
   if (customParameters) {
     const customNames = customParameters.map(param => param.name);
-    log.debug(`Recevied custom parameters as part of the Call: ${customNames}.`);
+    log.debug(`Received custom parameters as part of the Call: ${customNames}.`);
     yield (0, _effects.put)(_actions.callActions.customParametersReceived(currentCall.id, {
       customParameters
     }));
@@ -46978,11 +47095,11 @@ var _sdp = __webpack_require__(421);
 
 var _state = __webpack_require__(422);
 
-var _constants2 = __webpack_require__(69);
+var _constants2 = __webpack_require__(68);
 
 var _logs = __webpack_require__(2);
 
-var _midcall = __webpack_require__(71);
+var _midcall = __webpack_require__(70);
 
 var _negotiation = __webpack_require__(423);
 
@@ -47018,7 +47135,7 @@ const log = _logs.logManager.getLogger('CALL');
  *        - Indicates regular webRTC negotiation should occur.
  * Responsibilities:
  *    1. Determine what the remote operation was (ie. what is being offered).
- *    2. Process the offer based on remote oepration and current local state.
+ *    2. Process the offer based on remote operation and current local state.
  *    3. Respond to the request.
  *    4. Update call state (via redux action).
  * @method handleUpdateRequest
@@ -47087,7 +47204,7 @@ function* handleUpdateRequest(deps, targetCall, params) {
      *      a renegotiation occurs that changes from 'MoH' to 'media flowing'
      *      state. This needs to be handled as an unhold by the SDK so that
      *      the call state is updated to reflect the media state.
-     *  - As part of a remote consultative transer operation (when this user was
+     *  - As part of a remote consultative transfer operation (when this user was
      *      the first call specified in the transfer operation, but not for the
      *      second user). Same 'MoH' to 'media flowing' scenario as direct
      *      transfer.
@@ -47651,7 +47768,7 @@ exports.hasMediaFlowing = hasMediaFlowing;
 
 var _compareMedia = __webpack_require__(188);
 
-var _constants = __webpack_require__(69);
+var _constants = __webpack_require__(68);
 
 /**
  * Based on a MediaDiff object, determine what the call operation was that
@@ -47830,7 +47947,7 @@ function wasUnhold(mediaDiff) {
 }
 
 /**
- * A "3.X hold" opeation is when a hold operation changes media to `sendonly`
+ * A "3.X hold" operation is when a hold operation changes media to `sendonly`
  *    instead of `inactive`. This is what the 3.X SDK and Mobile SDK does. This
  *    is for interop with remote endpoints other than the 4.X SDK.
  *
@@ -47853,14 +47970,14 @@ function was3xHold(mediaDiff) {
 
   /*
    * 1) Handles when some media was flowing before the change.
-   *  or a special case where media was flowing but assumes media wasnt flowing.
+   *  or a special case where media was flowing but assumes media wasn't flowing.
    * 2) All changed media is now "sendonly".
    *    All changed video media is not receiving.
    */
   const wasFlowing = hadMediaFlowing(mediaDiff);
   const allSendOnly = changed.every(({ media, changes }) => {
     /**
-     * Possible scenerios:
+     * Possible scenarios:
      *
      *  1. Audio-only 3.X Hold:
      *    - A sendrecv --> A sendonly
@@ -47880,7 +47997,7 @@ function was3xHold(mediaDiff) {
      *  7. Two way Audio, One way send Video:
      *    - A/V sendrecv/sendonly --> A/V sendonly/sendonly (video checked by 5) below)
      *
-     * The summary of these senarios are:
+     * The summary of these scenarios are:
      *  - Audio always stops receiving.
      *  - Audio always continues sending.
      *  - Video is never receiving afterwards (stop, same).
@@ -47926,7 +48043,7 @@ function was3xHold(mediaDiff) {
 }
 
 /**
- * A "3.X unhold" opeation is when a v3.X SDK performs unhold. This is for
+ * A "3.X unhold" operation is when a v3.X SDK performs unhold. This is for
  *    interop.
  *
  * This operation is the same as a "regular" unhold, except that media changes
@@ -48096,7 +48213,7 @@ function wasRemoveMedia(mediaDiff) {
  * A "start Music on Hold" operation is when media is currently held, and one
  *    audio media is changed to "send only".
  *
- * This checker does not guarentee that it was a "start MoH" scenario, and not
+ * This checker does not guarantee that it was a "start MoH" scenario, and not
  *    a very specific "add media" scenario. It is an edge-case, but it is
  *    possible that both sides of the Call removed all media, then one side
  *    adds a single audio track. There is no way to tell the difference with
@@ -48150,7 +48267,7 @@ function wasStartMoh(mediaDiff) {
  * A "stop Music on Hold" operation is when media starts in a MoH state, then
  *    reverts back to an "on hold" state.
  *
- * This checker does not guarentee that it was a "stop MoH" scenario, and not
+ * This checker does not guarantee that it was a "stop MoH" scenario, and not
  *    a very specific "remove media" scenario. It is possible that a Call is
  *    established with one-way audio (and no video), then the audio is removed.
  *    There is no way to tell the difference with only a MediaDiff object.
@@ -48227,7 +48344,7 @@ function wasNoChange(mediaDiff) {
 }
 
 /**
- * Determines whether a MediDiff object describes the SDP as having had media
+ * Determines whether a MediaDiff object describes the SDP as having had media
  *    flowing (a media both sending and receiving; flowing in both directions)
  *    _before_ the SDP changes.
  * @method hadMediaFlowing
@@ -48284,7 +48401,7 @@ function hadMediaFlowing(mediaDiff) {
 }
 
 /**
- * Determines whether a MediDiff object describes the SDP as having media
+ * Determines whether a MediaDiff object describes the SDP as having media
  *    flowing (a media both sending and receiving; flowing in both directions)
  *    _after_ the SDP changes.
  * @method hasMediaFlowing
@@ -48340,7 +48457,7 @@ exports.setMediaInactive = setMediaInactive;
 exports.hasMediaFlowing = hasMediaFlowing;
 exports.hasMusicOnHold = hasMusicOnHold;
 
-var _sdpTransform = __webpack_require__(57);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -48490,7 +48607,7 @@ exports.receivedAnswer = receivedAnswer;
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -48694,13 +48811,13 @@ var _constants = __webpack_require__(23);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
-var _sdpTransform = __webpack_require__(57);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -48716,7 +48833,7 @@ const log = _logs.logManager.getLogger('CALL');
  * Entry saga for sending DTMF tones on a call.
  *
  * Determines if the DTMF tones need to be out-of-band (preferred) or in-band.
- *    Referes to helper functions to send the tones.
+ *    Refers to helper functions to send the tones.
  *
  * Assumptions:
  *    1. None; everything is checked.
@@ -48825,7 +48942,7 @@ function* sendDtmf(deps, action) {
  * @param  {string}  options.tone           The tone sequence.
  * @param  {number}  [options.duration]     The length of each DTMF tone.
  * @param  {number}  [options.intertoneGap] The gap between each DTMF tone.
- * @return {boolean} Whether the operation was succesful or not.
+ * @return {boolean} Whether the operation was successful or not.
  */
 function* playOutBand(session, options) {
   const result = yield (0, _effects.call)([session, 'sendDTMF'], options);
@@ -48862,7 +48979,7 @@ function* playOutBand(session, options) {
  * @param  {string}  options.tone           The tone sequence.
  * @param  {number}  [options.duration=100]     The length of each DTMF tone.
  * @param  {number}  [options.intertoneGap=70]  The gap between each DTMF tone.
- * @return {boolean} Whether the operation was succesful or not.
+ * @return {boolean} Whether the operation was successful or not.
  */
 function* playInBand(session, options) {
   let { tone, duration, intertoneGap: gap } = options;
@@ -49029,7 +49146,7 @@ function* addTones(context, targetNode, tones, options) {
  * Checks whether an SDP has at least one telephone-event codec.
  *
  * TODO: If there isn't a telephone-event, then the PeerConnection won't have
- *    a "dtmf sender" (RTCRtpSender.dtmf). Should preferrably check for that
+ *    a "dtmf sender" (RTCRtpSender.dtmf). Should preferably check for that
  *    rather than looking through the SDP.
  * This isn't being done because the Session/Peer models wrap "send dtmf" in a
  *    way that makes it inconvenient to use.
@@ -49119,7 +49236,7 @@ exports.normalizeIceFailure = normalizeIceFailure;
 
 var _actions = __webpack_require__(32);
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -49127,7 +49244,7 @@ var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(23);
 
-var _midcall = __webpack_require__(71);
+var _midcall = __webpack_require__(70);
 
 var _logs = __webpack_require__(2);
 
@@ -49537,11 +49654,11 @@ var _eventTypes = __webpack_require__(429);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(46);
+var _actionTypes = __webpack_require__(47);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _constants = __webpack_require__(69);
+var _constants = __webpack_require__(68);
 
 var _actionTypes2 = __webpack_require__(11);
 
@@ -49854,7 +49971,8 @@ callEvents[actionTypes.AVAILABLE_CODECS_RETRIEVED] = action => {
 
 callEvents[actionTypes.CALL_INCOMING] = action => {
   return callEventHandler(eventTypes.CALL_INCOMING, action, {
-    error: action.payload.error
+    error: action.payload.error,
+    mediaOffered: action.payload.mediaOffered
   });
 };
 
@@ -50471,9 +50589,9 @@ var _constants = __webpack_require__(7);
 
 var _actions = __webpack_require__(91);
 
-var _selectors = __webpack_require__(72);
+var _selectors = __webpack_require__(71);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
@@ -50596,7 +50714,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(49);
+var _actionTypes = __webpack_require__(50);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -50748,7 +50866,7 @@ var _eventTypes = __webpack_require__(436);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(49);
+var _actionTypes = __webpack_require__(50);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -50830,9 +50948,9 @@ exports.connectWebsocket = connectWebsocket;
 
 var _websocket = __webpack_require__(438);
 
-var _selectors = __webpack_require__(72);
+var _selectors = __webpack_require__(71);
 
-var _actionTypes = __webpack_require__(49);
+var _actionTypes = __webpack_require__(50);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -50840,7 +50958,7 @@ var _actions = __webpack_require__(91);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _selectors3 = __webpack_require__(34);
 
@@ -50868,7 +50986,7 @@ const log = _logs.logManager.getLogger('CONNECTIVITY');
 function* wsConnectFlow() {
   log.info('Creating channel for handling websocket actions ...');
   const chan = yield (0, _effects.actionChannel)(actionTypes.WS_ATTEMPT_CONNECT);
-  log.info('Channel successfuly created.');
+  log.info('Channel successfully created.');
   yield (0, _effects.takeEvery)(chan, websocketLifecycle);
 }
 
@@ -50948,16 +51066,15 @@ function* websocketLifecycle(wsConnectAction) {
   //      we want to cancel these tasks either way.
   yield (0, _effects.cancel)([emitTask, pingFlow]);
 
+  log.debug('Cleaning up websocket connection ...');
+  yield (0, _effects.call)(_websocket.cleanupWebSocket, websocket);
+
   if (action.type === actionTypes.WS_DISCONNECT) {
     // If we're disconnecting, close the websocket to end it's lifecycle.
-    log.debug('Closing websocket connection ...');
-    yield (0, _effects.call)(_websocket.closeWebsocket, websocket);
     yield (0, _effects.put)(actions.wsDisconnectFinished(undefined, platform));
-    log.info('Successfully closed websocket connection.');
-  } else if (action.type === actionTypes.WS_CLOSED && [1000, 1005].includes(action.payload.code === 1000)) {
+    log.info('Successfully disconnected websocket connection.');
+  } else if (action.type === actionTypes.WS_CLOSED && action.payload.code === 1000) {
     // 1000 signifies a normal closure
-    // 1005 indicates a closure with no status code (this is the default if websocket.close() is called without passing a code)
-
     // Normal websocket close, don't try to reconnect
     log.debug('Websocket closed normally.');
     yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
@@ -50992,7 +51109,7 @@ function* websocketLifecycle(wsConnectAction) {
 
       // If we've lost connection, re-dispatch the initial action, so that we can
       //      start the lifecycle over.
-      log.debug('Attempting to reconnect to websocket ...');
+      log.debug('Attempting to reconnect using a new websocket ...');
       yield (0, _effects.put)(actions.wsAttemptConnect(wsInfo, wsConnectAction.meta.platform, true));
     } else {
       log.debug('Not attempting to reconnect to websocket autoReconnect is false.');
@@ -51242,7 +51359,7 @@ function* connectWebsocket(wsInfo, platform) {
     });
     const attemptDuration = Date.now() - wsConnectStart;
 
-    // Checking for both timeout and open websocket errors here since we need to calculate the next delay paramaters in
+    // Checking for both timeout and open websocket errors here since we need to calculate the next delay parameters in
     //  both scenarios
     if (timeout || openWs && openWs.error) {
       connectionAttempt++;
@@ -51303,7 +51420,7 @@ var _promise = __webpack_require__(21);
 var _promise2 = _interopRequireDefault(_promise);
 
 exports.openWebsocket = openWebsocket;
-exports.closeWebsocket = closeWebsocket;
+exports.cleanupWebSocket = cleanupWebSocket;
 exports.wsEmitter = wsEmitter;
 
 var _actions = __webpack_require__(91);
@@ -51368,17 +51485,15 @@ function openWebsocket(options) {
 
 /**
  * Clean-up a provided websocket.
- * @method closeWebsocket
+ * @method cleanupWebSocket
  * @param  {Websocket} ws Websocket to be cleaned-up.
  * @return {Websocket} ws The websocket after being cleaned.
  */
-function closeWebsocket(ws) {
+function cleanupWebSocket(ws) {
   if (ws.close) {
     ws.close();
-  } else {
-    ws.onclose = null;
   }
-
+  ws.onclose = null;
   ws.onmessage = null;
   ws.onopen = null;
   ws.onerror = null;
@@ -51419,7 +51534,7 @@ function createWsChannel(ws, platform) {
       emit(_reduxSaga.END);
     };
 
-    return () => closeWebsocket(ws);
+    return () => cleanupWebSocket(ws);
   }, _reduxSaga.buffers.expanding(INITIAL_BUFFER_SIZE));
 }
 
@@ -51580,7 +51695,7 @@ var _selectors2 = __webpack_require__(34);
 
 var _logs = __webpack_require__(2);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 // Retrieve logger
 const log = _logs.logManager.getLogger('Messaging'); /**
@@ -51628,7 +51743,7 @@ function api(context) {
     /**
      * Retrieves a conversation object matching the User ID and Type provided if available.
      *
-     * Conversations are made availble using the {@link conversation.fetch} or
+     * Conversations are made available using the {@link conversation.fetch} or
      *    {@link conversation.create} Messaging APIs.
      *
      * @public
@@ -51729,7 +51844,7 @@ function api(context) {
     /**
      * Retrieves all available conversations for the current user.
      *
-     * Conversations are made availble using the {@link conversation.fetch} or
+     * Conversations are made available using the {@link conversation.fetch} or
      *    {@link conversation.create} Messaging APIs.
      *
      * @public
@@ -51786,11 +51901,11 @@ exports.deleteMessageFinish = deleteMessageFinish;
 exports.getImageLinks = getImageLinks;
 exports.getImageLinksFinish = getImageLinksFinish;
 
-var _actionTypes = __webpack_require__(73);
+var _actionTypes = __webpack_require__(72);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -51926,7 +52041,7 @@ function messageReceived(destination, parts, messageId, sender, timestamp, meta 
  *
  * @method incomingMessageRead
  * @param {string} messageId The unique id of the message being marked as read.
- * @param {string} participant The other pariticipant of the conversation.
+ * @param {string} participant The other participant of the conversation.
  * @returns {Object} A flux standard action representing the incoming message read action.
  */
 const incomingMessageRead = exports.incomingMessageRead = (messageId, participant) => messageReadHelper(actionTypes.INCOMING_MESSAGE_READ, messageId, participant);
@@ -51936,7 +52051,7 @@ const incomingMessageRead = exports.incomingMessageRead = (messageId, participan
  *
  * @method sendMessageRead
  * @param {string} messageId The unique id of the message being marked as read.
- * @param {string} participant The other pariticipant of the conversation.
+ * @param {string} participant The other participant of the conversation.
  * @returns {Object} A flux standard action representing the send message read action.
  */
 const sendMessageRead = exports.sendMessageRead = (messageId, participant) => messageReadHelper(actionTypes.SEND_MESSAGE_READ, messageId, participant);
@@ -52109,7 +52224,7 @@ exports.deleteConversationFinish = deleteConversationFinish;
 exports.setIsTyping = setIsTyping;
 exports.setIsTypingFinished = setIsTypingFinished;
 
-var _actionTypes = __webpack_require__(73);
+var _actionTypes = __webpack_require__(72);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -52286,7 +52401,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(73);
+var _actionTypes = __webpack_require__(72);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -52673,11 +52788,11 @@ var _fp = __webpack_require__(3);
 
 var _actions = __webpack_require__(131);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _compose = __webpack_require__(138);
 
@@ -52702,7 +52817,7 @@ const log = _logs.logManager.getLogger('MESSAGING');
  * @param {string} [id=undefined] id The unique identifier for the conversation.
  * @param {string} [description=''] The description associated with the conversation.
  * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
- * @param {Array<string>} [isTypingList=[]] A array that represents the list of usings who are currently typing.
+ * @param {Array<string>} [isTypingList=[]] A array that represents the list of users who are currently typing.
  * @param {number} lastReceived The timestamp associated with the last received message.
  */
 
@@ -52725,7 +52840,7 @@ const log = _logs.logManager.getLogger('MESSAGING');
  * @property {string} type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @property {string} lastMessage The last message received.
  * @property {Array<conversation.Message>} messages The array of message objects.
- * @property {Array<string>} isTypingList The array indentifying the User IDs of the users who are currently typing.
+ * @property {Array<string>} isTypingList The array identifying the User IDs of the users who are currently typing.
  *
  * @public
  * @static
@@ -53218,7 +53333,7 @@ module.exports = { "default": __webpack_require__(447), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(448);
-module.exports = __webpack_require__(8).Object.getPrototypeOf;
+module.exports = __webpack_require__(9).Object.getPrototypeOf;
 
 
 /***/ }),
@@ -53270,7 +53385,7 @@ var _subscriptions = __webpack_require__(451);
 
 var subsSagas = _interopRequireWildcard(_subscriptions);
 
-var _actionTypes = __webpack_require__(73);
+var _actionTypes = __webpack_require__(72);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -53280,7 +53395,7 @@ var _constants = __webpack_require__(7);
 
 var _effects = __webpack_require__(129);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 var _effects2 = __webpack_require__(1);
 
@@ -53519,17 +53634,17 @@ var _requests = __webpack_require__(190);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _constants = __webpack_require__(7);
 
-var _mappings = __webpack_require__(50);
+var _mappings = __webpack_require__(51);
 
 var _effects = __webpack_require__(1);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -53628,10 +53743,10 @@ function* sendChatMessage(action) {
 
   // TODO: when the backend API expands its functionality this log/error should be removed
   if (fileParts.length > 1) {
-    log.info('Too many fileParts to upload, API  doesnt currently support multiple fileParts.');
+    log.info("Too many fileParts to upload, API doesn't currently support multiple fileParts.");
     yield (0, _effects.put)(_actions.messageActions.sendMessageFinish({
       error: new _errors2.default({
-        message: 'Too many fileParts to upload, API  doesnt currently support multiple fileParts.',
+        message: "Too many fileParts to upload, API doesn't currently support multiple fileParts.",
         code: _errors.messagingCodes.INVALID_FILE_PARTS
       })
     }));
@@ -53886,13 +54001,8 @@ function* sendSMS(action) {
 // TODO: Have a single "handleIncoming" saga that handles both IM and SMS?
 function* handleIncomingSMS(action) {
   const notification = action.payload.inboundSMSMessageNotification;
-  let { message, messageId, senderAddress } = notification.inboundSMSMessage;
+  const { message, messageId, senderAddress } = notification.inboundSMSMessage;
   const { dateTime } = notification;
-
-  if (!senderAddress) {
-    // Incorrect property name: AEB-2485
-    senderAddress = notification.inboundSMSMessage.senderAdress;
-  }
 
   const existingConversation = yield (0, _effects.select)(_selectors.findConversation, [senderAddress], _mappings.chatTypes.SMS);
   const newConversation = !existingConversation;
@@ -54081,14 +54191,14 @@ function* fetchSmsMessages(action) {
     const remoteAddress = tmp2[0];
     const localAddress = tmp2[1].split('/messages/')[0];
 
-    // message.type is either outbound or inboud
-    // Assume type is 'outboud'.
+    // message.type is either outbound or inbound
+    // Assume type is 'outbound'.
     // This means the senderAddress is localAddress & destinationAddress is remoteAddress.
     let senderAddress = localAddress;
     let destinationAddress = remoteAddress;
 
     if (message.type !== 'outbound') {
-      // otheriwse, the values are swapped
+      // otherwise, the values are swapped
       senderAddress = remoteAddress;
       destinationAddress = localAddress;
     }
@@ -54202,15 +54312,15 @@ var _requests = __webpack_require__(190);
 
 var _selectors = __webpack_require__(92);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _selectors3 = __webpack_require__(34);
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -54294,7 +54404,7 @@ function* chatUnsubscription(action) {
     chatSubscription = chatSubscription[0];
   }
 
-  log.info(`Unsubcribing from chat service on ${action.payload.type} channel.`);
+  log.info(`Unsubscribing from chat service on ${action.payload.type} channel.`);
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
 
   const response = yield (0, _effects.call)(_requests.chatUnsubscribe, requestInfo, chatSubscription);
@@ -54418,7 +54528,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _actionTypes = __webpack_require__(73);
+var _actionTypes = __webpack_require__(72);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -54730,7 +54840,7 @@ var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(49);
+var _actionTypes2 = __webpack_require__(50);
 
 var _reduxActions = __webpack_require__(14);
 
@@ -55116,7 +55226,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _keys = __webpack_require__(54);
+var _keys = __webpack_require__(55);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -55166,7 +55276,6 @@ function findNotificationInfo(notification) {
 }
 
 function* processNotifications() {
-  const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
   const idCache = [];
 
   /**
@@ -55174,15 +55283,21 @@ function* processNotifications() {
    *      judging by its event ID.
    * @method isDuplicate
    * @param  {string} id
+   * @param {Object} config
    * @return {boolean}
    */
-  function isDuplicate(id) {
-    if (idCache.indexOf(id) !== -1) {
+  function isDuplicate(id, config) {
+    // Get the list of "relevant" IDs in the queue ("relevant" being the latest X elements).
+    // This covers edge-cases where the cache length config is changed (to a smaller number)
+    //    after the queue has begun to be populated.
+    const ids = config.idCacheLength === 0 ? [] : idCache.slice(config.idCacheLength * -1);
+    // If the notification ID is part of the list, then it's a duplicate.
+    if (ids.indexOf(id) !== -1) {
       return true; // duplicate.
     } else {
       // Not a duplicate.
       idCache.push(id);
-      if (idCache.length > config.idCacheLength) {
+      while (idCache.length > config.idCacheLength) {
         idCache.shift();
       }
 
@@ -55192,6 +55307,7 @@ function* processNotifications() {
 
   while (true) {
     const { payload: notification, meta } = yield (0, _effects.take)(actionTypes.PROCESS_NOTIFICATION);
+    const config = yield (0, _effects.select)(_selectors.getNotificationConfig);
     log.info(`Received notification on channel ${meta.channel}; handling.`);
 
     // Only process notifications from enabled channels, ie. "silence" the channel.
@@ -55209,7 +55325,7 @@ function* processNotifications() {
     }
 
     log.debug(`Received notification of type ${notificationType} with ID ${notificationId}.`);
-    if (!isDuplicate(notificationId)) {
+    if (!isDuplicate(notificationId, config)) {
       log.info('Notifying other plugins about notification ...');
       // Notify others (plugins) that a new notification was receive.
       yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
@@ -55592,7 +55708,7 @@ const log = _logs.logManager.getLogger('PRESENCE'); /**
  * @property {string} status The current status the user has set for themselves. For supported values see {@link presence.statuses}.
  * @property {string} activity The current activity of the user.
  *      For supported values see {@link presence.activities}.
- * @property {string} note Additional message acompanying the status & activity.
+ * @property {string} note Additional message accompanying the status & activity.
  * @property {boolean} loading Whether the presence information has been loaded or is in the process of loading.
  */
 
@@ -55899,11 +56015,11 @@ var _presence = __webpack_require__(192);
 
 var _subscriptions = __webpack_require__(468);
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _selectors2 = __webpack_require__(34);
 
@@ -56053,7 +56169,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(70);
+var _helpers = __webpack_require__(69);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56113,7 +56229,7 @@ function* unsubscribe(presenceListId, subscriptionId, requestInfo) {
 
   const response = yield (0, _effects2.default)(requestOptions);
 
-  if (response.error) {
+  if (response.error && response.payload.result.code !== 404) {
     return {
       error: (0, _helpers.handleRequestError)(response, 'Unsubscribe from presence list')
     };
@@ -56151,7 +56267,7 @@ var actions = _interopRequireWildcard(_actions);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _selectors2 = __webpack_require__(34);
 
@@ -56159,7 +56275,7 @@ var _constants = __webpack_require__(7);
 
 var _constants2 = __webpack_require__(132);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -56295,7 +56411,7 @@ function* subscribePresence({ payload }) {
   });
   if (presenceSubscription.length === 0) {
     yield (0, _effects.put)(actions.subscribePresenceFinish(new _errors2.default({
-      message: 'Found no subscription for presence service. Subcribe for presence first and then try again.',
+      message: 'Found no subscription for presence service. Subscribe for presence first and then try again.',
       code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
     })));
     return;
@@ -56448,7 +56564,7 @@ eventsMap[actionTypes.UNSUBSCRIBE_FINISH] = action => {
   }
 };
 
-// TODO: Should have events to notifiy of successful operations for these actions.
+// TODO: Should have events to notify of successful operations for these actions.
 eventsMap[actionTypes.CREATE_PRESENCE_LIST_FINISH] = presenceError;
 
 exports.default = eventsMap;
@@ -56716,7 +56832,7 @@ exports.default = function (context) {
     },
 
     /**
-     * Retrieves the list of particpants from an available Group.
+     * Retrieves the list of participants from an available Group.
      *
      * @public
      * @memberof groups
@@ -56869,7 +56985,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 const log = _logs.logManager.getLogger('GROUPS'); /**
                                                    * The 'groups' namespace provides an interface for an application to create and
-                                                   *    manage Groups for a User. Groups are used in conjuction with the
+                                                   *    manage Groups for a User. Groups are used in conjunction with the
                                                    *    {@link conversation Messaging} feature to allow for group conversations.
                                                    *
                                                    * Groups are persisted by the server. When the SDK is initialized, there will
@@ -57335,9 +57451,9 @@ var _actions = __webpack_require__(193);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -57606,7 +57722,7 @@ function* acceptInvitation({ payload }) {
     return;
   }
 
-  // Need to accept the invitation before you can fetch the group. Otherewise, The
+  // Need to accept the invitation before you can fetch the group. Otherwise, The
   // request will fail with a 404 because you are not actually in the chat group yet.
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
   const userInfo = yield (0, _effects.select)(_selectors.getUserInfo, _constants.platforms.CPAAS);
@@ -57755,7 +57871,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(70);
+var _helpers = __webpack_require__(69);
 
 var _utils = __webpack_require__(194);
 
@@ -57770,7 +57886,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param  {string} params.type Closed group indicates this is an invitation-based closed chat group. Only Closed is supported.
  * @param  {Object} requestInfo Info needed to perform the request.
  * @param  {string} [params.subject] Subject of the group chat session.
- * @param  {string} [params.image]  HTTP URL of the image that is assigned to the grpup chat session avatar
+ * @param  {string} [params.image]  HTTP URL of the image that is assigned to the group chat session avatar
  * @return {group}
  */
 function* createRequest(params, requestInfo) {
@@ -58410,7 +58526,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(48);
+var _actionTypes = __webpack_require__(49);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -58516,7 +58632,7 @@ reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
 };
 
 /*
- * When a plugin reports a succesful subscription, store it in state.
+ * When a plugin reports a successful subscription, store it in state.
  */
 reducers[actionTypes.PLUGIN_SUBSCRIPTION_FINISHED] = {
   next(state, action) {
@@ -58527,7 +58643,7 @@ reducers[actionTypes.PLUGIN_SUBSCRIPTION_FINISHED] = {
 };
 
 /*
- * When a plugin reports a succesful unsubscription, remove it from state.
+ * When a plugin reports a successful unsubscription, remove it from state.
  */
 reducers[actionTypes.PLUGIN_UNSUBSCRIPTION_FINISHED] = {
   next(state, action) {
@@ -58554,7 +58670,7 @@ reducers[actionTypes.REGISTER_SUB_SERVICE] = {
 };
 
 /*
- * Store the new notifiction channel into state.
+ * Store the new notification channel into state.
  * Assumption: A channel of the same type should NOT already exist.
  */
 reducers[actionTypes.CHANNEL_OPENED] = {
@@ -58624,13 +58740,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _constants = __webpack_require__(7);
 
@@ -58908,7 +59024,7 @@ var _eventTypes = __webpack_require__(488);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(48);
+var _actionTypes = __webpack_require__(49);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -59015,11 +59131,11 @@ exports.subscriptionFlow = subscriptionFlow;
 exports.onConnectionLostEntry = onConnectionLostEntry;
 exports.onConnectionLost = onConnectionLost;
 
-var _actionTypes = __webpack_require__(48);
+var _actionTypes = __webpack_require__(49);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var actions = _interopRequireWildcard(_actions);
 
@@ -59027,17 +59143,17 @@ var _channels = __webpack_require__(490);
 
 var _selectors = __webpack_require__(34);
 
-var _actionTypes2 = __webpack_require__(49);
+var _actionTypes2 = __webpack_require__(50);
 
 var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
 
 var _constants = __webpack_require__(84);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -59364,21 +59480,21 @@ exports.closeChannel = closeChannel;
 
 var _requests = __webpack_require__(491);
 
-var _actions = __webpack_require__(47);
+var _actions = __webpack_require__(48);
 
 var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__(34);
 
-var _selectors2 = __webpack_require__(9);
+var _selectors2 = __webpack_require__(10);
 
 var _effects = __webpack_require__(186);
 
 var _logs = __webpack_require__(2);
 
-var _selectors3 = __webpack_require__(72);
+var _selectors3 = __webpack_require__(71);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -59564,7 +59680,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -60522,7 +60638,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -60649,7 +60765,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -60741,7 +60857,7 @@ var _users = __webpack_require__(505);
 
 var usersSagas = _interopRequireWildcard(_users);
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -60869,15 +60985,15 @@ var actions = _interopRequireWildcard(_contacts);
 
 var _contacts2 = __webpack_require__(504);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _utils = __webpack_require__(198);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 var _effects = __webpack_require__(1);
 
@@ -61011,11 +61127,11 @@ var _effects2 = _interopRequireDefault(_effects);
 
 var _handleRequestError = __webpack_require__(127);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61190,15 +61306,15 @@ var actions = _interopRequireWildcard(_users);
 
 var _users2 = __webpack_require__(506);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _logs = __webpack_require__(2);
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(89);
+var _codes = __webpack_require__(86);
 
 var _effects = __webpack_require__(1);
 
@@ -61394,7 +61510,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -61452,7 +61568,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _actionTypes = __webpack_require__(51);
+var _actionTypes = __webpack_require__(52);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -61630,7 +61746,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.__testonly__ = undefined;
 exports.default = watchRequests;
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -61650,7 +61766,7 @@ var _utils = __webpack_require__(126);
 
 var _logs = __webpack_require__(2);
 
-var _version = __webpack_require__(63);
+var _version = __webpack_require__(77);
 
 var _effects = __webpack_require__(1);
 
@@ -61736,7 +61852,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _objectWithoutProperties2 = __webpack_require__(77);
+var _objectWithoutProperties2 = __webpack_require__(76);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
@@ -61872,14 +61988,14 @@ exports.default = async function makeRequest(options, requestId) {
 
     /*
      * Try to parse the response as JSON, and if successful, include
-     * it in the returned error. otherwise, provide an empty object instaed.
+     * it in the returned error. otherwise, provide an empty object instead.
      */
     let responseBody;
     try {
       responseBody = await response.json();
     } catch (err) {
       responseBody = {};
-      log.debug('Failed to parse reponse:', err.message);
+      log.debug('Failed to parse response:', err.message);
     }
     return makeResponse({ error: 'REQUEST' }, (0, _extends3.default)({ body: responseBody }, result));
   }
@@ -61998,7 +62114,7 @@ exports.linkAuthorization = linkAuthorization;
 exports.ucAuthorization = ucAuthorization;
 exports.cpaasAuthorization = cpaasAuthorization;
 
-var _errors = __webpack_require__(10);
+var _errors = __webpack_require__(8);
 
 var _errors2 = _interopRequireDefault(_errors);
 
@@ -62162,7 +62278,7 @@ var _eventTypes = __webpack_require__(515);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(88);
+var _actionTypes = __webpack_require__(89);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -62265,7 +62381,7 @@ var _utils = __webpack_require__(126);
 
 var _logs = __webpack_require__(2);
 
-var _selectors = __webpack_require__(9);
+var _selectors = __webpack_require__(10);
 
 var _fp = __webpack_require__(3);
 
@@ -62284,13 +62400,20 @@ function api({ dispatch, getState }) {
   return {
     request: {
       /**
+       * The 'request' namespace (within the 'api' type) is used to make network requests to the server.
+       *
+       * @public
+       * @namespace request
+       */
+
+      /**
        * Send a request to the underlying REST service with the appropriate configuration and authentication.
        * This is a wrapper on top of the browser's [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
        * and behaves very similarly but using SDK configuration for the base URL and authentication as well
        * as SDK logging.
        *
        * @public
-       * @memberof api
+       * @memberof request
        * @method fetch
        * @param {string} resource The full path of the resource to fetch from the underlying service. This should include any REST version
        *                          or user information. This path will be appended to the base URL according to SDK configuration.
@@ -62309,7 +62432,7 @@ function api({ dispatch, getState }) {
        *
        * // Note that you will need to subscribe for the `custom` service in order to
        * // receive notifications from the `externalnotification` service.
-       * const response = await client.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)
+       * const response = await client.request.fetch('/rest/version/1/user/xyz@test.com/externalnotification', requestOptions)
        */
       async fetch(resource, init = {}) {
         log.debug(_logs.API_LOG_TAG + 'fetch: ', resource);
@@ -62370,7 +62493,7 @@ function api({ dispatch, getState }) {
  */
 
 /**
- * The Phone Numer ie: +18885559876
+ * The Phone Number ie: +18885559876
  *
  * @public
  * @static
