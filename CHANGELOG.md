@@ -5,6 +5,16 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.35.0 - beta
+
+### Added
+
+- Added a new (optional) object property `defaultPeerConfig` to `config.call` which would allow for a complete configuration on an RTCPeerConnection. `defaultPeerConfig` supports the same set of properties defined in RTCConfiguration. See [RTCConfiguration properties](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). `KJS-370`
+
+### Fixed
+
+- Fixed behaviour where a call would still connect when no ICE candidates were found. Calls that experience this will now fail instead. `KJS-329`
+
 ## 4.34.0 - 2021-11-26
 
 ### Added

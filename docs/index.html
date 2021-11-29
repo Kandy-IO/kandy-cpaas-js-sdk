@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.34.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.35.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.34.0</code></div>
+          <div class='mb1'><code>4.35.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -204,6 +204,12 @@
                               href='#calldscpcontrols'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> DSCPControls
+                            </a></li>
+                          
+                            <li><a
+                              href='#callrtcpeerconnectionconfig'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> RTCPeerConnectionConfig
                             </a></li>
                           
                             <li><a
@@ -1817,25 +1823,14 @@ to be exposed in the logs, potentially displaying sensitive information.
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>call.sdpSemantics</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>&#39;unified-plan&#39;</code>)
+  <td class='break-word'><span class='code bold'>call.defaultPeerConfig</span> <code class='quiet'><a href="#callrtcpeerconnectionconfig">call.RTCPeerConnectionConfig</a>?</code>
   </td>
-  <td class='break-word'><span>The sdpSemantics to use (
-<code>'unified-plan'</code>
- or 
-<code>'plan-b'</code>
-).
-As 'plan-b' has become a deprecated option, it will therefore be removed in the future.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>call.iceServers</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#calliceserver">call.IceServer</a>>?</code>
-  </td>
-  <td class='break-word'><span>The list of ICE servers to be used for calls.
+  <td class='break-word'><span>A key-value dictionary that corresponds
+to the available RTCPeerConfiguration which is normally passed when creating an RTCPeerConnection.
+See 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#parameters">RTCPeerConnection's configuration parameters</a>
+ for more information.
+This is the recommended way of setting ICE servers and other RTCPeerConnection-related configuration.
 </span></td>
 </tr>
 
@@ -4301,6 +4296,123 @@ client.call.make(destination, mediaConstraints,
       </div>
     </div>
   
+    <div class='border-bottom' id='callrtcpeerconnectionconfig'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>RTCPeerConnectionConfig</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Configuration options for an RTCPeerConnection.
+It represents an RTCPeerConfiguration dictionary, whose parameters are documented <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#parameters">here</a>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>RTCPeerConnectionConfig</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>iceServers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;RTCIceServer>?)</code>
+	    The list of ICE servers to be used for calls.
+The full set of properties defined for an RTCIceServer, are mentioned
+
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer#properties">here</a>
+.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>sdpSemantics</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>&#39;unified-plan&#39;</code>)</code>
+	    The sdpSemantics to use (
+<code>'unified-plan'</code>
+ or 
+<code>'plan-b'</code>
+).
+As 'plan-b' has become a deprecated option, it will therefore be removed in the future.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>iceCandidatePoolSize</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
+	    An unsigned 16-bit integer value which specifies
+the size of the prefetched ICE candidate pool. The default value is 0 (meaning no candidate prefetching will occur).
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>iceTransportPolicy</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+	    The current ICE transport policy; if the policy isn't specified,
+'all' is assumed by default. Possible values are: 'all', 'public', 'relay'.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>bundlePolicy</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+	    For further description on this and other properties,
+see 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#parameters">RTCPeerConnection's configuration parameters</a>
+.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='calliceserver'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -4356,6 +4468,21 @@ client.call.make(destination, mediaConstraints,
       
         <div class='space-bottom0'>
           <span class='code bold'>credential</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
+          </code>
+
+          
+
+          
+             : The credential needed by the ICE server.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>username</span> 
           <code class='quiet'>
             (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)
           </code>
@@ -19521,6 +19648,10 @@ client.services.subscribe(notSubscribed)</pre>
   <td class='break-word'><span class='code bold'>params.reason</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
   </td>
   <td class='break-word'><span>When unsolicited, the reason for the change.
+Reason can have (but not limited to) these values:
+'GONE' - When Connection was terminated by the server.
+'LOST_CONNECTION' - When internet connection was lost.
+'WS_OVERRIDDEN' - When websocket was overridden by the server.
 </span></td>
 </tr>
 
