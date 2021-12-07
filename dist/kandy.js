@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.35.0-beta.801
+ * Version: 4.35.0-beta.802
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -8749,7 +8749,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.35.0-beta.801';
+  return '4.35.0-beta.802';
 }
 
 /***/ }),
@@ -18570,9 +18570,7 @@ function* publish({ status, activity, note }, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Presence publish')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Presence publish');
   } else {
     return response.payload.body.presenceSource;
   }
@@ -18603,9 +18601,7 @@ function* createList(user, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Create presence list')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Create presence list');
   } else {
     return response.payload.body.presenceList;
   }
@@ -18627,9 +18623,7 @@ function* deleteList(presenceListId, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Delete presence list')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Delete presence list');
   } else {
     return response;
   }
@@ -18651,9 +18645,7 @@ function* getList(presenceListId, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Get presence list')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Get presence list');
   } else {
     return response;
   }
@@ -18673,9 +18665,7 @@ function* getPresenceLists(requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Get presence lists')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Get presence lists');
   } else {
     return response.payload.body.presenceListCollection;
   }
@@ -18704,9 +18694,7 @@ function* retrievePresence(users, requestInfo) {
   const response = yield (0, _effects2.default)(requestOptions);
 
   if (response.error) {
-    return {
-      error: (0, _helpers.handleRequestError)(response, 'Fetch users presence')
-    };
+    return (0, _helpers.handleRequestError)(response, 'Fetch users presence');
   } else {
     return response.payload.body.presenceList;
   }
@@ -56992,6 +56980,10 @@ var _selectors = __webpack_require__(10);
 
 var _selectors2 = __webpack_require__(34);
 
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
+
 var _constants = __webpack_require__(8);
 
 var _effects = __webpack_require__(1);
@@ -56999,10 +56991,6 @@ var _effects = __webpack_require__(1);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Helpers.
-
-
-// Other plugins.
-// Presence plugin.
 const log = _logs.logManager.getLogger('PRESENCE');
 
 /**
@@ -57014,6 +57002,10 @@ const log = _logs.logManager.getLogger('PRESENCE');
 
 
 // Libraries.
+
+
+// Other plugins.
+// Presence plugin.
 function* presenceSubscribe(config, type) {
   const requestInfo = yield (0, _effects.select)(_selectors.getRequestInfo, _constants.platforms.CPAAS);
   const channels = yield (0, _effects.select)(_selectors2.getNotificationChannels);
@@ -57027,7 +57019,14 @@ function* presenceSubscribe(config, type) {
 
   // check if there is a presence list already
   let presenceListId, newListResponse;
-  if (!presenceListResponse.error) {
+  if (presenceListResponse instanceof _errors2.default) {
+    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
+      service: 'presence',
+      type: 'websocket',
+      error: presenceListResponse
+    }));
+    return;
+  } else {
     // check if there is an existing presenceList
     if (presenceListResponse.presenceList.length > 0) {
       const url = presenceListResponse.presenceList[0].resourceURL;
@@ -57039,11 +57038,11 @@ function* presenceSubscribe(config, type) {
       //  create a new presenceList
       newListResponse = yield (0, _effects.call)(_presence.createList, [], requestInfo);
 
-      if (newListResponse.error) {
+      if (newListResponse instanceof _errors2.default) {
         yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
           service: 'presence',
           type: 'websocket',
-          error: newListResponse.error
+          error: newListResponse
         }));
         return;
       }
@@ -57053,13 +57052,6 @@ function* presenceSubscribe(config, type) {
         presenceListId = resourceURL.substring(resourceURL.lastIndexOf('/') + 1);
       }
     }
-  } else {
-    yield (0, _effects.put)((0, _actions.reportSubscriptionFinished)({
-      service: 'presence',
-      type: 'websocket',
-      error: presenceListResponse.error
-    }));
-    return;
   }
 
   // Subscribe to the presence list subscription
@@ -57329,15 +57321,15 @@ const activityMapUcToCPaaS = {
   const response = yield (0, _effects.call)(_presence.publish, payload, requestInfo);
   log.debug('Received response from getRequestInfo request:', response);
 
-  if (!response.error) {
+  if (response instanceof _errors2.default) {
+    yield (0, _effects.put)(actions.updatePresenceFinish(response));
+  } else {
     const presenceValues = {};
     presenceValues.status = response.presence.person['overriding-willingness'].overridingWillingnessValue;
     presenceValues.activity = response.presence.person.activities.activityValue;
     presenceValues.note = response.presence.person.activities.other;
 
     yield (0, _effects.put)(actions.updatePresenceFinish(presenceValues));
-  } else {
-    yield (0, _effects.put)(actions.updatePresenceFinish(response.error));
   }
 }
 
@@ -57353,16 +57345,18 @@ function* fetchPresence({ payload }) {
   const response = yield (0, _effects.call)(_presence.retrievePresence, users, requestInfo);
   log.debug('Received response from retrievePresence request:', response);
 
-  if (!response.error) {
+  if (response instanceof _errors2.default) {
+    yield (0, _effects.put)(actions.getPresenceFinish(response));
+  } else {
     const presence = {};
     const presenceContact = response.presenceContact[0];
     presence.userId = presenceContact.presentityUserId;
-    presence.activity = presenceContact.presence.person.activities.activityValue;
-    presence.status = presenceContact.presence.person['overriding-willingness'].overridingWillingnessValue;
-    presence.note = presenceContact.presence.person.activities.other;
+    if (presenceContact.presence) {
+      presence.activity = presenceContact.presence.person.activities.activityValue;
+      presence.status = presenceContact.presence.person['overriding-willingness'].overridingWillingnessValue;
+      presence.note = presenceContact.presence.person.activities.other;
+    }
     yield (0, _effects.put)(actions.getPresenceFinish(presence));
-  } else {
-    yield (0, _effects.put)(actions.getPresenceFinish(response.error));
   }
 }
 

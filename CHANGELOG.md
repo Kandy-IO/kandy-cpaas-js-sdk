@@ -14,6 +14,7 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed behaviour where a call would still connect when no ICE candidates were found. Calls that experience this will now fail instead. `KJS-329`
+- Fixed how cpaas presence request errors are being passed inside the presence plugin to use `BasicError`. `KJS-448`
 
 ## 4.34.0 - 2021-11-26
 
