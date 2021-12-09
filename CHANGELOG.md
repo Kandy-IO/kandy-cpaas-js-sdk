@@ -15,6 +15,7 @@ Kandy.js change log.
 
 - Fixed behaviour where a call would still connect when no ICE candidates were found. Calls that experience this will now fail instead. `KJS-329`
 - Fixed how cpaas presence request errors are being passed inside the presence plugin to use `BasicError`. `KJS-448`
+- Fixed a Call issue where unexpected tracks would appear after call operations if video was added to the call at some point. `KJS-382`, `KJS-267`
 
 ## 4.34.0 - 2021-11-26
 
