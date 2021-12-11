@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.35.0-beta.805
+ * Version: 4.35.0-beta.806
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -8749,7 +8749,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.35.0-beta.805';
+  return '4.35.0-beta.806';
 }
 
 /***/ }),
@@ -18382,7 +18382,7 @@ function unsubscribePresence(users) {
 }
 
 function unsubscribePresenceFinish(result) {
-  if (!Array.isArray(result.presentityUserId)) {
+  if (result.presentityUserId && !Array.isArray(result.presentityUserId)) {
     result.presentityUserId = [result.presentityUserId];
   }
   return {
@@ -56670,12 +56670,19 @@ var _reduxActions = __webpack_require__(14);
 
 var _fp = __webpack_require__(3);
 
+var _errors = __webpack_require__(7);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Libraries
 const reducers = {};
+
+// Helpers
+
+
+// Libraries
+
 
 reducers[actionTypes.UPDATE] = {
   next(state) {
@@ -56845,14 +56852,22 @@ reducers[actionTypes.UNSUBSCRIBE_FINISH] = {
     });
   },
   throw(state, { payload }) {
-    const updatedUsers = (0, _assign2.default)({}, state.users);
-    payload.presentityUserId.forEach(userId => {
-      updatedUsers[userId] = {
-        userId,
-        loading: false,
-        isPending: false
-      };
-    });
+    let updatedUsers = (0, _assign2.default)({}, state.users);
+    if (payload.code === _errors.subscriptionCodes.CPAAS_SERVICE_UNSUB_FAIL) {
+      // Remove the userId from state
+      updatedUsers = (0, _fp.omit)(payload.presentityUserId, updatedUsers);
+    } else {
+      // Update the userId in state
+      if (payload.presentityUserId && payload.presentityUserId.length > 0) {
+        payload.presentityUserId.forEach(userId => {
+          updatedUsers[userId] = {
+            userId,
+            loading: false,
+            isPending: false
+          };
+        });
+      }
+    }
 
     return (0, _extends3.default)({}, state, {
       users: updatedUsers
@@ -57384,22 +57399,26 @@ function* subscribePresence({ payload }) {
   var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
     return sub.service === 'presence';
   });
+  let response;
+  let action;
   if (presenceSubscription.length === 0) {
-    yield (0, _effects.put)(actions.subscribePresenceFinish(new _errors2.default({
+    const error = new _errors2.default({
       message: 'Found no subscription for presence service. Subscribe for presence first and then try again.',
       code: _errors.subscriptionCodes.CPAAS_SERVICE_SUB_FAIL
-    })));
-    return;
+    });
+    error.presentityUserId = [userId];
+    action = actions.subscribePresenceFinish(error);
+  } else {
+    const presenceListId = presenceSubscription[0].presenceListId;
+    response = yield (0, _effects.call)(_presence.addUser, userId, presenceListId, requestInfo);
+    log.debug('Received response from addUser request:', response);
+    if (response instanceof _errors2.default) {
+      response.presentityUserId = [userId];
+    }
+    action = actions.subscribePresenceFinish(response);
   }
-  const presenceListId = presenceSubscription[0].presenceListId;
-  const response = yield (0, _effects.call)(_presence.addUser, userId, presenceListId, requestInfo);
-  log.debug('Received response from addUser request:', response);
 
-  if (response instanceof _errors2.default) {
-    response.presentityUserId = [userId];
-  }
-
-  yield (0, _effects.put)(actions.subscribePresenceFinish(response));
+  yield (0, _effects.put)(action);
 }
 /**
  * unsubscribePresence.
@@ -57415,13 +57434,26 @@ function* unsubscribePresence({ payload }) {
   var presenceSubscription = subscriptions.subscriptions.filter(function (sub) {
     return sub.service === 'presence';
   });
-  const presenceListId = presenceSubscription[0].presenceListId;
+  let response;
+  let action;
+  if (presenceSubscription.length === 0) {
+    const error = new _errors2.default({
+      message: 'Found no subscription for presence service.',
+      code: _errors.subscriptionCodes.CPAAS_SERVICE_UNSUB_FAIL
+    });
+    error.presentityUserId = [userId];
+    action = actions.unsubscribePresenceFinish(error);
+  } else {
+    const presenceListId = presenceSubscription[0].presenceListId;
+    response = yield (0, _effects.call)(_presence.removeUser, userId, presenceListId, requestInfo);
+    log.debug('Received response from removeUser request:', response);
+    if (response instanceof _errors2.default) {
+      response.presentityUserId = [userId];
+    }
+    action = actions.unsubscribePresenceFinish(response);
+  }
 
-  const response = yield (0, _effects.call)(_presence.removeUser, userId, presenceListId, requestInfo);
-  log.debug('Received response from removeUser request:', response);
-
-  response.presentityUserId = userId;
-  yield (0, _effects.put)(actions.unsubscribePresenceFinish(response));
+  yield (0, _effects.put)(action);
 }
 
 /**
