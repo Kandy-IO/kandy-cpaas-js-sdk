@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.35.0-beta.813
+ * Version: 4.35.0-beta.814
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -8847,7 +8847,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.35.0-beta.813';
+  return '4.35.0-beta.814';
 }
 
 /***/ }),
@@ -31623,7 +31623,8 @@ function* renderTracks(webRTC, action) {
   // selector is not empty
   selector && (
   // selector is a string or a DOM element
-  (0, _fp.isString)(selector) || selector instanceof Element)) {
+  // (note: We can't use instanceof here since elements part of another window are not of the same instance as window.Element)
+  (0, _fp.isString)(selector) || 'tagName' in selector)) {
     log.info(`Rendering track(s) in element ${selector}.`, trackIds);
 
     // Render the tracks.
