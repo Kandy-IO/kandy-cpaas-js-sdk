@@ -70,13 +70,19 @@ The Call configs are used to initialize call/network settings. This can customiz
 
 ```javascript
 call: {
-  // Specify the TURN/STUN servers that should be used.
-  iceServers: [
-    { urls: '$KANDYTURN1$' },
-    { urls: '$KANDYSTUN1$' },
-    { urls: '$KANDYTURN2$' },
-    { urls: '$KANDYSTUN2$' }
-  ],
+  defaultPeerConfig: {
+    // A key-value dictionary that corresponds to the available RTCPeerConfiguration which is normally
+    // passed when creating an RTCPeerConnection.
+    // See https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#parameters RTCPeerConnection's
+    // configuration parameters} for more information.
+    // Specify the TURN/STUN servers that should be used.
+    iceServers: [
+      { urls: '$KANDYTURN1$' },
+      { urls: '$KANDYSTUN1$' },
+      { urls: '$KANDYTURN2$' },
+      { urls: '$KANDYSTUN2$' }
+    ]
+  },
   // Specify that credentials should be fetched from the server.
   serverTurnCredentials: true
 }

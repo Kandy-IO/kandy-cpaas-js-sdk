@@ -7,11 +7,24 @@ Kandy.js change log.
 
 ## 4.36.0 - beta
 
+## 4.35.1 - 2022-01-17
+
+Please note that the changelog entry for v4.35.0 regarding the `defaultPeerConfig` has been clarified. It was previously missing key information about the `call.iceServers` configuration.
+
+### Fixed
+
+- Fixed a Call issue where starting a call immediately after subscription was complete would result in an error. `KJS-474`
+- Fixed a compatibility issue introduced in v4.35.0 where the `updateConfig` API would set Call configurations differently than when set originally during SDK initialization. `KJS-504`
+- Updated configuration tutorial for call configuration to demonstrate the new `defaultPeerConfig` configuration object. `KJS-499`
+- Fixed a Call issue where errors would not be reported to the application in certain scenarios when a failure occurred at the WebRTC level of a call operation. `KJS-508`
+
 ## 4.35.0 - 2021-12-21
 
 ### Added
 
-- Added a new (optional) object property `defaultPeerConfig` to `config.call` which would allow for a complete configuration on an RTCPeerConnection. `defaultPeerConfig` supports the same set of properties defined in RTCConfiguration. See [RTCConfiguration properties](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). `KJS-370`
+- Added a Call config `defaultPeerConfig` to allow for a complete configuration of an RTCPeerConnection. `KJS-370`
+  - `defaultPeerConfig` supports the same set of properties defined in RTCConfiguration. See [RTCConfiguration properties](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection) for details.
+  - Please note that an existing configuration, `call.iceServers`, has been moved to be within `defaultPeerConfig`. The previous format is still accepted for backwards-compatibility, but we recommend updating your configuration to reflect this change. It will be deprecated and removed in the future.
 
 ### Fixed
 
