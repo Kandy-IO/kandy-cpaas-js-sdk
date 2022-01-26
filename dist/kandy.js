@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.36.0-beta.822
+ * Version: 4.36.0-beta.823
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7232,7 +7232,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.36.0-beta.822';
+  return '4.36.0-beta.823';
 }
 
 /***/ }),
@@ -11019,6 +11019,11 @@ function formatString(text, variables) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 exports.setupCall = setupCall;
 exports.setupIncomingCall = setupIncomingCall;
 exports.answerWebrtcSession = answerWebrtcSession;
@@ -11086,7 +11091,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
   log.info('Setting up local WebRTC portions of call.');
 
   const {
-    sdpSemantics,
+    defaultPeerConfig,
     turnInfo,
     trickleIceMode,
     bandwidth,
@@ -11105,21 +11110,31 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
     return { error };
   }
 
-  // Create a webRTC session to represent this call.
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
-    peer: {
-      rtcConfig: {
-        sdpSemantics,
-        iceServers: turnInfo.servers
-      },
-      trickleIceMode,
-      iceCollectionCheck,
-      iceCollectionDelay,
-      maxIceTimeout,
-      removeBundling
-    }
-  });
-  log.debug('Created WebRTC Session for Call.', { webrtcSessionId: session.id });
+  let session;
+  try {
+    // Create a webRTC session to represent this call.
+    session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
+      peer: {
+        rtcConfig: (0, _extends3.default)({}, defaultPeerConfig, {
+          iceServers: turnInfo.servers
+        }),
+        trickleIceMode,
+        iceCollectionCheck,
+        iceCollectionDelay,
+        maxIceTimeout,
+        removeBundling
+      }
+    });
+    log.debug('Created WebRTC Session for Call.', { webrtcSessionId: session.id });
+  } catch (error) {
+    log.debug('Failed to create WebRTC Session for Call.', error.message);
+    return {
+      error: new _errors2.default({
+        message: error.message,
+        code: _errors.callCodes.GENERIC_ERROR
+      })
+    };
+  }
 
   // Trigger a new action specifying that the session has been created
   yield (0, _effects.put)(_actions.callActions.sessionCreated(callId, {
@@ -11257,7 +11272,7 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
 function* setupIncomingCall(deps, sessionOptions) {
   const { webRTC } = deps;
   const {
-    sdpSemantics,
+    defaultPeerConfig,
     turnInfo,
     trickleIceMode,
     callId,
@@ -11271,19 +11286,29 @@ function* setupIncomingCall(deps, sessionOptions) {
   const log = _logs.logManager.getLogger('CALL', callId);
   log.info('Setting up remote WebRTC portions of call.');
 
-  const session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
-    peer: {
-      rtcConfig: {
-        sdpSemantics,
-        iceServers: turnInfo.servers
-      },
-      trickleIceMode,
-      iceCollectionDelay,
-      maxIceTimeout,
-      iceCollectionCheck,
-      removeBundling
-    }
-  });
+  let session;
+  try {
+    session = yield (0, _effects.call)([webRTC.sessionManager, 'create'], {
+      peer: {
+        rtcConfig: (0, _extends3.default)({}, defaultPeerConfig, {
+          iceServers: turnInfo.servers
+        }),
+        trickleIceMode,
+        iceCollectionDelay,
+        maxIceTimeout,
+        iceCollectionCheck,
+        removeBundling
+      }
+    });
+  } catch (error) {
+    log.debug('Failed to create WebRTC Session for incoming Call.', error.message);
+    return {
+      error: new _errors2.default({
+        message: error.message,
+        code: _errors.callCodes.GENERIC_ERROR
+      })
+    };
+  }
 
   // Trigger a new action specifying that the session has been created
   yield (0, _effects.put)(_actions.callActions.sessionCreated(callId, {
@@ -43799,7 +43824,7 @@ function* makeCall(deps, action) {
   const bandwidth = (0, _bandwidth.checkBandwidthControls)(action.payload.bandwidth);
 
   const { error, offerSdp, sessionId, mediaIds } = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
-    sdpSemantics: callOptions.defaultPeerConfig.sdpSemantics,
+    defaultPeerConfig: callOptions.defaultPeerConfig,
     turnInfo,
     bandwidth,
     dscpControls: action.payload.dscpControls,
@@ -44063,7 +44088,7 @@ function* answerCall(deps, action) {
     // Setup a webRTC session.
     webrtcInfo = yield (0, _effects.call)(_establish.setupCall, deps, mediaConstraints, {
       callId: action.payload.id,
-      sdpSemantics: callOptions.defaultPeerConfig.sdpSemantics,
+      defaultPeerConfig: callOptions.defaultPeerConfig,
       turnInfo,
       bandwidth,
       dscpControls: action.payload.dscpControls,
@@ -47429,13 +47454,13 @@ function* incomingCall(deps, params) {
     const turnInfo = yield (0, _effects.select)(_selectors.getTurnInfo);
 
     // Since we have the remote offer SDP, we can setup a webRTC session.
-    yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
+    const { error } = yield (0, _effects.call)(_establish.setupIncomingCall, deps, {
       offer: {
         sdp,
         type: 'offer'
       },
       trickleIceMode: callConfig.trickleIceMode,
-      sdpSemantics: callConfig.defaultPeerConfig.sdpSemantics,
+      defaultPeerConfig: callConfig.defaultPeerConfig,
       iceCollectionDelay: callConfig.iceCollectionDelay,
       iceCollectionCheck: callConfig.iceCollectionCheck,
       maxIceTimeout: callConfig.maxIceTimeout,
@@ -47444,6 +47469,15 @@ function* incomingCall(deps, params) {
       removeBundling: callConfig.removeBundling,
       serverTurnCredentials: callConfig.serverTurnCredentials
     });
+
+    if (error) {
+      log.info(`Failed to initiate incoming call. Changing to ${_constants.CALL_STATES.ENDED}.`);
+      yield (0, _effects.put)(_actions.callActions.endCallFinish(callId, {
+        isLocal: true,
+        error
+      }));
+      return;
+    }
   } else {
     log.debug('Incoming call is a slow-start call.');
     // Slow start call.

@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 4.36.0 - beta
 
+### Fixed
+
+- Fixed a Call issue preventing all configuration properties of `call.defaultPeerConfig` from being used to start and answer calls.
+
 ## 4.35.1 - 2022-01-17
 
 Please note that the changelog entry for v4.35.0 regarding the `defaultPeerConfig` has been clarified. It was previously missing key information about the `call.iceServers` configuration.
