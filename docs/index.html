@@ -2725,7 +2725,15 @@ client.on( ... )</pre>
 
   
 
-  <p>Update values in the global Config section of the store. The values pertain to the SDK configuration.</p>
+  <p>Update the configuration values for the SDK to use.</p>
+<p>This API will only modify the configurations provided, leaving other configurations
+as they were originally set, by performing a merge of the new values into the
+previous values.</p>
+<p>Please note that that the object provided to the <code>updateConfig</code> API may be different
+than the object retrieved from the <a href="#apigetconfig">getConfig</a> API. This may happen when a format
+change has happened and the SDK modifies the provided format to alleviate
+backwards-compatibility issues. We recommend ensuring the configurations you
+provide are as described by the <a href="#config">config</a> section.</p>
 
 
   <div class='pre p1 fill-light mt0'>updateConfig(newConfigValues: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
@@ -2763,6 +2771,25 @@ client.on( ... )</pre>
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// Instantiate the SDK with certain configs.</span>
+<span class="hljs-keyword">const</span> client = create({
+  <span class="hljs-attr">authentication</span>: { ... },
+  <span class="hljs-attr">logs</span>: { ... },
+  ...
+})
+
+<span class="hljs-comment">// Modify a subsection of the configs at a later time.</span>
+<span class="hljs-comment">// This will only update the specified configurations.</span>
+client.updateConfig({
+    <span class="hljs-attr">logs</span>: {
+      <span class="hljs-attr">loglevel</span>: <span class="hljs-string">&#x27;DEBUG&#x27;</span>
+    }
+})</pre>
+    
   
 
   

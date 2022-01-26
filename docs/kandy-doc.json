@@ -1413,7 +1413,7 @@
                 "column": 0
               },
               "end": {
-                "line": 128,
+                "line": 130,
                 "column": 1
               }
             },
@@ -3101,22 +3101,22 @@
           ],
           "loc": {
             "start": {
-              "line": 264,
+              "line": 266,
               "column": 4
             },
             "end": {
-              "line": 270,
+              "line": 272,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 271,
+                "line": 273,
                 "column": 4
               },
               "end": {
-                "line": 273,
+                "line": 275,
                 "column": 5
               }
             },
@@ -3196,22 +3196,22 @@
           ],
           "loc": {
             "start": {
-              "line": 276,
+              "line": 278,
               "column": 4
             },
             "end": {
-              "line": 302,
+              "line": 304,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 303,
+                "line": 305,
                 "column": 4
               },
               "end": {
-                "line": 329,
+                "line": 331,
                 "column": 5
               }
             },
@@ -3277,26 +3277,31 @@
               "type": null
             },
             {
+              "title": "static",
+              "description": null,
+              "lineNumber": 4
+            },
+            {
               "title": "memberof",
               "description": "api",
-              "lineNumber": 4
+              "lineNumber": 5
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 5,
+              "lineNumber": 6,
               "name": "config"
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 6,
+              "lineNumber": 7,
               "name": "getConfig"
             },
             {
               "title": "returns",
               "description": "A configuration Object.",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -3305,22 +3310,22 @@
           ],
           "loc": {
             "start": {
-              "line": 13,
+              "line": 15,
               "column": 4
             },
             "end": {
-              "line": 21,
+              "line": 24,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 22,
+                "line": 25,
                 "column": 4
               },
               "end": {
-                "line": 25,
+                "line": 28,
                 "column": 5
               }
             },
@@ -3359,6 +3364,7 @@
           "todos": [],
           "yields": [],
           "access": "public",
+          "scope": "static",
           "memberof": "api",
           "kind": "function",
           "name": "getConfig",
@@ -3376,10 +3382,11 @@
             },
             {
               "name": "getConfig",
-              "kind": "function"
+              "kind": "function",
+              "scope": "static"
             }
           ],
-          "namespace": "apigetConfig"
+          "namespace": "api.getConfig"
         },
         {
           "description": {
@@ -3390,7 +3397,65 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Update values in the global Config section of the store. The values pertain to the SDK configuration."
+                    "value": "Update the configuration values for the SDK to use."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This API will only modify the configurations provided, leaving other configurations\nas they were originally set, by performing a merge of the new values into the\nprevious values."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Please note that that the object provided to the "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "updateConfig"
+                  },
+                  {
+                    "type": "text",
+                    "value": " API may be different\nthan the object retrieved from the "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#apigetconfig",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "getConfig"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " API. This may happen when a format\nchange has happened and the SDK modifies the provided format to alleviate\nbackwards-compatibility issues. We recommend ensuring the configurations you\nprovide are as described by the "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#config",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "config"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " section."
                   }
                 ]
               }
@@ -3400,73 +3465,82 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 3,
+              "lineNumber": 13,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 4
+              "lineNumber": 14
             },
             {
               "title": "memberof",
               "description": "api",
-              "lineNumber": 5
+              "lineNumber": 15
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 6,
+              "lineNumber": 16,
               "name": "config"
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 7,
+              "lineNumber": 17,
               "name": "updateConfig"
             },
             {
               "title": "param",
               "description": "Key-value pairs that will be placed into the store. See {@link config} for details on what key-value pairs are available for use.",
-              "lineNumber": 8,
+              "lineNumber": 18,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
               },
               "name": "newConfigValues"
+            },
+            {
+              "title": "example",
+              "description": "// Instantiate the SDK with certain configs.\nconst client = create({\n  authentication: { ... },\n  logs: { ... },\n  ...\n})\n\n// Modify a subsection of the configs at a later time.\n// This will only update the specified configurations.\nclient.updateConfig({\n    logs: {\n      loglevel: 'DEBUG'\n    }\n})",
+              "lineNumber": 19
             }
           ],
           "loc": {
             "start": {
-              "line": 27,
+              "line": 30,
               "column": 4
             },
             "end": {
-              "line": 36,
+              "line": 64,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 37,
+                "line": 65,
                 "column": 4
               },
               "end": {
-                "line": 46,
+                "line": 77,
                 "column": 5
               }
             },
             "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/config/interface/api.js"
           },
           "augments": [],
-          "examples": [],
+          "examples": [
+            {
+              "description": "// Instantiate the SDK with certain configs.\nconst client = create({\n  authentication: { ... },\n  logs: { ... },\n  ...\n})\n\n// Modify a subsection of the configs at a later time.\n// This will only update the specified configurations.\nclient.updateConfig({\n    logs: {\n      loglevel: 'DEBUG'\n    }\n})"
+            }
+          ],
           "implements": [],
           "params": [
             {
               "title": "param",
               "name": "newConfigValues",
-              "lineNumber": 8,
+              "lineNumber": 18,
               "description": {
                 "type": "root",
                 "children": [

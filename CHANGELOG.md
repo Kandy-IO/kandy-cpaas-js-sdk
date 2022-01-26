@@ -9,6 +9,9 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed a Config issue where the SDK would unintentionally mutate the object provided by the application while setting configs internally. `KJS-511`
+  - The `getConfig` API can be used to retrieve the configs being used by the SDK.
+- Fixed a Config issue where the `updateConfig` API may revert a Call config to the default value if only a subsection was being updated. `KJS-511`
 - Fixed a Call issue preventing all configuration properties of `call.defaultPeerConfig` from being used to start and answer calls.
 
 ## 4.35.1 - 2022-01-17
