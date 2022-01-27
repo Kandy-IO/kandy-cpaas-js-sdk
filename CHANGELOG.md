@@ -13,6 +13,7 @@ Kandy.js change log.
   - The `getConfig` API can be used to retrieve the configs being used by the SDK.
 - Fixed a Config issue where the `updateConfig` API may revert a Call config to the default value if only a subsection was being updated. `KJS-511`
 - Fixed a Call issue preventing all configuration properties of `call.defaultPeerConfig` from being used to start and answer calls.
+- Added new call error code `call:11` that represents a failure to answer call due to a media negotiation mismatch. `KJS-517`
 
 ## 4.35.1 - 2022-01-17
 

@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.36.0-beta.825
+ * Version: 4.36.0-beta.826
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7232,7 +7232,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.36.0-beta.825';
+  return '4.36.0-beta.826';
 }
 
 /***/ }),
@@ -9145,7 +9145,9 @@ const authCodes = exports.authCodes = {
   // Offer could not be generated
   INVALID_OFFER: 'call:9',
   // No ICE candidates found
-  NO_ICE_CANDIDATES: 'call:10'
+  NO_ICE_CANDIDATES: 'call:10',
+  // Failed to recieve answer due to media mismatch
+  SESSION_MISMATCH: 'call:11'
 
   /**
    * Error codes for the Call History plugin.
@@ -49835,7 +49837,7 @@ function* receivedAnswer(deps, sessionInfo, targetCall) {
     let errorInfo;
     if (err.message.includes('The order of m-lines')) {
       errorInfo = {
-        code: 'call:10',
+        code: _errors.callCodes.SESSION_MISMATCH,
         message: 'Failed to receive answer due to media negotiation mismatch.'
       };
     } else {
