@@ -5,6 +5,16 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.36.0 - 2022-01-28
+
+### Fixed
+
+- Fixed a Config issue where the SDK would unintentionally mutate the object provided by the application while setting configs internally. `KJS-511`
+  - The `getConfig` API can be used to retrieve the configs being used by the SDK.
+- Fixed a Config issue where the `updateConfig` API may revert a Call config to the default value if only a subsection was being updated. `KJS-511`
+- Fixed a Call issue preventing all configuration properties of `call.defaultPeerConfig` from being used to start and answer calls. `KJS-543`
+- Added new call error code `call:11` that represents a failure to answer call due to a media negotiation mismatch. `KJS-517`
+
 ## 4.35.1 - 2022-01-17
 
 Please note that the changelog entry for v4.35.0 regarding the `defaultPeerConfig` has been clarified. It was previously missing key information about the `call.iceServers` configuration.
