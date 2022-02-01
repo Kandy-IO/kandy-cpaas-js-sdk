@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.36.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.37.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.36.0</code></div>
+          <div class='mb1'><code>4.37.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -216,6 +216,24 @@
                               href='#calliceserver'
                               class='regular pre-open'>
                               <span style="color:blue">ⓣ</span> IceServer
+                            </a></li>
+                          
+                            <li><a
+                              href='#callicecollectioninfo'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> IceCollectionInfo
+                            </a></li>
+                          
+                            <li><a
+                              href='#callicecollectioncheckfunction'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> IceCollectionCheckFunction
+                            </a></li>
+                          
+                            <li><a
+                              href='#callicecollectioncheckresult'
+                              class='regular pre-open'>
+                              <span style="color:blue">ⓣ</span> IceCollectionCheckResult
                             </a></li>
                           
                             <li><a
@@ -1837,42 +1855,52 @@ This is the recommended way of setting ICE servers and other RTCPeerConnection-r
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>call.iceCollectionDelay</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>call.iceCollectionIdealTimeout</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
   
     (default <code>1000</code>)
   </td>
-  <td class='break-word'><span>Time, in milliseconds, to delay in between
-ICE candidate checks. If ICE collection does not complete normally, the SDK will check
-collected candidates at this interval to determine if the operation can continue.
+  <td class='break-word'><span>The amount of time to wait for an ideal candidate in milliseconds.
+The default is 1000ms. An ideal list of candidates is a complete list of candidates considering the RTCPeerConnection configuration.
+Note that this values will not be considered if a custom function is passed through the 
+<code>iceCollectionCheckFunction</code>
+, and
+any timeouts must be handled by the custom function.
 </span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>call.maxIceTimeout</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>call.iceCollectionMaxTimeout</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
   
     (default <code>3000</code>)
   </td>
-  <td class='break-word'><span>Maximum time, in milliseconds, to wait for ICE
-collection to complete normally. After this time, the process will timeout and the
-operation will attempt to continue no matter how many candidates have been collected.
+  <td class='break-word'><span>The maximum amount of time to wait for ICE collection in milliseconds.
+The default is 3000ms. After this time has been reached, the call will proceed with the currently gathered candidates.
+Note that this values will not be considered if a custom function is passed through the 
+<code>iceCollectionCheckFunction</code>
+, and
+any timeouts must be handled by the custom function.
 </span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>call.iceCollectionCheck</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>?</code>
+  <td class='break-word'><span class='code bold'>call.iceCollectionCheckFunction</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>?</code>
   </td>
-  <td class='break-word'><span>Function to check whether collected candidates
-can be used to continue the operation. The function will receive the following two parameters:
-an array of ICE servers &#x26; an extra details object, to help in the decision making.
-The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),
-the maximum ICE collection timeout (in milliseconds) and an array of offered media.
-The function must return a boolean value of whether the SDK should attempt to continue
-the operation. By default, the check is to ensure at least one relay candidate has been
-collected.
+  <td class='break-word'><span>Override the default IceCollectionCheckFunction to manually decide when
+to proceed with operations, error out, or wait for the appropriate states and candidates. The function will an object containing
+the ice collection info. See 
+<a href="#callicecollectioninfo">IceCollectionInfo</a>
+ for more details. The function must return
+a results object with details on how to proceed with the ICE collection check or operatiaon. See 
+<a href="#callicecollectioncheckresult">IceCollectionResult</a>
+
+object for details on the format of the return object. By default, the check is to ensure at least one relay candidate has been
+collected. For more information, see 
+<a href="#callicecollectioncheckfunction">IceCollectionCheckFunction</a>
+.
 </span></td>
 </tr>
 
@@ -4518,6 +4546,439 @@ see
 
           
              : The credential needed by the ICE server.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callicecollectioninfo'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>IceCollectionInfo</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>This object is provided to the <a href="call.IceCollectionCheckFunction%60">IceCollectionCheckFunction</a>, and contains the
+necessary information about the call (i.e., call ID, current call operation), and information about the ongoing ICE collection,
+such as the list of all ICE candidates collected so far and the ICE gathering state.</p>
+
+
+  <div class='pre p1 fill-light mt0'>IceCollectionInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>callId</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The ID of the call.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>callOperation</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The current operation of the call.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>reason</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The reason the check function was called. Three possible values:
+'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.
+'IceGatheringStateChanged' - The ICE gathering state changed.
+'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on 
+<code>wait</code>
+ value returned by 
+<code>IceCollectionCheckFunction</code>
+)
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>iceCandidates</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;RTCIceCandidate>)
+          </code>
+
+          
+
+          
+             : An array of all ICE candidates collected so far.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>iceCollectionDuration</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : The time elapsed since the start of the ICE collection process.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>iceGatheringState</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The current ICE gathering state.
+See 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState">RTCPeerConnection.iceGatheringState</a>
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>rtcPeerConnectionConfig</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)
+          </code>
+
+          
+
+          
+             : The current configration for the RTCPeerConnection.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>rtcLocalSessionDescription</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : The current local session description set on the peer.
+
+          
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callicecollectioncheckfunction'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>IceCollectionCheckFunction(iceCollectionInfo)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The form of the ICE collection check function, the arguments that it receives, and the outputs expected.</p>
+<p>This function is provided the necessary details of the current WebRTC session and ICE collection
+(<a href="#callicecollectioninfo">IceCollectionInfo</a>), which it can use to dictate how to proceed with a call.
+The function can be invoked for three different reasons:
+a new ICE candidate was collected, the ICE gathering state changed, or a scheduled call based on the <code>wait</code> time set after
+an initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason).</p>
+<p>The function must then return an appropriate result object in the format of <a href="#callicecollectioncheckresult">IceCollectionCheckResult</a>
+which will dictate how the call will proceed. An incorrect return object, or result <code>type</code>, will cause the call to end with an error.</p>
+<p>[Default]
+The default IceCollectionCheckFunction uses the following algorithm to determine if the call can proceed to negotiation:</p>
+<ol>
+<li>If the <code>iceGatheringState</code> is "complete" at any stage, then proceed with the negotiation.</li>
+<li>Otherwise, if before the ideal ICE collection timeout:
+<ul>
+<li>If every media has a relay ICE candidate for every configured TURN server, proceed with negotiation.</li>
+<li>Else, wait until the ideal timeout, or when invoked for another reason.</li>
+</ul>
+</li>
+<li>Otherwise, if before the max ICE collection timeout, but after the ideal ICE collection timeout:
+<ul>
+<li>If every media has atleast one relay ICE candidate, proceed with negotiation.</li>
+<li>Else, wait until max timeout, or when invoked for another reason.</li>
+</ul>
+</li>
+<li>Otherwise, if we are at, or past, the max ICE collection timeout:
+<ul>
+<li>If there are any ICE candidates collected, proceed with negotiation.</li>
+<li>Else, end the call with an error.</li>
+</ul>
+</li>
+</ol>
+<p>The ideal and max timeouts can be configured with the <code>idealIceCollectionTimeout</code> and <code>maxIceCollectionTimeout</code> properties of
+the call config.</p>
+
+
+  <div class='pre p1 fill-light mt0'>IceCollectionCheckFunction(iceCollectionInfo: <a href="#callicecollectioninfo">call.IceCollectionInfo</a>): <a href="#callicecollectioncheckresult">call.IceCollectionCheckResult</a></div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>iceCollectionInfo</span> <code class='quiet'>(<a href="#callicecollectioninfo">call.IceCollectionInfo</a>)</code>
+	    Information about the current status of the ICE candidate collection.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Returns</div>
+    
+      <div>
+        <code><a href="#callicecollectioncheckresult">call.IceCollectionCheckResult</a></code>:
+          Information on how to proceed with the call and/or ICE collection.
+
+        
+      </div>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isRelayCandidate</span> (<span class="hljs-params">candidate</span>) </span>{
+<span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> This would need to be different for Firefox since the `.type` property doesn&#x27;t exist</span>
+<span class="hljs-comment">// and we would need to parse it ourselves in the `.candidate` property.</span>
+  <span class="hljs-keyword">return</span> candidate.type === <span class="hljs-string">&#x27;relay&#x27;</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">myIceCollectionCheck</span> (<span class="hljs-params">{ iceGatheringState, iceCandidates }</span>) </span>{
+  <span class="hljs-keyword">if</span> (iceGatheringState === <span class="hljs-string">&#x27;complete&#x27;</span>) {
+    <span class="hljs-keyword">if</span> (iceCandidates.some(isRelayCandidate)) {
+      <span class="hljs-keyword">return</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;StartCall&#x27;</span> }
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;Error&#x27;</span>, <span class="hljs-attr">error</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&#x27;Failed to start call because there is no relay candidates.&#x27;</span>) }
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;Wait&#x27;</span> }
+  }
+}</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='callicecollectioncheckresult'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>IceCollectionCheckResult</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>IceCollectionCheckResult</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>type</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : Indicates how the system should proceed with the call operation / ICE collection. The possible values are:
+'StartCall' - instruct the system to start the call with the currently gathered ICE candidates and other information.
+'Error' - instruct the system to fail the call with an error. The error to communicate to the user should be specified in the 
+<code>error</code>
+ property.
+'Wait' - instruct the system to wait for the specified amount of time before triggering a new ICE collection check. The amount
+of wait time should be specified in the 
+<code>wait</code>
+ property.
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>error</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)
+          </code>
+
+          
+
+          
+             : An error to be sent the user when the 
+<code>type</code>
+ of the result is 
+<code>IceCollectionCheckResultType.Error</code>
+
+          
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>wait</span> 
+          <code class='quiet'>
+            (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)
+          </code>
+
+          
+
+          
+             : The amount of time (in milliseconds) to wait before triggering a new ICE collection check. This is only
+valid if the 
+<code>type</code>
+ of result is 
+<code>IceCollectionCheckResultType.Wait</code>
+. If a value is not provided, the ICE collection check function
+will only be triggered for new candidates or when the ICE gathering state changes.
 
           
           

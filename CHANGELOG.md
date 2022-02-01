@@ -5,6 +5,22 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.37.0 - beta
+
+### Added
+
+- Added a Call config `iceCollectionCheckFunction` to allow for configuration of the ICE candidate collection process. `KJS-449`
+  - This replaces the previous `iceCollectionCheck` Call config, and previous functions provided using that config will need to be updated to adhere to the form of the new IceCollectionCheckFunction definition.
+  - See [IceCollectionCheckFunction documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callicecollectioncheckfunction) for more information.
+
+### Changed
+
+- Changed when we start a call audit loop from Connected state to Initiated state in order to catch scenarios where the call is ended before it's connected. `KJS-445`
+- Changed the default ICE Collection Check Function functionality. `KJS-450`
+  - Previously, negotiation would begin as soon as an ICE candidate of type "relay" was collected.
+  - The new change takes into account the number of media transports, and configured TURN servers. For more information, see [IceCollectionCheckFunction documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callicecollectioncheckfunction).
+  - Added Call config properties `iceCollectionIdealTimeout` and `iceCollectionMaxTimeout` to allow configuration of the timeouts for the default function.
+
 ## 4.36.0 - 2022-01-28
 
 ### Fixed

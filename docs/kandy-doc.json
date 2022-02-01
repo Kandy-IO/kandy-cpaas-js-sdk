@@ -1236,7 +1236,7 @@
             },
             {
               "title": "param",
-              "description": "Time, in milliseconds, to delay in between\n   ICE candidate checks. If ICE collection does not complete normally, the SDK will check\n   collected candidates at this interval to determine if the operation can continue.",
+              "description": "The amount of time to wait for an ideal candidate in milliseconds.\n   The default is 1000ms. An ideal list of candidates is a complete list of candidates considering the RTCPeerConnection configuration.\n   Note that this values will not be considered if a custom function is passed through the `iceCollectionCheckFunction`, and\n   any timeouts must be handled by the custom function.",
               "lineNumber": 11,
               "type": {
                 "type": "OptionalType",
@@ -1245,13 +1245,13 @@
                   "name": "number"
                 }
               },
-              "name": "call.iceCollectionDelay",
+              "name": "call.iceCollectionIdealTimeout",
               "default": "1000"
             },
             {
               "title": "param",
-              "description": "Maximum time, in milliseconds, to wait for ICE\n   collection to complete normally. After this time, the process will timeout and the\n   operation will attempt to continue no matter how many candidates have been collected.",
-              "lineNumber": 14,
+              "description": "The maximum amount of time to wait for ICE collection in milliseconds.\n   The default is 3000ms. After this time has been reached, the call will proceed with the currently gathered candidates.\n   Note that this values will not be considered if a custom function is passed through the `iceCollectionCheckFunction`, and\n   any timeouts must be handled by the custom function.",
+              "lineNumber": 15,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -1259,13 +1259,13 @@
                   "name": "number"
                 }
               },
-              "name": "call.maxIceTimeout",
+              "name": "call.iceCollectionMaxTimeout",
               "default": "3000"
             },
             {
               "title": "param",
-              "description": "Function to check whether collected candidates\n   can be used to continue the operation. The function will receive the following two parameters:\n   an array of ICE servers & an extra details object, to help in the decision making.\n   The details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\n   the maximum ICE collection timeout (in milliseconds) and an array of offered media.\n   The function must return a boolean value of whether the SDK should attempt to continue\n   the operation. By default, the check is to ensure at least one relay candidate has been\n   collected.",
-              "lineNumber": 17,
+              "description": "Override the default IceCollectionCheckFunction to manually decide when\n   to proceed with operations, error out, or wait for the appropriate states and candidates. The function will an object containing\n   the ice collection info. See {@link call.IceCollectionInfo IceCollectionInfo} for more details. The function must return\n   a results object with details on how to proceed with the ICE collection check or operatiaon. See {@link call.IceCollectionCheckResult IceCollectionResult}\n   object for details on the format of the return object. By default, the check is to ensure at least one relay candidate has been\n   collected. For more information, see {@link call.IceCollectionCheckFunction IceCollectionCheckFunction}.",
+              "lineNumber": 19,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -1273,7 +1273,7 @@
                   "name": "Function"
                 }
               },
-              "name": "call.iceCollectionCheck"
+              "name": "call.iceCollectionCheckFunction"
             },
             {
               "title": "param",
@@ -1490,7 +1490,7 @@
                 },
                 {
                   "title": "param",
-                  "name": "call.iceCollectionDelay",
+                  "name": "call.iceCollectionIdealTimeout",
                   "lineNumber": 11,
                   "description": {
                     "type": "root",
@@ -1500,7 +1500,15 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "Time, in milliseconds, to delay in between\nICE candidate checks. If ICE collection does not complete normally, the SDK will check\ncollected candidates at this interval to determine if the operation can continue."
+                            "value": "The amount of time to wait for an ideal candidate in milliseconds.\nThe default is 1000ms. An ideal list of candidates is a complete list of candidates considering the RTCPeerConnection configuration.\nNote that this values will not be considered if a custom function is passed through the "
+                          },
+                          {
+                            "type": "inlineCode",
+                            "value": "iceCollectionCheckFunction"
+                          },
+                          {
+                            "type": "text",
+                            "value": ", and\nany timeouts must be handled by the custom function."
                           }
                         ]
                       }
@@ -1514,8 +1522,8 @@
                 },
                 {
                   "title": "param",
-                  "name": "call.maxIceTimeout",
-                  "lineNumber": 14,
+                  "name": "call.iceCollectionMaxTimeout",
+                  "lineNumber": 15,
                   "description": {
                     "type": "root",
                     "children": [
@@ -1524,7 +1532,15 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "Maximum time, in milliseconds, to wait for ICE\ncollection to complete normally. After this time, the process will timeout and the\noperation will attempt to continue no matter how many candidates have been collected."
+                            "value": "The maximum amount of time to wait for ICE collection in milliseconds.\nThe default is 3000ms. After this time has been reached, the call will proceed with the currently gathered candidates.\nNote that this values will not be considered if a custom function is passed through the "
+                          },
+                          {
+                            "type": "inlineCode",
+                            "value": "iceCollectionCheckFunction"
+                          },
+                          {
+                            "type": "text",
+                            "value": ", and\nany timeouts must be handled by the custom function."
                           }
                         ]
                       }
@@ -1538,8 +1554,8 @@
                 },
                 {
                   "title": "param",
-                  "name": "call.iceCollectionCheck",
-                  "lineNumber": 17,
+                  "name": "call.iceCollectionCheckFunction",
+                  "lineNumber": 19,
                   "description": {
                     "type": "root",
                     "children": [
@@ -1548,7 +1564,55 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "Function to check whether collected candidates\ncan be used to continue the operation. The function will receive the following two parameters:\nan array of ICE servers & an extra details object, to help in the decision making.\nThe details object includes: an array of ICE candidates, the elapsed time so far (in milliseconds),\nthe maximum ICE collection timeout (in milliseconds) and an array of offered media.\nThe function must return a boolean value of whether the SDK should attempt to continue\nthe operation. By default, the check is to ensure at least one relay candidate has been\ncollected."
+                            "value": "Override the default IceCollectionCheckFunction to manually decide when\nto proceed with operations, error out, or wait for the appropriate states and candidates. The function will an object containing\nthe ice collection info. See "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#callicecollectioninfo",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "IceCollectionInfo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " for more details. The function must return\na results object with details on how to proceed with the ICE collection check or operatiaon. See "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#callicecollectioncheckresult",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "IceCollectionResult"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": "\nobject for details on the format of the return object. By default, the check is to ensure at least one relay candidate has been\ncollected. For more information, see "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#callicecollectioncheckfunction",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "IceCollectionCheckFunction"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": "."
                           }
                         ]
                       }
@@ -5283,11 +5347,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 386,
+          "line": 478,
           "column": 0
         },
         "end": {
-          "line": 390,
+          "line": 482,
           "column": 1
         }
       },
@@ -9294,11 +9358,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -9977,11 +10041,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -10159,11 +10223,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -10355,11 +10419,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -10594,11 +10658,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -10917,11 +10981,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -11249,11 +11313,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -11409,6 +11473,1153 @@
           "namespace": "call.IceServer"
         },
         {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This object is provided to the "
+                  },
+                  {
+                    "type": "link",
+                    "url": "call.IceCollectionCheckFunction`",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "IceCollectionCheckFunction"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": ", and contains the\nnecessary information about the call (i.e., call ID, current call operation), and information about the ongoing ICE collection,\nsuch as the list of all ICE candidates collected so far and the ICE gathering state."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 5,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 6
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 7,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "IceCollectionInfo"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 8
+            },
+            {
+              "title": "property",
+              "description": "The ID of the call.",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "callId"
+            },
+            {
+              "title": "property",
+              "description": "The current operation of the call.",
+              "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "callOperation"
+            },
+            {
+              "title": "property",
+              "description": "The reason the check function was called. Three possible values:\n 'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.\n 'IceGatheringStateChanged' - The ICE gathering state changed.\n 'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by `IceCollectionCheckFunction`)",
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "reason"
+            },
+            {
+              "title": "property",
+              "description": "An array of all ICE candidates collected so far.",
+              "lineNumber": 15,
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "RTCIceCandidate"
+                  }
+                ]
+              },
+              "name": "iceCandidates"
+            },
+            {
+              "title": "property",
+              "description": "The time elapsed since the start of the ICE collection process.",
+              "lineNumber": 16,
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              },
+              "name": "iceCollectionDuration"
+            },
+            {
+              "title": "property",
+              "description": "The current ICE gathering state.\n   See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState RTCPeerConnection.iceGatheringState}",
+              "lineNumber": 17,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "iceGatheringState"
+            },
+            {
+              "title": "property",
+              "description": "The current configration for the RTCPeerConnection.",
+              "lineNumber": 19,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "rtcPeerConnectionConfig"
+            },
+            {
+              "title": "property",
+              "description": "The current local session description set on the peer.",
+              "lineNumber": 20,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "rtcLocalSessionDescription"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 207,
+              "column": 0
+            },
+            "end": {
+              "line": 228,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 478,
+                "column": 0
+              },
+              "end": {
+                "line": 482,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "callId",
+              "lineNumber": 9,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The ID of the call."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "callOperation",
+              "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The current operation of the call."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "reason",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The reason the check function was called. Three possible values:\n'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.\n'IceGatheringStateChanged' - The ICE gathering state changed.\n'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "wait"
+                      },
+                      {
+                        "type": "text",
+                        "value": " value returned by "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "IceCollectionCheckFunction"
+                      },
+                      {
+                        "type": "text",
+                        "value": ")"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "iceCandidates",
+              "lineNumber": 15,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An array of all ICE candidates collected so far."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "TypeApplication",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Array"
+                },
+                "applications": [
+                  {
+                    "type": "NameExpression",
+                    "name": "RTCIceCandidate"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "property",
+              "name": "iceCollectionDuration",
+              "lineNumber": 16,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The time elapsed since the start of the ICE collection process."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              }
+            },
+            {
+              "title": "property",
+              "name": "iceGatheringState",
+              "lineNumber": 17,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The current ICE gathering state.\nSee "
+                      },
+                      {
+                        "type": "link",
+                        "url": "https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState",
+                        "title": null,
+                        "jsdoc": true,
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "RTCPeerConnection.iceGatheringState"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "rtcPeerConnectionConfig",
+              "lineNumber": 19,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The current configration for the RTCPeerConnection."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            {
+              "title": "property",
+              "name": "rtcLocalSessionDescription",
+              "lineNumber": 20,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The current local session description set on the peer."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "IceCollectionInfo",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "IceCollectionInfo",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.IceCollectionInfo"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The form of the ICE collection check function, the arguments that it receives, and the outputs expected."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This function is provided the necessary details of the current WebRTC session and ICE collection\n("
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callicecollectioninfo",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "IceCollectionInfo"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "), which it can use to dictate how to proceed with a call.\nThe function can be invoked for three different reasons:\na new ICE candidate was collected, the ICE gathering state changed, or a scheduled call based on the "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "wait"
+                  },
+                  {
+                    "type": "text",
+                    "value": " time set after\nan initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason)."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The function must then return an appropriate result object in the format of "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#callicecollectioncheckresult",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "IceCollectionCheckResult"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\nwhich will dictate how the call will proceed. An incorrect return object, or result "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "type"
+                  },
+                  {
+                    "type": "text",
+                    "value": ", will cause the call to end with an error."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "[Default]\nThe default IceCollectionCheckFunction uses the following algorithm to determine if the call can proceed to negotiation:"
+                  }
+                ]
+              },
+              {
+                "type": "list",
+                "ordered": true,
+                "start": 1,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "If the "
+                          },
+                          {
+                            "type": "inlineCode",
+                            "value": "iceGatheringState"
+                          },
+                          {
+                            "type": "text",
+                            "value": " is \"complete\" at any stage, then proceed with the negotiation."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Otherwise, if before the ideal ICE collection timeout:"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "list",
+                        "ordered": false,
+                        "start": null,
+                        "spread": false,
+                        "children": [
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "If every media has a relay ICE candidate for every configured TURN server, proceed with negotiation."
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "Else, wait until the ideal timeout, or when invoked for another reason."
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Otherwise, if before the max ICE collection timeout, but after the ideal ICE collection timeout:"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "list",
+                        "ordered": false,
+                        "start": null,
+                        "spread": false,
+                        "children": [
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "If every media has atleast one relay ICE candidate, proceed with negotiation."
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "Else, wait until max timeout, or when invoked for another reason."
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Otherwise, if we are at, or past, the max ICE collection timeout:"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "list",
+                        "ordered": false,
+                        "start": null,
+                        "spread": false,
+                        "children": [
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "If there are any ICE candidates collected, proceed with negotiation."
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "Else, end the call with an error."
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The ideal and max timeouts can be configured with the "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "idealIceCollectionTimeout"
+                  },
+                  {
+                    "type": "text",
+                    "value": " and "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "maxIceCollectionTimeout"
+                  },
+                  {
+                    "type": "text",
+                    "value": " properties of\nthe call config."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 27,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 28
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 29,
+              "type": {
+                "type": "NameExpression",
+                "name": "Function"
+              },
+              "name": "IceCollectionCheckFunction"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 30
+            },
+            {
+              "title": "param",
+              "description": "Information about the current status of the ICE candidate collection.",
+              "lineNumber": 31,
+              "type": {
+                "type": "NameExpression",
+                "name": "call.IceCollectionInfo"
+              },
+              "name": "iceCollectionInfo"
+            },
+            {
+              "title": "returns",
+              "description": "Information on how to proceed with the call and/or ICE collection.",
+              "lineNumber": 32,
+              "type": {
+                "type": "NameExpression",
+                "name": "call.IceCollectionCheckResult"
+              }
+            },
+            {
+              "title": "example",
+              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}",
+              "lineNumber": 33
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 230,
+              "column": 0
+            },
+            "end": {
+              "line": 281,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 478,
+                "column": 0
+              },
+              "end": {
+                "line": 482,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [
+            {
+              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}"
+            }
+          ],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "iceCollectionInfo",
+              "lineNumber": 31,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Information about the current status of the ICE candidate collection."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "call.IceCollectionInfo"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Information on how to proceed with the call and/or ICE collection."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "call.IceCollectionCheckResult"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "IceCollectionCheckFunction",
+          "type": {
+            "type": "NameExpression",
+            "name": "Function"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "IceCollectionCheckFunction",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.IceCollectionCheckFunction"
+        },
+        {
+          "description": "",
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 1,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 2
+            },
+            {
+              "title": "typedef",
+              "description": null,
+              "lineNumber": 3,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "IceCollectionCheckResult"
+            },
+            {
+              "title": "memberof",
+              "description": "call",
+              "lineNumber": 4
+            },
+            {
+              "title": "property",
+              "description": "Indicates how the system should proceed with the call operation / ICE collection. The possible values are:\n   'StartCall' - instruct the system to start the call with the currently gathered ICE candidates and other information.\n   'Error' - instruct the system to fail the call with an error. The error to communicate to the user should be specified in the `error` property.\n   'Wait' - instruct the system to wait for the specified amount of time before triggering a new ICE collection check. The amount\n       of wait time should be specified in the `wait` property.",
+              "lineNumber": 5,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "type"
+            },
+            {
+              "title": "property",
+              "description": "An error to be sent the user when the `type` of the result is `IceCollectionCheckResultType.Error`",
+              "lineNumber": 10,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "error"
+            },
+            {
+              "title": "property",
+              "description": "The amount of time (in milliseconds) to wait before triggering a new ICE collection check. This is only\n   valid if the `type` of result is `IceCollectionCheckResultType.Wait`. If a value is not provided, the ICE collection check function\n   will only be triggered for new candidates or when the ICE gathering state changes.",
+              "lineNumber": 11,
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              },
+              "name": "wait"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 283,
+              "column": 0
+            },
+            "end": {
+              "line": 297,
+              "column": 3
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 478,
+                "column": 0
+              },
+              "end": {
+                "line": 482,
+                "column": 1
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_beta/packages/kandy/src/call/interfaceNew/api/index.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [],
+          "properties": [
+            {
+              "title": "property",
+              "name": "type",
+              "lineNumber": 5,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Indicates how the system should proceed with the call operation / ICE collection. The possible values are:\n'StartCall' - instruct the system to start the call with the currently gathered ICE candidates and other information.\n'Error' - instruct the system to fail the call with an error. The error to communicate to the user should be specified in the "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "error"
+                      },
+                      {
+                        "type": "text",
+                        "value": " property.\n'Wait' - instruct the system to wait for the specified amount of time before triggering a new ICE collection check. The amount\nof wait time should be specified in the "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "wait"
+                      },
+                      {
+                        "type": "text",
+                        "value": " property."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "error",
+              "lineNumber": 10,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "An error to be sent the user when the "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "type"
+                      },
+                      {
+                        "type": "text",
+                        "value": " of the result is "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "IceCollectionCheckResultType.Error"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            },
+            {
+              "title": "property",
+              "name": "wait",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The amount of time (in milliseconds) to wait before triggering a new ICE collection check. This is only\nvalid if the "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "type"
+                      },
+                      {
+                        "type": "text",
+                        "value": " of result is "
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "IceCollectionCheckResultType.Wait"
+                      },
+                      {
+                        "type": "text",
+                        "value": ". If a value is not provided, the ICE collection check function\nwill only be triggered for new candidates or when the ICE gathering state changes."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              }
+            }
+          ],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "kind": "typedef",
+          "name": "IceCollectionCheckResult",
+          "type": {
+            "type": "NameExpression",
+            "name": "Object"
+          },
+          "memberof": "call",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "call",
+              "kind": "namespace"
+            },
+            {
+              "name": "IceCollectionCheckResult",
+              "kind": "typedef",
+              "scope": "static"
+            }
+          ],
+          "namespace": "call.IceCollectionCheckResult"
+        },
+        {
           "description": "",
           "tags": [
             {
@@ -11480,22 +12691,22 @@
           ],
           "loc": {
             "start": {
-              "line": 207,
+              "line": 299,
               "column": 0
             },
             "end": {
-              "line": 218,
+              "line": 310,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -11717,22 +12928,22 @@
           ],
           "loc": {
             "start": {
-              "line": 220,
+              "line": 312,
               "column": 0
             },
             "end": {
-              "line": 230,
+              "line": 322,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -11953,22 +13164,22 @@
           ],
           "loc": {
             "start": {
-              "line": 232,
+              "line": 324,
               "column": 0
             },
             "end": {
-              "line": 243,
+              "line": 335,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -12254,22 +13465,22 @@
           ],
           "loc": {
             "start": {
-              "line": 245,
+              "line": 337,
               "column": 0
             },
             "end": {
-              "line": 266,
+              "line": 358,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -12656,22 +13867,22 @@
           ],
           "loc": {
             "start": {
-              "line": 268,
+              "line": 360,
               "column": 0
             },
             "end": {
-              "line": 278,
+              "line": 370,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -12898,22 +14109,22 @@
           ],
           "loc": {
             "start": {
-              "line": 280,
+              "line": 372,
               "column": 0
             },
             "end": {
-              "line": 291,
+              "line": 383,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 386,
+                "line": 478,
                 "column": 0
               },
               "end": {
-                "line": 390,
+                "line": 482,
                 "column": 1
               }
             },
@@ -37124,11 +38335,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 386,
+          "line": 478,
           "column": 0
         },
         "end": {
-          "line": 390,
+          "line": 482,
           "column": 1
         }
       },
