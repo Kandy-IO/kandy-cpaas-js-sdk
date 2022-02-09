@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.37.0-beta.830
+ * Version: 4.37.0-beta.831
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3225,7 +3225,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // Thank's IE8 for his funny defineProperty
-module.exports = !__webpack_require__(43)(function () {
+module.exports = !__webpack_require__(44)(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -6472,73 +6472,6 @@ exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const prefix = '@@KANDY/';
-
-const PROCESS_NOTIFICATION = exports.PROCESS_NOTIFICATION = prefix + 'PROCESS_NOTIFICATION';
-const PROCESS_NOTIFICATION_FINISH = exports.PROCESS_NOTIFICATION_FINISH = prefix + 'PROCESS_NOTIFICATION_FINISH';
-const NOTIFICATION_RECEIVED = exports.NOTIFICATION_RECEIVED = prefix + 'NOTIFICATION_RECEIVED';
-
-const ENABLE_NOTIFICATION_CHANNEL = exports.ENABLE_NOTIFICATION_CHANNEL = prefix + 'ENABLE_NOTIFICATION_CHANNEL';
-const ENABLE_NOTIFICATION_CHANNEL_FINISH = exports.ENABLE_NOTIFICATION_CHANNEL_FINISH = prefix + 'ENABLE_NOTIFICATION_CHANNEL_FINISH';
-
-const REGISTER_APPLE_PUSH_NOTIFICATION = exports.REGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'REGISTER_APPLE_PUSH_NOTIFICATION';
-const REGISTER_ANDROID_PUSH_NOTIFICATION = exports.REGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'REGISTER_ANDROID_PUSH_NOTIFICATION';
-
-const UNREGISTER_APPLE_PUSH_NOTIFICATION = exports.UNREGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'UNREGISTER_APPLE_PUSH_NOTIFICATION';
-const UNREGISTER_ANDROID_PUSH_NOTIFICATION = exports.UNREGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'UNREGISTER_ANDROID_PUSH_NOTIFICATION';
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports) {
-
-module.exports = function (exec) {
-  try {
-    return !!exec();
-  } catch (e) {
-    return true;
-  }
-};
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = __webpack_require__(99);
-var defined = __webpack_require__(100);
-module.exports = function (it) {
-  return IObject(defined(it));
-};
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 7.1.13 ToObject(argument)
-var defined = __webpack_require__(100);
-module.exports = function (it) {
-  return Object(defined(it));
-};
-
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = { "default": __webpack_require__(341), __esModule: true };
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 const callPrefix = '@@KANDY/CALL/';
 
 /**
@@ -6666,6 +6599,73 @@ const trackPrefix = callPrefix + 'TRACK/';
 
 const TRACK_ADDED = exports.TRACK_ADDED = trackPrefix + 'ADDED';
 const TRACK_REMOVED = exports.TRACK_REMOVED = trackPrefix + 'REMOVED';
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const prefix = '@@KANDY/';
+
+const PROCESS_NOTIFICATION = exports.PROCESS_NOTIFICATION = prefix + 'PROCESS_NOTIFICATION';
+const PROCESS_NOTIFICATION_FINISH = exports.PROCESS_NOTIFICATION_FINISH = prefix + 'PROCESS_NOTIFICATION_FINISH';
+const NOTIFICATION_RECEIVED = exports.NOTIFICATION_RECEIVED = prefix + 'NOTIFICATION_RECEIVED';
+
+const ENABLE_NOTIFICATION_CHANNEL = exports.ENABLE_NOTIFICATION_CHANNEL = prefix + 'ENABLE_NOTIFICATION_CHANNEL';
+const ENABLE_NOTIFICATION_CHANNEL_FINISH = exports.ENABLE_NOTIFICATION_CHANNEL_FINISH = prefix + 'ENABLE_NOTIFICATION_CHANNEL_FINISH';
+
+const REGISTER_APPLE_PUSH_NOTIFICATION = exports.REGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'REGISTER_APPLE_PUSH_NOTIFICATION';
+const REGISTER_ANDROID_PUSH_NOTIFICATION = exports.REGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'REGISTER_ANDROID_PUSH_NOTIFICATION';
+
+const UNREGISTER_APPLE_PUSH_NOTIFICATION = exports.UNREGISTER_APPLE_PUSH_NOTIFICATION = prefix + 'UNREGISTER_APPLE_PUSH_NOTIFICATION';
+const UNREGISTER_ANDROID_PUSH_NOTIFICATION = exports.UNREGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'UNREGISTER_ANDROID_PUSH_NOTIFICATION';
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return !!exec();
+  } catch (e) {
+    return true;
+  }
+};
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = __webpack_require__(99);
+var defined = __webpack_require__(100);
+module.exports = function (it) {
+  return IObject(defined(it));
+};
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__(100);
+module.exports = function (it) {
+  return Object(defined(it));
+};
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(341), __esModule: true };
 
 /***/ }),
 /* 48 */
@@ -7286,7 +7286,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.37.0-beta.830';
+  return '4.37.0-beta.831';
 }
 
 /***/ }),
@@ -8950,7 +8950,7 @@ var id = 0;
 var isExtensible = Object.isExtensible || function () {
   return true;
 };
-var FREEZE = !__webpack_require__(43)(function () {
+var FREEZE = !__webpack_require__(44)(function () {
   return isExtensible(Object.preventExtensions({}));
 });
 var setMeta = function (it) {
@@ -10147,7 +10147,7 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has = __webpack_require__(38);
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var IE_PROTO = __webpack_require__(102)('IE_PROTO');
 var ObjectProto = Object.prototype;
 
@@ -10245,7 +10245,7 @@ module.exports = function (target, src, safe) {
 // most Object methods by ES6 should accept primitives
 var $export = __webpack_require__(13);
 var core = __webpack_require__(9);
-var fails = __webpack_require__(43);
+var fails = __webpack_require__(44);
 module.exports = function (KEY, exec) {
   var fn = (core.Object || {})[KEY] || Object[KEY];
   var exp = {};
@@ -11579,7 +11579,7 @@ exports.unregisterApplePushNotification = unregisterApplePushNotification;
 exports.unregisterAndroidPushNotification = unregisterAndroidPushNotification;
 exports.enableNotificationChannelFinish = enableNotificationChannelFinish;
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(43);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -11914,7 +11914,7 @@ function toCamelCase(string) {
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = !__webpack_require__(22) && !__webpack_require__(43)(function () {
+module.exports = !__webpack_require__(22) && !__webpack_require__(44)(function () {
   return Object.defineProperty(__webpack_require__(97)('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -11924,7 +11924,7 @@ module.exports = !__webpack_require__(22) && !__webpack_require__(43)(function (
 /***/ (function(module, exports, __webpack_require__) {
 
 var has = __webpack_require__(38);
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 var arrayIndexOf = __webpack_require__(211)(false);
 var IE_PROTO = __webpack_require__(102)('IE_PROTO');
 
@@ -12462,7 +12462,7 @@ module.exports = function (exec, skipClosing) {
 
 var DESCRIPTORS = __webpack_require__(22);
 var getKeys = __webpack_require__(54);
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 var isEnum = __webpack_require__(62).f;
 module.exports = function (isEntries) {
   return function (it) {
@@ -12519,7 +12519,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 
 var pIE = __webpack_require__(62);
 var createDesc = __webpack_require__(53);
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 var toPrimitive = __webpack_require__(98);
 var has = __webpack_require__(38);
 var IE8_DOM_DEFINE = __webpack_require__(134);
@@ -12882,7 +12882,7 @@ module.exports = {
 var global = __webpack_require__(15);
 var $export = __webpack_require__(13);
 var meta = __webpack_require__(83);
-var fails = __webpack_require__(43);
+var fails = __webpack_require__(44);
 var hide = __webpack_require__(37);
 var redefineAll = __webpack_require__(113);
 var forOf = __webpack_require__(67);
@@ -14413,7 +14413,7 @@ var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -15032,7 +15032,7 @@ exports.restartMedia = restartMedia;
 exports.restartMediaFinish = restartMediaFinish;
 exports.updateCall = updateCall;
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -21444,12 +21444,12 @@ var DESCRIPTORS = __webpack_require__(22);
 var getKeys = __webpack_require__(54);
 var gOPS = __webpack_require__(105);
 var pIE = __webpack_require__(62);
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var IObject = __webpack_require__(99);
 var $assign = Object.assign;
 
 // should work with symbols and should have deterministic property order (V8 bug)
-module.exports = !$assign || __webpack_require__(43)(function () {
+module.exports = !$assign || __webpack_require__(44)(function () {
   var A = {};
   var B = {};
   // eslint-disable-next-line no-undef
@@ -21484,7 +21484,7 @@ module.exports = !$assign || __webpack_require__(43)(function () {
 
 // false -> Array#indexOf
 // true  -> Array#includes
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 var toLength = __webpack_require__(77);
 var toAbsoluteIndex = __webpack_require__(212);
 module.exports = function (IS_INCLUDES) {
@@ -22837,7 +22837,7 @@ module.exports = function (Constructor, NAME, next) {
 var addToUnscopables = __webpack_require__(228);
 var step = __webpack_require__(143);
 var Iterators = __webpack_require__(65);
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 
 // 22.1.3.4 Array.prototype.entries()
 // 22.1.3.13 Array.prototype.keys()
@@ -23335,7 +23335,7 @@ module.exports = __webpack_require__(9).Object.keys;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 Object.keys(O)
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var $keys = __webpack_require__(54);
 
 __webpack_require__(114)('keys', function () {
@@ -24298,7 +24298,7 @@ var DESCRIPTORS = __webpack_require__(22);
 var $export = __webpack_require__(13);
 var redefine = __webpack_require__(140);
 var META = __webpack_require__(83).KEY;
-var $fails = __webpack_require__(43);
+var $fails = __webpack_require__(44);
 var shared = __webpack_require__(103);
 var setToStringTag = __webpack_require__(66);
 var uid = __webpack_require__(78);
@@ -24309,8 +24309,8 @@ var enumKeys = __webpack_require__(247);
 var isArray = __webpack_require__(155);
 var anObject = __webpack_require__(30);
 var isObject = __webpack_require__(21);
-var toObject = __webpack_require__(45);
-var toIObject = __webpack_require__(44);
+var toObject = __webpack_require__(46);
+var toIObject = __webpack_require__(45);
 var toPrimitive = __webpack_require__(98);
 var createDesc = __webpack_require__(53);
 var _create = __webpack_require__(80);
@@ -24564,7 +24564,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = __webpack_require__(44);
+var toIObject = __webpack_require__(45);
 var gOPN = __webpack_require__(156).f;
 var toString = {}.toString;
 
@@ -26478,7 +26478,7 @@ module.exports = __webpack_require__(162)(SET, function (get) {
 // 6 -> Array#findIndex
 var ctx = __webpack_require__(36);
 var IObject = __webpack_require__(99);
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var toLength = __webpack_require__(77);
 var asc = __webpack_require__(268);
 module.exports = function (TYPE, $create) {
@@ -27134,7 +27134,7 @@ module.exports = __webpack_require__(9).Array.from;
 
 var ctx = __webpack_require__(36);
 var $export = __webpack_require__(13);
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var call = __webpack_require__(144);
 var isArrayIter = __webpack_require__(145);
 var toLength = __webpack_require__(77);
@@ -37826,7 +37826,7 @@ var _promise = __webpack_require__(19);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -38164,7 +38164,7 @@ var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -38288,7 +38288,7 @@ var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -38407,7 +38407,7 @@ var _promise = __webpack_require__(19);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -39615,7 +39615,7 @@ var _from = __webpack_require__(56);
 
 var _from2 = _interopRequireDefault(_from);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -42061,7 +42061,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.turnChanged = turnChanged;
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -42298,7 +42298,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -42645,7 +42645,24 @@ callReducers[actionTypes.UPDATE_CALL] = {
     const _action$payload = action.payload,
           { transition } = _action$payload,
           payloadWithoutTransition = (0, _objectWithoutProperties3.default)(_action$payload, ['transition']);
-    return (0, _extends3.default)({}, state, payloadWithoutTransition);
+    const newState = (0, _extends3.default)({}, state, payloadWithoutTransition);
+
+    /*
+     * Edge-case workaround.
+     * If the current operation is an on-going remote slow-start, then this remote
+     *   update call action is intended to be the "finish" for it. The "update call"
+     *   action being used here is an edge-case when the remote operation wasn't
+     *   something we can identify.
+     * This is being done manually because the "update call" action does not work
+     *   with the SDK's "operation tracking" logic in the reducers.
+     * See function `handleSlowUpdateResponse` in `/call/negotiation.js` for more info.
+     * Reference: KJS-542
+     */
+    if (action.meta && action.meta.isRemote === true && newState.remoteOp && newState.remoteOp.operation === _constants.OPERATIONS.SLOW_START && newState.remoteOp.status === _constants.OP_STATUS.ONGOING) {
+      newState.remoteOp = undefined;
+    }
+
+    return newState;
   }
 };
 
@@ -43173,7 +43190,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -43261,7 +43278,7 @@ var _support = __webpack_require__(404);
 
 var supportSagas = _interopRequireWildcard(_support);
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -43295,7 +43312,7 @@ var _effects = __webpack_require__(128);
 
 var _actionTypes3 = __webpack_require__(49);
 
-var _actionTypes4 = __webpack_require__(42);
+var _actionTypes4 = __webpack_require__(43);
 
 var _codecs = __webpack_require__(429);
 
@@ -45966,7 +45983,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _map = __webpack_require__(46);
+var _map = __webpack_require__(47);
 
 var _map2 = _interopRequireDefault(_map);
 
@@ -48244,6 +48261,8 @@ function* sessionStatusUpdateEnded(deps, params) {
   // Close the local webRTC session
   yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
 
+  // If we had the local operation tracked in state, then we can dispatch the action
+  //    intended to "finish" the operation.
   const localOp = currentCall.localOp;
   if (localOp && localOp.operation && localOp.status === _constants2.OP_STATUS.PENDING) {
     let transition;
@@ -48270,31 +48289,32 @@ function* sessionStatusUpdateEnded(deps, params) {
           statusCode: _constants.STATUS_CODES.JOIN_SUCCESS
         };
         break;
+      default:
+        log.info('Unknown local call operation for completed notice. Cannot provide transition information.');
+        break;
     }
     if (finishAction) {
-      log.debug('Marking call locally as ended. Call ID: ', currentCall.id);
-
       yield (0, _effects.put)(finishAction(currentCall.id, { transition }));
-
-      // We also need to notify the backend that call with currentCall.id should be removed
-      // by sending a DELETE REST request.
-      // Perform signalling to end the session on server's side.
-      const isAnonymous = currentCall.isAnonymous;
-      const account = currentCall.account;
-      log.info('Ending call by requesting to be removed from backend ...');
-      const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
-
-      if (!response.error) {
-        log.info(`Finished ending call. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
-        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, (0, _index.generateEndParams)(currentCall.state, true, params)));
-      } else {
-        log.debug(`Error received when attempting to end the session: ${response.error}. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
-        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
-          isLocal: true,
-          error: response.error
-        }));
-      }
     }
+  }
+
+  // We also need to notify the backend that call with currentCall.id should be removed
+  // by sending a DELETE REST request.
+  // Perform signalling to end the session on server's side.
+  const isAnonymous = currentCall.isAnonymous;
+  const account = currentCall.account;
+  log.debug('Ending call session on server-side.');
+  const response = yield (0, _effects.call)(requests.endSession, { wrtcsSessionId, isAnonymous, account });
+
+  if (!response.error) {
+    log.info(`Finished ending call. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, (0, _index.generateEndParams)(currentCall.state, true, params)));
+  } else {
+    log.debug(`Error received when attempting to end the session: ${response.error}. Changing call state to ${_constants.CALL_STATES.ENDED}.`);
+    yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+      isLocal: true,
+      error: response.error
+    }));
   }
 }
 
@@ -48572,6 +48592,10 @@ var _operations2 = _interopRequireDefault(_operations);
 
 var _actions = __webpack_require__(32);
 
+var _actionTypes = __webpack_require__(42);
+
+var actionTypes = _interopRequireWildcard(_actionTypes);
+
 var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(20);
@@ -48590,16 +48614,14 @@ var _negotiation = __webpack_require__(425);
 
 var _effects = __webpack_require__(1);
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Other plugins.
 
 
 // Call plugin helpers.
-
-
-// Call plugin.
-// Callstack.
 const log = _logs.logManager.getLogger('CALL');
 
 /**
@@ -48637,6 +48659,10 @@ const log = _logs.logManager.getLogger('CALL');
 
 
 // Libraries.
+
+
+// Call plugin.
+// Callstack.
 function* handleUpdateRequest(deps, targetCall, params) {
   const { webRTC, requests } = deps;
 
@@ -49181,14 +49207,35 @@ function* handleSlowUpdateResponse(deps, targetCall, params) {
     const nextState = mediaFlowing ? _constants.CALL_STATES.CONNECTED : _constants.CALL_STATES.ON_HOLD;
 
     log.info(`Finished processing remote slow-start response. Changing to ${nextState}.`);
-    yield (0, _effects.put)(callAction(targetCall.id, {
+
+    const action = callAction(targetCall.id, {
       state: nextState,
       // Remote participant's information.
       remoteParticipant: {
         displayNumber: params.remoteNumber,
         displayName: params.remoteName
       }
-    }));
+    });
+
+    if (action.type === actionTypes.UPDATE_CALL) {
+      /*
+       * This is a hack. The proper solution would be to never use a generic action for state changes.
+       * This action doesn't work with the SDK's "operation tracking" logic in the call reducers, so
+       *     the call state becomes out-of-sync with the operations.
+       *  In this scenario, the operation start was a remote slow-start negotiation, but the SDK fails
+       *      to determine what the actual operation was, so it falls-back to using the generic action
+       *      for the "finish". This means that the remoteOp in state never gets cleaned-up, which can
+       *      cause issues later.
+       *  The workaround is to mark the action as a remote update action, so that the reducer can
+       *      manually clean-up the remote operation in this scenario.
+       * Reference: KJS-542
+       */
+      action.meta = {
+        isRemote: true
+      };
+    }
+
+    yield (0, _effects.put)(action);
   } else {
     // Scenario: The call is in an unexpected state for receiving a remote
     //    answer SDP. This should never happen.
@@ -50731,7 +50778,7 @@ exports.callIceCollectionCheck = callIceCollectionCheck;
 
 var _actions = __webpack_require__(32);
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -51195,7 +51242,7 @@ var _eventTypes = __webpack_require__(431);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(47);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -54882,7 +54929,7 @@ module.exports = __webpack_require__(9).Object.getPrototypeOf;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = __webpack_require__(45);
+var toObject = __webpack_require__(46);
 var $getPrototypeOf = __webpack_require__(109);
 
 __webpack_require__(114)('getPrototypeOf', function () {
@@ -54930,7 +54977,7 @@ var _actionTypes = __webpack_require__(74);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(42);
+var _actionTypes2 = __webpack_require__(43);
 
 var _constants = __webpack_require__(8);
 
@@ -56377,7 +56424,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(43);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56673,7 +56720,7 @@ var _eventTypes = __webpack_require__(460);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(43);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56773,7 +56820,7 @@ var _actions = __webpack_require__(129);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(43);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -57513,7 +57560,7 @@ var _actionTypes = __webpack_require__(94);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(42);
+var _actionTypes2 = __webpack_require__(43);
 
 var _effects = __webpack_require__(1);
 
@@ -58926,7 +58973,7 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _effects = __webpack_require__(1);
 
-var _actionTypes2 = __webpack_require__(42);
+var _actionTypes2 = __webpack_require__(43);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
