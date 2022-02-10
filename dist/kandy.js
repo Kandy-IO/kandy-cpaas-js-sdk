@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.37.0-beta.831
+ * Version: 4.37.0-beta.832
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7286,7 +7286,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.37.0-beta.831';
+  return '4.37.0-beta.832';
 }
 
 /***/ }),
@@ -27554,11 +27554,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 function getDefaultCollectionFunction(idealCollectionTimeout, maxCollectionTimeout) {
   /**
-   * Default function to determine if the ice candidates is enough to negotiate.
+   * Default function used for the SDK's ICE collection process. Will determine when enough
+   *     candidates have been collected, or enough time has passed, until negotiation can
+   *     continue or if the call should be considered failed.
    *
-   * We assume that: at least one relay candidate is good enough to try negotiation.
-   * Otherwise, we wait for intervals of `idealCollectionTimeout` until we reach the `maxCollectionTimeout`.
-   * If there are still no relay ICE candidates, we will try to proceed with negotiation regardless.
+   * If ICE collection completes normally (at any point),
+   *   - start the call if we have some ICE candidates.
+   *   - error the call if there are no ICE candidates.
+   *
+   * If a candidate is collected, follow logic based on below timings.
+   *
+   * If before the ideal timeout,
+   *   - start the call if every media section has a relay candidate for every TURN server.
+   *   - otherwise wait until max timeout.
+   *
+   * If before the max timeout (but after ideal),
+   *   - start the call if every media section has at least one relay candidate.
+   *   - otherwise wait until max timeout.
+   *
+   * If we reach max timeout,
+   *   - start the call if we have some ICE candidates.
+   *   - error the call if there are no ICE candidates.
    * @param {Object} iceCollectionInfo
    * @param {string} iceCollectionInfo.callId The ID of the call.
    * @param {string} iceCollectionInfo.callOperation The current operation of the call.
@@ -27580,6 +27596,10 @@ function getDefaultCollectionFunction(idealCollectionTimeout, maxCollectionTimeo
     } = iceCollectionInfo;
 
     if (iceGatheringState === 'complete') {
+      // If the ice gathering state is 'complete', but no candidates are available, end the call
+      if (iceCandidates.length === 0) {
+        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
+      }
       return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
     }
 
@@ -27635,7 +27655,7 @@ function getDefaultCollectionFunction(idealCollectionTimeout, maxCollectionTimeo
       }
     } else {
       // If we are passed the max timeout and no candidates are available, end the call
-      if (!iceCandidates.length) {
+      if (iceCandidates.length === 0) {
         return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
       }
       // Otherwise, if there are some candidates, we can attempt to start the call.
