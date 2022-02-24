@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.37.0-beta.835
+ * Version: 4.37.0-beta.836
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3225,7 +3225,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // Thank's IE8 for his funny defineProperty
-module.exports = !__webpack_require__(44)(function () {
+module.exports = !__webpack_require__(43)(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -6449,23 +6449,6 @@ const aOrAn = string => /[aeiou]/i.test(string[0]) ? 'an' : 'a';
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(294);
-var writer = __webpack_require__(295);
-
-exports.write = writer;
-exports.parse = parser.parse;
-exports.parseParams = parser.parseParams;
-exports.parseFmtpConfig = parser.parseFmtpConfig; // Alias of parseParams().
-exports.parsePayloads = parser.parsePayloads;
-exports.parseRemoteCandidates = parser.parseRemoteCandidates;
-exports.parseImageAttributes = parser.parseImageAttributes;
-exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -6601,7 +6584,7 @@ const TRACK_ADDED = exports.TRACK_ADDED = trackPrefix + 'ADDED';
 const TRACK_REMOVED = exports.TRACK_REMOVED = trackPrefix + 'REMOVED';
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6626,7 +6609,7 @@ const UNREGISTER_APPLE_PUSH_NOTIFICATION = exports.UNREGISTER_APPLE_PUSH_NOTIFIC
 const UNREGISTER_ANDROID_PUSH_NOTIFICATION = exports.UNREGISTER_ANDROID_PUSH_NOTIFICATION = prefix + 'UNREGISTER_ANDROID_PUSH_NOTIFICATION';
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = function (exec) {
@@ -6639,7 +6622,7 @@ module.exports = function (exec) {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // to indexed object, toObject with fallback for non-array-like ES3 strings
@@ -6651,7 +6634,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.13 ToObject(argument)
@@ -6659,6 +6642,23 @@ var defined = __webpack_require__(100);
 module.exports = function (it) {
   return Object(defined(it));
 };
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var parser = __webpack_require__(294);
+var writer = __webpack_require__(295);
+
+exports.write = writer;
+exports.parse = parser.parse;
+exports.parseParams = parser.parseParams;
+exports.parseFmtpConfig = parser.parseFmtpConfig; // Alias of parseParams().
+exports.parsePayloads = parser.parsePayloads;
+exports.parseRemoteCandidates = parser.parseRemoteCandidates;
+exports.parseImageAttributes = parser.parseImageAttributes;
+exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
 
 
 /***/ }),
@@ -7286,7 +7286,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.37.0-beta.835';
+  return '4.37.0-beta.836';
 }
 
 /***/ }),
@@ -8950,7 +8950,7 @@ var id = 0;
 var isExtensible = Object.isExtensible || function () {
   return true;
 };
-var FREEZE = !__webpack_require__(44)(function () {
+var FREEZE = !__webpack_require__(43)(function () {
   return isExtensible(Object.preventExtensions({}));
 });
 var setMeta = function (it) {
@@ -9369,7 +9369,7 @@ var _freeze2 = _interopRequireDefault(_freeze);
 
 exports.runPipeline = runPipeline;
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -9513,7 +9513,7 @@ var _logs = __webpack_require__(2);
 
 var _kandyLogger = __webpack_require__(82);
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -10147,7 +10147,7 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has = __webpack_require__(38);
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var IE_PROTO = __webpack_require__(102)('IE_PROTO');
 var ObjectProto = Object.prototype;
 
@@ -10245,7 +10245,7 @@ module.exports = function (target, src, safe) {
 // most Object methods by ES6 should accept primitives
 var $export = __webpack_require__(13);
 var core = __webpack_require__(9);
-var fails = __webpack_require__(44);
+var fails = __webpack_require__(43);
 module.exports = function (KEY, exec) {
   var fn = (core.Object || {})[KEY] || Object[KEY];
   var exp = {};
@@ -11085,10 +11085,6 @@ var mediaOps = _interopRequireWildcard(_media);
 
 var _effects = __webpack_require__(1);
 
-var _sdpTransform = __webpack_require__(41);
-
-var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -11115,7 +11111,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// Libraries.
+// WebRTC operations.
+
+
+// Helpers
+// Call plugin.
 function* setupCall(deps, mediaConstraints, sessionOptions) {
   const { webRTC } = deps;
 
@@ -11234,25 +11234,6 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
     bandwidth
   });
 
-  // Check if we have candidates here
-  const hasNoCandidates = sdp => sdp.media.every(m => !m.candidates || m.candidates.length === 0);
-  const parsedSdp = _sdpTransform2.default.parse(newSdp);
-  if (hasNoCandidates(parsedSdp)) {
-    // Close call functionality
-    yield (0, _effects.all)(session.localTracks.map(track => (0, _effects.call)([track, 'cleanup'])));
-    yield (0, _effects.call)([session, 'end']);
-
-    return {
-      error: new _errors2.default({
-        message: 'No ICE Candidates were found so media cannot flow.',
-        code: _errors.callCodes.NO_ICE_CANDIDATES
-      }),
-      offerSdp: null,
-      sessionId: null,
-      mediaIds: null
-    };
-  }
-
   log.info('Finished setting up local WebRTC portions of call.');
   return {
     error: false,
@@ -11274,16 +11255,11 @@ function* setupCall(deps, mediaConstraints, sessionOptions) {
  * @param  {Object} sessionOptions.turnInfo TURN information, contains server info.
  * @param  {string} sessionOptions.trickleIceMode the mode to enable for Trickle ICE.
  * @param  {Object} sessionOptions.offer an offer containing an SDP.
- * @return {Object} Object
- * @return {string} Object.sessionId an identifier for the session.
+ * @return {string} sessionId an identifier for the session.
  */
 
 
-// WebRTC operations.
-
-
-// Helpers
-// Call plugin.
+// Libraries.
 function* setupIncomingCall(deps, sessionOptions) {
   const { webRTC } = deps;
   const { defaultPeerConfig, turnInfo, trickleIceMode, callId, removeBundling } = sessionOptions;
@@ -11344,10 +11320,7 @@ function* setupIncomingCall(deps, sessionOptions) {
   }
 
   log.info('Finished setting up remote WebRTC portions of call.');
-  return {
-    sessionId: session.id,
-    error: null
-  };
+  return session.id;
 }
 
 /**
@@ -11452,20 +11425,6 @@ function* answerWebrtcSession(deps, mediaConstraints, sessionOptions) {
     endpoint: 'local',
     bandwidth
   });
-
-  // Check if we have candidates here
-  const hasNoCandidates = sdp => sdp.media.every(m => !m.candidates || m.candidates.length === 0);
-  const parsedSdp = _sdpTransform2.default.parse(newSdp);
-  if (hasNoCandidates(parsedSdp)) {
-    return {
-      error: new _errors2.default({
-        message: 'No ICE Candidates were found so media cannot flow.',
-        code: _errors.callCodes.NO_ICE_CANDIDATES
-      }),
-      answerSDP: null,
-      mediaIds: null
-    };
-  }
 
   log.info('Finished setting up local WebRTC portions of call.');
 
@@ -11579,7 +11538,7 @@ exports.unregisterApplePushNotification = unregisterApplePushNotification;
 exports.unregisterAndroidPushNotification = unregisterAndroidPushNotification;
 exports.enableNotificationChannelFinish = enableNotificationChannelFinish;
 
-var _actionTypes = __webpack_require__(43);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -11914,7 +11873,7 @@ function toCamelCase(string) {
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = !__webpack_require__(22) && !__webpack_require__(44)(function () {
+module.exports = !__webpack_require__(22) && !__webpack_require__(43)(function () {
   return Object.defineProperty(__webpack_require__(97)('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -11924,7 +11883,7 @@ module.exports = !__webpack_require__(22) && !__webpack_require__(44)(function (
 /***/ (function(module, exports, __webpack_require__) {
 
 var has = __webpack_require__(38);
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var arrayIndexOf = __webpack_require__(211)(false);
 var IE_PROTO = __webpack_require__(102)('IE_PROTO');
 
@@ -12462,7 +12421,7 @@ module.exports = function (exec, skipClosing) {
 
 var DESCRIPTORS = __webpack_require__(22);
 var getKeys = __webpack_require__(54);
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var isEnum = __webpack_require__(62).f;
 module.exports = function (isEntries) {
   return function (it) {
@@ -12519,7 +12478,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 
 var pIE = __webpack_require__(62);
 var createDesc = __webpack_require__(53);
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var toPrimitive = __webpack_require__(98);
 var has = __webpack_require__(38);
 var IE8_DOM_DEFINE = __webpack_require__(134);
@@ -12882,7 +12841,7 @@ module.exports = {
 var global = __webpack_require__(15);
 var $export = __webpack_require__(13);
 var meta = __webpack_require__(83);
-var fails = __webpack_require__(44);
+var fails = __webpack_require__(43);
 var hide = __webpack_require__(37);
 var redefineAll = __webpack_require__(113);
 var forOf = __webpack_require__(67);
@@ -15032,7 +14991,7 @@ exports.restartMedia = restartMedia;
 exports.restartMediaFinish = restartMediaFinish;
 exports.updateCall = updateCall;
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -17286,7 +17245,7 @@ exports.compareSummary = compareSummary;
 
 var _logs = __webpack_require__(2);
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -21444,12 +21403,12 @@ var DESCRIPTORS = __webpack_require__(22);
 var getKeys = __webpack_require__(54);
 var gOPS = __webpack_require__(105);
 var pIE = __webpack_require__(62);
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var IObject = __webpack_require__(99);
 var $assign = Object.assign;
 
 // should work with symbols and should have deterministic property order (V8 bug)
-module.exports = !$assign || __webpack_require__(44)(function () {
+module.exports = !$assign || __webpack_require__(43)(function () {
   var A = {};
   var B = {};
   // eslint-disable-next-line no-undef
@@ -21484,7 +21443,7 @@ module.exports = !$assign || __webpack_require__(44)(function () {
 
 // false -> Array#indexOf
 // true  -> Array#includes
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var toLength = __webpack_require__(77);
 var toAbsoluteIndex = __webpack_require__(212);
 module.exports = function (IS_INCLUDES) {
@@ -22837,7 +22796,7 @@ module.exports = function (Constructor, NAME, next) {
 var addToUnscopables = __webpack_require__(228);
 var step = __webpack_require__(143);
 var Iterators = __webpack_require__(65);
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 
 // 22.1.3.4 Array.prototype.entries()
 // 22.1.3.13 Array.prototype.keys()
@@ -23335,7 +23294,7 @@ module.exports = __webpack_require__(9).Object.keys;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 Object.keys(O)
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var $keys = __webpack_require__(54);
 
 __webpack_require__(114)('keys', function () {
@@ -24298,7 +24257,7 @@ var DESCRIPTORS = __webpack_require__(22);
 var $export = __webpack_require__(13);
 var redefine = __webpack_require__(140);
 var META = __webpack_require__(83).KEY;
-var $fails = __webpack_require__(44);
+var $fails = __webpack_require__(43);
 var shared = __webpack_require__(103);
 var setToStringTag = __webpack_require__(66);
 var uid = __webpack_require__(78);
@@ -24309,8 +24268,8 @@ var enumKeys = __webpack_require__(247);
 var isArray = __webpack_require__(155);
 var anObject = __webpack_require__(30);
 var isObject = __webpack_require__(21);
-var toObject = __webpack_require__(46);
-var toIObject = __webpack_require__(45);
+var toObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var toPrimitive = __webpack_require__(98);
 var createDesc = __webpack_require__(53);
 var _create = __webpack_require__(80);
@@ -24564,7 +24523,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = __webpack_require__(45);
+var toIObject = __webpack_require__(44);
 var gOPN = __webpack_require__(156).f;
 var toString = {}.toString;
 
@@ -26478,7 +26437,7 @@ module.exports = __webpack_require__(162)(SET, function (get) {
 // 6 -> Array#findIndex
 var ctx = __webpack_require__(36);
 var IObject = __webpack_require__(99);
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var toLength = __webpack_require__(77);
 var asc = __webpack_require__(268);
 module.exports = function (TYPE, $create) {
@@ -27134,7 +27093,7 @@ module.exports = __webpack_require__(9).Array.from;
 
 var ctx = __webpack_require__(36);
 var $export = __webpack_require__(13);
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var call = __webpack_require__(144);
 var isArrayIter = __webpack_require__(145);
 var toLength = __webpack_require__(77);
@@ -27538,7 +27497,7 @@ exports.getDefaultCollectionFunction = getDefaultCollectionFunction;
 
 var _constants = __webpack_require__(20);
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -42081,7 +42040,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.turnChanged = turnChanged;
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -42318,7 +42277,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -43210,7 +43169,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -43298,7 +43257,7 @@ var _support = __webpack_require__(404);
 
 var supportSagas = _interopRequireWildcard(_support);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -43332,7 +43291,7 @@ var _effects = __webpack_require__(128);
 
 var _actionTypes3 = __webpack_require__(49);
 
-var _actionTypes4 = __webpack_require__(43);
+var _actionTypes4 = __webpack_require__(42);
 
 var _codecs = __webpack_require__(429);
 
@@ -43558,8 +43517,7 @@ function* incomingCallNotification(deps) {
   const callDeps = (0, _extends3.default)({}, deps, {
     requests: {
       // Add the wrapped request to CPaaS's set of requests.
-      updateCallRinging: updateSessionRinging,
-      endSession: requests.endSession
+      updateCallRinging: updateSessionRinging
     }
 
     /**
@@ -44594,11 +44552,6 @@ function* answerCall(deps, action) {
       }, {
         isSlowStart: incomingCall.isSlowStart
       }));
-
-      if (webrtcInfo.error.code === _errors.callCodes.NO_ICE_CANDIDATES) {
-        yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, wrtcsSessionId);
-        yield (0, _effects.call)(requests.endSession, { wrtcsSessionId });
-      }
 
       return;
     }
@@ -47822,7 +47775,7 @@ var _effects = __webpack_require__(1);
 
 var _uuid = __webpack_require__(75);
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -48612,7 +48565,7 @@ var _operations2 = _interopRequireDefault(_operations);
 
 var _actions = __webpack_require__(32);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -50009,7 +49962,7 @@ exports.setMediaInactive = setMediaInactive;
 exports.hasMediaFlowing = hasMediaFlowing;
 exports.hasMusicOnHold = hasMusicOnHold;
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -50369,7 +50322,7 @@ var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
-var _sdpTransform = __webpack_require__(41);
+var _sdpTransform = __webpack_require__(46);
 
 var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 
@@ -50798,7 +50751,7 @@ exports.callIceCollectionCheck = callIceCollectionCheck;
 
 var _actions = __webpack_require__(32);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -51262,7 +51215,7 @@ var _eventTypes = __webpack_require__(431);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(42);
+var _actionTypes = __webpack_require__(41);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -54949,7 +54902,7 @@ module.exports = __webpack_require__(9).Object.getPrototypeOf;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = __webpack_require__(46);
+var toObject = __webpack_require__(45);
 var $getPrototypeOf = __webpack_require__(109);
 
 __webpack_require__(114)('getPrototypeOf', function () {
@@ -54997,7 +54950,7 @@ var _actionTypes = __webpack_require__(74);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(43);
+var _actionTypes2 = __webpack_require__(42);
 
 var _constants = __webpack_require__(8);
 
@@ -56444,7 +56397,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(43);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56740,7 +56693,7 @@ var _eventTypes = __webpack_require__(460);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
-var _actionTypes = __webpack_require__(43);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56840,7 +56793,7 @@ var _actions = __webpack_require__(129);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _actionTypes = __webpack_require__(43);
+var _actionTypes = __webpack_require__(42);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -57580,7 +57533,7 @@ var _actionTypes = __webpack_require__(94);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(43);
+var _actionTypes2 = __webpack_require__(42);
 
 var _effects = __webpack_require__(1);
 
@@ -58993,7 +58946,7 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _effects = __webpack_require__(1);
 
-var _actionTypes2 = __webpack_require__(43);
+var _actionTypes2 = __webpack_require__(42);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 

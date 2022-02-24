@@ -24,6 +24,9 @@ Kandy.js change log.
   - Previously, negotiation would begin as soon as an ICE candidate of type "relay" was collected.
   - The new change takes into account the number of media transports, and configured TURN servers. For more information, see [IceCollectionCheckFunction documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callicecollectioncheckfunction).
   - Added Call config properties `iceCollectionIdealTimeout` and `iceCollectionMaxTimeout` to allow configuration of the timeouts for the default function.
+- The SDK will no longer always end a call if no ICE candidates have been gathered, giving more control to the ICE collection check function. `KJS-546`
+  - The default ICE collection check behaviour will still fail a call if no ICE candidates have been gathered.
+  - Custom ICE collection check functions will now have to add logic for this as needed.
 
 ## 4.36.0 - 2022-01-28
 
