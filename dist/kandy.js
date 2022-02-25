@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.37.0-beta.836
+ * Version: 4.37.0-beta.837
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7286,7 +7286,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.37.0-beta.836';
+  return '4.37.0-beta.837';
 }
 
 /***/ }),
@@ -36237,15 +36237,6 @@ function onicecandidate(listener) {
         // Only trickle non-null (ie. actual) candidates.
         listener(event);
       }
-    } else if (event.candidate === null) {
-      // If we received the last candidate (null), then gathering is done and
-      //    Peer is ready for negotiation (no matter the scenario).
-      log.debug('ICE collection process complete; ready for negotiation.');
-
-      // Clear the candidate array without redefining it (it's a const).
-      iceCandidates.length = 0;
-
-      emitter.emit('onnegotiationready');
     } else if (config.trickleIceMode === _constants.PEER.TRICKLE_ICE.HALF) {
       // For half trickle, only start trickling after a certain threshold.
       //    Peer will be considered ready for negotiation after that point.
