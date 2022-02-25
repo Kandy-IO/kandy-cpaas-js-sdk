@@ -5,6 +5,29 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.37.0 - 2022-02-25
+
+### Added
+
+- Added a Call config `iceCollectionCheckFunction` to allow for configuration of the ICE candidate collection process. `KJS-449`
+  - This replaces the previous `iceCollectionCheck` Call config, and previous functions provided using that config will need to be updated to adhere to the form of the new IceCollectionCheckFunction definition.
+  - See [IceCollectionCheckFunction documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callicecollectioncheckfunction) for more information.
+
+### Fixed
+
+- Fixed a Call issue where an irregular remote, slow-start operation would cause the Call's operation tracking to become out-of-sync with actual operations. `KJS-542`
+
+### Changed
+
+- Changed when we start a call audit loop from Connected state to Initiated state in order to catch scenarios where the call is ended before it's connected. `KJS-445`
+- Changed the default ICE Collection Check Function functionality. `KJS-450`
+  - Previously, negotiation would begin as soon as an ICE candidate of type "relay" was collected.
+  - The new change takes into account the number of media transports, and configured TURN servers. For more information, see [IceCollectionCheckFunction documentation](https://kandy-io.github.io/kandy-cpaas-js-sdk/docs/#callicecollectioncheckfunction).
+  - Added Call config properties `iceCollectionIdealTimeout` and `iceCollectionMaxTimeout` to allow configuration of the timeouts for the default function.
+- The SDK will no longer always end a call if no ICE candidates have been gathered, giving more control to the ICE collection check function. `KJS-546`
+  - The default ICE collection check behaviour will still fail a call if no ICE candidates have been gathered.
+  - Custom ICE collection check functions will now have to add logic for this as needed.
+
 ## 4.36.0 - 2022-01-28
 
 ### Fixed
