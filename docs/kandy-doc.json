@@ -4426,22 +4426,22 @@
           ],
           "loc": {
             "start": {
-              "line": 240,
+              "line": 296,
               "column": 4
             },
             "end": {
-              "line": 250,
+              "line": 306,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 251,
+                "line": 307,
                 "column": 4
               },
               "end": {
-                "line": 254,
+                "line": 310,
                 "column": 5
               }
             },
@@ -4621,22 +4621,22 @@
           ],
           "loc": {
             "start": {
-              "line": 319,
+              "line": 375,
               "column": 4
             },
             "end": {
-              "line": 335,
+              "line": 391,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 336,
+                "line": 392,
                 "column": 4
               },
               "end": {
-                "line": 347,
+                "line": 403,
                 "column": 5
               }
             },
@@ -4828,22 +4828,22 @@
           ],
           "loc": {
             "start": {
-              "line": 412,
+              "line": 468,
               "column": 4
             },
             "end": {
-              "line": 429,
+              "line": 485,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 430,
+                "line": 503,
                 "column": 4
               },
               "end": {
-                "line": 444,
+                "line": 518,
                 "column": 5
               }
             },
@@ -44144,7 +44144,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Available presence information an be retrieved using the\n"
+                    "value": "Available presence information can be retrieved using the\n"
                   },
                   {
                     "type": "link",

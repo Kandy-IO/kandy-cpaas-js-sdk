@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.38.0 - beta
+
+### Fixed
+
+- Fixed a Presence issue where the SDK would incorrectly handle any fetched presence statuses. `KJS-578`
+
 ## 4.37.0 - 2022-02-25
 
 ### Added
