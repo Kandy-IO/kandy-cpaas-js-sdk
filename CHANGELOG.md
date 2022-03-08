@@ -5,6 +5,13 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.37.1 - 2022-03-08
+
+### Fixed
+
+- Refixed a Call issue where an irregular remote, slow-start operation causes the Call's subsequent operations to fail. `KJS-571`
+  - This issue was partially fixed in v4.37.0.
+
 ## 4.37.0 - 2022-02-25
 
 ### Added
