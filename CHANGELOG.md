@@ -10,6 +10,7 @@ Kandy.js change log.
 ### Fixed
 
 - Fixed a Presence issue where the SDK would incorrectly handle any fetched presence statuses. `KJS-578`
+- Fixed a Call issue where removing a local track would not trigger a `call:trackEnded` event if the user had previously been receiving music-on-hold. `KJS-626`
 
 ## 4.37.1 - 2022-03-08
 
