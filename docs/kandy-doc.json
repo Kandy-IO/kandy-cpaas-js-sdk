@@ -20828,6 +20828,15 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "Because it completely replaces an old track with a new one,\nthe old track's state characteristics are not carried over in the new track's state.\n(e.g. if an old track's state was 'muted' and replacement of this track has occured,\nthe new track's state will be 'unmuted', as this is its default state)"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "The progress of the operation will be tracked via the\n"
                   },
                   {
@@ -20879,35 +20888,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 17
+              "lineNumber": 22
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 18
+              "lineNumber": 23
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 19,
+              "lineNumber": 24,
               "name": "call"
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 20,
+              "lineNumber": 25,
               "name": "callMe"
             },
             {
               "title": "param",
               "description": "The ID of the call to replace the track of.",
-              "lineNumber": 21,
+              "lineNumber": 26,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -20917,7 +20926,7 @@
             {
               "title": "param",
               "description": "The ID of the track to replace.",
-              "lineNumber": 22,
+              "lineNumber": 27,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -20927,7 +20936,7 @@
             {
               "title": "param",
               "description": "The media options.",
-              "lineNumber": 23,
+              "lineNumber": 28,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20941,7 +20950,7 @@
             {
               "title": "param",
               "description": "Whether to create an audio track.",
-              "lineNumber": 24,
+              "lineNumber": 29,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20955,7 +20964,7 @@
             {
               "title": "param",
               "description": "Options for configuring the audio track.",
-              "lineNumber": 25,
+              "lineNumber": 30,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20968,7 +20977,7 @@
             {
               "title": "param",
               "description": "ID of the microphone to receive audio from.",
-              "lineNumber": 26,
+              "lineNumber": 31,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20981,7 +20990,7 @@
             {
               "title": "param",
               "description": "Whether to create a video track.",
-              "lineNumber": 27,
+              "lineNumber": 32,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20995,7 +21004,7 @@
             {
               "title": "param",
               "description": "Options for configuring the video track.",
-              "lineNumber": 28,
+              "lineNumber": 33,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21008,7 +21017,7 @@
             {
               "title": "param",
               "description": "ID of the camera to receive video from.",
-              "lineNumber": 29,
+              "lineNumber": 34,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21021,7 +21030,7 @@
             {
               "title": "param",
               "description": "The height of the video.",
-              "lineNumber": 30,
+              "lineNumber": 35,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21034,7 +21043,7 @@
             {
               "title": "param",
               "description": "The width of the video.",
-              "lineNumber": 31,
+              "lineNumber": 36,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21047,7 +21056,7 @@
             {
               "title": "param",
               "description": "The frame rate of the video.",
-              "lineNumber": 32,
+              "lineNumber": 37,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21060,12 +21069,12 @@
             {
               "title": "example",
               "description": "const callId = ...\n// Get the video track used by the call.\nconst videoTrack = ...\n\n// Replace the specified video track of the call with a new\n//    video track.\nclient.call.replaceTrack(callId, videoTrack.id, {\n  // The track should be replaced with a video track using\n  //    a specific device. This effectively changes the input\n  //    device for an ongoing call.\n  video: true,\n  videoOptions: {\n    deviceId: cameraId\n  }\n})",
-              "lineNumber": 33
+              "lineNumber": 38
             },
             {
               "title": "example",
               "description": "const callId = ...\n// Get the video track used by the call.\nconst videoTrack = ...\n\n// Can also replace the specified video track of the call with a new\n// screen sharing track because screen sharing is delivered as a video stream to remote peer.\n// User will then be prompted to pick a specific screen to share and thus the device id will be selected.\nclient.call.replaceTrack(callId, videoTrack.id, {\n  // The track should be replaced with a screen sharing track.\n  // Note that 'screenOptions' property is not mandatory, as API will use default values\n  // for properties like: width, height, frameRate.\n  screen: true\n})",
-              "lineNumber": 50
+              "lineNumber": 55
             }
           ],
           "loc": {
@@ -21074,18 +21083,18 @@
               "column": 4
             },
             "end": {
-              "line": 1202,
+              "line": 1207,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1203,
+                "line": 1208,
                 "column": 4
               },
               "end": {
-                "line": 1212,
+                "line": 1217,
                 "column": 5
               }
             },
@@ -21105,7 +21114,7 @@
             {
               "title": "param",
               "name": "callId",
-              "lineNumber": 21,
+              "lineNumber": 26,
               "description": {
                 "type": "root",
                 "children": [
@@ -21128,7 +21137,7 @@
             {
               "title": "param",
               "name": "trackId",
-              "lineNumber": 22,
+              "lineNumber": 27,
               "description": {
                 "type": "root",
                 "children": [
@@ -21151,7 +21160,7 @@
             {
               "title": "param",
               "name": "media",
-              "lineNumber": 23,
+              "lineNumber": 28,
               "description": {
                 "type": "root",
                 "children": [
@@ -21175,7 +21184,7 @@
                 {
                   "title": "param",
                   "name": "media.audio",
-                  "lineNumber": 24,
+                  "lineNumber": 29,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21199,7 +21208,7 @@
                 {
                   "title": "param",
                   "name": "media.audioOptions",
-                  "lineNumber": 25,
+                  "lineNumber": 30,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21225,7 +21234,7 @@
                     {
                       "title": "param",
                       "name": "media.audioOptions.deviceId",
-                      "lineNumber": 26,
+                      "lineNumber": 31,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21253,7 +21262,7 @@
                 {
                   "title": "param",
                   "name": "media.video",
-                  "lineNumber": 27,
+                  "lineNumber": 32,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21277,7 +21286,7 @@
                 {
                   "title": "param",
                   "name": "media.videoOptions",
-                  "lineNumber": 28,
+                  "lineNumber": 33,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21303,7 +21312,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.deviceId",
-                      "lineNumber": 29,
+                      "lineNumber": 34,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21329,7 +21338,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.height",
-                      "lineNumber": 30,
+                      "lineNumber": 35,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21355,7 +21364,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.width",
-                      "lineNumber": 31,
+                      "lineNumber": 36,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21381,7 +21390,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.frameRate",
-                      "lineNumber": 32,
+                      "lineNumber": 37,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21547,22 +21556,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1214,
+              "line": 1219,
               "column": 4
             },
             "end": {
-              "line": 1230,
+              "line": 1235,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1231,
+                "line": 1236,
                 "column": 4
               },
               "end": {
-                "line": 1241,
+                "line": 1246,
                 "column": 5
               }
             },
@@ -21727,22 +21736,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1243,
+              "line": 1248,
               "column": 4
             },
             "end": {
-              "line": 1259,
+              "line": 1264,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1260,
+                "line": 1265,
                 "column": 4
               },
               "end": {
-                "line": 1268,
+                "line": 1273,
                 "column": 5
               }
             },
@@ -22048,22 +22057,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1270,
+              "line": 1275,
               "column": 4
             },
             "end": {
-              "line": 1314,
+              "line": 1319,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1315,
+                "line": 1320,
                 "column": 4
               },
               "end": {
-                "line": 1315,
+                "line": 1320,
                 "column": 23
               }
             },
@@ -22606,22 +22615,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1317,
+              "line": 1322,
               "column": 4
             },
             "end": {
-              "line": 1396,
+              "line": 1401,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1397,
+                "line": 1402,
                 "column": 4
               },
               "end": {
-                "line": 1397,
+                "line": 1402,
                 "column": 55
               }
             },
@@ -23223,22 +23232,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1399,
+              "line": 1404,
               "column": 4
             },
             "end": {
-              "line": 1443,
+              "line": 1448,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1449,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1452,
                 "column": 5
               }
             },
@@ -23421,22 +23430,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1449,
+              "line": 1454,
               "column": 4
             },
             "end": {
-              "line": 1465,
+              "line": 1470,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1449,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1452,
                 "column": 5
               }
             },
@@ -23577,22 +23586,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1467,
+              "line": 1472,
               "column": 4
             },
             "end": {
-              "line": 1504,
+              "line": 1509,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1449,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1452,
                 "column": 5
               }
             },
@@ -23753,22 +23762,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1506,
+              "line": 1511,
               "column": 4
             },
             "end": {
-              "line": 1543,
+              "line": 1548,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1449,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1452,
                 "column": 5
               }
             },
@@ -40982,7 +40991,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Mutes the specified Tracks at their media source."
+                    "value": "Mutes the specified Tracks."
                   }
                 ]
               },
@@ -40991,7 +41000,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Prevents media from being received for the Tracks. Audio Tracks will\nbecome silent and video Tracks will be a black frame."
+                    "value": "This API prevents the media of the specified Tracks from being rendered. Audio\nTracks will become silent and video Tracks will be a black frame.\nThis does not stop media from being received by those Tracks. The media simply\ncannot be used by the application while the Track is muted."
                   }
                 ]
               },
@@ -41001,6 +41010,15 @@
                   {
                     "type": "text",
                     "value": "If a local Track being sent in a Call is muted, the Track will be\nnoticeably muted for the remote user. If a remote Track received in a\ncall is muted, the result will only be noticeable locally."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This mute operation acts on those specified Tracks directly.\nIt does not act on the active Call as a whole."
                   }
                 ]
               },
@@ -41035,29 +41053,29 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 12,
+              "lineNumber": 17,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 13
+              "lineNumber": 18
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 14
+              "lineNumber": 19
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 15,
+              "lineNumber": 20,
               "name": "muteTracks"
             },
             {
               "title": "param",
               "description": "List of Track IDs.",
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -41080,18 +41098,18 @@
               "column": 4
             },
             "end": {
-              "line": 191,
+              "line": 196,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 192,
+                "line": 197,
                 "column": 4
               },
               "end": {
-                "line": 195,
+                "line": 200,
                 "column": 5
               }
             },
@@ -41104,7 +41122,7 @@
             {
               "title": "param",
               "name": "trackIds",
-              "lineNumber": 16,
+              "lineNumber": 21,
               "description": {
                 "type": "root",
                 "children": [
@@ -41183,7 +41201,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Media will resume as normal for the Tracks."
+                    "value": "Media will resume its normal rendering for the Tracks.\nLike the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.\nTherefore it does not act on active Call as a whole."
                   }
                 ]
               },
@@ -41218,29 +41236,29 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 7,
+              "lineNumber": 9,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 8
+              "lineNumber": 10
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 9
+              "lineNumber": 11
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 10,
+              "lineNumber": 12,
               "name": "unmuteTracks"
             },
             {
               "title": "param",
               "description": "List of Track IDs.",
-              "lineNumber": 11,
+              "lineNumber": 13,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -41259,22 +41277,22 @@
           ],
           "loc": {
             "start": {
-              "line": 197,
+              "line": 202,
               "column": 4
             },
             "end": {
-              "line": 209,
+              "line": 216,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 210,
+                "line": 217,
                 "column": 4
               },
               "end": {
-                "line": 213,
+                "line": 220,
                 "column": 5
               }
             },
@@ -41287,7 +41305,7 @@
             {
               "title": "param",
               "name": "trackIds",
-              "lineNumber": 11,
+              "lineNumber": 13,
               "description": {
                 "type": "root",
                 "children": [

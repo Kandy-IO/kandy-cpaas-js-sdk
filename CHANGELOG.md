@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.39.0 - beta
+
+### Fixed
+
+- Fixed documentation for `call.replaceTrack`, `media.muteTracks` & `media.unmuteTracks` APIs to better document the interactions they have on calls and tracks. `KJS-594`
+
 ## 4.38.0 - 2022-03-25
 
 ### Fixed

@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.38.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.39.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.38.0</code></div>
+          <div class='mb1'><code>4.39.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -7988,6 +7988,10 @@ client.call.getStats(callId)</pre>
 <p>The operation will remove the old track from the call and add a
 new track to the call. This effectively allows for changing the
 track constraints (eg. device used) for an ongoing call.</p>
+<p>Because it completely replaces an old track with a new one,
+the old track's state characteristics are not carried over in the new track's state.
+(e.g. if an old track's state was 'muted' and replacement of this track has occured,
+the new track's state will be 'unmuted', as this is its default state)</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
@@ -17033,12 +17037,16 @@ escaped.
 
   
 
-  <p>Mutes the specified Tracks at their media source.</p>
-<p>Prevents media from being received for the Tracks. Audio Tracks will
-become silent and video Tracks will be a black frame.</p>
+  <p>Mutes the specified Tracks.</p>
+<p>This API prevents the media of the specified Tracks from being rendered. Audio
+Tracks will become silent and video Tracks will be a black frame.
+This does not stop media from being received by those Tracks. The media simply
+cannot be used by the application while the Track is muted.</p>
 <p>If a local Track being sent in a Call is muted, the Track will be
 noticeably muted for the remote user. If a remote Track received in a
 call is muted, the result will only be noticeable locally.</p>
+<p>This mute operation acts on those specified Tracks directly.
+It does not act on the active Call as a whole.</p>
 <p>The SDK will emit a <a href="#mediaeventmediamuted">media:muted</a> event
 when a Track has been muted.</p>
 
@@ -17101,7 +17109,9 @@ when a Track has been muted.</p>
   
 
   <p>Unmutes the specified Tracks.</p>
-<p>Media will resume as normal for the Tracks.</p>
+<p>Media will resume its normal rendering for the Tracks.
+Like the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.
+Therefore it does not act on active Call as a whole.</p>
 <p>The SDK will emit a <a href="#mediaeventmediaunmuted">media:unmuted</a> event
 when a Track has been unmuted.</p>
 

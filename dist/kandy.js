@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.38.0-beta.858
+ * Version: 4.39.0-beta.859
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7365,7 +7365,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.38.0-beta.858';
+  return '4.39.0-beta.859';
 }
 
 /***/ }),
@@ -30327,14 +30327,19 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Mutes the specified Tracks at their media source.
+     * Mutes the specified Tracks.
      *
-     * Prevents media from being received for the Tracks. Audio Tracks will
-     *    become silent and video Tracks will be a black frame.
+     * This API prevents the media of the specified Tracks from being rendered. Audio
+     *     Tracks will become silent and video Tracks will be a black frame.
+     * This does not stop media from being received by those Tracks. The media simply
+     *     cannot be used by the application while the Track is muted.
      *
      * If a local Track being sent in a Call is muted, the Track will be
      *    noticeably muted for the remote user. If a remote Track received in a
      *    call is muted, the result will only be noticeable locally.
+     *
+     * This mute operation acts on those specified Tracks directly.
+     * It does not act on the active Call as a whole.
      *
      * The SDK will emit a {@link media.event:media:muted media:muted} event
      *    when a Track has been muted.
@@ -30352,7 +30357,9 @@ function mediaAPI({ dispatch, getState }) {
     /**
      * Unmutes the specified Tracks.
      *
-     * Media will resume as normal for the Tracks.
+     * Media will resume its normal rendering for the Tracks.
+     * Like the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.
+     * Therefore it does not act on active Call as a whole.
      *
      * The SDK will emit a {@link media.event:media:unmuted media:unmuted} event
      *    when a Track has been unmuted.
@@ -41702,6 +41709,11 @@ function callAPI({ dispatch, getState }) {
      * The operation will remove the old track from the call and add a
      *    new track to the call. This effectively allows for changing the
      *    track constraints (eg. device used) for an ongoing call.
+     *
+     * Because it completely replaces an old track with a new one,
+     * the old track's state characteristics are not carried over in the new track's state.
+     * (e.g. if an old track's state was 'muted' and replacement of this track has occured,
+     * the new track's state will be 'unmuted', as this is its default state)
      *
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event.
