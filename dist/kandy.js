@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.39.0-beta.859
+ * Version: 4.39.0-beta.860
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7365,7 +7365,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.39.0-beta.859';
+  return '4.39.0-beta.860';
 }
 
 /***/ }),
@@ -24984,125 +24984,66 @@ module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
+var Rule = function Rule(name, fn, args, modifiers) {
+  this.name = name;
+  this.fn = fn;
+  this.args = args;
+  this.modifiers = modifiers;
+};
+
+Rule.prototype._test = function _test (value) {
+  var fn = this.fn;
+
+  try {
+    testAux(this.modifiers.slice(), fn)(value);
+  } catch (ex) {
+    fn = function () { return false; };
+  }
+
+  try {
+    return testAux(this.modifiers.slice(), fn)(value);
+  } catch (ex$1) {
+    return false;
   }
 };
 
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+Rule.prototype._check = function _check (value) {
+  try {
+    testAux(this.modifiers.slice(), this.fn)(value);
+  } catch (ex) {
+    if (testAux(this.modifiers.slice(), function (it) { return it; })(false)) {
+      return;
     }
   }
 
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  if (!testAux(this.modifiers.slice(), this.fn)(value)) {
+    throw null;
   }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
 
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
+Rule.prototype._testAsync = function _testAsync (value) {
+    var this$1 = this;
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var Rule = function () {
-  function Rule(name, fn, args, modifiers) {
-    classCallCheck(this, Rule);
-
-    this.name = name;
-    this.fn = fn;
-    this.args = args;
-    this.modifiers = modifiers;
-  }
-
-  createClass(Rule, [{
-    key: "_test",
-    value: function _test(value) {
-      var fn = this.fn;
-
-      try {
-        testAux(this.modifiers.slice(), fn)(value);
-      } catch (ex) {
-        fn = function fn() {
-          return false;
-        };
-      }
-
-      try {
-        return testAux(this.modifiers.slice(), fn)(value);
-      } catch (ex) {
-        return false;
-      }
-    }
-  }, {
-    key: "_check",
-    value: function _check(value) {
-      try {
-        testAux(this.modifiers.slice(), this.fn)(value);
-      } catch (ex) {
-        if (testAux(this.modifiers.slice(), function (it) {
-          return it;
-        })(false)) {
-          return;
+  return new Promise(function (resolve, reject) {
+    testAsyncAux(
+      this$1.modifiers.slice(),
+      this$1.fn
+    )(value)
+      .then(function (valid) {
+        if (valid) {
+          resolve(value);
+        } else {
+          reject(null);
         }
-      }
+      })
+      .catch(function (ex) { return reject(ex); });
+  });
+};
 
-      if (!testAux(this.modifiers.slice(), this.fn)(value)) {
-        throw null;
-      }
-    }
-  }, {
-    key: "_testAsync",
-    value: function _testAsync(value) {
-      var _this = this;
+function pickFn(fn, variant) {
+  if ( variant === void 0 ) variant = 'simple';
 
-      return new Promise(function (resolve, reject) {
-        testAsyncAux(_this.modifiers.slice(), _this.fn)(value).then(function (valid) {
-          if (valid) {
-            resolve(value);
-          } else {
-            reject(null);
-          }
-        }).catch(function (ex) {
-          return reject(ex);
-        });
-      });
-    }
-  }]);
-  return Rule;
-}();
-
-function pickFn(fn) {
-  var variant = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "simple";
-
-  return typeof fn === "object" ? fn[variant] : fn;
+  return typeof fn === 'object' ? fn[variant] : fn;
 }
 
 function testAux(modifiers, fn) {
@@ -25121,150 +25062,136 @@ function testAsyncAux(modifiers, fn) {
     var nextFn = testAsyncAux(modifiers, fn);
     return modifier.performAsync(nextFn);
   } else {
-    return function (value) {
-      return Promise.resolve(pickFn(fn, "async")(value));
-    };
+    return function (value) { return Promise.resolve(pickFn(fn, 'async')(value)); };
   }
 }
 
 var Modifier = function Modifier(name, perform, performAsync) {
-  classCallCheck(this, Modifier);
-
   this.name = name;
   this.perform = perform;
   this.performAsync = performAsync;
 };
 
-var ValidationError = function (_Error) {
-  inherits(ValidationError, _Error);
-
+var ValidationError = /*@__PURE__*/(function (Error) {
   function ValidationError(rule, value, cause, target) {
-    classCallCheck(this, ValidationError);
+    var remaining = [], len = arguments.length - 4;
+    while ( len-- > 0 ) remaining[ len ] = arguments[ len + 4 ];
 
-    for (var _len = arguments.length, remaining = Array(_len > 4 ? _len - 4 : 0), _key = 4; _key < _len; _key++) {
-      remaining[_key - 4] = arguments[_key];
-    }
-
-    var _this = possibleConstructorReturn(this, (ValidationError.__proto__ || Object.getPrototypeOf(ValidationError)).call(this, remaining));
-
+    Error.call(this, remaining);
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(_this, ValidationError);
+      Error.captureStackTrace(this, ValidationError);
     }
-    _this.rule = rule;
-    _this.value = value;
-    _this.cause = cause;
-    _this.target = target;
-    return _this;
+    this.rule = rule;
+    this.value = value;
+    this.cause = cause;
+    this.target = target;
   }
+
+  if ( Error ) ValidationError.__proto__ = Error;
+  ValidationError.prototype = Object.create( Error && Error.prototype );
+  ValidationError.prototype.constructor = ValidationError;
 
   return ValidationError;
-}(Error);
+}(Error));
 
-var Context = function () {
-  function Context() {
-    var chain = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var nextRuleModifiers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    classCallCheck(this, Context);
+var Context = function Context(chain, nextRuleModifiers) {
+  if ( chain === void 0 ) chain = [];
+  if ( nextRuleModifiers === void 0 ) nextRuleModifiers = [];
 
-    this.chain = chain;
-    this.nextRuleModifiers = nextRuleModifiers;
-  }
+  this.chain = chain;
+  this.nextRuleModifiers = nextRuleModifiers;
+};
 
-  createClass(Context, [{
-    key: "_applyRule",
-    value: function _applyRule(ruleFn, name) {
-      var _this = this;
+Context.prototype._applyRule = function _applyRule (ruleFn, name) {
+    var this$1 = this;
 
-      return function () {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
+  return function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-        _this.chain.push(new Rule(name, ruleFn.apply(_this, args), args, _this.nextRuleModifiers));
-        _this.nextRuleModifiers = [];
-        return _this;
-      };
-    }
-  }, {
-    key: "_applyModifier",
-    value: function _applyModifier(modifier, name) {
-      this.nextRuleModifiers.push(new Modifier(name, modifier.simple, modifier.async));
-      return this;
-    }
-  }, {
-    key: "_clone",
-    value: function _clone() {
-      return new Context(this.chain.slice(), this.nextRuleModifiers.slice());
-    }
-  }, {
-    key: "test",
-    value: function test(value) {
-      return this.chain.every(function (rule) {
-        return rule._test(value);
-      });
-    }
-  }, {
-    key: "testAll",
-    value: function testAll(value) {
-      var err = [];
-      this.chain.forEach(function (rule) {
-        try {
-          rule._check(value);
-        } catch (ex) {
-          err.push(new ValidationError(rule, value, ex));
-        }
-      });
-      return err;
-    }
-  }, {
-    key: "check",
-    value: function check(value) {
-      this.chain.forEach(function (rule) {
-        try {
-          rule._check(value);
-        } catch (ex) {
-          throw new ValidationError(rule, value, ex);
-        }
-      });
-    }
-  }, {
-    key: "testAsync",
-    value: function testAsync(value) {
-      var _this2 = this;
+    this$1.chain.push(
+      new Rule(name, ruleFn.apply(this$1, args), args, this$1.nextRuleModifiers)
+    );
+    this$1.nextRuleModifiers = [];
+    return this$1;
+  };
+};
 
-      return new Promise(function (resolve, reject) {
-        executeAsyncRules(value, _this2.chain.slice(), resolve, reject);
-      });
+Context.prototype._applyModifier = function _applyModifier (modifier, name) {
+  this.nextRuleModifiers.push(
+    new Modifier(name, modifier.simple, modifier.async)
+  );
+  return this;
+};
+
+Context.prototype._clone = function _clone () {
+  return new Context(this.chain.slice(), this.nextRuleModifiers.slice());
+};
+
+Context.prototype.test = function test (value) {
+  return this.chain.every(function (rule) { return rule._test(value); });
+};
+
+Context.prototype.testAll = function testAll (value) {
+  var err = [];
+  this.chain.forEach(function (rule) {
+    try {
+      rule._check(value);
+    } catch (ex) {
+      err.push(new ValidationError(rule, value, ex));
     }
-  }]);
-  return Context;
-}();
+  });
+  return err;
+};
+
+Context.prototype.check = function check (value) {
+  this.chain.forEach(function (rule) {
+    try {
+      rule._check(value);
+    } catch (ex) {
+      throw new ValidationError(rule, value, ex);
+    }
+  });
+};
+
+Context.prototype.testAsync = function testAsync (value) {
+    var this$1 = this;
+
+  return new Promise(function (resolve, reject) {
+    executeAsyncRules(value, this$1.chain.slice(), resolve, reject);
+  });
+};
 
 function executeAsyncRules(value, rules, resolve, reject) {
   if (rules.length) {
     var rule = rules.shift();
-    rule._testAsync(value).then(function () {
-      executeAsyncRules(value, rules, resolve, reject);
-    }, function (cause) {
-      reject(new ValidationError(rule, value, cause));
-    });
+    rule._testAsync(value).then(
+      function () {
+        executeAsyncRules(value, rules, resolve, reject);
+      },
+      function (cause) {
+        reject(new ValidationError(rule, value, cause));
+      }
+    );
   } else {
     resolve(value);
   }
 }
 
 function v8n() {
-  return proxyContext(new Context());
+  return typeof Proxy !== undefined
+    ? proxyContext(new Context())
+    : proxylessContext(new Context());
 }
 
 // Custom rules
 var customRules = {};
 
-v8n.extend = function (newRules) {
+v8n.extend = function(newRules) {
   Object.assign(customRules, newRules);
 };
 
-v8n.clearCustomRules = function () {
+v8n.clearCustomRules = function() {
   customRules = {};
 };
 
@@ -25286,76 +25213,86 @@ function proxyContext(context) {
       if (prop in availableRules) {
         return newContext._applyRule(availableRules[prop], prop);
       }
-    }
+    },
   });
+}
+
+function proxylessContext(context) {
+  var addRuleSet = function (ruleSet, targetContext) {
+    Object.keys(ruleSet).forEach(function (prop) {
+      targetContext[prop] = function () {
+        var args = [], len = arguments.length;
+        while ( len-- ) args[ len ] = arguments[ len ];
+
+        var newContext = proxylessContext(targetContext._clone());
+        var contextWithRuleApplied = newContext._applyRule(
+          ruleSet[prop],
+          prop
+        ).apply(void 0, args);
+        return contextWithRuleApplied;
+      };
+    });
+    return targetContext;
+  };
+
+  var contextWithAvailableRules = addRuleSet(availableRules, context);
+  var contextWithAllRules = addRuleSet(
+    customRules,
+    contextWithAvailableRules
+  );
+
+  Object.keys(availableModifiers).forEach(function (prop) {
+    Object.defineProperty(contextWithAllRules, prop, {
+      get: function () {
+        var newContext = proxylessContext(contextWithAllRules._clone());
+        return newContext._applyModifier(availableModifiers[prop], prop);
+      }
+    });
+  });
+
+  return contextWithAllRules;
 }
 
 var availableModifiers = {
   not: {
-    simple: function simple(fn) {
-      return function (value) {
-        return !fn(value);
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.resolve(fn(value)).then(function (result) {
-          return !result;
-        }).catch(function (e) {
-          return true;
-        });
-      };
-    }
+    simple: function (fn) { return function (value) { return !fn(value); }; },
+    async: function (fn) { return function (value) { return Promise.resolve(fn(value))
+        .then(function (result) { return !result; })
+        .catch(function () { return true; }); }; },
   },
 
   some: {
-    simple: function simple(fn) {
-      return function (value) {
-        return split(value).some(function (item) {
+    simple: function (fn) { return function (value) {
+      return split(value).some(function (item) {
+        try {
+          return fn(item);
+        } catch (ex) {
+          return false;
+        }
+      });
+    }; },
+    async: function (fn) { return function (value) {
+      return Promise.all(
+        split(value).map(function (item) {
           try {
-            return fn(item);
+            return fn(item).catch(function () { return false; });
           } catch (ex) {
             return false;
           }
-        });
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.all(split(value).map(function (item) {
-          try {
-            return fn(item).catch(function (e) {
-              return false;
-            });
-          } catch (ex) {
-            return false;
-          }
-        })).then(function (result) {
-          return result.some(Boolean);
-        });
-      };
-    }
+        })
+      ).then(function (result) { return result.some(Boolean); });
+    }; },
   },
 
   every: {
-    simple: function simple(fn) {
-      return function (value) {
-        return split(value).every(fn);
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.all(split(value).map(fn)).then(function (result) {
-          return result.every(Boolean);
-        });
-      };
-    }
-  }
+    simple: function (fn) { return function (value) { return value !== false && split(value).every(fn); }; },
+    async: function (fn) { return function (value) { return Promise.all(split(value).map(fn)).then(function (result) { return result.every(Boolean); }); }; },
+  },
 };
 
 function split(value) {
-  if (typeof value === "string") {
-    return value.split("");
+  if (typeof value === 'string') {
+    return value.split('');
   }
   return value;
 }
@@ -25363,260 +25300,141 @@ function split(value) {
 var availableRules = {
   // Value
 
-  equal: function equal(expected) {
-    return function (value) {
-      return value == expected;
-    };
-  },
+  equal: function (expected) { return function (value) { return value == expected; }; },
 
-  exact: function exact(expected) {
-    return function (value) {
-      return value === expected;
-    };
-  },
+  exact: function (expected) { return function (value) { return value === expected; }; },
 
   // Types
 
-  number: function number() {
-    var allowInfinite = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    return function (value) {
-      return typeof value === "number" && (allowInfinite || isFinite(value));
-    };
-  },
+  number: function (allowInfinite) {
+    if ( allowInfinite === void 0 ) allowInfinite = true;
 
-  integer: function integer() {
-    return function (value) {
-      var isInteger = Number.isInteger || isIntegerPolyfill;
-      return isInteger(value);
-    };
-  },
+    return function (value) { return typeof value === 'number' && (allowInfinite || isFinite(value)); };
+},
 
-  numeric: function numeric() {
-    return function (value) {
-      return !isNaN(parseFloat(value)) && isFinite(value);
-    };
-  },
+  integer: function () { return function (value) {
+    var isInteger = Number.isInteger || isIntegerPolyfill;
+    return isInteger(value);
+  }; },
 
-  string: function string() {
-    return testType("string");
-  },
+  numeric: function () { return function (value) { return !isNaN(parseFloat(value)) && isFinite(value); }; },
 
-  boolean: function boolean() {
-    return testType("boolean");
-  },
+  string: function () { return testType('string'); },
 
-  undefined: function undefined() {
-    return testType("undefined");
-  },
+  boolean: function () { return testType('boolean'); },
 
-  null: function _null() {
-    return testType("null");
-  },
+  undefined: function () { return testType('undefined'); },
 
-  array: function array() {
-    return testType("array");
-  },
+  null: function () { return testType('null'); },
 
-  object: function object() {
-    return testType("object");
-  },
+  array: function () { return testType('array'); },
 
-  instanceOf: function instanceOf(instance) {
-    return function (value) {
-      return value instanceof instance;
-    };
-  },
+  object: function () { return testType('object'); },
+
+  instanceOf: function (instance) { return function (value) { return value instanceof instance; }; },
 
   // Pattern
 
-  pattern: function pattern(expected) {
-    return function (value) {
-      return expected.test(value);
-    };
-  },
+  pattern: function (expected) { return function (value) { return expected.test(value); }; },
 
-  lowercase: function lowercase() {
-    return function (value) {
-      return (/^([a-z]+\s*)+$/.test(value)
-      );
-    };
-  },
+  lowercase: function () { return function (value) { return /^([a-z]+\s*)+$/.test(value); }; },
 
-  uppercase: function uppercase() {
-    return function (value) {
-      return (/^([A-Z]+\s*)+$/.test(value)
-      );
-    };
-  },
+  uppercase: function () { return function (value) { return /^([A-Z]+\s*)+$/.test(value); }; },
 
-  vowel: function vowel() {
-    return function (value) {
-      return (/^[aeiou]+$/i.test(value)
-      );
-    };
-  },
+  vowel: function () { return function (value) { return /^[aeiou]+$/i.test(value); }; },
 
-  consonant: function consonant() {
-    return function (value) {
-      return (/^(?=[^aeiou])([a-z]+)$/i.test(value)
-      );
-    };
-  },
+  consonant: function () { return function (value) { return /^(?=[^aeiou])([a-z]+)$/i.test(value); }; },
 
   // Value at
 
-  first: function first(expected) {
-    return function (value) {
-      return value[0] == expected;
-    };
-  },
+  first: function (expected) { return function (value) { return value[0] == expected; }; },
 
-  last: function last(expected) {
-    return function (value) {
-      return value[value.length - 1] == expected;
-    };
-  },
+  last: function (expected) { return function (value) { return value[value.length - 1] == expected; }; },
 
   // Length
 
-  empty: function empty() {
-    return function (value) {
-      return value.length === 0;
-    };
-  },
+  empty: function () { return function (value) { return value.length === 0; }; },
 
-  length: function length(min, max) {
-    return function (value) {
-      return value.length >= min && value.length <= (max || min);
-    };
-  },
+  length: function (min, max) { return function (value) { return value.length >= min && value.length <= (max || min); }; },
 
-  minLength: function minLength(min) {
-    return function (value) {
-      return value.length >= min;
-    };
-  },
+  minLength: function (min) { return function (value) { return value.length >= min; }; },
 
-  maxLength: function maxLength(max) {
-    return function (value) {
-      return value.length <= max;
-    };
-  },
+  maxLength: function (max) { return function (value) { return value.length <= max; }; },
 
   // Range
 
-  negative: function negative() {
-    return function (value) {
-      return value < 0;
-    };
-  },
+  negative: function () { return function (value) { return value < 0; }; },
 
-  positive: function positive() {
-    return function (value) {
-      return value >= 0;
-    };
-  },
+  positive: function () { return function (value) { return value >= 0; }; },
 
-  between: function between(a, b) {
-    return function (value) {
-      return value >= a && value <= b;
-    };
-  },
+  between: function (a, b) { return function (value) { return value >= a && value <= b; }; },
 
-  range: function range(a, b) {
-    return function (value) {
-      return value >= a && value <= b;
-    };
-  },
+  range: function (a, b) { return function (value) { return value >= a && value <= b; }; },
 
-  lessThan: function lessThan(n) {
-    return function (value) {
-      return value < n;
-    };
-  },
+  lessThan: function (n) { return function (value) { return value < n; }; },
 
-  lessThanOrEqual: function lessThanOrEqual(n) {
-    return function (value) {
-      return value <= n;
-    };
-  },
+  lessThanOrEqual: function (n) { return function (value) { return value <= n; }; },
 
-  greaterThan: function greaterThan(n) {
-    return function (value) {
-      return value > n;
-    };
-  },
+  greaterThan: function (n) { return function (value) { return value > n; }; },
 
-  greaterThanOrEqual: function greaterThanOrEqual(n) {
-    return function (value) {
-      return value >= n;
-    };
-  },
+  greaterThanOrEqual: function (n) { return function (value) { return value >= n; }; },
 
   // Divisible
 
-  even: function even() {
-    return function (value) {
-      return value % 2 === 0;
-    };
-  },
+  even: function () { return function (value) { return value % 2 === 0; }; },
 
-  odd: function odd() {
-    return function (value) {
-      return value % 2 !== 0;
-    };
-  },
+  odd: function () { return function (value) { return value % 2 !== 0; }; },
 
-  includes: function includes(expected) {
-    return function (value) {
-      return ~value.indexOf(expected);
-    };
-  },
+  includes: function (expected) { return function (value) { return ~value.indexOf(expected); }; },
 
-  schema: function schema(_schema) {
-    return testSchema(_schema);
-  },
+  schema: function (schema) { return testSchema(schema); },
 
   // branching
 
-  passesAnyOf: function passesAnyOf() {
-    for (var _len = arguments.length, validations = Array(_len), _key = 0; _key < _len; _key++) {
-      validations[_key] = arguments[_key];
+  passesAnyOf: function () {
+    var validations = [], len = arguments.length;
+    while ( len-- ) validations[ len ] = arguments[ len ];
+
+    return function (value) { return validations.some(function (validation) { return validation.test(value); }); };
+},
+
+  optional: function (validation, considerTrimmedEmptyString) {
+    if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
+
+    return function (value) {
+    if (
+      considerTrimmedEmptyString &&
+      typeof value === 'string' &&
+      value.trim() === ''
+    ) {
+      return true;
     }
 
-    return function (value) {
-      return validations.some(function (validation) {
-        return validation.test(value);
-      });
-    };
-  },
-
-  optional: function optional(validation) {
-    var considerTrimmedEmptyString = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    return function (value) {
-      if (considerTrimmedEmptyString && typeof value === "string" && value.trim() === "") {
-        return true;
-      }
-
-      if (value !== undefined && value !== null) validation.check(value);
-      return true;
-    };
-  }
+    if (value !== undefined && value !== null) { validation.check(value); }
+    return true;
+  };
+},
 };
 
 function testType(expected) {
   return function (value) {
-    return Array.isArray(value) && expected === "array" || value === null && expected === "null" || typeof value === expected;
+    return (
+      (Array.isArray(value) && expected === 'array') ||
+      (value === null && expected === 'null') ||
+      typeof value === expected
+    );
   };
 }
 
 function isIntegerPolyfill(value) {
-  return typeof value === "number" && isFinite(value) && Math.floor(value) === value;
+  return (
+    typeof value === 'number' && isFinite(value) && Math.floor(value) === value
+  );
 }
 
 function testSchema(schema) {
   return {
-    simple: function simple(value) {
+    simple: function (value) {
       var causes = [];
       Object.keys(schema).forEach(function (key) {
         var nestedValidation = schema[key];
@@ -25632,7 +25450,7 @@ function testSchema(schema) {
       }
       return true;
     },
-    async: function async(value) {
+    async: function (value) {
       var causes = [];
       var nested = Object.keys(schema).map(function (key) {
         var nestedValidation = schema[key];
@@ -25641,14 +25459,14 @@ function testSchema(schema) {
           causes.push(ex);
         });
       });
-      return Promise.all(nested).then(function (values) {
+      return Promise.all(nested).then(function () {
         if (causes.length > 0) {
           throw causes;
         }
 
         return true;
       });
-    }
+    },
   };
 }
 
