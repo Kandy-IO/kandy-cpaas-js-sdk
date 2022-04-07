@@ -575,7 +575,7 @@ Type: [Object][7]
 
 ### IceCollectionInfo
 
-This object is provided to the [IceCollectionCheckFunction][35], and contains the
+This object is provided to the [IceCollectionCheckFunction][18], and contains the
 necessary information about the call (i.e., call ID, current call operation), and information about the ongoing ICE collection,
 such as the list of all ICE candidates collected so far and the ICE gathering state.
 
@@ -588,11 +588,11 @@ Type: [Object][7]
 *   `reason` **[string][8]** The reason the check function was called. Three possible values:
     'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.
     'IceGatheringStateChanged' - The ICE gathering state changed.
-    'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by `IceCollectionCheckFunction`)
+    'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by [IceCollectionCheckFunction][18].)
 *   `iceCandidates` **[Array][19]\<RTCIceCandidate>** An array of all ICE candidates collected so far.
 *   `iceCollectionDuration` **[number][12]** The time elapsed since the start of the ICE collection process.
 *   `iceGatheringState` **[string][8]** The current ICE gathering state.
-    See [RTCPeerConnection.iceGatheringState][36]
+    See [RTCPeerConnection.iceGatheringState][35].
 *   `rtcPeerConnectionConfig` **[Object][7]** The current configration for the RTCPeerConnection.
 *   `rtcLocalSessionDescription` **[string][8]** The current local session description set on the peer.
 
@@ -604,7 +604,7 @@ This function is provided the necessary details of the current WebRTC session an
 ([IceCollectionInfo][16]), which it can use to dictate how to proceed with a call.
 The function can be invoked for three different reasons:
 a new ICE candidate was collected, the ICE gathering state changed, or a scheduled call based on the `wait` time set after
-an initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason).
+an initial invocation of the function.
 
 The function must then return an appropriate result object in the format of [IceCollectionCheckResult][17]
 which will dictate how the call will proceed. An incorrect return object, or result `type`, will cause the call to end with an error.
@@ -612,7 +612,9 @@ which will dictate how the call will proceed. An incorrect return object, or res
 \[Default]
 The default IceCollectionCheckFunction uses the following algorithm to determine if the call can proceed to negotiation:
 
-1.  If the `iceGatheringState` is "complete" at any stage, then proceed with the negotiation.
+1.  If the `iceGatheringState` is "complete" at any stage, then:
+    *   Proceed with the negotiation if any ICE candidates are collected.
+    *   Or, end the call if there are no ICE candidates collected.
 2.  Otherwise, if before the ideal ICE collection timeout:
     *   If every media has a relay ICE candidate for every configured TURN server, proceed with negotiation.
     *   Else, wait until the ideal timeout, or when invoked for another reason.
@@ -630,7 +632,13 @@ Type: [Function][15]
 
 #### Parameters
 
-*   `iceCollectionInfo` **[call.IceCollectionInfo][37]** Information about the current status of the ICE candidate collection.
+*   `iceCollectionInfo` **[call.IceCollectionInfo][36]** Information about the current status of the ICE candidate collection.
+*   `iceTimeouts` **[Object][7]** Configurations provided to the SDK for ICE collection timeout boundaries.
+
+    *   `iceTimeouts.iceCollectionIdealTimeout` **[number][12]** The amount of time to wait for ideal candidates, in
+        milliseconds.  See [config.call][37] for more information.
+    *   `iceTimeouts.iceCollectionMaxTimeout` **[number][12]** The maximum amount of time to wait for ICE collection,
+        in milliseconds. See [config.call][37] for more information.
 
 #### Examples
 
@@ -641,7 +649,7 @@ function isRelayCandidate (candidate) {
   return candidate.type === 'relay'
 }
 
-function myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {
+function myIceCollectionCheck ({ iceGatheringState, iceCandidates }, iceTimeouts) {
   if (iceGatheringState === 'complete') {
     if (iceCandidates.some(isRelayCandidate)) {
       return { type: 'StartCall' }
@@ -3442,9 +3450,9 @@ These handlers are used to customize low-level call behaviour for very specific
 environments and/or scenarios.
 
 Note that SDP handlers are exposed on the entry point of the SDK. They can be added during
-initialization of the SDK using the [config.call.sdpHandlers][140] configuration
+initialization of the SDK using the [config.call.sdpHandlers][37] configuration
 parameter. They can also be set after the SDK's creation by using the
-[call.setSdpHandlers][141] function.
+[call.setSdpHandlers][140] function.
 
 ### Examples
 
@@ -3529,8 +3537,8 @@ fully functional.
 
 The services an application can subscribe to are based on the features
 included in the SDK. The list of available services can be retrieved
-using the [services.getSubscriptions][142] API. These values can be used
-with the [services.subscribe][143] API.
+using the [services.getSubscriptions][141] API. These values can be used
+with the [services.subscribe][142] API.
 
 The channel used for subscriptions is the method for receiving the service
 updates. The recommended channel is `websocket`, where the SDK is able to
@@ -3541,7 +3549,7 @@ websocket cannot be used, will be available in the future.
 
 The ServiceDescriptor type defines the format for specifying how to subscribe for a certain service.
 This is the service configuration object that needs to be passed (as part of an array of configuration objects) when calling
-the [services.subscribe][143] function.
+the [services.subscribe][142] function.
 Only some plugins (`call`, `messaging` and `presence`) support such configuration object that needs to be passed
 to the subscribe function.
 
@@ -3568,7 +3576,7 @@ client.services.subscribe([
 ### SmsInboundServiceParams
 
 The SmsInboundServiceParams type defines the additional information when subscribing to SMS inbound service.
-This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][144] property.
+This is the configuration object that needs to be passed as the value for the [ServiceDescriptor.params][143] property.
 
 Type: [Object][7]
 
@@ -3591,7 +3599,7 @@ client.services.subscribe([
 Subscribes to platform notifications for an SDK service.
 
 Subscriptions can only be made for services available to the SDK. See
-[services.getSubscriptions][142] for information about services.
+[services.getSubscriptions][141] for information about services.
 
 Extra configurations can be provided for a subscription as part of its
 "service configurations" object (see the `services` parameter). This
@@ -3604,7 +3612,7 @@ type.
 
 #### Parameters
 
-*   `services` **[Array][19]<([string][8] | [services.ServiceDescriptor][145])>** A list of service configurations.
+*   `services` **[Array][19]<([string][8] | [services.ServiceDescriptor][144])>** A list of service configurations.
 *   `options` **[Object][7]?** The options object for non-credential options.
 
     *   `options.type` **[string][8]** The method of how to receive service updates. (optional, default `'websocket'`)
@@ -3627,7 +3635,7 @@ client.services.subscribe(services)
 Cancels existing subscriptions for platform notifications.
 
 Existing subscriptions can be retrieved using the
-[services.getSubscriptions][142] API. The `subscribed` values are the
+[services.getSubscriptions][141] API. The `subscribed` values are the
 services that can be unsubscribed from.
 
 #### Parameters
@@ -3655,7 +3663,7 @@ requires a subscription to its service in order to be fully functional.
 
 The `subscribed` values are the SDK's services that the application has
 an active subscription for. Services are subscribed to using the
-[services.subscribe][143] API.
+[services.subscribe][142] API.
 
 #### Examples
 
@@ -3679,7 +3687,7 @@ Returns **[Object][7]** Lists of subscribed and available services.
 Subscription information has changed.
 
 The updated subscription information can be retrieved using the
-[services.getSubscriptions][142] API.
+[services.getSubscriptions][141] API.
 
 #### Parameters
 
@@ -3696,7 +3704,7 @@ The updated subscription information can be retrieved using the
 An error occurred during a subscription operation.
 
 The subscription information can be retrieved using the
-[services.getSubscriptions][142] API.
+[services.getSubscriptions][141] API.
 
 #### Parameters
 
@@ -3743,12 +3751,12 @@ Type: [Object][7]
 
 Fetches information about a User.
 
-The SDK will emit a [users:change][146]
+The SDK will emit a [users:change][145]
 event after the operation completes. The User's information will then
 be available.
 
 Information about an available User can be retrieved using the
-[user.get][147] API.
+[user.get][146] API.
 
 #### Parameters
 
@@ -3757,45 +3765,45 @@ Information about an available User can be retrieved using the
 ### fetchSelfInfo
 
 Fetches information about the current User from directory.
-This API is simply a shortcut for the [user.fetch(getUserInfo().identity)][148] API.
+This API is simply a shortcut for the [user.fetch(getUserInfo().identity)][147] API.
 
-The SDK will emit a [users:change][146]
+The SDK will emit a [users:change][145]
 event after the operation completes. The User's information will then
 be available.
 
 Information about an available User can be retrieved using the
-[user.get][147] API.
+[user.get][146] API.
 
 ### get
 
 Retrieves information about a User, if available.
 
-See the [user.fetch][148] and [user.search][149] APIs for details about
+See the [user.fetch][147] and [user.search][148] APIs for details about
 making Users' information available.
 
 #### Parameters
 
 *   `userId` **[user.UserID][27]** The User ID of the user.
 
-Returns **[user.User][150]** The User object for the specified user.
+Returns **[user.User][149]** The User object for the specified user.
 
 ### getAll
 
 Retrieves information about all available Users.
 
-See the [user.fetch][148] and [user.search][149] APIs for details about
+See the [user.fetch][147] and [user.search][148] APIs for details about
 making Users' information available.
 
-Returns **[Array][19]<[user.User][150]>** An array of all the User objects.
+Returns **[Array][19]<[user.User][149]>** An array of all the User objects.
 
 ### search
 
 Searches the domain's directory for Users.
 
-The SDK will emit a [directory:change][151]
+The SDK will emit a [directory:change][150]
 event after the operation completes. The search results will be
 provided as part of the event, and will also be available using the
-[user.get][147] and [user.getAll][152] APIs.
+[user.get][146] and [user.getAll][151] APIs.
 
 #### Parameters
 
@@ -3828,7 +3836,7 @@ The directory has changed.
 
 *   `params` **[Object][7]** 
 
-    *   `params.results` **[Array][19]<[user.User][150]>** The Users' information returned by the
+    *   `params.results` **[Array][19]<[user.User][149]>** The Users' information returned by the
         operation.
 
 ### directory:error
@@ -3849,7 +3857,7 @@ A change has occurred in the users list
 
 *   `params` **[Object][7]** 
 
-    *   `params.results` **[Array][19]<[user.User][150]>** The Users' information returned by the
+    *   `params.results` **[Array][19]<[user.User][149]>** The Users' information returned by the
         operation.
 
 ### users:error
@@ -3930,11 +3938,11 @@ An error occurred while retrieving the user information
 
 [34]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
 
-[35]: call.IceCollectionCheckFunction`
+[35]: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState
 
-[36]: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState
+[36]: #callicecollectioninfo
 
-[37]: #callicecollectioninfo
+[37]: #configconfigcall
 
 [38]: #callicecollectioncheckresult
 
@@ -4140,28 +4148,26 @@ An error occurred while retrieving the user information
 
 [139]: https://developer.mozilla.org/en-US/docs/Web/API/Response
 
-[140]: #configconfigcall
+[140]: #callsetsdphandlers
 
-[141]: #callsetsdphandlers
+[141]: #servicesgetsubscriptions
 
-[142]: #servicesgetsubscriptions
+[142]: #servicessubscribe
 
-[143]: #servicessubscribe
+[143]: #servicesservicedescriptor
 
 [144]: #servicesservicedescriptor
 
-[145]: #servicesservicedescriptor
+[145]: #usereventuserschange
 
-[146]: #usereventuserschange
+[146]: #userget
 
-[147]: #userget
+[147]: #userfetch
 
-[148]: #userfetch
+[148]: #usersearch
 
-[149]: #usersearch
+[149]: #useruser
 
-[150]: #useruser
+[150]: #usereventdirectorychange
 
-[151]: #usereventdirectorychange
-
-[152]: #usergetall
+[151]: #usergetall
