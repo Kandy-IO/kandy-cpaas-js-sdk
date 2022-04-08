@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.39.0-beta.861
+ * Version: 4.39.0-beta.862
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6550,6 +6550,9 @@ const REPLACE_TRACK_FINISH = exports.REPLACE_TRACK_FINISH = callPrefix + 'REPLAC
 const MEDIA_RESTART = exports.MEDIA_RESTART = callPrefix + 'MEDIA_RESTART';
 const MEDIA_RESTART_FINISH = exports.MEDIA_RESTART_FINISH = callPrefix + 'MEDIA_RESTART_FINISH';
 
+const RESYNC = exports.RESYNC = callPrefix + 'RESYNC';
+const RESYNC_FINISH = exports.RESYNC_FINISH = callPrefix + 'RESYNC_FINISH';
+
 /**
  * Miscellaneous call actions
  */
@@ -7155,6 +7158,7 @@ const OPERATIONS = exports.OPERATIONS = {
   JOIN: 'JOIN',
   REPLACE_TRACK: 'REPLACE_TRACK',
   MEDIA_RESTART: 'MEDIA_RESTART',
+  RESYNC: 'RESYNC',
   // Remote-only.
   START_MOH: 'START_MOH',
   STOP_MOH: 'STOP_MOH',
@@ -7365,7 +7369,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.39.0-beta.861';
+  return '4.39.0-beta.862';
 }
 
 /***/ }),
@@ -14989,6 +14993,8 @@ exports.remoteStopMohFinish = remoteStopMohFinish;
 exports.remoteSlowStart = remoteSlowStart;
 exports.restartMedia = restartMedia;
 exports.restartMediaFinish = restartMediaFinish;
+exports.resync = resync;
+exports.resyncFinish = resyncFinish;
 exports.updateCall = updateCall;
 
 var _actionTypes = __webpack_require__(41);
@@ -15348,6 +15354,13 @@ function restartMediaFinish(id, params) {
   return callActionHelper(actionTypes.MEDIA_RESTART_FINISH, id, params);
 }
 
+function resync(id, params) {
+  return callActionHelper(actionTypes.RESYNC, id, params);
+}
+
+function resyncFinish(id, params) {
+  return callActionHelper(actionTypes.RESYNC_FINISH, id, params);
+}
 // Generic action.
 function updateCall(id, params) {
   return callActionHelper(actionTypes.UPDATE_CALL, id, params);
@@ -41660,6 +41673,31 @@ function callAPI({ dispatch, getState }) {
     },
 
     /**
+     * Re-sync a Call with the server by fetching the status of the Call on the server.
+     *
+     * This may be useful to get and update a call's state after processing incoming notifications
+     *    some time after they were received (e.g., waiting to process incoming call push notifications
+     *    till a connection is established).
+     *
+     * The progress of the `RESYNC` operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} events.
+     *
+     * The SDK may emit a {@link call.event:call:operation call:operation} event after the `RESYNC` operation is
+     *    complete if the call was ended do to the resync.
+     * @private
+     * @static
+     * @memberof call
+     * @requires call
+     * @requires link_call
+     * @method resync
+     * @param {string} callId The ID of the call to re-sync.
+     */
+    resync(callId) {
+      log.debug(`${_logs.API_LOG_TAG}call.resync, callId: ${callId}`);
+      dispatch(_actions.callActions.resync(callId));
+    },
+
+    /**
      * Possible states that a Call can be in.
      *
      * A Call's state describes the current status of the Call. An application
@@ -42817,7 +42855,7 @@ callReducers[webrtcActionTypes.SESSION_ICE_CONNECTION_STATE_CHANGE] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.SEND_RINGING_FEEDBACK, actionTypes.SEND_RINGING_FEEDBACK_FINISH, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.MEDIA_RESTART, actionTypes.MEDIA_RESTART_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.SEND_RINGING_FEEDBACK, actionTypes.SEND_RINGING_FEEDBACK_FINISH, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.MEDIA_RESTART, actionTypes.MEDIA_RESTART_FINISH, actionTypes.RESYNC, actionTypes.RESYNC_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 const specificWebrtcSessionActions = (0, _reduxActions.combineActions)(webrtcActionTypes.SESSION_ICE_CONNECTION_STATE_CHANGE);
 
@@ -47726,7 +47764,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 // Helpers
 // TODO: Move this to a shared location.
-function* incomingCall(deps, params) {
+function* incomingCall(deps, params, channel) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
   const callConfig = yield (0, _effects.select)(_selectors.getOptions);
@@ -47843,6 +47881,12 @@ function* incomingCall(deps, params) {
   yield (0, _effects.put)(_actions.callActions.updateCall(callId, {
     state: nextState
   }));
+
+  // Workaround for re-syncing incoming calls received via PUSH.
+  // TODO: Check if this can be removed once we start receiving TURN credentials with incoming call notifications.
+  if (channel && channel.toLowerCase() === 'push') {
+    yield (0, _effects.put)(_actions.callActions.resync(callId));
+  }
 }
 
 /**
@@ -50656,6 +50700,7 @@ var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2
 exports.sendCallAudit = sendCallAudit;
 exports.getSessions = getSessions;
 exports.updateCallState = updateCallState;
+exports.resyncCallState = resyncCallState;
 exports.normalizeIceFailure = normalizeIceFailure;
 exports.callIceCollectionCheck = callIceCollectionCheck;
 
@@ -50678,6 +50723,10 @@ var _actions2 = __webpack_require__(27);
 var _actionTypes2 = __webpack_require__(12);
 
 var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
@@ -50712,7 +50761,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// Other plugins.
+// Callstack plugin.
+// Call plugin.
 function* sendCallAudit(deps, action) {
   const { webRTC, requests } = deps;
   let currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
@@ -50770,11 +50820,14 @@ function* sendCallAudit(deps, action) {
       // Hangup call automatically (from webRTC perspective)
       yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
 
-      // Cleanup Redux state by sending END_CALL_FINISH action
-      yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
-        isLocal: true,
-        transition: { statusCode: 9909, reasonText: 'Call has ended due to call audit failure.' }
-      }));
+      const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+      if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+        // Cleanup Redux state by sending END_CALL_FINISH action
+        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+          isLocal: true,
+          transition: { statusCode: 9909, reasonText: 'Call has ended due to call audit failure.' }
+        }));
+      }
       return;
     } else if (audit) {
       log.debug(`Call audit status is ${audit.status}.`);
@@ -50807,8 +50860,7 @@ function* sendCallAudit(deps, action) {
 // Libraries.
 
 
-// Callstack plugin.
-// Call plugin.
+// Other plugins.
 function* getSessions(deps, action) {
   const config = yield (0, _effects.select)(_selectors.getOptions);
   if (!config.resyncOnConnect) {
@@ -50890,6 +50942,80 @@ function* updateCallState(deps, activeCall) {
         }
       }
     }
+  }
+}
+
+/**
+ * Sends a GET session request and updates the call if necessary.
+ * The response to the GET session request contains two properties that can be used for determining the call state:
+ *  1. `statusCode` - Code which can be used to provide more info for error responses
+ *  2. `state`
+ *    a. "RINGING" - Call exists, and can be either accepted or rejected.
+ *    b. "ANSWERED" - Call is active, and can be either Connected or Held.
+ *
+ * This saga performs the signaling operation to get the status of a call session on the server, and any local
+ *    WebRTC operations necessary for closing the call if necessary.
+ *
+ * Responsibilities:
+ *    1. Update the call state if the call is out of sync (call's status does not match the response from the server)
+ * @method resyncCallState
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.getSession GET session signalling function.
+ * @param {Object}   action        The call being acted on.
+ */
+function* resyncCallState(deps, action) {
+  const { webRTC, requests } = deps;
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+
+  const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  if (!currentCall) {
+    log.debug(`Call ${action.payload.id} not found.`);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'Call not found; invalid call ID.'
+      })
+    }));
+    return;
+  }
+
+  const sessionStatusResponse = yield (0, _effects.call)(requests.getSession, {
+    wrtcsSessionId: currentCall.wrtcsSessionId
+  });
+
+  // Call not found
+  if (sessionStatusResponse.error && sessionStatusResponse.error.code === 47) {
+    log.info('Call re-sync found that the call has ended. Ending Call.');
+    // End the call as the session does not exist on the server anymore (statusCode 47 response)
+    yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
+
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
+    const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+    if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+      yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+        isLocal: true
+      }));
+    }
+  } else if (sessionStatusResponse.error) {
+    // GET response errors other than session not found
+    log.info(`Call re-sync failure (${sessionStatusResponse.error.code}).`, sessionStatusResponse.error);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id, {
+      error: sessionStatusResponse.error
+    }));
+  } else if (sessionStatusResponse.state === 'ANSWERED' && currentCall.state !== _constants.CALL_STATES.CONNECTED && currentCall.state !== _constants.CALL_STATES.ON_HOLD) {
+    log.info('Call re-sync found that call is cancelled. Cancelling call.');
+    // If the call is answered, but not by us, report call as cancelled
+    yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
+    const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+    if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+      yield (0, _effects.put)(_actions.callActions.callCancelled(currentCall.id));
+    }
+  } else {
+    log.info('Call re-sync found that there are no changes necessary for the call');
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
   }
 }
 
@@ -51245,7 +51371,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.SEND_RINGING_FEEDBACK, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.MEDIA_RESTART, operation: _constants.OPERATIONS.MEDIA_RESTART }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.SEND_RINGING_FEEDBACK, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.MEDIA_RESTART, operation: _constants.OPERATIONS.MEDIA_RESTART }, { type: actionTypes.RESYNC, operation: _constants.OPERATIONS.RESYNC }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -51532,6 +51658,14 @@ callEvents[actionTypes.MEDIA_RESTART_FINISH] = (action, params) => {
   })), callEventHandler(eventTypes.MEDIA_RESTART, action, {
     error: action.payload.error
   })];
+};
+
+callEvents[actionTypes.RESYNC_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.RESYNC,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  }))];
 };
 
 exports.default = (0, _extends3.default)({}, callEvents);
@@ -56805,7 +56939,7 @@ function* processNotifications() {
     if (!isDuplicate(notificationId, config)) {
       log.info('Notifying other plugins about notification ...');
       // Notify others (plugins) that a new notification was receive.
-      yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
+      yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform, meta.channel));
       log.debug(`Finished processing notification of type ${notificationType} with ID ${notificationId}`);
 
       // Finish processing the notification.
