@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.39.0-beta.872
+ * Version: 4.39.0-beta.873
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7369,7 +7369,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.39.0-beta.872';
+  return '4.39.0-beta.873';
 }
 
 /***/ }),
@@ -27259,7 +27259,14 @@ function api(context) {
      *   as they were originally set, by performing a merge of the new values into the
      *   previous values.
      *
-     * Please note that that the object provided to the `updateConfig` API may be different
+     * Please note that updating the {@link config#config.call call.removeH264Codecs} configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the
+     *   h264 codec remover sdp handler you should follow this procedure:
+     *   1. Update the config for removeH264Codecs using the {@link api.updateConfig updateConfig} API.
+     *   2. Update the sdp handler list using the {@link call.setSdpHandlers setSdpHandlers} API and provide any client defined SDP handler functions.
+     *
+     *      NOTE: You can get the currently defined SDP handler functions with the {@link api.getConfig getConfig} API.
+     *
+     * Please note that the object provided to the `updateConfig` API may be different
      *   than the object retrieved from the {@link api.getConfig getConfig} API. This may happen when a format
      *   change has happened and the SDK modifies the provided format to alleviate
      *   backwards-compatibility issues. We recommend ensuring the configurations you

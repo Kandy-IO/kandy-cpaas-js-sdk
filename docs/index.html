@@ -2757,7 +2757,18 @@ client.on( ... )</pre>
 <p>This API will only modify the configurations provided, leaving other configurations
 as they were originally set, by performing a merge of the new values into the
 previous values.</p>
-<p>Please note that that the object provided to the <code>updateConfig</code> API may be different
+<p>Please note that updating the <a href="#configconfigcall">call.removeH264Codecs</a> configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the
+h264 codec remover sdp handler you should follow this procedure:</p>
+<ol>
+<li>
+<p>Update the config for removeH264Codecs using the <a href="#apiupdateconfig">updateConfig</a> API.</p>
+</li>
+<li>
+<p>Update the sdp handler list using the <a href="#callsetsdphandlers">setSdpHandlers</a> API and provide any client defined SDP handler functions.</p>
+<p>NOTE: You can get the currently defined SDP handler functions with the <a href="#apigetconfig">getConfig</a> API.</p>
+</li>
+</ol>
+<p>Please note that the object provided to the <code>updateConfig</code> API may be different
 than the object retrieved from the <a href="#apigetconfig">getConfig</a> API. This may happen when a format
 change has happened and the SDK modifies the provided format to alleviate
 backwards-compatibility issues. We recommend ensuring the configurations you

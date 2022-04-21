@@ -3479,7 +3479,129 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Please note that that the object provided to the "
+                    "value": "Please note that updating the "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#configconfigcall",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.removeH264Codecs"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the\nh264 codec remover sdp handler you should follow this procedure:"
+                  }
+                ]
+              },
+              {
+                "type": "list",
+                "ordered": true,
+                "start": 1,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Update the config for removeH264Codecs using the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#apiupdateconfig",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "updateConfig"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": true,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Update the sdp handler list using the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#callsetsdphandlers",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "setSdpHandlers"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API and provide any client defined SDP handler functions."
+                          }
+                        ]
+                      },
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "NOTE: You can get the currently defined SDP handler functions with the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#apigetconfig",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "getConfig"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Please note that the object provided to the "
                   },
                   {
                     "type": "inlineCode",
@@ -3529,35 +3651,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 20,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 14
+              "lineNumber": 21
             },
             {
               "title": "memberof",
               "description": "api",
-              "lineNumber": 15
+              "lineNumber": 22
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 23,
               "name": "config"
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 17,
+              "lineNumber": 24,
               "name": "updateConfig"
             },
             {
               "title": "param",
               "description": "Key-value pairs that will be placed into the store. See {@link config} for details on what key-value pairs are available for use.",
-              "lineNumber": 18,
+              "lineNumber": 25,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -3567,7 +3689,7 @@
             {
               "title": "example",
               "description": "// Instantiate the SDK with certain configs.\nconst client = create({\n  authentication: { ... },\n  logs: { ... },\n  ...\n})\n\n// Modify a subsection of the configs at a later time.\n// This will only update the specified configurations.\nclient.updateConfig({\n    logs: {\n      loglevel: 'DEBUG'\n    }\n})",
-              "lineNumber": 19
+              "lineNumber": 26
             }
           ],
           "loc": {
@@ -3576,18 +3698,18 @@
               "column": 4
             },
             "end": {
-              "line": 64,
+              "line": 71,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 72,
                 "column": 4
               },
               "end": {
-                "line": 77,
+                "line": 84,
                 "column": 5
               }
             },
@@ -3604,7 +3726,7 @@
             {
               "title": "param",
               "name": "newConfigValues",
-              "lineNumber": 18,
+              "lineNumber": 25,
               "description": {
                 "type": "root",
                 "children": [
