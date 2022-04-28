@@ -3479,7 +3479,129 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Please note that that the object provided to the "
+                    "value": "Please note that updating the "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#configconfigcall",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "call.removeH264Codecs"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the\nh264 codec remover sdp handler you should follow this procedure:"
+                  }
+                ]
+              },
+              {
+                "type": "list",
+                "ordered": true,
+                "start": 1,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Update the config for removeH264Codecs using the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#apiupdateconfig",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "updateConfig"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": true,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Update the sdp handler list using the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#callsetsdphandlers",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "setSdpHandlers"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API and provide any client defined SDP handler functions."
+                          }
+                        ]
+                      },
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "NOTE: You can get the currently defined SDP handler functions with the "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#apigetconfig",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "getConfig"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " API."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Please note that the object provided to the "
                   },
                   {
                     "type": "inlineCode",
@@ -3529,35 +3651,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 20,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 14
+              "lineNumber": 21
             },
             {
               "title": "memberof",
               "description": "api",
-              "lineNumber": 15
+              "lineNumber": 22
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 23,
               "name": "config"
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 17,
+              "lineNumber": 24,
               "name": "updateConfig"
             },
             {
               "title": "param",
               "description": "Key-value pairs that will be placed into the store. See {@link config} for details on what key-value pairs are available for use.",
-              "lineNumber": 18,
+              "lineNumber": 25,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -3567,7 +3689,7 @@
             {
               "title": "example",
               "description": "// Instantiate the SDK with certain configs.\nconst client = create({\n  authentication: { ... },\n  logs: { ... },\n  ...\n})\n\n// Modify a subsection of the configs at a later time.\n// This will only update the specified configurations.\nclient.updateConfig({\n    logs: {\n      loglevel: 'DEBUG'\n    }\n})",
-              "lineNumber": 19
+              "lineNumber": 26
             }
           ],
           "loc": {
@@ -3576,18 +3698,18 @@
               "column": 4
             },
             "end": {
-              "line": 64,
+              "line": 71,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 72,
                 "column": 4
               },
               "end": {
-                "line": 77,
+                "line": 84,
                 "column": 5
               }
             },
@@ -3604,7 +3726,7 @@
             {
               "title": "param",
               "name": "newConfigValues",
-              "lineNumber": 18,
+              "lineNumber": 25,
               "description": {
                 "type": "root",
                 "children": [
@@ -5347,11 +5469,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 478,
+          "line": 485,
           "column": 0
         },
         "end": {
-          "line": 482,
+          "line": 489,
           "column": 1
         }
       },
@@ -9358,11 +9480,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -10041,11 +10163,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -10223,11 +10345,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -10419,11 +10541,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -10658,11 +10780,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -10981,11 +11103,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -11313,11 +11435,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -11485,7 +11607,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.IceCollectionCheckFunction`",
+                    "url": "#callicecollectioncheckfunction",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -11552,7 +11674,7 @@
             },
             {
               "title": "property",
-              "description": "The reason the check function was called. Three possible values:\n 'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.\n 'IceGatheringStateChanged' - The ICE gathering state changed.\n 'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by `IceCollectionCheckFunction`)",
+              "description": "The reason the check function was called. Three possible values:\n 'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.\n 'IceGatheringStateChanged' - The ICE gathering state changed.\n 'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by {@link call.IceCollectionCheckFunction IceCollectionCheckFunction}.)",
               "lineNumber": 11,
               "type": {
                 "type": "NameExpression",
@@ -11591,7 +11713,7 @@
             },
             {
               "title": "property",
-              "description": "The current ICE gathering state.\n   See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState RTCPeerConnection.iceGatheringState}",
+              "description": "The current ICE gathering state.\n   See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState RTCPeerConnection.iceGatheringState}.",
               "lineNumber": 17,
               "type": {
                 "type": "NameExpression",
@@ -11633,11 +11755,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -11717,12 +11839,20 @@
                         "value": " value returned by "
                       },
                       {
-                        "type": "inlineCode",
-                        "value": "IceCollectionCheckFunction"
+                        "type": "link",
+                        "url": "#callicecollectioncheckfunction",
+                        "title": null,
+                        "jsdoc": true,
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "IceCollectionCheckFunction"
+                          }
+                        ]
                       },
                       {
                         "type": "text",
-                        "value": ")"
+                        "value": ".)"
                       }
                     ]
                   }
@@ -11813,6 +11943,10 @@
                             "value": "RTCPeerConnection.iceGatheringState"
                           }
                         ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "."
                       }
                     ]
                   }
@@ -11946,7 +12080,7 @@
                   },
                   {
                     "type": "text",
-                    "value": " time set after\nan initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason)."
+                    "value": " time set after\nan initial invocation of the function."
                   }
                 ]
               },
@@ -12016,7 +12150,47 @@
                           },
                           {
                             "type": "text",
-                            "value": " is \"complete\" at any stage, then proceed with the negotiation."
+                            "value": " is \"complete\" at any stage, then:"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "list",
+                        "ordered": false,
+                        "start": null,
+                        "spread": false,
+                        "children": [
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "Proceed with the negotiation if any ICE candidates are collected."
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "Or, end the call if there are no ICE candidates collected."
+                                  }
+                                ]
+                              }
+                            ]
                           }
                         ]
                       }
@@ -12223,18 +12397,18 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 27,
+              "lineNumber": 29,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 28
+              "lineNumber": 30
             },
             {
               "title": "typedef",
               "description": null,
-              "lineNumber": 29,
+              "lineNumber": 31,
               "type": {
                 "type": "NameExpression",
                 "name": "Function"
@@ -12244,12 +12418,12 @@
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 30
+              "lineNumber": 32
             },
             {
               "title": "param",
               "description": "Information about the current status of the ICE candidate collection.",
-              "lineNumber": 31,
+              "lineNumber": 33,
               "type": {
                 "type": "NameExpression",
                 "name": "call.IceCollectionInfo"
@@ -12257,9 +12431,39 @@
               "name": "iceCollectionInfo"
             },
             {
+              "title": "param",
+              "description": "Configurations provided to the SDK for ICE collection timeout boundaries.",
+              "lineNumber": 34,
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "name": "iceTimeouts"
+            },
+            {
+              "title": "param",
+              "description": "The amount of time to wait for ideal candidates, in\n     milliseconds.  See {@link config#config.call config.call} for more information.",
+              "lineNumber": 35,
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              },
+              "name": "iceTimeouts.iceCollectionIdealTimeout"
+            },
+            {
+              "title": "param",
+              "description": "The maximum amount of time to wait for ICE collection,\n     in milliseconds. See {@link config#config.call config.call} for more information.",
+              "lineNumber": 37,
+              "type": {
+                "type": "NameExpression",
+                "name": "number"
+              },
+              "name": "iceTimeouts.iceCollectionMaxTimeout"
+            },
+            {
               "title": "returns",
               "description": "Information on how to proceed with the call and/or ICE collection.",
-              "lineNumber": 32,
+              "lineNumber": 39,
               "type": {
                 "type": "NameExpression",
                 "name": "call.IceCollectionCheckResult"
@@ -12267,8 +12471,8 @@
             },
             {
               "title": "example",
-              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}",
-              "lineNumber": 33
+              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }, iceTimeouts) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}",
+              "lineNumber": 40
             }
           ],
           "loc": {
@@ -12277,18 +12481,18 @@
               "column": 0
             },
             "end": {
-              "line": 281,
+              "line": 288,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -12297,7 +12501,7 @@
           "augments": [],
           "examples": [
             {
-              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}"
+              "description": "function isRelayCandidate (candidate) {\n// NOTE: This would need to be different for Firefox since the `.type` property doesn't exist\n// and we would need to parse it ourselves in the `.candidate` property.\n  return candidate.type === 'relay'\n}\n\nfunction myIceCollectionCheck ({ iceGatheringState, iceCandidates }, iceTimeouts) {\n  if (iceGatheringState === 'complete') {\n    if (iceCandidates.some(isRelayCandidate)) {\n      return { type: 'StartCall' }\n    } else {\n      return { type: 'Error', error: new Error('Failed to start call because there is no relay candidates.') }\n    }\n  } else {\n    return { type: 'Wait' }\n  }\n}"
             }
           ],
           "implements": [],
@@ -12305,7 +12509,7 @@
             {
               "title": "param",
               "name": "iceCollectionInfo",
-              "lineNumber": 31,
+              "lineNumber": 33,
               "description": {
                 "type": "root",
                 "children": [
@@ -12324,6 +12528,109 @@
                 "type": "NameExpression",
                 "name": "call.IceCollectionInfo"
               }
+            },
+            {
+              "title": "param",
+              "name": "iceTimeouts",
+              "lineNumber": 34,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Configurations provided to the SDK for ICE collection timeout boundaries."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "iceTimeouts.iceCollectionIdealTimeout",
+                  "lineNumber": 35,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The amount of time to wait for ideal candidates, in\nmilliseconds.  See "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#configconfigcall",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "config.call"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " for more information."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "number"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "iceTimeouts.iceCollectionMaxTimeout",
+                  "lineNumber": 37,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The maximum amount of time to wait for ICE collection,\nin milliseconds. See "
+                          },
+                          {
+                            "type": "link",
+                            "url": "#configconfigcall",
+                            "title": null,
+                            "jsdoc": true,
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "config.call"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": " for more information."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "number"
+                  }
+                }
+              ]
             }
           ],
           "properties": [],
@@ -12445,22 +12752,22 @@
           ],
           "loc": {
             "start": {
-              "line": 283,
+              "line": 290,
               "column": 0
             },
             "end": {
-              "line": 297,
+              "line": 304,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -12691,22 +12998,22 @@
           ],
           "loc": {
             "start": {
-              "line": 299,
+              "line": 306,
               "column": 0
             },
             "end": {
-              "line": 310,
+              "line": 317,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -12928,22 +13235,22 @@
           ],
           "loc": {
             "start": {
-              "line": 312,
+              "line": 319,
               "column": 0
             },
             "end": {
-              "line": 322,
+              "line": 329,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -13164,22 +13471,22 @@
           ],
           "loc": {
             "start": {
-              "line": 324,
+              "line": 331,
               "column": 0
             },
             "end": {
-              "line": 335,
+              "line": 342,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -13465,22 +13772,22 @@
           ],
           "loc": {
             "start": {
-              "line": 337,
+              "line": 344,
               "column": 0
             },
             "end": {
-              "line": 358,
+              "line": 365,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -13867,22 +14174,22 @@
           ],
           "loc": {
             "start": {
-              "line": 360,
+              "line": 367,
               "column": 0
             },
             "end": {
-              "line": 370,
+              "line": 377,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -14109,22 +14416,22 @@
           ],
           "loc": {
             "start": {
-              "line": 372,
+              "line": 379,
               "column": 0
             },
             "end": {
-              "line": 383,
+              "line": 390,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 478,
+                "line": 485,
                 "column": 0
               },
               "end": {
-                "line": 482,
+                "line": 489,
                 "column": 1
               }
             },
@@ -20828,6 +21135,15 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "Because it completely replaces an old track with a new one,\nthe old track's state characteristics are not carried over in the new track's state.\n(e.g. if an old track's state was 'muted' and replacement of this track has occured,\nthe new track's state will be 'unmuted', as this is its default state)"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "The progress of the operation will be tracked via the\n"
                   },
                   {
@@ -20879,35 +21195,35 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 17
+              "lineNumber": 22
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 18
+              "lineNumber": 23
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 19,
+              "lineNumber": 24,
               "name": "call"
             },
             {
               "title": "requires",
               "description": null,
-              "lineNumber": 20,
+              "lineNumber": 25,
               "name": "callMe"
             },
             {
               "title": "param",
               "description": "The ID of the call to replace the track of.",
-              "lineNumber": 21,
+              "lineNumber": 26,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -20917,7 +21233,7 @@
             {
               "title": "param",
               "description": "The ID of the track to replace.",
-              "lineNumber": 22,
+              "lineNumber": 27,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -20927,7 +21243,7 @@
             {
               "title": "param",
               "description": "The media options.",
-              "lineNumber": 23,
+              "lineNumber": 28,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20941,7 +21257,7 @@
             {
               "title": "param",
               "description": "Whether to create an audio track.",
-              "lineNumber": 24,
+              "lineNumber": 29,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20955,7 +21271,7 @@
             {
               "title": "param",
               "description": "Options for configuring the audio track.",
-              "lineNumber": 25,
+              "lineNumber": 30,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20968,7 +21284,7 @@
             {
               "title": "param",
               "description": "ID of the microphone to receive audio from.",
-              "lineNumber": 26,
+              "lineNumber": 31,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20981,7 +21297,7 @@
             {
               "title": "param",
               "description": "Whether to create a video track.",
-              "lineNumber": 27,
+              "lineNumber": 32,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -20995,7 +21311,7 @@
             {
               "title": "param",
               "description": "Options for configuring the video track.",
-              "lineNumber": 28,
+              "lineNumber": 33,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21008,7 +21324,7 @@
             {
               "title": "param",
               "description": "ID of the camera to receive video from.",
-              "lineNumber": 29,
+              "lineNumber": 34,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21021,7 +21337,7 @@
             {
               "title": "param",
               "description": "The height of the video.",
-              "lineNumber": 30,
+              "lineNumber": 35,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21034,7 +21350,7 @@
             {
               "title": "param",
               "description": "The width of the video.",
-              "lineNumber": 31,
+              "lineNumber": 36,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21047,7 +21363,7 @@
             {
               "title": "param",
               "description": "The frame rate of the video.",
-              "lineNumber": 32,
+              "lineNumber": 37,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -21060,12 +21376,12 @@
             {
               "title": "example",
               "description": "const callId = ...\n// Get the video track used by the call.\nconst videoTrack = ...\n\n// Replace the specified video track of the call with a new\n//    video track.\nclient.call.replaceTrack(callId, videoTrack.id, {\n  // The track should be replaced with a video track using\n  //    a specific device. This effectively changes the input\n  //    device for an ongoing call.\n  video: true,\n  videoOptions: {\n    deviceId: cameraId\n  }\n})",
-              "lineNumber": 33
+              "lineNumber": 38
             },
             {
               "title": "example",
               "description": "const callId = ...\n// Get the video track used by the call.\nconst videoTrack = ...\n\n// Can also replace the specified video track of the call with a new\n// screen sharing track because screen sharing is delivered as a video stream to remote peer.\n// User will then be prompted to pick a specific screen to share and thus the device id will be selected.\nclient.call.replaceTrack(callId, videoTrack.id, {\n  // The track should be replaced with a screen sharing track.\n  // Note that 'screenOptions' property is not mandatory, as API will use default values\n  // for properties like: width, height, frameRate.\n  screen: true\n})",
-              "lineNumber": 50
+              "lineNumber": 55
             }
           ],
           "loc": {
@@ -21074,18 +21390,18 @@
               "column": 4
             },
             "end": {
-              "line": 1202,
+              "line": 1207,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1203,
+                "line": 1208,
                 "column": 4
               },
               "end": {
-                "line": 1212,
+                "line": 1217,
                 "column": 5
               }
             },
@@ -21105,7 +21421,7 @@
             {
               "title": "param",
               "name": "callId",
-              "lineNumber": 21,
+              "lineNumber": 26,
               "description": {
                 "type": "root",
                 "children": [
@@ -21128,7 +21444,7 @@
             {
               "title": "param",
               "name": "trackId",
-              "lineNumber": 22,
+              "lineNumber": 27,
               "description": {
                 "type": "root",
                 "children": [
@@ -21151,7 +21467,7 @@
             {
               "title": "param",
               "name": "media",
-              "lineNumber": 23,
+              "lineNumber": 28,
               "description": {
                 "type": "root",
                 "children": [
@@ -21175,7 +21491,7 @@
                 {
                   "title": "param",
                   "name": "media.audio",
-                  "lineNumber": 24,
+                  "lineNumber": 29,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21199,7 +21515,7 @@
                 {
                   "title": "param",
                   "name": "media.audioOptions",
-                  "lineNumber": 25,
+                  "lineNumber": 30,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21225,7 +21541,7 @@
                     {
                       "title": "param",
                       "name": "media.audioOptions.deviceId",
-                      "lineNumber": 26,
+                      "lineNumber": 31,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21253,7 +21569,7 @@
                 {
                   "title": "param",
                   "name": "media.video",
-                  "lineNumber": 27,
+                  "lineNumber": 32,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21277,7 +21593,7 @@
                 {
                   "title": "param",
                   "name": "media.videoOptions",
-                  "lineNumber": 28,
+                  "lineNumber": 33,
                   "description": {
                     "type": "root",
                     "children": [
@@ -21303,7 +21619,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.deviceId",
-                      "lineNumber": 29,
+                      "lineNumber": 34,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21329,7 +21645,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.height",
-                      "lineNumber": 30,
+                      "lineNumber": 35,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21355,7 +21671,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.width",
-                      "lineNumber": 31,
+                      "lineNumber": 36,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21381,7 +21697,7 @@
                     {
                       "title": "param",
                       "name": "media.videoOptions.frameRate",
-                      "lineNumber": 32,
+                      "lineNumber": 37,
                       "description": {
                         "type": "root",
                         "children": [
@@ -21547,22 +21863,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1214,
+              "line": 1219,
               "column": 4
             },
             "end": {
-              "line": 1230,
+              "line": 1235,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1231,
+                "line": 1236,
                 "column": 4
               },
               "end": {
-                "line": 1241,
+                "line": 1246,
                 "column": 5
               }
             },
@@ -21727,22 +22043,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1243,
+              "line": 1248,
               "column": 4
             },
             "end": {
-              "line": 1259,
+              "line": 1264,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1260,
+                "line": 1265,
                 "column": 4
               },
               "end": {
-                "line": 1268,
+                "line": 1273,
                 "column": 5
               }
             },
@@ -22048,22 +22364,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1270,
+              "line": 1300,
               "column": 4
             },
             "end": {
-              "line": 1314,
+              "line": 1344,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1315,
+                "line": 1345,
                 "column": 4
               },
               "end": {
-                "line": 1315,
+                "line": 1345,
                 "column": 23
               }
             },
@@ -22606,22 +22922,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1317,
+              "line": 1347,
               "column": 4
             },
             "end": {
-              "line": 1396,
+              "line": 1426,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1397,
+                "line": 1427,
                 "column": 4
               },
               "end": {
-                "line": 1397,
+                "line": 1427,
                 "column": 55
               }
             },
@@ -23223,22 +23539,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1399,
+              "line": 1429,
               "column": 4
             },
             "end": {
-              "line": 1443,
+              "line": 1473,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1474,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1477,
                 "column": 5
               }
             },
@@ -23421,22 +23737,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1449,
+              "line": 1479,
               "column": 4
             },
             "end": {
-              "line": 1465,
+              "line": 1495,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1474,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1477,
                 "column": 5
               }
             },
@@ -23577,22 +23893,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1467,
+              "line": 1497,
               "column": 4
             },
             "end": {
-              "line": 1504,
+              "line": 1534,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1474,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1477,
                 "column": 5
               }
             },
@@ -23753,22 +24069,22 @@
           ],
           "loc": {
             "start": {
-              "line": 1506,
+              "line": 1536,
               "column": 4
             },
             "end": {
-              "line": 1543,
+              "line": 1573,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 1444,
+                "line": 1474,
                 "column": 4
               },
               "end": {
-                "line": 1447,
+                "line": 1477,
                 "column": 5
               }
             },
@@ -38335,11 +38651,11 @@
     "context": {
       "loc": {
         "start": {
-          "line": 478,
+          "line": 485,
           "column": 0
         },
         "end": {
-          "line": 482,
+          "line": 489,
           "column": 1
         }
       },
@@ -40982,7 +41298,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Mutes the specified Tracks at their media source."
+                    "value": "Mutes the specified Tracks."
                   }
                 ]
               },
@@ -40991,7 +41307,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Prevents media from being received for the Tracks. Audio Tracks will\nbecome silent and video Tracks will be a black frame."
+                    "value": "This API prevents the media of the specified Tracks from being rendered. Audio\nTracks will become silent and video Tracks will be a black frame.\nThis does not stop media from being received by those Tracks. The media simply\ncannot be used by the application while the Track is muted."
                   }
                 ]
               },
@@ -41001,6 +41317,15 @@
                   {
                     "type": "text",
                     "value": "If a local Track being sent in a Call is muted, the Track will be\nnoticeably muted for the remote user. If a remote Track received in a\ncall is muted, the result will only be noticeable locally."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This mute operation acts on those specified Tracks directly.\nIt does not act on the active Call as a whole."
                   }
                 ]
               },
@@ -41035,29 +41360,29 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 12,
+              "lineNumber": 17,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 13
+              "lineNumber": 18
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 14
+              "lineNumber": 19
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 15,
+              "lineNumber": 20,
               "name": "muteTracks"
             },
             {
               "title": "param",
               "description": "List of Track IDs.",
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -41080,18 +41405,18 @@
               "column": 4
             },
             "end": {
-              "line": 191,
+              "line": 196,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 192,
+                "line": 197,
                 "column": 4
               },
               "end": {
-                "line": 195,
+                "line": 200,
                 "column": 5
               }
             },
@@ -41104,7 +41429,7 @@
             {
               "title": "param",
               "name": "trackIds",
-              "lineNumber": 16,
+              "lineNumber": 21,
               "description": {
                 "type": "root",
                 "children": [
@@ -41183,7 +41508,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Media will resume as normal for the Tracks."
+                    "value": "Media will resume its normal rendering for the Tracks.\nLike the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.\nTherefore it does not act on active Call as a whole."
                   }
                 ]
               },
@@ -41218,29 +41543,29 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 7,
+              "lineNumber": 9,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 8
+              "lineNumber": 10
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 9
+              "lineNumber": 11
             },
             {
               "title": "method",
               "description": null,
-              "lineNumber": 10,
+              "lineNumber": 12,
               "name": "unmuteTracks"
             },
             {
               "title": "param",
               "description": "List of Track IDs.",
-              "lineNumber": 11,
+              "lineNumber": 13,
               "type": {
                 "type": "TypeApplication",
                 "expression": {
@@ -41259,22 +41584,22 @@
           ],
           "loc": {
             "start": {
-              "line": 197,
+              "line": 202,
               "column": 4
             },
             "end": {
-              "line": 209,
+              "line": 216,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 210,
+                "line": 217,
                 "column": 4
               },
               "end": {
-                "line": 213,
+                "line": 220,
                 "column": 5
               }
             },
@@ -41287,7 +41612,7 @@
             {
               "title": "param",
               "name": "trackIds",
-              "lineNumber": 11,
+              "lineNumber": 13,
               "description": {
                 "type": "root",
                 "children": [

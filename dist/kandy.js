@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.38.0
+ * Version: 4.39.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1276,7 +1276,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.logManager = exports.API_LOG_TAG = undefined;
 
-var _kandyLogger = __webpack_require__(82);
+var _kandyLogger = __webpack_require__(83);
 
 var _kandyLogger2 = _interopRequireDefault(_kandyLogger);
 
@@ -1319,7 +1319,7 @@ module.exports = __webpack_require__(216)(_, _);
 
 exports.__esModule = true;
 
-var _assign = __webpack_require__(76);
+var _assign = __webpack_require__(77);
 
 var _assign2 = _interopRequireDefault(_assign);
 
@@ -1497,7 +1497,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _codes = __webpack_require__(87);
+var _codes = __webpack_require__(71);
 
 Object.defineProperty(exports, 'authCodes', {
   enumerable: true,
@@ -1648,7 +1648,7 @@ exports.getRequestInfo = getRequestInfo;
 
 var _fp = __webpack_require__(3);
 
-var _constants = __webpack_require__(85);
+var _constants = __webpack_require__(86);
 
 var _constants2 = __webpack_require__(8);
 
@@ -2704,7 +2704,7 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 /***/ (function(module, exports, __webpack_require__) {
 
 var store = __webpack_require__(103)('wks');
-var uid = __webpack_require__(78);
+var uid = __webpack_require__(79);
 var Symbol = __webpack_require__(15).Symbol;
 var USE_SYMBOL = typeof Symbol == 'function';
 
@@ -2878,7 +2878,7 @@ exports.getTurnInfo = getTurnInfo;
 
 var _constants = __webpack_require__(20);
 
-var _selectors = __webpack_require__(86);
+var _selectors = __webpack_require__(87);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3242,7 +3242,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.logManager = undefined;
 
-var _kandyLogger = __webpack_require__(82);
+var _kandyLogger = __webpack_require__(83);
 
 var _kandyLogger2 = _interopRequireDefault(_kandyLogger);
 
@@ -6550,6 +6550,9 @@ const REPLACE_TRACK_FINISH = exports.REPLACE_TRACK_FINISH = callPrefix + 'REPLAC
 const MEDIA_RESTART = exports.MEDIA_RESTART = callPrefix + 'MEDIA_RESTART';
 const MEDIA_RESTART_FINISH = exports.MEDIA_RESTART_FINISH = callPrefix + 'MEDIA_RESTART_FINISH';
 
+const RESYNC = exports.RESYNC = callPrefix + 'RESYNC';
+const RESYNC_FINISH = exports.RESYNC_FINISH = callPrefix + 'RESYNC_FINISH';
+
 /**
  * Miscellaneous call actions
  */
@@ -7155,6 +7158,7 @@ const OPERATIONS = exports.OPERATIONS = {
   JOIN: 'JOIN',
   REPLACE_TRACK: 'REPLACE_TRACK',
   MEDIA_RESTART: 'MEDIA_RESTART',
+  RESYNC: 'RESYNC',
   // Remote-only.
   START_MOH: 'START_MOH',
   STOP_MOH: 'STOP_MOH',
@@ -7323,7 +7327,7 @@ var ctx = __webpack_require__(36);
 var call = __webpack_require__(144);
 var isArrayIter = __webpack_require__(145);
 var anObject = __webpack_require__(30);
-var toLength = __webpack_require__(77);
+var toLength = __webpack_require__(78);
 var getIterFn = __webpack_require__(146);
 var BREAK = {};
 var RETURN = {};
@@ -7365,7 +7369,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.38.0';
+  return '4.39.0';
 }
 
 /***/ }),
@@ -7438,6 +7442,177 @@ const logLevels = exports.logLevels = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+/**
+ * Error codes for the Auth plugin.
+ * @name authCodes
+ */
+const authCodes = exports.authCodes = {
+  INVALID_CREDENTIALS: 'authentication:1',
+  CONNECT_FAIL_WS_ERROR: 'authentication:2',
+  LINK_UNSUBSCRIBE_FAIL: 'authentication:3',
+  LINK_SUBSCRIBE_FAIL: 'authentication:4',
+  LINK_EXTEND_SUBSCRIPTION_FAIL: 'authentication:5',
+  LINK_UPDATE_SUBSCRIPTION_FAIL: 'authentication:6',
+  UC_SUBSCRIBE_FAIL: 'authentication:7',
+  UC_REFRESH_TOKEN_FAIL: 'authentication:8',
+  UC_CREATE_TOKEN_FAIL: 'authentication:9',
+  UC_EXTEND_SUBSCRIPTION_FAIL: 'authentication:10',
+  UC_DISCONNECT_FAIL: 'authentication:11',
+  MISSING_SERVICE: 'authentication:12'
+
+  /**
+   * Error codes for the Call plugin.
+   * @name callCodes
+   */
+};const callCodes = exports.callCodes = {
+  UNKNOWN_ERROR: 'call:1',
+  GENERIC_ERROR: 'call:2',
+  INIT_MEDIA_FAILED: 'call:3',
+  USER_MEDIA_ERROR: 'call:4',
+  NOT_SUPPORTED: 'call:5',
+  // The call is in the wrong state.
+  INVALID_STATE: 'call:6',
+  // A provided parameter is not valid.
+  INVALID_PARAM: 'call:7',
+  // There is a desync between components' state.
+  STATE_DESYNC: 'call:8',
+  // Offer could not be generated
+  INVALID_OFFER: 'call:9',
+  // No ICE candidates found
+  NO_ICE_CANDIDATES: 'call:10',
+  // Failed to recieve answer due to media mismatch
+  SESSION_MISMATCH: 'call:11'
+
+  /**
+   * Error codes for the Call History plugin.
+   * @name callHistoryCodes
+   */
+};const callHistoryCodes = exports.callHistoryCodes = {
+  UNKNOWN_ERROR: 'callHistory:1',
+  BAD_REQUEST: 'callHistory:2',
+  NOT_FOUND: 'callHistory:3',
+  NOT_AUTHENTICATED: 'callHistory:4',
+  FORBIDDEN: 'callHistory:5'
+  /**
+   * @name clickToCallCodes
+   */
+};const clickToCallCodes = exports.clickToCallCodes = {
+  MISSING_ARGS: 'clickToCall:1',
+  RESPONSE_ERROR: 'clickToCall:2'
+  /**
+   * Error codes for the Groups plugin.
+   * @name groupsCodes
+   */
+};const groupsCodes = exports.groupsCodes = {
+  UNKNOWN_ERROR: 'groups:1',
+  GENERIC_ERROR: 'groups:2',
+  MISSING_PARAMETERS: 'groups:3'
+
+  /**
+   * Error codes for the Message plugin.
+   * @name messagingCodes
+   */
+};const messagingCodes = exports.messagingCodes = {
+  CREATE_GROUP_FAIL: 'messaging:1',
+  MARK_READ_FAIL: 'messaging:2',
+  REMOVE_MEMBERS_FAIL: 'messaging:3',
+  ADD_MEMBERS_FAIL: 'messaging:4',
+  SEND_MESSAGE_FAIL: 'messaging:5',
+  FETCH_MESSAGES_FAIL: 'messaging:6',
+  FILE_UPLOAD_FAIL: 'messaging:7',
+  FETCH_CONVERSATIONS_FAIL: 'messaging:8',
+  INVALID_DESTINATION: 'messaging:9',
+  INVALID_FILE_PARTS: 'messaging:10',
+  SET_IS_TYPING_FAIL: 'messaging:11'
+
+  /**
+   * Error codes for the Message Waiting Indicator plugin.
+   * @name mwiCodes
+   */
+};const mwiCodes = exports.mwiCodes = {
+  FETCH_MWI_FAIL: 'mwi:1'
+
+  /**
+   * Error codes from the Sip Events plugin.
+   * @name sipEventCodes
+   */
+};const sipEventCodes = exports.sipEventCodes = {
+  UNKNOWN_ERROR: 'sipEvents:1',
+  // The user did not subscribe/connect for the specified sip event service.
+  NOT_PROVISIONED: 'sipEvents:2',
+  // The user is not subscribed for the specified sip event.
+  NOT_SUBSCRIBED: 'sipEvents:3'
+
+  /**
+   * Error codes for the audio bridge portion of the call plugin.
+   * @name bridgeCodes
+   */
+};const bridgeCodes = exports.bridgeCodes = {
+  UNKNOWN_ERROR: 'audioBridge:1',
+  // TODO: Make "invalid input" (and others) a generic code.
+  INVALID_INPUT: 'audioBridge:2',
+  ALREADY_EXISTS: 'audioBridge:3',
+  NOT_FOUND: 'audioBridge:4',
+  NOT_SUPPORTED: 'audioBridge:5',
+  MEDIA_NOT_FOUND: 'audioBridge:6',
+  INVALID_STATE: 'audioBridge:7'
+
+  /**
+   * Error codes for the subscription plugin.
+   * @name subscriptionCodes
+   */
+};const subscriptionCodes = exports.subscriptionCodes = {
+  WS_CONNECTION_ERROR: 'subscription:1',
+  CPAAS_WSREQUEST_FAIL: 'subscription:2',
+  CPAAS_WSREVOKE_FAIL: 'subscription:3',
+  CPAAS_WSREFRESH_FAIL: 'subscription:4',
+  CPAAS_SERVICE_SUB_FAIL: 'subscription:5',
+  CPAAS_SERVICE_UNSUB_FAIL: 'subscription:6',
+  CPAAS_UNSUBSCRIBE_FAIL: 'subscription:7'
+
+  /**
+   * Error codes for the connectivity plugin
+   * @name connectivityCodes
+   */
+};const connectivityCodes = exports.connectivityCodes = {
+  WS_MESSAGE_ERROR: 'connectivity:1'
+
+  /**
+   * Error codes for the Presence plugin.
+   * @name presenceCodes
+   */
+};const presenceCodes = exports.presenceCodes = {
+  INVALID_STATUS: 'presence:1',
+  INVALID_ACTIVITY: 'presence:2'
+
+  /**
+   * Error codes for the Users plugin
+   * @name usersCodes
+   */
+};const usersCodes = exports.usersCodes = {
+  UNKNOWN: 'users:1',
+  REFRESH_CONTACTS_FAIL: 'users:2',
+  DIRECTORY_REQUEST_FAIL: 'users:3',
+  INVALID_PARAM: 'users:4'
+
+  /**
+   * Error codes for the Webrtc plugin
+   * @name webrtcCodes
+   */
+};const webrtcCodes = exports.webrtcCodes = {
+  INVALID_PARAM: 'webrtc:1'
+};
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _handleRequestError = __webpack_require__(126);
 
@@ -7449,7 +7624,7 @@ Object.defineProperty(exports, 'handleRequestError', {
 });
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8037,7 +8212,7 @@ function* webRtcReplaceTrack(webRTC, params) {
 }
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8097,7 +8272,7 @@ function getCheckConnectivity(state) {
 }
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8144,7 +8319,7 @@ const GET_IMAGE_LINKS = exports.GET_IMAGE_LINKS = PREFIX + 'GET_IMAGE_LINKS';
 const GET_IMAGE_LINKS_FINISH = exports.GET_IMAGE_LINKS_FINISH = PREFIX + 'GET_IMAGE_LINKS_FINISH';
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8794,13 +8969,13 @@ function version_version(uuid) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__(208), __esModule: true };
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.15 ToLength
@@ -8812,7 +8987,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports) {
 
 var id = 0;
@@ -8823,13 +8998,13 @@ module.exports = function (key) {
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
@@ -8876,7 +9051,7 @@ module.exports = Object.create || function create(O, Properties) {
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(227);
@@ -8901,7 +9076,7 @@ for (var i = 0; i < DOMIterables.length; i++) {
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8939,10 +9114,10 @@ const logLevels = exports.logLevels = _constants.logLevels;
 const logFormatter = exports.logFormatter = _logFormatter2.default;
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var META = __webpack_require__(78)('meta');
+var META = __webpack_require__(79)('meta');
 var isObject = __webpack_require__(21);
 var has = __webpack_require__(38);
 var setDesc = __webpack_require__(25).f;
@@ -8998,7 +9173,7 @@ var meta = module.exports = {
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9016,7 +9191,7 @@ const SET_HANDLER = exports.SET_HANDLER = prefix + 'SET_HANDLER';
 const HANDLERS_CHANGE = exports.HANDLERS_CHANGE = prefix + 'HANDLERS_CHANGE';
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9046,7 +9221,7 @@ const SUBSCRIPTION_STATE = exports.SUBSCRIPTION_STATE = {
 };
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9130,169 +9305,6 @@ function getMediaById(state, mediaId) {
 function getBrowserDetails(state) {
   return state.webrtc.browser;
 }
-
-/***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Error codes for the Auth plugin.
- * @name authCodes
- */
-const authCodes = exports.authCodes = {
-  INVALID_CREDENTIALS: 'authentication:1',
-  CONNECT_FAIL_WS_ERROR: 'authentication:2',
-  LINK_UNSUBSCRIBE_FAIL: 'authentication:3',
-  LINK_SUBSCRIBE_FAIL: 'authentication:4',
-  LINK_EXTEND_SUBSCRIPTION_FAIL: 'authentication:5',
-  LINK_UPDATE_SUBSCRIPTION_FAIL: 'authentication:6',
-  UC_SUBSCRIBE_FAIL: 'authentication:7',
-  UC_REFRESH_TOKEN_FAIL: 'authentication:8',
-  UC_CREATE_TOKEN_FAIL: 'authentication:9',
-  UC_EXTEND_SUBSCRIPTION_FAIL: 'authentication:10',
-  UC_DISCONNECT_FAIL: 'authentication:11',
-  MISSING_SERVICE: 'authentication:12'
-
-  /**
-   * Error codes for the Call plugin.
-   * @name callCodes
-   */
-};const callCodes = exports.callCodes = {
-  UNKNOWN_ERROR: 'call:1',
-  GENERIC_ERROR: 'call:2',
-  INIT_MEDIA_FAILED: 'call:3',
-  USER_MEDIA_ERROR: 'call:4',
-  NOT_SUPPORTED: 'call:5',
-  // The call is in the wrong state.
-  INVALID_STATE: 'call:6',
-  // A provided parameter is not valid.
-  INVALID_PARAM: 'call:7',
-  // There is a desync between components' state.
-  STATE_DESYNC: 'call:8',
-  // Offer could not be generated
-  INVALID_OFFER: 'call:9',
-  // No ICE candidates found
-  NO_ICE_CANDIDATES: 'call:10',
-  // Failed to recieve answer due to media mismatch
-  SESSION_MISMATCH: 'call:11'
-
-  /**
-   * Error codes for the Call History plugin.
-   * @name callHistoryCodes
-   */
-};const callHistoryCodes = exports.callHistoryCodes = {
-  UNKNOWN_ERROR: 'callHistory:1',
-  BAD_REQUEST: 'callHistory:2',
-  NOT_FOUND: 'callHistory:3',
-  NOT_AUTHENTICATED: 'callHistory:4',
-  FORBIDDEN: 'callHistory:5'
-  /**
-   * @name clickToCallCodes
-   */
-};const clickToCallCodes = exports.clickToCallCodes = {
-  MISSING_ARGS: 'clickToCall:1',
-  RESPONSE_ERROR: 'clickToCall:2'
-  /**
-   * Error codes for the Groups plugin.
-   * @name groupsCodes
-   */
-};const groupsCodes = exports.groupsCodes = {
-  UNKNOWN_ERROR: 'groups:1',
-  GENERIC_ERROR: 'groups:2',
-  MISSING_PARAMETERS: 'groups:3'
-
-  /**
-   * Error codes for the Message plugin.
-   * @name messagingCodes
-   */
-};const messagingCodes = exports.messagingCodes = {
-  CREATE_GROUP_FAIL: 'messaging:1',
-  MARK_READ_FAIL: 'messaging:2',
-  REMOVE_MEMBERS_FAIL: 'messaging:3',
-  ADD_MEMBERS_FAIL: 'messaging:4',
-  SEND_MESSAGE_FAIL: 'messaging:5',
-  FETCH_MESSAGES_FAIL: 'messaging:6',
-  FILE_UPLOAD_FAIL: 'messaging:7',
-  FETCH_CONVERSATIONS_FAIL: 'messaging:8',
-  INVALID_DESTINATION: 'messaging:9',
-  INVALID_FILE_PARTS: 'messaging:10',
-  SET_IS_TYPING_FAIL: 'messaging:11'
-
-  /**
-   * Error codes for the Message Waiting Indicator plugin.
-   * @name mwiCodes
-   */
-};const mwiCodes = exports.mwiCodes = {
-  FETCH_MWI_FAIL: 'mwi:1'
-
-  /**
-   * Error codes from the Sip Events plugin.
-   * @name sipEventCodes
-   */
-};const sipEventCodes = exports.sipEventCodes = {
-  UNKNOWN_ERROR: 'sipEvents:1',
-  // The user did not subscribe/connect for the specified sip event service.
-  NOT_PROVISIONED: 'sipEvents:2',
-  // The user is not subscribed for the specified sip event.
-  NOT_SUBSCRIBED: 'sipEvents:3'
-
-  /**
-   * Error codes for the audio bridge portion of the call plugin.
-   * @name bridgeCodes
-   */
-};const bridgeCodes = exports.bridgeCodes = {
-  UNKNOWN_ERROR: 'audioBridge:1',
-  // TODO: Make "invalid input" (and others) a generic code.
-  INVALID_INPUT: 'audioBridge:2',
-  ALREADY_EXISTS: 'audioBridge:3',
-  NOT_FOUND: 'audioBridge:4',
-  NOT_SUPPORTED: 'audioBridge:5',
-  MEDIA_NOT_FOUND: 'audioBridge:6',
-  INVALID_STATE: 'audioBridge:7'
-
-  /**
-   * Error codes for the subscription plugin.
-   * @name subscriptionCodes
-   */
-};const subscriptionCodes = exports.subscriptionCodes = {
-  WS_CONNECTION_ERROR: 'subscription:1',
-  CPAAS_WSREQUEST_FAIL: 'subscription:2',
-  CPAAS_WSREVOKE_FAIL: 'subscription:3',
-  CPAAS_WSREFRESH_FAIL: 'subscription:4',
-  CPAAS_SERVICE_SUB_FAIL: 'subscription:5',
-  CPAAS_SERVICE_UNSUB_FAIL: 'subscription:6',
-  CPAAS_UNSUBSCRIBE_FAIL: 'subscription:7'
-  /**
-   * Error codes for the Presence plugin.
-   * @name presenceCodes
-   */
-};const presenceCodes = exports.presenceCodes = {
-  INVALID_STATUS: 'presence:1',
-  INVALID_ACTIVITY: 'presence:2'
-
-  /**
-   * Error codes for the Users plugin
-   * @name usersCodes
-   */
-};const usersCodes = exports.usersCodes = {
-  UNKNOWN: 'users:1',
-  REFRESH_CONTACTS_FAIL: 'users:2',
-  DIRECTORY_REQUEST_FAIL: 'users:3',
-  INVALID_PARAM: 'users:4'
-
-  /**
-   * Error codes for the Webrtc plugin
-   * @name webrtcCodes
-   */
-};const webrtcCodes = exports.webrtcCodes = {
-  INVALID_PARAM: 'webrtc:1'
-};
 
 /***/ }),
 /* 88 */
@@ -9511,7 +9523,7 @@ exports.default = runPipeline;
 
 var _logs = __webpack_require__(2);
 
-var _kandyLogger = __webpack_require__(82);
+var _kandyLogger = __webpack_require__(83);
 
 var _sdpTransform = __webpack_require__(46);
 
@@ -9692,11 +9704,19 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _constants = __webpack_require__(8);
 
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 /**
  * @param {string} type
  */
+
+// Constants
 function createWsAction(type) {
   /**
    * @param {any=} payload
@@ -9707,14 +9727,14 @@ function createWsAction(type) {
     return {
       type,
       // TODO: This must check for basic error eventually instead.
-      error: payload instanceof Error,
+      error: payload instanceof Error || payload instanceof _errors2.default,
       payload,
       meta: { platform, isReconnect }
     };
   }
   return action;
 }
-// Constants
+
 const wsAttemptConnect = exports.wsAttemptConnect = createWsAction(actionTypes.WS_ATTEMPT_CONNECT);
 const wsDisconnect = exports.wsDisconnect = createWsAction(actionTypes.WS_DISCONNECT);
 const wsConnectFinished = exports.wsConnectFinished = createWsAction(actionTypes.WS_CONNECT_FINISHED);
@@ -9988,7 +10008,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var shared = __webpack_require__(103)('keys');
-var uid = __webpack_require__(78);
+var uid = __webpack_require__(79);
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
@@ -10341,7 +10361,7 @@ exports.levelsChanged = levelsChanged;
 exports.setHandler = setHandler;
 exports.handlersChanged = handlersChanged;
 
-var _actionTypes = __webpack_require__(84);
+var _actionTypes = __webpack_require__(85);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -12688,7 +12708,7 @@ function getTypes(state) {
 "use strict";
 
 var dP = __webpack_require__(25).f;
-var create = __webpack_require__(80);
+var create = __webpack_require__(81);
 var redefineAll = __webpack_require__(113);
 var ctx = __webpack_require__(36);
 var anInstance = __webpack_require__(111);
@@ -12697,7 +12717,7 @@ var $iterDefine = __webpack_require__(108);
 var step = __webpack_require__(143);
 var setSpecies = __webpack_require__(151);
 var DESCRIPTORS = __webpack_require__(22);
-var fastKey = __webpack_require__(83).fastKey;
+var fastKey = __webpack_require__(84).fastKey;
 var validate = __webpack_require__(119);
 var SIZE = DESCRIPTORS ? '_s' : 'size';
 
@@ -12840,7 +12860,7 @@ module.exports = {
 
 var global = __webpack_require__(15);
 var $export = __webpack_require__(13);
-var meta = __webpack_require__(83);
+var meta = __webpack_require__(84);
 var fails = __webpack_require__(43);
 var hide = __webpack_require__(37);
 var redefineAll = __webpack_require__(113);
@@ -13195,9 +13215,9 @@ function parseConfigs(options = {}) {
  */
 function mergeDefaults(options = {}) {
   options = (0, _utils.mergeValues)(defaultOptions, options);
-  // If no ice collection check function was provided, get the default one and use any set/default values for the timeouts
+  // If no ice collection check function was provided, get the default one.
   if (!options.iceCollectionCheckFunction) {
-    options.iceCollectionCheckFunction = (0, _defaults.getDefaultCollectionFunction)(options.iceCollectionIdealTimeout, options.iceCollectionMaxTimeout);
+    options.iceCollectionCheckFunction = _defaults.iceCollectionCheckFunction;
   }
   parseOptions(options);
 
@@ -14989,6 +15009,8 @@ exports.remoteStopMohFinish = remoteStopMohFinish;
 exports.remoteSlowStart = remoteSlowStart;
 exports.restartMedia = restartMedia;
 exports.restartMediaFinish = restartMediaFinish;
+exports.resync = resync;
+exports.resyncFinish = resyncFinish;
 exports.updateCall = updateCall;
 
 var _actionTypes = __webpack_require__(41);
@@ -15348,6 +15370,13 @@ function restartMediaFinish(id, params) {
   return callActionHelper(actionTypes.MEDIA_RESTART_FINISH, id, params);
 }
 
+function resync(id, params) {
+  return callActionHelper(actionTypes.RESYNC, id, params);
+}
+
+function resyncFinish(id, params) {
+  return callActionHelper(actionTypes.RESYNC_FINISH, id, params);
+}
 // Generic action.
 function updateCall(id, params) {
   return callActionHelper(actionTypes.UPDATE_CALL, id, params);
@@ -15455,7 +15484,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(71);
+var _helpers = __webpack_require__(72);
 
 var _constants = __webpack_require__(8);
 
@@ -16944,7 +16973,7 @@ var _actions = __webpack_require__(92);
 
 var _actionTypes = __webpack_require__(50);
 
-var _selectors = __webpack_require__(73);
+var _selectors = __webpack_require__(74);
 
 var _selectors2 = __webpack_require__(10);
 
@@ -17773,7 +17802,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _helpers = __webpack_require__(71);
+var _helpers = __webpack_require__(72);
 
 var _mappings = __webpack_require__(51);
 
@@ -18759,7 +18788,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(71);
+var _helpers = __webpack_require__(72);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21444,7 +21473,7 @@ module.exports = !$assign || __webpack_require__(43)(function () {
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = __webpack_require__(44);
-var toLength = __webpack_require__(77);
+var toLength = __webpack_require__(78);
 var toAbsoluteIndex = __webpack_require__(212);
 module.exports = function (IS_INCLUDES) {
   return function ($this, el, fromIndex) {
@@ -22735,9 +22764,9 @@ module.exports = function isPlainObject(value) {
 /* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(79);
+__webpack_require__(80);
 __webpack_require__(65);
-__webpack_require__(81);
+__webpack_require__(82);
 __webpack_require__(229);
 __webpack_require__(233);
 __webpack_require__(234);
@@ -22773,7 +22802,7 @@ module.exports = function (TO_STRING) {
 
 "use strict";
 
-var create = __webpack_require__(80);
+var create = __webpack_require__(81);
 var descriptor = __webpack_require__(53);
 var setToStringTag = __webpack_require__(67);
 var IteratorPrototype = {};
@@ -24238,7 +24267,7 @@ $export($export.S, 'Object', {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(246);
-__webpack_require__(79);
+__webpack_require__(80);
 __webpack_require__(249);
 __webpack_require__(250);
 module.exports = __webpack_require__(9).Symbol;
@@ -24256,11 +24285,11 @@ var has = __webpack_require__(38);
 var DESCRIPTORS = __webpack_require__(22);
 var $export = __webpack_require__(13);
 var redefine = __webpack_require__(140);
-var META = __webpack_require__(83).KEY;
+var META = __webpack_require__(84).KEY;
 var $fails = __webpack_require__(43);
 var shared = __webpack_require__(103);
 var setToStringTag = __webpack_require__(67);
-var uid = __webpack_require__(78);
+var uid = __webpack_require__(79);
 var wks = __webpack_require__(16);
 var wksExt = __webpack_require__(115);
 var wksDefine = __webpack_require__(116);
@@ -24272,7 +24301,7 @@ var toObject = __webpack_require__(45);
 var toIObject = __webpack_require__(44);
 var toPrimitive = __webpack_require__(98);
 var createDesc = __webpack_require__(53);
-var _create = __webpack_require__(80);
+var _create = __webpack_require__(81);
 var gOPNExt = __webpack_require__(248);
 var $GOPD = __webpack_require__(157);
 var $GOPS = __webpack_require__(105);
@@ -24984,125 +25013,66 @@ module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
+var Rule = function Rule(name, fn, args, modifiers) {
+  this.name = name;
+  this.fn = fn;
+  this.args = args;
+  this.modifiers = modifiers;
+};
+
+Rule.prototype._test = function _test (value) {
+  var fn = this.fn;
+
+  try {
+    testAux(this.modifiers.slice(), fn)(value);
+  } catch (ex) {
+    fn = function () { return false; };
+  }
+
+  try {
+    return testAux(this.modifiers.slice(), fn)(value);
+  } catch (ex$1) {
+    return false;
   }
 };
 
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+Rule.prototype._check = function _check (value) {
+  try {
+    testAux(this.modifiers.slice(), this.fn)(value);
+  } catch (ex) {
+    if (testAux(this.modifiers.slice(), function (it) { return it; })(false)) {
+      return;
     }
   }
 
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  if (!testAux(this.modifiers.slice(), this.fn)(value)) {
+    throw null;
   }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
 
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
+Rule.prototype._testAsync = function _testAsync (value) {
+    var this$1 = this;
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var Rule = function () {
-  function Rule(name, fn, args, modifiers) {
-    classCallCheck(this, Rule);
-
-    this.name = name;
-    this.fn = fn;
-    this.args = args;
-    this.modifiers = modifiers;
-  }
-
-  createClass(Rule, [{
-    key: "_test",
-    value: function _test(value) {
-      var fn = this.fn;
-
-      try {
-        testAux(this.modifiers.slice(), fn)(value);
-      } catch (ex) {
-        fn = function fn() {
-          return false;
-        };
-      }
-
-      try {
-        return testAux(this.modifiers.slice(), fn)(value);
-      } catch (ex) {
-        return false;
-      }
-    }
-  }, {
-    key: "_check",
-    value: function _check(value) {
-      try {
-        testAux(this.modifiers.slice(), this.fn)(value);
-      } catch (ex) {
-        if (testAux(this.modifiers.slice(), function (it) {
-          return it;
-        })(false)) {
-          return;
+  return new Promise(function (resolve, reject) {
+    testAsyncAux(
+      this$1.modifiers.slice(),
+      this$1.fn
+    )(value)
+      .then(function (valid) {
+        if (valid) {
+          resolve(value);
+        } else {
+          reject(null);
         }
-      }
+      })
+      .catch(function (ex) { return reject(ex); });
+  });
+};
 
-      if (!testAux(this.modifiers.slice(), this.fn)(value)) {
-        throw null;
-      }
-    }
-  }, {
-    key: "_testAsync",
-    value: function _testAsync(value) {
-      var _this = this;
+function pickFn(fn, variant) {
+  if ( variant === void 0 ) variant = 'simple';
 
-      return new Promise(function (resolve, reject) {
-        testAsyncAux(_this.modifiers.slice(), _this.fn)(value).then(function (valid) {
-          if (valid) {
-            resolve(value);
-          } else {
-            reject(null);
-          }
-        }).catch(function (ex) {
-          return reject(ex);
-        });
-      });
-    }
-  }]);
-  return Rule;
-}();
-
-function pickFn(fn) {
-  var variant = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "simple";
-
-  return typeof fn === "object" ? fn[variant] : fn;
+  return typeof fn === 'object' ? fn[variant] : fn;
 }
 
 function testAux(modifiers, fn) {
@@ -25121,150 +25091,136 @@ function testAsyncAux(modifiers, fn) {
     var nextFn = testAsyncAux(modifiers, fn);
     return modifier.performAsync(nextFn);
   } else {
-    return function (value) {
-      return Promise.resolve(pickFn(fn, "async")(value));
-    };
+    return function (value) { return Promise.resolve(pickFn(fn, 'async')(value)); };
   }
 }
 
 var Modifier = function Modifier(name, perform, performAsync) {
-  classCallCheck(this, Modifier);
-
   this.name = name;
   this.perform = perform;
   this.performAsync = performAsync;
 };
 
-var ValidationError = function (_Error) {
-  inherits(ValidationError, _Error);
-
+var ValidationError = /*@__PURE__*/(function (Error) {
   function ValidationError(rule, value, cause, target) {
-    classCallCheck(this, ValidationError);
+    var remaining = [], len = arguments.length - 4;
+    while ( len-- > 0 ) remaining[ len ] = arguments[ len + 4 ];
 
-    for (var _len = arguments.length, remaining = Array(_len > 4 ? _len - 4 : 0), _key = 4; _key < _len; _key++) {
-      remaining[_key - 4] = arguments[_key];
-    }
-
-    var _this = possibleConstructorReturn(this, (ValidationError.__proto__ || Object.getPrototypeOf(ValidationError)).call(this, remaining));
-
+    Error.call(this, remaining);
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(_this, ValidationError);
+      Error.captureStackTrace(this, ValidationError);
     }
-    _this.rule = rule;
-    _this.value = value;
-    _this.cause = cause;
-    _this.target = target;
-    return _this;
+    this.rule = rule;
+    this.value = value;
+    this.cause = cause;
+    this.target = target;
   }
+
+  if ( Error ) ValidationError.__proto__ = Error;
+  ValidationError.prototype = Object.create( Error && Error.prototype );
+  ValidationError.prototype.constructor = ValidationError;
 
   return ValidationError;
-}(Error);
+}(Error));
 
-var Context = function () {
-  function Context() {
-    var chain = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var nextRuleModifiers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    classCallCheck(this, Context);
+var Context = function Context(chain, nextRuleModifiers) {
+  if ( chain === void 0 ) chain = [];
+  if ( nextRuleModifiers === void 0 ) nextRuleModifiers = [];
 
-    this.chain = chain;
-    this.nextRuleModifiers = nextRuleModifiers;
-  }
+  this.chain = chain;
+  this.nextRuleModifiers = nextRuleModifiers;
+};
 
-  createClass(Context, [{
-    key: "_applyRule",
-    value: function _applyRule(ruleFn, name) {
-      var _this = this;
+Context.prototype._applyRule = function _applyRule (ruleFn, name) {
+    var this$1 = this;
 
-      return function () {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
+  return function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-        _this.chain.push(new Rule(name, ruleFn.apply(_this, args), args, _this.nextRuleModifiers));
-        _this.nextRuleModifiers = [];
-        return _this;
-      };
-    }
-  }, {
-    key: "_applyModifier",
-    value: function _applyModifier(modifier, name) {
-      this.nextRuleModifiers.push(new Modifier(name, modifier.simple, modifier.async));
-      return this;
-    }
-  }, {
-    key: "_clone",
-    value: function _clone() {
-      return new Context(this.chain.slice(), this.nextRuleModifiers.slice());
-    }
-  }, {
-    key: "test",
-    value: function test(value) {
-      return this.chain.every(function (rule) {
-        return rule._test(value);
-      });
-    }
-  }, {
-    key: "testAll",
-    value: function testAll(value) {
-      var err = [];
-      this.chain.forEach(function (rule) {
-        try {
-          rule._check(value);
-        } catch (ex) {
-          err.push(new ValidationError(rule, value, ex));
-        }
-      });
-      return err;
-    }
-  }, {
-    key: "check",
-    value: function check(value) {
-      this.chain.forEach(function (rule) {
-        try {
-          rule._check(value);
-        } catch (ex) {
-          throw new ValidationError(rule, value, ex);
-        }
-      });
-    }
-  }, {
-    key: "testAsync",
-    value: function testAsync(value) {
-      var _this2 = this;
+    this$1.chain.push(
+      new Rule(name, ruleFn.apply(this$1, args), args, this$1.nextRuleModifiers)
+    );
+    this$1.nextRuleModifiers = [];
+    return this$1;
+  };
+};
 
-      return new Promise(function (resolve, reject) {
-        executeAsyncRules(value, _this2.chain.slice(), resolve, reject);
-      });
+Context.prototype._applyModifier = function _applyModifier (modifier, name) {
+  this.nextRuleModifiers.push(
+    new Modifier(name, modifier.simple, modifier.async)
+  );
+  return this;
+};
+
+Context.prototype._clone = function _clone () {
+  return new Context(this.chain.slice(), this.nextRuleModifiers.slice());
+};
+
+Context.prototype.test = function test (value) {
+  return this.chain.every(function (rule) { return rule._test(value); });
+};
+
+Context.prototype.testAll = function testAll (value) {
+  var err = [];
+  this.chain.forEach(function (rule) {
+    try {
+      rule._check(value);
+    } catch (ex) {
+      err.push(new ValidationError(rule, value, ex));
     }
-  }]);
-  return Context;
-}();
+  });
+  return err;
+};
+
+Context.prototype.check = function check (value) {
+  this.chain.forEach(function (rule) {
+    try {
+      rule._check(value);
+    } catch (ex) {
+      throw new ValidationError(rule, value, ex);
+    }
+  });
+};
+
+Context.prototype.testAsync = function testAsync (value) {
+    var this$1 = this;
+
+  return new Promise(function (resolve, reject) {
+    executeAsyncRules(value, this$1.chain.slice(), resolve, reject);
+  });
+};
 
 function executeAsyncRules(value, rules, resolve, reject) {
   if (rules.length) {
     var rule = rules.shift();
-    rule._testAsync(value).then(function () {
-      executeAsyncRules(value, rules, resolve, reject);
-    }, function (cause) {
-      reject(new ValidationError(rule, value, cause));
-    });
+    rule._testAsync(value).then(
+      function () {
+        executeAsyncRules(value, rules, resolve, reject);
+      },
+      function (cause) {
+        reject(new ValidationError(rule, value, cause));
+      }
+    );
   } else {
     resolve(value);
   }
 }
 
 function v8n() {
-  return proxyContext(new Context());
+  return typeof Proxy !== undefined
+    ? proxyContext(new Context())
+    : proxylessContext(new Context());
 }
 
 // Custom rules
 var customRules = {};
 
-v8n.extend = function (newRules) {
+v8n.extend = function(newRules) {
   Object.assign(customRules, newRules);
 };
 
-v8n.clearCustomRules = function () {
+v8n.clearCustomRules = function() {
   customRules = {};
 };
 
@@ -25286,76 +25242,86 @@ function proxyContext(context) {
       if (prop in availableRules) {
         return newContext._applyRule(availableRules[prop], prop);
       }
-    }
+    },
   });
+}
+
+function proxylessContext(context) {
+  var addRuleSet = function (ruleSet, targetContext) {
+    Object.keys(ruleSet).forEach(function (prop) {
+      targetContext[prop] = function () {
+        var args = [], len = arguments.length;
+        while ( len-- ) args[ len ] = arguments[ len ];
+
+        var newContext = proxylessContext(targetContext._clone());
+        var contextWithRuleApplied = newContext._applyRule(
+          ruleSet[prop],
+          prop
+        ).apply(void 0, args);
+        return contextWithRuleApplied;
+      };
+    });
+    return targetContext;
+  };
+
+  var contextWithAvailableRules = addRuleSet(availableRules, context);
+  var contextWithAllRules = addRuleSet(
+    customRules,
+    contextWithAvailableRules
+  );
+
+  Object.keys(availableModifiers).forEach(function (prop) {
+    Object.defineProperty(contextWithAllRules, prop, {
+      get: function () {
+        var newContext = proxylessContext(contextWithAllRules._clone());
+        return newContext._applyModifier(availableModifiers[prop], prop);
+      }
+    });
+  });
+
+  return contextWithAllRules;
 }
 
 var availableModifiers = {
   not: {
-    simple: function simple(fn) {
-      return function (value) {
-        return !fn(value);
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.resolve(fn(value)).then(function (result) {
-          return !result;
-        }).catch(function (e) {
-          return true;
-        });
-      };
-    }
+    simple: function (fn) { return function (value) { return !fn(value); }; },
+    async: function (fn) { return function (value) { return Promise.resolve(fn(value))
+        .then(function (result) { return !result; })
+        .catch(function () { return true; }); }; },
   },
 
   some: {
-    simple: function simple(fn) {
-      return function (value) {
-        return split(value).some(function (item) {
+    simple: function (fn) { return function (value) {
+      return split(value).some(function (item) {
+        try {
+          return fn(item);
+        } catch (ex) {
+          return false;
+        }
+      });
+    }; },
+    async: function (fn) { return function (value) {
+      return Promise.all(
+        split(value).map(function (item) {
           try {
-            return fn(item);
+            return fn(item).catch(function () { return false; });
           } catch (ex) {
             return false;
           }
-        });
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.all(split(value).map(function (item) {
-          try {
-            return fn(item).catch(function (e) {
-              return false;
-            });
-          } catch (ex) {
-            return false;
-          }
-        })).then(function (result) {
-          return result.some(Boolean);
-        });
-      };
-    }
+        })
+      ).then(function (result) { return result.some(Boolean); });
+    }; },
   },
 
   every: {
-    simple: function simple(fn) {
-      return function (value) {
-        return split(value).every(fn);
-      };
-    },
-    async: function async(fn) {
-      return function (value) {
-        return Promise.all(split(value).map(fn)).then(function (result) {
-          return result.every(Boolean);
-        });
-      };
-    }
-  }
+    simple: function (fn) { return function (value) { return value !== false && split(value).every(fn); }; },
+    async: function (fn) { return function (value) { return Promise.all(split(value).map(fn)).then(function (result) { return result.every(Boolean); }); }; },
+  },
 };
 
 function split(value) {
-  if (typeof value === "string") {
-    return value.split("");
+  if (typeof value === 'string') {
+    return value.split('');
   }
   return value;
 }
@@ -25363,260 +25329,141 @@ function split(value) {
 var availableRules = {
   // Value
 
-  equal: function equal(expected) {
-    return function (value) {
-      return value == expected;
-    };
-  },
+  equal: function (expected) { return function (value) { return value == expected; }; },
 
-  exact: function exact(expected) {
-    return function (value) {
-      return value === expected;
-    };
-  },
+  exact: function (expected) { return function (value) { return value === expected; }; },
 
   // Types
 
-  number: function number() {
-    var allowInfinite = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    return function (value) {
-      return typeof value === "number" && (allowInfinite || isFinite(value));
-    };
-  },
+  number: function (allowInfinite) {
+    if ( allowInfinite === void 0 ) allowInfinite = true;
 
-  integer: function integer() {
-    return function (value) {
-      var isInteger = Number.isInteger || isIntegerPolyfill;
-      return isInteger(value);
-    };
-  },
+    return function (value) { return typeof value === 'number' && (allowInfinite || isFinite(value)); };
+},
 
-  numeric: function numeric() {
-    return function (value) {
-      return !isNaN(parseFloat(value)) && isFinite(value);
-    };
-  },
+  integer: function () { return function (value) {
+    var isInteger = Number.isInteger || isIntegerPolyfill;
+    return isInteger(value);
+  }; },
 
-  string: function string() {
-    return testType("string");
-  },
+  numeric: function () { return function (value) { return !isNaN(parseFloat(value)) && isFinite(value); }; },
 
-  boolean: function boolean() {
-    return testType("boolean");
-  },
+  string: function () { return testType('string'); },
 
-  undefined: function undefined() {
-    return testType("undefined");
-  },
+  boolean: function () { return testType('boolean'); },
 
-  null: function _null() {
-    return testType("null");
-  },
+  undefined: function () { return testType('undefined'); },
 
-  array: function array() {
-    return testType("array");
-  },
+  null: function () { return testType('null'); },
 
-  object: function object() {
-    return testType("object");
-  },
+  array: function () { return testType('array'); },
 
-  instanceOf: function instanceOf(instance) {
-    return function (value) {
-      return value instanceof instance;
-    };
-  },
+  object: function () { return testType('object'); },
+
+  instanceOf: function (instance) { return function (value) { return value instanceof instance; }; },
 
   // Pattern
 
-  pattern: function pattern(expected) {
-    return function (value) {
-      return expected.test(value);
-    };
-  },
+  pattern: function (expected) { return function (value) { return expected.test(value); }; },
 
-  lowercase: function lowercase() {
-    return function (value) {
-      return (/^([a-z]+\s*)+$/.test(value)
-      );
-    };
-  },
+  lowercase: function () { return function (value) { return /^([a-z]+\s*)+$/.test(value); }; },
 
-  uppercase: function uppercase() {
-    return function (value) {
-      return (/^([A-Z]+\s*)+$/.test(value)
-      );
-    };
-  },
+  uppercase: function () { return function (value) { return /^([A-Z]+\s*)+$/.test(value); }; },
 
-  vowel: function vowel() {
-    return function (value) {
-      return (/^[aeiou]+$/i.test(value)
-      );
-    };
-  },
+  vowel: function () { return function (value) { return /^[aeiou]+$/i.test(value); }; },
 
-  consonant: function consonant() {
-    return function (value) {
-      return (/^(?=[^aeiou])([a-z]+)$/i.test(value)
-      );
-    };
-  },
+  consonant: function () { return function (value) { return /^(?=[^aeiou])([a-z]+)$/i.test(value); }; },
 
   // Value at
 
-  first: function first(expected) {
-    return function (value) {
-      return value[0] == expected;
-    };
-  },
+  first: function (expected) { return function (value) { return value[0] == expected; }; },
 
-  last: function last(expected) {
-    return function (value) {
-      return value[value.length - 1] == expected;
-    };
-  },
+  last: function (expected) { return function (value) { return value[value.length - 1] == expected; }; },
 
   // Length
 
-  empty: function empty() {
-    return function (value) {
-      return value.length === 0;
-    };
-  },
+  empty: function () { return function (value) { return value.length === 0; }; },
 
-  length: function length(min, max) {
-    return function (value) {
-      return value.length >= min && value.length <= (max || min);
-    };
-  },
+  length: function (min, max) { return function (value) { return value.length >= min && value.length <= (max || min); }; },
 
-  minLength: function minLength(min) {
-    return function (value) {
-      return value.length >= min;
-    };
-  },
+  minLength: function (min) { return function (value) { return value.length >= min; }; },
 
-  maxLength: function maxLength(max) {
-    return function (value) {
-      return value.length <= max;
-    };
-  },
+  maxLength: function (max) { return function (value) { return value.length <= max; }; },
 
   // Range
 
-  negative: function negative() {
-    return function (value) {
-      return value < 0;
-    };
-  },
+  negative: function () { return function (value) { return value < 0; }; },
 
-  positive: function positive() {
-    return function (value) {
-      return value >= 0;
-    };
-  },
+  positive: function () { return function (value) { return value >= 0; }; },
 
-  between: function between(a, b) {
-    return function (value) {
-      return value >= a && value <= b;
-    };
-  },
+  between: function (a, b) { return function (value) { return value >= a && value <= b; }; },
 
-  range: function range(a, b) {
-    return function (value) {
-      return value >= a && value <= b;
-    };
-  },
+  range: function (a, b) { return function (value) { return value >= a && value <= b; }; },
 
-  lessThan: function lessThan(n) {
-    return function (value) {
-      return value < n;
-    };
-  },
+  lessThan: function (n) { return function (value) { return value < n; }; },
 
-  lessThanOrEqual: function lessThanOrEqual(n) {
-    return function (value) {
-      return value <= n;
-    };
-  },
+  lessThanOrEqual: function (n) { return function (value) { return value <= n; }; },
 
-  greaterThan: function greaterThan(n) {
-    return function (value) {
-      return value > n;
-    };
-  },
+  greaterThan: function (n) { return function (value) { return value > n; }; },
 
-  greaterThanOrEqual: function greaterThanOrEqual(n) {
-    return function (value) {
-      return value >= n;
-    };
-  },
+  greaterThanOrEqual: function (n) { return function (value) { return value >= n; }; },
 
   // Divisible
 
-  even: function even() {
-    return function (value) {
-      return value % 2 === 0;
-    };
-  },
+  even: function () { return function (value) { return value % 2 === 0; }; },
 
-  odd: function odd() {
-    return function (value) {
-      return value % 2 !== 0;
-    };
-  },
+  odd: function () { return function (value) { return value % 2 !== 0; }; },
 
-  includes: function includes(expected) {
-    return function (value) {
-      return ~value.indexOf(expected);
-    };
-  },
+  includes: function (expected) { return function (value) { return ~value.indexOf(expected); }; },
 
-  schema: function schema(_schema) {
-    return testSchema(_schema);
-  },
+  schema: function (schema) { return testSchema(schema); },
 
   // branching
 
-  passesAnyOf: function passesAnyOf() {
-    for (var _len = arguments.length, validations = Array(_len), _key = 0; _key < _len; _key++) {
-      validations[_key] = arguments[_key];
+  passesAnyOf: function () {
+    var validations = [], len = arguments.length;
+    while ( len-- ) validations[ len ] = arguments[ len ];
+
+    return function (value) { return validations.some(function (validation) { return validation.test(value); }); };
+},
+
+  optional: function (validation, considerTrimmedEmptyString) {
+    if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
+
+    return function (value) {
+    if (
+      considerTrimmedEmptyString &&
+      typeof value === 'string' &&
+      value.trim() === ''
+    ) {
+      return true;
     }
 
-    return function (value) {
-      return validations.some(function (validation) {
-        return validation.test(value);
-      });
-    };
-  },
-
-  optional: function optional(validation) {
-    var considerTrimmedEmptyString = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    return function (value) {
-      if (considerTrimmedEmptyString && typeof value === "string" && value.trim() === "") {
-        return true;
-      }
-
-      if (value !== undefined && value !== null) validation.check(value);
-      return true;
-    };
-  }
+    if (value !== undefined && value !== null) { validation.check(value); }
+    return true;
+  };
+},
 };
 
 function testType(expected) {
   return function (value) {
-    return Array.isArray(value) && expected === "array" || value === null && expected === "null" || typeof value === expected;
+    return (
+      (Array.isArray(value) && expected === 'array') ||
+      (value === null && expected === 'null') ||
+      typeof value === expected
+    );
   };
 }
 
 function isIntegerPolyfill(value) {
-  return typeof value === "number" && isFinite(value) && Math.floor(value) === value;
+  return (
+    typeof value === 'number' && isFinite(value) && Math.floor(value) === value
+  );
 }
 
 function testSchema(schema) {
   return {
-    simple: function simple(value) {
+    simple: function (value) {
       var causes = [];
       Object.keys(schema).forEach(function (key) {
         var nestedValidation = schema[key];
@@ -25632,7 +25479,7 @@ function testSchema(schema) {
       }
       return true;
     },
-    async: function async(value) {
+    async: function (value) {
       var causes = [];
       var nested = Object.keys(schema).map(function (key) {
         var nestedValidation = schema[key];
@@ -25641,14 +25488,14 @@ function testSchema(schema) {
           causes.push(ex);
         });
       });
-      return Promise.all(nested).then(function (values) {
+      return Promise.all(nested).then(function () {
         if (causes.length > 0) {
           throw causes;
         }
 
         return true;
       });
-    }
+    },
   };
 }
 
@@ -25733,7 +25580,7 @@ var _utils = __webpack_require__(11);
 
 var _effects = __webpack_require__(1);
 
-var _kandyLogger = __webpack_require__(82);
+var _kandyLogger = __webpack_require__(83);
 
 var _index = __webpack_require__(2);
 
@@ -26061,7 +25908,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(84);
+var _actionTypes = __webpack_require__(85);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -26219,7 +26066,7 @@ exports.setLogHandler = setLogHandler;
 exports.getLevelMap = getLevelMap;
 exports.getHandlerMap = getHandlerMap;
 
-var _actionTypes = __webpack_require__(84);
+var _actionTypes = __webpack_require__(85);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -26393,9 +26240,9 @@ module.exports = { "default": __webpack_require__(265), __esModule: true };
 /* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(79);
+__webpack_require__(80);
 __webpack_require__(65);
-__webpack_require__(81);
+__webpack_require__(82);
 __webpack_require__(266);
 __webpack_require__(270);
 __webpack_require__(272);
@@ -26438,7 +26285,7 @@ module.exports = __webpack_require__(162)(SET, function (get) {
 var ctx = __webpack_require__(36);
 var IObject = __webpack_require__(99);
 var toObject = __webpack_require__(45);
-var toLength = __webpack_require__(77);
+var toLength = __webpack_require__(78);
 var asc = __webpack_require__(268);
 module.exports = function (TYPE, $create) {
   var IS_MAP = TYPE == 1;
@@ -26767,7 +26614,7 @@ var _symbol = __webpack_require__(154);
 
 var _symbol2 = _interopRequireDefault(_symbol);
 
-var _assign = __webpack_require__(76);
+var _assign = __webpack_require__(77);
 
 var _assign2 = _interopRequireDefault(_assign);
 
@@ -27096,7 +26943,7 @@ var $export = __webpack_require__(13);
 var toObject = __webpack_require__(45);
 var call = __webpack_require__(144);
 var isArrayIter = __webpack_require__(145);
-var toLength = __webpack_require__(77);
+var toLength = __webpack_require__(78);
 var createProperty = __webpack_require__(283);
 var getIterFn = __webpack_require__(146);
 
@@ -27155,7 +27002,7 @@ module.exports = { "default": __webpack_require__(285), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(65);
-__webpack_require__(81);
+__webpack_require__(82);
 module.exports = __webpack_require__(115).f('iterator');
 
 
@@ -27176,7 +27023,7 @@ module.exports = function create(P, D) {
 
 var $export = __webpack_require__(13);
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-$export($export.S, 'Object', { create: __webpack_require__(80) });
+$export($export.S, 'Object', { create: __webpack_require__(81) });
 
 
 /***/ }),
@@ -27412,7 +27259,14 @@ function api(context) {
      *   as they were originally set, by performing a merge of the new values into the
      *   previous values.
      *
-     * Please note that that the object provided to the `updateConfig` API may be different
+     * Please note that updating the {@link config#config.call call.removeH264Codecs} configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the
+     *   h264 codec remover sdp handler you should follow this procedure:
+     *   1. Update the config for removeH264Codecs using the {@link api.updateConfig updateConfig} API.
+     *   2. Update the sdp handler list using the {@link call.setSdpHandlers setSdpHandlers} API and provide any client defined SDP handler functions.
+     *
+     *      NOTE: You can get the currently defined SDP handler functions with the {@link api.getConfig getConfig} API.
+     *
+     * Please note that the object provided to the `updateConfig` API may be different
      *   than the object retrieved from the {@link api.getConfig getConfig} API. This may happen when a format
      *   change has happened and the SDK modifies the provided format to alleviate
      *   backwards-compatibility issues. We recommend ensuring the configurations you
@@ -27493,7 +27347,7 @@ function getConfiguration(state) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getDefaultCollectionFunction = getDefaultCollectionFunction;
+exports.iceCollectionCheckFunction = iceCollectionCheckFunction;
 
 var _constants = __webpack_require__(20);
 
@@ -27504,124 +27358,118 @@ var _sdpTransform2 = _interopRequireDefault(_sdpTransform);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Returns the default ice collection check function.
+ * Default function used for the SDK's ICE collection process. Will determine when enough
+ *     candidates have been collected, or enough time has passed, until negotiation can
+ *     continue or if the call should be considered failed.
  *
- * @method getDefaultCollectionFunction
- * @param {number} idealCollectionTimeout The desired ideal ice collection check timeout.
- * @param {number} maxCollectionTimeout The desired max ice collection check timeout.
- * @returns {Function} The default ice collection check function.
+ * If ICE collection completes normally (at any point),
+ *   - start the call if we have some ICE candidates.
+ *   - error the call if there are no ICE candidates.
+ *
+ * If a candidate is collected, follow logic based on below timings.
+ *
+ * If before the ideal timeout,
+ *   - start the call if every media section has a relay candidate for every TURN server.
+ *   - otherwise wait until max timeout.
+ *
+ * If before the max timeout (but after ideal),
+ *   - start the call if every media section has at least one relay candidate.
+ *   - otherwise wait until max timeout.
+ *
+ * If we reach max timeout,
+ *   - start the call if we have some ICE candidates.
+ *   - error the call if there are no ICE candidates.
+ * @param {Object} iceCollectionInfo
+ * @param {string} iceCollectionInfo.callId The ID of the call.
+ * @param {string} iceCollectionInfo.callOperation The current operation of the call.
+ * @param {string} iceCollectionInfo.reason The reason the check function was called.
+ * @param {Array<Object>} iceCollectionInfo.iceCandidates The array of ICE candidates collected so far.
+ * @param {number} iceCollectionInfo.iceCollectionDuration The time elapsed since the start of the ICE collection process.
+ * @param {string} iceCollectionInfo.iceGatheringState The current ICE gathering state.
+ * @param {Object} iceCollectionInfo.rtcPeerConnectionConfig The config of the RTC peer connection.
+ * @param {string} iceCollectionInfo.rtcLocalSessionDescription The local description set on the peer.
+ * @param {Object} timeoutConfigs Timeout configuration values provided by the application.
+ * @param {number} timeoutConfigs.iceCollectionIdealTimeout The desired ideal ice collection check timeout.
+ * @param {number} timeoutConfigs.iceCollectionMaxTimeout The desired max ice collection check timeout.
+ * @return {call.iceCollectionCheckResult} Information on how to proceed with the ice collection check.
  */
-function getDefaultCollectionFunction(idealCollectionTimeout, maxCollectionTimeout) {
-  /**
-   * Default function used for the SDK's ICE collection process. Will determine when enough
-   *     candidates have been collected, or enough time has passed, until negotiation can
-   *     continue or if the call should be considered failed.
-   *
-   * If ICE collection completes normally (at any point),
-   *   - start the call if we have some ICE candidates.
-   *   - error the call if there are no ICE candidates.
-   *
-   * If a candidate is collected, follow logic based on below timings.
-   *
-   * If before the ideal timeout,
-   *   - start the call if every media section has a relay candidate for every TURN server.
-   *   - otherwise wait until max timeout.
-   *
-   * If before the max timeout (but after ideal),
-   *   - start the call if every media section has at least one relay candidate.
-   *   - otherwise wait until max timeout.
-   *
-   * If we reach max timeout,
-   *   - start the call if we have some ICE candidates.
-   *   - error the call if there are no ICE candidates.
-   * @param {Object} iceCollectionInfo
-   * @param {string} iceCollectionInfo.callId The ID of the call.
-   * @param {string} iceCollectionInfo.callOperation The current operation of the call.
-   * @param {string} iceCollectionInfo.reason The reason the check function was called.
-   * @param {Array<Object>} iceCollectionInfo.iceCandidates The array of ICE candidates collected so far.
-   * @param {number} iceCollectionInfo.iceCollectionDuration The time elapsed since the start of the ICE collection process.
-   * @param {string} iceCollectionInfo.iceGatheringState The current ICE gathering state.
-   * @param {Object} iceCollectionInfo.rtcPeerConnectionConfig The config of the RTC peer connection.
-   * @param {string} iceCollectionInfo.rtcLocalSessionDescription The local description set on the peer.
-   * @return {call.iceCollectionCheckResult} Information on how to proceed with the ice collection check.
-   */
-  const iceCollectionCheckFunction = (iceCollectionInfo = {}) => {
-    const {
-      iceCollectionDuration,
-      iceCandidates,
-      iceGatheringState,
-      rtcPeerConnectionConfig,
-      rtcLocalSessionDescription
-    } = iceCollectionInfo;
+function iceCollectionCheckFunction(iceCollectionInfo = {}, timeoutConfigs) {
+  const {
+    iceCollectionDuration,
+    iceCandidates,
+    iceGatheringState,
+    rtcPeerConnectionConfig,
+    rtcLocalSessionDescription
+  } = iceCollectionInfo;
 
-    if (iceGatheringState === 'complete') {
-      // If the ice gathering state is 'complete', but no candidates are available, end the call
-      if (iceCandidates.length === 0) {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
-      }
-      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
+  const { iceCollectionIdealTimeout, iceCollectionMaxTimeout } = timeoutConfigs;
+
+  if (iceGatheringState === 'complete') {
+    // If the ice gathering state is 'complete', but no candidates are available, end the call
+    if (iceCandidates.length === 0) {
+      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
     }
+    return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
+  }
 
-    // If we are under the ideal timeout time and iceGathering state is not complete, we will check that the amount
-    //  relay candidates for each transport is equal to the number of configured TURN servers.
-    if (iceCollectionDuration < idealCollectionTimeout) {
-      // Number of TURN servers
-      let totalTurnServers = 0;
-      const configuredIceServers = rtcPeerConnectionConfig.rtcConfig.iceServers || [];
-      configuredIceServers.forEach(iceServer => {
-        if (Array.isArray(iceServer.urls)) {
-          totalTurnServers += iceServer.urls.filter(url => url.startsWith('turn')).length;
-        } else if (typeof iceServer.urls === 'string' && iceServer.urls.startsWith('turn')) {
-          totalTurnServers += 1;
-        }
-      });
-
-      // RTP Relay candidates collected so far
-      const relayCandidates = iceCandidates.filter(candidate => candidate.component === 'rtp' && candidate.type === 'relay');
-
-      // Check whether there is atleast candidates for each media transport equal to the number of configured
-      //  turn servers before starting the call.
-      const parsedSdp = _sdpTransform2.default.parse(rtcLocalSessionDescription.sdp);
-      const readyToStart = parsedSdp.media.every(media => {
-        const sectionRelays = relayCandidates.filter(candidate => parseInt(candidate.sdpMid) === media.mid || candidate.sdpMid === media.mid);
-        return sectionRelays.length >= totalTurnServers;
-      });
-
-      // If no TURN servers we're provided we will wait till the ideal collection timeout.
-      if (!readyToStart || !totalTurnServers) {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.WAIT, wait: idealCollectionTimeout - iceCollectionDuration };
-      } else {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
+  // If we are under the ideal timeout time and iceGathering state is not complete, we will check that the amount
+  //  relay candidates for each transport is equal to the number of configured TURN servers.
+  if (iceCollectionDuration < iceCollectionIdealTimeout) {
+    // Number of TURN servers
+    let totalTurnServers = 0;
+    const configuredIceServers = rtcPeerConnectionConfig.rtcConfig.iceServers || [];
+    configuredIceServers.forEach(iceServer => {
+      if (Array.isArray(iceServer.urls)) {
+        totalTurnServers += iceServer.urls.filter(url => url.startsWith('turn')).length;
+      } else if (typeof iceServer.urls === 'string' && iceServer.urls.startsWith('turn')) {
+        totalTurnServers += 1;
       }
-    } else if (iceCollectionDuration < maxCollectionTimeout) {
-      // If we are passed the ideal timeout time, we will check that the amount relay candidates for each transport is
-      //  1 or more.
+    });
 
-      // RTP Relay candidates collected so far
-      const relayCandidates = iceCandidates.filter(candidate => candidate.component === 'rtp' && candidate.type === 'relay');
+    // RTP Relay candidates collected so far
+    const relayCandidates = iceCandidates.filter(candidate => candidate.component === 'rtp' && candidate.type === 'relay');
 
-      // Check whether there is atleast 1 candidate for each media transport before starting the call.
-      const parsedSdp = _sdpTransform2.default.parse(rtcLocalSessionDescription.sdp);
-      const readyToStart = parsedSdp.media.every(media => {
-        const sectionRelays = relayCandidates.filter(candidate => parseInt(candidate.sdpMid) === media.mid || candidate.sdpMid === media.mid);
-        return sectionRelays.length >= 1;
-      });
+    // Check whether there is atleast candidates for each media transport equal to the number of configured
+    //  turn servers before starting the call.
+    const parsedSdp = _sdpTransform2.default.parse(rtcLocalSessionDescription.sdp);
+    const readyToStart = parsedSdp.media.every(media => {
+      const sectionRelays = relayCandidates.filter(candidate => parseInt(candidate.sdpMid) === media.mid || candidate.sdpMid === media.mid);
+      return sectionRelays.length >= totalTurnServers;
+    });
 
-      if (readyToStart) {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
-      } else {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.WAIT, wait: maxCollectionTimeout - iceCollectionDuration };
-      }
+    // If no TURN servers we're provided we will wait till the ideal collection timeout.
+    if (!readyToStart || !totalTurnServers) {
+      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.WAIT, wait: iceCollectionIdealTimeout - iceCollectionDuration };
     } else {
-      // If we are passed the max timeout and no candidates are available, end the call
-      if (iceCandidates.length === 0) {
-        return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
-      }
-      // Otherwise, if there are some candidates, we can attempt to start the call.
       return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
     }
-  };
-  return iceCollectionCheckFunction;
+  } else if (iceCollectionDuration < iceCollectionMaxTimeout) {
+    // If we are passed the ideal timeout time, we will check that the amount relay candidates for each transport is
+    //  1 or more.
+
+    // RTP Relay candidates collected so far
+    const relayCandidates = iceCandidates.filter(candidate => candidate.component === 'rtp' && candidate.type === 'relay');
+
+    // Check whether there is atleast 1 candidate for each media transport before starting the call.
+    const parsedSdp = _sdpTransform2.default.parse(rtcLocalSessionDescription.sdp);
+    const readyToStart = parsedSdp.media.every(media => {
+      const sectionRelays = relayCandidates.filter(candidate => parseInt(candidate.sdpMid) === media.mid || candidate.sdpMid === media.mid);
+      return sectionRelays.length >= 1;
+    });
+
+    if (readyToStart) {
+      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
+    } else {
+      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.WAIT, wait: iceCollectionMaxTimeout - iceCollectionDuration };
+    }
+  } else {
+    // If we are passed the max timeout and no candidates are available, end the call
+    if (iceCandidates.length === 0) {
+      return { type: _constants.ICE_COLLECTION_RESULT_TYPES.ERROR, error: 'No ICE candidates available for call to proceed.' };
+    }
+    // Otherwise, if there are some candidates, we can attempt to start the call.
+    return { type: _constants.ICE_COLLECTION_RESULT_TYPES.START_CALL };
+  }
 }
 
 /***/ }),
@@ -28269,7 +28117,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _assign = __webpack_require__(76);
+var _assign = __webpack_require__(77);
 
 var _assign2 = _interopRequireDefault(_assign);
 
@@ -29000,7 +28848,7 @@ var actions = _interopRequireWildcard(_actions);
 
 var _selectors = __webpack_require__(10);
 
-var _constants = __webpack_require__(85);
+var _constants = __webpack_require__(86);
 
 var _logs = __webpack_require__(2);
 
@@ -30092,7 +29940,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _selectors = __webpack_require__(86);
+var _selectors = __webpack_require__(87);
 
 var _media = __webpack_require__(314);
 
@@ -30155,7 +30003,7 @@ exports.default = mediaAPI;
 
 var _actions = __webpack_require__(27);
 
-var _selectors = __webpack_require__(86);
+var _selectors = __webpack_require__(87);
 
 var _logs = __webpack_require__(2);
 
@@ -30327,14 +30175,19 @@ function mediaAPI({ dispatch, getState }) {
     },
 
     /**
-     * Mutes the specified Tracks at their media source.
+     * Mutes the specified Tracks.
      *
-     * Prevents media from being received for the Tracks. Audio Tracks will
-     *    become silent and video Tracks will be a black frame.
+     * This API prevents the media of the specified Tracks from being rendered. Audio
+     *     Tracks will become silent and video Tracks will be a black frame.
+     * This does not stop media from being received by those Tracks. The media simply
+     *     cannot be used by the application while the Track is muted.
      *
      * If a local Track being sent in a Call is muted, the Track will be
      *    noticeably muted for the remote user. If a remote Track received in a
      *    call is muted, the result will only be noticeable locally.
+     *
+     * This mute operation acts on those specified Tracks directly.
+     * It does not act on the active Call as a whole.
      *
      * The SDK will emit a {@link media.event:media:muted media:muted} event
      *    when a Track has been muted.
@@ -30352,7 +30205,9 @@ function mediaAPI({ dispatch, getState }) {
     /**
      * Unmutes the specified Tracks.
      *
-     * Media will resume as normal for the Tracks.
+     * Media will resume its normal rendering for the Tracks.
+     * Like the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.
+     * Therefore it does not act on active Call as a whole.
      *
      * The SDK will emit a {@link media.event:media:unmuted media:unmuted} event
      *    when a Track has been unmuted.
@@ -32245,7 +32100,7 @@ var _actionTypes = __webpack_require__(12);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
-var _actionTypes2 = __webpack_require__(84);
+var _actionTypes2 = __webpack_require__(85);
 
 var _selectors = __webpack_require__(160);
 
@@ -36093,9 +35948,9 @@ if (typeof module === 'object') {
 /* 341 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(79);
+__webpack_require__(80);
 __webpack_require__(65);
-__webpack_require__(81);
+__webpack_require__(82);
 __webpack_require__(342);
 __webpack_require__(343);
 __webpack_require__(344);
@@ -36813,7 +36668,7 @@ module.exports = __webpack_require__(9).Object.freeze;
 
 // 19.1.2.5 Object.freeze(O)
 var isObject = __webpack_require__(21);
-var meta = __webpack_require__(83).onFreeze;
+var meta = __webpack_require__(84).onFreeze;
 
 __webpack_require__(114)('freeze', function ($freeze) {
   return function freeze(it) {
@@ -38221,7 +38076,7 @@ var _Peer = __webpack_require__(174);
 
 var _Peer2 = _interopRequireDefault(_Peer);
 
-var _uuid = __webpack_require__(75);
+var _uuid = __webpack_require__(76);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -38345,7 +38200,7 @@ var _session = __webpack_require__(386);
 
 var _session2 = _interopRequireDefault(_session);
 
-var _uuid = __webpack_require__(75);
+var _uuid = __webpack_require__(76);
 
 var _eventemitter = __webpack_require__(31);
 
@@ -40263,7 +40118,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /**
- * This object is provided to the {@link call.IceCollectionCheckFunction` IceCollectionCheckFunction}, and contains the
+ * This object is provided to the {@link call.IceCollectionCheckFunction IceCollectionCheckFunction}, and contains the
  *  necessary information about the call (i.e., call ID, current call operation), and information about the ongoing ICE collection,
  *  such as the list of all ICE candidates collected so far and the ICE gathering state.
  *
@@ -40276,11 +40131,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {string} reason The reason the check function was called. Three possible values:
  *  'NewCandidate' - A new ICE candidate was collected. Note: there may be multiple new ICE candidates collected.
  *  'IceGatheringStateChanged' - The ICE gathering state changed.
- *  'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by `IceCollectionCheckFunction`)
+ *  'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on `wait` value returned by {@link call.IceCollectionCheckFunction IceCollectionCheckFunction}.)
  * @property {Array<RTCIceCandidate>} iceCandidates An array of all ICE candidates collected so far.
  * @property {number} iceCollectionDuration The time elapsed since the start of the ICE collection process.
  * @property {string} iceGatheringState The current ICE gathering state.
- *    See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState RTCPeerConnection.iceGatheringState}
+ *    See {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState RTCPeerConnection.iceGatheringState}.
  * @property {Object} rtcPeerConnectionConfig The current configration for the RTCPeerConnection.
  * @property {string} rtcLocalSessionDescription The current local session description set on the peer.
  */
@@ -40292,14 +40147,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * ({@link call.IceCollectionInfo IceCollectionInfo}), which it can use to dictate how to proceed with a call.
  *  The function can be invoked for three different reasons:
  *  a new ICE candidate was collected, the ICE gathering state changed, or a scheduled call based on the `wait` time set after
- *  an initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason).
+ *  an initial invocation of the function.
  *
  * The function must then return an appropriate result object in the format of {@link call.IceCollectionCheckResult IceCollectionCheckResult}
  *  which will dictate how the call will proceed. An incorrect return object, or result `type`, will cause the call to end with an error.
  *
  * [Default]
  * The default IceCollectionCheckFunction uses the following algorithm to determine if the call can proceed to negotiation:
- * 1. If the `iceGatheringState` is "complete" at any stage, then proceed with the negotiation.
+ * 1. If the `iceGatheringState` is "complete" at any stage, then:
+ *    - Proceed with the negotiation if any ICE candidates are collected.
+ *    - Or, end the call if there are no ICE candidates collected.
  * 2. Otherwise, if before the ideal ICE collection timeout:
  *    - If every media has a relay ICE candidate for every configured TURN server, proceed with negotiation.
  *    - Else, wait until the ideal timeout, or when invoked for another reason.
@@ -40317,6 +40174,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @typedef {Function} IceCollectionCheckFunction
  * @memberof call
  * @param {call.IceCollectionInfo} iceCollectionInfo Information about the current status of the ICE candidate collection.
+ * @param {Object} iceTimeouts Configurations provided to the SDK for ICE collection timeout boundaries.
+ * @param {number} iceTimeouts.iceCollectionIdealTimeout The amount of time to wait for ideal candidates, in
+ *      milliseconds.  See {@link config#config.call config.call} for more information.
+ * @param {number} iceTimeouts.iceCollectionMaxTimeout The maximum amount of time to wait for ICE collection,
+ *      in milliseconds. See {@link config#config.call config.call} for more information.
  * @returns {call.IceCollectionCheckResult} Information on how to proceed with the call and/or ICE collection.
  * @example
  * function isRelayCandidate (candidate) {
@@ -40325,7 +40187,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *   return candidate.type === 'relay'
  * }
  *
- * function myIceCollectionCheck ({ iceGatheringState, iceCandidates }) {
+ * function myIceCollectionCheck ({ iceGatheringState, iceCandidates }, iceTimeouts) {
  *   if (iceGatheringState === 'complete') {
  *     if (iceCandidates.some(isRelayCandidate)) {
  *       return { type: 'StartCall' }
@@ -40566,7 +40428,7 @@ var _selectors2 = __webpack_require__(10);
 
 var _actions2 = __webpack_require__(28);
 
-var _uuid = __webpack_require__(75);
+var _uuid = __webpack_require__(76);
 
 var _fp = __webpack_require__(3);
 
@@ -41703,6 +41565,11 @@ function callAPI({ dispatch, getState }) {
      *    new track to the call. This effectively allows for changing the
      *    track constraints (eg. device used) for an ongoing call.
      *
+     * Because it completely replaces an old track with a new one,
+     * the old track's state characteristics are not carried over in the new track's state.
+     * (e.g. if an old track's state was 'muted' and replacement of this track has occured,
+     * the new track's state will be 'unmuted', as this is its default state)
+     *
      * The progress of the operation will be tracked via the
      *    {@link call.event:call:operation call:operation} event.
      *
@@ -41826,6 +41693,31 @@ function callAPI({ dispatch, getState }) {
         removeH264Codecs: config.removeH264Codecs
       };
       dispatch((0, _actions2.setSdpHandlers)(sdpHandlers, options));
+    },
+
+    /**
+     * Re-sync a Call with the server by fetching the status of the Call on the server.
+     *
+     * This may be useful to get and update a call's state after processing incoming notifications
+     *    some time after they were received (e.g., waiting to process incoming call push notifications
+     *    till a connection is established).
+     *
+     * The progress of the `RESYNC` operation will be tracked via the
+     *    {@link call.event:call:operation call:operation} events.
+     *
+     * The SDK may emit a {@link call.event:call:operation call:operation} event after the `RESYNC` operation is
+     *    complete if the call was ended do to the resync.
+     * @private
+     * @static
+     * @memberof call
+     * @requires call
+     * @requires link_call
+     * @method resync
+     * @param {string} callId The ID of the call to re-sync.
+     */
+    resync(callId) {
+      log.debug(`${_logs.API_LOG_TAG}call.resync, callId: ${callId}`);
+      dispatch(_actions.callActions.resync(callId));
     },
 
     /**
@@ -42986,7 +42878,7 @@ callReducers[webrtcActionTypes.SESSION_ICE_CONNECTION_STATE_CHANGE] = {
 const callReducer = (0, _reduxActions.handleActions)(callReducers, {});
 
 // Actions routed to call-tier reducers.
-const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.SEND_RINGING_FEEDBACK, actionTypes.SEND_RINGING_FEEDBACK_FINISH, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.MEDIA_RESTART, actionTypes.MEDIA_RESTART_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
+const specificCallActions = (0, _reduxActions.combineActions)(actionTypes.PENDING_OPERATION, actionTypes.PENDING_MAKE_CALL, actionTypes.MAKE_CALL_FINISH, actionTypes.ANSWER_CALL, actionTypes.ANSWER_CALL_FINISH, actionTypes.REJECT_CALL, actionTypes.REJECT_CALL_FINISH, actionTypes.CALL_ACCEPTED, actionTypes.SEND_RINGING_FEEDBACK, actionTypes.SEND_RINGING_FEEDBACK_FINISH, actionTypes.CALL_RINGING, actionTypes.SESSION_PROGRESS, actionTypes.CALL_CANCELLED, actionTypes.IGNORE_CALL, actionTypes.IGNORE_CALL_FINISH, actionTypes.END_CALL, actionTypes.END_CALL_FINISH, actionTypes.CALL_HOLD, actionTypes.CALL_HOLD_FINISH, actionTypes.CALL_UNHOLD, actionTypes.CALL_UNHOLD_FINISH, actionTypes.SET_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS, actionTypes.SEND_CUSTOM_PARAMETERS_FINISH, actionTypes.CALL_REMOTE_HOLD_FINISH, actionTypes.CALL_REMOTE_UNHOLD_FINISH, actionTypes.ADD_MEDIA, actionTypes.ADD_BASIC_MEDIA, actionTypes.ADD_MEDIA_FINISH, actionTypes.REMOVE_MEDIA, actionTypes.REMOVE_BASIC_MEDIA, actionTypes.REMOVE_MEDIA_FINISH, actionTypes.RENEGOTIATE, actionTypes.RENEGOTIATE_FINISH, actionTypes.UPDATE_CALL, actionTypes.FORWARD_CALL, actionTypes.FORWARD_CALL_FINISH, actionTypes.DIRECT_TRANSFER, actionTypes.DIRECT_TRANSFER_FINISH, actionTypes.SEND_DTMF, actionTypes.SEND_DTMF_FINISH, actionTypes.JOIN, actionTypes.REPLACE_TRACK, actionTypes.REPLACE_TRACK_FINISH, actionTypes.MEDIA_RESTART, actionTypes.MEDIA_RESTART_FINISH, actionTypes.RESYNC, actionTypes.RESYNC_FINISH, actionTypes.REMOTE_SLOW_START, actionTypes.REMOTE_START_MOH_FINISH, actionTypes.REMOTE_STOP_MOH_FINISH, actionTypes.GET_STATS, actionTypes.GET_STATS_FINISH, actionTypes.SESSION_CREATED);
 
 const specificWebrtcSessionActions = (0, _reduxActions.combineActions)(webrtcActionTypes.SESSION_ICE_CONNECTION_STATE_CHANGE);
 
@@ -44271,7 +44163,7 @@ var _bandwidth = __webpack_require__(180);
 
 var _establish = __webpack_require__(127);
 
-var _midcall = __webpack_require__(72);
+var _midcall = __webpack_require__(73);
 
 var _logs = __webpack_require__(2);
 
@@ -46059,7 +45951,7 @@ exports.iceRestart = iceRestart;
 
 var _establish = __webpack_require__(127);
 
-var _midcall = __webpack_require__(72);
+var _midcall = __webpack_require__(73);
 
 var _rollback = __webpack_require__(418);
 
@@ -46077,11 +45969,11 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _selectors2 = __webpack_require__(86);
+var _selectors2 = __webpack_require__(87);
 
 var _selectors3 = __webpack_require__(10);
 
-var _selectors4 = __webpack_require__(73);
+var _selectors4 = __webpack_require__(74);
 
 var _effects = __webpack_require__(186);
 
@@ -47797,7 +47689,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _uuid = __webpack_require__(75);
+var _uuid = __webpack_require__(76);
 
 // Generate a unique SDK GUID for the running SDK instance.
 const sdkId = (0, _uuid.v4)();
@@ -47844,7 +47736,7 @@ var _logs = __webpack_require__(2);
 
 var _establish = __webpack_require__(127);
 
-var _midcall = __webpack_require__(72);
+var _midcall = __webpack_require__(73);
 
 var _errors = __webpack_require__(7);
 
@@ -47852,7 +47744,7 @@ var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
-var _uuid = __webpack_require__(75);
+var _uuid = __webpack_require__(76);
 
 var _sdpTransform = __webpack_require__(46);
 
@@ -47895,7 +47787,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 // Helpers
 // TODO: Move this to a shared location.
-function* incomingCall(deps, params) {
+function* incomingCall(deps, params, channel) {
   const requests = deps.requests;
   const { sdp, wrtcsSessionId, remoteNumber, remoteName, calleeNumber, customParameters } = params;
   const callConfig = yield (0, _effects.select)(_selectors.getOptions);
@@ -48012,6 +47904,12 @@ function* incomingCall(deps, params) {
   yield (0, _effects.put)(_actions.callActions.updateCall(callId, {
     state: nextState
   }));
+
+  // Workaround for re-syncing incoming calls received via PUSH.
+  // TODO: Check if this can be removed once we start receiving TURN credentials with incoming call notifications.
+  if (channel && channel.toLowerCase() === 'push') {
+    yield (0, _effects.put)(_actions.callActions.resync(callId));
+  }
 }
 
 /**
@@ -48660,7 +48558,7 @@ var _constants2 = __webpack_require__(58);
 
 var _logs = __webpack_require__(2);
 
-var _midcall = __webpack_require__(72);
+var _midcall = __webpack_require__(73);
 
 var _negotiation = __webpack_require__(425);
 
@@ -50825,6 +50723,7 @@ var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2
 exports.sendCallAudit = sendCallAudit;
 exports.getSessions = getSessions;
 exports.updateCallState = updateCallState;
+exports.resyncCallState = resyncCallState;
 exports.normalizeIceFailure = normalizeIceFailure;
 exports.callIceCollectionCheck = callIceCollectionCheck;
 
@@ -50838,7 +50737,7 @@ var _selectors = __webpack_require__(18);
 
 var _constants = __webpack_require__(20);
 
-var _midcall = __webpack_require__(72);
+var _midcall = __webpack_require__(73);
 
 var _logs = __webpack_require__(2);
 
@@ -50847,6 +50746,10 @@ var _actions2 = __webpack_require__(27);
 var _actionTypes2 = __webpack_require__(12);
 
 var webrtcActionTypes = _interopRequireWildcard(_actionTypes2);
+
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
 
 var _effects = __webpack_require__(1);
 
@@ -50881,7 +50784,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 
-// Other plugins.
+// Callstack plugin.
+// Call plugin.
 function* sendCallAudit(deps, action) {
   const { webRTC, requests } = deps;
   let currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
@@ -50939,11 +50843,14 @@ function* sendCallAudit(deps, action) {
       // Hangup call automatically (from webRTC perspective)
       yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
 
-      // Cleanup Redux state by sending END_CALL_FINISH action
-      yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
-        isLocal: true,
-        transition: { statusCode: 9909, reasonText: 'Call has ended due to call audit failure.' }
-      }));
+      const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+      if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+        // Cleanup Redux state by sending END_CALL_FINISH action
+        yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+          isLocal: true,
+          transition: { statusCode: 9909, reasonText: 'Call has ended due to call audit failure.' }
+        }));
+      }
       return;
     } else if (audit) {
       log.debug(`Call audit status is ${audit.status}.`);
@@ -50976,8 +50883,7 @@ function* sendCallAudit(deps, action) {
 // Libraries.
 
 
-// Callstack plugin.
-// Call plugin.
+// Other plugins.
 function* getSessions(deps, action) {
   const config = yield (0, _effects.select)(_selectors.getOptions);
   if (!config.resyncOnConnect) {
@@ -51059,6 +50965,80 @@ function* updateCallState(deps, activeCall) {
         }
       }
     }
+  }
+}
+
+/**
+ * Sends a GET session request and updates the call if necessary.
+ * The response to the GET session request contains two properties that can be used for determining the call state:
+ *  1. `statusCode` - Code which can be used to provide more info for error responses
+ *  2. `state`
+ *    a. "RINGING" - Call exists, and can be either accepted or rejected.
+ *    b. "ANSWERED" - Call is active, and can be either Connected or Held.
+ *
+ * This saga performs the signaling operation to get the status of a call session on the server, and any local
+ *    WebRTC operations necessary for closing the call if necessary.
+ *
+ * Responsibilities:
+ *    1. Update the call state if the call is out of sync (call's status does not match the response from the server)
+ * @method resyncCallState
+ * @param {Object}   deps          Dependencies that the saga uses.
+ * @param {Object}   deps.webRTC   The WebRTC stack.
+ * @param {Object}   deps.requests The set of platform-specific signalling functions.
+ * @param {Function} deps.requests.getSession GET session signalling function.
+ * @param {Object}   action        The call being acted on.
+ */
+function* resyncCallState(deps, action) {
+  const { webRTC, requests } = deps;
+  const log = _logs.logManager.getLogger('CALL', action.payload.id);
+
+  const currentCall = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+  if (!currentCall) {
+    log.debug(`Call ${action.payload.id} not found.`);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(action.payload.id, {
+      error: new _errors2.default({
+        code: _errors.callCodes.INVALID_PARAM,
+        message: 'Call not found; invalid call ID.'
+      })
+    }));
+    return;
+  }
+
+  const sessionStatusResponse = yield (0, _effects.call)(requests.getSession, {
+    wrtcsSessionId: currentCall.wrtcsSessionId
+  });
+
+  // Call not found
+  if (sessionStatusResponse.error && sessionStatusResponse.error.code === 47) {
+    log.info('Call re-sync found that the call has ended. Ending Call.');
+    // End the call as the session does not exist on the server anymore (statusCode 47 response)
+    yield (0, _effects.call)(_midcall.closeCall, webRTC, currentCall.webrtcSessionId);
+
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
+    const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+    if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+      yield (0, _effects.put)(_actions.callActions.endCallFinish(currentCall.id, {
+        isLocal: true
+      }));
+    }
+  } else if (sessionStatusResponse.error) {
+    // GET response errors other than session not found
+    log.info(`Call re-sync failure (${sessionStatusResponse.error.code}).`, sessionStatusResponse.error);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id, {
+      error: sessionStatusResponse.error
+    }));
+  } else if (sessionStatusResponse.state === 'ANSWERED' && currentCall.state !== _constants.CALL_STATES.CONNECTED && currentCall.state !== _constants.CALL_STATES.ON_HOLD) {
+    log.info('Call re-sync found that call is cancelled. Cancelling call.');
+    // If the call is answered, but not by us, report call as cancelled
+    yield (0, _effects.call)(_midcall.closeCall, deps.webRTC, currentCall.webrtcSessionId);
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
+    const latestCallState = yield (0, _effects.select)(_selectors.getCallById, action.payload.id);
+    if (latestCallState.state !== _constants.CALL_STATES.ENDED && latestCallState.state !== _constants.CALL_STATES.CANCELLED) {
+      yield (0, _effects.put)(_actions.callActions.callCancelled(currentCall.id));
+    }
+  } else {
+    log.info('Call re-sync found that there are no changes necessary for the call');
+    yield (0, _effects.put)(_actions.callActions.resyncFinish(currentCall.id));
   }
 }
 
@@ -51175,7 +51155,13 @@ function* callIceCollectionCheck(deps, action) {
     result = config.iceCollectionCheckFunction((0, _extends3.default)({
       callId: currentCall.id,
       callOperation: currentCall.localOp && currentCall.localOp.operation
-    }, iceCollectionInfo));
+    }, iceCollectionInfo), {
+      // TODO: If a call changes these configs in the middle of ICE collection,
+      //    it will change the values given to this function. Very unlikely scenario,
+      //    but could cause issues. Could also change `iceCollectionCheckFunction` itself.
+      iceCollectionIdealTimeout: config.iceCollectionIdealTimeout,
+      iceCollectionMaxTimeout: config.iceCollectionMaxTimeout
+    });
   } catch (e) {
     log.info('Error thrown by the iceCollectionCheckFunction. Ending call.', e);
     result = {
@@ -51408,7 +51394,7 @@ function callOperationHandler(action, params) {
 const callEvents = exports.callEvents = {};
 
 // START actions
-const startActionTypesAndOperations = [{ type: actionTypes.SEND_RINGING_FEEDBACK, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.MEDIA_RESTART, operation: _constants.OPERATIONS.MEDIA_RESTART }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
+const startActionTypesAndOperations = [{ type: actionTypes.SEND_RINGING_FEEDBACK, operation: _constants.OPERATIONS.SEND_RINGING_FEEDBACK }, { type: actionTypes.ANSWER_CALL, operation: _constants.OPERATIONS.ANSWER }, { type: actionTypes.REJECT_CALL, operation: _constants.OPERATIONS.REJECT }, { type: actionTypes.IGNORE_CALL, operation: _constants.OPERATIONS.IGNORE }, { type: actionTypes.END_CALL, operation: _constants.OPERATIONS.END }, { type: actionTypes.FORWARD_CALL, operation: _constants.OPERATIONS.FORWARD_CALL }, { type: actionTypes.CALL_HOLD, operation: _constants.OPERATIONS.HOLD }, { type: actionTypes.CALL_UNHOLD, operation: _constants.OPERATIONS.UNHOLD }, { type: actionTypes.SEND_CUSTOM_PARAMETERS, operation: _constants.OPERATIONS.SEND_CUSTOM_PARAMETERS }, { type: actionTypes.ADD_MEDIA, operation: _constants.OPERATIONS.ADD_MEDIA }, { type: actionTypes.ADD_BASIC_MEDIA, operation: _constants.OPERATIONS.ADD_BASIC_MEDIA }, { type: actionTypes.REMOVE_MEDIA, operation: _constants.OPERATIONS.REMOVE_MEDIA }, { type: actionTypes.REMOVE_BASIC_MEDIA, operation: _constants.OPERATIONS.REMOVE_BASIC_MEDIA }, { type: actionTypes.RENEGOTIATE, operation: _constants.OPERATIONS.RENEGOTIATE }, { type: actionTypes.MEDIA_RESTART, operation: _constants.OPERATIONS.MEDIA_RESTART }, { type: actionTypes.RESYNC, operation: _constants.OPERATIONS.RESYNC }, { type: actionTypes.SEND_DTMF, operation: _constants.OPERATIONS.SEND_DTMF }, { type: actionTypes.GET_STATS, operation: _constants.OPERATIONS.GET_STATS }, { type: actionTypes.CONSULTATIVE_TRANSFER, operation: _constants.OPERATIONS.CONSULTATIVE_TRANSFER }, { type: actionTypes.DIRECT_TRANSFER, operation: _constants.OPERATIONS.DIRECT_TRANSFER }, { type: actionTypes.JOIN, operation: _constants.OPERATIONS.JOIN }, { type: actionTypes.REPLACE_TRACK, operation: _constants.OPERATIONS.REPLACE_TRACK }];
 startActionTypesAndOperations.forEach(startActionTypeAndOperation => {
   callEvents[startActionTypeAndOperation.type] = (action, params) => {
     return callOperationHandler(action, (0, _extends3.default)({}, params, {
@@ -51695,6 +51681,14 @@ callEvents[actionTypes.MEDIA_RESTART_FINISH] = (action, params) => {
   })), callEventHandler(eventTypes.MEDIA_RESTART, action, {
     error: action.payload.error
   })];
+};
+
+callEvents[actionTypes.RESYNC_FINISH] = (action, params) => {
+  return [callOperationHandler(action, (0, _extends3.default)({}, params, {
+    operation: _constants.OPERATIONS.RESYNC,
+    transition: _constants.OP_TRANSITIONS.FINISH,
+    isLocal: true
+  }))];
 };
 
 exports.default = (0, _extends3.default)({}, callEvents);
@@ -52229,7 +52223,7 @@ var _constants = __webpack_require__(8);
 
 var _actions = __webpack_require__(92);
 
-var _selectors = __webpack_require__(73);
+var _selectors = __webpack_require__(74);
 
 var _selectors2 = __webpack_require__(10);
 
@@ -52588,7 +52582,7 @@ exports.connectWebsocket = connectWebsocket;
 
 var _websocket = __webpack_require__(440);
 
-var _selectors = __webpack_require__(73);
+var _selectors = __webpack_require__(74);
 
 var _actionTypes = __webpack_require__(50);
 
@@ -52608,11 +52602,20 @@ var _effects = __webpack_require__(1);
 
 var _constants = __webpack_require__(8);
 
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _codes = __webpack_require__(71);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Get the logger
+
+
+// Helpers
 
 
 // Libraries.
@@ -52661,7 +52664,10 @@ function* websocketLifecycle(wsConnectAction) {
       yield (0, _effects.put)(actions.wsReconnectFailed(undefined, platform));
       return;
     } else {
-      yield (0, _effects.put)(actions.wsConnectFinished(new Error(websocket.message), platform));
+      yield (0, _effects.put)(actions.wsConnectFinished(new _errors2.default({
+        message: websocket.message,
+        code: _codes.subscriptionCodes.WS_CONNECTION_ERROR
+      }), platform));
       return;
     }
   }
@@ -52819,7 +52825,7 @@ function* serverPingFlow(ws) {
 
       // if the pong websocket message has an error then try to reconnect
       if (error) {
-        log.error(`Got error when attempting to reply: ${error.message}`);
+        log.info(`Got error when attempting to reply: ${error.message}`);
         if (autoReconnect) {
           log.info('Trying to auto reconnect ...');
         }
@@ -52959,7 +52965,10 @@ function _sendWSMessage(ws, message) {
       log.debug('Sending message on websocket.', message);
       ws.send(message);
     } else {
-      throw new Error('websocket was not in readyState');
+      throw new _errors2.default({
+        message: 'websocket was not in readyState',
+        code: _codes.connectivityCodes.WS_MESSAGE_ERROR
+      });
     }
   } catch (e) {
     return e;
@@ -52995,6 +53004,7 @@ function* connectWebsocket(wsInfo, platform) {
     }
     return websocket;
   }
+
   while (connectionAttempt < configs.reconnectLimit || !configs.reconnectLimit) {
     const wsConnectStart = Date.now();
     const { openWs, timeout } = yield (0, _effects.race)({
@@ -53033,7 +53043,7 @@ function* connectWebsocket(wsInfo, platform) {
         if (timeout) {
           return {
             error: true,
-            message: 'Timed out.'
+            message: `Websocket connection timed out. Tried ${connectionAttempt} times to connect.`
           };
         }
         break;
@@ -53098,7 +53108,9 @@ const log = _logs.logManager.getLogger('CONNECTIVITY');
  */
 function openWebsocket(options) {
   // Create the websocket.
-  const ws = new WebSocket(`${options.protocol}://${options.server}:${options.port}${options.url}` + (0, _utils.toQueryString)(options.params));
+  const wsUrl = `${options.protocol}://${options.server}:${options.port}${options.url}` + (0, _utils.toQueryString)(options.params);
+  log.debug(`Opening socket at: ${wsUrl}`);
+  const ws = new WebSocket(wsUrl);
 
   // Use a promise to wait for the first message from the websocket.
   // This indicates whether the WS opened successfully or not.
@@ -53545,7 +53557,7 @@ exports.deleteMessageFinish = deleteMessageFinish;
 exports.getImageLinks = getImageLinks;
 exports.getImageLinksFinish = getImageLinksFinish;
 
-var _actionTypes = __webpack_require__(74);
+var _actionTypes = __webpack_require__(75);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -53868,7 +53880,7 @@ exports.deleteConversationFinish = deleteConversationFinish;
 exports.setIsTyping = setIsTyping;
 exports.setIsTypingFinished = setIsTypingFinished;
 
-var _actionTypes = __webpack_require__(74);
+var _actionTypes = __webpack_require__(75);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -54045,7 +54057,7 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _actionTypes = __webpack_require__(74);
+var _actionTypes = __webpack_require__(75);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -55029,7 +55041,7 @@ var _subscriptions = __webpack_require__(453);
 
 var subsSagas = _interopRequireWildcard(_subscriptions);
 
-var _actionTypes = __webpack_require__(74);
+var _actionTypes = __webpack_require__(75);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56172,7 +56184,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _actionTypes = __webpack_require__(74);
+var _actionTypes = __webpack_require__(75);
 
 var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -56968,7 +56980,7 @@ function* processNotifications() {
     if (!isDuplicate(notificationId, config)) {
       log.info('Notifying other plugins about notification ...');
       // Notify others (plugins) that a new notification was receive.
-      yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform));
+      yield (0, _effects.put)(actions.notificationReceived(notification, meta.platform, meta.channel));
       log.debug(`Finished processing notification of type ${notificationType} with ID ${notificationId}`);
 
       // Finish processing the notification.
@@ -57363,7 +57375,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _assign = __webpack_require__(76);
+var _assign = __webpack_require__(77);
 
 var _assign2 = _interopRequireDefault(_assign);
 
@@ -57858,7 +57870,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(71);
+var _helpers = __webpack_require__(72);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -59583,7 +59595,7 @@ var _effects = __webpack_require__(33);
 
 var _effects2 = _interopRequireDefault(_effects);
 
-var _helpers = __webpack_require__(71);
+var _helpers = __webpack_require__(72);
 
 var _utils = __webpack_require__(195);
 
@@ -60244,7 +60256,7 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _constants = __webpack_require__(8);
 
-var _constants2 = __webpack_require__(85);
+var _constants2 = __webpack_require__(86);
 
 var _reduxActions = __webpack_require__(14);
 
@@ -60863,7 +60875,7 @@ var _actionTypes2 = __webpack_require__(50);
 
 var connectivityActionTypes = _interopRequireWildcard(_actionTypes2);
 
-var _constants = __webpack_require__(85);
+var _constants = __webpack_require__(86);
 
 var _selectors2 = __webpack_require__(10);
 
@@ -61208,7 +61220,7 @@ var _effects = __webpack_require__(186);
 
 var _logs = __webpack_require__(2);
 
-var _selectors3 = __webpack_require__(73);
+var _selectors3 = __webpack_require__(74);
 
 var _errors = __webpack_require__(7);
 
@@ -62709,7 +62721,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(87);
+var _codes = __webpack_require__(71);
 
 var _effects = __webpack_require__(1);
 
@@ -62847,7 +62859,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(87);
+var _codes = __webpack_require__(71);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63030,7 +63042,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _codes = __webpack_require__(87);
+var _codes = __webpack_require__(71);
 
 var _effects = __webpack_require__(1);
 

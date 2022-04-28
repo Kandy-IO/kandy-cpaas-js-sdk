@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.38.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.39.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.38.0</code></div>
+          <div class='mb1'><code>4.39.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -2757,7 +2757,18 @@ client.on( ... )</pre>
 <p>This API will only modify the configurations provided, leaving other configurations
 as they were originally set, by performing a merge of the new values into the
 previous values.</p>
-<p>Please note that that the object provided to the <code>updateConfig</code> API may be different
+<p>Please note that updating the <a href="#configconfigcall">call.removeH264Codecs</a> configuration will not immediately change the SDP handlers used for a call. If you want to add or remove the
+h264 codec remover sdp handler you should follow this procedure:</p>
+<ol>
+<li>
+<p>Update the config for removeH264Codecs using the <a href="#apiupdateconfig">updateConfig</a> API.</p>
+</li>
+<li>
+<p>Update the sdp handler list using the <a href="#callsetsdphandlers">setSdpHandlers</a> API and provide any client defined SDP handler functions.</p>
+<p>NOTE: You can get the currently defined SDP handler functions with the <a href="#apigetconfig">getConfig</a> API.</p>
+</li>
+</ol>
+<p>Please note that the object provided to the <code>updateConfig</code> API may be different
 than the object retrieved from the <a href="#apigetconfig">getConfig</a> API. This may happen when a format
 change has happened and the SDK modifies the provided format to alleviate
 backwards-compatibility issues. We recommend ensuring the configurations you
@@ -4582,7 +4593,7 @@ see
 
   
 
-  <p>This object is provided to the <a href="call.IceCollectionCheckFunction%60">IceCollectionCheckFunction</a>, and contains the
+  <p>This object is provided to the <a href="#callicecollectioncheckfunction">IceCollectionCheckFunction</a>, and contains the
 necessary information about the call (i.e., call ID, current call operation), and information about the ongoing ICE collection,
 such as the list of all ICE candidates collected so far and the ICE gathering state.</p>
 
@@ -4654,8 +4665,8 @@ such as the list of all ICE candidates collected so far and the ICE gathering st
 'Scheduled' - A scheduled call (for first invocation, and subsequent invocations based on 
 <code>wait</code>
  value returned by 
-<code>IceCollectionCheckFunction</code>
-)
+<a href="#callicecollectioncheckfunction">IceCollectionCheckFunction</a>
+.)
 
           
           
@@ -4703,6 +4714,7 @@ such as the list of all ICE candidates collected so far and the ICE gathering st
              : The current ICE gathering state.
 See 
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceGatheringState">RTCPeerConnection.iceGatheringState</a>
+.
 
           
           
@@ -4761,7 +4773,7 @@ See
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>IceCollectionCheckFunction(iceCollectionInfo)</span>
+            <span class='code strong strong truncate'>IceCollectionCheckFunction(iceCollectionInfo, iceTimeouts)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4774,13 +4786,18 @@ See
 (<a href="#callicecollectioninfo">IceCollectionInfo</a>), which it can use to dictate how to proceed with a call.
 The function can be invoked for three different reasons:
 a new ICE candidate was collected, the ICE gathering state changed, or a scheduled call based on the <code>wait</code> time set after
-an initial invocation of the function (See {@link call.IceCollectionInfo IceCollectionInfo}.reason).</p>
+an initial invocation of the function.</p>
 <p>The function must then return an appropriate result object in the format of <a href="#callicecollectioncheckresult">IceCollectionCheckResult</a>
 which will dictate how the call will proceed. An incorrect return object, or result <code>type</code>, will cause the call to end with an error.</p>
 <p>[Default]
 The default IceCollectionCheckFunction uses the following algorithm to determine if the call can proceed to negotiation:</p>
 <ol>
-<li>If the <code>iceGatheringState</code> is "complete" at any stage, then proceed with the negotiation.</li>
+<li>If the <code>iceGatheringState</code> is "complete" at any stage, then:
+<ul>
+<li>Proceed with the negotiation if any ICE candidates are collected.</li>
+<li>Or, end the call if there are no ICE candidates collected.</li>
+</ul>
+</li>
 <li>Otherwise, if before the ideal ICE collection timeout:
 <ul>
 <li>If every media has a relay ICE candidate for every configured TURN server, proceed with negotiation.</li>
@@ -4804,7 +4821,7 @@ The default IceCollectionCheckFunction uses the following algorithm to determine
 the call config.</p>
 
 
-  <div class='pre p1 fill-light mt0'>IceCollectionCheckFunction(iceCollectionInfo: <a href="#callicecollectioninfo">call.IceCollectionInfo</a>): <a href="#callicecollectioncheckresult">call.IceCollectionCheckResult</a></div>
+  <div class='pre p1 fill-light mt0'>IceCollectionCheckFunction(iceCollectionInfo: <a href="#callicecollectioninfo">call.IceCollectionInfo</a>, iceTimeouts: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="#callicecollectioncheckresult">call.IceCollectionCheckResult</a></div>
   
     <p>
       Type:
@@ -4830,6 +4847,55 @@ the call config.</p>
 	    Information about the current status of the ICE candidate collection.
 
           </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>iceTimeouts</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    Configurations provided to the SDK for ICE collection timeout boundaries.
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>iceTimeouts.iceCollectionIdealTimeout</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  </td>
+  <td class='break-word'><span>The amount of time to wait for ideal candidates, in
+milliseconds.  See 
+<a href="#configconfigcall">config.call</a>
+ for more information.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>iceTimeouts.iceCollectionMaxTimeout</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  </td>
+  <td class='break-word'><span>The maximum amount of time to wait for ICE collection,
+in milliseconds. See 
+<a href="#configconfigcall">config.call</a>
+ for more information.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
           
         </div>
       
@@ -4862,7 +4928,7 @@ the call config.</p>
   <span class="hljs-keyword">return</span> candidate.type === <span class="hljs-string">&#x27;relay&#x27;</span>
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">myIceCollectionCheck</span> (<span class="hljs-params">{ iceGatheringState, iceCandidates }</span>) </span>{
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">myIceCollectionCheck</span> (<span class="hljs-params">{ iceGatheringState, iceCandidates }, iceTimeouts</span>) </span>{
   <span class="hljs-keyword">if</span> (iceGatheringState === <span class="hljs-string">&#x27;complete&#x27;</span>) {
     <span class="hljs-keyword">if</span> (iceCandidates.some(isRelayCandidate)) {
       <span class="hljs-keyword">return</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;StartCall&#x27;</span> }
@@ -7988,6 +8054,10 @@ client.call.getStats(callId)</pre>
 <p>The operation will remove the old track from the call and add a
 new track to the call. This effectively allows for changing the
 track constraints (eg. device used) for an ongoing call.</p>
+<p>Because it completely replaces an old track with a new one,
+the old track's state characteristics are not carried over in the new track's state.
+(e.g. if an old track's state was 'muted' and replacement of this track has occured,
+the new track's state will be 'unmuted', as this is its default state)</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
 <p>The SDK will emit a
@@ -17033,12 +17103,16 @@ escaped.
 
   
 
-  <p>Mutes the specified Tracks at their media source.</p>
-<p>Prevents media from being received for the Tracks. Audio Tracks will
-become silent and video Tracks will be a black frame.</p>
+  <p>Mutes the specified Tracks.</p>
+<p>This API prevents the media of the specified Tracks from being rendered. Audio
+Tracks will become silent and video Tracks will be a black frame.
+This does not stop media from being received by those Tracks. The media simply
+cannot be used by the application while the Track is muted.</p>
 <p>If a local Track being sent in a Call is muted, the Track will be
 noticeably muted for the remote user. If a remote Track received in a
 call is muted, the result will only be noticeable locally.</p>
+<p>This mute operation acts on those specified Tracks directly.
+It does not act on the active Call as a whole.</p>
 <p>The SDK will emit a <a href="#mediaeventmediamuted">media:muted</a> event
 when a Track has been muted.</p>
 
@@ -17101,7 +17175,9 @@ when a Track has been muted.</p>
   
 
   <p>Unmutes the specified Tracks.</p>
-<p>Media will resume as normal for the Tracks.</p>
+<p>Media will resume its normal rendering for the Tracks.
+Like the 'muteTracks' API, this unmute operation acts on those specified Tracks directly.
+Therefore it does not act on active Call as a whole.</p>
 <p>The SDK will emit a <a href="#mediaeventmediaunmuted">media:unmuted</a> event
 when a Track has been unmuted.</p>
 
