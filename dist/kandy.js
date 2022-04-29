@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.39.0-beta.879
+ * Version: 4.40.0-beta.880
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7369,7 +7369,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.39.0-beta.879';
+  return '4.40.0-beta.880';
 }
 
 /***/ }),
@@ -17725,6 +17725,8 @@ const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:chang
  * @param {string} params.type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
  * @param {string} [params.sender] The username of the sender.
+ * @param {string} [params.next] A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend.
+ * @param {Array<string>} [params.messageIds] The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation.
  */
 const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 
@@ -18421,14 +18423,32 @@ function* fetchSmsConversationsRequest(requestInfo) {
  * @param {Object} params
  * @param {string} params.destination a target email or groupId to send the message to
  * @param {string} [params.type='chat-onToOne'] The type of messages to fetch. See {@link conversation.chatTypes} for valid types.
+ * @param {Object} params.options The specific constraints used in fetching messages.
+ * @param {number} [params.options.untilTime] A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.
+ * @param {string} [params.options.next] A unique identifier, that can be used to fetch the next set of messages.
+ * @param {number} params.options.amount A maximum amount of messages to fetch.
  * @return {Object}
  */
-function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE } = {}) {
+function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE, options } = {}) {
   let url;
   if (type === _mappings.chatTypes.GROUP) {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}/messages`;
   } else if (type === _mappings.chatTypes.ONETOONE) {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+    if (options) {
+      // `untilTime` & `next` are optional params
+      if (options.untilTime) {
+        url = url + `?lastMessageTime=${options.untilTime}`;
+      }
+      if (options.next) {
+        const token = options.untilTime ? '&' : '?';
+        url = url + `${token}next=${options.next}`;
+      }
+      // `amount` param will always be provided so that we don't
+      // potentially ask the server to return its default value which is a large one: 1000 messages
+      const token = options.untilTime || options.next ? '&' : '?';
+      url = url + `${token}max=${options.amount}`;
+    }
   } else {
     return {
       error: new _errors2.default({
@@ -53735,14 +53755,14 @@ function sendMessageReadFinish({ messageId, participant, error }) {
  * @method fetchMessages
  * @param {string} id The ID of the conversation whose messages are about to be fetched.
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
- * @param {number} amount A number representing the amount of messages to fetch.
+ * @param {Object} options The fetch options. Its properties specify some contraints that are to be included as part of the fetch request.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the fetch messages action.
  */
-function fetchMessages(id, destination, amount, type) {
+function fetchMessages(id, destination, options, type) {
   return {
     type: actionTypes.FETCH_MESSAGES,
-    payload: { id, destination, amount, type }
+    payload: { id, destination, options, type }
   };
 }
 
@@ -53752,13 +53772,14 @@ function fetchMessages(id, destination, amount, type) {
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @param {Array<message>} messages An array of formatted messages to put into the store.
+ * @param {string} next A unique identifier, that can be used to fetch the next set of messages. If it's null, then server has no more results.
  * @param {Object} [error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
-function fetchMessagesFinished(destination, type, messages, error) {
+function fetchMessagesFinished(destination, type, messages, next, error) {
   return {
     type: actionTypes.FETCH_MESSAGES_FINISHED,
-    payload: error || { destination, type, messages },
+    payload: error || { destination, type, messages, next },
     error: !!error
   };
 }
@@ -54458,24 +54479,15 @@ var _actions2 = __webpack_require__(17);
 
 var _eventTypes = __webpack_require__(189);
 
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
+
 var _logs = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = _logs.logManager.getLogger('MESSAGING');
-
-/**
- * Base conversation stamp
- *
- * @param {Array<string>} destination The destination(s) for messages being sent through
- * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
- * @param {string} [id=undefined] id The unique identifier for the conversation.
- * @param {string} [description=''] The description associated with the conversation.
- * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
- * @param {Array<string>} [isTypingList=[]] A array that represents the list of users who are currently typing.
- * @param {number} lastReceived The timestamp associated with the last received message.
- */
+// Errors & Codes
 
 // Events
 /**
@@ -54555,6 +54567,20 @@ const log = _logs.logManager.getLogger('MESSAGING');
  * @memberof conversation
  */
 
+const log = _logs.logManager.getLogger('MESSAGING');
+
+/**
+ * Base conversation stamp
+ *
+ * @param {Array<string>} destination The destination(s) for messages being sent through
+ * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
+ * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
+ * @param {string} [id=undefined] id The unique identifier for the conversation.
+ * @param {string} [description=''] The description associated with the conversation.
+ * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
+ * @param {Array<string>} [isTypingList=[]] A array that represents the list of users who are currently typing.
+ * @param {number} lastReceived The timestamp associated with the last received message.
+ */
 const conversationBase = {
   initializers: [function ({
     destination,
@@ -54637,18 +54663,40 @@ const conversationBase = {
     },
 
     /**
-     * Gets all messages from this conversation.
+     * Gets either a subset or all available messages, associated with this conversation.
+     * In this context, available messages means whatever messages have been fetched so far, from backend.
+     * (i.e. they are locally stored).
      *
      * @public
      * @static
      * @memberof conversation.Conversation
      * @method getMessages
+     * @param {number} [startIndex=0] Specifies the start index value within the array of all available messages.
+     *   If not specified or invalid, its value will default to index 0.
+     * @param {number} [amount] Specifies how many messages to return, starting with startIndex.
+     *   If not specified or invalid, then the last message returned will always be last message fetched so far.
      * @return {Array<conversation.Message>} An array of messages.
      */
-    getMessages: function () {
+    getMessages: function (options = {}) {
+      let { startIndex, amount } = options;
       const conversation = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
 
-      return conversation.messages.map(message => {
+      if (isNaN(startIndex) || startIndex < 0) {
+        // If startIndex is invalid, set to default value.
+        startIndex = 0;
+      }
+      if (startIndex >= conversation.messages.length) {
+        return [];
+      }
+
+      let subset;
+      if (!amount || isNaN(amount) || amount < 0) {
+        // If amount is invalid, get all messages after startIndex.
+        subset = conversation.messages.slice(startIndex);
+      } else {
+        subset = conversation.messages.slice(startIndex, startIndex + amount);
+      }
+      return subset.map(message => {
         if (!message.parts) {
           log.debug('no message parts found on message, skipping message');
           return;
@@ -54790,6 +54838,7 @@ const conversationBase = {
      * Allows the user to fetch messages associated with a specific conversation to make them available.
      * When the operation is complete, a `messages:change` event will be emitted.
      * Messages can then be retrieved using {@link conversation.Conversation.getMessages Conversation.getMessages}.
+     * The list of returned messages will always be time sorted so that the most recent mesage will be the first one in that list.
      *
      * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
@@ -54797,10 +54846,69 @@ const conversationBase = {
      * @static
      * @memberof conversation.Conversation
      * @method fetchMessages
-     * @param {number} [amount=50] An amount of messages to fetch.
+     * @param {Object} [options] Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend.
+     * @param {number} [options.amount=50] A maximum amount of messages to fetch.
+     *  If server has more messages then its response will include a `next` parameter which can be used
+     *  for subsequent fetch requests (i.e. `next` can be used for pagination)
+     * @param {String} [options.next] A unique identifier, that can be used to fetch the next set of messages.
+     *  It's value is provided by the backend (as part of a previous fetch response) and it should be
+     *  used as-is, by subsequent client requests.
+     * @param {number} [options.untilTime] A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.
+     *  Therefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.
+     *  This parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.
+     *  It can be simultaneously used with `next` and/or `amount` parameters.
      */
-    fetchMessages: function (amount = 50) {
-      this.context.dispatch(_actions.messageActions.fetchMessages(this.id, this.destination, amount, this.type));
+    fetchMessages: function (options = { amount: 50 }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.fetchMessages', options);
+
+      if (options && typeof options !== 'object') {
+        if (typeof options === 'number') {
+          // Also support the old way of using this API (i.e. fetchMessages(50))
+          // TODO: May want to remove this code when going to major release.
+          log.warn(_logs.API_LOG_TAG + 'conversation.fetchMessages', 'The parameter to fetchMessages has changed. Please see its documentation and update your application to use the new capabilities.');
+          options = { amount: options };
+        } else {
+          const error = new _errors2.default({
+            message: 'options parameter, if provided, it must be an Object instance',
+            code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+          });
+          this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+          return;
+        }
+      }
+      if (options.untilTime) {
+        // check if is a valid Unix-like timestamp
+        if (isNaN(options.untilTime) || options.untilTime <= 0 || options.untilTime.toString().length !== 10) {
+          const error = new _errors2.default({
+            message: 'options.untilTime property must be a positive, 10-digit timestamp value',
+            code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+          });
+          this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+          return;
+        }
+      }
+      if (options && options.amount <= 0) {
+        const error = new _errors2.default({
+          message: 'options.amount property must be a positive value',
+          code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+        });
+        this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+        return;
+      }
+
+      if (options.next && typeof options.next !== 'string') {
+        const error = new _errors2.default({
+          message: 'options.next property must be a string value',
+          code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+        });
+        this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+        return;
+      }
+
+      if (options && !options.amount) {
+        options.amount = 50;
+      }
+      this.context.dispatch(_actions.messageActions.fetchMessages(this.id, this.destination, options, this.type));
     }
   }
   /*
@@ -55755,7 +55863,7 @@ function* fetchSmsConversations(action) {
 }
 
 /**
- * Saga that fetches all chat messages for a particular conversation
+ * Saga that fetches a list of chat messages for a particular conversation.
  * @method fetchChatMessages
  * @param {Object} action A 'FETCH_MESSAGES' action.
  */
@@ -55763,38 +55871,39 @@ function* fetchChatMessages(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const response = yield (0, _effects.call)(_requests.fetchMessagesRequest, requestInfo, {
     destination: action.payload.destination[0],
-    type: action.payload.type
-  });
-
-  const messageList = response.chatMessage.map(message => {
-    let parts = [];
-    if (message.text) {
-      parts = parts.concat({ type: 'text', text: message.text });
-    }
-    if (message.attachment) {
-      parts = parts.concat(message.attachment.map(attachment => {
-        return (0, _extends3.default)({
-          type: 'file'
-        }, attachment, {
-          rawURL: attachment.link,
-          name: attachment.name
-        });
-      }));
-    }
-
-    return {
-      parts: parts,
-      sender: message.senderAddress,
-      destination: message['x-destinationAddress'],
-      timestamp: message.dateTime,
-      messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
-    };
+    type: action.payload.type,
+    options: action.payload.options
   });
 
   if (response.error) {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, response.error));
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, null, response.error));
   } else {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, null));
+    const next = response.next || null; // next: it may or it may not be defined in server's response
+    const messageList = response.chatMessage.map(message => {
+      let parts = [];
+      if (message.text) {
+        parts = parts.concat({ type: 'text', text: message.text });
+      }
+      if (message.attachment) {
+        parts = parts.concat(message.attachment.map(attachment => {
+          return (0, _extends3.default)({
+            type: 'file'
+          }, attachment, {
+            rawURL: attachment.link,
+            name: attachment.name
+          });
+        }));
+      }
+
+      return {
+        parts: parts,
+        sender: message.senderAddress,
+        destination: message['x-destinationAddress'],
+        timestamp: message.dateTime,
+        messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
+      };
+    });
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, next, null));
   }
 }
 
@@ -56289,12 +56398,23 @@ eventsMap[actionTypes.FETCH_MESSAGES_FINISHED] = function (action) {
       args: action.payload
     };
   } else {
+    const payload = {
+      destination: action.payload.destination,
+      type: action.payload.type
+    };
+
+    if (action.payload.next) {
+      payload.next = action.payload.next;
+    }
+    if (action.payload.messages && action.payload.messages.length >= 0) {
+      // In CPaaS, `messageId` property is always part of the message obj.
+      payload.messageIds = action.payload.messages.map(message => {
+        return message.messageId;
+      });
+    }
     return {
       type: eventTypes.MESSAGES_CHANGE,
-      args: {
-        destination: action.payload.destination,
-        type: action.payload.type
-      }
+      args: payload
     };
   }
 };

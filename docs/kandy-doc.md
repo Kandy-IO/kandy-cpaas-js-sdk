@@ -2308,7 +2308,16 @@ If successful, the event [messages:change][96] will be emitted.
 
 #### getMessages
 
-Gets all messages from this conversation.
+Gets either a subset or all available messages, associated with this conversation.
+In this context, available messages means whatever messages have been fetched so far, from backend.
+(i.e. they are locally stored).
+
+##### Parameters
+
+*   `startIndex` **[number][12]** Specifies the start index value within the array of all available messages.
+    If not specified or invalid, its value will default to index 0. (optional, default `0`)
+*   `amount` **[number][12]?** Specifies how many messages to return, starting with startIndex.
+    If not specified or invalid, then the last message returned will always be last message fetched so far.
 
 Returns **[Array][19]<[conversation.Message][95]>** An array of messages.
 
@@ -2357,12 +2366,24 @@ Returns **[Function][15]** The unsubscribe function.
 Allows the user to fetch messages associated with a specific conversation to make them available.
 When the operation is complete, a `messages:change` event will be emitted.
 Messages can then be retrieved using [Conversation.getMessages][98].
+The list of returned messages will always be time sorted so that the most recent mesage will be the first one in that list.
 
 If successful, the event [messages:change][96] will be emitted.
 
 ##### Parameters
 
-*   `amount` **[number][12]** An amount of messages to fetch. (optional, default `50`)
+*   `options` **[Object][7]?** Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend.
+
+    *   `options.amount` **[number][12]** A maximum amount of messages to fetch.
+        If server has more messages then its response will include a `next` parameter which can be used
+        for subsequent fetch requests (i.e. `next` can be used for pagination) (optional, default `50`)
+    *   `options.next` **[String][8]?** A unique identifier, that can be used to fetch the next set of messages.
+        It's value is provided by the backend (as part of a previous fetch response) and it should be
+        used as-is, by subsequent client requests.
+    *   `options.untilTime` **[number][12]?** A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.
+        Therefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.
+        This parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.
+        It can be simultaneously used with `next` and/or `amount` parameters.
 
 #### setIsTyping
 
@@ -2475,6 +2496,8 @@ If a single message was created/edited, `messageId` will be present.
     *   `params.type` **[string][8]** The type of conversation. See [conversation.chatTypes][88] for valid types.
     *   `params.messageId` **[string][8]?** The ID of the message affected.
     *   `params.sender` **[string][8]?** The username of the sender.
+    *   `params.next` **[string][8]?** A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend.
+    *   `params.messageIds` **[Array][19]<[string][8]>?** The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation.
 
 ### messages:error
 

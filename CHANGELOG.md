@@ -5,6 +5,15 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.40.0 - beta
+
+### Added
+
+- Added extra parameter support for `conversation.Conversation.fetchMessages` API, so that it uses the latest capabilities provided by backend in terms of fetching historical chat messages.
+  The newly added parameter support is for: `next` & `untilTime`.
+  `KJS-811`, `KJS-812`, `KJS-813`
+- Added extra parameter support for `conversation.Conversation.getMessages` API, so that it can also return a subset of all fetched messages. The newly added parameters are: `startIndex` & `amount`. `KJS-814`
+
 ## 4.39.0 - 2022-04-28
 
 ### Added

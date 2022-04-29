@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.39.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 4.40.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.39.0</code></div>
+          <div class='mb1'><code>4.40.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -12683,7 +12683,7 @@ This property applies only to conversation object stored in recipient's state.
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>getMessages()</span>
+            <span class='code strong strong truncate'>getMessages(startIndex, amount?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -12691,20 +12691,48 @@ This property applies only to conversation object stored in recipient's state.
 
   
 
-  <p>Gets all messages from this conversation.</p>
+  <p>Gets either a subset or all available messages, associated with this conversation.
+In this context, available messages means whatever messages have been fetched so far, from backend.
+(i.e. they are locally stored).</p>
 
 
-  <div class='pre p1 fill-light mt0'>getMessages(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#conversationmessage">conversation.Message</a>></div>
-  
-  
-
-  
-  
-  
-  
+  <div class='pre p1 fill-light mt0'>getMessages(startIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, amount: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#conversationmessage">conversation.Message</a>></div>
   
   
 
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>startIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            = <code>0</code>)</code>
+	    Specifies the start index value within the array of all available messages.
+If not specified or invalid, its value will default to index 0.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>amount</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
+	    Specifies how many messages to return, starting with startIndex.
+If not specified or invalid, then the last message returned will always be last message fetched so far.
+
+          </div>
+          
+        </div>
+      
+    </div>
   
 
   
@@ -13023,7 +13051,7 @@ Provide an array of message IDs for the messages to be deleted.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>fetchMessages(amount)</span>
+            <span class='code strong strong truncate'>fetchMessages(options?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -13033,11 +13061,12 @@ Provide an array of message IDs for the messages to be deleted.</p>
 
   <p>Allows the user to fetch messages associated with a specific conversation to make them available.
 When the operation is complete, a <code>messages:change</code> event will be emitted.
-Messages can then be retrieved using <a href="#conversationconversationgetmessages">Conversation.getMessages</a>.</p>
+Messages can then be retrieved using <a href="#conversationconversationgetmessages">Conversation.getMessages</a>.
+The list of returned messages will always be time sorted so that the most recent mesage will be the first one in that list.</p>
 <p>If successful, the event <a href="#conversationeventmessageschange">messages:change</a> will be emitted.</p>
 
 
-  <div class='pre p1 fill-light mt0'>fetchMessages(amount: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  <div class='pre p1 fill-light mt0'>fetchMessages(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</div>
   
   
 
@@ -13054,11 +13083,70 @@ Messages can then be retrieved using <a href="#conversationconversationgetmessag
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>amount</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
-            = <code>50</code>)</code>
-	    An amount of messages to fetch.
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
+	    Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend.
 
           </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.amount</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  
+    (default <code>50</code>)
+  </td>
+  <td class='break-word'><span>A maximum amount of messages to fetch.
+If server has more messages then its response will include a 
+<code>next</code>
+ parameter which can be used
+for subsequent fetch requests (i.e. 
+<code>next</code>
+ can be used for pagination)
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.next</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?</code>
+  </td>
+  <td class='break-word'><span>A unique identifier, that can be used to fetch the next set of messages.
+It's value is provided by the backend (as part of a previous fetch response) and it should be
+used as-is, by subsequent client requests.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.untilTime</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  </td>
+  <td class='break-word'><span>A Unix-like timestamp representing the delimiting date &#x26; time (up to the seconds) for those messages.
+Therefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.
+This parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.
+It can be simultaneously used with 
+<code>next</code>
+ and/or 
+<code>amount</code>
+ parameters.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
           
         </div>
       
@@ -14289,6 +14377,24 @@ If a single message was created/edited, <code>messageId</code> will be present.<
   <td class='break-word'><span class='code bold'>params.sender</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
   </td>
   <td class='break-word'><span>The username of the sender.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.next</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  </td>
+  <td class='break-word'><span>A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.messageIds</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>?</code>
+  </td>
+  <td class='break-word'><span>The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation.
 </span></td>
 </tr>
 
