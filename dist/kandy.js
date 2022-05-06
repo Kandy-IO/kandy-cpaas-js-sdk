@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.40.0-beta.881
+ * Version: 4.40.0-beta.882
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3998,6 +3998,7 @@ exports.getSubscriptionInfo = getSubscriptionInfo;
 exports.getSubscriptions = getSubscriptions;
 exports.getSubscriptionExpiry = getSubscriptionExpiry;
 exports.getWebsocketConfig = getWebsocketConfig;
+exports.getPendingOperation = getPendingOperation;
 
 var _fp = __webpack_require__(3);
 
@@ -4143,6 +4144,15 @@ function getWebsocketConfig(state) {
   // provided values for websocket will be used from authentication config and defaults
   // will come from the subscription plugin.
   return (0, _utils.mergeValues)(subConfig.websocket, authConfig.websocket);
+}
+
+/**
+ * Return the pending operation if one is pending.
+ * @method getPendingOperation
+ * @return {string}
+ */
+function getPendingOperation(state) {
+  return state.subscription.pendingOperation;
 }
 
 /***/ }),
@@ -7369,7 +7379,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.40.0-beta.881';
+  return '4.40.0-beta.882';
 }
 
 /***/ }),
@@ -20882,13 +20892,13 @@ var _cpaas15 = __webpack_require__(483);
 
 var _cpaas16 = _interopRequireDefault(_cpaas15);
 
-var _cpaas17 = __webpack_require__(495);
+var _cpaas17 = __webpack_require__(496);
 
 var _cpaas18 = _interopRequireDefault(_cpaas17);
 
-var _request = __webpack_require__(510);
+var _request = __webpack_require__(511);
 
-__webpack_require__(520);
+__webpack_require__(521);
 
 var _sdpHandlers = __webpack_require__(202);
 
@@ -60245,11 +60255,11 @@ exports.default = createSubscriptionPlugin;
 
 var _interface = __webpack_require__(484);
 
-var _events = __webpack_require__(488);
+var _events = __webpack_require__(489);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _sagas = __webpack_require__(490);
+var _sagas = __webpack_require__(491);
 
 var _actions = __webpack_require__(28);
 
@@ -60341,11 +60351,11 @@ var _reducers = __webpack_require__(485);
 
 var _reducers2 = _interopRequireDefault(_reducers);
 
-var _name = __webpack_require__(486);
+var _name = __webpack_require__(487);
 
 var _name2 = _interopRequireDefault(_name);
 
-var _api = __webpack_require__(487);
+var _api = __webpack_require__(488);
 
 var _api2 = _interopRequireDefault(_api);
 
@@ -60376,7 +60386,9 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _constants = __webpack_require__(8);
 
-var _constants2 = __webpack_require__(86);
+var _constants2 = __webpack_require__(486);
+
+var _constants3 = __webpack_require__(86);
 
 var _reduxActions = __webpack_require__(14);
 
@@ -60396,9 +60408,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 // Libraries.
-
-
-// Constants
 const defaultState = {
   // Information about the open notification channels.
   notificationChannels: {},
@@ -60407,28 +60416,40 @@ const defaultState = {
   // The list of services that plugins can subscribe to.
   registeredServices: [],
   // Whether a subscription change is currently in progress.
-  isPending: false
+  isPending: false,
+  // The operation that is currently pending.
+  pendingOperation: null
 };
 
 // Other plugins.
 
 
+// Constants
+
+
 const reducers = {};
 
 // Helper function for changing the pending value.
-function pendingChange(value) {
+function pendingChange(value, operation) {
   return (state, action) => {
-    return (0, _extends3.default)({}, state, { isPending: value });
+    return (0, _extends3.default)({}, state, { isPending: value, pendingOperation: operation });
   };
 }
 // Change isPending depending on the start/finish of subscriptions.
-reducers[actionTypes.SUBSCRIBE] = pendingChange(true);
-reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
+reducers[actionTypes.SUBSCRIBE] = pendingChange(true, {
+  operation: _constants2.OPERATIONS.SUBSCRIBE,
+  startTime: Date.now()
+});
+reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true, {
+  operation: _constants2.OPERATIONS.UNSUBSCRIBE,
+  startTime: Date.now()
+});
 
 reducers[actionTypes.SUBSCRIBE_FINISHED] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
       isPending: false,
+      pendingOperation: null,
       error: undefined,
       platform: action.meta.platform,
       subscriptions: action.payload.subscriptions || state.subscriptions
@@ -60437,6 +60458,7 @@ reducers[actionTypes.SUBSCRIBE_FINISHED] = {
   throw(state, action) {
     return (0, _extends3.default)({}, state, {
       isPending: false,
+      pendingOperation: null,
       error: action.payload
     });
   }
@@ -60448,7 +60470,8 @@ reducers[actionTypes.SUBSCRIBE_FINISHED] = {
 reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
   next(state, action) {
     const newState = (0, _extends3.default)({}, state, {
-      isPending: false
+      isPending: false,
+      pendingOperation: null
 
       /*
        * Check if we are using link platform and clear the subscription array
@@ -60462,7 +60485,7 @@ reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
      *    aren't receiving anything from them.
      * In "normal" scenarios, other reducers handle the subscriptions state.
      */
-    if (action.payload.reason === _constants2.DISCONNECT_REASONS.LOST_CONNECTION) {
+    if (action.payload.reason === _constants3.DISCONNECT_REASONS.LOST_CONNECTION) {
       newState.subscriptions = [];
     }
 
@@ -60470,7 +60493,8 @@ reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
   },
   throw(state) {
     return (0, _extends3.default)({}, state, {
-      isPending: false
+      isPending: false,
+      pendingOperation: null
     });
   }
 };
@@ -60566,6 +60590,46 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
+ * Possible subscription states.
+ * @name SUBSCRIPTION_STATE
+ * @type {Object}
+ */
+const SUBSCRIPTION_STATE = exports.SUBSCRIPTION_STATE = {
+  FULL: 'FULL',
+  PARTIAL: 'PARTIAL',
+  NONE: 'NONE'
+
+  /**
+   * Possible disconnect reasons.
+   * @name DISCONNECT_REASONS
+   * @type {Object}
+   */
+};const DISCONNECT_REASONS = exports.DISCONNECT_REASONS = {
+  GONE: 'GONE',
+  LOST_CONNECTION: 'LOST_CONNECTION',
+  WS_OVERRIDDEN: 'WS_OVERRIDDEN'
+
+  /**
+   * Possible operations.
+   * @name OPERATIONS
+   * @type {Object}
+   */
+};const OPERATIONS = exports.OPERATIONS = {
+  SUBSCRIBE: 'SUBSCRIBE',
+  UNSUBSCRIBE: 'UNSUBSCRIBE'
+};
+
+/***/ }),
+/* 487 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
  * This interface is for an subscription plugin.
  * @type {string}
  */
@@ -60573,7 +60637,7 @@ const name = 'subscription';
 exports.default = name;
 
 /***/ }),
-/* 487 */
+/* 488 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60854,7 +60918,7 @@ function api({ dispatch, getState }) {
 }
 
 /***/ }),
-/* 488 */
+/* 489 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60864,7 +60928,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _eventTypes = __webpack_require__(489);
+var _eventTypes = __webpack_require__(490);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
@@ -60910,7 +60974,7 @@ eventsMap[actionTypes.RESUBSCRIPTION_FINISHED] = function (action) {
 exports.default = eventsMap;
 
 /***/ }),
-/* 489 */
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60966,7 +61030,7 @@ const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
 const SUB_RESUB = exports.SUB_RESUB = 'subscription:resub';
 
 /***/ }),
-/* 490 */
+/* 491 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60987,7 +61051,7 @@ var _actions = __webpack_require__(48);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _channels = __webpack_require__(491);
+var _channels = __webpack_require__(492);
 
 var _selectors = __webpack_require__(34);
 
@@ -61005,7 +61069,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _effects = __webpack_require__(493);
+var _effects = __webpack_require__(494);
 
 var _effects2 = __webpack_require__(1);
 
@@ -61308,7 +61372,7 @@ function* onConnectionLost() {
 }
 
 /***/ }),
-/* 491 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61326,7 +61390,7 @@ exports.ensureChannelOpen = ensureChannelOpen;
 exports.openWebsocketChannel = openWebsocketChannel;
 exports.closeChannel = closeChannel;
 
-var _requests = __webpack_require__(492);
+var _requests = __webpack_require__(493);
 
 var _actions = __webpack_require__(48);
 
@@ -61501,7 +61565,7 @@ function* closeChannel(channel, platform) {
 }
 
 /***/ }),
-/* 492 */
+/* 493 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61764,7 +61828,7 @@ function* refreshWebsocket(connection, subscription, credentials) {
 }
 
 /***/ }),
-/* 493 */
+/* 494 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61774,7 +61838,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _waitFor = __webpack_require__(494);
+var _waitFor = __webpack_require__(495);
 
 Object.defineProperty(exports, 'waitFor', {
   enumerable: true,
@@ -61784,7 +61848,7 @@ Object.defineProperty(exports, 'waitFor', {
 });
 
 /***/ }),
-/* 494 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61889,7 +61953,7 @@ function waitFor(timeout, waitPatterns) {
 }
 
 /***/ }),
-/* 495 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61909,19 +61973,19 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.default = cpaasUsers;
 
-var _index = __webpack_require__(496);
+var _index = __webpack_require__(497);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _sagas = __webpack_require__(503);
+var _sagas = __webpack_require__(504);
 
 var sagas = _interopRequireWildcard(_sagas);
 
-var _contacts = __webpack_require__(508);
+var _contacts = __webpack_require__(509);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
-var _users = __webpack_require__(509);
+var _users = __webpack_require__(510);
 
 var _users2 = _interopRequireDefault(_users);
 
@@ -61954,7 +62018,7 @@ function cpaasUsers() {
 }
 
 /***/ }),
-/* 496 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61964,11 +62028,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _api = __webpack_require__(497);
+var _api = __webpack_require__(498);
 
 var _api2 = _interopRequireDefault(_api);
 
-var _reducers = __webpack_require__(500);
+var _reducers = __webpack_require__(501);
 
 var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -61985,7 +62049,7 @@ const name = 'users';
 exports.default = { name, api: _api2.default, reducer: _reducers2.default };
 
 /***/ }),
-/* 497 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61996,11 +62060,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _users = __webpack_require__(498);
+var _users = __webpack_require__(499);
 
 var _users2 = _interopRequireDefault(_users);
 
-var _contacts = __webpack_require__(499);
+var _contacts = __webpack_require__(500);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
@@ -62024,7 +62088,7 @@ function api(context) {
 }
 
 /***/ }),
-/* 498 */
+/* 499 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62224,7 +62288,7 @@ function usersAPI({ dispatch, getState, primitives }) {
 }
 
 /***/ }),
-/* 499 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62433,7 +62497,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
 }
 
 /***/ }),
-/* 500 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62447,11 +62511,11 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _contacts = __webpack_require__(501);
+var _contacts = __webpack_require__(502);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
-var _users = __webpack_require__(502);
+var _users = __webpack_require__(503);
 
 var _users2 = _interopRequireDefault(_users);
 
@@ -62472,7 +62536,7 @@ const reducer = (0, _reduxActions.handleActions)((0, _extends3.default)({}, _con
 exports.default = reducer;
 
 /***/ }),
-/* 501 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62599,7 +62663,7 @@ reducers[actionTypes.UPDATE_CONTACT_FINISH] = {
 exports.default = reducers;
 
 /***/ }),
-/* 502 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62679,7 +62743,7 @@ reducers[actionTypes.SEARCH_DIRECTORY_FINISH] = {
 exports.default = reducers;
 
 /***/ }),
-/* 503 */
+/* 504 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62697,11 +62761,11 @@ exports.searchDirectory = searchDirectory;
 exports.fetchUser = fetchUser;
 exports.fetchSelfInfo = fetchSelfInfo;
 
-var _contacts = __webpack_require__(504);
+var _contacts = __webpack_require__(505);
 
 var contactsSagas = _interopRequireWildcard(_contacts);
 
-var _users = __webpack_require__(506);
+var _users = __webpack_require__(507);
 
 var usersSagas = _interopRequireWildcard(_users);
 
@@ -62807,7 +62871,7 @@ function* fetchSelfInfo() {
 }
 
 /***/ }),
-/* 504 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62831,7 +62895,7 @@ var _contacts = __webpack_require__(198);
 
 var actions = _interopRequireWildcard(_contacts);
 
-var _contacts2 = __webpack_require__(505);
+var _contacts2 = __webpack_require__(506);
 
 var _selectors = __webpack_require__(10);
 
@@ -62949,7 +63013,7 @@ function* refreshContacts(action) {
 }
 
 /***/ }),
-/* 505 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63130,7 +63194,7 @@ function* refreshContactsRequest(requestInfo) {
 }
 
 /***/ }),
-/* 506 */
+/* 507 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63152,7 +63216,7 @@ var _users = __webpack_require__(196);
 
 var actions = _interopRequireWildcard(_users);
 
-var _users2 = __webpack_require__(507);
+var _users2 = __webpack_require__(508);
 
 var _selectors = __webpack_require__(10);
 
@@ -63267,7 +63331,7 @@ function* fetchSelfInfo(action) {
 }
 
 /***/ }),
-/* 507 */
+/* 508 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63348,7 +63412,7 @@ function mapSearchKey(key) {
 }
 
 /***/ }),
-/* 508 */
+/* 509 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63406,7 +63470,7 @@ eventsMap[actionTypes.FETCH_CONTACT_FINISH] = contactsChangeEvent;
 exports.default = eventsMap;
 
 /***/ }),
-/* 509 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63458,7 +63522,7 @@ eventsMap[actionTypes.FETCH_USER_FINISH] = eventsMap[actionTypes.FETCH_SELF_INFO
 exports.default = eventsMap;
 
 /***/ }),
-/* 510 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63469,17 +63533,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.cpaasRequest = exports.ucRequest = exports.linkRequest = undefined;
 
-var _configs = __webpack_require__(511);
+var _configs = __webpack_require__(512);
 
-var _sagas = __webpack_require__(512);
+var _sagas = __webpack_require__(513);
 
 var _sagas2 = _interopRequireDefault(_sagas);
 
-var _events = __webpack_require__(515);
+var _events = __webpack_require__(516);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _interface = __webpack_require__(517);
+var _interface = __webpack_require__(518);
 
 var _actions = __webpack_require__(28);
 
@@ -63547,7 +63611,7 @@ function pluginFactory(platform) {
 }
 
 /***/ }),
-/* 511 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63582,7 +63646,7 @@ const v8nValidation = _validation.validation.schema({
 const parseOptions = exports.parseOptions = (0, _validation.parse)('request', v8nValidation);
 
 /***/ }),
-/* 512 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63602,11 +63666,11 @@ var _actions = __webpack_require__(178);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _makeRequest = __webpack_require__(513);
+var _makeRequest = __webpack_require__(514);
 
 var _makeRequest2 = _interopRequireDefault(_makeRequest);
 
-var _authorization = __webpack_require__(514);
+var _authorization = __webpack_require__(515);
 
 var authorizations = _interopRequireWildcard(_authorization);
 
@@ -63686,7 +63750,7 @@ const __testonly__ = exports.__testonly__ = { watchRequests, handleRequest
 };
 
 /***/ }),
-/* 513 */
+/* 514 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63944,7 +64008,7 @@ function makeResponse(apiResponse = {}, httpResponse = {}) {
 }
 
 /***/ }),
-/* 514 */
+/* 515 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64112,7 +64176,7 @@ function getStatusCode(response) {
 }
 
 /***/ }),
-/* 515 */
+/* 516 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64122,7 +64186,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _eventTypes = __webpack_require__(516);
+var _eventTypes = __webpack_require__(517);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
@@ -64146,7 +64210,7 @@ eventsMap[actionTypes.AUTHORIZATION_ERROR] = function (action) {
 exports.default = eventsMap;
 
 /***/ }),
-/* 516 */
+/* 517 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64172,7 +64236,7 @@ Object.defineProperty(exports, "__esModule", {
 const REQUEST_ERROR = exports.REQUEST_ERROR = 'request:error';
 
 /***/ }),
-/* 517 */
+/* 518 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64183,11 +64247,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.api = exports.name = undefined;
 
-var _name = __webpack_require__(518);
+var _name = __webpack_require__(519);
 
 var _name2 = _interopRequireDefault(_name);
 
-var _api = __webpack_require__(519);
+var _api = __webpack_require__(520);
 
 var _api2 = _interopRequireDefault(_api);
 
@@ -64197,7 +64261,7 @@ exports.name = _name2.default;
 exports.api = _api2.default;
 
 /***/ }),
-/* 518 */
+/* 519 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64214,7 +64278,7 @@ const name = 'requests';
 exports.default = name;
 
 /***/ }),
-/* 519 */
+/* 520 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64298,7 +64362,7 @@ function api({ dispatch, getState }) {
 }
 
 /***/ }),
-/* 520 */
+/* 521 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
