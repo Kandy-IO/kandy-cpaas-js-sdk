@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.39.0
+ * Version: 4.40.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3998,6 +3998,7 @@ exports.getSubscriptionInfo = getSubscriptionInfo;
 exports.getSubscriptions = getSubscriptions;
 exports.getSubscriptionExpiry = getSubscriptionExpiry;
 exports.getWebsocketConfig = getWebsocketConfig;
+exports.getPendingOperation = getPendingOperation;
 
 var _fp = __webpack_require__(3);
 
@@ -4143,6 +4144,15 @@ function getWebsocketConfig(state) {
   // provided values for websocket will be used from authentication config and defaults
   // will come from the subscription plugin.
   return (0, _utils.mergeValues)(subConfig.websocket, authConfig.websocket);
+}
+
+/**
+ * Return the pending operation if one is pending.
+ * @method getPendingOperation
+ * @return {string}
+ */
+function getPendingOperation(state) {
+  return state.subscription.pendingOperation;
 }
 
 /***/ }),
@@ -7369,7 +7379,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.39.0';
+  return '4.40.0';
 }
 
 /***/ }),
@@ -17725,6 +17735,8 @@ const CONVERSATIONS_CHANGE = exports.CONVERSATIONS_CHANGE = 'conversations:chang
  * @param {string} params.type The type of conversation. See {@link conversation.chatTypes} for valid types.
  * @param {string} [params.messageId] The ID of the message affected.
  * @param {string} [params.sender] The username of the sender.
+ * @param {string} [params.next] A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend.
+ * @param {Array<string>} [params.messageIds] The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation.
  */
 const MESSAGES_CHANGE = exports.MESSAGES_CHANGE = 'messages:change';
 
@@ -18421,14 +18433,32 @@ function* fetchSmsConversationsRequest(requestInfo) {
  * @param {Object} params
  * @param {string} params.destination a target email or groupId to send the message to
  * @param {string} [params.type='chat-onToOne'] The type of messages to fetch. See {@link conversation.chatTypes} for valid types.
+ * @param {Object} params.options The specific constraints used in fetching messages.
+ * @param {number} [params.options.untilTime] A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.
+ * @param {string} [params.options.next] A unique identifier, that can be used to fetch the next set of messages.
+ * @param {number} params.options.amount A maximum amount of messages to fetch.
  * @return {Object}
  */
-function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE } = {}) {
+function* fetchMessagesRequest(requestInfo, { destination, type = _mappings.chatTypes.ONETOONE, options } = {}) {
   let url;
   if (type === _mappings.chatTypes.GROUP) {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/group/${destination}/messages`;
   } else if (type === _mappings.chatTypes.ONETOONE) {
     url = `${requestInfo.baseURL}/cpaas/chat/v1/${requestInfo.username}/oneToOne/${destination}/adhoc/messages`;
+    if (options) {
+      // `untilTime` & `next` are optional params
+      if (options.untilTime) {
+        url = url + `?lastMessageTime=${options.untilTime}`;
+      }
+      if (options.next) {
+        const token = options.untilTime ? '&' : '?';
+        url = url + `${token}next=${options.next}`;
+      }
+      // `amount` param will always be provided so that we don't
+      // potentially ask the server to return its default value which is a large one: 1000 messages
+      const token = options.untilTime || options.next ? '&' : '?';
+      url = url + `${token}max=${options.amount}`;
+    }
   } else {
     return {
       error: new _errors2.default({
@@ -20862,13 +20892,13 @@ var _cpaas15 = __webpack_require__(483);
 
 var _cpaas16 = _interopRequireDefault(_cpaas15);
 
-var _cpaas17 = __webpack_require__(495);
+var _cpaas17 = __webpack_require__(496);
 
 var _cpaas18 = _interopRequireDefault(_cpaas17);
 
-var _request = __webpack_require__(510);
+var _request = __webpack_require__(511);
 
-__webpack_require__(520);
+__webpack_require__(521);
 
 var _sdpHandlers = __webpack_require__(202);
 
@@ -53735,14 +53765,14 @@ function sendMessageReadFinish({ messageId, participant, error }) {
  * @method fetchMessages
  * @param {string} id The ID of the conversation whose messages are about to be fetched.
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
- * @param {number} amount A number representing the amount of messages to fetch.
+ * @param {Object} options The fetch options. Its properties specify some contraints that are to be included as part of the fetch request.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @returns {Object} A flux standard action representing the fetch messages action.
  */
-function fetchMessages(id, destination, amount, type) {
+function fetchMessages(id, destination, options, type) {
   return {
     type: actionTypes.FETCH_MESSAGES,
-    payload: { id, destination, amount, type }
+    payload: { id, destination, options, type }
   };
 }
 
@@ -53752,13 +53782,14 @@ function fetchMessages(id, destination, amount, type) {
  * @param {Array<string>} destination An array of destinations for messages created in this conversation.
  * @param {string} type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
  * @param {Array<message>} messages An array of formatted messages to put into the store.
+ * @param {string} next A unique identifier, that can be used to fetch the next set of messages. If it's null, then server has no more results.
  * @param {Object} [error] An error object, only present if an error occurred.
  * @returns {Object} A flux standard action representing the fetch messages finished action.
  */
-function fetchMessagesFinished(destination, type, messages, error) {
+function fetchMessagesFinished(destination, type, messages, next, error) {
   return {
     type: actionTypes.FETCH_MESSAGES_FINISHED,
-    payload: error || { destination, type, messages },
+    payload: error || { destination, type, messages, next },
     error: !!error
   };
 }
@@ -54458,24 +54489,15 @@ var _actions2 = __webpack_require__(17);
 
 var _eventTypes = __webpack_require__(189);
 
+var _errors = __webpack_require__(7);
+
+var _errors2 = _interopRequireDefault(_errors);
+
 var _logs = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = _logs.logManager.getLogger('MESSAGING');
-
-/**
- * Base conversation stamp
- *
- * @param {Array<string>} destination The destination(s) for messages being sent through
- * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
- * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
- * @param {string} [id=undefined] id The unique identifier for the conversation.
- * @param {string} [description=''] The description associated with the conversation.
- * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
- * @param {Array<string>} [isTypingList=[]] A array that represents the list of users who are currently typing.
- * @param {number} lastReceived The timestamp associated with the last received message.
- */
+// Errors & Codes
 
 // Events
 /**
@@ -54555,6 +54577,20 @@ const log = _logs.logManager.getLogger('MESSAGING');
  * @memberof conversation
  */
 
+const log = _logs.logManager.getLogger('MESSAGING');
+
+/**
+ * Base conversation stamp
+ *
+ * @param {Array<string>} destination The destination(s) for messages being sent through
+ * this conversation in this instance of the SDK. This should be an Array with any number of user IDs.
+ * @param {string} [type='chat-oneToOne'] The message type. See {@link conversation.chatTypes} for valid types.
+ * @param {string} [id=undefined] id The unique identifier for the conversation.
+ * @param {string} [description=''] The description associated with the conversation.
+ * @param {Array<conversation.Message>} [messages=[]] An array containing the conversation's messages.
+ * @param {Array<string>} [isTypingList=[]] A array that represents the list of users who are currently typing.
+ * @param {number} lastReceived The timestamp associated with the last received message.
+ */
 const conversationBase = {
   initializers: [function ({
     destination,
@@ -54637,18 +54673,40 @@ const conversationBase = {
     },
 
     /**
-     * Gets all messages from this conversation.
+     * Gets either a subset or all available messages, associated with this conversation.
+     * In this context, available messages means whatever messages have been fetched so far, from backend.
+     * (i.e. they are locally stored).
      *
      * @public
      * @static
      * @memberof conversation.Conversation
      * @method getMessages
+     * @param {number} [startIndex=0] Specifies the start index value within the array of all available messages.
+     *   If not specified or invalid, its value will default to index 0.
+     * @param {number} [amount] Specifies how many messages to return, starting with startIndex.
+     *   If not specified or invalid, then the last message returned will always be last message fetched so far.
      * @return {Array<conversation.Message>} An array of messages.
      */
-    getMessages: function () {
+    getMessages: function (options = {}) {
+      let { startIndex, amount } = options;
       const conversation = (0, _selectors.findConversation)(this.context.getState(), this.destination, this.type);
 
-      return conversation.messages.map(message => {
+      if (isNaN(startIndex) || startIndex < 0) {
+        // If startIndex is invalid, set to default value.
+        startIndex = 0;
+      }
+      if (startIndex >= conversation.messages.length) {
+        return [];
+      }
+
+      let subset;
+      if (!amount || isNaN(amount) || amount < 0) {
+        // If amount is invalid, get all messages after startIndex.
+        subset = conversation.messages.slice(startIndex);
+      } else {
+        subset = conversation.messages.slice(startIndex, startIndex + amount);
+      }
+      return subset.map(message => {
         if (!message.parts) {
           log.debug('no message parts found on message, skipping message');
           return;
@@ -54790,6 +54848,7 @@ const conversationBase = {
      * Allows the user to fetch messages associated with a specific conversation to make them available.
      * When the operation is complete, a `messages:change` event will be emitted.
      * Messages can then be retrieved using {@link conversation.Conversation.getMessages Conversation.getMessages}.
+     * The list of returned messages will always be time sorted so that the most recent mesage will be the first one in that list.
      *
      * If successful, the event {@link conversation.event:messages:change messages:change} will be emitted.
      *
@@ -54797,10 +54856,69 @@ const conversationBase = {
      * @static
      * @memberof conversation.Conversation
      * @method fetchMessages
-     * @param {number} [amount=50] An amount of messages to fetch.
+     * @param {Object} [options] Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend.
+     * @param {number} [options.amount=50] A maximum amount of messages to fetch.
+     *  If server has more messages then its response will include a `next` parameter which can be used
+     *  for subsequent fetch requests (i.e. `next` can be used for pagination)
+     * @param {String} [options.next] A unique identifier, that can be used to fetch the next set of messages.
+     *  It's value is provided by the backend (as part of a previous fetch response) and it should be
+     *  used as-is, by subsequent client requests.
+     * @param {number} [options.untilTime] A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.
+     *  Therefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.
+     *  This parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.
+     *  It can be simultaneously used with `next` and/or `amount` parameters.
      */
-    fetchMessages: function (amount = 50) {
-      this.context.dispatch(_actions.messageActions.fetchMessages(this.id, this.destination, amount, this.type));
+    fetchMessages: function (options = { amount: 50 }) {
+      log.debug(_logs.API_LOG_TAG + 'conversation.fetchMessages', options);
+
+      if (options && typeof options !== 'object') {
+        if (typeof options === 'number') {
+          // Also support the old way of using this API (i.e. fetchMessages(50))
+          // TODO: May want to remove this code when going to major release.
+          log.warn(_logs.API_LOG_TAG + 'conversation.fetchMessages', 'The parameter to fetchMessages has changed. Please see its documentation and update your application to use the new capabilities.');
+          options = { amount: options };
+        } else {
+          const error = new _errors2.default({
+            message: 'options parameter, if provided, it must be an Object instance',
+            code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+          });
+          this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+          return;
+        }
+      }
+      if (options.untilTime) {
+        // check if is a valid Unix-like timestamp
+        if (isNaN(options.untilTime) || options.untilTime <= 0 || options.untilTime.toString().length !== 10) {
+          const error = new _errors2.default({
+            message: 'options.untilTime property must be a positive, 10-digit timestamp value',
+            code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+          });
+          this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+          return;
+        }
+      }
+      if (options && options.amount <= 0) {
+        const error = new _errors2.default({
+          message: 'options.amount property must be a positive value',
+          code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+        });
+        this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+        return;
+      }
+
+      if (options.next && typeof options.next !== 'string') {
+        const error = new _errors2.default({
+          message: 'options.next property must be a string value',
+          code: _errors.messagingCodes.FETCH_MESSAGES_FAIL
+        });
+        this.context.dispatch((0, _actions2.emitEvent)(_eventTypes.MESSAGES_ERROR, { error }));
+        return;
+      }
+
+      if (options && !options.amount) {
+        options.amount = 50;
+      }
+      this.context.dispatch(_actions.messageActions.fetchMessages(this.id, this.destination, options, this.type));
     }
   }
   /*
@@ -55755,7 +55873,7 @@ function* fetchSmsConversations(action) {
 }
 
 /**
- * Saga that fetches all chat messages for a particular conversation
+ * Saga that fetches a list of chat messages for a particular conversation.
  * @method fetchChatMessages
  * @param {Object} action A 'FETCH_MESSAGES' action.
  */
@@ -55763,38 +55881,39 @@ function* fetchChatMessages(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const response = yield (0, _effects.call)(_requests.fetchMessagesRequest, requestInfo, {
     destination: action.payload.destination[0],
-    type: action.payload.type
-  });
-
-  const messageList = response.chatMessage.map(message => {
-    let parts = [];
-    if (message.text) {
-      parts = parts.concat({ type: 'text', text: message.text });
-    }
-    if (message.attachment) {
-      parts = parts.concat(message.attachment.map(attachment => {
-        return (0, _extends3.default)({
-          type: 'file'
-        }, attachment, {
-          rawURL: attachment.link,
-          name: attachment.name
-        });
-      }));
-    }
-
-    return {
-      parts: parts,
-      sender: message.senderAddress,
-      destination: message['x-destinationAddress'],
-      timestamp: message.dateTime,
-      messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
-    };
+    type: action.payload.type,
+    options: action.payload.options
   });
 
   if (response.error) {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, response.error));
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, null, null, response.error));
   } else {
-    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, null));
+    const next = response.next || null; // next: it may or it may not be defined in server's response
+    const messageList = response.chatMessage.map(message => {
+      let parts = [];
+      if (message.text) {
+        parts = parts.concat({ type: 'text', text: message.text });
+      }
+      if (message.attachment) {
+        parts = parts.concat(message.attachment.map(attachment => {
+          return (0, _extends3.default)({
+            type: 'file'
+          }, attachment, {
+            rawURL: attachment.link,
+            name: attachment.name
+          });
+        }));
+      }
+
+      return {
+        parts: parts,
+        sender: message.senderAddress,
+        destination: message['x-destinationAddress'],
+        timestamp: message.dateTime,
+        messageId: message.resourceURL.split('/messages/')[1] // messageID is after /messages/ in the resourceURL
+      };
+    });
+    yield (0, _effects.put)(_actions.messageActions.fetchMessagesFinished(action.payload.destination, action.payload.type, messageList, next, null));
   }
 }
 
@@ -56289,12 +56408,23 @@ eventsMap[actionTypes.FETCH_MESSAGES_FINISHED] = function (action) {
       args: action.payload
     };
   } else {
+    const payload = {
+      destination: action.payload.destination,
+      type: action.payload.type
+    };
+
+    if (action.payload.next) {
+      payload.next = action.payload.next;
+    }
+    if (action.payload.messages && action.payload.messages.length >= 0) {
+      // In CPaaS, `messageId` property is always part of the message obj.
+      payload.messageIds = action.payload.messages.map(message => {
+        return message.messageId;
+      });
+    }
     return {
       type: eventTypes.MESSAGES_CHANGE,
-      args: {
-        destination: action.payload.destination,
-        type: action.payload.type
-      }
+      args: payload
     };
   }
 };
@@ -60125,11 +60255,11 @@ exports.default = createSubscriptionPlugin;
 
 var _interface = __webpack_require__(484);
 
-var _events = __webpack_require__(488);
+var _events = __webpack_require__(489);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _sagas = __webpack_require__(490);
+var _sagas = __webpack_require__(491);
 
 var _actions = __webpack_require__(28);
 
@@ -60221,11 +60351,11 @@ var _reducers = __webpack_require__(485);
 
 var _reducers2 = _interopRequireDefault(_reducers);
 
-var _name = __webpack_require__(486);
+var _name = __webpack_require__(487);
 
 var _name2 = _interopRequireDefault(_name);
 
-var _api = __webpack_require__(487);
+var _api = __webpack_require__(488);
 
 var _api2 = _interopRequireDefault(_api);
 
@@ -60256,7 +60386,9 @@ var actionTypes = _interopRequireWildcard(_actionTypes);
 
 var _constants = __webpack_require__(8);
 
-var _constants2 = __webpack_require__(86);
+var _constants2 = __webpack_require__(486);
+
+var _constants3 = __webpack_require__(86);
 
 var _reduxActions = __webpack_require__(14);
 
@@ -60276,9 +60408,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 // Libraries.
-
-
-// Constants
 const defaultState = {
   // Information about the open notification channels.
   notificationChannels: {},
@@ -60287,28 +60416,40 @@ const defaultState = {
   // The list of services that plugins can subscribe to.
   registeredServices: [],
   // Whether a subscription change is currently in progress.
-  isPending: false
+  isPending: false,
+  // The operation that is currently pending.
+  pendingOperation: null
 };
 
 // Other plugins.
 
 
+// Constants
+
+
 const reducers = {};
 
 // Helper function for changing the pending value.
-function pendingChange(value) {
+function pendingChange(value, operation) {
   return (state, action) => {
-    return (0, _extends3.default)({}, state, { isPending: value });
+    return (0, _extends3.default)({}, state, { isPending: value, pendingOperation: operation });
   };
 }
 // Change isPending depending on the start/finish of subscriptions.
-reducers[actionTypes.SUBSCRIBE] = pendingChange(true);
-reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true);
+reducers[actionTypes.SUBSCRIBE] = pendingChange(true, {
+  operation: _constants2.OPERATIONS.SUBSCRIBE,
+  startTime: Date.now()
+});
+reducers[actionTypes.UNSUBSCRIBE] = pendingChange(true, {
+  operation: _constants2.OPERATIONS.UNSUBSCRIBE,
+  startTime: Date.now()
+});
 
 reducers[actionTypes.SUBSCRIBE_FINISHED] = {
   next(state, action) {
     return (0, _extends3.default)({}, state, {
       isPending: false,
+      pendingOperation: null,
       error: undefined,
       platform: action.meta.platform,
       subscriptions: action.payload.subscriptions || state.subscriptions
@@ -60317,6 +60458,7 @@ reducers[actionTypes.SUBSCRIBE_FINISHED] = {
   throw(state, action) {
     return (0, _extends3.default)({}, state, {
       isPending: false,
+      pendingOperation: null,
       error: action.payload
     });
   }
@@ -60328,7 +60470,8 @@ reducers[actionTypes.SUBSCRIBE_FINISHED] = {
 reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
   next(state, action) {
     const newState = (0, _extends3.default)({}, state, {
-      isPending: false
+      isPending: false,
+      pendingOperation: null
 
       /*
        * Check if we are using link platform and clear the subscription array
@@ -60342,7 +60485,7 @@ reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
      *    aren't receiving anything from them.
      * In "normal" scenarios, other reducers handle the subscriptions state.
      */
-    if (action.payload.reason === _constants2.DISCONNECT_REASONS.LOST_CONNECTION) {
+    if (action.payload.reason === _constants3.DISCONNECT_REASONS.LOST_CONNECTION) {
       newState.subscriptions = [];
     }
 
@@ -60350,7 +60493,8 @@ reducers[actionTypes.UNSUBSCRIBE_FINISHED] = {
   },
   throw(state) {
     return (0, _extends3.default)({}, state, {
-      isPending: false
+      isPending: false,
+      pendingOperation: null
     });
   }
 };
@@ -60446,6 +60590,46 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 /**
+ * Possible subscription states.
+ * @name SUBSCRIPTION_STATE
+ * @type {Object}
+ */
+const SUBSCRIPTION_STATE = exports.SUBSCRIPTION_STATE = {
+  FULL: 'FULL',
+  PARTIAL: 'PARTIAL',
+  NONE: 'NONE'
+
+  /**
+   * Possible disconnect reasons.
+   * @name DISCONNECT_REASONS
+   * @type {Object}
+   */
+};const DISCONNECT_REASONS = exports.DISCONNECT_REASONS = {
+  GONE: 'GONE',
+  LOST_CONNECTION: 'LOST_CONNECTION',
+  WS_OVERRIDDEN: 'WS_OVERRIDDEN'
+
+  /**
+   * Possible operations.
+   * @name OPERATIONS
+   * @type {Object}
+   */
+};const OPERATIONS = exports.OPERATIONS = {
+  SUBSCRIBE: 'SUBSCRIBE',
+  UNSUBSCRIBE: 'UNSUBSCRIBE'
+};
+
+/***/ }),
+/* 487 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
  * This interface is for an subscription plugin.
  * @type {string}
  */
@@ -60453,7 +60637,7 @@ const name = 'subscription';
 exports.default = name;
 
 /***/ }),
-/* 487 */
+/* 488 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60734,7 +60918,7 @@ function api({ dispatch, getState }) {
 }
 
 /***/ }),
-/* 488 */
+/* 489 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60744,7 +60928,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _eventTypes = __webpack_require__(489);
+var _eventTypes = __webpack_require__(490);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
@@ -60790,7 +60974,7 @@ eventsMap[actionTypes.RESUBSCRIPTION_FINISHED] = function (action) {
 exports.default = eventsMap;
 
 /***/ }),
-/* 489 */
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60846,7 +61030,7 @@ const SUB_ERROR = exports.SUB_ERROR = 'subscription:error';
 const SUB_RESUB = exports.SUB_RESUB = 'subscription:resub';
 
 /***/ }),
-/* 490 */
+/* 491 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -60867,7 +61051,7 @@ var _actions = __webpack_require__(48);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _channels = __webpack_require__(491);
+var _channels = __webpack_require__(492);
 
 var _selectors = __webpack_require__(34);
 
@@ -60885,7 +61069,7 @@ var _errors = __webpack_require__(7);
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _effects = __webpack_require__(493);
+var _effects = __webpack_require__(494);
 
 var _effects2 = __webpack_require__(1);
 
@@ -61188,7 +61372,7 @@ function* onConnectionLost() {
 }
 
 /***/ }),
-/* 491 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61206,7 +61390,7 @@ exports.ensureChannelOpen = ensureChannelOpen;
 exports.openWebsocketChannel = openWebsocketChannel;
 exports.closeChannel = closeChannel;
 
-var _requests = __webpack_require__(492);
+var _requests = __webpack_require__(493);
 
 var _actions = __webpack_require__(48);
 
@@ -61381,7 +61565,7 @@ function* closeChannel(channel, platform) {
 }
 
 /***/ }),
-/* 492 */
+/* 493 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61644,7 +61828,7 @@ function* refreshWebsocket(connection, subscription, credentials) {
 }
 
 /***/ }),
-/* 493 */
+/* 494 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61654,7 +61838,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _waitFor = __webpack_require__(494);
+var _waitFor = __webpack_require__(495);
 
 Object.defineProperty(exports, 'waitFor', {
   enumerable: true,
@@ -61664,7 +61848,7 @@ Object.defineProperty(exports, 'waitFor', {
 });
 
 /***/ }),
-/* 494 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61769,7 +61953,7 @@ function waitFor(timeout, waitPatterns) {
 }
 
 /***/ }),
-/* 495 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61789,19 +61973,19 @@ var _extends3 = _interopRequireDefault(_extends2);
 
 exports.default = cpaasUsers;
 
-var _index = __webpack_require__(496);
+var _index = __webpack_require__(497);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _sagas = __webpack_require__(503);
+var _sagas = __webpack_require__(504);
 
 var sagas = _interopRequireWildcard(_sagas);
 
-var _contacts = __webpack_require__(508);
+var _contacts = __webpack_require__(509);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
-var _users = __webpack_require__(509);
+var _users = __webpack_require__(510);
 
 var _users2 = _interopRequireDefault(_users);
 
@@ -61834,7 +62018,7 @@ function cpaasUsers() {
 }
 
 /***/ }),
-/* 496 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61844,11 +62028,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _api = __webpack_require__(497);
+var _api = __webpack_require__(498);
 
 var _api2 = _interopRequireDefault(_api);
 
-var _reducers = __webpack_require__(500);
+var _reducers = __webpack_require__(501);
 
 var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -61865,7 +62049,7 @@ const name = 'users';
 exports.default = { name, api: _api2.default, reducer: _reducers2.default };
 
 /***/ }),
-/* 497 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -61876,11 +62060,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = api;
 
-var _users = __webpack_require__(498);
+var _users = __webpack_require__(499);
 
 var _users2 = _interopRequireDefault(_users);
 
-var _contacts = __webpack_require__(499);
+var _contacts = __webpack_require__(500);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
@@ -61904,7 +62088,7 @@ function api(context) {
 }
 
 /***/ }),
-/* 498 */
+/* 499 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62104,7 +62288,7 @@ function usersAPI({ dispatch, getState, primitives }) {
 }
 
 /***/ }),
-/* 499 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62313,7 +62497,7 @@ function contactsAPI({ dispatch, getState, primitives }) {
 }
 
 /***/ }),
-/* 500 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62327,11 +62511,11 @@ var _extends2 = __webpack_require__(4);
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _contacts = __webpack_require__(501);
+var _contacts = __webpack_require__(502);
 
 var _contacts2 = _interopRequireDefault(_contacts);
 
-var _users = __webpack_require__(502);
+var _users = __webpack_require__(503);
 
 var _users2 = _interopRequireDefault(_users);
 
@@ -62352,7 +62536,7 @@ const reducer = (0, _reduxActions.handleActions)((0, _extends3.default)({}, _con
 exports.default = reducer;
 
 /***/ }),
-/* 501 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62479,7 +62663,7 @@ reducers[actionTypes.UPDATE_CONTACT_FINISH] = {
 exports.default = reducers;
 
 /***/ }),
-/* 502 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62559,7 +62743,7 @@ reducers[actionTypes.SEARCH_DIRECTORY_FINISH] = {
 exports.default = reducers;
 
 /***/ }),
-/* 503 */
+/* 504 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62577,11 +62761,11 @@ exports.searchDirectory = searchDirectory;
 exports.fetchUser = fetchUser;
 exports.fetchSelfInfo = fetchSelfInfo;
 
-var _contacts = __webpack_require__(504);
+var _contacts = __webpack_require__(505);
 
 var contactsSagas = _interopRequireWildcard(_contacts);
 
-var _users = __webpack_require__(506);
+var _users = __webpack_require__(507);
 
 var usersSagas = _interopRequireWildcard(_users);
 
@@ -62687,7 +62871,7 @@ function* fetchSelfInfo() {
 }
 
 /***/ }),
-/* 504 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -62711,7 +62895,7 @@ var _contacts = __webpack_require__(198);
 
 var actions = _interopRequireWildcard(_contacts);
 
-var _contacts2 = __webpack_require__(505);
+var _contacts2 = __webpack_require__(506);
 
 var _selectors = __webpack_require__(10);
 
@@ -62829,7 +63013,7 @@ function* refreshContacts(action) {
 }
 
 /***/ }),
-/* 505 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63010,7 +63194,7 @@ function* refreshContactsRequest(requestInfo) {
 }
 
 /***/ }),
-/* 506 */
+/* 507 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63032,7 +63216,7 @@ var _users = __webpack_require__(196);
 
 var actions = _interopRequireWildcard(_users);
 
-var _users2 = __webpack_require__(507);
+var _users2 = __webpack_require__(508);
 
 var _selectors = __webpack_require__(10);
 
@@ -63147,7 +63331,7 @@ function* fetchSelfInfo(action) {
 }
 
 /***/ }),
-/* 507 */
+/* 508 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63228,7 +63412,7 @@ function mapSearchKey(key) {
 }
 
 /***/ }),
-/* 508 */
+/* 509 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63286,7 +63470,7 @@ eventsMap[actionTypes.FETCH_CONTACT_FINISH] = contactsChangeEvent;
 exports.default = eventsMap;
 
 /***/ }),
-/* 509 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63338,7 +63522,7 @@ eventsMap[actionTypes.FETCH_USER_FINISH] = eventsMap[actionTypes.FETCH_SELF_INFO
 exports.default = eventsMap;
 
 /***/ }),
-/* 510 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63349,17 +63533,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.cpaasRequest = exports.ucRequest = exports.linkRequest = undefined;
 
-var _configs = __webpack_require__(511);
+var _configs = __webpack_require__(512);
 
-var _sagas = __webpack_require__(512);
+var _sagas = __webpack_require__(513);
 
 var _sagas2 = _interopRequireDefault(_sagas);
 
-var _events = __webpack_require__(515);
+var _events = __webpack_require__(516);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _interface = __webpack_require__(517);
+var _interface = __webpack_require__(518);
 
 var _actions = __webpack_require__(28);
 
@@ -63427,7 +63611,7 @@ function pluginFactory(platform) {
 }
 
 /***/ }),
-/* 511 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63462,7 +63646,7 @@ const v8nValidation = _validation.validation.schema({
 const parseOptions = exports.parseOptions = (0, _validation.parse)('request', v8nValidation);
 
 /***/ }),
-/* 512 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63482,11 +63666,11 @@ var _actions = __webpack_require__(178);
 
 var actions = _interopRequireWildcard(_actions);
 
-var _makeRequest = __webpack_require__(513);
+var _makeRequest = __webpack_require__(514);
 
 var _makeRequest2 = _interopRequireDefault(_makeRequest);
 
-var _authorization = __webpack_require__(514);
+var _authorization = __webpack_require__(515);
 
 var authorizations = _interopRequireWildcard(_authorization);
 
@@ -63566,7 +63750,7 @@ const __testonly__ = exports.__testonly__ = { watchRequests, handleRequest
 };
 
 /***/ }),
-/* 513 */
+/* 514 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63824,7 +64008,7 @@ function makeResponse(apiResponse = {}, httpResponse = {}) {
 }
 
 /***/ }),
-/* 514 */
+/* 515 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63992,7 +64176,7 @@ function getStatusCode(response) {
 }
 
 /***/ }),
-/* 515 */
+/* 516 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64002,7 +64186,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _eventTypes = __webpack_require__(516);
+var _eventTypes = __webpack_require__(517);
 
 var eventTypes = _interopRequireWildcard(_eventTypes);
 
@@ -64026,7 +64210,7 @@ eventsMap[actionTypes.AUTHORIZATION_ERROR] = function (action) {
 exports.default = eventsMap;
 
 /***/ }),
-/* 516 */
+/* 517 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64052,7 +64236,7 @@ Object.defineProperty(exports, "__esModule", {
 const REQUEST_ERROR = exports.REQUEST_ERROR = 'request:error';
 
 /***/ }),
-/* 517 */
+/* 518 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64063,11 +64247,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.api = exports.name = undefined;
 
-var _name = __webpack_require__(518);
+var _name = __webpack_require__(519);
 
 var _name2 = _interopRequireDefault(_name);
 
-var _api = __webpack_require__(519);
+var _api = __webpack_require__(520);
 
 var _api2 = _interopRequireDefault(_api);
 
@@ -64077,7 +64261,7 @@ exports.name = _name2.default;
 exports.api = _api2.default;
 
 /***/ }),
-/* 518 */
+/* 519 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64094,7 +64278,7 @@ const name = 'requests';
 exports.default = name;
 
 /***/ }),
-/* 519 */
+/* 520 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64178,7 +64362,7 @@ function api({ dispatch, getState }) {
 }
 
 /***/ }),
-/* 520 */
+/* 521 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

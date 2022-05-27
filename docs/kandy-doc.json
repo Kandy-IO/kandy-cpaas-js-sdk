@@ -28710,6 +28710,41 @@
                 }
               },
               "name": "params.sender"
+            },
+            {
+              "title": "param",
+              "description": "A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend.",
+              "lineNumber": 12,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "string"
+                }
+              },
+              "name": "params.next"
+            },
+            {
+              "title": "param",
+              "description": "The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation.",
+              "lineNumber": 13,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "TypeApplication",
+                  "expression": {
+                    "type": "NameExpression",
+                    "name": "Array"
+                  },
+                  "applications": [
+                    {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  ]
+                }
+              },
+              "name": "params.messageIds"
             }
           ],
           "loc": {
@@ -28718,18 +28753,18 @@
               "column": 0
             },
             "end": {
-              "line": 37,
+              "line": 39,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 38,
+                "line": 40,
                 "column": 0
               },
               "end": {
-                "line": 38,
+                "line": 40,
                 "column": 48
               }
             },
@@ -28870,6 +28905,67 @@
                       "name": "string"
                     }
                   }
+                },
+                {
+                  "title": "param",
+                  "name": "params.next",
+                  "lineNumber": 12,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "A unique identifier that can be used to fetch the next set of messages. This parameter is present only if a fetch request was issued on a chat conversation and only if there are more messages to fetch from backend."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.messageIds",
+                  "lineNumber": 13,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The message IDs associated with the fetched messages. This parameter is present only if a fetch request was issued on a chat conversation."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                      "type": "TypeApplication",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "Array"
+                      },
+                      "applications": [
+                        {
+                          "type": "NameExpression",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  }
                 }
               ]
             }
@@ -28958,22 +29054,22 @@
           ],
           "loc": {
             "start": {
-              "line": 40,
+              "line": 42,
               "column": 0
             },
             "end": {
-              "line": 48,
+              "line": 50,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 49,
+                "line": 51,
                 "column": 0
               },
               "end": {
-                "line": 49,
+                "line": 51,
                 "column": 46
               }
             },
@@ -29147,22 +29243,22 @@
           ],
           "loc": {
             "start": {
-              "line": 51,
+              "line": 53,
               "column": 0
             },
             "end": {
-              "line": 63,
+              "line": 65,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 64,
+                "line": 66,
                 "column": 0
               },
               "end": {
-                "line": 64,
+                "line": 66,
                 "column": 58
               }
             },
@@ -31125,22 +31221,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 137,
+                    "line": 140,
                     "column": 4
                   },
                   "end": {
-                    "line": 152,
+                    "line": 155,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 153,
+                      "line": 156,
                       "column": 4
                     },
                     "end": {
-                      "line": 171,
+                      "line": 174,
                       "column": 5
                     }
                   },
@@ -31302,22 +31398,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 173,
+                    "line": 176,
                     "column": 4
                   },
                   "end": {
-                    "line": 182,
+                    "line": 185,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 183,
+                      "line": 186,
                       "column": 4
                     },
                     "end": {
-                      "line": 185,
+                      "line": 188,
                       "column": 5
                     }
                   },
@@ -31372,7 +31468,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "value": "Gets all messages from this conversation."
+                          "value": "Gets either a subset or all available messages, associated with this conversation.\nIn this context, available messages means whatever messages have been fetched so far, from backend.\n(i.e. they are locally stored)."
                         }
                       ]
                     }
@@ -31382,29 +31478,56 @@
                   {
                     "title": "public",
                     "description": null,
-                    "lineNumber": 3,
+                    "lineNumber": 5,
                     "type": null
                   },
                   {
                     "title": "static",
                     "description": null,
-                    "lineNumber": 4
+                    "lineNumber": 6
                   },
                   {
                     "title": "memberof",
                     "description": "conversation.Conversation",
-                    "lineNumber": 5
+                    "lineNumber": 7
                   },
                   {
                     "title": "method",
                     "description": null,
-                    "lineNumber": 6,
+                    "lineNumber": 8,
                     "name": "getMessages"
+                  },
+                  {
+                    "title": "param",
+                    "description": "Specifies the start index value within the array of all available messages.\n  If not specified or invalid, its value will default to index 0.",
+                    "lineNumber": 9,
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "number"
+                      }
+                    },
+                    "name": "startIndex",
+                    "default": "0"
+                  },
+                  {
+                    "title": "param",
+                    "description": "Specifies how many messages to return, starting with startIndex.\n  If not specified or invalid, then the last message returned will always be last message fetched so far.",
+                    "lineNumber": 11,
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "number"
+                      }
+                    },
+                    "name": "amount"
                   },
                   {
                     "title": "return",
                     "description": "An array of messages.",
-                    "lineNumber": 7,
+                    "lineNumber": 13,
                     "type": {
                       "type": "TypeApplication",
                       "expression": {
@@ -31422,22 +31545,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 187,
+                    "line": 190,
                     "column": 4
                   },
                   "end": {
-                    "line": 195,
+                    "line": 204,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 196,
+                      "line": 205,
                       "column": 4
                     },
                     "end": {
-                      "line": 206,
+                      "line": 231,
                       "column": 5
                     }
                   },
@@ -31446,7 +31569,58 @@
                 "augments": [],
                 "examples": [],
                 "implements": [],
-                "params": [],
+                "params": [
+                  {
+                    "title": "param",
+                    "name": "startIndex",
+                    "lineNumber": 9,
+                    "description": {
+                      "type": "root",
+                      "children": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "Specifies the start index value within the array of all available messages.\nIf not specified or invalid, its value will default to index 0."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "type": {
+                      "type": "NameExpression",
+                      "name": "number"
+                    },
+                    "default": "0"
+                  },
+                  {
+                    "title": "param",
+                    "name": "amount",
+                    "lineNumber": 11,
+                    "description": {
+                      "type": "root",
+                      "children": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "Specifies how many messages to return, starting with startIndex.\nIf not specified or invalid, then the last message returned will always be last message fetched so far."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "number"
+                      }
+                    }
+                  }
+                ],
                 "properties": [],
                 "returns": [
                   {
@@ -31574,22 +31748,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 208,
+                    "line": 233,
                     "column": 4
                   },
                   "end": {
-                    "line": 217,
+                    "line": 242,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 218,
+                      "line": 243,
                       "column": 4
                     },
                     "end": {
-                      "line": 260,
+                      "line": 285,
                       "column": 5
                     }
                   },
@@ -31770,22 +31944,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 262,
+                    "line": 287,
                     "column": 4
                   },
                   "end": {
-                    "line": 273,
+                    "line": 298,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 274,
+                      "line": 299,
                       "column": 4
                     },
                     "end": {
-                      "line": 278,
+                      "line": 303,
                       "column": 5
                     }
                   },
@@ -31931,22 +32105,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 280,
+                    "line": 305,
                     "column": 4
                   },
                   "end": {
-                    "line": 289,
+                    "line": 314,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 290,
+                      "line": 315,
                       "column": 4
                     },
                     "end": {
-                      "line": 292,
+                      "line": 317,
                       "column": 5
                     }
                   },
@@ -32066,22 +32240,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 294,
+                    "line": 319,
                     "column": 4
                   },
                   "end": {
-                    "line": 304,
+                    "line": 329,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 305,
+                      "line": 330,
                       "column": 4
                     },
                     "end": {
-                      "line": 322,
+                      "line": 347,
                       "column": 5
                     }
                   },
@@ -32254,7 +32428,7 @@
                         },
                         {
                           "type": "text",
-                          "value": "."
+                          "value": ".\nThe list of returned messages will always be time sorted so that the most recent mesage will be the first one in that list."
                         }
                       ]
                     },
@@ -32289,29 +32463,42 @@
                   {
                     "title": "public",
                     "description": null,
-                    "lineNumber": 7,
+                    "lineNumber": 8,
                     "type": null
                   },
                   {
                     "title": "static",
                     "description": null,
-                    "lineNumber": 8
+                    "lineNumber": 9
                   },
                   {
                     "title": "memberof",
                     "description": "conversation.Conversation",
-                    "lineNumber": 9
+                    "lineNumber": 10
                   },
                   {
                     "title": "method",
                     "description": null,
-                    "lineNumber": 10,
+                    "lineNumber": 11,
                     "name": "fetchMessages"
                   },
                   {
                     "title": "param",
-                    "description": "An amount of messages to fetch.",
-                    "lineNumber": 11,
+                    "description": "Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend.",
+                    "lineNumber": 12,
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "Object"
+                      }
+                    },
+                    "name": "options"
+                  },
+                  {
+                    "title": "param",
+                    "description": "A maximum amount of messages to fetch.\n If server has more messages then its response will include a `next` parameter which can be used\n for subsequent fetch requests (i.e. `next` can be used for pagination)",
+                    "lineNumber": 13,
                     "type": {
                       "type": "OptionalType",
                       "expression": {
@@ -32319,28 +32506,54 @@
                         "name": "number"
                       }
                     },
-                    "name": "amount",
+                    "name": "options.amount",
                     "default": "50"
+                  },
+                  {
+                    "title": "param",
+                    "description": "A unique identifier, that can be used to fetch the next set of messages.\n It's value is provided by the backend (as part of a previous fetch response) and it should be\n used as-is, by subsequent client requests.",
+                    "lineNumber": 16,
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                      }
+                    },
+                    "name": "options.next"
+                  },
+                  {
+                    "title": "param",
+                    "description": "A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.\n Therefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.\n This parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.\n It can be simultaneously used with `next` and/or `amount` parameters.",
+                    "lineNumber": 19,
+                    "type": {
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "number"
+                      }
+                    },
+                    "name": "options.untilTime"
                   }
                 ],
                 "loc": {
                   "start": {
-                    "line": 342,
+                    "line": 367,
                     "column": 4
                   },
                   "end": {
-                    "line": 354,
+                    "line": 390,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 355,
+                      "line": 391,
                       "column": 4
                     },
                     "end": {
-                      "line": 357,
+                      "line": 445,
                       "column": 5
                     }
                   },
@@ -32352,8 +32565,8 @@
                 "params": [
                   {
                     "title": "param",
-                    "name": "amount",
-                    "lineNumber": 11,
+                    "name": "options",
+                    "lineNumber": 12,
                     "description": {
                       "type": "root",
                       "children": [
@@ -32362,17 +32575,129 @@
                           "children": [
                             {
                               "type": "text",
-                              "value": "An amount of messages to fetch."
+                              "value": "Fetch options. Even though it's an optional parameter, user is encouraged to specify one in order to avoid a large amount of data being returned by backend."
                             }
                           ]
                         }
                       ]
                     },
                     "type": {
-                      "type": "NameExpression",
-                      "name": "number"
+                      "type": "OptionalType",
+                      "expression": {
+                        "type": "NameExpression",
+                        "name": "Object"
+                      }
                     },
-                    "default": "50"
+                    "properties": [
+                      {
+                        "title": "param",
+                        "name": "options.amount",
+                        "lineNumber": 13,
+                        "description": {
+                          "type": "root",
+                          "children": [
+                            {
+                              "type": "paragraph",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "value": "A maximum amount of messages to fetch.\nIf server has more messages then its response will include a "
+                                },
+                                {
+                                  "type": "inlineCode",
+                                  "value": "next"
+                                },
+                                {
+                                  "type": "text",
+                                  "value": " parameter which can be used\nfor subsequent fetch requests (i.e. "
+                                },
+                                {
+                                  "type": "inlineCode",
+                                  "value": "next"
+                                },
+                                {
+                                  "type": "text",
+                                  "value": " can be used for pagination)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "type": {
+                          "type": "NameExpression",
+                          "name": "number"
+                        },
+                        "default": "50"
+                      },
+                      {
+                        "title": "param",
+                        "name": "options.next",
+                        "lineNumber": 16,
+                        "description": {
+                          "type": "root",
+                          "children": [
+                            {
+                              "type": "paragraph",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "value": "A unique identifier, that can be used to fetch the next set of messages.\nIt's value is provided by the backend (as part of a previous fetch response) and it should be\nused as-is, by subsequent client requests."
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "type": {
+                          "type": "OptionalType",
+                          "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                          }
+                        }
+                      },
+                      {
+                        "title": "param",
+                        "name": "options.untilTime",
+                        "lineNumber": 19,
+                        "description": {
+                          "type": "root",
+                          "children": [
+                            {
+                              "type": "paragraph",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "value": "A Unix-like timestamp representing the delimiting date & time (up to the seconds) for those messages.\nTherefore any messages, whose timestamp are smaller than untilTime (i.e. older), will not be returned by the server's response.\nThis parameter can be used to add an additional constraint (i.e. limit by time) as opposed to limit using an explicit amount.\nIt can be simultaneously used with "
+                                },
+                                {
+                                  "type": "inlineCode",
+                                  "value": "next"
+                                },
+                                {
+                                  "type": "text",
+                                  "value": " and/or "
+                                },
+                                {
+                                  "type": "inlineCode",
+                                  "value": "amount"
+                                },
+                                {
+                                  "type": "text",
+                                  "value": " parameters."
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "type": {
+                          "type": "OptionalType",
+                          "expression": {
+                            "type": "NameExpression",
+                            "name": "number"
+                          }
+                        }
+                      }
+                    ]
                   }
                 ],
                 "properties": [],
@@ -32487,22 +32812,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 375,
+                    "line": 463,
                     "column": 4
                   },
                   "end": {
-                    "line": 386,
+                    "line": 474,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 387,
+                      "line": 475,
                       "column": 4
                     },
                     "end": {
-                      "line": 392,
+                      "line": 480,
                       "column": 5
                     }
                   },
@@ -33436,22 +33761,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 435,
+                    "line": 523,
                     "column": 4
                   },
                   "end": {
-                    "line": 442,
+                    "line": 530,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 443,
+                      "line": 531,
                       "column": 4
                     },
                     "end": {
-                      "line": 449,
+                      "line": 537,
                       "column": 5
                     }
                   },
@@ -33550,22 +33875,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 470,
+                    "line": 558,
                     "column": 4
                   },
                   "end": {
-                    "line": 477,
+                    "line": 565,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 478,
+                      "line": 566,
                       "column": 4
                     },
                     "end": {
-                      "line": 485,
+                      "line": 573,
                       "column": 5
                     }
                   },
@@ -33686,22 +34011,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 506,
+                    "line": 594,
                     "column": 4
                   },
                   "end": {
-                    "line": 512,
+                    "line": 600,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 513,
+                      "line": 601,
                       "column": 4
                     },
                     "end": {
-                      "line": 516,
+                      "line": 604,
                       "column": 5
                     }
                   },
