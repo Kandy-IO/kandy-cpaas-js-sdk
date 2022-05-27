@@ -30887,11 +30887,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 78,
+                "line": 79,
                 "column": 0
               },
               "end": {
-                "line": 78,
+                "line": 79,
                 "column": 51
               }
             },
@@ -31221,22 +31221,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 140,
+                    "line": 141,
                     "column": 4
                   },
                   "end": {
-                    "line": 155,
+                    "line": 156,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 156,
+                      "line": 157,
                       "column": 4
                     },
                     "end": {
-                      "line": 174,
+                      "line": 175,
                       "column": 5
                     }
                   },
@@ -31398,22 +31398,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 176,
+                    "line": 177,
                     "column": 4
                   },
                   "end": {
-                    "line": 185,
+                    "line": 186,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 186,
+                      "line": 187,
                       "column": 4
                     },
                     "end": {
-                      "line": 188,
+                      "line": 189,
                       "column": 5
                     }
                   },
@@ -31545,22 +31545,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 190,
+                    "line": 191,
                     "column": 4
                   },
                   "end": {
-                    "line": 204,
+                    "line": 205,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 205,
+                      "line": 206,
                       "column": 4
                     },
                     "end": {
-                      "line": 231,
+                      "line": 232,
                       "column": 5
                     }
                   },
@@ -31748,22 +31748,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 233,
+                    "line": 234,
                     "column": 4
                   },
                   "end": {
-                    "line": 242,
+                    "line": 243,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 243,
+                      "line": 244,
                       "column": 4
                     },
                     "end": {
-                      "line": 285,
+                      "line": 286,
                       "column": 5
                     }
                   },
@@ -31944,22 +31944,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 287,
+                    "line": 288,
                     "column": 4
                   },
                   "end": {
-                    "line": 298,
+                    "line": 299,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 299,
+                      "line": 300,
                       "column": 4
                     },
                     "end": {
-                      "line": 303,
+                      "line": 304,
                       "column": 5
                     }
                   },
@@ -32105,22 +32105,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 305,
+                    "line": 306,
                     "column": 4
                   },
                   "end": {
-                    "line": 314,
+                    "line": 315,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 315,
+                      "line": 316,
                       "column": 4
                     },
                     "end": {
-                      "line": 317,
+                      "line": 318,
                       "column": 5
                     }
                   },
@@ -32240,22 +32240,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 319,
+                    "line": 320,
                     "column": 4
                   },
                   "end": {
-                    "line": 329,
+                    "line": 330,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 330,
+                      "line": 331,
                       "column": 4
                     },
                     "end": {
-                      "line": 347,
+                      "line": 348,
                       "column": 5
                     }
                   },
@@ -32538,22 +32538,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 367,
+                    "line": 368,
                     "column": 4
                   },
                   "end": {
-                    "line": 390,
+                    "line": 391,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 391,
+                      "line": 392,
                       "column": 4
                     },
                     "end": {
-                      "line": 445,
+                      "line": 446,
                       "column": 5
                     }
                   },
@@ -32812,22 +32812,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 463,
+                    "line": 464,
                     "column": 4
                   },
                   "end": {
-                    "line": 474,
+                    "line": 475,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 475,
+                      "line": 476,
                       "column": 4
                     },
                     "end": {
-                      "line": 480,
+                      "line": 481,
                       "column": 5
                     }
                   },
@@ -33014,11 +33014,11 @@
           "context": {
             "loc": {
               "start": {
-                "line": 78,
+                "line": 79,
                 "column": 0
               },
               "end": {
-                "line": 78,
+                "line": 79,
                 "column": 51
               }
             },
@@ -33441,7 +33441,7 @@
             },
             {
               "title": "property",
-              "description": "Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).",
+              "description": "Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).\nThe fetching includes retrieval of message attachment(s) as well as retrieval of thumbnail(s) representing the attachment(s).",
               "lineNumber": 29,
               "type": {
                 "type": "NameExpression",
@@ -33452,18 +33452,18 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 30,
+              "lineNumber": 31,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 31
+              "lineNumber": 32
             },
             {
               "title": "typedef",
               "description": null,
-              "lineNumber": 32,
+              "lineNumber": 33,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -33473,7 +33473,7 @@
             {
               "title": "memberof",
               "description": "conversation",
-              "lineNumber": 33
+              "lineNumber": 34
             }
           ],
           "loc": {
@@ -33482,18 +33482,18 @@
               "column": 0
             },
             "end": {
-              "line": 76,
+              "line": 77,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 78,
+                "line": 79,
                 "column": 0
               },
               "end": {
-                "line": 78,
+                "line": 79,
                 "column": 51
               }
             },
@@ -33688,7 +33688,7 @@
                     "children": [
                       {
                         "type": "text",
-                        "value": "Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s)."
+                        "value": "Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).\nThe fetching includes retrieval of message attachment(s) as well as retrieval of thumbnail(s) representing the attachment(s)."
                       }
                     ]
                   }
@@ -33761,22 +33761,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 523,
+                    "line": 524,
                     "column": 4
                   },
                   "end": {
-                    "line": 530,
+                    "line": 531,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 531,
+                      "line": 532,
                       "column": 4
                     },
                     "end": {
-                      "line": 537,
+                      "line": 538,
                       "column": 5
                     }
                   },
@@ -33875,22 +33875,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 558,
+                    "line": 559,
                     "column": 4
                   },
                   "end": {
-                    "line": 565,
+                    "line": 566,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 566,
+                      "line": 567,
                       "column": 4
                     },
                     "end": {
-                      "line": 573,
+                      "line": 574,
                       "column": 5
                     }
                   },
@@ -34011,22 +34011,22 @@
                 ],
                 "loc": {
                   "start": {
-                    "line": 594,
+                    "line": 595,
                     "column": 4
                   },
                   "end": {
-                    "line": 600,
+                    "line": 601,
                     "column": 7
                   }
                 },
                 "context": {
                   "loc": {
                     "start": {
-                      "line": 601,
+                      "line": 602,
                       "column": 4
                     },
                     "end": {
-                      "line": 604,
+                      "line": 605,
                       "column": 5
                     }
                   },
