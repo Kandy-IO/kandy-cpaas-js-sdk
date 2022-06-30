@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.41.0-beta.894
+ * Version: 4.41.0-beta.896
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7379,7 +7379,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.41.0-beta.894';
+  return '4.41.0-beta.896';
 }
 
 /***/ }),
@@ -25054,13 +25054,13 @@ Rule.prototype._test = function _test (value) {
   var fn = this.fn;
 
   try {
-    testAux(this.modifiers.slice(), fn)(value);
+    testAux(this.modifiers.slice(), fn, this)(value);
   } catch (ex) {
     fn = function () { return false; };
   }
 
   try {
-    return testAux(this.modifiers.slice(), fn)(value);
+    return testAux(this.modifiers.slice(), fn, this)(value);
   } catch (ex$1) {
     return false;
   }
@@ -25068,14 +25068,14 @@ Rule.prototype._test = function _test (value) {
 
 Rule.prototype._check = function _check (value) {
   try {
-    testAux(this.modifiers.slice(), this.fn)(value);
+    testAux(this.modifiers.slice(), this.fn, this)(value);
   } catch (ex) {
-    if (testAux(this.modifiers.slice(), function (it) { return it; })(false)) {
+    if (testAux(this.modifiers.slice(), function (it) { return it; }, this)(false)) {
       return;
     }
   }
 
-  if (!testAux(this.modifiers.slice(), this.fn)(value)) {
+  if (!testAux(this.modifiers.slice(), this.fn, this)(value)) {
     throw null;
   }
 };
@@ -25086,7 +25086,8 @@ Rule.prototype._testAsync = function _testAsync (value) {
   return new Promise(function (resolve, reject) {
     testAsyncAux(
       this$1.modifiers.slice(),
-      this$1.fn
+      this$1.fn,
+      this$1
     )(value)
       .then(function (valid) {
         if (valid) {
@@ -25105,21 +25106,21 @@ function pickFn(fn, variant) {
   return typeof fn === 'object' ? fn[variant] : fn;
 }
 
-function testAux(modifiers, fn) {
+function testAux(modifiers, fn, rule) {
   if (modifiers.length) {
     var modifier = modifiers.shift();
-    var nextFn = testAux(modifiers, fn);
-    return modifier.perform(nextFn);
+    var nextFn = testAux(modifiers, fn, rule);
+    return modifier.perform(nextFn, rule);
   } else {
     return pickFn(fn);
   }
 }
 
-function testAsyncAux(modifiers, fn) {
+function testAsyncAux(modifiers, fn, rule) {
   if (modifiers.length) {
     var modifier = modifiers.shift();
-    var nextFn = testAsyncAux(modifiers, fn);
-    return modifier.performAsync(nextFn);
+    var nextFn = testAsyncAux(modifiers, fn, rule);
+    return modifier.performAsync(nextFn, rule);
   } else {
     return function (value) { return Promise.resolve(pickFn(fn, 'async')(value)); };
   }
@@ -25237,8 +25238,31 @@ function executeAsyncRules(value, rules, resolve, reject) {
   }
 }
 
+var consideredEmpty = function (value, considerTrimmedEmptyString) {
+  if (
+    considerTrimmedEmptyString &&
+    typeof value === 'string' &&
+    value.trim().length === 0
+  ) {
+    return true;
+  }
+
+  return value === undefined || value === null;
+};
+
+function optional (validation, considerTrimmedEmptyString) {
+  if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
+
+  return ({
+  simple: function (value) { return consideredEmpty(value, considerTrimmedEmptyString) ||
+    validation.check(value) === undefined; },
+  async: function (value) { return consideredEmpty(value, considerTrimmedEmptyString) ||
+    validation.testAsync(value); },
+});
+}
+
 function v8n() {
-  return typeof Proxy !== undefined
+  return typeof Proxy !== 'undefined'
     ? proxyContext(new Context())
     : proxylessContext(new Context());
 }
@@ -25305,7 +25329,7 @@ function proxylessContext(context) {
       get: function () {
         var newContext = proxylessContext(contextWithAllRules._clone());
         return newContext._applyModifier(availableModifiers[prop], prop);
-      }
+      },
     });
   });
 
@@ -25347,7 +25371,39 @@ var availableModifiers = {
     simple: function (fn) { return function (value) { return value !== false && split(value).every(fn); }; },
     async: function (fn) { return function (value) { return Promise.all(split(value).map(fn)).then(function (result) { return result.every(Boolean); }); }; },
   },
+
+  strict: {
+    simple: function (fn, rule) { return function (value) {
+      if (isSchemaRule(rule) && value && typeof value === 'object') {
+        return (
+          Object.keys(rule.args[0]).length === Object.keys(value).length &&
+          fn(value)
+        );
+      }
+      return fn(value);
+    }; },
+    async: function (fn, rule) { return function (value) { return Promise.resolve(fn(value))
+        .then(function (result) {
+          if (isSchemaRule(rule) && value && typeof value === 'object') {
+            return (
+              Object.keys(rule.args[0]).length === Object.keys(value).length &&
+              result
+            );
+          }
+          return result;
+        })
+        .catch(function () { return false; }); }; },
+  },
 };
+
+function isSchemaRule(rule) {
+  return (
+    rule &&
+    rule.name === 'schema' &&
+    rule.args.length > 0 &&
+    typeof rule.args[0] === 'object'
+  );
+}
 
 function split(value) {
   if (typeof value === 'string') {
@@ -25457,22 +25513,7 @@ var availableRules = {
     return function (value) { return validations.some(function (validation) { return validation.test(value); }); };
 },
 
-  optional: function (validation, considerTrimmedEmptyString) {
-    if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
-
-    return function (value) {
-    if (
-      considerTrimmedEmptyString &&
-      typeof value === 'string' &&
-      value.trim() === ''
-    ) {
-      return true;
-    }
-
-    if (value !== undefined && value !== null) { validation.check(value); }
-    return true;
-  };
-},
+  optional: optional,
 };
 
 function testType(expected) {
