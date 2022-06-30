@@ -5,11 +5,15 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 4.41.0 - beta
+## 4.41.0 - 2022-06-30
 
 ### Added
 
 - Added support for attachment thumbnails, as part of fetching multi-part messages. Applications can now display the actual thumbnail image associated with a given file attachment. `KJS-682`
+
+### Fixed
+
+- Fixed an issue with the Multimedia tutorial codepens that prevented them from sending or receiving messages properly. `KJS-908`
 
 ## 4.40.0 - 2022-05-27
 
