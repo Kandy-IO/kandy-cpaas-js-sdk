@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>kandy-cpaas-js-sdk 4.41.0 | Documentation</title>
+  <title>kandy-cpaas-js-sdk 5.0.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>kandy-cpaas-js-sdk</h3>
-          <div class='mb1'><code>4.41.0</code></div>
+          <div class='mb1'><code>5.0.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -493,15 +493,15 @@
                             </a></li>
                           
                             <li><a
-                              href='#calleventcallnewtrack'
+                              href='#calleventcalltracksadded'
                               class='regular pre-open'>
-                              <span style="color:orange">ⓔ</span> call:newTrack
+                              <span style="color:orange">ⓔ</span> call:tracksAdded
                             </a></li>
                           
                             <li><a
-                              href='#calleventcalltrackended'
+                              href='#calleventcalltracksremoved'
                               class='regular pre-open'>
-                              <span style="color:orange">ⓔ</span> call:trackEnded
+                              <span style="color:orange">ⓔ</span> call:tracksRemoved
                             </a></li>
                           
                             <li><a
@@ -1012,6 +1012,12 @@
                               <span style="color:orange">ⓔ</span> media:trackRendered
                             </a></li>
                           
+                            <li><a
+                              href='#mediaeventmediatrackended'
+                              class='regular pre-open'>
+                              <span style="color:orange">ⓔ</span> media:trackEnded
+                            </a></li>
+                          
                         </ul>
                       
                     </div>
@@ -1051,24 +1057,6 @@
                             </a></li>
                           
                             <li><a
-                              href='#presenceget'
-                              class='regular pre-open'>
-                              <span style="color:green">ⓕ</span> .get
-                            </a></li>
-                          
-                            <li><a
-                              href='#presencegetall'
-                              class='regular pre-open'>
-                              <span style="color:green">ⓕ</span> .getAll
-                            </a></li>
-                          
-                            <li><a
-                              href='#presencegetself'
-                              class='regular pre-open'>
-                              <span style="color:green">ⓕ</span> .getSelf
-                            </a></li>
-                          
-                            <li><a
                               href='#presencefetch'
                               class='regular pre-open'>
                               <span style="color:green">ⓕ</span> .fetch
@@ -1084,6 +1072,24 @@
                               href='#presenceunsubscribe'
                               class='regular pre-open'>
                               <span style="color:green">ⓕ</span> .unsubscribe
+                            </a></li>
+                          
+                            <li><a
+                              href='#presenceget'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .get
+                            </a></li>
+                          
+                            <li><a
+                              href='#presencegetall'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .getAll
+                            </a></li>
+                          
+                            <li><a
+                              href='#presencegetself'
+                              class='regular pre-open'>
+                              <span style="color:green">ⓕ</span> .getSelf
                             </a></li>
                           
                           </ul>
@@ -6319,7 +6325,7 @@ call has connected with the remote participant. The
 <a href="#callgetbyid">call.getById</a> API can be used to retrieve the latest call state
 after the change. Further events will be emitted to indicate that the
 call has received media from the remote participant. See the
-<a href="#calleventcallnewtrack">call:newTrack</a> event for more
+<a>call:newTrack</a> event for more
 information about this.</p>
 <p>The SDK requires access to the system's media devices (eg. microphone)
 in order to answer a call. If it does not already have permissions to
@@ -7007,7 +7013,7 @@ will be notified of the operation through a
   <p>Ends an ongoing call.</p>
 <p>The SDK will stop any/all local media associated with the call. Events
 will be emitted to indicate which media tracks were stopped. See the
-<a href="#calleventcalltrackended">call:trackEnded</a> event for more
+<a>call:trackEnded</a> event for more
 information.</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
@@ -7079,7 +7085,7 @@ call was ended.</p>
 Will get new media tracks from the specific sources to add to the call.</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
-<p>The SDK will emit a <a href="#calleventcallnewtrack">call:newTrack</a> event
+<p>The SDK will emit a <a>call:newTrack</a> event
 both for the local and remote users to indicate a track has been
 added to the Call.</p>
 
@@ -7351,7 +7357,7 @@ added to the Call.</p>
   <p>Remove tracks from an ongoing call.</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
-<p>The SDK will emit a <a href="#calleventcalltrackended">call:trackEnded</a>
+<p>The SDK will emit a <a>call:trackEnded</a>
 event for both the local and remote users to indicate that a track
 has been removed.</p>
 
@@ -7463,7 +7469,7 @@ already have video. For more advanced scenarios, the
 <a href="#calladdmedia">call.addMedia</a> API can be used.</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
-<p>The SDK will emit a <a href="#calleventcallnewtrack">call:newTrack</a> event
+<p>The SDK will emit a <a>call:newTrack</a> event
 both for the local and remote users to indicate a track has been
 added to the Call.</p>
 
@@ -7635,7 +7641,7 @@ video track. For more advanced scenarios, the
 <a href="#callremovemedia">call.removeMedia</a> API can be used.</p>
 <p>The progress of the operation will be tracked via the
 <a href="#calleventcalloperation">call:operation</a> event.</p>
-<p>The SDK will emit a <a href="#calleventcalltrackended">call:trackEnded</a>
+<p>The SDK will emit a <a>call:trackEnded</a>
 event for both the local and remote users to indicate that a track
 has been removed.</p>
 
@@ -9894,11 +9900,11 @@ API.</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='calleventcallnewtrack'>
+    <div class='border-bottom' id='calleventcalltracksadded'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>call:newTrack</span>
+            <span class='code strong strong truncate'>call:tracksAdded</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -9906,14 +9912,22 @@ API.</p>
 
   
 
-  <p>A new Track has been added to the Call.</p>
-<p>The Track may have been added by either the local user or remote user using
-the <a href="#calladdmedia">call.addMedia</a> API.</p>
-<p>Information about the Track can be retrieved using the
-<a href="#mediagettrackbyid">media.getTrackById</a> API.</p>
+  <p>Tracks have been added to the Call after an SDK operation. Both sides of the Call
+are now able to render these tracks.</p>
+<p>Tracks are added to a Call when either the local or remote user adds new media
+to the Call, using the <a href="#calladdmedia">call.addMedia</a> API for example, or when the
+Call is unheld with the <a href="#callunhold">call.unhold</a> API.</p>
+<p>Remote tracks are similarly added to a Call when new tracks are added by the
+remote user or either user unholds the call.</p>
+<p>This event can indicate that multiple tracks have been removed by the same
+operation. For example, if the remote user added video to the call, this
+event would indicate a single, remote video track was added. If the local
+user unheld the call, this event would indicate that any tracks previously
+on the call have been re-added, both local and remote.</p>
+<p>Information about a Track can be retrieved using the <a href="#mediagettrackbyid">media.getTrackById</a> API.</p>
 
 
-  <div class='pre p1 fill-light mt0'>call:newTrack</div>
+  <div class='pre p1 fill-light mt0'>call:tracksAdded</div>
   
   
 
@@ -9950,34 +9964,16 @@ the <a href="#calladdmedia">call.addMedia</a> API.</p>
                 <tr>
   <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The ID of the call the track was added to.
+  <td class='break-word'><span>The ID of the Call the tracks were added to.
 </span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.mediaId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>params.trackIds</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>
   </td>
-  <td class='break-word'><span>The ID of the media the track was added to.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.trackId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The ID of the newly added track.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.local</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
-  </td>
-  <td class='break-word'><span>Whether the track is local or not (remote)
+  <td class='break-word'><span>List of track IDs that have been added to the Call.
 </span></td>
 </tr>
 
@@ -9997,6 +9993,20 @@ the <a href="#calladdmedia">call.addMedia</a> API.</p>
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">&#x27;call:tracksAdded&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+   <span class="hljs-comment">// Get the information for each track.</span>
+   <span class="hljs-keyword">const</span> tracks = params.trackIds.map(client.media.getTrackById)
+   tracks.forEach(<span class="hljs-function"><span class="hljs-params">track</span> =&gt;</span> {
+     <span class="hljs-keyword">const</span> { id, kind, isLocal } = track
+     <span class="hljs-comment">// Handle the track depending whether it is audio vs. video and local vs. remote.</span>
+     ...
+   })
+})</pre>
+    
   
 
   
@@ -10009,11 +10019,11 @@ the <a href="#calladdmedia">call.addMedia</a> API.</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='calleventcalltrackended'>
+    <div class='border-bottom' id='calleventcalltracksremoved'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>call:trackEnded</span>
+            <span class='code strong strong truncate'>call:tracksRemoved</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -10021,17 +10031,20 @@ the <a href="#calladdmedia">call.addMedia</a> API.</p>
 
   
 
-  <p>A Track has been removed from a Call.</p>
-<p>The Track may have been removed by either the local user or remote user using
-the <a href="#callremovemedia">call.removeMedia</a> API. Tracks are also removed from Calls
-automatically while the Call is on hold.</p>
-<p>Note that receiving this event is not an indication that a media operation
-has completed. Therefore the application should not assume it is safe to
-perform a new operation at this time. To be notified when a call has had
-its media removed, see <a href="#calleventcallremovedmedia">call:removedMedia</a></p>
+  <p>Tracks have been removed from the Call after an SDK operation. The tracks may still
+exist, but the media is not available to both sides of the Call any longer.</p>
+<p>Tracks are removed from a Call when either the local or remote user stops the
+tracks, by using the <a href="#callremovemedia">call.removeMedia</a> API for example, or when the
+Call is held with the <a href="#callhold">call.hold</a> API.</p>
+<p>This event can indicate that multiple tracks have been removed by the same
+operation. For example, if the remote user removed video from the call, this
+event would indicate a single, remote video track was removed. If the local
+user held the call, this event would indicate that all tracks on the call
+have been removed, both local and remote.</p>
+<p>Information about a Track can be retrieved using the <a href="#mediagettrackbyid">media.getTrackById</a> API.</p>
 
 
-  <div class='pre p1 fill-light mt0'>call:trackEnded</div>
+  <div class='pre p1 fill-light mt0'>call:tracksRemoved</div>
   
   
 
@@ -10068,34 +10081,16 @@ its media removed, see <a href="#calleventcallremovedmedia">call:removedMedia</a
                 <tr>
   <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The ID of the call the track was removed from.
+  <td class='break-word'><span>The ID of the Call the tracks were removed from.
 </span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.mediaId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>params.trackIds</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>
   </td>
-  <td class='break-word'><span>The ID of the media the track was removed from.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.trackId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>The ID of the removed track.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.local</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
-  </td>
-  <td class='break-word'><span>Whether the track was local or not (remote)
+  <td class='break-word'><span>List of track IDs that have been removed from the Call.
 </span></td>
 </tr>
 
@@ -10115,6 +10110,20 @@ its media removed, see <a href="#calleventcallremovedmedia">call:removedMedia</a
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">&#x27;call:tracksRemoved&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+   <span class="hljs-comment">// Get the information for each track.</span>
+   <span class="hljs-keyword">const</span> tracks = params.trackIds.map(client.media.getTrackById)
+   tracks.forEach(<span class="hljs-function"><span class="hljs-params">track</span> =&gt;</span> {
+     <span class="hljs-keyword">const</span> { id, kind, isLocal } = track
+     <span class="hljs-comment">// Handle the track depending whether it is audio vs. video and local vs. remote.</span>
+     ...
+   })
+})</pre>
+    
   
 
   
@@ -10262,13 +10271,14 @@ its media removed, see <a href="#calleventcallremovedmedia">call:removedMedia</a
 
   
 
-  <p>A Track has been replaced on the Call.</p>
-<p>A Track is replaced by the local user using the <a href="#callreplacetrack">call.replaceTrack</a>
-API.</p>
-<p>This event is similar to the <a href="#calleventcallnewtrack">call:newTrack</a>
-event, where the call has a new Track, except that an existing Track has
-been removed at the same time. The event includes information about the
-Track that was replaced to help an application replace it seamlessly.</p>
+  <p>A local Track has been replaced by the <a href="#callreplacetrack">call.replaceTrack</a> API.</p>
+<p>This event is a combination of a track being removed from the Call and a new
+track being added to the Call. The previous Track's media is no longer
+available, similar to the <a href="#calleventcalltracksremoved">call:tracksRemoved</a>
+event, and the new Track is available in its place, similar to the
+<a href="#calleventcalltracksadded">call:tracksAdded</a> event. The event
+includes information about the Track that was replaced to help an application
+replace it seamlessly.</p>
 
 
   <div class='pre p1 fill-light mt0'>call:trackReplaced</div>
@@ -10355,6 +10365,21 @@ Track that was replaced to help an application replace it seamlessly.</p>
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>client.on(<span class="hljs-string">&#x27;call:trackReplaced&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+  <span class="hljs-keyword">const</span> { callId, oldTrack, newTrackId } = params
+
+  <span class="hljs-comment">// Unrender the removed track.</span>
+  handleTrackGone(oldTrack, callId)
+
+  <span class="hljs-comment">// Render the added track.</span>
+  <span class="hljs-keyword">const</span> track = client.media.getTrackById(newTrackId)
+  handleTrackAdded(track, callId)
+})</pre>
+    
   
 
   
@@ -11960,7 +11985,7 @@ Will trigger the <code>contacts:change</code> event.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>fetch(contactId)</span>
+            <span class='code strong strong truncate'>fetch(id)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -11972,7 +11997,7 @@ Will trigger the <code>contacts:change</code> event.</p>
 Will trigger the <code>contacts:change</code> event.</p>
 
 
-  <div class='pre p1 fill-light mt0'>fetch(contactId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  <div class='pre p1 fill-light mt0'>fetch(id: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
   
   
 
@@ -11989,7 +12014,7 @@ Will trigger the <code>contacts:change</code> event.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>contactId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The unique contact ID of the contact.
 
           </div>
@@ -17679,14 +17704,10 @@ API.</p>
 track will be silent and a video track will be a black frame. It is
 possible for the track to start receiving media again (see the
 <a href="#mediaeventmediasourceunmuted">media:sourceUnmuted</a> event).</p>
-<p>This event is generated outside the control of the SDK. This may happen for a
-local track if the browser or end-user stops allowing the SDK to access
-the media device, for example. This may happen for a remote track during a
-call when the remote endpoint stops sending media during a hold operation,
-for example.</p>
-<p>Handling this event is only required if you are using <code>unified-plan</code> as the
-<code>sdpSemantics</code> setting in the SDK's configuration. This setting will become
-the default in an upcoming release.</p>
+<p>This event is generated outside the control of the SDK. This will predominantely
+happen for a remote track during network issues, where media will lose frames
+and be "choppy". This may also happen for a local track if the browser or
+end-user stops allowing the SDK to access the media device, for example.</p>
 
 
   <div class='pre p1 fill-light mt0'>media:sourceMuted</div>
@@ -17776,9 +17797,6 @@ the default in an upcoming release.</p>
 be able to display video or play audio once again.</p>
 <p>This event is generated outside the control of the SDK, when the cause of the
 media source being muted had been undone.</p>
-<p>Handling this event is only required if you are using <code>unified-plan</code> as the
-<code>sdpSemantics</code> setting in the SDK's configuration. This setting will become
-the default in an upcoming release.</p>
 
 
   <div class='pre p1 fill-light mt0'>media:sourceUnmuted</div>
@@ -17921,6 +17939,111 @@ the default in an upcoming release.</p>
   <td class='break-word'><span class='code bold'>params.error</span> <code class='quiet'><a href="#apibasicerror">api.BasicError</a>?</code>
   </td>
   <td class='break-word'><span>An error object, if the operation was not successful.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='mediaeventmediatrackended'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>media:trackEnded</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>A local Track has ended unexpectedly. The Track may still be part of a Call but
+has become disconnected from its media source and is not recoverable.</p>
+<p>This event is emitted when an action other than an SDK operation stops the
+track. The most comon scenarios are when a device being used for a Call
+disconnects, any local tracks (such as audio from a bluetooth headset's
+microphone or video from a USB camera) from that device will be ended.
+Another scenario is for screensharing, where some browsers provide the
+ability to stop screensharing directly rather than through an SDK operation.</p>
+<p>When a local track ends this way, it will still be part of the Call but will
+not have any media. The track can be removed from the call with the
+<a href="#callremovemedia">call.removeMedia</a> API so the remote side of the Call knows the track
+has stopped, or the track can be replaced with a new track using the
+<a href="#callreplacetrack">call.replaceTrack</a> API to prevent any interruption.</p>
+
+
+  <div class='pre p1 fill-light mt0'>media:trackEnded</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.trackId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  </td>
+  <td class='break-word'><span>The Track that has ended.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.callId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  </td>
+  <td class='break-word'><span>The ID of the Call the Track is used in.
 </span></td>
 </tr>
 
@@ -18483,6 +18606,191 @@ available and can be retrieved with <a href="#presencegetself">presence.getSelf<
       </div>
     </div>
   
+    <div class='border-bottom' id='presencefetch'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fetch(user)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Fetches presence information for the given users. This will refresh the
+available information with any new information from the server.</p>
+<p>Available presence information an be retrieved using the
+<a href="#presenceget">presence.get</a> or <a href="#presencegetall">presence.getAll</a> APIs.</p>
+
+
+  <div class='pre p1 fill-light mt0'>fetch(user: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>user</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
+	    A User ID or an array of User IDs.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='presencesubscribe'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>subscribe(users)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Subscribe to another User's presence updates.</p>
+<p>When the User updates their presence information, the SDK will emit a
+<a href="#presenceeventpresencechange">presence:change</a> event.</p>
+
+
+  <div class='pre p1 fill-light mt0'>subscribe(users: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>users</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
+	    A User ID or an array of User IDs.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='presenceunsubscribe'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>unsubscribe(users)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Unsubscribe from another User's presence updates.</p>
+
+
+  <div class='pre p1 fill-light mt0'>unsubscribe(users: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>users</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
+	    A User ID or an array of User IDs.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='presenceget'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -18650,191 +18958,6 @@ available and can be retrieved with <a href="#presencegetself">presence.getSelf<
         
       </div>
     
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='presencefetch'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>fetch(user)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Fetches presence information for the given users. This will refresh the
-available information with any new information from the server.</p>
-<p>Available presence information can be retrieved using the
-<a href="#presenceget">presence.get</a> or <a href="#presencegetall">presence.getAll</a> APIs.</p>
-
-
-  <div class='pre p1 fill-light mt0'>fetch(user: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>user</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
-	    A User ID or an array of User IDs.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='presencesubscribe'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>subscribe(users)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Subscribe to another User's presence updates.</p>
-<p>When the User updates their presence information, the SDK will emit a
-<a href="#presenceeventpresencechange">presence:change</a> event.</p>
-
-
-  <div class='pre p1 fill-light mt0'>subscribe(users: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>users</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
-	    A User ID or an array of User IDs.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='presenceunsubscribe'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>unsubscribe(users)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Unsubscribe from another User's presence updates.</p>
-
-
-  <div class='pre p1 fill-light mt0'>unsubscribe(users: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>users</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
-	    A User ID or an array of User IDs.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
   
 
   
