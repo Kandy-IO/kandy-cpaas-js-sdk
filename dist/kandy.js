@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 4.40.0
+ * Version: 4.41.0
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7379,7 +7379,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '4.40.0';
+  return '4.41.0';
 }
 
 /***/ }),
@@ -25054,13 +25054,13 @@ Rule.prototype._test = function _test (value) {
   var fn = this.fn;
 
   try {
-    testAux(this.modifiers.slice(), fn)(value);
+    testAux(this.modifiers.slice(), fn, this)(value);
   } catch (ex) {
     fn = function () { return false; };
   }
 
   try {
-    return testAux(this.modifiers.slice(), fn)(value);
+    return testAux(this.modifiers.slice(), fn, this)(value);
   } catch (ex$1) {
     return false;
   }
@@ -25068,14 +25068,14 @@ Rule.prototype._test = function _test (value) {
 
 Rule.prototype._check = function _check (value) {
   try {
-    testAux(this.modifiers.slice(), this.fn)(value);
+    testAux(this.modifiers.slice(), this.fn, this)(value);
   } catch (ex) {
-    if (testAux(this.modifiers.slice(), function (it) { return it; })(false)) {
+    if (testAux(this.modifiers.slice(), function (it) { return it; }, this)(false)) {
       return;
     }
   }
 
-  if (!testAux(this.modifiers.slice(), this.fn)(value)) {
+  if (!testAux(this.modifiers.slice(), this.fn, this)(value)) {
     throw null;
   }
 };
@@ -25086,7 +25086,8 @@ Rule.prototype._testAsync = function _testAsync (value) {
   return new Promise(function (resolve, reject) {
     testAsyncAux(
       this$1.modifiers.slice(),
-      this$1.fn
+      this$1.fn,
+      this$1
     )(value)
       .then(function (valid) {
         if (valid) {
@@ -25105,21 +25106,21 @@ function pickFn(fn, variant) {
   return typeof fn === 'object' ? fn[variant] : fn;
 }
 
-function testAux(modifiers, fn) {
+function testAux(modifiers, fn, rule) {
   if (modifiers.length) {
     var modifier = modifiers.shift();
-    var nextFn = testAux(modifiers, fn);
-    return modifier.perform(nextFn);
+    var nextFn = testAux(modifiers, fn, rule);
+    return modifier.perform(nextFn, rule);
   } else {
     return pickFn(fn);
   }
 }
 
-function testAsyncAux(modifiers, fn) {
+function testAsyncAux(modifiers, fn, rule) {
   if (modifiers.length) {
     var modifier = modifiers.shift();
-    var nextFn = testAsyncAux(modifiers, fn);
-    return modifier.performAsync(nextFn);
+    var nextFn = testAsyncAux(modifiers, fn, rule);
+    return modifier.performAsync(nextFn, rule);
   } else {
     return function (value) { return Promise.resolve(pickFn(fn, 'async')(value)); };
   }
@@ -25237,8 +25238,31 @@ function executeAsyncRules(value, rules, resolve, reject) {
   }
 }
 
+var consideredEmpty = function (value, considerTrimmedEmptyString) {
+  if (
+    considerTrimmedEmptyString &&
+    typeof value === 'string' &&
+    value.trim().length === 0
+  ) {
+    return true;
+  }
+
+  return value === undefined || value === null;
+};
+
+function optional (validation, considerTrimmedEmptyString) {
+  if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
+
+  return ({
+  simple: function (value) { return consideredEmpty(value, considerTrimmedEmptyString) ||
+    validation.check(value) === undefined; },
+  async: function (value) { return consideredEmpty(value, considerTrimmedEmptyString) ||
+    validation.testAsync(value); },
+});
+}
+
 function v8n() {
-  return typeof Proxy !== undefined
+  return typeof Proxy !== 'undefined'
     ? proxyContext(new Context())
     : proxylessContext(new Context());
 }
@@ -25305,7 +25329,7 @@ function proxylessContext(context) {
       get: function () {
         var newContext = proxylessContext(contextWithAllRules._clone());
         return newContext._applyModifier(availableModifiers[prop], prop);
-      }
+      },
     });
   });
 
@@ -25347,7 +25371,39 @@ var availableModifiers = {
     simple: function (fn) { return function (value) { return value !== false && split(value).every(fn); }; },
     async: function (fn) { return function (value) { return Promise.all(split(value).map(fn)).then(function (result) { return result.every(Boolean); }); }; },
   },
+
+  strict: {
+    simple: function (fn, rule) { return function (value) {
+      if (isSchemaRule(rule) && value && typeof value === 'object') {
+        return (
+          Object.keys(rule.args[0]).length === Object.keys(value).length &&
+          fn(value)
+        );
+      }
+      return fn(value);
+    }; },
+    async: function (fn, rule) { return function (value) { return Promise.resolve(fn(value))
+        .then(function (result) {
+          if (isSchemaRule(rule) && value && typeof value === 'object') {
+            return (
+              Object.keys(rule.args[0]).length === Object.keys(value).length &&
+              result
+            );
+          }
+          return result;
+        })
+        .catch(function () { return false; }); }; },
+  },
 };
+
+function isSchemaRule(rule) {
+  return (
+    rule &&
+    rule.name === 'schema' &&
+    rule.args.length > 0 &&
+    typeof rule.args[0] === 'object'
+  );
+}
 
 function split(value) {
   if (typeof value === 'string') {
@@ -25457,22 +25513,7 @@ var availableRules = {
     return function (value) { return validations.some(function (validation) { return validation.test(value); }); };
 },
 
-  optional: function (validation, considerTrimmedEmptyString) {
-    if ( considerTrimmedEmptyString === void 0 ) considerTrimmedEmptyString = false;
-
-    return function (value) {
-    if (
-      considerTrimmedEmptyString &&
-      typeof value === 'string' &&
-      value.trim() === ''
-    ) {
-      return true;
-    }
-
-    if (value !== undefined && value !== null) { validation.check(value); }
-    return true;
-  };
-},
+  optional: optional,
 };
 
 function testType(expected) {
@@ -53871,18 +53912,19 @@ function getImageLinks({ parts, destination, type, messageId }) {
  * Returns a get image links finish action
  * @method getImageLinksFinish
  * @param {Object} params
- * @param {string} params.url the url that returns an attachment
- * @param {string} params.rawURL the url returned when we upload an image
- * @param {Array} params.destination the destination address(es)
+ * @param {string} params.url The url that returns an attachment
+ * @param {string} params.rawURL The url returned when we upload an image
+ * @param [string] params.thumbnailUrl The url that returns a thumbnail representing the attachment
+ * @param {Array} params.destination The destination address(es)
  * @param {string} params.type The type of conversation: can be one of "chat-oneToOne", "chat-group" or "sms".
- * @param {string} params.messageId id for looking up the message
- * @param {Object} [params.error] a standard error object
+ * @param {string} params.messageId The id for looking up the message
+ * @param {Object} [params.error] A standard error object
  * @returns {Object}
  */
-function getImageLinksFinish({ url, rawURL, destination, type, messageId, error }) {
+function getImageLinksFinish({ url, rawURL, thumbnailUrl, destination, type, messageId, error }) {
   return {
     type: actionTypes.GET_IMAGE_LINKS_FINISH,
-    payload: error || { url, rawURL, destination, type, messageId },
+    payload: error || { url, rawURL, thumbnailUrl, destination, type, messageId },
     error: !!error
   };
 }
@@ -54396,7 +54438,8 @@ reducers[actionTypes.GET_IMAGE_LINKS_FINISH] = {
                     // iterate over message parts and find ours using oldURL
                     if ((0, _fp.isEqual)(part.rawURL, action.payload.rawURL)) {
                       return (0, _extends3.default)({}, part, {
-                        url: action.payload.url
+                        url: action.payload.url,
+                        thumbnailUrl: action.payload.thumbnailUrl
                       });
                     }
                     return part;
@@ -54571,6 +54614,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @property {string} type The type of message that was sent. See {@link conversation.chatTypes} for valid types.
  * This property applies only to message objects stored in sender's state.
  * @property {boolean} isFetchingLinks Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
+ * The fetching includes retrieval of message attachment(s) as well as retrieval of thumbnail(s) representing the attachment(s).
  * @public
  * @static
  * @typedef {Object} Message
@@ -56004,21 +56048,45 @@ function* getImageLinks(action) {
   const requestInfo = yield (0, _effects.select)(_selectors2.getRequestInfo, _constants.platforms.CPAAS);
   const { parts, destination, type, messageId } = action.payload;
   const fileParts = parts.filter(part => part.type === 'file');
-  const responseList = yield (0, _effects.all)(fileParts.map(filePart => (0, _effects.call)(_requests.fetchImageLinks, requestInfo, filePart.rawURL)));
+  const responseListForImages = yield (0, _effects.all)(fileParts.map(filePart => (0, _effects.call)(_requests.fetchImageLinks, requestInfo, filePart.rawURL)));
+  // Since `fetchImageLinks` request fetches one image link at a time, we need to
+  // separately request for the links associated with the thumbnail images, as well.
+  const responseListForThumbnails = yield (0, _effects.all)(fileParts.map(filePart => (0, _effects.call)(_requests.fetchImageLinks, requestInfo, filePart.thumbnail.link)));
 
-  yield (0, _effects.all)(responseList.map((response, index) => {
+  yield (0, _effects.all)(responseListForImages.map((response, index) => {
     if (response.error) {
+      // If we got an error while trying to get the link to actual image resource,
+      // we can assume it is an error for thumbnail image as well, because
+      // there is no point in showing a thumbnail icon if the actual resource cannot be accessed.
       return (0, _effects.put)(_actions.messageActions.getImageLinksFinish({ error: response.error }));
     } else {
       // create a url from the blob and save it to the store.
       const url = URL.createObjectURL(response.blob);
-      return (0, _effects.put)(_actions.messageActions.getImageLinksFinish({
-        url,
-        rawURL: fileParts[index].rawURL,
-        destination,
-        type,
-        messageId
-      }));
+
+      // If available, the order of thumbnail images will be the same as
+      // actual images, so we can access thumbnails using the same `index`.
+      const thumbnailResponse = responseListForThumbnails[index];
+      let payload;
+      if (thumbnailResponse.error) {
+        payload = {
+          url,
+          rawURL: fileParts[index].rawURL,
+          destination,
+          type,
+          messageId
+        };
+      } else {
+        const thumbnailUrl = URL.createObjectURL(thumbnailResponse.blob);
+        payload = {
+          url,
+          rawURL: fileParts[index].rawURL,
+          thumbnailUrl,
+          destination,
+          type,
+          messageId
+        };
+      }
+      return (0, _effects.put)(_actions.messageActions.getImageLinksFinish(payload));
     }
   }));
 }

@@ -2444,6 +2444,7 @@ Type: [Object][7]
 *   `type` **[string][8]** The type of message that was sent. See [conversation.chatTypes][88] for valid types.
     This property applies only to message objects stored in sender's state.
 *   `isFetchingLinks` **[boolean][11]** Whether or not the recipient of the message is in the process of fetching the message attachment(s) using the provided link(s).
+    The fetching includes retrieval of message attachment(s) as well as retrieval of thumbnail(s) representing the attachment(s).
 
 #### send
 
