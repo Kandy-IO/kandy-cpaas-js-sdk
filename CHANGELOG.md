@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.41.1 - 2022-07-20
+
+### Fixed
+
+- Fixed a Call issue where a `join` operation would cause audio issues for remote users with music-on-hold in certain backend configurations. `KJS-934`
+
 ## 4.41.0 - 2022-06-30
 
 ### Added
