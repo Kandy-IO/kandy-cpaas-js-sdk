@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 5.0.0-beta.902
+ * Version: 5.0.0-beta.903
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7031,7 +7031,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '5.0.0-beta.902';
+  return '5.0.0-beta.903';
 }
 
 /***/ }),
@@ -44794,13 +44794,21 @@ callReducers[actionTypes.CALL_REMOTE_UNHOLD_FINISH] = {
     const localTracks = (0, _fp.union)(state.localTracks, addedLocal);
 
     const callState = state.localHold ? _constants.CALL_STATES.ON_HOLD : _constants.CALL_STATES.CONNECTED;
-    return (0, _extends3.default)({}, state, {
+    const newCall = (0, _extends3.default)({}, state, {
       remoteHold: false,
       state: callState,
       remoteParticipant: (0, _extends3.default)({}, state.remoteParticipant, action.payload.remoteParticipant),
       localTracks,
       remoteTracks: tracks
-    });
+
+      // If `hasMOH` was explicitly set to true, set it to false as part of unhold.
+      // This will happen when there is an explicit "start MOH" negotiation but
+      //    "stop MOH" is done as part of unhold.
+    });if (newCall.hasMOH === true) {
+      newCall.hasMOH = false;
+    }
+
+    return newCall;
   }
 };
 
@@ -44834,6 +44842,7 @@ callReducers[actionTypes.REMOTE_START_MOH_FINISH] = {
     const tracks = (0, _fp.union)(state.remoteTracks, addedTracks);
 
     return (0, _extends3.default)({}, state, {
+      hasMOH: true,
       remoteTracks: tracks
     });
   }
@@ -44846,6 +44855,7 @@ callReducers[actionTypes.REMOTE_STOP_MOH_FINISH] = {
     const tracksLeft = state.remoteTracks.filter(trackId => !removedTracks.includes(trackId));
 
     return (0, _extends3.default)({}, state, {
+      hasMOH: false,
       remoteTracks: tracksLeft
     });
   }
@@ -50821,6 +50831,19 @@ function* handleUpdateRequest(deps, targetCall, params) {
   const sameSession = yield (0, _effects.call)(_negotiation.isSameSdpSessionId, webRTC, targetCall.webrtcSessionId, sdp);
   if (!sameSession) {
     log.debug(`Received offer SDP is from a different session. Recreating Peer for call ${targetCall.id}.`);
+    yield (0, _effects.call)(_midcall.recreatePeer, webRTC, targetCall.webrtcSessionId);
+  } else if (remoteOp === _constants2.OPERATIONS.UNHOLD && targetCall.hasMOH) {
+    /*
+     * Edge-case: Even though its the same SDP session, the Peer still needs to
+     *    be recreated.
+     * The remote operation is an unhold but it is also stopping MoH. The Peer was
+     *    recreated on start MOH because the SDP was from a different session, but
+     *    the session doesn't change for stop MOH because it was a remote complex
+     *    operation. The Peer needs to be recreated again otherwise local tracks
+     *    will not be properly added back the call (because of how `recreatePeer` works).
+     * Reference: KJS-934
+     */
+    log.debug(`Received offer SDP is both an unhold and stop MoH on the same session. Recreating Peer for call ${targetCall.id}.`);
     yield (0, _effects.call)(_midcall.recreatePeer, webRTC, targetCall.webrtcSessionId);
   }
 
