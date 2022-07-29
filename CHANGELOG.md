@@ -133,6 +133,12 @@ The v5.0 release also includes changes to a few other parts of the SDK. These ch
 
 The following features have been updated internally: Contacts, Presence, Users. They do not require any application changes as part of v5.0, as the changes are backwards-compatible. As always, if you encounter an issue with a release change, please report the issue to us.
 
+## 4.41.2 - 2022-07-28
+
+### Fixed
+
+- Fixed a Call issue where sending in-band DTMF tones 0 and \* would not be recognized by the remote endpoint. `KJS-982`
+
 ## 4.41.1 - 2022-07-20
 
 ### Fixed

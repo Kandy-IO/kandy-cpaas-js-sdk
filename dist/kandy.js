@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 5.0.0-beta.907
+ * Version: 5.0.0-beta.908
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7031,7 +7031,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '5.0.0-beta.907';
+  return '5.0.0-beta.908';
 }
 
 /***/ }),
@@ -52194,9 +52194,9 @@ function convertTone(tone) {
     case '9':
       return ['852', '1477'];
     case '0':
-      return ['941', '1209'];
-    case '*':
       return ['941', '1336'];
+    case '*':
+      return ['941', '1209'];
     case '#':
       return ['941', '1477'];
   }
