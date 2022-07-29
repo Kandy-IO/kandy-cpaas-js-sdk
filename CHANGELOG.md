@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.41.2 - 2022-07-28
+
+### Fixed
+
+- Fixed a Call issue where sending in-band DTMF tones 0 and \* would not be recognized by the remote endpoint. `KJS-982`
+
 ## 4.41.1 - 2022-07-20
 
 ### Fixed
