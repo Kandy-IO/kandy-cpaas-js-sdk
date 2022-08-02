@@ -12,14 +12,6 @@ categories:
 
 In this quickstart, we will help you dip your toes in before you dive in. This guide will help you get started with the $KANDY$ Javascript SDK.
 
-## Base URL
-
-This is the HTTPS entry point that you will use for Javascript SDK authentication, REST service and websocket notifications. It will need to be included in the configurations for the SDK (see below).
-
-```
-  $KANDYFQDN$
-```
-
 ## Getting the SDK
 
 The Kandy SDK is available on NPM and can be added to your project using either npm or yarn.
@@ -102,6 +94,14 @@ const client = create({
   // Other feature configs.
   // ...
 })
+```
+
+### Base URL
+
+This is the HTTPS entry point that you will use for Javascript SDK authentication, REST service and websocket notifications. It will need to be included in the configurations for the SDK.
+
+```
+  $KANDYFQDN$
 ```
 
 To learn more about configuring the SDK, please see the [Configuration Quickstart](configurations).
