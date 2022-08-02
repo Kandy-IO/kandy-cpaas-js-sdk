@@ -5,7 +5,7 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
-## 5.0.0 - beta
+## 5.0.0 - 2022-08-02
 
 The v5.0 release of the Kandy JS SDK simplifies and improves how media tracks are handled for calls. It does not add any new features, but it fixes and clarifies the different scenarios around what/how tracks can be added or removed from a call. The majority of changes are internal to the SDK in how tracks are handled, but they affect how the SDK communicates with an application for this handling. The release also comes with recommendation changes on when an application should render/remove tracks to take into account the SDK changes.
 
