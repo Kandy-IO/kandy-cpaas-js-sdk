@@ -73,7 +73,7 @@
           "column": 58
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
     },
     "augments": [],
     "examples": [
@@ -220,7 +220,7 @@
           "column": 58
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
     },
     "augments": [],
     "examples": [],
@@ -533,7 +533,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/logs/config.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/logs/config.js"
           },
           "augments": [],
           "examples": [],
@@ -993,7 +993,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/auth/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/auth/cpaas/index.js"
           },
           "augments": [],
           "examples": [],
@@ -1417,7 +1417,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/cpaas/index.js"
           },
           "augments": [],
           "examples": [],
@@ -2143,7 +2143,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/cpaas/index.js"
           },
           "augments": [],
           "examples": [],
@@ -2593,7 +2593,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/notifications/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/notifications/cpaas/index.js"
           },
           "augments": [],
           "examples": [],
@@ -2776,7 +2776,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/cpaas/index.js"
           },
           "augments": [],
           "examples": [],
@@ -2948,7 +2948,7 @@
           "column": 58
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
     },
     "augments": [],
     "examples": [],
@@ -3057,7 +3057,7 @@
                 "column": 44
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/request/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/request/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -3165,26 +3165,26 @@
           ],
           "loc": {
             "start": {
-              "line": 290,
+              "line": 266,
               "column": 4
             },
             "end": {
-              "line": 296,
+              "line": 272,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 297,
+                "line": 273,
                 "column": 4
               },
               "end": {
-                "line": 299,
+                "line": 275,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/factory.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/factory.js"
           },
           "augments": [],
           "examples": [],
@@ -3260,26 +3260,26 @@
           ],
           "loc": {
             "start": {
-              "line": 302,
+              "line": 278,
               "column": 4
             },
             "end": {
-              "line": 328,
+              "line": 304,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 329,
+                "line": 305,
                 "column": 4
               },
               "end": {
-                "line": 355,
+                "line": 331,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/factory.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/factory.js"
           },
           "augments": [],
           "examples": [
@@ -3393,7 +3393,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/config/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/config/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -3713,7 +3713,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/config/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/config/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -3883,7 +3883,7 @@
                 "column": 3
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/events/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/events/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -4074,7 +4074,7 @@
                 "column": 3
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/events/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/events/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -4251,7 +4251,7 @@
                 "column": 3
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/events/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/events/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -4405,7 +4405,7 @@
                 "column": 3
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/events/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/events/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -4567,7 +4567,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/auth/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/auth/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -4762,7 +4762,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/auth/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/auth/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -4969,7 +4969,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/auth/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/auth/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -5158,7 +5158,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/index.js"
           },
           "augments": [],
           "examples": [
@@ -5300,26 +5300,26 @@
           ],
           "loc": {
             "start": {
-              "line": 3,
+              "line": 1,
               "column": 0
             },
             "end": {
-              "line": 11,
+              "line": 9,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 13,
+                "line": 11,
                 "column": 0
               },
               "end": {
-                "line": 27,
+                "line": 25,
                 "column": 16
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/errors/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/errors/index.js"
           },
           "augments": [],
           "examples": [],
@@ -5477,7 +5477,7 @@
           "column": 1
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
     "examples": [],
@@ -5686,7 +5686,7 @@
                 "column": 46
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -6020,7 +6020,7 @@
                 "column": 40
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -6233,7 +6233,7 @@
                 "column": 43
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -6535,7 +6535,7 @@
                 "column": 51
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -6905,7 +6905,7 @@
                 "column": 47
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -7138,7 +7138,7 @@
                 "column": 53
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -7263,7 +7263,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Tracks have been added to the Call after an SDK operation. Both sides of the Call\nare now able to render these tracks."
+                    "value": "A new Track has been added to the Call."
                   }
                 ]
               },
@@ -7272,7 +7272,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Tracks are added to a Call when either the local or remote user adds new media\nto the Call, using the "
+                    "value": "The Track may have been added by either the local user or remote user using\nthe "
                   },
                   {
                     "type": "link",
@@ -7288,22 +7288,6 @@
                   },
                   {
                     "type": "text",
-                    "value": " API for example, or when the\nCall is unheld with the "
-                  },
-                  {
-                    "type": "link",
-                    "url": "#callunhold",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call.unhold"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
                     "value": " API."
                   }
                 ]
@@ -7313,25 +7297,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Remote tracks are similarly added to a Call when new tracks are added by the\nremote user or either user unholds the call."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "This event can indicate that multiple tracks have been removed by the same\noperation. For example, if the remote user added video to the call, this\nevent would indicate a single, remote video track was added. If the local\nuser unheld the call, this event would indicate that any tracks previously\non the call have been re-added, both local and remote."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Information about a Track can be retrieved using the "
+                    "value": "Information about the Track can be retrieved using the\n"
                   },
                   {
                     "type": "link",
@@ -7357,23 +7323,23 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 18,
+              "lineNumber": 9,
               "type": null
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 19
+              "lineNumber": 10
             },
             {
               "title": "event",
-              "description": "call:tracksAdded",
-              "lineNumber": 20
+              "description": "call:newTrack",
+              "lineNumber": 11
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 21,
+              "lineNumber": 12,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -7382,8 +7348,8 @@
             },
             {
               "title": "param",
-              "description": "The ID of the Call the tracks were added to.",
-              "lineNumber": 22,
+              "description": "The ID of the call the track was added to.",
+              "lineNumber": 13,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -7392,27 +7358,33 @@
             },
             {
               "title": "param",
-              "description": "List of track IDs that have been added to the Call.",
-              "lineNumber": 23,
+              "description": "The ID of the media the track was added to.",
+              "lineNumber": 14,
               "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
+                "type": "NameExpression",
+                "name": "string"
               },
-              "name": "params.trackIds"
+              "name": "params.mediaId"
             },
             {
-              "title": "example",
-              "description": "client.on('call:tracksAdded', function (params) {\n   // Get the information for each track.\n   const tracks = params.trackIds.map(client.media.getTrackById)\n   tracks.forEach(track => {\n     const { id, kind, isLocal } = track\n     // Handle the track depending whether it is audio vs. video and local vs. remote.\n     ...\n   })\n})",
-              "lineNumber": 24
+              "title": "param",
+              "description": "The ID of the newly added track.",
+              "lineNumber": 15,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.trackId"
+            },
+            {
+              "title": "param",
+              "description": "Whether the track is local or not (remote)",
+              "lineNumber": 16,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "params.local"
             }
           ],
           "loc": {
@@ -7421,35 +7393,31 @@
               "column": 0
             },
             "end": {
-              "line": 177,
+              "line": 160,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 178,
+                "line": 161,
                 "column": 0
               },
               "end": {
-                "line": 178,
-                "column": 51
+                "line": 161,
+                "column": 45
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
-          "examples": [
-            {
-              "description": "client.on('call:tracksAdded', function (params) {\n   // Get the information for each track.\n   const tracks = params.trackIds.map(client.media.getTrackById)\n   tracks.forEach(track => {\n     const { id, kind, isLocal } = track\n     // Handle the track depending whether it is audio vs. video and local vs. remote.\n     ...\n   })\n})"
-            }
-          ],
+          "examples": [],
           "implements": [],
           "params": [
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 21,
+              "lineNumber": 12,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -7458,7 +7426,7 @@
                 {
                   "title": "param",
                   "name": "params.callId",
-                  "lineNumber": 22,
+                  "lineNumber": 13,
                   "description": {
                     "type": "root",
                     "children": [
@@ -7467,7 +7435,7 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "The ID of the Call the tracks were added to."
+                            "value": "The ID of the call the track was added to."
                           }
                         ]
                       }
@@ -7480,8 +7448,8 @@
                 },
                 {
                   "title": "param",
-                  "name": "params.trackIds",
-                  "lineNumber": 23,
+                  "name": "params.mediaId",
+                  "lineNumber": 14,
                   "description": {
                     "type": "root",
                     "children": [
@@ -7490,24 +7458,61 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "List of track IDs that have been added to the Call."
+                            "value": "The ID of the media the track was added to."
                           }
                         ]
                       }
                     ]
                   },
                   "type": {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.trackId",
+                  "lineNumber": 15,
+                  "description": {
+                    "type": "root",
+                    "children": [
                       {
-                        "type": "NameExpression",
-                        "name": "string"
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the newly added track."
+                          }
+                        ]
                       }
                     ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.local",
+                  "lineNumber": 16,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Whether the track is local or not (remote)"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "boolean"
                   }
                 }
               ]
@@ -7522,7 +7527,7 @@
           "access": "public",
           "memberof": "call",
           "kind": "event",
-          "name": "call:tracksAdded",
+          "name": "call:newTrack",
           "members": {
             "global": [],
             "inner": [],
@@ -7536,11 +7541,11 @@
               "kind": "namespace"
             },
             {
-              "name": "call:tracksAdded",
+              "name": "call:newTrack",
               "kind": "event"
             }
           ],
-          "namespace": "call.event:call:tracksAdded"
+          "namespace": "call.event:call:newTrack"
         },
         {
           "description": {
@@ -7551,7 +7556,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Tracks have been removed from the Call after an SDK operation. The tracks may still\nexist, but the media is not available to both sides of the Call any longer."
+                    "value": "A Track has been removed from a Call."
                   }
                 ]
               },
@@ -7560,7 +7565,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Tracks are removed from a Call when either the local or remote user stops the\ntracks, by using the "
+                    "value": "The Track may have been removed by either the local user or remote user using\nthe "
                   },
                   {
                     "type": "link",
@@ -7576,23 +7581,7 @@
                   },
                   {
                     "type": "text",
-                    "value": " API for example, or when the\nCall is held with the "
-                  },
-                  {
-                    "type": "link",
-                    "url": "#callhold",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call.hold"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " API."
+                    "value": " API. Tracks are also removed from Calls\nautomatically while the Call is on hold."
                   }
                 ]
               },
@@ -7601,32 +7590,19 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "This event can indicate that multiple tracks have been removed by the same\noperation. For example, if the remote user removed video from the call, this\nevent would indicate a single, remote video track was removed. If the local\nuser held the call, this event would indicate that all tracks on the call\nhave been removed, both local and remote."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Information about a Track can be retrieved using the "
+                    "value": "Note that receiving this event is not an indication that a media operation\nhas completed. Therefore the application should not assume it is safe to\nperform a new operation at this time. To be notified when a call has had\nits media removed, see "
                   },
                   {
                     "type": "link",
-                    "url": "#mediagettrackbyid",
+                    "url": "#calleventcallremovedmedia",
                     "title": null,
                     "jsdoc": true,
                     "children": [
                       {
                         "type": "text",
-                        "value": "media.getTrackById"
+                        "value": "call:removedMedia"
                       }
                     ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " API."
                   }
                 ]
               }
@@ -7636,23 +7612,23 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 15,
+              "lineNumber": 12,
               "type": null
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 16
+              "lineNumber": 13
             },
             {
               "title": "event",
-              "description": "call:tracksRemoved",
-              "lineNumber": 17
+              "description": "call:trackEnded",
+              "lineNumber": 14
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 18,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -7661,8 +7637,8 @@
             },
             {
               "title": "param",
-              "description": "The ID of the Call the tracks were removed from.",
-              "lineNumber": 19,
+              "description": "The ID of the call the track was removed from.",
+              "lineNumber": 16,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -7671,64 +7647,66 @@
             },
             {
               "title": "param",
-              "description": "List of track IDs that have been removed from the Call.",
-              "lineNumber": 20,
+              "description": "The ID of the media the track was removed from.",
+              "lineNumber": 17,
               "type": {
-                "type": "TypeApplication",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "Array"
-                },
-                "applications": [
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
+                "type": "NameExpression",
+                "name": "string"
               },
-              "name": "params.trackIds"
+              "name": "params.mediaId"
             },
             {
-              "title": "example",
-              "description": "client.on('call:tracksRemoved', function (params) {\n   // Get the information for each track.\n   const tracks = params.trackIds.map(client.media.getTrackById)\n   tracks.forEach(track => {\n     const { id, kind, isLocal } = track\n     // Handle the track depending whether it is audio vs. video and local vs. remote.\n     ...\n   })\n})",
-              "lineNumber": 21
+              "title": "param",
+              "description": "The ID of the removed track.",
+              "lineNumber": 18,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              },
+              "name": "params.trackId"
+            },
+            {
+              "title": "param",
+              "description": "Whether the track was local or not (remote)",
+              "lineNumber": 19,
+              "type": {
+                "type": "NameExpression",
+                "name": "boolean"
+              },
+              "name": "params.local"
             }
           ],
           "loc": {
             "start": {
-              "line": 180,
+              "line": 163,
               "column": 0
             },
             "end": {
-              "line": 211,
+              "line": 183,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 212,
+                "line": 184,
                 "column": 0
               },
               "end": {
-                "line": 212,
-                "column": 55
+                "line": 184,
+                "column": 49
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
-          "examples": [
-            {
-              "description": "client.on('call:tracksRemoved', function (params) {\n   // Get the information for each track.\n   const tracks = params.trackIds.map(client.media.getTrackById)\n   tracks.forEach(track => {\n     const { id, kind, isLocal } = track\n     // Handle the track depending whether it is audio vs. video and local vs. remote.\n     ...\n   })\n})"
-            }
-          ],
+          "examples": [],
           "implements": [],
           "params": [
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 18,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -7737,6 +7715,75 @@
                 {
                   "title": "param",
                   "name": "params.callId",
+                  "lineNumber": 16,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the call the track was removed from."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.mediaId",
+                  "lineNumber": 17,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the media the track was removed from."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.trackId",
+                  "lineNumber": 18,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The ID of the removed track."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "params.local",
                   "lineNumber": 19,
                   "description": {
                     "type": "root",
@@ -7746,7 +7793,7 @@
                         "children": [
                           {
                             "type": "text",
-                            "value": "The ID of the Call the tracks were removed from."
+                            "value": "Whether the track was local or not (remote)"
                           }
                         ]
                       }
@@ -7754,39 +7801,7 @@
                   },
                   "type": {
                     "type": "NameExpression",
-                    "name": "string"
-                  }
-                },
-                {
-                  "title": "param",
-                  "name": "params.trackIds",
-                  "lineNumber": 20,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "List of track IDs that have been removed from the Call."
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "type": {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
+                    "name": "boolean"
                   }
                 }
               ]
@@ -7801,7 +7816,7 @@
           "access": "public",
           "memberof": "call",
           "kind": "event",
-          "name": "call:tracksRemoved",
+          "name": "call:trackEnded",
           "members": {
             "global": [],
             "inner": [],
@@ -7815,11 +7830,11 @@
               "kind": "namespace"
             },
             {
-              "name": "call:tracksRemoved",
+              "name": "call:trackEnded",
               "kind": "event"
             }
           ],
-          "namespace": "call.event:call:tracksRemoved"
+          "namespace": "call.event:call:trackEnded"
         },
         {
           "description": {
@@ -7942,26 +7957,26 @@
           ],
           "loc": {
             "start": {
-              "line": 214,
+              "line": 186,
               "column": 0
             },
             "end": {
-              "line": 234,
+              "line": 206,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 235,
+                "line": 207,
                 "column": 0
               },
               "end": {
-                "line": 235,
+                "line": 207,
                 "column": 50
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -8119,7 +8134,16 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "A local Track has been replaced by the "
+                    "value": "A Track has been replaced on the Call."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A Track is replaced by the local user using the "
                   },
                   {
                     "type": "link",
@@ -8135,7 +8159,7 @@
                   },
                   {
                     "type": "text",
-                    "value": " API."
+                    "value": "\nAPI."
                   }
                 ]
               },
@@ -8144,39 +8168,23 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "This event is a combination of a track being removed from the Call and a new\ntrack being added to the Call. The previous Track's media is no longer\navailable, similar to the "
+                    "value": "This event is similar to the "
                   },
                   {
                     "type": "link",
-                    "url": "#calleventcalltracksremoved",
+                    "url": "#calleventcallnewtrack",
                     "title": null,
                     "jsdoc": true,
                     "children": [
                       {
                         "type": "text",
-                        "value": "call:tracksRemoved"
+                        "value": "call:newTrack"
                       }
                     ]
                   },
                   {
                     "type": "text",
-                    "value": "\nevent, and the new Track is available in its place, similar to the\n"
-                  },
-                  {
-                    "type": "link",
-                    "url": "#calleventcalltracksadded",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call:tracksAdded"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " event. The event\nincludes information about the Track that was replaced to help an application\nreplace it seamlessly."
+                    "value": "\nevent, where the call has a new Track, except that an existing Track has\nbeen removed at the same time. The event includes information about the\nTrack that was replaced to help an application replace it seamlessly."
                   }
                 ]
               }
@@ -8186,23 +8194,23 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 10,
+              "lineNumber": 11,
               "type": null
             },
             {
               "title": "memberof",
               "description": "call",
-              "lineNumber": 11
+              "lineNumber": 12
             },
             {
               "title": "event",
               "description": "call:trackReplaced",
-              "lineNumber": 12
+              "lineNumber": 13
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 14,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -8212,7 +8220,7 @@
             {
               "title": "param",
               "description": "The ID of the call where a track was replaced.",
-              "lineNumber": 14,
+              "lineNumber": 15,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -8222,7 +8230,7 @@
             {
               "title": "param",
               "description": "The ID of the new track that replaced the old track.",
-              "lineNumber": 15,
+              "lineNumber": 16,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -8235,7 +8243,7 @@
             {
               "title": "param",
               "description": "State of the replaced track.",
-              "lineNumber": 16,
+              "lineNumber": 17,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -8248,7 +8256,7 @@
             {
               "title": "param",
               "description": "An error object, if the operation was not successful.",
-              "lineNumber": 17,
+              "lineNumber": 18,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -8257,48 +8265,39 @@
                 }
               },
               "name": "params.error"
-            },
-            {
-              "title": "example",
-              "description": "client.on('call:trackReplaced', function (params) {\n  const { callId, oldTrack, newTrackId } = params\n\n  // Unrender the removed track.\n  handleTrackGone(oldTrack, callId)\n\n  // Render the added track.\n  const track = client.media.getTrackById(newTrackId)\n  handleTrackAdded(track, callId)\n})",
-              "lineNumber": 18
             }
           ],
           "loc": {
             "start": {
-              "line": 237,
+              "line": 209,
               "column": 0
             },
             "end": {
-              "line": 266,
+              "line": 228,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 267,
+                "line": 229,
                 "column": 0
               },
               "end": {
-                "line": 267,
+                "line": 229,
                 "column": 55
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
-          "examples": [
-            {
-              "description": "client.on('call:trackReplaced', function (params) {\n  const { callId, oldTrack, newTrackId } = params\n\n  // Unrender the removed track.\n  handleTrackGone(oldTrack, callId)\n\n  // Render the added track.\n  const track = client.media.getTrackById(newTrackId)\n  handleTrackAdded(track, callId)\n})"
-            }
-          ],
+          "examples": [],
           "implements": [],
           "params": [
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 13,
+              "lineNumber": 14,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -8307,7 +8306,7 @@
                 {
                   "title": "param",
                   "name": "params.callId",
-                  "lineNumber": 14,
+                  "lineNumber": 15,
                   "description": {
                     "type": "root",
                     "children": [
@@ -8330,7 +8329,7 @@
                 {
                   "title": "param",
                   "name": "params.newTrackId",
-                  "lineNumber": 15,
+                  "lineNumber": 16,
                   "description": {
                     "type": "root",
                     "children": [
@@ -8356,7 +8355,7 @@
                 {
                   "title": "param",
                   "name": "params.oldTrack",
-                  "lineNumber": 16,
+                  "lineNumber": 17,
                   "description": {
                     "type": "root",
                     "children": [
@@ -8382,7 +8381,7 @@
                 {
                   "title": "param",
                   "name": "params.error",
-                  "lineNumber": 17,
+                  "lineNumber": 18,
                   "description": {
                     "type": "root",
                     "children": [
@@ -8536,26 +8535,26 @@
           ],
           "loc": {
             "start": {
-              "line": 284,
+              "line": 246,
               "column": 0
             },
             "end": {
-              "line": 295,
+              "line": 257,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 296,
+                "line": 258,
                 "column": 0
               },
               "end": {
-                "line": 296,
+                "line": 258,
                 "column": 54
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -8774,26 +8773,26 @@
           ],
           "loc": {
             "start": {
-              "line": 298,
+              "line": 260,
               "column": 0
             },
             "end": {
-              "line": 314,
+              "line": 276,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 315,
+                "line": 277,
                 "column": 0
               },
               "end": {
-                "line": 315,
+                "line": 277,
                 "column": 67
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -9055,26 +9054,26 @@
           ],
           "loc": {
             "start": {
-              "line": 317,
+              "line": 279,
               "column": 0
             },
             "end": {
-              "line": 348,
+              "line": 310,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 349,
+                "line": 311,
                 "column": 0
               },
               "end": {
-                "line": 349,
+                "line": 311,
                 "column": 48
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -9489,7 +9488,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -10172,7 +10171,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [
@@ -10354,7 +10353,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -10550,7 +10549,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [
@@ -10789,7 +10788,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -11112,7 +11111,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -11444,7 +11443,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -11764,7 +11763,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -12497,7 +12496,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [
@@ -12772,7 +12771,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -13018,7 +13017,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -13255,7 +13254,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -13491,7 +13490,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -13792,7 +13791,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -14194,7 +14193,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -14436,7 +14435,7 @@
                 "column": 1
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
           },
           "augments": [],
           "examples": [],
@@ -15052,7 +15051,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -15754,7 +15753,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -15903,7 +15902,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:newTrack",
+                    "url": "#calleventcallnewtrack",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -16225,7 +16224,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -16924,7 +16923,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -17120,7 +17119,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -17363,7 +17362,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -17581,7 +17580,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -17737,7 +17736,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -17905,7 +17904,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -18010,7 +18009,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:trackEnded",
+                    "url": "#calleventcalltrackended",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -18161,7 +18160,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -18269,7 +18268,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:newTrack",
+                    "url": "#calleventcallnewtrack",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -18586,7 +18585,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -19151,7 +19150,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:trackEnded",
+                    "url": "#calleventcalltrackended",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -19266,7 +19265,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -19463,7 +19462,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:newTrack",
+                    "url": "#calleventcallnewtrack",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -19652,7 +19651,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -19983,7 +19982,7 @@
                   },
                   {
                     "type": "link",
-                    "url": "call.event:call:trackEnded",
+                    "url": "#calleventcalltrackended",
                     "title": null,
                     "jsdoc": true,
                     "children": [
@@ -20068,7 +20067,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -20280,7 +20279,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -20481,7 +20480,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -20694,7 +20693,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -21018,7 +21017,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -21406,7 +21405,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -21883,7 +21882,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -22063,7 +22062,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -22384,7 +22383,7 @@
                 "column": 23
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -22942,7 +22941,7 @@
                 "column": 55
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -23559,7 +23558,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -23757,7 +23756,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [],
@@ -23913,7 +23912,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -24089,7 +24088,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/call.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/call.js"
           },
           "augments": [],
           "examples": [
@@ -24200,7 +24199,7 @@
                 "column": 0
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/docs/docs.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/docs/docs.js"
           },
           "augments": [],
           "examples": [],
@@ -24311,7 +24310,7 @@
                 "column": 0
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/docs/docs.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/docs/docs.js"
           },
           "augments": [],
           "examples": [],
@@ -24413,7 +24412,7 @@
           "column": 70
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -24507,7 +24506,7 @@
                 "column": 36
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -24899,7 +24898,7 @@
                 "column": 70
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -25540,7 +25539,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -25689,7 +25688,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -25812,7 +25811,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/connectivity/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/connectivity/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -25889,26 +25888,26 @@
     ],
     "loc": {
       "start": {
-        "line": 6,
+        "line": 10,
         "column": 2
       },
       "end": {
-        "line": 11,
+        "line": 15,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 13,
+          "line": 17,
           "column": 2
         },
         "end": {
-          "line": 13,
-          "column": 96
+          "line": 195,
+          "column": 3
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
     },
     "augments": [],
     "examples": [],
@@ -25992,7 +25991,7 @@
                 "column": 42
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -26125,7 +26124,7 @@
                 "column": 46
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -26254,7 +26253,7 @@
                 "column": 48
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -26479,26 +26478,26 @@
           ],
           "loc": {
             "start": {
-              "line": 41,
+              "line": 42,
               "column": 4
             },
             "end": {
-              "line": 60,
+              "line": 61,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 61,
+                "line": 62,
                 "column": 4
               },
               "end": {
-                "line": 74,
+                "line": 65,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -26868,26 +26867,26 @@
           ],
           "loc": {
             "start": {
-              "line": 76,
+              "line": 67,
               "column": 4
             },
             "end": {
-              "line": 84,
+              "line": 75,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 85,
+                "line": 76,
                 "column": 4
               },
               "end": {
-                "line": 88,
+                "line": 79,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27013,26 +27012,26 @@
           ],
           "loc": {
             "start": {
-              "line": 90,
+              "line": 81,
               "column": 4
             },
             "end": {
-              "line": 97,
+              "line": 88,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 98,
+                "line": 89,
                 "column": 4
               },
               "end": {
-                "line": 101,
+                "line": 92,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27133,26 +27132,26 @@
           ],
           "loc": {
             "start": {
-              "line": 103,
+              "line": 94,
               "column": 4
             },
             "end": {
-              "line": 110,
+              "line": 101,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 111,
+                "line": 102,
                 "column": 4
               },
               "end": {
-                "line": 123,
+                "line": 105,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27241,26 +27240,26 @@
           ],
           "loc": {
             "start": {
-              "line": 125,
+              "line": 107,
               "column": 4
             },
             "end": {
-              "line": 133,
+              "line": 115,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 134,
+                "line": 116,
                 "column": 4
               },
               "end": {
-                "line": 146,
+                "line": 119,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27503,26 +27502,26 @@
           ],
           "loc": {
             "start": {
-              "line": 172,
+              "line": 145,
               "column": 4
             },
             "end": {
-              "line": 191,
+              "line": 164,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 192,
+                "line": 165,
                 "column": 4
               },
               "end": {
-                "line": 215,
+                "line": 180,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27886,31 +27885,31 @@
                 "type": "NameExpression",
                 "name": "string"
               },
-              "name": "id"
+              "name": "contactId"
             }
           ],
           "loc": {
             "start": {
-              "line": 217,
+              "line": 182,
               "column": 4
             },
             "end": {
-              "line": 225,
+              "line": 190,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 226,
+                "line": 191,
                 "column": 4
               },
               "end": {
-                "line": 237,
+                "line": 194,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/contacts.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/contacts.js"
           },
           "augments": [],
           "examples": [],
@@ -27918,7 +27917,7 @@
           "params": [
             {
               "title": "param",
-              "name": "id",
+              "name": "contactId",
               "lineNumber": 7,
               "description": {
                 "type": "root",
@@ -28101,7 +28100,7 @@
           "column": 40
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -28223,7 +28222,7 @@
                 "column": 52
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -28466,7 +28465,7 @@
                 "column": 58
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -28769,7 +28768,7 @@
                 "column": 48
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -29074,7 +29073,7 @@
                 "column": 46
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -29263,7 +29262,7 @@
                 "column": 58
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -29582,7 +29581,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -29835,7 +29834,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -30117,7 +30116,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -30387,7 +30386,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -30563,7 +30562,7 @@
                 "column": 13
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -30896,7 +30895,7 @@
                 "column": 51
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
           },
           "augments": [],
           "examples": [],
@@ -31241,7 +31240,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [
@@ -31418,7 +31417,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -31565,7 +31564,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -31768,7 +31767,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -31964,7 +31963,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -32125,7 +32124,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -32260,7 +32259,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -32558,7 +32557,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -32832,7 +32831,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -33023,7 +33022,7 @@
                 "column": 51
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
           },
           "augments": [],
           "examples": [],
@@ -33498,7 +33497,7 @@
                 "column": 51
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
           },
           "augments": [],
           "examples": [],
@@ -33781,7 +33780,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -33895,7 +33894,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -34031,7 +34030,7 @@
                       "column": 5
                     }
                   },
-                  "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/messaging/cpaas/interface/mixins.js"
+                  "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/messaging/cpaas/interface/mixins.js"
                 },
                 "augments": [],
                 "examples": [],
@@ -34205,7 +34204,7 @@
           "column": 36
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -34350,7 +34349,7 @@
                 "column": 36
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -34500,7 +34499,7 @@
                 "column": 42
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -34703,7 +34702,7 @@
                 "column": 42
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -34994,7 +34993,7 @@
                 "column": 44
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -35163,7 +35162,7 @@
                 "column": 68
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -35380,7 +35379,7 @@
                 "column": 40
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -35705,7 +35704,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36013,7 +36012,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36128,7 +36127,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36275,7 +36274,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36441,7 +36440,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36634,7 +36633,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36792,7 +36791,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -36941,7 +36940,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -37090,7 +37089,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -37270,7 +37269,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -37459,7 +37458,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -37674,7 +37673,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/groups/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/groups/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -37865,7 +37864,7 @@
           "column": 1
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/logs/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/logs/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -38069,7 +38068,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/logs/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/logs/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -38434,7 +38433,7 @@
                 "column": 0
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/logs/docs.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/logs/docs.js"
           },
           "augments": [],
           "examples": [
@@ -38805,7 +38804,7 @@
                 "column": 0
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/logs/docs.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/logs/docs.js"
           },
           "augments": [],
           "examples": [
@@ -38985,7 +38984,7 @@
           "column": 1
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/call/interfaceNew/api/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/call/interfaceNew/api/index.js"
     },
     "augments": [],
     "examples": [],
@@ -39094,7 +39093,7 @@
                 "column": 47
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [
@@ -39239,7 +39238,7 @@
                 "column": 55
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -39419,7 +39418,7 @@
                 "column": 41
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -39606,7 +39605,7 @@
                 "column": 45
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -39728,7 +39727,32 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "This event is generated outside the control of the SDK. This will predominantely\nhappen for a remote track during network issues, where media will lose frames\nand be \"choppy\". This may also happen for a local track if the browser or\nend-user stops allowing the SDK to access the media device, for example."
+                    "value": "This event is generated outside the control of the SDK. This may happen for a\nlocal track if the browser or end-user stops allowing the SDK to access\nthe media device, for example. This may happen for a remote track during a\ncall when the remote endpoint stops sending media during a hold operation,\nfor example."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Handling this event is only required if you are using "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "unified-plan"
+                  },
+                  {
+                    "type": "text",
+                    "value": " as the\n"
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "sdpSemantics"
+                  },
+                  {
+                    "type": "text",
+                    "value": " setting in the SDK's configuration. This setting will become\nthe default in an upcoming release."
                   }
                 ]
               }
@@ -39738,28 +39762,28 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 12,
+              "lineNumber": 17,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 13
+              "lineNumber": 18
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 14
+              "lineNumber": 19
             },
             {
               "title": "event",
               "description": "media:sourceMuted",
-              "lineNumber": 15
+              "lineNumber": 20
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -39769,7 +39793,7 @@
             {
               "title": "param",
               "description": "The track that is affected as a result of media source being muted.",
-              "lineNumber": 17,
+              "lineNumber": 22,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -39783,22 +39807,22 @@
               "column": 0
             },
             "end": {
-              "line": 80,
+              "line": 85,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 81,
+                "line": 86,
                 "column": 0
               },
               "end": {
-                "line": 81,
+                "line": 86,
                 "column": 53
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -39807,7 +39831,7 @@
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 16,
+              "lineNumber": 21,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -39816,7 +39840,7 @@
                 {
                   "title": "param",
                   "name": "params.trackId",
-                  "lineNumber": 17,
+                  "lineNumber": 22,
                   "description": {
                     "type": "root",
                     "children": [
@@ -39916,6 +39940,31 @@
                     "value": "This event is generated outside the control of the SDK, when the cause of the\nmedia source being muted had been undone."
                   }
                 ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Handling this event is only required if you are using "
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "unified-plan"
+                  },
+                  {
+                    "type": "text",
+                    "value": " as the\n"
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "sdpSemantics"
+                  },
+                  {
+                    "type": "text",
+                    "value": " setting in the SDK's configuration. This setting will become\nthe default in an upcoming release."
+                  }
+                ]
               }
             ]
           },
@@ -39923,28 +39972,28 @@
             {
               "title": "public",
               "description": null,
-              "lineNumber": 9,
+              "lineNumber": 13,
               "type": null
             },
             {
               "title": "static",
               "description": null,
-              "lineNumber": 10
+              "lineNumber": 14
             },
             {
               "title": "memberof",
               "description": "media",
-              "lineNumber": 11
+              "lineNumber": 15
             },
             {
               "title": "event",
               "description": "media:sourceUnmuted",
-              "lineNumber": 12
+              "lineNumber": 16
             },
             {
               "title": "param",
               "description": null,
-              "lineNumber": 13,
+              "lineNumber": 17,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -39954,7 +40003,7 @@
             {
               "title": "param",
               "description": "The track that is affected as a result of media source being unmuted.",
-              "lineNumber": 14,
+              "lineNumber": 18,
               "type": {
                 "type": "NameExpression",
                 "name": "string"
@@ -39964,26 +40013,26 @@
           ],
           "loc": {
             "start": {
-              "line": 83,
+              "line": 88,
               "column": 0
             },
             "end": {
-              "line": 98,
+              "line": 107,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 99,
+                "line": 108,
                 "column": 0
               },
               "end": {
-                "line": 99,
+                "line": 108,
                 "column": 57
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -39992,7 +40041,7 @@
             {
               "title": "param",
               "name": "params",
-              "lineNumber": 13,
+              "lineNumber": 17,
               "type": {
                 "type": "NameExpression",
                 "name": "Object"
@@ -40001,7 +40050,7 @@
                 {
                   "title": "param",
                   "name": "params.trackId",
-                  "lineNumber": 14,
+                  "lineNumber": 18,
                   "description": {
                     "type": "root",
                     "children": [
@@ -40147,26 +40196,26 @@
           ],
           "loc": {
             "start": {
-              "line": 101,
+              "line": 110,
               "column": 0
             },
             "end": {
-              "line": 112,
+              "line": 121,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 113,
+                "line": 122,
                 "column": 0
               },
               "end": {
-                "line": 113,
+                "line": 122,
                 "column": 51
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -40295,240 +40344,6 @@
             }
           ],
           "namespace": "media.event:media:trackRendered"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "A local Track has ended unexpectedly. The Track may still be part of a Call but\nhas become disconnected from its media source and is not recoverable."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "This event is emitted when an action other than an SDK operation stops the\ntrack. The most comon scenarios are when a device being used for a Call\ndisconnects, any local tracks (such as audio from a bluetooth headset's\nmicrophone or video from a USB camera) from that device will be ended.\nAnother scenario is for screensharing, where some browsers provide the\nability to stop screensharing directly rather than through an SDK operation."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "When a local track ends this way, it will still be part of the Call but will\nnot have any media. The track can be removed from the call with the\n"
-                  },
-                  {
-                    "type": "link",
-                    "url": "#callremovemedia",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call.removeMedia"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " API so the remote side of the Call knows the track\nhas stopped, or the track can be replaced with a new track using the\n"
-                  },
-                  {
-                    "type": "link",
-                    "url": "#callreplacetrack",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "call.replaceTrack"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " API to prevent any interruption."
-                  }
-                ]
-              }
-            ]
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 16,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 17
-            },
-            {
-              "title": "memberof",
-              "description": "media",
-              "lineNumber": 18
-            },
-            {
-              "title": "event",
-              "description": "media:trackEnded",
-              "lineNumber": 19
-            },
-            {
-              "title": "param",
-              "description": null,
-              "lineNumber": 20,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "params"
-            },
-            {
-              "title": "param",
-              "description": "The Track that has ended.",
-              "lineNumber": 21,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "params.trackId"
-            },
-            {
-              "title": "param",
-              "description": "The ID of the Call the Track is used in.",
-              "lineNumber": 22,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "name": "params.callId"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 115,
-              "column": 0
-            },
-            "end": {
-              "line": 138,
-              "column": 3
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 139,
-                "column": 0
-              },
-              "end": {
-                "line": 139,
-                "column": 45
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/eventTypes.js"
-          },
-          "augments": [],
-          "examples": [],
-          "implements": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "params",
-              "lineNumber": 20,
-              "type": {
-                "type": "NameExpression",
-                "name": "Object"
-              },
-              "properties": [
-                {
-                  "title": "param",
-                  "name": "params.trackId",
-                  "lineNumber": 21,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The Track that has ended."
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "type": {
-                    "type": "NameExpression",
-                    "name": "Object"
-                  }
-                },
-                {
-                  "title": "param",
-                  "name": "params.callId",
-                  "lineNumber": 22,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "The ID of the Call the Track is used in."
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "type": {
-                    "type": "NameExpression",
-                    "name": "Object"
-                  }
-                }
-              ]
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "yields": [],
-          "access": "public",
-          "scope": "static",
-          "memberof": "media",
-          "kind": "event",
-          "name": "media:trackEnded",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "media",
-              "kind": "namespace"
-            },
-            {
-              "name": "media:trackEnded",
-              "kind": "event",
-              "scope": "static"
-            }
-          ],
-          "namespace": "media.event:media:trackEnded"
         }
       ],
       "static": [
@@ -40626,7 +40441,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -40764,7 +40579,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -40926,7 +40741,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -41224,7 +41039,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [
@@ -41457,7 +41272,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [
@@ -41706,7 +41521,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -41930,7 +41745,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -42113,7 +41928,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/webrtc/interface/api/media.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/webrtc/interface/api/media.js"
           },
           "augments": [],
           "examples": [],
@@ -42329,10 +42144,10 @@
         },
         "end": {
           "line": 42,
-          "column": 49
+          "column": 36
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -42537,7 +42352,7 @@
                 "column": 41
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -42775,7 +42590,7 @@
                 "column": 48
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -42899,7 +42714,7 @@
                 "column": 45
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -43081,7 +42896,7 @@
                 "column": 49
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -43254,7 +43069,7 @@
                 "column": 37
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -43401,26 +43216,26 @@
           ],
           "loc": {
             "start": {
-              "line": 23,
+              "line": 22,
               "column": 4
             },
             "end": {
-              "line": 36,
+              "line": 35,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 37,
+                "line": 36,
                 "column": 4
               },
               "end": {
-                "line": 37,
+                "line": 36,
                 "column": 37
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/cpaas/index.js"
           },
           "augments": [],
           "examples": [
@@ -43607,26 +43422,26 @@
           ],
           "loc": {
             "start": {
-              "line": 38,
+              "line": 37,
               "column": 4
             },
             "end": {
-              "line": 56,
+              "line": 55,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 57,
+                "line": 56,
                 "column": 4
               },
               "end": {
-                "line": 57,
+                "line": 56,
                 "column": 41
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/cpaas/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/cpaas/index.js"
           },
           "augments": [],
           "examples": [
@@ -43894,10 +43709,10 @@
               },
               "end": {
                 "line": 42,
-                "column": 49
+                "column": 36
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -44273,26 +44088,26 @@
           ],
           "loc": {
             "start": {
-              "line": 57,
+              "line": 51,
               "column": 4
             },
             "end": {
-              "line": 79,
+              "line": 73,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 80,
+                "line": 74,
                 "column": 4
               },
               "end": {
-                "line": 88,
+                "line": 77,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -44419,591 +44234,6 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "Fetches presence information for the given users. This will refresh the\navailable information with any new information from the server."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Available presence information an be retrieved using the\n"
-                  },
-                  {
-                    "type": "link",
-                    "url": "#presenceget",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "presence.get"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " or "
-                  },
-                  {
-                    "type": "link",
-                    "url": "#presencegetall",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "presence.getAll"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " APIs."
-                  }
-                ]
-              }
-            ]
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 7,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 8
-            },
-            {
-              "title": "memberof",
-              "description": "presence",
-              "lineNumber": 9
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 10,
-              "name": "presence"
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 11,
-              "name": "fetch"
-            },
-            {
-              "title": "param",
-              "description": "A User ID or an array of User IDs.",
-              "lineNumber": 12,
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              },
-              "name": "user"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 90,
-              "column": 4
-            },
-            "end": {
-              "line": 103,
-              "column": 7
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 104,
-                "column": 4
-              },
-              "end": {
-                "line": 112,
-                "column": 5
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "implements": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "user",
-              "lineNumber": 12,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A User ID or an array of User IDs."
-                      }
-                    ]
-                  }
-                ]
-              },
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "yields": [],
-          "access": "public",
-          "scope": "static",
-          "memberof": "presence",
-          "kind": "function",
-          "name": "fetch",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "presence",
-              "kind": "namespace"
-            },
-            {
-              "name": "fetch",
-              "kind": "function",
-              "scope": "static"
-            }
-          ],
-          "namespace": "presence.fetch"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Subscribe to another User's presence updates."
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "When the User updates their presence information, the SDK will emit a\n"
-                  },
-                  {
-                    "type": "link",
-                    "url": "#presenceeventpresencechange",
-                    "title": null,
-                    "jsdoc": true,
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "presence:change"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "text",
-                    "value": " event."
-                  }
-                ]
-              }
-            ]
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 6,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 7
-            },
-            {
-              "title": "memberof",
-              "description": "presence",
-              "lineNumber": 8
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 9,
-              "name": "presence"
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 10,
-              "name": "subscribe"
-            },
-            {
-              "title": "param",
-              "description": "A User ID or an array of User IDs.",
-              "lineNumber": 11,
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              },
-              "name": "users"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 114,
-              "column": 4
-            },
-            "end": {
-              "line": 126,
-              "column": 7
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 127,
-                "column": 4
-              },
-              "end": {
-                "line": 135,
-                "column": 5
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "implements": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "users",
-              "lineNumber": 11,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A User ID or an array of User IDs."
-                      }
-                    ]
-                  }
-                ]
-              },
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "yields": [],
-          "access": "public",
-          "scope": "static",
-          "memberof": "presence",
-          "kind": "function",
-          "name": "subscribe",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "presence",
-              "kind": "namespace"
-            },
-            {
-              "name": "subscribe",
-              "kind": "function",
-              "scope": "static"
-            }
-          ],
-          "namespace": "presence.subscribe"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
-                    "value": "Unsubscribe from another User's presence updates."
-                  }
-                ]
-              }
-            ]
-          },
-          "tags": [
-            {
-              "title": "public",
-              "description": null,
-              "lineNumber": 3,
-              "type": null
-            },
-            {
-              "title": "static",
-              "description": null,
-              "lineNumber": 4
-            },
-            {
-              "title": "memberof",
-              "description": "presence",
-              "lineNumber": 5
-            },
-            {
-              "title": "requires",
-              "description": null,
-              "lineNumber": 6,
-              "name": "presence"
-            },
-            {
-              "title": "method",
-              "description": null,
-              "lineNumber": 7,
-              "name": "unsubscribe"
-            },
-            {
-              "title": "param",
-              "description": "A User ID or an array of User IDs.",
-              "lineNumber": 8,
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              },
-              "name": "users"
-            }
-          ],
-          "loc": {
-            "start": {
-              "line": 137,
-              "column": 4
-            },
-            "end": {
-              "line": 146,
-              "column": 7
-            }
-          },
-          "context": {
-            "loc": {
-              "start": {
-                "line": 147,
-                "column": 4
-              },
-              "end": {
-                "line": 155,
-                "column": 5
-              }
-            },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
-          },
-          "augments": [],
-          "examples": [],
-          "implements": [],
-          "params": [
-            {
-              "title": "param",
-              "name": "users",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "A User ID or an array of User IDs."
-                      }
-                    ]
-                  }
-                ]
-              },
-              "type": {
-                "type": "UnionType",
-                "elements": [
-                  {
-                    "type": "TypeApplication",
-                    "expression": {
-                      "type": "NameExpression",
-                      "name": "Array"
-                    },
-                    "applications": [
-                      {
-                        "type": "NameExpression",
-                        "name": "string"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                ]
-              }
-            }
-          ],
-          "properties": [],
-          "returns": [],
-          "sees": [],
-          "throws": [],
-          "todos": [],
-          "yields": [],
-          "access": "public",
-          "scope": "static",
-          "memberof": "presence",
-          "kind": "function",
-          "name": "unsubscribe",
-          "members": {
-            "global": [],
-            "inner": [],
-            "instance": [],
-            "events": [],
-            "static": []
-          },
-          "path": [
-            {
-              "name": "presence",
-              "kind": "namespace"
-            },
-            {
-              "name": "unsubscribe",
-              "kind": "function",
-              "scope": "static"
-            }
-          ],
-          "namespace": "presence.unsubscribe"
-        },
-        {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "paragraph",
-                "children": [
-                  {
-                    "type": "text",
                     "value": "Retrieves the presence information for specified users, if available."
                   }
                 ]
@@ -45097,26 +44327,26 @@
           ],
           "loc": {
             "start": {
-              "line": 157,
+              "line": 79,
               "column": 4
             },
             "end": {
-              "line": 167,
+              "line": 89,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 168,
+                "line": 90,
                 "column": 4
               },
               "end": {
-                "line": 180,
+                "line": 102,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -45300,26 +44530,26 @@
           ],
           "loc": {
             "start": {
-              "line": 182,
+              "line": 104,
               "column": 4
             },
             "end": {
-              "line": 191,
+              "line": 113,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 192,
+                "line": 114,
                 "column": 4
               },
               "end": {
-                "line": 195,
+                "line": 117,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -45468,26 +44698,26 @@
           ],
           "loc": {
             "start": {
-              "line": 197,
+              "line": 119,
               "column": 4
             },
             "end": {
-              "line": 208,
+              "line": 130,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 209,
+                "line": 131,
                 "column": 4
               },
               "end": {
-                "line": 212,
+                "line": 134,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/presence/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
           },
           "augments": [],
           "examples": [],
@@ -45545,6 +44775,591 @@
             }
           ],
           "namespace": "presence.getSelf"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Fetches presence information for the given users. This will refresh the\navailable information with any new information from the server."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Available presence information can be retrieved using the\n"
+                  },
+                  {
+                    "type": "link",
+                    "url": "#presenceget",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "presence.get"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " or "
+                  },
+                  {
+                    "type": "link",
+                    "url": "#presencegetall",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "presence.getAll"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " APIs."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 7,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 8
+            },
+            {
+              "title": "memberof",
+              "description": "presence",
+              "lineNumber": 9
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 10,
+              "name": "presence"
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 11,
+              "name": "fetch"
+            },
+            {
+              "title": "param",
+              "description": "A User ID or an array of User IDs.",
+              "lineNumber": 12,
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "user"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 136,
+              "column": 4
+            },
+            "end": {
+              "line": 149,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 150,
+                "column": 4
+              },
+              "end": {
+                "line": 154,
+                "column": 5
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "user",
+              "lineNumber": 12,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A User ID or an array of User IDs."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "presence",
+          "kind": "function",
+          "name": "fetch",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "presence",
+              "kind": "namespace"
+            },
+            {
+              "name": "fetch",
+              "kind": "function",
+              "scope": "static"
+            }
+          ],
+          "namespace": "presence.fetch"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Subscribe to another User's presence updates."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "When the User updates their presence information, the SDK will emit a\n"
+                  },
+                  {
+                    "type": "link",
+                    "url": "#presenceeventpresencechange",
+                    "title": null,
+                    "jsdoc": true,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "presence:change"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " event."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 6,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 7
+            },
+            {
+              "title": "memberof",
+              "description": "presence",
+              "lineNumber": 8
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 9,
+              "name": "presence"
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 10,
+              "name": "subscribe"
+            },
+            {
+              "title": "param",
+              "description": "A User ID or an array of User IDs.",
+              "lineNumber": 11,
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "users"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 156,
+              "column": 4
+            },
+            "end": {
+              "line": 168,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 169,
+                "column": 4
+              },
+              "end": {
+                "line": 172,
+                "column": 5
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "users",
+              "lineNumber": 11,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A User ID or an array of User IDs."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "presence",
+          "kind": "function",
+          "name": "subscribe",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "presence",
+              "kind": "namespace"
+            },
+            {
+              "name": "subscribe",
+              "kind": "function",
+              "scope": "static"
+            }
+          ],
+          "namespace": "presence.subscribe"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Unsubscribe from another User's presence updates."
+                  }
+                ]
+              }
+            ]
+          },
+          "tags": [
+            {
+              "title": "public",
+              "description": null,
+              "lineNumber": 3,
+              "type": null
+            },
+            {
+              "title": "static",
+              "description": null,
+              "lineNumber": 4
+            },
+            {
+              "title": "memberof",
+              "description": "presence",
+              "lineNumber": 5
+            },
+            {
+              "title": "requires",
+              "description": null,
+              "lineNumber": 6,
+              "name": "presence"
+            },
+            {
+              "title": "method",
+              "description": null,
+              "lineNumber": 7,
+              "name": "unsubscribe"
+            },
+            {
+              "title": "param",
+              "description": "A User ID or an array of User IDs.",
+              "lineNumber": 8,
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              },
+              "name": "users"
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 174,
+              "column": 4
+            },
+            "end": {
+              "line": 183,
+              "column": 7
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 184,
+                "column": 4
+              },
+              "end": {
+                "line": 187,
+                "column": 5
+              }
+            },
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/presence/interface/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "implements": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "users",
+              "lineNumber": 8,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "A User ID or an array of User IDs."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "TypeApplication",
+                    "expression": {
+                      "type": "NameExpression",
+                      "name": "Array"
+                    },
+                    "applications": [
+                      {
+                        "type": "NameExpression",
+                        "name": "string"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "string"
+                  }
+                ]
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "yields": [],
+          "access": "public",
+          "scope": "static",
+          "memberof": "presence",
+          "kind": "function",
+          "name": "unsubscribe",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "presence",
+              "kind": "namespace"
+            },
+            {
+              "name": "unsubscribe",
+              "kind": "function",
+              "scope": "static"
+            }
+          ],
+          "namespace": "presence.unsubscribe"
         }
       ]
     },
@@ -45607,7 +45422,7 @@
           "column": 7
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/request/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/request/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -45741,7 +45556,7 @@
                 "column": 7
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/request/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/request/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -46016,7 +45831,7 @@
           "column": 58
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
     },
     "augments": [],
     "examples": [
@@ -46137,7 +45952,7 @@
                 "column": 58
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
           },
           "augments": [],
           "examples": [],
@@ -46383,7 +46198,7 @@
                 "column": 58
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/builds/core/index.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/builds/core/index.js"
           },
           "augments": [],
           "examples": [
@@ -46614,7 +46429,7 @@
           "column": 36
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
     },
     "augments": [],
     "examples": [],
@@ -46736,7 +46551,7 @@
                 "column": 47
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -46908,7 +46723,7 @@
                 "column": 45
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -47084,7 +46899,7 @@
                 "column": 45
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -47337,7 +47152,7 @@
                 "column": 36
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -47559,7 +47374,7 @@
                 "column": 36
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -47821,7 +47636,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -48087,7 +47902,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -48309,7 +48124,7 @@
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/subscription/interface/api.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/subscription/interface/api.js"
           },
           "augments": [],
           "examples": [
@@ -48429,11 +48244,11 @@
           "column": 2
         },
         "end": {
-          "line": 207,
+          "line": 182,
           "column": 3
         }
       },
-      "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+      "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
     },
     "augments": [],
     "examples": [],
@@ -48541,7 +48356,7 @@
                 "column": 50
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -48696,7 +48511,7 @@
                 "column": 48
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -48854,7 +48669,7 @@
                 "column": 42
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -49014,7 +48829,7 @@
                 "column": 40
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/events/eventTypes.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/events/eventTypes.js"
           },
           "augments": [],
           "examples": [],
@@ -49208,11 +49023,11 @@
                 "column": 2
               },
               "end": {
-                "line": 207,
+                "line": 182,
                 "column": 3
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -49508,11 +49323,11 @@
                 "column": 4
               },
               "end": {
-                "line": 59,
+                "line": 51,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -49686,26 +49501,26 @@
           ],
           "loc": {
             "start": {
-              "line": 78,
+              "line": 70,
               "column": 4
             },
             "end": {
-              "line": 94,
+              "line": 86,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 95,
+                "line": 87,
                 "column": 4
               },
               "end": {
-                "line": 107,
+                "line": 90,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -49843,26 +49658,26 @@
           ],
           "loc": {
             "start": {
-              "line": 109,
+              "line": 92,
               "column": 4
             },
             "end": {
-              "line": 121,
+              "line": 104,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 122,
+                "line": 105,
                 "column": 4
               },
               "end": {
-                "line": 125,
+                "line": 108,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -50045,26 +49860,26 @@
           ],
           "loc": {
             "start": {
-              "line": 127,
+              "line": 110,
               "column": 4
             },
             "end": {
-              "line": 138,
+              "line": 121,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 139,
+                "line": 122,
                 "column": 4
               },
               "end": {
-                "line": 142,
+                "line": 125,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -50389,26 +50204,26 @@
           ],
           "loc": {
             "start": {
-              "line": 169,
+              "line": 152,
               "column": 4
             },
             "end": {
-              "line": 194,
+              "line": 177,
               "column": 7
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 195,
+                "line": 178,
                 "column": 4
               },
               "end": {
-                "line": 206,
+                "line": 181,
                 "column": 5
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/users/interface/api/users.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/users/interface/api/users.js"
           },
           "augments": [],
           "examples": [],
@@ -50829,7 +50644,7 @@
                 "column": 0
               }
             },
-            "file": "/var/jenkins_home/workspace/Kandy.js_master/packages/kandy/src/docs/docs.js"
+            "file": "/var/jenkins_home/workspace/Kandy.js_v4-support/packages/kandy/src/docs/docs.js"
           },
           "augments": [],
           "examples": [],
