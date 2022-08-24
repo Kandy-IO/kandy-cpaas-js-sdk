@@ -7,6 +7,10 @@ Kandy.js change log.
 
 ## 5.1.0 - beta
 
+### Fixed
+
+- Fixed a Call issue where where remote video would not be added to the call in certain backend configurations. `KJS-1052`
+
 ### Changed
 
 - Updated the `webrtc-adapter` package. `KJS-911`

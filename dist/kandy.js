@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 5.1.0-beta.917
+ * Version: 5.1.0-beta.918
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -7043,7 +7043,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '5.1.0-beta.917';
+  return '5.1.0-beta.918';
 }
 
 /***/ }),
@@ -12039,7 +12039,8 @@ function getHeldSectionIds(mediaDiff) {
     // We know this was a hold operation, so we only need to check that the
     //    media section stopped sending media to know that a track was removed here.
     if (changes.sending === 'STOP') {
-      heldSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      heldSections.push(id);
     }
   });
   return heldSections;
@@ -12060,13 +12061,15 @@ function get3xHeldSectionIds(mediaDiff) {
       // Changed audio always stops being received by the remote endpoint.
       // Changed audio always continues being sent by the remote endpoint.
       if (changes.receiving === 'STOP' && changes.sending === 'SAME') {
-        heldSections.push(media.sectionId);
+        const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+        heldSections.push(id);
       }
     } else {
       // Changed video is never received afterwards.
       //     Either stopped or stayed "not receiving".
       if (changes.receiving === 'STOP' || changes.receiving === 'SAME' && media.willReceive === false) {
-        heldSections.push(media.sectionId);
+        const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+        heldSections.push(id);
       }
     }
   });
@@ -12075,7 +12078,8 @@ function get3xHeldSectionIds(mediaDiff) {
   //    change the direction but just stopped the video being sent.
   mediaDiff.unchanged.forEach(media => {
     if (media.type === 'video' && media.willSend && !media.willReceive) {
-      heldSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      heldSections.push(id);
     }
   });
 
@@ -12095,7 +12099,8 @@ function getUnheldSectionIds(mediaDiff) {
     // We know this was an unhold operation, so we only need to check that the
     //    media section started sending media to know that a track was added here.
     if (changes.sending === 'START') {
-      unheldSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      unheldSections.push(id);
     }
   });
   return unheldSections;
@@ -12121,7 +12126,8 @@ function get3xUnheldSectionIds(mediaDiff) {
      * This behaviour was seen when the remote endpoint was a SIP device. See KAA-2593.
      */
     media.type === 'video' && changes.sending === 'START' && changes.receiving === 'START') {
-      unheldSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      unheldSections.push(id);
     }
   });
   return unheldSections;
@@ -12139,13 +12145,18 @@ function getAddedSectionIds(mediaDiff) {
     const { media, changes } = changedMedia;
     // This ChangedMedia object represents a "track added".
     if (changes.sending === 'START' && changes.receiving === 'SAME') {
-      addedMediaSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      addedMediaSections.push(id);
     }
   });
 
   // For the Transceiver for newly added media sections to exist, the SDK has to
   //    have handled the remote offer at the WebRTC-layer already.
-  const newSectionsWithTracks = mediaDiff.added.filter(mediaSummary => mediaSummary.willSend).map(mediaSummary => mediaSummary.sectionId);
+  const newSectionsWithTracks = mediaDiff.added.filter(mediaSummary => mediaSummary.willSend).map(mediaSummary => {
+    // If the sectionId is undefined, return the index instead.
+    // The order of media sections (their index) /should/ never change.
+    return typeof mediaSummary.sectionId === 'undefined' ? mediaSummary.sectionIndex : mediaSummary.sectionId;
+  });
 
   addedMediaSections = addedMediaSections.concat(newSectionsWithTracks);
 
@@ -12165,7 +12176,8 @@ function getRemovedSectionIds(mediaDiff) {
     const { media, changes } = changedMedia;
     // This ChangedMedia object represents a "track removed".
     if (changes.sending === 'STOP' && changes.receiving !== 'STOP') {
-      removedMediaSections.push(media.sectionId);
+      const id = typeof media.sectionId === 'undefined' ? media.sectionIndex : media.sectionId;
+      removedMediaSections.push(id);
     }
   });
 
@@ -18470,13 +18482,15 @@ const MEDIA_TRANSITIONS = exports.MEDIA_TRANSITIONS = {
  */
 function summarizeMedia(sdp) {
   const sdpMedia = [];
-  sdp.media.forEach(media => {
+  sdp.media.forEach((media, index) => {
     /*
      * Generate/Find a unique ID for this media section. This will be used to
      *    compare against another SDP's media sections to find matching
      *    sections.
      */
     const sectionId = media.mid;
+    // In case the sectionId is undefined, take note of the index of the media section.
+    const sectionIndex = index;
 
     if (media.ssrcGroups && media.ssrcGroups.length > 1) {
       /*
@@ -18538,15 +18552,17 @@ function summarizeMedia(sdp) {
     /**
      * Summarized information about a media section from an SDP.
      * @typedef  {Object}  MediaSummary
-     * @property {string}  sectionId   A unique identifier for the media section.
-     * @property {string}  type        The type of media line.
-     * @property {boolean} willSend    Whether the media will send data.
-     * @property {boolean} willReceive Whether the media will receive data.
-     * @property {string}  mediaId     The MediaStream ID of the media.
-     * @property {string}  trackId     The MediaStreamTrack ID of the media.
+     * @property {string}  sectionId    A unique identifier for the media section.
+     * @property {string}  sectionIndex The index of the media section in the SDP.
+     * @property {string}  type         The type of media line.
+     * @property {boolean} willSend     Whether the media will send data.
+     * @property {boolean} willReceive  Whether the media will receive data.
+     * @property {string}  mediaId      The MediaStream ID of the media.
+     * @property {string}  trackId      The MediaStreamTrack ID of the media.
      */
     const summary = {
       sectionId,
+      sectionIndex,
       type: media.type,
       willSend,
       willReceive,
