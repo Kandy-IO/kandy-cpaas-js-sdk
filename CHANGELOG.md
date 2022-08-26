@@ -5,6 +5,17 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 5.1.0 - 2022-08-26
+
+### Fixed
+
+- Fixed a Call issue where where remote video would not be added to the call in certain backend configurations. `KJS-1052`
+
+### Changed
+
+- Updated the `webrtc-adapter` package. `KJS-911`
+  - This affects the RTCIceCandidates that are received by the IceCollectionCheck function. The candidate's component property will now be polyfilled according to latest WebRTC spec, i.e., it will now explicitly be "rtp" or "rtcp" instead of "1" or "2".
+
 ## 5.0.0 - 2022-08-02
 
 The v5.0 release of the Kandy JS SDK simplifies and improves how media tracks are handled for calls. It does not add any new features, but it fixes and clarifies the different scenarios around what/how tracks can be added or removed from a call. The majority of changes are internal to the SDK in how tracks are handled, but they affect how the SDK communicates with an application for this handling. The release also comes with recommendation changes on when an application should render/remove tracks to take into account the SDK changes.
