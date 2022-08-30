@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 5.2.0-beta.921
+ * Version: 5.2.0-beta.922
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6972,7 +6972,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '5.2.0-beta.921';
+  return '5.2.0-beta.922';
 }
 
 /***/ }),
@@ -46179,6 +46179,7 @@ function* makeCall(deps, action) {
     const sessionState = yield (0, _effects.select)(_selectors2.getSessionById, sessionId);
 
     yield (0, _effects.put)(_actions.callActions.pendingMakeCall(action.payload.id, {
+      state: _constants.CALL_STATES.INITIATED,
       // The ID that the backend uses to track this webRTC session.
       wrtcsSessionId: response.wrtcsSessionId,
       // The ID that the webRTC stack uses to track this webRTC session.
