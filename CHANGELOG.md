@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 5.1.1 - 2022-08-31
+
+### Fixed
+
+- Fixed an issue introduced in v5.1.0 causing the SDK to fail to initialize.
+
 ## 5.1.0 - 2022-08-26
 
 ### Fixed
