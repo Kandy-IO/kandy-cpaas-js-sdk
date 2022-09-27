@@ -5,6 +5,12 @@ Kandy.js change log.
 - This project adheres to [Semantic Versioning](http://semver.org/).
 - This change log follows [keepachangelog.com](http://keepachangelog.com/) recommendations.
 
+## 4.41.3 - 2022-09-27
+
+### Fixed
+
+- Fixed a Call issue where, when making an outgoing call, receiving the call answer then a remote midcall operation immediately afterwards would not ensure the call is established before handling the remote operation. `KJS-1152`
+
 ## 4.41.2 - 2022-07-28
 
 ### Fixed
