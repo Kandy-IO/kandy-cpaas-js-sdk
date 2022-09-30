@@ -393,22 +393,8 @@
             },
             {
               "title": "param",
-              "description": "Enable the detailed call logger\n   for v3.X. Requires log level debug.",
-              "lineNumber": 23,
-              "type": {
-                "type": "OptionalType",
-                "expression": {
-                  "type": "NameExpression",
-                  "name": "boolean"
-                }
-              },
-              "name": "logs.enableFcsLogs",
-              "default": "true"
-            },
-            {
-              "title": "param",
               "description": "Options specifically for action logs when\n   logLevel is at DEBUG+ levels. Set this to false to not output action logs.",
-              "lineNumber": 25,
+              "lineNumber": 23,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -431,7 +417,7 @@
             {
               "title": "param",
               "description": "The function to receive action\n   log entries from the SDK. If not provided, a default handler will be used\n   that logs actions to the console.",
-              "lineNumber": 27,
+              "lineNumber": 25,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -444,7 +430,7 @@
             {
               "title": "param",
               "description": "Only output information\n   about the action itself. Omits the SDK context for when it occurred.",
-              "lineNumber": 30,
+              "lineNumber": 28,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -458,7 +444,7 @@
             {
               "title": "param",
               "description": "Whether logs should be\n   minimized when initially output. The full log is still output and can be\n   inspected on the console.",
-              "lineNumber": 32,
+              "lineNumber": 30,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -472,7 +458,7 @@
             {
               "title": "param",
               "description": "Include a diff of what SDK\n   context was changed by the action.",
-              "lineNumber": 35,
+              "lineNumber": 33,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -486,7 +472,7 @@
             {
               "title": "param",
               "description": "Log level to be set\n   on the action logs",
-              "lineNumber": 37,
+              "lineNumber": 35,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -500,7 +486,7 @@
             {
               "title": "param",
               "description": "Allow action payloads\n   to be exposed in the logs, potentially displaying sensitive information.",
-              "lineNumber": 39,
+              "lineNumber": 37,
               "type": {
                 "type": "OptionalType",
                 "expression": {
@@ -518,18 +504,18 @@
               "column": 0
             },
             "end": {
-              "line": 44,
+              "line": 42,
               "column": 3
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 45,
+                "line": 43,
                 "column": 0
               },
               "end": {
-                "line": 50,
+                "line": 47,
                 "column": 1
               }
             },
@@ -630,32 +616,8 @@
                 },
                 {
                   "title": "param",
-                  "name": "logs.enableFcsLogs",
-                  "lineNumber": 23,
-                  "description": {
-                    "type": "root",
-                    "children": [
-                      {
-                        "type": "paragraph",
-                        "children": [
-                          {
-                            "type": "text",
-                            "value": "Enable the detailed call logger\nfor v3.X. Requires log level debug."
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "type": {
-                    "type": "NameExpression",
-                    "name": "boolean"
-                  },
-                  "default": "true"
-                },
-                {
-                  "title": "param",
                   "name": "logs.logActions",
-                  "lineNumber": 25,
+                  "lineNumber": 23,
                   "description": {
                     "type": "root",
                     "children": [
@@ -688,7 +650,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.handler",
-                      "lineNumber": 27,
+                      "lineNumber": 25,
                       "description": {
                         "type": "root",
                         "children": [
@@ -714,7 +676,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.actionOnly",
-                      "lineNumber": 30,
+                      "lineNumber": 28,
                       "description": {
                         "type": "root",
                         "children": [
@@ -738,7 +700,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.collapsed",
-                      "lineNumber": 32,
+                      "lineNumber": 30,
                       "description": {
                         "type": "root",
                         "children": [
@@ -762,7 +724,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.diff",
-                      "lineNumber": 35,
+                      "lineNumber": 33,
                       "description": {
                         "type": "root",
                         "children": [
@@ -786,7 +748,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.level",
-                      "lineNumber": 37,
+                      "lineNumber": 35,
                       "description": {
                         "type": "root",
                         "children": [
@@ -810,7 +772,7 @@
                     {
                       "title": "param",
                       "name": "logs.logActions.exposePayloads",
-                      "lineNumber": 39,
+                      "lineNumber": 37,
                       "description": {
                         "type": "root",
                         "children": [
