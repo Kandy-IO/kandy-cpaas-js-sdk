@@ -11,6 +11,12 @@ Kandy.js change log.
 
 - Fixed a Call issue where, when making an outgoing call, receiving the call answer then a remote midcall operation immediately afterwards would not ensure the call is established before handling the remote operation. `KJS-1152`
 
+## 5.1.1 - 2022-08-31
+
+### Fixed
+
+- Fixed an issue introduced in v5.1.0 causing the SDK to fail to initialize.
+
 ## 5.1.0 - 2022-08-26
 
 ### Fixed
