@@ -7,6 +7,11 @@ Kandy.js change log.
 
 ## 5.3.0 - beta
 
+### Fixed
+
+- Fixed the `directory:change` event to contain the proper payload so that `Address Book & Directory` search results can be properly obtained by the application from this event. `KJS-1151`
+  - This issue was introduced in the v5.0 release.
+
 ## 5.2.0 - 2022-09-30
 
 ### Fixed

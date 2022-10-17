@@ -1,7 +1,7 @@
 /**
  * Kandy.js
  * kandy.cpaas.js
- * Version: 5.3.0-beta.944
+ * Version: 5.3.0-beta.945
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -6972,7 +6972,7 @@ exports.getVersion = getVersion;
  * for the @@ tag below with actual version value.
  */
 function getVersion() {
-  return '5.3.0-beta.944';
+  return '5.3.0-beta.945';
 }
 
 /***/ }),
@@ -63977,7 +63977,7 @@ function usersApi(container) {
         return;
       }
       // searchDirectory succeeded
-      emitEvent(_eventTypes.DIRECTORY_CHANGE, searchData);
+      emitEvent(_eventTypes.DIRECTORY_CHANGE, { results: searchData });
     }
   };
 }
