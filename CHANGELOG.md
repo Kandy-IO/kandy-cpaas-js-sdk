@@ -9,6 +9,8 @@ Kandy.js change log.
 
 ### Fixed
 
+- Fixed the `contacts.remove` API to ensure it completes executing before sending a `contacts:change` event to application level. `KJS-1150`
+  - This issue was introduced in the v5.0 release.
 - Fixed the `directory:change` event to contain the proper payload so that `Address Book & Directory` search results can be properly obtained by the application from this event. `KJS-1151`
   - This issue was introduced in the v5.0 release.
 
