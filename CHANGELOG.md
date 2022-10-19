@@ -13,6 +13,7 @@ Kandy.js change log.
   - This issue was introduced in the v5.0 release.
 - Fixed the `directory:change` event to contain the proper payload so that `Address Book & Directory` search results can be properly obtained by the application from this event. `KJS-1151`
   - This issue was introduced in the v5.0 release.
+- Fixed 'Group Chat' tutorial by using the right identifier in order to access a given chat group. This scenario occurs when receiving a 'group:invitation_received' event, informing of a newly created group and inviting a participant to join that group. `KJS-381`
 
 ## 5.2.0 - 2022-09-30
 
